@@ -1,0 +1,112 @@
+# https://hazelcast.org/documentation/
+# com\hazelcast\hazelcast\3.12.3\hazelcast-3.12.3.jar!\hazelcast-full-example.yaml
+
+hazelcast:
+  group:
+    name: turms-0.8.0-beta
+
+  network:
+    port:
+      auto-increment: true
+      port-count: 127
+      port: 5701
+    outbound-ports:
+      - 0
+    join:
+      multicast:
+        enabled: true
+        multicast-timeout-seconds: 4
+    failure-detector:
+      icmp:
+        enabled: false
+
+  executor-service:
+    default:
+      pool-size: 16
+      queue-capacity: 0
+
+  map:
+    default:
+      in-memory-format: BINARY
+      metadata-policy: CREATE_ON_UPDATE
+      backup-count: 1
+      async-backup-count: 0
+      time-to-live-seconds: 0
+      max-idle-seconds: 0
+      eviction-policy: NONE
+      max-size:
+        policy: PER_NODE
+        max-size: 0
+        merge-policy:
+          batch-size: 100
+          class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
+        cache-deserialized-values: INDEX-ONLY
+
+  event-journal:
+    map:
+      default:
+        enabled: false
+    cache:
+      default:
+        enabled: false
+
+  replicatedmap:
+    default:
+      in-memory-format: OBJECT
+      async-fillup: true
+      statistics-enabled: false
+      merge-policy:
+        batch-size: 100
+        class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
+    sharedProperties:
+      in-memory-format: OBJECT
+      async-fillup: true
+      statistics-enabled: false
+      merge-policy:
+        batch-size: 100
+        class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
+    admins:
+      in-memory-format: OBJECT
+      async-fillup: true
+      statistics-enabled: false
+      merge-policy:
+        batch-size: 100
+        class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
+    adminRoles:
+      in-memory-format: OBJECT
+      async-fillup: true
+      statistics-enabled: false
+      merge-policy:
+        batch-size: 100
+        class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
+
+  flake-id-generator:
+    default:
+      prefetch-count: 100
+      prefetch-validity-millis: 600000
+      id-offset: 0
+      node-id-offset: 0
+      statistics-enabled: false
+
+  serialization:
+    data-serializable-factories:
+      - factory-id: 1
+        class-name: im.turms.turms.config.hazelcast.IdentifiedDataFactory
+
+  services:
+    enable-defaults: true
+
+  scheduled-executor-service:
+    default:
+      capacity: 128
+      durability: 1
+      pool-size: 16
+
+#  cp-subsystem:
+#    cp-member-count: 3
+#    group-size: 3
+#    locks:
+#      lock1:
+#        lock-acquire-limit: 1
+#      lock2:
+#        lock-acquire-limit: 2

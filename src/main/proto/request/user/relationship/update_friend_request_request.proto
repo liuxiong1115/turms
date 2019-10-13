@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package im.turms.proto;
+
+option java_package = "im.turms.turms.pojo.request";
+option java_multiple_files = true;
+
+import "google/protobuf/wrappers.proto";
+import "constant/response_action.proto";
+
+message UpdateFriendRequestRequest {
+    int64 requestId = 1;
+    ResponseAction responseAction = 2;
+    google.protobuf.StringValue reason = 3;
+}

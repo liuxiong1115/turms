@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package im.turms.proto;
+
+option java_package = "im.turms.turms.pojo.dto";
+option java_multiple_files = true;
+
+import "google/protobuf/wrappers.proto";
+
+message GroupJoinQuestion {
+    google.protobuf.Int64Value id = 1;
+    google.protobuf.Int64Value group_id = 2;
+    google.protobuf.StringValue question = 3;
+    repeated google.protobuf.StringValue answers = 4;
+}
