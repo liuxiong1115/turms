@@ -63,6 +63,7 @@ public class Constants {
     public static final String PASSWORD = "password";
     public static final String ACKNOWLEDGED = "acknowledged";
     public static final String AUTHENTICATED = "authenticated";
+    public static final String STATUS = "status";
 
     public static final long ADMIN_ROLE_ROOT_ID = 0L;
     public static final String ADMIN_ROLE_ROOT_NAME = "ROOT";

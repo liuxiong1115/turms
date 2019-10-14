@@ -42,7 +42,7 @@ public class Message implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private int maxTextLimit = 500;
     @JsonView(MutablePropertiesView.class)
-    private int maxRecordsSizeBytes = 1024 * 1024;
+    private int maxRecordsSizeBytes = 15 * 1024 * 1024;
     /**
      * Whether to persist messages in databases.
      * Note: If false, senders will not get the message id after sending a message and also cannot edit a message

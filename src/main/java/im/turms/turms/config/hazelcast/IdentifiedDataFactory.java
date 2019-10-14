@@ -31,6 +31,7 @@ import im.turms.turms.property.env.*;
 
 public class IdentifiedDataFactory implements DataSerializableFactory {
     public static final int FACTORY_ID = 1;
+
     @Override
     public IdentifiedDataSerializable create(int typeId) {
         Type type = Type.values()[typeId - 1];
@@ -47,6 +48,8 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
                 return new Cache();
             case PROPERTY_CLUSTER:
                 return new Cluster();
+            case PROPERTY_DATABASE:
+                return new Database();
             case PROPERTY_GROUP:
                 return new Group();
             case PROPERTY_MESSAGE:
@@ -85,6 +88,7 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
         PROPERTIES,
         PROPERTY_CACHE,
         PROPERTY_CLUSTER,
+        PROPERTY_DATABASE,
         PROPERTY_GROUP,
         PROPERTY_MESSAGE,
         PROPERTY_MESSAGE_TYPING_STATUS,

@@ -17,9 +17,12 @@
 
 package im.turms.turms.config.mongo;
 
+import com.mongodb.WriteConcern;
 import im.turms.turms.config.mongo.convert.EnumToIntegerConverter;
 import im.turms.turms.config.mongo.convert.IntegerToEnumConverter;
 import im.turms.turms.config.mongo.convert.IntegerToEnumConverterFactory;
+import im.turms.turms.pojo.domain.*;
+import im.turms.turms.property.TurmsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;
@@ -27,6 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.WriteConcernResolver;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
@@ -38,12 +42,14 @@ import java.util.List;
 
 @Configuration
 public class MongoConfig {
+    private final TurmsProperties turmsProperties;
     private final MongoDbFactory mongoDbFactory;
     private final MongoMappingContext mongoMappingContext;
 
-    public MongoConfig(MongoDbFactory mongoDbFactory, MongoMappingContext mongoMappingContext) {
+    public MongoConfig(MongoDbFactory mongoDbFactory, MongoMappingContext mongoMappingContext, TurmsProperties turmsProperties) {
         this.mongoDbFactory = mongoDbFactory;
         this.mongoMappingContext = mongoMappingContext;
+        this.turmsProperties = turmsProperties;
     }
 
     @Bean
@@ -65,5 +71,38 @@ public class MongoConfig {
                 .addConverterFactory(new IntegerToEnumConverterFactory());
         converter.afterPropertiesSet();
         return converter;
+    }
+
+    @Bean
+    public WriteConcernResolver writeConcernResolver() {
+        return action -> {
+            Class<?> entityType = action.getEntityType();
+            if (entityType == Admin.class) return turmsProperties.getDatabase().getWriteConcern().getAdmin();
+            if (entityType == AdminActionLog.class) return turmsProperties.getDatabase().getWriteConcern().getAdminActionLog();
+            if (entityType == AdminRole.class) return turmsProperties.getDatabase().getWriteConcern().getAdminRole();
+            if (entityType == Group.class) return turmsProperties.getDatabase().getWriteConcern().getGroup();
+            if (entityType == GroupBlacklistedUser.class) return turmsProperties.getDatabase().getWriteConcern().getGroupBlacklistedUser();
+            if (entityType == GroupInvitation.class) return turmsProperties.getDatabase().getWriteConcern().getGroupInvitation();
+            if (entityType == GroupJoinQuestion.class) return turmsProperties.getDatabase().getWriteConcern().getGroupJoinQuestion();
+            if (entityType == GroupJoinRequest.class) return turmsProperties.getDatabase().getWriteConcern().getGroupJoinRequest();
+            if (entityType == GroupMember.class) return turmsProperties.getDatabase().getWriteConcern().getGroupMember();
+            if (entityType == GroupType.class) return turmsProperties.getDatabase().getWriteConcern().getGroupType();
+            if (entityType == GroupVersion.class) return turmsProperties.getDatabase().getWriteConcern().getGroupVersion();
+            if (entityType == Message.class) return turmsProperties.getDatabase().getWriteConcern().getMessage();
+            if (entityType == MessageStatus.class) return turmsProperties.getDatabase().getWriteConcern().getMessageStatus();
+            if (entityType == User.class) return turmsProperties.getDatabase().getWriteConcern().getUser();
+            if (entityType == UserFriendRequest.class) return turmsProperties.getDatabase().getWriteConcern().getUserFriendRequest();
+            if (entityType == UserLocation.class) return turmsProperties.getDatabase().getWriteConcern().getUserLocation();
+            if (entityType == UserLoginLog.class) return turmsProperties.getDatabase().getWriteConcern().getUserLoginLog();
+            if (entityType == UserMaxDailyOnlineUserNumber.class) return turmsProperties.getDatabase().getWriteConcern().getUserMaxDailyOnlineUser();
+            if (entityType == UserOnlineUserNumber.class) return turmsProperties.getDatabase().getWriteConcern().getUserOnlineUserNumber();
+            if (entityType == UserPermissionGroup.class) return turmsProperties.getDatabase().getWriteConcern().getUserPermissionGroup();
+            if (entityType == UserPermissionGroupMember.class) return turmsProperties.getDatabase().getWriteConcern().getUserPermissionGroupMember();
+            if (entityType == UserRelationship.class) return turmsProperties.getDatabase().getWriteConcern().getUserRelationship();
+            if (entityType == UserRelationshipGroup.class) return turmsProperties.getDatabase().getWriteConcern().getUserRelationshipGroup();
+            if (entityType == UserRelationshipGroupMember.class) return turmsProperties.getDatabase().getWriteConcern().getUserRelationshipGroupMember();
+            if (entityType == UserVersion.class) return turmsProperties.getDatabase().getWriteConcern().getUserVersion();
+            return WriteConcern.ACKNOWLEDGED;
+        };
     }
 }

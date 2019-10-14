@@ -23,6 +23,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 
 import java.util.Map;
 
+import static im.turms.turms.common.Constants.STATUS;
+
 @Component
 public class GlobalErrorAttributes extends DefaultErrorAttributes {
     @Override
@@ -30,17 +32,18 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
             ServerRequest request,
             boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(request, false);
-        if ((Integer) errorAttributes.get("status") == 500) {
+        if ((Integer) errorAttributes.get(STATUS) == 500) {
             Object messageObj = errorAttributes.get("message");
+            boolean isClientError;
             if (messageObj == null) {
-                errorAttributes.put("status", 404);
-                errorAttributes.remove("error");
+                isClientError = true;
             } else {
                 String message = messageObj.toString();
-                if (message.contains("WebFlux") || message.contains("cast")) {
-                    errorAttributes.put("status", 404);
-                    errorAttributes.remove("error");
-                }
+                isClientError = message.contains("WebFlux") || message.contains("cast");
+            }
+            if (isClientError) {
+                errorAttributes.put(STATUS, 404);
+                errorAttributes.remove("error");
             }
         }
         return errorAttributes;
