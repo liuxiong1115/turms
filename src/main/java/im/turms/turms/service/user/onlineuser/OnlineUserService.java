@@ -19,8 +19,6 @@ package im.turms.turms.service.user.onlineuser;
 
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.hazelcast.core.Member;
-import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
-import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
 import im.turms.turms.common.TurmsStatusCode;
@@ -38,6 +36,7 @@ import im.turms.turms.task.UserOfflineTask;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketMessage;
@@ -54,7 +53,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
@@ -93,9 +91,6 @@ public class OnlineUserService {
                     onClusterMembersChange();
                     return null;
                 });
-        IScheduledExecutorService countOnExecutorService = turmsClusterManager
-                .getHazelcastInstance()
-                .getScheduledExecutorService(COUNT_ONLINE_USER_NUMBER);
         this.mongoTemplate = mongoTemplate;
         this.userLoginLogService = userLoginLogService;
         this.onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
@@ -104,18 +99,13 @@ public class OnlineUserService {
         this.turmsTaskExecutor = turmsTaskExecutor;
     }
 
-    @PostHazelcastInitialized
-    public static Function<TurmsClusterManager, Void> initLogOnlineUserNumberExecutor() {
-        return turmsClusterManager -> {
-            // TODO: 0.9.0
-            IScheduledExecutorService executorService =
-                    turmsClusterManager
-                            .getHazelcastInstance()
-                            .getScheduledExecutorService(COUNT_ONLINE_USER_NUMBER);
-            //            executorService.scheduleAtFixedRate(named(COUNT_ONLINE_USER_NUMBER,
-            // OnlineUserService::logOnlineUserNumber);
-            return null;
-        };
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void onlineUsersNumberSaveTimer() {
+        if (turmsClusterManager.isCurrentMemberMaster()) {
+            countOnlineUsers()
+                    .flatMap(this::saveOnlineUsersNumber)
+                    .subscribe();
+        }
     }
 
     public void setAllLocalUsersOffline(@NotNull CloseStatus closeStatus) {
@@ -264,12 +254,11 @@ public class OnlineUserService {
                 TimeUnit.SECONDS);
     }
 
-    public Mono<UserOnlineUserNumber> logOnlineUsersNumber() {
-        int currentOnlineUserNumber = countLocalOnlineUsers();
+    public Mono<UserOnlineUserNumber> saveOnlineUsersNumber(@NotNull Integer onlineUsersNumber) {
         UserOnlineUserNumber userOnlineUserNumber = new UserOnlineUserNumber();
-        userOnlineUserNumber.setId(turmsClusterManager.generateRandomId());
-        userOnlineUserNumber.setNumber(currentOnlineUserNumber);
-        return mongoTemplate.insert(userOnlineUserNumber);
+        userOnlineUserNumber.setTimestamp(new Date());
+        userOnlineUserNumber.setNumber(onlineUsersNumber);
+        return mongoTemplate.save(userOnlineUserNumber);
     }
 
     private Mono<Long> logUserOnline(

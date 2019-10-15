@@ -30,9 +30,6 @@ import java.util.Date;
 @FieldNameConstants
 public class UserOnlineUserNumber {
     @Id
-    private Long id;
-
-    @Indexed
     private Date timestamp;
 
     @Indexed

@@ -123,7 +123,7 @@ public class TurmsClusterManager {
         }
     }
 
-    private boolean isCurrentMemberMaster() {
+    public boolean isCurrentMemberMaster() {
         for (Member member : hazelcastInstance.getCluster().getMembers()) {
             return member.getUuid()
                     .equals(hazelcastInstance.getCluster().getLocalMember().getUuid());
