@@ -55,7 +55,7 @@ public class Database implements IdentifiedDataSerializable {
     @NoArgsConstructor
     public static class WriteConcern {
         private com.mongodb.WriteConcern admin = com.mongodb.WriteConcern.MAJORITY;
-        private com.mongodb.WriteConcern adminActionLog = com.mongodb.WriteConcern.UNACKNOWLEDGED;
+        private com.mongodb.WriteConcern adminActionLog = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern adminRole = com.mongodb.WriteConcern.MAJORITY;
         private com.mongodb.WriteConcern group = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern groupBlacklistedUser = com.mongodb.WriteConcern.ACKNOWLEDGED;
@@ -69,8 +69,8 @@ public class Database implements IdentifiedDataSerializable {
         private com.mongodb.WriteConcern messageStatus = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern user = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userFriendRequest = com.mongodb.WriteConcern.ACKNOWLEDGED;
-        private com.mongodb.WriteConcern userLocation = com.mongodb.WriteConcern.UNACKNOWLEDGED;
-        private com.mongodb.WriteConcern userLoginLog = com.mongodb.WriteConcern.UNACKNOWLEDGED;
+        private com.mongodb.WriteConcern userLocation = com.mongodb.WriteConcern.ACKNOWLEDGED;
+        private com.mongodb.WriteConcern userLoginLog = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userMaxDailyOnlineUser = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userOnlineUserNumber = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userPermissionGroup = com.mongodb.WriteConcern.ACKNOWLEDGED;

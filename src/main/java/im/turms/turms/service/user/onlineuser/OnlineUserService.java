@@ -294,7 +294,7 @@ public class OnlineUserService {
         Mono<UserLocation> locationIdMono;
         if (userLocation != null) {
             locationIdMono = userLocationService
-                    .saveUserLocation(userId, userLocation.xFloat(), userLocation.yFloat(), new Date());
+                    .saveUserLocation(null, userId, userLocation.xFloat(), userLocation.yFloat(), new Date());
         } else {
             locationIdMono = Mono.empty();
         }

@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -24,11 +25,14 @@ public class UserLocationService {
     }
 
     public Mono<UserLocation> saveUserLocation(
+            @Nullable Long id,
             @NotNull Long userId,
             float longitude,
             float latitude,
             Date timestamp) {
-        Long id = turmsClusterManager.generateRandomId();
+        if (id == null) {
+            id = turmsClusterManager.generateRandomId();
+        }
         UserLocation location = new UserLocation();
         location.setId(id);
         location.setUserId(userId);

@@ -17,7 +17,6 @@
 
 package im.turms.turms.config.mongo;
 
-import com.mongodb.WriteConcern;
 import im.turms.turms.config.mongo.convert.EnumToIntegerConverter;
 import im.turms.turms.config.mongo.convert.IntegerToEnumConverter;
 import im.turms.turms.config.mongo.convert.IntegerToEnumConverterFactory;
@@ -30,18 +29,20 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.WriteConcernResolver;
-import org.springframework.data.mongodb.core.convert.DbRefResolver;
-import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
-import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.*;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// Reference: org/springframework/boot/autoconfigure/data/mongo/MongoReactiveDataAutoConfiguration.java
 @Configuration
 public class MongoConfig {
+    // Note: Remember changing to turmsClusterManager.getTurmsProperties() when needing to support updating
+    // config dynamically.
     private final TurmsProperties turmsProperties;
     private final MongoDbFactory mongoDbFactory;
     private final MongoMappingContext mongoMappingContext;
@@ -50,6 +51,7 @@ public class MongoConfig {
         this.mongoDbFactory = mongoDbFactory;
         this.mongoMappingContext = mongoMappingContext;
         this.turmsProperties = turmsProperties;
+        this.mongoMappingContext.setAutoIndexCreation(true);
     }
 
     @Bean
@@ -58,6 +60,16 @@ public class MongoConfig {
         converters.add(new EnumToIntegerConverter());
         converters.add(new IntegerToEnumConverter(null));
         return new CustomConversions(CustomConversions.StoreConversions.NONE, converters);
+    }
+
+    @Bean
+    public ReactiveMongoTemplate reactiveMongoTemplate(
+            ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory,
+            MongoConverter converter,
+            WriteConcernResolver writeConcernResolver) {
+        ReactiveMongoTemplate template = new ReactiveMongoTemplate(reactiveMongoDatabaseFactory, converter);
+        template.setWriteConcernResolver(writeConcernResolver);
+        return template;
     }
 
     @Bean
@@ -102,7 +114,7 @@ public class MongoConfig {
             if (entityType == UserRelationshipGroup.class) return turmsProperties.getDatabase().getWriteConcern().getUserRelationshipGroup();
             if (entityType == UserRelationshipGroupMember.class) return turmsProperties.getDatabase().getWriteConcern().getUserRelationshipGroupMember();
             if (entityType == UserVersion.class) return turmsProperties.getDatabase().getWriteConcern().getUserVersion();
-            return WriteConcern.ACKNOWLEDGED;
+            return action.getDefaultWriteConcern();
         };
     }
 }
