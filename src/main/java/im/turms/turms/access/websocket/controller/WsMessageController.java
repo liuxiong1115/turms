@@ -290,16 +290,20 @@ public class WsMessageController {
                         } else {
                             date = new Date(request.getReadDate().getValue());
                         }
-                        return messageStatusService.updateMessagesReadDate(
-                                request.getMessageId(),
-                                date);
-
+                        if (turmsClusterManager.getTurmsProperties().getMessage()
+                                .isDeletePrivateMessageAfterAcknowledged()) {
+                            return messageService.deleteMessage(request.getMessageId(), true, false);
+                        } else {
+                            return messageStatusService.updateMessagesReadDate(
+                                    request.getMessageId(),
+                                    date);
+                        }
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
                 })
-                .flatMap(updated -> {
-                    if (updated != null && updated) {
+                .flatMap(updatedOrDeleted -> {
+                    if (updatedOrDeleted != null && updatedOrDeleted) {
                         return messageService.queryMessageSenderId(request.getMessageId())
                                 .flatMap(senderId -> {
                                     RequestResult result = RequestResult.recipientData(

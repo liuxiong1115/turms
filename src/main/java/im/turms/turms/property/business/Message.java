@@ -67,6 +67,8 @@ public class Message implements IdentifiedDataSerializable {
     private boolean allowSendingMessagesToStranger = false;
     @JsonView(MutablePropertiesView.class)
     private boolean allowSendingMessagesToOneself = false;
+    @JsonView(MutablePropertiesView.class)
+    private boolean deletePrivateMessageAfterAcknowledged = false;
     /**
      * NOTE: To recall messages, more system resources are needed. So, turn it off if you don't need it.
      */
@@ -105,6 +107,7 @@ public class Message implements IdentifiedDataSerializable {
         readReceipt.writeData(out);
         out.writeBoolean(allowSendingMessagesToStranger);
         out.writeBoolean(allowSendingMessagesToOneself);
+        out.writeBoolean(deletePrivateMessageAfterAcknowledged);
         out.writeBoolean(allowRecallingMessage);
         out.writeBoolean(allowEditingMessageBySender);
         out.writeInt(allowableRecallDurationSeconds);
@@ -126,6 +129,7 @@ public class Message implements IdentifiedDataSerializable {
         readReceipt.readData(in);
         allowSendingMessagesToStranger = in.readBoolean();
         allowSendingMessagesToOneself = in.readBoolean();
+        deletePrivateMessageAfterAcknowledged = in.readBoolean();
         allowRecallingMessage = in.readBoolean();
         allowEditingMessageBySender = in.readBoolean();
         allowableRecallDurationSeconds = in.readInt();
