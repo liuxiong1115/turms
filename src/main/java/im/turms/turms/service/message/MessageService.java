@@ -74,9 +74,11 @@ public class MessageService {
     @Scheduled(cron = EXPIRY_MESSAGES_CLEANER_CRON)
     public void expiryMessagesCleaner() {
         if (turmsClusterManager.isCurrentMemberMaster()) {
-            deleteExpiryMessagesAndStatuses(turmsClusterManager.getTurmsProperties()
-                    .getMessage().getMessagesTimeToLiveHours())
-                    .subscribe();
+            int messagesTimeToLiveHours = turmsClusterManager.getTurmsProperties()
+                    .getMessage().getMessagesTimeToLiveHours();
+            if (messagesTimeToLiveHours != 0) {
+                deleteExpiryMessagesAndStatuses(messagesTimeToLiveHours).subscribe();
+            }
         }
     }
 
