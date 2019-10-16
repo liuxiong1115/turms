@@ -276,9 +276,6 @@ public class WsMessageController {
     }
 
     private Mono<RequestResult> updateMessageReadDate(TurmsRequestWrapper turmsRequestWrapper) {
-        if (!turmsClusterManager.getTurmsProperties().getMessage().getReadReceipt().isEnabled()) {
-            return Mono.just(RequestResult.status(TurmsStatusCode.DISABLE_FUNCTION));
-        }
         UpdateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateMessageRequest();
         return messageService.isMessageSentToUser(request.getMessageId(), turmsRequestWrapper.getUserId())
                 .flatMap(authenticated -> {
@@ -304,14 +301,18 @@ public class WsMessageController {
                 })
                 .flatMap(updatedOrDeleted -> {
                     if (updatedOrDeleted != null && updatedOrDeleted) {
-                        return messageService.queryMessageSenderId(request.getMessageId())
-                                .flatMap(senderId -> {
-                                    RequestResult result = RequestResult.recipientData(
-                                            senderId,
-                                            turmsRequestWrapper.getTurmsRequest(),
-                                            TurmsStatusCode.OK);
-                                    return Mono.just(result);
-                                });
+                        if (turmsClusterManager.getTurmsProperties().getMessage().getReadReceipt().isEnabled()) {
+                            return messageService.queryMessageSenderId(request.getMessageId())
+                                    .flatMap(senderId -> {
+                                        RequestResult result = RequestResult.recipientData(
+                                                senderId,
+                                                turmsRequestWrapper.getTurmsRequest(),
+                                                TurmsStatusCode.OK);
+                                        return Mono.just(result);
+                                    });
+                        } else {
+                            return Mono.just(RequestResult.ok());
+                        }
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RESOURCES_HAVE_CHANGED));
                     }
