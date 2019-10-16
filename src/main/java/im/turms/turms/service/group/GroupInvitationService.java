@@ -18,10 +18,8 @@
 package im.turms.turms.service.group;
 
 import com.google.protobuf.Int64Value;
-import com.hazelcast.cp.lock.FencedLock;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
@@ -36,7 +34,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -46,7 +44,6 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
@@ -72,26 +69,16 @@ public class GroupInvitationService {
         this.groupTypeService = groupTypeService;
     }
 
-    @PostHazelcastInitialized
-    public Function<TurmsClusterManager, Void> initGroupInvitationsCleaner() {
-        return (clusterManager -> {
-            TASK_SCHEDULER.schedule(() -> {
-                FencedLock lock = clusterManager.getHazelcastInstance().getCPSubsystem().getLock(HAZELCAST_EXPIRY_GROUP_INVITATIONS_CLEANER_LOCK);
-                if (lock.tryLock()) {
-                    try {
-                        if (clusterManager.getTurmsProperties().getGroup()
-                                .isDeleteExpiryGroupInvitations()) {
-                            removeAllExpiryGroupInvitations().subscribe();
-                        } else {
-                            updateExpiryRequestsStatus().subscribe();
-                        }
-                    } finally {
-                        lock.unlock();
-                    }
-                }
-            }, new CronTrigger(EXPIRY_GROUP_INVITATIONS_CLEANER_CRON));
-            return null;
-        });
+    @Scheduled(cron = EXPIRY_GROUP_INVITATIONS_CLEANER_CRON)
+    public void groupInvitationsCleaner() {
+        if (turmsClusterManager.isCurrentMemberMaster()) {
+            if (turmsClusterManager.getTurmsProperties().getGroup()
+                    .isDeleteExpiryGroupInvitations()) {
+                removeAllExpiryGroupInvitations().subscribe();
+            } else {
+                updateExpiryRequestsStatus().subscribe();
+            }
+        }
     }
 
     public Mono<Boolean> removeAllExpiryGroupInvitations() {

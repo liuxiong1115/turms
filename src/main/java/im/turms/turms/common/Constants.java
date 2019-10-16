@@ -56,8 +56,10 @@ public class Constants {
     public static final String HAZELCAST_EXPIRY_GROUP_JOIN_REQUESTS_CLEANER_LOCK = "gjrcl";
 
     public static final String EXPIRY_USER_FRIEND_REQUESTS_CLEANER_CRON = "0 0 2 * * ?";
-    public static final String EXPIRY_GROUP_INVITATIONS_CLEANER_CRON = "0 20 2 * * ?";
-    public static final String EXPIRY_GROUP_JOIN_REQUESTS_CLEANER_CRON = "0 40 2 * * ?";
+    public static final String EXPIRY_GROUP_INVITATIONS_CLEANER_CRON = "0 15 2 * * ?";
+    public static final String EXPIRY_GROUP_JOIN_REQUESTS_CLEANER_CRON = "0 30 2 * * ?";
+    public static final String EXPIRY_MESSAGES_CLEANER_CRON = "0 45 2 * * ?";
+    public static final String ONLINE_USERS_NUMBER_PERSISTER_CRON = "0 0/5 * * * ?";
 
     public static final String ACCOUNT = "account";
     public static final String PASSWORD = "password";

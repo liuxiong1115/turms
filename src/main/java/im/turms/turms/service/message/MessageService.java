@@ -37,6 +37,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,6 +46,8 @@ import reactor.util.function.Tuple2;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,6 +69,15 @@ public class MessageService {
         this.turmsClusterManager = turmsClusterManager;
         this.messageStatusService = messageStatusService;
         this.groupMemberService = groupMemberService;
+    }
+
+    @Scheduled(cron = EXPIRY_MESSAGES_CLEANER_CRON)
+    public void expiryMessagesCleaner() {
+        if (turmsClusterManager.isCurrentMemberMaster()) {
+            deleteExpiryMessagesAndStatuses(turmsClusterManager.getTurmsProperties()
+                    .getMessage().getMessagesTimeToLiveHours())
+                    .subscribe();
+        }
     }
 
     public Mono<Boolean> isMessageSentByUser(@NotNull Long messageId, @NotNull Long senderId) {
@@ -295,6 +307,33 @@ public class MessageService {
             @Nullable Boolean logicalDelete) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
         return executeDeleteMessage(deleteMessageStatus, query, logicalDelete);
+    }
+
+    public Flux<Long> queryExpiryMessagesIds(@NotNull Integer timeToLiveHours) {
+        Date beforeDate = Date.from(Instant.now().minus(timeToLiveHours, ChronoUnit.HOURS));
+        Query query = new Query()
+                .addCriteria(Criteria.where(Message.Fields.deliveryDate).lt(beforeDate));
+        query.fields().include(ID);
+        return mongoTemplate.find(query, Message.class)
+                .map(Message::getId);
+    }
+
+    public Mono<Boolean> deleteExpiryMessagesAndStatuses(@NotNull Integer timeToLiveHours) {
+        return queryExpiryMessagesIds(timeToLiveHours)
+                .collectList()
+                .flatMap(messagesIds -> {
+                    if (messagesIds.isEmpty()) {
+                        return Mono.just(true);
+                    } else {
+                        Query messagesQuery = new Query().addCriteria(Criteria.where(ID).in(messagesIds));
+                        Query messagesStatusesQuery = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds));
+                        return mongoTemplate.inTransaction().execute(operations -> Mono.zip(
+                                operations.remove(messagesQuery, Message.class),
+                                operations.remove(messagesStatusesQuery, MessageStatus.class))
+                                .thenReturn(true))
+                                .single();
+                    }
+                });
     }
 
     public Mono<Boolean> deleteMessages(

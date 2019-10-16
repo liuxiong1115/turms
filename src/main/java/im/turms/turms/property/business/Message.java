@@ -61,6 +61,8 @@ public class Message implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private boolean messageStatusPersistent = true;
     @JsonView(MutablePropertiesView.class)
+    private int messagesTimeToLiveHours = 0;
+    @JsonView(MutablePropertiesView.class)
     private boolean logicallyDeleteMessageByDefault = true;
     private ReadReceipt readReceipt = new ReadReceipt();
     @JsonView(MutablePropertiesView.class)
@@ -103,6 +105,7 @@ public class Message implements IdentifiedDataSerializable {
         out.writeBoolean(messagePersistent);
         out.writeBoolean(recordsPersistent);
         out.writeBoolean(messageStatusPersistent);
+        out.writeInt(messagesTimeToLiveHours);
         out.writeBoolean(logicallyDeleteMessageByDefault);
         readReceipt.writeData(out);
         out.writeBoolean(allowSendingMessagesToStranger);
@@ -125,6 +128,7 @@ public class Message implements IdentifiedDataSerializable {
         messagePersistent = in.readBoolean();
         recordsPersistent = in.readBoolean();
         messageStatusPersistent = in.readBoolean();
+        messagesTimeToLiveHours = in.readInt();
         logicallyDeleteMessageByDefault = in.readBoolean();
         readReceipt.readData(in);
         allowSendingMessagesToStranger = in.readBoolean();

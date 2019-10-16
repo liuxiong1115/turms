@@ -57,8 +57,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
-import static im.turms.turms.common.Constants.ALL_DEVICE_TYPES;
-import static im.turms.turms.common.Constants.OFFLINE_USER_ONLINE_INFO;
+import static im.turms.turms.common.Constants.*;
 
 @Service
 public class OnlineUserService {
@@ -100,8 +99,8 @@ public class OnlineUserService {
         this.turmsTaskExecutor = turmsTaskExecutor;
     }
 
-    @Scheduled(cron = "0 0/5 * * * ?")
-    public void onlineUsersNumberSaveTimer() {
+    @Scheduled(cron = ONLINE_USERS_NUMBER_PERSISTER_CRON)
+    public void onlineUsersNumberPersister() {
         if (turmsClusterManager.isCurrentMemberMaster()) {
             countOnlineUsers()
                     .flatMap(this::saveOnlineUsersNumber)

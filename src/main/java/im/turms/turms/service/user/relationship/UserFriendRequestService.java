@@ -1,10 +1,8 @@
 package im.turms.turms.service.user.relationship;
 
 import com.google.protobuf.Int64Value;
-import com.hazelcast.cp.lock.FencedLock;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
@@ -21,7 +19,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -30,7 +28,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.function.Function;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -49,27 +46,16 @@ public class UserFriendRequestService {
         this.userRelationshipService = userRelationshipService;
     }
 
-    @PostHazelcastInitialized
-    public Function<TurmsClusterManager, Void> initUserFriendRequestsCleaner() {
-        return (clusterManager -> {
-            TASK_SCHEDULER.schedule(() -> {
-                FencedLock lock = clusterManager.getHazelcastInstance().getCPSubsystem()
-                        .getLock(HAZELCAST_EXPIRY_USER_FRIEND_REQUESTS_CLEANER_LOCK);
-                if (lock.tryLock()) {
-                    try {
-                        if (clusterManager.getTurmsProperties().getUser()
-                                .getFriendRequest().isDeleteExpiryRequests()) {
-                            removeAllExpiryFriendRequests().subscribe();
-                        } else {
-                            updateExpiryRequestsStatus().subscribe();
-                        }
-                    } finally {
-                        lock.unlock();
-                    }
-                }
-            }, new CronTrigger(EXPIRY_USER_FRIEND_REQUESTS_CLEANER_CRON));
-            return null;
-        });
+    @Scheduled(cron = EXPIRY_USER_FRIEND_REQUESTS_CLEANER_CRON)
+    public void userFriendRequestsCleaner() {
+        if (turmsClusterManager.isCurrentMemberMaster()) {
+            if (turmsClusterManager.getTurmsProperties().getUser()
+                    .getFriendRequest().isDeleteExpiryRequests()) {
+                removeAllExpiryFriendRequests().subscribe();
+            } else {
+                updateExpiryRequestsStatus().subscribe();
+            }
+        }
     }
 
     public Mono<Boolean> removeAllExpiryFriendRequests() {
