@@ -136,7 +136,7 @@ public enum DeviceType
 
   private final int value;
 
-  DeviceType(int value) {
+  private DeviceType(int value) {
     this.value = value;
   }
 

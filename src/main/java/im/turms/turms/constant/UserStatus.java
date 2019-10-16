@@ -145,7 +145,7 @@ public enum UserStatus
 
   private final int value;
 
-  UserStatus(int value) {
+  private UserStatus(int value) {
     this.value = value;
   }
 

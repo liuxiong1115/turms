@@ -312,7 +312,8 @@ private static final long serialVersionUID = 0L;
       if (!getTimestamp()
           .equals(other.getTimestamp())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -644,7 +645,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setLatitude(float value) {
-
+      
       latitude_ = value;
       onChanged();
       return this;
@@ -654,7 +655,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearLatitude() {
-
+      
       latitude_ = 0F;
       onChanged();
       return this;
@@ -674,7 +675,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setLongitude(float value) {
-
+      
       longitude_ = value;
       onChanged();
       return this;
@@ -684,7 +685,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearLongitude() {
-
+      
       longitude_ = 0F;
       onChanged();
       return this;
@@ -777,7 +778,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue name = 3;</code>
      */
     public com.google.protobuf.StringValue.Builder getNameBuilder() {
-
+      
       onChanged();
       return getNameFieldBuilder().getBuilder();
     }
@@ -796,7 +797,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue name = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getNameFieldBuilder() {
       if (nameBuilder_ == null) {
         nameBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -896,7 +897,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue address = 4;</code>
      */
     public com.google.protobuf.StringValue.Builder getAddressBuilder() {
-
+      
       onChanged();
       return getAddressFieldBuilder().getBuilder();
     }
@@ -915,7 +916,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue address = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getAddressFieldBuilder() {
       if (addressBuilder_ == null) {
         addressBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1015,7 +1016,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value timestamp = 5;</code>
      */
     public com.google.protobuf.Int64Value.Builder getTimestampBuilder() {
-
+      
       onChanged();
       return getTimestampFieldBuilder().getBuilder();
     }
@@ -1034,7 +1035,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value timestamp = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getTimestampFieldBuilder() {
       if (timestampBuilder_ == null) {
         timestampBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

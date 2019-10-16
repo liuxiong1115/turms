@@ -166,7 +166,8 @@ private static final long serialVersionUID = 0L;
         != other.getGroupId()) return false;
     if (getBlacklistedUserId()
         != other.getBlacklistedUserId()) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -444,7 +445,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setGroupId(long value) {
-
+      
       groupId_ = value;
       onChanged();
       return this;
@@ -454,7 +455,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearGroupId() {
-
+      
       groupId_ = 0L;
       onChanged();
       return this;
@@ -474,7 +475,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setBlacklistedUserId(long value) {
-
+      
       blacklistedUserId_ = value;
       onChanged();
       return this;
@@ -484,7 +485,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearBlacklistedUserId() {
-
+      
       blacklistedUserId_ = 0L;
       onChanged();
       return this;

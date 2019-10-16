@@ -943,5 +943,5 @@ public interface TurmsRequestOrBuilder extends
    */
   im.turms.turms.pojo.request.UpdateGroupMemberRequestOrBuilder getUpdateGroupMemberRequestOrBuilder();
 
-  im.turms.turms.pojo.request.TurmsRequest.KindCase getKindCase();
+  public im.turms.turms.pojo.request.TurmsRequest.KindCase getKindCase();
 }

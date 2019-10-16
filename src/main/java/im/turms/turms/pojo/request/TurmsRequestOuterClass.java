@@ -16,7 +16,7 @@ public final class TurmsRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_TurmsRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_TurmsRequest_fieldAccessorTable;
 
@@ -62,7 +62,7 @@ public final class TurmsRequestOuterClass {
       "tionship/update_relationship_request.pro" +
       "to\032(request/group/create_group_request.p" +
       "roto\032(request/group/delete_group_request" +
-              ".proto\032'request/group/query_group_reques" +
+      ".proto\032\'request/group/query_group_reques" +
       "t.proto\0323request/group/query_joined_grou" +
       "ps_ids_request.proto\0325request/group/quer" +
       "y_joined_groups_infos_request.proto\032(req" +
@@ -125,7 +125,7 @@ public final class TurmsRequestOuterClass {
       "H\000\022`\n$query_user_group_invitations_reque" +
       "st\030d \001(\01320.im.turms.proto.QueryUserGroup" +
       "InvitationsRequestH\000\022M\n\032query_user_profi" +
-              "le_request\030e \001(\0132'.im.turms.proto.QueryU" +
+      "le_request\030e \001(\0132\'.im.turms.proto.QueryU" +
       "serProfileRequestH\000\022T\n\036query_users_ids_n" +
       "earby_request\030f \001(\0132*.im.turms.proto.Que" +
       "ryUsersIdsNearbyRequestH\000\022X\n query_users" +

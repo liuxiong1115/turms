@@ -127,7 +127,7 @@ public enum MessageDeliveryStatus
 
   private final int value;
 
-  MessageDeliveryStatus(int value) {
+  private MessageDeliveryStatus(int value) {
     this.value = value;
   }
 

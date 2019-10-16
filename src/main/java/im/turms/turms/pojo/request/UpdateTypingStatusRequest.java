@@ -176,7 +176,8 @@ private static final long serialVersionUID = 0L;
     if (chatType_ != other.chatType_) return false;
     if (getToId()
         != other.getToId()) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -475,7 +476,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       chatType_ = value.getNumber();
       onChanged();
       return this;
@@ -485,7 +486,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearChatType() {
-
+      
       chatType_ = 0;
       onChanged();
       return this;
@@ -505,7 +506,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setToId(long value) {
-
+      
       toId_ = value;
       onChanged();
       return this;
@@ -515,7 +516,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearToId() {
-
+      
       toId_ = 0L;
       onChanged();
       return this;

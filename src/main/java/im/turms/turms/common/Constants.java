@@ -87,5 +87,5 @@ public class Constants {
      * the source code in at compile time.
      * So, DO NOT remove "static final"
      */
-    public static final boolean DEV_MODE = false;
+    public static final boolean DEV_MODE = true;
 }

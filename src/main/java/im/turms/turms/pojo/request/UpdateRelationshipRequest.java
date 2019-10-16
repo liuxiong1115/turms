@@ -286,7 +286,8 @@ private static final long serialVersionUID = 0L;
       if (!getDeleteGroupIndex()
           .equals(other.getDeleteGroupIndex())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -609,7 +610,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setRelatedUserId(long value) {
-
+      
       relatedUserId_ = value;
       onChanged();
       return this;
@@ -619,7 +620,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearRelatedUserId() {
-
+      
       relatedUserId_ = 0L;
       onChanged();
       return this;
@@ -712,7 +713,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BoolValue blocked = 2;</code>
      */
     public com.google.protobuf.BoolValue.Builder getBlockedBuilder() {
-
+      
       onChanged();
       return getBlockedFieldBuilder().getBuilder();
     }
@@ -731,7 +732,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BoolValue blocked = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
         getBlockedFieldBuilder() {
       if (blockedBuilder_ == null) {
         blockedBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -831,7 +832,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value new_group_index = 3;</code>
      */
     public com.google.protobuf.Int32Value.Builder getNewGroupIndexBuilder() {
-
+      
       onChanged();
       return getNewGroupIndexFieldBuilder().getBuilder();
     }
@@ -850,7 +851,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value new_group_index = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getNewGroupIndexFieldBuilder() {
       if (newGroupIndexBuilder_ == null) {
         newGroupIndexBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -950,7 +951,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value delete_group_index = 4;</code>
      */
     public com.google.protobuf.Int32Value.Builder getDeleteGroupIndexBuilder() {
-
+      
       onChanged();
       return getDeleteGroupIndexFieldBuilder().getBuilder();
     }
@@ -969,7 +970,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value delete_group_index = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getDeleteGroupIndexFieldBuilder() {
       if (deleteGroupIndexBuilder_ == null) {
         deleteGroupIndexBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

@@ -118,7 +118,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
    */
-  public java.util.List<? extends im.turms.turms.pojo.dto.GroupJoinRequestOrBuilder>
+  public java.util.List<? extends im.turms.turms.pojo.dto.GroupJoinRequestOrBuilder> 
       getGroupJoinRequestsOrBuilderList() {
     return groupJoinRequests_;
   }
@@ -224,7 +224,8 @@ private static final long serialVersionUID = 0L;
       if (!getLastUpdatedDate()
           .equals(other.getLastUpdatedDate())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -495,7 +496,7 @@ private static final long serialVersionUID = 0L;
             groupJoinRequestsBuilder_ = null;
             groupJoinRequests_ = other.groupJoinRequests_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            groupJoinRequestsBuilder_ =
+            groupJoinRequestsBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getGroupJoinRequestsFieldBuilder() : null;
           } else {
@@ -731,7 +732,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
-    public java.util.List<? extends im.turms.turms.pojo.dto.GroupJoinRequestOrBuilder>
+    public java.util.List<? extends im.turms.turms.pojo.dto.GroupJoinRequestOrBuilder> 
          getGroupJoinRequestsOrBuilderList() {
       if (groupJoinRequestsBuilder_ != null) {
         return groupJoinRequestsBuilder_.getMessageOrBuilderList();
@@ -757,12 +758,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
-    public java.util.List<im.turms.turms.pojo.dto.GroupJoinRequest.Builder>
+    public java.util.List<im.turms.turms.pojo.dto.GroupJoinRequest.Builder> 
          getGroupJoinRequestsBuilderList() {
       return getGroupJoinRequestsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        im.turms.turms.pojo.dto.GroupJoinRequest, im.turms.turms.pojo.dto.GroupJoinRequest.Builder, im.turms.turms.pojo.dto.GroupJoinRequestOrBuilder>
+        im.turms.turms.pojo.dto.GroupJoinRequest, im.turms.turms.pojo.dto.GroupJoinRequest.Builder, im.turms.turms.pojo.dto.GroupJoinRequestOrBuilder> 
         getGroupJoinRequestsFieldBuilder() {
       if (groupJoinRequestsBuilder_ == null) {
         groupJoinRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
@@ -863,7 +864,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getLastUpdatedDateBuilder() {
-
+      
       onChanged();
       return getLastUpdatedDateFieldBuilder().getBuilder();
     }
@@ -882,7 +883,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getLastUpdatedDateFieldBuilder() {
       if (lastUpdatedDateBuilder_ == null) {
         lastUpdatedDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

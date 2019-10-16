@@ -25,6 +25,8 @@ import im.turms.turms.common.ReactorUtil;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import javax.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -40,8 +42,13 @@ public class TurmsTaskExecutor {
         executor = this.turmsClusterManager.getExecutor();
     }
 
-    public <T> Flux<T> callAll(Callable<T> task) {
+    public <T> Flux<T> callAll(@NotNull Callable<T> task) {
         Map<Member, Future<T>> futureMap = executor.submitToAllMembers(task);
         return ReactorUtil.futures2Flux(futureMap.values());
+    }
+
+    public <T> Flux<T> callAll(@NotNull Callable<T> task, @NotNull Duration duration) {
+        Map<Member, Future<T>> futureMap = executor.submitToAllMembers(task);
+        return ReactorUtil.futures2Flux(futureMap.values()).timeout(duration);
     }
 }

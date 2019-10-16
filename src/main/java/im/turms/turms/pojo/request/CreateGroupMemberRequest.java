@@ -16,6 +16,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private CreateGroupMemberRequest() {
+    role_ = 0;
   }
 
   @java.lang.Override
@@ -59,6 +60,25 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 26: {
+            com.google.protobuf.StringValue.Builder subBuilder = null;
+            if (name_ != null) {
+              subBuilder = name_.toBuilder();
+            }
+            name_ = input.readMessage(com.google.protobuf.StringValue.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(name_);
+              name_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
+          case 32: {
+            int rawValue = input.readEnum();
+
+            role_ = rawValue;
+            break;
+          }
+          case 42: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (muteEndDate_ != null) {
               subBuilder = muteEndDate_.toBuilder();
@@ -123,24 +143,66 @@ private static final long serialVersionUID = 0L;
     return userId_;
   }
 
-  public static final int MUTE_END_DATE_FIELD_NUMBER = 3;
+  public static final int NAME_FIELD_NUMBER = 3;
+  private com.google.protobuf.StringValue name_;
+  /**
+   * <code>.google.protobuf.StringValue name = 3;</code>
+   * @return Whether the name field is set.
+   */
+  public boolean hasName() {
+    return name_ != null;
+  }
+  /**
+   * <code>.google.protobuf.StringValue name = 3;</code>
+   * @return The name.
+   */
+  public com.google.protobuf.StringValue getName() {
+    return name_ == null ? com.google.protobuf.StringValue.getDefaultInstance() : name_;
+  }
+  /**
+   * <code>.google.protobuf.StringValue name = 3;</code>
+   */
+  public com.google.protobuf.StringValueOrBuilder getNameOrBuilder() {
+    return getName();
+  }
+
+  public static final int ROLE_FIELD_NUMBER = 4;
+  private int role_;
+  /**
+   * <code>.im.turms.proto.GroupMemberRole role = 4;</code>
+   * @return The enum numeric value on the wire for role.
+   */
+  public int getRoleValue() {
+    return role_;
+  }
+  /**
+   * <code>.im.turms.proto.GroupMemberRole role = 4;</code>
+   * @return The role.
+   */
+  public im.turms.turms.constant.GroupMemberRole getRole() {
+    @SuppressWarnings("deprecation")
+    im.turms.turms.constant.GroupMemberRole result = im.turms.turms.constant.GroupMemberRole.valueOf(role_);
+    return result == null ? im.turms.turms.constant.GroupMemberRole.UNRECOGNIZED : result;
+  }
+
+  public static final int MUTE_END_DATE_FIELD_NUMBER = 5;
   private com.google.protobuf.Int64Value muteEndDate_;
   /**
-   * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+   * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
    * @return Whether the muteEndDate field is set.
    */
   public boolean hasMuteEndDate() {
     return muteEndDate_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+   * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
    * @return The muteEndDate.
    */
   public com.google.protobuf.Int64Value getMuteEndDate() {
     return muteEndDate_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : muteEndDate_;
   }
   /**
-   * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+   * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getMuteEndDateOrBuilder() {
     return getMuteEndDate();
@@ -166,8 +228,14 @@ private static final long serialVersionUID = 0L;
     if (userId_ != 0L) {
       output.writeInt64(2, userId_);
     }
+    if (name_ != null) {
+      output.writeMessage(3, getName());
+    }
+    if (role_ != im.turms.turms.constant.GroupMemberRole.OWNER.getNumber()) {
+      output.writeEnum(4, role_);
+    }
     if (muteEndDate_ != null) {
-      output.writeMessage(3, getMuteEndDate());
+      output.writeMessage(5, getMuteEndDate());
     }
     unknownFields.writeTo(output);
   }
@@ -186,9 +254,17 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(2, userId_);
     }
+    if (name_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, getName());
+    }
+    if (role_ != im.turms.turms.constant.GroupMemberRole.OWNER.getNumber()) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeEnumSize(4, role_);
+    }
     if (muteEndDate_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, getMuteEndDate());
+        .computeMessageSize(5, getMuteEndDate());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -209,12 +285,19 @@ private static final long serialVersionUID = 0L;
         != other.getGroupId()) return false;
     if (getUserId()
         != other.getUserId()) return false;
+    if (hasName() != other.hasName()) return false;
+    if (hasName()) {
+      if (!getName()
+          .equals(other.getName())) return false;
+    }
+    if (role_ != other.role_) return false;
     if (hasMuteEndDate() != other.hasMuteEndDate()) return false;
     if (hasMuteEndDate()) {
       if (!getMuteEndDate()
           .equals(other.getMuteEndDate())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -230,6 +313,12 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + USER_ID_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getUserId());
+    if (hasName()) {
+      hash = (37 * hash) + NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getName().hashCode();
+    }
+    hash = (37 * hash) + ROLE_FIELD_NUMBER;
+    hash = (53 * hash) + role_;
     if (hasMuteEndDate()) {
       hash = (37 * hash) + MUTE_END_DATE_FIELD_NUMBER;
       hash = (53 * hash) + getMuteEndDate().hashCode();
@@ -371,6 +460,14 @@ private static final long serialVersionUID = 0L;
 
       userId_ = 0L;
 
+      if (nameBuilder_ == null) {
+        name_ = null;
+      } else {
+        name_ = null;
+        nameBuilder_ = null;
+      }
+      role_ = 0;
+
       if (muteEndDateBuilder_ == null) {
         muteEndDate_ = null;
       } else {
@@ -405,6 +502,12 @@ private static final long serialVersionUID = 0L;
       im.turms.turms.pojo.request.CreateGroupMemberRequest result = new im.turms.turms.pojo.request.CreateGroupMemberRequest(this);
       result.groupId_ = groupId_;
       result.userId_ = userId_;
+      if (nameBuilder_ == null) {
+        result.name_ = name_;
+      } else {
+        result.name_ = nameBuilder_.build();
+      }
+      result.role_ = role_;
       if (muteEndDateBuilder_ == null) {
         result.muteEndDate_ = muteEndDate_;
       } else {
@@ -464,6 +567,12 @@ private static final long serialVersionUID = 0L;
       if (other.getUserId() != 0L) {
         setUserId(other.getUserId());
       }
+      if (other.hasName()) {
+        mergeName(other.getName());
+      }
+      if (other.role_ != 0) {
+        setRoleValue(other.getRoleValue());
+      }
       if (other.hasMuteEndDate()) {
         mergeMuteEndDate(other.getMuteEndDate());
       }
@@ -510,7 +619,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setGroupId(long value) {
-
+      
       groupId_ = value;
       onChanged();
       return this;
@@ -520,7 +629,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearGroupId() {
-
+      
       groupId_ = 0L;
       onChanged();
       return this;
@@ -540,7 +649,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setUserId(long value) {
-
+      
       userId_ = value;
       onChanged();
       return this;
@@ -550,8 +659,179 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearUserId() {
-
+      
       userId_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private com.google.protobuf.StringValue name_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> nameBuilder_;
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     * @return Whether the name field is set.
+     */
+    public boolean hasName() {
+      return nameBuilder_ != null || name_ != null;
+    }
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     * @return The name.
+     */
+    public com.google.protobuf.StringValue getName() {
+      if (nameBuilder_ == null) {
+        return name_ == null ? com.google.protobuf.StringValue.getDefaultInstance() : name_;
+      } else {
+        return nameBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     */
+    public Builder setName(com.google.protobuf.StringValue value) {
+      if (nameBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        name_ = value;
+        onChanged();
+      } else {
+        nameBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     */
+    public Builder setName(
+        com.google.protobuf.StringValue.Builder builderForValue) {
+      if (nameBuilder_ == null) {
+        name_ = builderForValue.build();
+        onChanged();
+      } else {
+        nameBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     */
+    public Builder mergeName(com.google.protobuf.StringValue value) {
+      if (nameBuilder_ == null) {
+        if (name_ != null) {
+          name_ =
+            com.google.protobuf.StringValue.newBuilder(name_).mergeFrom(value).buildPartial();
+        } else {
+          name_ = value;
+        }
+        onChanged();
+      } else {
+        nameBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     */
+    public Builder clearName() {
+      if (nameBuilder_ == null) {
+        name_ = null;
+        onChanged();
+      } else {
+        name_ = null;
+        nameBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     */
+    public com.google.protobuf.StringValue.Builder getNameBuilder() {
+      
+      onChanged();
+      return getNameFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     */
+    public com.google.protobuf.StringValueOrBuilder getNameOrBuilder() {
+      if (nameBuilder_ != null) {
+        return nameBuilder_.getMessageOrBuilder();
+      } else {
+        return name_ == null ?
+            com.google.protobuf.StringValue.getDefaultInstance() : name_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.StringValue name = 3;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
+        getNameFieldBuilder() {
+      if (nameBuilder_ == null) {
+        nameBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>(
+                getName(),
+                getParentForChildren(),
+                isClean());
+        name_ = null;
+      }
+      return nameBuilder_;
+    }
+
+    private int role_ = 0;
+    /**
+     * <code>.im.turms.proto.GroupMemberRole role = 4;</code>
+     * @return The enum numeric value on the wire for role.
+     */
+    public int getRoleValue() {
+      return role_;
+    }
+    /**
+     * <code>.im.turms.proto.GroupMemberRole role = 4;</code>
+     * @param value The enum numeric value on the wire for role to set.
+     * @return This builder for chaining.
+     */
+    public Builder setRoleValue(int value) {
+      role_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.im.turms.proto.GroupMemberRole role = 4;</code>
+     * @return The role.
+     */
+    public im.turms.turms.constant.GroupMemberRole getRole() {
+      @SuppressWarnings("deprecation")
+      im.turms.turms.constant.GroupMemberRole result = im.turms.turms.constant.GroupMemberRole.valueOf(role_);
+      return result == null ? im.turms.turms.constant.GroupMemberRole.UNRECOGNIZED : result;
+    }
+    /**
+     * <code>.im.turms.proto.GroupMemberRole role = 4;</code>
+     * @param value The role to set.
+     * @return This builder for chaining.
+     */
+    public Builder setRole(im.turms.turms.constant.GroupMemberRole value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      
+      role_ = value.getNumber();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.im.turms.proto.GroupMemberRole role = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearRole() {
+      
+      role_ = 0;
       onChanged();
       return this;
     }
@@ -560,14 +840,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> muteEndDateBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      * @return Whether the muteEndDate field is set.
      */
     public boolean hasMuteEndDate() {
       return muteEndDateBuilder_ != null || muteEndDate_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      * @return The muteEndDate.
      */
     public com.google.protobuf.Int64Value getMuteEndDate() {
@@ -578,7 +858,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      */
     public Builder setMuteEndDate(com.google.protobuf.Int64Value value) {
       if (muteEndDateBuilder_ == null) {
@@ -594,7 +874,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      */
     public Builder setMuteEndDate(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -608,7 +888,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      */
     public Builder mergeMuteEndDate(com.google.protobuf.Int64Value value) {
       if (muteEndDateBuilder_ == null) {
@@ -626,7 +906,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      */
     public Builder clearMuteEndDate() {
       if (muteEndDateBuilder_ == null) {
@@ -640,15 +920,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      */
     public com.google.protobuf.Int64Value.Builder getMuteEndDateBuilder() {
-
+      
       onChanged();
       return getMuteEndDateFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getMuteEndDateOrBuilder() {
       if (muteEndDateBuilder_ != null) {
@@ -659,10 +939,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 3;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getMuteEndDateFieldBuilder() {
       if (muteEndDateBuilder_ == null) {
         muteEndDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

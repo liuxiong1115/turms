@@ -301,7 +301,7 @@ private static final long serialVersionUID = 0L;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs =
+        com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         url_ = s;
@@ -316,7 +316,7 @@ private static final long serialVersionUID = 0L;
         getUrlBytes() {
       java.lang.Object ref = url_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         url_ = b;
@@ -477,7 +477,8 @@ private static final long serialVersionUID = 0L;
         if (!getFileSize()
             .equals(other.getFileSize())) return false;
       }
-      return unknownFields.equals(other.unknownFields);
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -811,7 +812,7 @@ private static final long serialVersionUID = 0L;
           getUrlBytes() {
         java.lang.Object ref = url_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
+          com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           url_ = b;
@@ -830,7 +831,7 @@ private static final long serialVersionUID = 0L;
         if (value == null) {
     throw new NullPointerException();
   }
-
+  
         url_ = value;
         onChanged();
         return this;
@@ -840,7 +841,7 @@ private static final long serialVersionUID = 0L;
        * @return This builder for chaining.
        */
       public Builder clearUrl() {
-
+        
         url_ = getDefaultInstance().getUrl();
         onChanged();
         return this;
@@ -856,7 +857,7 @@ private static final long serialVersionUID = 0L;
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-
+        
         url_ = value;
         onChanged();
         return this;
@@ -949,7 +950,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.BoolValue original = 2;</code>
        */
       public com.google.protobuf.BoolValue.Builder getOriginalBuilder() {
-
+        
         onChanged();
         return getOriginalFieldBuilder().getBuilder();
       }
@@ -968,7 +969,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.BoolValue original = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>
+          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
           getOriginalFieldBuilder() {
         if (originalBuilder_ == null) {
           originalBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1068,7 +1069,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.Int32Value image_size = 3;</code>
        */
       public com.google.protobuf.Int32Value.Builder getImageSizeBuilder() {
-
+        
         onChanged();
         return getImageSizeFieldBuilder().getBuilder();
       }
@@ -1087,7 +1088,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.Int32Value image_size = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+          com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
           getImageSizeFieldBuilder() {
         if (imageSizeBuilder_ == null) {
           imageSizeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1187,7 +1188,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.Int32Value file_size = 4;</code>
        */
       public com.google.protobuf.Int32Value.Builder getFileSizeBuilder() {
-
+        
         onChanged();
         return getFileSizeFieldBuilder().getBuilder();
       }
@@ -1206,7 +1207,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.Int32Value file_size = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+          com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
           getFileSizeFieldBuilder() {
         if (fileSizeBuilder_ == null) {
           fileSizeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1379,7 +1380,8 @@ private static final long serialVersionUID = 0L;
       if (!getData()
           .equals(other.getData())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -1748,7 +1750,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
     public im.turms.turms.pojo.dto.ImageFile.Description.Builder getDescriptionBuilder() {
-
+      
       onChanged();
       return getDescriptionFieldBuilder().getBuilder();
     }
@@ -1767,7 +1769,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.dto.ImageFile.Description, im.turms.turms.pojo.dto.ImageFile.Description.Builder, im.turms.turms.pojo.dto.ImageFile.DescriptionOrBuilder>
+        im.turms.turms.pojo.dto.ImageFile.Description, im.turms.turms.pojo.dto.ImageFile.Description.Builder, im.turms.turms.pojo.dto.ImageFile.DescriptionOrBuilder> 
         getDescriptionFieldBuilder() {
       if (descriptionBuilder_ == null) {
         descriptionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1867,7 +1869,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BytesValue data = 2;</code>
      */
     public com.google.protobuf.BytesValue.Builder getDataBuilder() {
-
+      
       onChanged();
       return getDataFieldBuilder().getBuilder();
     }
@@ -1886,7 +1888,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BytesValue data = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder>
+        com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder> 
         getDataFieldBuilder() {
       if (dataBuilder_ == null) {
         dataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

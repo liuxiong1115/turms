@@ -105,7 +105,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <code>repeated .im.turms.proto.UserStatusDetail user_statuses = 1;</code>
    */
-  public java.util.List<? extends im.turms.turms.pojo.dto.UserStatusDetailOrBuilder>
+  public java.util.List<? extends im.turms.turms.pojo.dto.UserStatusDetailOrBuilder> 
       getUserStatusesOrBuilderList() {
     return userStatuses_;
   }
@@ -176,7 +176,8 @@ private static final long serialVersionUID = 0L;
 
     if (!getUserStatusesList()
         .equals(other.getUserStatusesList())) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -432,7 +433,7 @@ private static final long serialVersionUID = 0L;
             userStatusesBuilder_ = null;
             userStatuses_ = other.userStatuses_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            userStatusesBuilder_ =
+            userStatusesBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getUserStatusesFieldBuilder() : null;
           } else {
@@ -665,7 +666,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.UserStatusDetail user_statuses = 1;</code>
      */
-    public java.util.List<? extends im.turms.turms.pojo.dto.UserStatusDetailOrBuilder>
+    public java.util.List<? extends im.turms.turms.pojo.dto.UserStatusDetailOrBuilder> 
          getUserStatusesOrBuilderList() {
       if (userStatusesBuilder_ != null) {
         return userStatusesBuilder_.getMessageOrBuilderList();
@@ -691,12 +692,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.UserStatusDetail user_statuses = 1;</code>
      */
-    public java.util.List<im.turms.turms.pojo.dto.UserStatusDetail.Builder>
+    public java.util.List<im.turms.turms.pojo.dto.UserStatusDetail.Builder> 
          getUserStatusesBuilderList() {
       return getUserStatusesFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        im.turms.turms.pojo.dto.UserStatusDetail, im.turms.turms.pojo.dto.UserStatusDetail.Builder, im.turms.turms.pojo.dto.UserStatusDetailOrBuilder>
+        im.turms.turms.pojo.dto.UserStatusDetail, im.turms.turms.pojo.dto.UserStatusDetail.Builder, im.turms.turms.pojo.dto.UserStatusDetailOrBuilder> 
         getUserStatusesFieldBuilder() {
       if (userStatusesBuilder_ == null) {
         userStatusesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<

@@ -142,7 +142,8 @@ private static final long serialVersionUID = 0L;
 
     if (getQuestionId()
         != other.getQuestionId()) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -411,7 +412,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setQuestionId(long value) {
-
+      
       questionId_ = value;
       onChanged();
       return this;
@@ -421,7 +422,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearQuestionId() {
-
+      
       questionId_ = 0L;
       onChanged();
       return this;

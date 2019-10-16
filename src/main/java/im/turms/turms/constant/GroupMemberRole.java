@@ -127,7 +127,7 @@ public enum GroupMemberRole
 
   private final int value;
 
-  GroupMemberRole(int value) {
+  private GroupMemberRole(int value) {
     this.value = value;
   }
 

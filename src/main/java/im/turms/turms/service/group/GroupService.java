@@ -105,6 +105,8 @@ public class GroupService {
                                 group.getId(),
                                 creatorId,
                                 GroupMemberRole.OWNER,
+                                null,
+                                null,
                                 operations))
                         .flatMap(results -> groupVersionService.upsert(groupId)
                                 .thenReturn(results.getT1())))

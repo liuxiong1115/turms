@@ -339,7 +339,8 @@ private static final long serialVersionUID = 0L;
       if (!getLastUpdatedDate()
           .equals(other.getLastUpdatedDate())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -828,7 +829,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BoolValue is_blocked = 2;</code>
      */
     public com.google.protobuf.BoolValue.Builder getIsBlockedBuilder() {
-
+      
       onChanged();
       return getIsBlockedFieldBuilder().getBuilder();
     }
@@ -847,7 +848,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BoolValue is_blocked = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
         getIsBlockedFieldBuilder() {
       if (isBlockedBuilder_ == null) {
         isBlockedBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -947,7 +948,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value group_index = 3;</code>
      */
     public com.google.protobuf.Int32Value.Builder getGroupIndexBuilder() {
-
+      
       onChanged();
       return getGroupIndexFieldBuilder().getBuilder();
     }
@@ -966,7 +967,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value group_index = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getGroupIndexFieldBuilder() {
       if (groupIndexBuilder_ == null) {
         groupIndexBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1066,7 +1067,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 4;</code>
      */
     public com.google.protobuf.Int64Value.Builder getLastUpdatedDateBuilder() {
-
+      
       onChanged();
       return getLastUpdatedDateFieldBuilder().getBuilder();
     }
@@ -1085,7 +1086,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getLastUpdatedDateFieldBuilder() {
       if (lastUpdatedDateBuilder_ == null) {
         lastUpdatedDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

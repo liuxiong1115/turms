@@ -105,7 +105,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
    */
-  public java.util.List<? extends im.turms.turms.pojo.dto.MessagesWithTotalOrBuilder>
+  public java.util.List<? extends im.turms.turms.pojo.dto.MessagesWithTotalOrBuilder> 
       getMessagesWithTotalListOrBuilderList() {
     return messagesWithTotalList_;
   }
@@ -176,7 +176,8 @@ private static final long serialVersionUID = 0L;
 
     if (!getMessagesWithTotalListList()
         .equals(other.getMessagesWithTotalListList())) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -432,7 +433,7 @@ private static final long serialVersionUID = 0L;
             messagesWithTotalListBuilder_ = null;
             messagesWithTotalList_ = other.messagesWithTotalList_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            messagesWithTotalListBuilder_ =
+            messagesWithTotalListBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getMessagesWithTotalListFieldBuilder() : null;
           } else {
@@ -665,7 +666,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
      */
-    public java.util.List<? extends im.turms.turms.pojo.dto.MessagesWithTotalOrBuilder>
+    public java.util.List<? extends im.turms.turms.pojo.dto.MessagesWithTotalOrBuilder> 
          getMessagesWithTotalListOrBuilderList() {
       if (messagesWithTotalListBuilder_ != null) {
         return messagesWithTotalListBuilder_.getMessageOrBuilderList();
@@ -691,12 +692,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
      */
-    public java.util.List<im.turms.turms.pojo.dto.MessagesWithTotal.Builder>
+    public java.util.List<im.turms.turms.pojo.dto.MessagesWithTotal.Builder> 
          getMessagesWithTotalListBuilderList() {
       return getMessagesWithTotalListFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        im.turms.turms.pojo.dto.MessagesWithTotal, im.turms.turms.pojo.dto.MessagesWithTotal.Builder, im.turms.turms.pojo.dto.MessagesWithTotalOrBuilder>
+        im.turms.turms.pojo.dto.MessagesWithTotal, im.turms.turms.pojo.dto.MessagesWithTotal.Builder, im.turms.turms.pojo.dto.MessagesWithTotalOrBuilder> 
         getMessagesWithTotalListFieldBuilder() {
       if (messagesWithTotalListBuilder_ == null) {
         messagesWithTotalListBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<

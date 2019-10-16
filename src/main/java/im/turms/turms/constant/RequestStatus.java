@@ -145,7 +145,7 @@ public enum RequestStatus
 
   private final int value;
 
-  RequestStatus(int value) {
+  private RequestStatus(int value) {
     this.value = value;
   }
 

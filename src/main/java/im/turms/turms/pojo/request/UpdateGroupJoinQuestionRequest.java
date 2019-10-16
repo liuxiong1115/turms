@@ -252,7 +252,8 @@ private static final long serialVersionUID = 0L;
     }
     if (!getAnswersList()
         .equals(other.getAnswersList())) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -562,7 +563,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setQuestionId(long value) {
-
+      
       questionId_ = value;
       onChanged();
       return this;
@@ -572,7 +573,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearQuestionId() {
-
+      
       questionId_ = 0L;
       onChanged();
       return this;
@@ -665,7 +666,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue question = 2;</code>
      */
     public com.google.protobuf.StringValue.Builder getQuestionBuilder() {
-
+      
       onChanged();
       return getQuestionFieldBuilder().getBuilder();
     }
@@ -684,7 +685,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue question = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getQuestionFieldBuilder() {
       if (questionBuilder_ == null) {
         questionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

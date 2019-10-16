@@ -897,7 +897,7 @@ private static final long serialVersionUID = 0L;
     UPDATE_GROUP_MEMBER_REQUEST(603),
     KIND_NOT_SET(0);
     private final int value;
-    KindCase(int value) {
+    private KindCase(int value) {
       this.value = value;
     }
     /**
@@ -971,7 +971,7 @@ private static final long serialVersionUID = 0L;
     public int getNumber() {
       return this.value;
     }
-  }
+  };
 
   public KindCase
   getKindCase() {
@@ -3246,7 +3246,8 @@ private static final long serialVersionUID = 0L;
       case 0:
       default:
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -4461,7 +4462,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value request_id = 1;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRequestIdBuilder() {
-
+      
       onChanged();
       return getRequestIdFieldBuilder().getBuilder();
     }
@@ -4490,7 +4491,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value request_id = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getRequestIdFieldBuilder() {
       if (requestIdBuilder_ == null) {
         requestIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -4625,7 +4626,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value requester_id = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRequesterIdBuilder() {
-
+      
       onChanged();
       return getRequesterIdFieldBuilder().getBuilder();
     }
@@ -4654,7 +4655,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value requester_id = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getRequesterIdFieldBuilder() {
       if (requesterIdBuilder_ == null) {
         requesterIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -4823,7 +4824,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.AckRequest, im.turms.turms.pojo.request.AckRequest.Builder, im.turms.turms.pojo.request.AckRequestOrBuilder>
+        im.turms.turms.pojo.request.AckRequest, im.turms.turms.pojo.request.AckRequest.Builder, im.turms.turms.pojo.request.AckRequestOrBuilder> 
         getAckRequestFieldBuilder() {
       if (ackRequestBuilder_ == null) {
         if (!(kindCase_ == 3)) {
@@ -4837,7 +4838,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 3;
-      onChanged();
+      onChanged();;
       return ackRequestBuilder_;
     }
 
@@ -4997,7 +4998,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateMessageRequest create_message_request = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateMessageRequest, im.turms.turms.pojo.request.CreateMessageRequest.Builder, im.turms.turms.pojo.request.CreateMessageRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateMessageRequest, im.turms.turms.pojo.request.CreateMessageRequest.Builder, im.turms.turms.pojo.request.CreateMessageRequestOrBuilder> 
         getCreateMessageRequestFieldBuilder() {
       if (createMessageRequestBuilder_ == null) {
         if (!(kindCase_ == 5)) {
@@ -5011,7 +5012,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 5;
-      onChanged();
+      onChanged();;
       return createMessageRequestBuilder_;
     }
 
@@ -5135,7 +5136,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryMessageStatusRequest, im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder, im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryMessageStatusRequest, im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder, im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder> 
         getQueryMessageStatusRequestFieldBuilder() {
       if (queryMessageStatusRequestBuilder_ == null) {
         if (!(kindCase_ == 6)) {
@@ -5149,7 +5150,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 6;
-      onChanged();
+      onChanged();;
       return queryMessageStatusRequestBuilder_;
     }
 
@@ -5273,7 +5274,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryMessagesRequest query_messages_request = 7;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryMessagesRequest, im.turms.turms.pojo.request.QueryMessagesRequest.Builder, im.turms.turms.pojo.request.QueryMessagesRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryMessagesRequest, im.turms.turms.pojo.request.QueryMessagesRequest.Builder, im.turms.turms.pojo.request.QueryMessagesRequestOrBuilder> 
         getQueryMessagesRequestFieldBuilder() {
       if (queryMessagesRequestBuilder_ == null) {
         if (!(kindCase_ == 7)) {
@@ -5287,7 +5288,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 7;
-      onChanged();
+      onChanged();;
       return queryMessagesRequestBuilder_;
     }
 
@@ -5411,7 +5412,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryPendingMessagesWithTotalRequest query_pending_messages_with_total_request = 8;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryPendingMessagesWithTotalRequest, im.turms.turms.pojo.request.QueryPendingMessagesWithTotalRequest.Builder, im.turms.turms.pojo.request.QueryPendingMessagesWithTotalRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryPendingMessagesWithTotalRequest, im.turms.turms.pojo.request.QueryPendingMessagesWithTotalRequest.Builder, im.turms.turms.pojo.request.QueryPendingMessagesWithTotalRequestOrBuilder> 
         getQueryPendingMessagesWithTotalRequestFieldBuilder() {
       if (queryPendingMessagesWithTotalRequestBuilder_ == null) {
         if (!(kindCase_ == 8)) {
@@ -5425,7 +5426,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 8;
-      onChanged();
+      onChanged();;
       return queryPendingMessagesWithTotalRequestBuilder_;
     }
 
@@ -5549,7 +5550,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateMessageRequest update_message_request = 9;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateMessageRequest, im.turms.turms.pojo.request.UpdateMessageRequest.Builder, im.turms.turms.pojo.request.UpdateMessageRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateMessageRequest, im.turms.turms.pojo.request.UpdateMessageRequest.Builder, im.turms.turms.pojo.request.UpdateMessageRequestOrBuilder> 
         getUpdateMessageRequestFieldBuilder() {
       if (updateMessageRequestBuilder_ == null) {
         if (!(kindCase_ == 9)) {
@@ -5563,7 +5564,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 9;
-      onChanged();
+      onChanged();;
       return updateMessageRequestBuilder_;
     }
 
@@ -5687,7 +5688,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateTypingStatusRequest update_typing_status_request = 10;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateTypingStatusRequest, im.turms.turms.pojo.request.UpdateTypingStatusRequest.Builder, im.turms.turms.pojo.request.UpdateTypingStatusRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateTypingStatusRequest, im.turms.turms.pojo.request.UpdateTypingStatusRequest.Builder, im.turms.turms.pojo.request.UpdateTypingStatusRequestOrBuilder> 
         getUpdateTypingStatusRequestFieldBuilder() {
       if (updateTypingStatusRequestBuilder_ == null) {
         if (!(kindCase_ == 10)) {
@@ -5701,7 +5702,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 10;
-      onChanged();
+      onChanged();;
       return updateTypingStatusRequestBuilder_;
     }
 
@@ -5861,7 +5862,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryUserGroupInvitationsRequest query_user_group_invitations_request = 100;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryUserGroupInvitationsRequest, im.turms.turms.pojo.request.QueryUserGroupInvitationsRequest.Builder, im.turms.turms.pojo.request.QueryUserGroupInvitationsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryUserGroupInvitationsRequest, im.turms.turms.pojo.request.QueryUserGroupInvitationsRequest.Builder, im.turms.turms.pojo.request.QueryUserGroupInvitationsRequestOrBuilder> 
         getQueryUserGroupInvitationsRequestFieldBuilder() {
       if (queryUserGroupInvitationsRequestBuilder_ == null) {
         if (!(kindCase_ == 100)) {
@@ -5875,7 +5876,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 100;
-      onChanged();
+      onChanged();;
       return queryUserGroupInvitationsRequestBuilder_;
     }
 
@@ -5999,7 +6000,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryUserProfileRequest query_user_profile_request = 101;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryUserProfileRequest, im.turms.turms.pojo.request.QueryUserProfileRequest.Builder, im.turms.turms.pojo.request.QueryUserProfileRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryUserProfileRequest, im.turms.turms.pojo.request.QueryUserProfileRequest.Builder, im.turms.turms.pojo.request.QueryUserProfileRequestOrBuilder> 
         getQueryUserProfileRequestFieldBuilder() {
       if (queryUserProfileRequestBuilder_ == null) {
         if (!(kindCase_ == 101)) {
@@ -6013,7 +6014,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 101;
-      onChanged();
+      onChanged();;
       return queryUserProfileRequestBuilder_;
     }
 
@@ -6137,7 +6138,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryUsersIdsNearbyRequest query_users_ids_nearby_request = 102;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryUsersIdsNearbyRequest, im.turms.turms.pojo.request.QueryUsersIdsNearbyRequest.Builder, im.turms.turms.pojo.request.QueryUsersIdsNearbyRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryUsersIdsNearbyRequest, im.turms.turms.pojo.request.QueryUsersIdsNearbyRequest.Builder, im.turms.turms.pojo.request.QueryUsersIdsNearbyRequestOrBuilder> 
         getQueryUsersIdsNearbyRequestFieldBuilder() {
       if (queryUsersIdsNearbyRequestBuilder_ == null) {
         if (!(kindCase_ == 102)) {
@@ -6151,7 +6152,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 102;
-      onChanged();
+      onChanged();;
       return queryUsersIdsNearbyRequestBuilder_;
     }
 
@@ -6275,7 +6276,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryUsersInfosNearbyRequest query_users_infos_nearby_request = 103;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryUsersInfosNearbyRequest, im.turms.turms.pojo.request.QueryUsersInfosNearbyRequest.Builder, im.turms.turms.pojo.request.QueryUsersInfosNearbyRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryUsersInfosNearbyRequest, im.turms.turms.pojo.request.QueryUsersInfosNearbyRequest.Builder, im.turms.turms.pojo.request.QueryUsersInfosNearbyRequestOrBuilder> 
         getQueryUsersInfosNearbyRequestFieldBuilder() {
       if (queryUsersInfosNearbyRequestBuilder_ == null) {
         if (!(kindCase_ == 103)) {
@@ -6289,7 +6290,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 103;
-      onChanged();
+      onChanged();;
       return queryUsersInfosNearbyRequestBuilder_;
     }
 
@@ -6413,7 +6414,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryUsersOnlineStatusRequest query_users_online_status_request = 104;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryUsersOnlineStatusRequest, im.turms.turms.pojo.request.QueryUsersOnlineStatusRequest.Builder, im.turms.turms.pojo.request.QueryUsersOnlineStatusRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryUsersOnlineStatusRequest, im.turms.turms.pojo.request.QueryUsersOnlineStatusRequest.Builder, im.turms.turms.pojo.request.QueryUsersOnlineStatusRequestOrBuilder> 
         getQueryUsersOnlineStatusRequestFieldBuilder() {
       if (queryUsersOnlineStatusRequestBuilder_ == null) {
         if (!(kindCase_ == 104)) {
@@ -6427,7 +6428,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 104;
-      onChanged();
+      onChanged();;
       return queryUsersOnlineStatusRequestBuilder_;
     }
 
@@ -6551,7 +6552,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateUserLocationRequest update_user_location_request = 105;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateUserLocationRequest, im.turms.turms.pojo.request.UpdateUserLocationRequest.Builder, im.turms.turms.pojo.request.UpdateUserLocationRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateUserLocationRequest, im.turms.turms.pojo.request.UpdateUserLocationRequest.Builder, im.turms.turms.pojo.request.UpdateUserLocationRequestOrBuilder> 
         getUpdateUserLocationRequestFieldBuilder() {
       if (updateUserLocationRequestBuilder_ == null) {
         if (!(kindCase_ == 105)) {
@@ -6565,7 +6566,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 105;
-      onChanged();
+      onChanged();;
       return updateUserLocationRequestBuilder_;
     }
 
@@ -6689,7 +6690,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateUserOnlineStatusRequest update_user_online_status_request = 106;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateUserOnlineStatusRequest, im.turms.turms.pojo.request.UpdateUserOnlineStatusRequest.Builder, im.turms.turms.pojo.request.UpdateUserOnlineStatusRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateUserOnlineStatusRequest, im.turms.turms.pojo.request.UpdateUserOnlineStatusRequest.Builder, im.turms.turms.pojo.request.UpdateUserOnlineStatusRequestOrBuilder> 
         getUpdateUserOnlineStatusRequestFieldBuilder() {
       if (updateUserOnlineStatusRequestBuilder_ == null) {
         if (!(kindCase_ == 106)) {
@@ -6703,7 +6704,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 106;
-      onChanged();
+      onChanged();;
       return updateUserOnlineStatusRequestBuilder_;
     }
 
@@ -6827,7 +6828,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateUserRequest update_user_request = 107;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateUserRequest, im.turms.turms.pojo.request.UpdateUserRequest.Builder, im.turms.turms.pojo.request.UpdateUserRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateUserRequest, im.turms.turms.pojo.request.UpdateUserRequest.Builder, im.turms.turms.pojo.request.UpdateUserRequestOrBuilder> 
         getUpdateUserRequestFieldBuilder() {
       if (updateUserRequestBuilder_ == null) {
         if (!(kindCase_ == 107)) {
@@ -6841,7 +6842,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 107;
-      onChanged();
+      onChanged();;
       return updateUserRequestBuilder_;
     }
 
@@ -7001,7 +7002,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateFriendRequestRequest create_friend_request_request = 200;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateFriendRequestRequest, im.turms.turms.pojo.request.CreateFriendRequestRequest.Builder, im.turms.turms.pojo.request.CreateFriendRequestRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateFriendRequestRequest, im.turms.turms.pojo.request.CreateFriendRequestRequest.Builder, im.turms.turms.pojo.request.CreateFriendRequestRequestOrBuilder> 
         getCreateFriendRequestRequestFieldBuilder() {
       if (createFriendRequestRequestBuilder_ == null) {
         if (!(kindCase_ == 200)) {
@@ -7015,7 +7016,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 200;
-      onChanged();
+      onChanged();;
       return createFriendRequestRequestBuilder_;
     }
 
@@ -7139,7 +7140,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateRelationshipGroupRequest create_relationship_group_request = 201;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateRelationshipGroupRequest, im.turms.turms.pojo.request.CreateRelationshipGroupRequest.Builder, im.turms.turms.pojo.request.CreateRelationshipGroupRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateRelationshipGroupRequest, im.turms.turms.pojo.request.CreateRelationshipGroupRequest.Builder, im.turms.turms.pojo.request.CreateRelationshipGroupRequestOrBuilder> 
         getCreateRelationshipGroupRequestFieldBuilder() {
       if (createRelationshipGroupRequestBuilder_ == null) {
         if (!(kindCase_ == 201)) {
@@ -7153,7 +7154,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 201;
-      onChanged();
+      onChanged();;
       return createRelationshipGroupRequestBuilder_;
     }
 
@@ -7277,7 +7278,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateRelationshipRequest create_relationship_request = 202;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateRelationshipRequest, im.turms.turms.pojo.request.CreateRelationshipRequest.Builder, im.turms.turms.pojo.request.CreateRelationshipRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateRelationshipRequest, im.turms.turms.pojo.request.CreateRelationshipRequest.Builder, im.turms.turms.pojo.request.CreateRelationshipRequestOrBuilder> 
         getCreateRelationshipRequestFieldBuilder() {
       if (createRelationshipRequestBuilder_ == null) {
         if (!(kindCase_ == 202)) {
@@ -7291,7 +7292,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 202;
-      onChanged();
+      onChanged();;
       return createRelationshipRequestBuilder_;
     }
 
@@ -7415,7 +7416,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.DeleteRelationshipGroupRequest delete_relationship_group_request = 203;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.DeleteRelationshipGroupRequest, im.turms.turms.pojo.request.DeleteRelationshipGroupRequest.Builder, im.turms.turms.pojo.request.DeleteRelationshipGroupRequestOrBuilder>
+        im.turms.turms.pojo.request.DeleteRelationshipGroupRequest, im.turms.turms.pojo.request.DeleteRelationshipGroupRequest.Builder, im.turms.turms.pojo.request.DeleteRelationshipGroupRequestOrBuilder> 
         getDeleteRelationshipGroupRequestFieldBuilder() {
       if (deleteRelationshipGroupRequestBuilder_ == null) {
         if (!(kindCase_ == 203)) {
@@ -7429,7 +7430,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 203;
-      onChanged();
+      onChanged();;
       return deleteRelationshipGroupRequestBuilder_;
     }
 
@@ -7553,7 +7554,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.DeleteRelationshipRequest delete_relationship_request = 204;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.DeleteRelationshipRequest, im.turms.turms.pojo.request.DeleteRelationshipRequest.Builder, im.turms.turms.pojo.request.DeleteRelationshipRequestOrBuilder>
+        im.turms.turms.pojo.request.DeleteRelationshipRequest, im.turms.turms.pojo.request.DeleteRelationshipRequest.Builder, im.turms.turms.pojo.request.DeleteRelationshipRequestOrBuilder> 
         getDeleteRelationshipRequestFieldBuilder() {
       if (deleteRelationshipRequestBuilder_ == null) {
         if (!(kindCase_ == 204)) {
@@ -7567,7 +7568,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 204;
-      onChanged();
+      onChanged();;
       return deleteRelationshipRequestBuilder_;
     }
 
@@ -7691,7 +7692,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryFriendRequestsRequest query_friend_requests_request = 205;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryFriendRequestsRequest, im.turms.turms.pojo.request.QueryFriendRequestsRequest.Builder, im.turms.turms.pojo.request.QueryFriendRequestsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryFriendRequestsRequest, im.turms.turms.pojo.request.QueryFriendRequestsRequest.Builder, im.turms.turms.pojo.request.QueryFriendRequestsRequestOrBuilder> 
         getQueryFriendRequestsRequestFieldBuilder() {
       if (queryFriendRequestsRequestBuilder_ == null) {
         if (!(kindCase_ == 205)) {
@@ -7705,7 +7706,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 205;
-      onChanged();
+      onChanged();;
       return queryFriendRequestsRequestBuilder_;
     }
 
@@ -7829,7 +7830,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryRelatedUsersIdsRequest query_related_users_ids_request = 206;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryRelatedUsersIdsRequest, im.turms.turms.pojo.request.QueryRelatedUsersIdsRequest.Builder, im.turms.turms.pojo.request.QueryRelatedUsersIdsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryRelatedUsersIdsRequest, im.turms.turms.pojo.request.QueryRelatedUsersIdsRequest.Builder, im.turms.turms.pojo.request.QueryRelatedUsersIdsRequestOrBuilder> 
         getQueryRelatedUsersIdsRequestFieldBuilder() {
       if (queryRelatedUsersIdsRequestBuilder_ == null) {
         if (!(kindCase_ == 206)) {
@@ -7843,7 +7844,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 206;
-      onChanged();
+      onChanged();;
       return queryRelatedUsersIdsRequestBuilder_;
     }
 
@@ -7967,7 +7968,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryRelationshipGroupsRequest query_relationship_groups_request = 207;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryRelationshipGroupsRequest, im.turms.turms.pojo.request.QueryRelationshipGroupsRequest.Builder, im.turms.turms.pojo.request.QueryRelationshipGroupsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryRelationshipGroupsRequest, im.turms.turms.pojo.request.QueryRelationshipGroupsRequest.Builder, im.turms.turms.pojo.request.QueryRelationshipGroupsRequestOrBuilder> 
         getQueryRelationshipGroupsRequestFieldBuilder() {
       if (queryRelationshipGroupsRequestBuilder_ == null) {
         if (!(kindCase_ == 207)) {
@@ -7981,7 +7982,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 207;
-      onChanged();
+      onChanged();;
       return queryRelationshipGroupsRequestBuilder_;
     }
 
@@ -8105,7 +8106,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryRelationshipsRequest query_relationships_request = 208;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryRelationshipsRequest, im.turms.turms.pojo.request.QueryRelationshipsRequest.Builder, im.turms.turms.pojo.request.QueryRelationshipsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryRelationshipsRequest, im.turms.turms.pojo.request.QueryRelationshipsRequest.Builder, im.turms.turms.pojo.request.QueryRelationshipsRequestOrBuilder> 
         getQueryRelationshipsRequestFieldBuilder() {
       if (queryRelationshipsRequestBuilder_ == null) {
         if (!(kindCase_ == 208)) {
@@ -8119,7 +8120,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 208;
-      onChanged();
+      onChanged();;
       return queryRelationshipsRequestBuilder_;
     }
 
@@ -8243,7 +8244,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateFriendRequestRequest update_friend_request_request = 209;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateFriendRequestRequest, im.turms.turms.pojo.request.UpdateFriendRequestRequest.Builder, im.turms.turms.pojo.request.UpdateFriendRequestRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateFriendRequestRequest, im.turms.turms.pojo.request.UpdateFriendRequestRequest.Builder, im.turms.turms.pojo.request.UpdateFriendRequestRequestOrBuilder> 
         getUpdateFriendRequestRequestFieldBuilder() {
       if (updateFriendRequestRequestBuilder_ == null) {
         if (!(kindCase_ == 209)) {
@@ -8257,7 +8258,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 209;
-      onChanged();
+      onChanged();;
       return updateFriendRequestRequestBuilder_;
     }
 
@@ -8381,7 +8382,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateRelationshipGroupRequest update_relationship_group_request = 210;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateRelationshipGroupRequest, im.turms.turms.pojo.request.UpdateRelationshipGroupRequest.Builder, im.turms.turms.pojo.request.UpdateRelationshipGroupRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateRelationshipGroupRequest, im.turms.turms.pojo.request.UpdateRelationshipGroupRequest.Builder, im.turms.turms.pojo.request.UpdateRelationshipGroupRequestOrBuilder> 
         getUpdateRelationshipGroupRequestFieldBuilder() {
       if (updateRelationshipGroupRequestBuilder_ == null) {
         if (!(kindCase_ == 210)) {
@@ -8395,7 +8396,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 210;
-      onChanged();
+      onChanged();;
       return updateRelationshipGroupRequestBuilder_;
     }
 
@@ -8519,7 +8520,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateRelationshipRequest update_relationship_request = 211;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateRelationshipRequest, im.turms.turms.pojo.request.UpdateRelationshipRequest.Builder, im.turms.turms.pojo.request.UpdateRelationshipRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateRelationshipRequest, im.turms.turms.pojo.request.UpdateRelationshipRequest.Builder, im.turms.turms.pojo.request.UpdateRelationshipRequestOrBuilder> 
         getUpdateRelationshipRequestFieldBuilder() {
       if (updateRelationshipRequestBuilder_ == null) {
         if (!(kindCase_ == 211)) {
@@ -8533,7 +8534,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 211;
-      onChanged();
+      onChanged();;
       return updateRelationshipRequestBuilder_;
     }
 
@@ -8693,7 +8694,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateGroupRequest create_group_request = 300;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateGroupRequest, im.turms.turms.pojo.request.CreateGroupRequest.Builder, im.turms.turms.pojo.request.CreateGroupRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateGroupRequest, im.turms.turms.pojo.request.CreateGroupRequest.Builder, im.turms.turms.pojo.request.CreateGroupRequestOrBuilder> 
         getCreateGroupRequestFieldBuilder() {
       if (createGroupRequestBuilder_ == null) {
         if (!(kindCase_ == 300)) {
@@ -8707,7 +8708,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 300;
-      onChanged();
+      onChanged();;
       return createGroupRequestBuilder_;
     }
 
@@ -8831,7 +8832,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.DeleteGroupRequest delete_group_request = 301;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.DeleteGroupRequest, im.turms.turms.pojo.request.DeleteGroupRequest.Builder, im.turms.turms.pojo.request.DeleteGroupRequestOrBuilder>
+        im.turms.turms.pojo.request.DeleteGroupRequest, im.turms.turms.pojo.request.DeleteGroupRequest.Builder, im.turms.turms.pojo.request.DeleteGroupRequestOrBuilder> 
         getDeleteGroupRequestFieldBuilder() {
       if (deleteGroupRequestBuilder_ == null) {
         if (!(kindCase_ == 301)) {
@@ -8845,7 +8846,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 301;
-      onChanged();
+      onChanged();;
       return deleteGroupRequestBuilder_;
     }
 
@@ -8969,7 +8970,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryGroupRequest query_group_request = 302;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryGroupRequest, im.turms.turms.pojo.request.QueryGroupRequest.Builder, im.turms.turms.pojo.request.QueryGroupRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryGroupRequest, im.turms.turms.pojo.request.QueryGroupRequest.Builder, im.turms.turms.pojo.request.QueryGroupRequestOrBuilder> 
         getQueryGroupRequestFieldBuilder() {
       if (queryGroupRequestBuilder_ == null) {
         if (!(kindCase_ == 302)) {
@@ -8983,7 +8984,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 302;
-      onChanged();
+      onChanged();;
       return queryGroupRequestBuilder_;
     }
 
@@ -9107,7 +9108,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryJoinedGroupsIdsRequest query_joined_groups_ids_request = 303;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryJoinedGroupsIdsRequest, im.turms.turms.pojo.request.QueryJoinedGroupsIdsRequest.Builder, im.turms.turms.pojo.request.QueryJoinedGroupsIdsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryJoinedGroupsIdsRequest, im.turms.turms.pojo.request.QueryJoinedGroupsIdsRequest.Builder, im.turms.turms.pojo.request.QueryJoinedGroupsIdsRequestOrBuilder> 
         getQueryJoinedGroupsIdsRequestFieldBuilder() {
       if (queryJoinedGroupsIdsRequestBuilder_ == null) {
         if (!(kindCase_ == 303)) {
@@ -9121,7 +9122,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 303;
-      onChanged();
+      onChanged();;
       return queryJoinedGroupsIdsRequestBuilder_;
     }
 
@@ -9245,7 +9246,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryJoinedGroupsInfosRequest query_joined_groups_infos_request = 304;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryJoinedGroupsInfosRequest, im.turms.turms.pojo.request.QueryJoinedGroupsInfosRequest.Builder, im.turms.turms.pojo.request.QueryJoinedGroupsInfosRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryJoinedGroupsInfosRequest, im.turms.turms.pojo.request.QueryJoinedGroupsInfosRequest.Builder, im.turms.turms.pojo.request.QueryJoinedGroupsInfosRequestOrBuilder> 
         getQueryJoinedGroupsInfosRequestFieldBuilder() {
       if (queryJoinedGroupsInfosRequestBuilder_ == null) {
         if (!(kindCase_ == 304)) {
@@ -9259,7 +9260,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 304;
-      onChanged();
+      onChanged();;
       return queryJoinedGroupsInfosRequestBuilder_;
     }
 
@@ -9383,7 +9384,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateGroupRequest update_group_request = 305;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateGroupRequest, im.turms.turms.pojo.request.UpdateGroupRequest.Builder, im.turms.turms.pojo.request.UpdateGroupRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateGroupRequest, im.turms.turms.pojo.request.UpdateGroupRequest.Builder, im.turms.turms.pojo.request.UpdateGroupRequestOrBuilder> 
         getUpdateGroupRequestFieldBuilder() {
       if (updateGroupRequestBuilder_ == null) {
         if (!(kindCase_ == 305)) {
@@ -9397,7 +9398,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 305;
-      onChanged();
+      onChanged();;
       return updateGroupRequestBuilder_;
     }
 
@@ -9557,7 +9558,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateGroupBlacklistedUserRequest create_group_blacklisted_user_request = 400;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateGroupBlacklistedUserRequest, im.turms.turms.pojo.request.CreateGroupBlacklistedUserRequest.Builder, im.turms.turms.pojo.request.CreateGroupBlacklistedUserRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateGroupBlacklistedUserRequest, im.turms.turms.pojo.request.CreateGroupBlacklistedUserRequest.Builder, im.turms.turms.pojo.request.CreateGroupBlacklistedUserRequestOrBuilder> 
         getCreateGroupBlacklistedUserRequestFieldBuilder() {
       if (createGroupBlacklistedUserRequestBuilder_ == null) {
         if (!(kindCase_ == 400)) {
@@ -9571,7 +9572,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 400;
-      onChanged();
+      onChanged();;
       return createGroupBlacklistedUserRequestBuilder_;
     }
 
@@ -9695,7 +9696,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.DeleteGroupBlacklistedUserRequest delete_group_blacklisted_user_request = 401;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.DeleteGroupBlacklistedUserRequest, im.turms.turms.pojo.request.DeleteGroupBlacklistedUserRequest.Builder, im.turms.turms.pojo.request.DeleteGroupBlacklistedUserRequestOrBuilder>
+        im.turms.turms.pojo.request.DeleteGroupBlacklistedUserRequest, im.turms.turms.pojo.request.DeleteGroupBlacklistedUserRequest.Builder, im.turms.turms.pojo.request.DeleteGroupBlacklistedUserRequestOrBuilder> 
         getDeleteGroupBlacklistedUserRequestFieldBuilder() {
       if (deleteGroupBlacklistedUserRequestBuilder_ == null) {
         if (!(kindCase_ == 401)) {
@@ -9709,7 +9710,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 401;
-      onChanged();
+      onChanged();;
       return deleteGroupBlacklistedUserRequestBuilder_;
     }
 
@@ -9833,7 +9834,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryGroupBlacklistedUsersIdsRequest query_group_blacklisted_users_ids_request = 402;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryGroupBlacklistedUsersIdsRequest, im.turms.turms.pojo.request.QueryGroupBlacklistedUsersIdsRequest.Builder, im.turms.turms.pojo.request.QueryGroupBlacklistedUsersIdsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryGroupBlacklistedUsersIdsRequest, im.turms.turms.pojo.request.QueryGroupBlacklistedUsersIdsRequest.Builder, im.turms.turms.pojo.request.QueryGroupBlacklistedUsersIdsRequestOrBuilder> 
         getQueryGroupBlacklistedUsersIdsRequestFieldBuilder() {
       if (queryGroupBlacklistedUsersIdsRequestBuilder_ == null) {
         if (!(kindCase_ == 402)) {
@@ -9847,7 +9848,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 402;
-      onChanged();
+      onChanged();;
       return queryGroupBlacklistedUsersIdsRequestBuilder_;
     }
 
@@ -9971,7 +9972,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryGroupBlacklistedUsersInfosRequest query_group_blacklisted_users_infos_request = 403;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequest, im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequest.Builder, im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequest, im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequest.Builder, im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequestOrBuilder> 
         getQueryGroupBlacklistedUsersInfosRequestFieldBuilder() {
       if (queryGroupBlacklistedUsersInfosRequestBuilder_ == null) {
         if (!(kindCase_ == 403)) {
@@ -9985,7 +9986,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 403;
-      onChanged();
+      onChanged();;
       return queryGroupBlacklistedUsersInfosRequestBuilder_;
     }
 
@@ -10145,7 +10146,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.Builder, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequestOrBuilder>
+        im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.Builder, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequestOrBuilder> 
         getCheckGroupJoinQuestionAnswerRequestFieldBuilder() {
       if (checkGroupJoinQuestionAnswerRequestBuilder_ == null) {
         if (!(kindCase_ == 500)) {
@@ -10159,7 +10160,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 500;
-      onChanged();
+      onChanged();;
       return checkGroupJoinQuestionAnswerRequestBuilder_;
     }
 
@@ -10283,7 +10284,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateGroupInvitationRequest create_group_invitation_request = 501;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateGroupInvitationRequest, im.turms.turms.pojo.request.CreateGroupInvitationRequest.Builder, im.turms.turms.pojo.request.CreateGroupInvitationRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateGroupInvitationRequest, im.turms.turms.pojo.request.CreateGroupInvitationRequest.Builder, im.turms.turms.pojo.request.CreateGroupInvitationRequestOrBuilder> 
         getCreateGroupInvitationRequestFieldBuilder() {
       if (createGroupInvitationRequestBuilder_ == null) {
         if (!(kindCase_ == 501)) {
@@ -10297,7 +10298,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 501;
-      onChanged();
+      onChanged();;
       return createGroupInvitationRequestBuilder_;
     }
 
@@ -10421,7 +10422,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateGroupJoinRequestRequest create_group_join_request_request = 502;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateGroupJoinRequestRequest, im.turms.turms.pojo.request.CreateGroupJoinRequestRequest.Builder, im.turms.turms.pojo.request.CreateGroupJoinRequestRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateGroupJoinRequestRequest, im.turms.turms.pojo.request.CreateGroupJoinRequestRequest.Builder, im.turms.turms.pojo.request.CreateGroupJoinRequestRequestOrBuilder> 
         getCreateGroupJoinRequestRequestFieldBuilder() {
       if (createGroupJoinRequestRequestBuilder_ == null) {
         if (!(kindCase_ == 502)) {
@@ -10435,7 +10436,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 502;
-      onChanged();
+      onChanged();;
       return createGroupJoinRequestRequestBuilder_;
     }
 
@@ -10559,7 +10560,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateGroupJoinQuestionRequest create_group_join_question_request = 503;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateGroupJoinQuestionRequest, im.turms.turms.pojo.request.CreateGroupJoinQuestionRequest.Builder, im.turms.turms.pojo.request.CreateGroupJoinQuestionRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateGroupJoinQuestionRequest, im.turms.turms.pojo.request.CreateGroupJoinQuestionRequest.Builder, im.turms.turms.pojo.request.CreateGroupJoinQuestionRequestOrBuilder> 
         getCreateGroupJoinQuestionRequestFieldBuilder() {
       if (createGroupJoinQuestionRequestBuilder_ == null) {
         if (!(kindCase_ == 503)) {
@@ -10573,7 +10574,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 503;
-      onChanged();
+      onChanged();;
       return createGroupJoinQuestionRequestBuilder_;
     }
 
@@ -10697,7 +10698,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.DeleteGroupInvitationRequest delete_group_invitation_request = 504;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.DeleteGroupInvitationRequest, im.turms.turms.pojo.request.DeleteGroupInvitationRequest.Builder, im.turms.turms.pojo.request.DeleteGroupInvitationRequestOrBuilder>
+        im.turms.turms.pojo.request.DeleteGroupInvitationRequest, im.turms.turms.pojo.request.DeleteGroupInvitationRequest.Builder, im.turms.turms.pojo.request.DeleteGroupInvitationRequestOrBuilder> 
         getDeleteGroupInvitationRequestFieldBuilder() {
       if (deleteGroupInvitationRequestBuilder_ == null) {
         if (!(kindCase_ == 504)) {
@@ -10711,7 +10712,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 504;
-      onChanged();
+      onChanged();;
       return deleteGroupInvitationRequestBuilder_;
     }
 
@@ -10835,7 +10836,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.DeleteGroupJoinRequestRequest delete_group_join_request_request = 505;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.DeleteGroupJoinRequestRequest, im.turms.turms.pojo.request.DeleteGroupJoinRequestRequest.Builder, im.turms.turms.pojo.request.DeleteGroupJoinRequestRequestOrBuilder>
+        im.turms.turms.pojo.request.DeleteGroupJoinRequestRequest, im.turms.turms.pojo.request.DeleteGroupJoinRequestRequest.Builder, im.turms.turms.pojo.request.DeleteGroupJoinRequestRequestOrBuilder> 
         getDeleteGroupJoinRequestRequestFieldBuilder() {
       if (deleteGroupJoinRequestRequestBuilder_ == null) {
         if (!(kindCase_ == 505)) {
@@ -10849,7 +10850,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 505;
-      onChanged();
+      onChanged();;
       return deleteGroupJoinRequestRequestBuilder_;
     }
 
@@ -10973,7 +10974,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.DeleteGroupJoinQuestionRequest delete_group_join_question_request = 506;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.DeleteGroupJoinQuestionRequest, im.turms.turms.pojo.request.DeleteGroupJoinQuestionRequest.Builder, im.turms.turms.pojo.request.DeleteGroupJoinQuestionRequestOrBuilder>
+        im.turms.turms.pojo.request.DeleteGroupJoinQuestionRequest, im.turms.turms.pojo.request.DeleteGroupJoinQuestionRequest.Builder, im.turms.turms.pojo.request.DeleteGroupJoinQuestionRequestOrBuilder> 
         getDeleteGroupJoinQuestionRequestFieldBuilder() {
       if (deleteGroupJoinQuestionRequestBuilder_ == null) {
         if (!(kindCase_ == 506)) {
@@ -10987,7 +10988,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 506;
-      onChanged();
+      onChanged();;
       return deleteGroupJoinQuestionRequestBuilder_;
     }
 
@@ -11111,7 +11112,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryGroupInvitationsRequest query_group_invitations_request = 507;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryGroupInvitationsRequest, im.turms.turms.pojo.request.QueryGroupInvitationsRequest.Builder, im.turms.turms.pojo.request.QueryGroupInvitationsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryGroupInvitationsRequest, im.turms.turms.pojo.request.QueryGroupInvitationsRequest.Builder, im.turms.turms.pojo.request.QueryGroupInvitationsRequestOrBuilder> 
         getQueryGroupInvitationsRequestFieldBuilder() {
       if (queryGroupInvitationsRequestBuilder_ == null) {
         if (!(kindCase_ == 507)) {
@@ -11125,7 +11126,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 507;
-      onChanged();
+      onChanged();;
       return queryGroupInvitationsRequestBuilder_;
     }
 
@@ -11249,7 +11250,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryGroupJoinRequestsRequest query_group_join_requests_request = 508;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryGroupJoinRequestsRequest, im.turms.turms.pojo.request.QueryGroupJoinRequestsRequest.Builder, im.turms.turms.pojo.request.QueryGroupJoinRequestsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryGroupJoinRequestsRequest, im.turms.turms.pojo.request.QueryGroupJoinRequestsRequest.Builder, im.turms.turms.pojo.request.QueryGroupJoinRequestsRequestOrBuilder> 
         getQueryGroupJoinRequestsRequestFieldBuilder() {
       if (queryGroupJoinRequestsRequestBuilder_ == null) {
         if (!(kindCase_ == 508)) {
@@ -11263,7 +11264,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 508;
-      onChanged();
+      onChanged();;
       return queryGroupJoinRequestsRequestBuilder_;
     }
 
@@ -11387,7 +11388,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryGroupJoinQuestionsRequest query_group_join_questions_request = 509;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryGroupJoinQuestionsRequest, im.turms.turms.pojo.request.QueryGroupJoinQuestionsRequest.Builder, im.turms.turms.pojo.request.QueryGroupJoinQuestionsRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryGroupJoinQuestionsRequest, im.turms.turms.pojo.request.QueryGroupJoinQuestionsRequest.Builder, im.turms.turms.pojo.request.QueryGroupJoinQuestionsRequestOrBuilder> 
         getQueryGroupJoinQuestionsRequestFieldBuilder() {
       if (queryGroupJoinQuestionsRequestBuilder_ == null) {
         if (!(kindCase_ == 509)) {
@@ -11401,7 +11402,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 509;
-      onChanged();
+      onChanged();;
       return queryGroupJoinQuestionsRequestBuilder_;
     }
 
@@ -11525,7 +11526,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateGroupJoinQuestionRequest update_group_join_question_request = 510;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateGroupJoinQuestionRequest, im.turms.turms.pojo.request.UpdateGroupJoinQuestionRequest.Builder, im.turms.turms.pojo.request.UpdateGroupJoinQuestionRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateGroupJoinQuestionRequest, im.turms.turms.pojo.request.UpdateGroupJoinQuestionRequest.Builder, im.turms.turms.pojo.request.UpdateGroupJoinQuestionRequestOrBuilder> 
         getUpdateGroupJoinQuestionRequestFieldBuilder() {
       if (updateGroupJoinQuestionRequestBuilder_ == null) {
         if (!(kindCase_ == 510)) {
@@ -11539,7 +11540,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 510;
-      onChanged();
+      onChanged();;
       return updateGroupJoinQuestionRequestBuilder_;
     }
 
@@ -11699,7 +11700,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.CreateGroupMemberRequest create_group_member_request = 600;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CreateGroupMemberRequest, im.turms.turms.pojo.request.CreateGroupMemberRequest.Builder, im.turms.turms.pojo.request.CreateGroupMemberRequestOrBuilder>
+        im.turms.turms.pojo.request.CreateGroupMemberRequest, im.turms.turms.pojo.request.CreateGroupMemberRequest.Builder, im.turms.turms.pojo.request.CreateGroupMemberRequestOrBuilder> 
         getCreateGroupMemberRequestFieldBuilder() {
       if (createGroupMemberRequestBuilder_ == null) {
         if (!(kindCase_ == 600)) {
@@ -11713,7 +11714,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 600;
-      onChanged();
+      onChanged();;
       return createGroupMemberRequestBuilder_;
     }
 
@@ -11837,7 +11838,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.DeleteGroupMemberRequest delete_group_member_request = 601;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.DeleteGroupMemberRequest, im.turms.turms.pojo.request.DeleteGroupMemberRequest.Builder, im.turms.turms.pojo.request.DeleteGroupMemberRequestOrBuilder>
+        im.turms.turms.pojo.request.DeleteGroupMemberRequest, im.turms.turms.pojo.request.DeleteGroupMemberRequest.Builder, im.turms.turms.pojo.request.DeleteGroupMemberRequestOrBuilder> 
         getDeleteGroupMemberRequestFieldBuilder() {
       if (deleteGroupMemberRequestBuilder_ == null) {
         if (!(kindCase_ == 601)) {
@@ -11851,7 +11852,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 601;
-      onChanged();
+      onChanged();;
       return deleteGroupMemberRequestBuilder_;
     }
 
@@ -11975,7 +11976,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.QueryGroupMembersRequest query_group_members_request = 602;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryGroupMembersRequest, im.turms.turms.pojo.request.QueryGroupMembersRequest.Builder, im.turms.turms.pojo.request.QueryGroupMembersRequestOrBuilder>
+        im.turms.turms.pojo.request.QueryGroupMembersRequest, im.turms.turms.pojo.request.QueryGroupMembersRequest.Builder, im.turms.turms.pojo.request.QueryGroupMembersRequestOrBuilder> 
         getQueryGroupMembersRequestFieldBuilder() {
       if (queryGroupMembersRequestBuilder_ == null) {
         if (!(kindCase_ == 602)) {
@@ -11989,7 +11990,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 602;
-      onChanged();
+      onChanged();;
       return queryGroupMembersRequestBuilder_;
     }
 
@@ -12113,7 +12114,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.UpdateGroupMemberRequest update_group_member_request = 603;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.UpdateGroupMemberRequest, im.turms.turms.pojo.request.UpdateGroupMemberRequest.Builder, im.turms.turms.pojo.request.UpdateGroupMemberRequestOrBuilder>
+        im.turms.turms.pojo.request.UpdateGroupMemberRequest, im.turms.turms.pojo.request.UpdateGroupMemberRequest.Builder, im.turms.turms.pojo.request.UpdateGroupMemberRequestOrBuilder> 
         getUpdateGroupMemberRequestFieldBuilder() {
       if (updateGroupMemberRequestBuilder_ == null) {
         if (!(kindCase_ == 603)) {
@@ -12127,7 +12128,7 @@ private static final long serialVersionUID = 0L;
         kind_ = null;
       }
       kindCase_ = 603;
-      onChanged();
+      onChanged();;
       return updateGroupMemberRequestBuilder_;
     }
     @java.lang.Override

@@ -224,7 +224,8 @@ private static final long serialVersionUID = 0L;
       if (!getReason()
           .equals(other.getReason())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -519,7 +520,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setRequestId(long value) {
-
+      
       requestId_ = value;
       onChanged();
       return this;
@@ -529,7 +530,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearRequestId() {
-
+      
       requestId_ = 0L;
       onChanged();
       return this;
@@ -571,7 +572,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       responseAction_ = value.getNumber();
       onChanged();
       return this;
@@ -581,7 +582,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearResponseAction() {
-
+      
       responseAction_ = 0;
       onChanged();
       return this;
@@ -674,7 +675,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
     public com.google.protobuf.StringValue.Builder getReasonBuilder() {
-
+      
       onChanged();
       return getReasonFieldBuilder().getBuilder();
     }
@@ -693,7 +694,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getReasonFieldBuilder() {
       if (reasonBuilder_ == null) {
         reasonBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

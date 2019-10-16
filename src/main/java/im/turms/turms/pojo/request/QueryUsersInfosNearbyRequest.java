@@ -264,7 +264,8 @@ private static final long serialVersionUID = 0L;
       if (!getMaxNumber()
           .equals(other.getMaxNumber())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -578,7 +579,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setLatitude(float value) {
-
+      
       latitude_ = value;
       onChanged();
       return this;
@@ -588,7 +589,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearLatitude() {
-
+      
       latitude_ = 0F;
       onChanged();
       return this;
@@ -608,7 +609,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setLongitude(float value) {
-
+      
       longitude_ = value;
       onChanged();
       return this;
@@ -618,7 +619,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearLongitude() {
-
+      
       longitude_ = 0F;
       onChanged();
       return this;
@@ -711,7 +712,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.FloatValue distance = 3;</code>
      */
     public com.google.protobuf.FloatValue.Builder getDistanceBuilder() {
-
+      
       onChanged();
       return getDistanceFieldBuilder().getBuilder();
     }
@@ -730,7 +731,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.FloatValue distance = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.FloatValue, com.google.protobuf.FloatValue.Builder, com.google.protobuf.FloatValueOrBuilder>
+        com.google.protobuf.FloatValue, com.google.protobuf.FloatValue.Builder, com.google.protobuf.FloatValueOrBuilder> 
         getDistanceFieldBuilder() {
       if (distanceBuilder_ == null) {
         distanceBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -830,7 +831,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.UInt32Value maxNumber = 4;</code>
      */
     public com.google.protobuf.UInt32Value.Builder getMaxNumberBuilder() {
-
+      
       onChanged();
       return getMaxNumberFieldBuilder().getBuilder();
     }
@@ -849,7 +850,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.UInt32Value maxNumber = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.UInt32Value, com.google.protobuf.UInt32Value.Builder, com.google.protobuf.UInt32ValueOrBuilder>
+        com.google.protobuf.UInt32Value, com.google.protobuf.UInt32Value.Builder, com.google.protobuf.UInt32ValueOrBuilder> 
         getMaxNumberFieldBuilder() {
       if (maxNumberBuilder_ == null) {
         maxNumberBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

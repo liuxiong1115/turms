@@ -109,7 +109,7 @@ public enum ProfileAccessStrategy
 
   private final int value;
 
-  ProfileAccessStrategy(int value) {
+  private ProfileAccessStrategy(int value) {
     this.value = value;
   }
 

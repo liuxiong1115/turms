@@ -495,11 +495,21 @@ public class WsGroupController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateGroupMemberRequest() {
         return turmsRequestWrapper -> {
             CreateGroupMemberRequest request = turmsRequestWrapper.getTurmsRequest().getCreateGroupMemberRequest();
+            String name = request.hasName() ? request.getName().getValue() : null;
+            Date muteEndDate = request.hasMuteEndDate() ? new Date(request.getMuteEndDate().getValue()) : null;
+            GroupMemberRole role = request.getRole();
+            if (role == null || role == GroupMemberRole.UNRECOGNIZED) {
+                role = GroupMemberRole.MEMBER;
+            } else if (role == GroupMemberRole.OWNER) {
+                return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+            }
             return groupMemberService.authAndAddGroupMember(
                     turmsRequestWrapper.getUserId(),
                     request.getGroupId(),
                     request.getUserId(),
-                    GroupMemberRole.MEMBER,
+                    role,
+                    name,
+                    muteEndDate,
                     null)
                     .map(added -> {
                         if (added != null && added

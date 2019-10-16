@@ -16,7 +16,7 @@ public final class GroupJoinQuestionOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_GroupJoinQuestion_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_GroupJoinQuestion_fieldAccessorTable;
 
@@ -30,7 +30,7 @@ public final class GroupJoinQuestionOuterClass {
     java.lang.String[] descriptorData = {
       "\n#dto/group/group_join_question.proto\022\016i" +
       "m.turms.proto\032\036google/protobuf/wrappers." +
-              "proto\"\312\001\n\021GroupJoinQuestion\022'\n\002id\030\001 \001(\0132" +
+      "proto\"\312\001\n\021GroupJoinQuestion\022\'\n\002id\030\001 \001(\0132" +
       "\033.google.protobuf.Int64Value\022-\n\010group_id" +
       "\030\002 \001(\0132\033.google.protobuf.Int64Value\022.\n\010q" +
       "uestion\030\003 \001(\0132\034.google.protobuf.StringVa" +

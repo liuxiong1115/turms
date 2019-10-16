@@ -118,7 +118,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <code>repeated .im.turms.proto.GroupInvitation group_invitations = 1;</code>
    */
-  public java.util.List<? extends im.turms.turms.pojo.dto.GroupInvitationOrBuilder>
+  public java.util.List<? extends im.turms.turms.pojo.dto.GroupInvitationOrBuilder> 
       getGroupInvitationsOrBuilderList() {
     return groupInvitations_;
   }
@@ -224,7 +224,8 @@ private static final long serialVersionUID = 0L;
       if (!getLastUpdatedDate()
           .equals(other.getLastUpdatedDate())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -495,7 +496,7 @@ private static final long serialVersionUID = 0L;
             groupInvitationsBuilder_ = null;
             groupInvitations_ = other.groupInvitations_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            groupInvitationsBuilder_ =
+            groupInvitationsBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getGroupInvitationsFieldBuilder() : null;
           } else {
@@ -731,7 +732,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.GroupInvitation group_invitations = 1;</code>
      */
-    public java.util.List<? extends im.turms.turms.pojo.dto.GroupInvitationOrBuilder>
+    public java.util.List<? extends im.turms.turms.pojo.dto.GroupInvitationOrBuilder> 
          getGroupInvitationsOrBuilderList() {
       if (groupInvitationsBuilder_ != null) {
         return groupInvitationsBuilder_.getMessageOrBuilderList();
@@ -757,12 +758,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.GroupInvitation group_invitations = 1;</code>
      */
-    public java.util.List<im.turms.turms.pojo.dto.GroupInvitation.Builder>
+    public java.util.List<im.turms.turms.pojo.dto.GroupInvitation.Builder> 
          getGroupInvitationsBuilderList() {
       return getGroupInvitationsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        im.turms.turms.pojo.dto.GroupInvitation, im.turms.turms.pojo.dto.GroupInvitation.Builder, im.turms.turms.pojo.dto.GroupInvitationOrBuilder>
+        im.turms.turms.pojo.dto.GroupInvitation, im.turms.turms.pojo.dto.GroupInvitation.Builder, im.turms.turms.pojo.dto.GroupInvitationOrBuilder> 
         getGroupInvitationsFieldBuilder() {
       if (groupInvitationsBuilder_ == null) {
         groupInvitationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
@@ -863,7 +864,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getLastUpdatedDateBuilder() {
-
+      
       onChanged();
       return getLastUpdatedDateFieldBuilder().getBuilder();
     }
@@ -882,7 +883,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getLastUpdatedDateFieldBuilder() {
       if (lastUpdatedDateBuilder_ == null) {
         lastUpdatedDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

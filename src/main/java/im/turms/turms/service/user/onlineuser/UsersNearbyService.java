@@ -40,6 +40,7 @@ import reactor.core.publisher.Flux;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -182,7 +183,7 @@ public class UsersNearbyService {
             return turmsTaskExecutor.callAll(new QueryNearestUsersTask(
                     currentUserPosition,
                     maxDistance,
-                    maxNumber))
+                    maxNumber), Duration.ofSeconds(30))
                     .collectList()
                     .flatMapMany(entries -> {
                         Iterable<Entry<Long, PointFloat>> result = getNearestPoints(

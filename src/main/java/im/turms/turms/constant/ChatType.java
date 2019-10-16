@@ -109,7 +109,7 @@ public enum ChatType
 
   private final int value;
 
-  ChatType(int value) {
+  private ChatType(int value) {
     this.value = value;
   }
 

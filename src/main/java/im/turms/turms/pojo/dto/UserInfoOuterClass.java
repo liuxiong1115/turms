@@ -16,7 +16,7 @@ public final class UserInfoOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UserInfo_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UserInfo_fieldAccessorTable;
 
@@ -31,7 +31,7 @@ public final class UserInfoOuterClass {
       "\n\030dto/user/user_info.proto\022\016im.turms.pro" +
       "to\032\036google/protobuf/wrappers.proto\032&cons" +
       "tant/profile_access_strategy.proto\"\247\003\n\010U" +
-              "serInfo\022'\n\002id\030\001 \001(\0132\033.google.protobuf.In" +
+      "serInfo\022\'\n\002id\030\001 \001(\0132\033.google.protobuf.In" +
       "t64Value\022*\n\004name\030\002 \001(\0132\034.google.protobuf" +
       ".StringValue\022+\n\005intro\030\003 \001(\0132\034.google.pro" +
       "tobuf.StringValue\0229\n\023profile_picture_url" +

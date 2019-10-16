@@ -16,7 +16,7 @@ public final class MessageOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_Message_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_Message_fieldAccessorTable;
 
@@ -30,7 +30,7 @@ public final class MessageOuterClass {
     java.lang.String[] descriptorData = {
       "\n\031dto/message/message.proto\022\016im.turms.pr" +
       "oto\032\036google/protobuf/wrappers.proto\032\030con" +
-              "stant/chat_type.proto\"\373\002\n\007Message\022'\n\002id\030" +
+      "stant/chat_type.proto\"\373\002\n\007Message\022\'\n\002id\030" +
       "\001 \001(\0132\033.google.protobuf.Int64Value\022+\n\tch" +
       "at_type\030\002 \001(\0162\030.im.turms.proto.ChatType\022" +
       "2\n\rdelivery_date\030\003 \001(\0132\033.google.protobuf" +

@@ -16,12 +16,12 @@ public final class TurmsResponseOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_TurmsResponse_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_TurmsResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_TurmsResponse_Data_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_TurmsResponse_Data_fieldAccessorTable;
 
@@ -87,7 +87,7 @@ public final class TurmsResponseOuterClass {
       "thVersionH\000\022Z\n!group_join_questions_with" +
       "_version\030\017 \001(\0132-.im.turms.proto.GroupJoi" +
       "nQuestionsWithVersionH\000\022M\n\032group_members" +
-              "_with_version\030\020 \001(\0132'.im.turms.proto.Gro" +
+      "_with_version\030\020 \001(\0132\'.im.turms.proto.Gro" +
       "upMembersWithVersionH\000\022@\n\023groups_with_ve" +
       "rsion\030\021 \001(\0132!.im.turms.proto.GroupsWithV" +
       "ersionH\000B\006\n\004kindB \n\034im.turms.turms.pojo." +

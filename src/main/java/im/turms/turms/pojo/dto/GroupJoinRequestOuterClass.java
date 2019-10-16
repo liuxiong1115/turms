@@ -16,7 +16,7 @@ public final class GroupJoinRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_GroupJoinRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_GroupJoinRequest_fieldAccessorTable;
 
@@ -31,7 +31,7 @@ public final class GroupJoinRequestOuterClass {
       "\n\"dto/group/group_join_request.proto\022\016im" +
       ".turms.proto\032\036google/protobuf/wrappers.p" +
       "roto\032\035constant/request_status.proto\"\230\003\n\020" +
-              "GroupJoinRequest\022'\n\002id\030\001 \001(\0132\033.google.pr" +
+      "GroupJoinRequest\022\'\n\002id\030\001 \001(\0132\033.google.pr" +
       "otobuf.Int64Value\0222\n\rcreation_date\030\002 \001(\013" +
       "2\033.google.protobuf.Int64Value\022-\n\007content" +
       "\030\003 \001(\0132\034.google.protobuf.StringValue\022-\n\006" +

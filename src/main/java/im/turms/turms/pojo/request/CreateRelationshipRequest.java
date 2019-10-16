@@ -214,7 +214,8 @@ private static final long serialVersionUID = 0L;
       if (!getGroupIndex()
           .equals(other.getGroupIndex())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -510,7 +511,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setUserId(long value) {
-
+      
       userId_ = value;
       onChanged();
       return this;
@@ -520,7 +521,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearUserId() {
-
+      
       userId_ = 0L;
       onChanged();
       return this;
@@ -540,7 +541,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setIsBlocked(boolean value) {
-
+      
       isBlocked_ = value;
       onChanged();
       return this;
@@ -550,7 +551,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearIsBlocked() {
-
+      
       isBlocked_ = false;
       onChanged();
       return this;
@@ -643,7 +644,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value group_index = 3;</code>
      */
     public com.google.protobuf.Int32Value.Builder getGroupIndexBuilder() {
-
+      
       onChanged();
       return getGroupIndexFieldBuilder().getBuilder();
     }
@@ -662,7 +663,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value group_index = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getGroupIndexFieldBuilder() {
       if (groupIndexBuilder_ == null) {
         groupIndexBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

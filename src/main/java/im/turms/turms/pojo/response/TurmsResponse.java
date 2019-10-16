@@ -388,7 +388,7 @@ private static final long serialVersionUID = 0L;
      */
     im.turms.turms.pojo.response.GroupsWithVersionOrBuilder getGroupsWithVersionOrBuilder();
 
-    im.turms.turms.pojo.response.TurmsResponse.Data.KindCase getKindCase();
+    public im.turms.turms.pojo.response.TurmsResponse.Data.KindCase getKindCase();
   }
   /**
    * Protobuf type {@code im.turms.proto.TurmsResponse.Data}
@@ -729,7 +729,7 @@ private static final long serialVersionUID = 0L;
       GROUPS_WITH_VERSION(17),
       KIND_NOT_SET(0);
       private final int value;
-      KindCase(int value) {
+      private KindCase(int value) {
         this.value = value;
       }
       /**
@@ -768,7 +768,7 @@ private static final long serialVersionUID = 0L;
       public int getNumber() {
         return this.value;
       }
-    }
+    };
 
     public KindCase
     getKindCase() {
@@ -1482,7 +1482,8 @@ private static final long serialVersionUID = 0L;
         case 0:
         default:
       }
-      return unknownFields.equals(other.unknownFields);
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2130,7 +2131,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.Int64Values ids = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.Int64Values, im.turms.turms.pojo.response.Int64Values.Builder, im.turms.turms.pojo.response.Int64ValuesOrBuilder>
+          im.turms.turms.pojo.response.Int64Values, im.turms.turms.pojo.response.Int64Values.Builder, im.turms.turms.pojo.response.Int64ValuesOrBuilder> 
           getIdsFieldBuilder() {
         if (idsBuilder_ == null) {
           if (!(kindCase_ == 1)) {
@@ -2144,7 +2145,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 1;
-        onChanged();
+        onChanged();;
         return idsBuilder_;
       }
 
@@ -2268,7 +2269,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.Int64ValuesWithVersion, im.turms.turms.pojo.response.Int64ValuesWithVersion.Builder, im.turms.turms.pojo.response.Int64ValuesWithVersionOrBuilder>
+          im.turms.turms.pojo.response.Int64ValuesWithVersion, im.turms.turms.pojo.response.Int64ValuesWithVersion.Builder, im.turms.turms.pojo.response.Int64ValuesWithVersionOrBuilder> 
           getIdsWithVersionFieldBuilder() {
         if (idsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 2)) {
@@ -2282,7 +2283,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 2;
-        onChanged();
+        onChanged();;
         return idsWithVersionBuilder_;
       }
 
@@ -2406,7 +2407,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.BoolValue success = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>
+          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
           getSuccessFieldBuilder() {
         if (successBuilder_ == null) {
           if (!(kindCase_ == 3)) {
@@ -2420,7 +2421,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 3;
-        onChanged();
+        onChanged();;
         return successBuilder_;
       }
 
@@ -2544,7 +2545,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.dto.Acknowledge, im.turms.turms.pojo.dto.Acknowledge.Builder, im.turms.turms.pojo.dto.AcknowledgeOrBuilder>
+          im.turms.turms.pojo.dto.Acknowledge, im.turms.turms.pojo.dto.Acknowledge.Builder, im.turms.turms.pojo.dto.AcknowledgeOrBuilder> 
           getAcknowledgeFieldBuilder() {
         if (acknowledgeBuilder_ == null) {
           if (!(kindCase_ == 4)) {
@@ -2558,7 +2559,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 4;
-        onChanged();
+        onChanged();;
         return acknowledgeBuilder_;
       }
 
@@ -2682,7 +2683,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.Messages messages = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.Messages, im.turms.turms.pojo.response.Messages.Builder, im.turms.turms.pojo.response.MessagesOrBuilder>
+          im.turms.turms.pojo.response.Messages, im.turms.turms.pojo.response.Messages.Builder, im.turms.turms.pojo.response.MessagesOrBuilder> 
           getMessagesFieldBuilder() {
         if (messagesBuilder_ == null) {
           if (!(kindCase_ == 5)) {
@@ -2696,7 +2697,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 5;
-        onChanged();
+        onChanged();;
         return messagesBuilder_;
       }
 
@@ -2820,7 +2821,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.dto.MessageStatus, im.turms.turms.pojo.dto.MessageStatus.Builder, im.turms.turms.pojo.dto.MessageStatusOrBuilder>
+          im.turms.turms.pojo.dto.MessageStatus, im.turms.turms.pojo.dto.MessageStatus.Builder, im.turms.turms.pojo.dto.MessageStatusOrBuilder> 
           getMessageStatusFieldBuilder() {
         if (messageStatusBuilder_ == null) {
           if (!(kindCase_ == 6)) {
@@ -2834,7 +2835,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 6;
-        onChanged();
+        onChanged();;
         return messageStatusBuilder_;
       }
 
@@ -2958,7 +2959,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.MessagesWithTotalList, im.turms.turms.pojo.response.MessagesWithTotalList.Builder, im.turms.turms.pojo.response.MessagesWithTotalListOrBuilder>
+          im.turms.turms.pojo.response.MessagesWithTotalList, im.turms.turms.pojo.response.MessagesWithTotalList.Builder, im.turms.turms.pojo.response.MessagesWithTotalListOrBuilder> 
           getMessagesWithTotalListFieldBuilder() {
         if (messagesWithTotalListBuilder_ == null) {
           if (!(kindCase_ == 7)) {
@@ -2972,7 +2973,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 7;
-        onChanged();
+        onChanged();;
         return messagesWithTotalListBuilder_;
       }
 
@@ -3096,7 +3097,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.UsersInfosWithVersion, im.turms.turms.pojo.response.UsersInfosWithVersion.Builder, im.turms.turms.pojo.response.UsersInfosWithVersionOrBuilder>
+          im.turms.turms.pojo.response.UsersInfosWithVersion, im.turms.turms.pojo.response.UsersInfosWithVersion.Builder, im.turms.turms.pojo.response.UsersInfosWithVersionOrBuilder> 
           getUsersInfosWithVersionFieldBuilder() {
         if (usersInfosWithVersionBuilder_ == null) {
           if (!(kindCase_ == 8)) {
@@ -3110,7 +3111,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 8;
-        onChanged();
+        onChanged();;
         return usersInfosWithVersionBuilder_;
       }
 
@@ -3234,7 +3235,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 9;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.UsersOnlineStatuses, im.turms.turms.pojo.response.UsersOnlineStatuses.Builder, im.turms.turms.pojo.response.UsersOnlineStatusesOrBuilder>
+          im.turms.turms.pojo.response.UsersOnlineStatuses, im.turms.turms.pojo.response.UsersOnlineStatuses.Builder, im.turms.turms.pojo.response.UsersOnlineStatusesOrBuilder> 
           getUsersOnlineStatusesFieldBuilder() {
         if (usersOnlineStatusesBuilder_ == null) {
           if (!(kindCase_ == 9)) {
@@ -3248,7 +3249,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 9;
-        onChanged();
+        onChanged();;
         return usersOnlineStatusesBuilder_;
       }
 
@@ -3372,7 +3373,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 10;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.UserFriendRequestsWithVersion, im.turms.turms.pojo.response.UserFriendRequestsWithVersion.Builder, im.turms.turms.pojo.response.UserFriendRequestsWithVersionOrBuilder>
+          im.turms.turms.pojo.response.UserFriendRequestsWithVersion, im.turms.turms.pojo.response.UserFriendRequestsWithVersion.Builder, im.turms.turms.pojo.response.UserFriendRequestsWithVersionOrBuilder> 
           getUserFriendRequestsWithVersionFieldBuilder() {
         if (userFriendRequestsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 10)) {
@@ -3386,7 +3387,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 10;
-        onChanged();
+        onChanged();;
         return userFriendRequestsWithVersionBuilder_;
       }
 
@@ -3510,7 +3511,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 11;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.UserRelationshipGroupsWithVersion, im.turms.turms.pojo.response.UserRelationshipGroupsWithVersion.Builder, im.turms.turms.pojo.response.UserRelationshipGroupsWithVersionOrBuilder>
+          im.turms.turms.pojo.response.UserRelationshipGroupsWithVersion, im.turms.turms.pojo.response.UserRelationshipGroupsWithVersion.Builder, im.turms.turms.pojo.response.UserRelationshipGroupsWithVersionOrBuilder> 
           getUserRelationshipGroupsWithVersionFieldBuilder() {
         if (userRelationshipGroupsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 11)) {
@@ -3524,7 +3525,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 11;
-        onChanged();
+        onChanged();;
         return userRelationshipGroupsWithVersionBuilder_;
       }
 
@@ -3648,7 +3649,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 12;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.UserRelationshipsWithVersion, im.turms.turms.pojo.response.UserRelationshipsWithVersion.Builder, im.turms.turms.pojo.response.UserRelationshipsWithVersionOrBuilder>
+          im.turms.turms.pojo.response.UserRelationshipsWithVersion, im.turms.turms.pojo.response.UserRelationshipsWithVersion.Builder, im.turms.turms.pojo.response.UserRelationshipsWithVersionOrBuilder> 
           getUserRelationshipsWithVersionFieldBuilder() {
         if (userRelationshipsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 12)) {
@@ -3662,7 +3663,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 12;
-        onChanged();
+        onChanged();;
         return userRelationshipsWithVersionBuilder_;
       }
 
@@ -3786,7 +3787,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 13;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.GroupInvitationsWithVersion, im.turms.turms.pojo.response.GroupInvitationsWithVersion.Builder, im.turms.turms.pojo.response.GroupInvitationsWithVersionOrBuilder>
+          im.turms.turms.pojo.response.GroupInvitationsWithVersion, im.turms.turms.pojo.response.GroupInvitationsWithVersion.Builder, im.turms.turms.pojo.response.GroupInvitationsWithVersionOrBuilder> 
           getGroupInvitationsWithVersionFieldBuilder() {
         if (groupInvitationsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 13)) {
@@ -3800,7 +3801,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 13;
-        onChanged();
+        onChanged();;
         return groupInvitationsWithVersionBuilder_;
       }
 
@@ -3924,7 +3925,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 14;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.GroupJoinRequestsWithVersion, im.turms.turms.pojo.response.GroupJoinRequestsWithVersion.Builder, im.turms.turms.pojo.response.GroupJoinRequestsWithVersionOrBuilder>
+          im.turms.turms.pojo.response.GroupJoinRequestsWithVersion, im.turms.turms.pojo.response.GroupJoinRequestsWithVersion.Builder, im.turms.turms.pojo.response.GroupJoinRequestsWithVersionOrBuilder> 
           getGroupJoinRequestsWithVersionFieldBuilder() {
         if (groupJoinRequestsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 14)) {
@@ -3938,7 +3939,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 14;
-        onChanged();
+        onChanged();;
         return groupJoinRequestsWithVersionBuilder_;
       }
 
@@ -4062,7 +4063,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 15;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.GroupJoinQuestionsWithVersion, im.turms.turms.pojo.response.GroupJoinQuestionsWithVersion.Builder, im.turms.turms.pojo.response.GroupJoinQuestionsWithVersionOrBuilder>
+          im.turms.turms.pojo.response.GroupJoinQuestionsWithVersion, im.turms.turms.pojo.response.GroupJoinQuestionsWithVersion.Builder, im.turms.turms.pojo.response.GroupJoinQuestionsWithVersionOrBuilder> 
           getGroupJoinQuestionsWithVersionFieldBuilder() {
         if (groupJoinQuestionsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 15)) {
@@ -4076,7 +4077,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 15;
-        onChanged();
+        onChanged();;
         return groupJoinQuestionsWithVersionBuilder_;
       }
 
@@ -4200,7 +4201,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 16;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.GroupMembersWithVersion, im.turms.turms.pojo.response.GroupMembersWithVersion.Builder, im.turms.turms.pojo.response.GroupMembersWithVersionOrBuilder>
+          im.turms.turms.pojo.response.GroupMembersWithVersion, im.turms.turms.pojo.response.GroupMembersWithVersion.Builder, im.turms.turms.pojo.response.GroupMembersWithVersionOrBuilder> 
           getGroupMembersWithVersionFieldBuilder() {
         if (groupMembersWithVersionBuilder_ == null) {
           if (!(kindCase_ == 16)) {
@@ -4214,7 +4215,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 16;
-        onChanged();
+        onChanged();;
         return groupMembersWithVersionBuilder_;
       }
 
@@ -4338,7 +4339,7 @@ private static final long serialVersionUID = 0L;
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 17;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.response.GroupsWithVersion, im.turms.turms.pojo.response.GroupsWithVersion.Builder, im.turms.turms.pojo.response.GroupsWithVersionOrBuilder>
+          im.turms.turms.pojo.response.GroupsWithVersion, im.turms.turms.pojo.response.GroupsWithVersion.Builder, im.turms.turms.pojo.response.GroupsWithVersionOrBuilder> 
           getGroupsWithVersionFieldBuilder() {
         if (groupsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 17)) {
@@ -4352,7 +4353,7 @@ private static final long serialVersionUID = 0L;
           kind_ = null;
         }
         kindCase_ = 17;
-        onChanged();
+        onChanged();;
         return groupsWithVersionBuilder_;
       }
       @java.lang.Override
@@ -4594,7 +4595,8 @@ private static final long serialVersionUID = 0L;
       if (!getNotification()
           .equals(other.getNotification())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -4935,7 +4937,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setRequestId(long value) {
-
+      
       requestId_ = value;
       onChanged();
       return this;
@@ -4950,7 +4952,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearRequestId() {
-
+      
       requestId_ = 0L;
       onChanged();
       return this;
@@ -4970,7 +4972,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setCode(int value) {
-
+      
       code_ = value;
       onChanged();
       return this;
@@ -4980,7 +4982,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearCode() {
-
+      
       code_ = 0;
       onChanged();
       return this;
@@ -5073,7 +5075,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
     public com.google.protobuf.StringValue.Builder getReasonBuilder() {
-
+      
       onChanged();
       return getReasonFieldBuilder().getBuilder();
     }
@@ -5092,7 +5094,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getReasonFieldBuilder() {
       if (reasonBuilder_ == null) {
         reasonBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -5192,7 +5194,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.TurmsResponse.Data data = 4;</code>
      */
     public im.turms.turms.pojo.response.TurmsResponse.Data.Builder getDataBuilder() {
-
+      
       onChanged();
       return getDataFieldBuilder().getBuilder();
     }
@@ -5211,7 +5213,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.TurmsResponse.Data data = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.response.TurmsResponse.Data, im.turms.turms.pojo.response.TurmsResponse.Data.Builder, im.turms.turms.pojo.response.TurmsResponse.DataOrBuilder>
+        im.turms.turms.pojo.response.TurmsResponse.Data, im.turms.turms.pojo.response.TurmsResponse.Data.Builder, im.turms.turms.pojo.response.TurmsResponse.DataOrBuilder> 
         getDataFieldBuilder() {
       if (dataBuilder_ == null) {
         dataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -5311,7 +5313,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.TurmsRequest notification = 5;</code>
      */
     public im.turms.turms.pojo.request.TurmsRequest.Builder getNotificationBuilder() {
-
+      
       onChanged();
       return getNotificationFieldBuilder().getBuilder();
     }
@@ -5330,7 +5332,7 @@ private static final long serialVersionUID = 0L;
      * <code>.im.turms.proto.TurmsRequest notification = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.TurmsRequest, im.turms.turms.pojo.request.TurmsRequest.Builder, im.turms.turms.pojo.request.TurmsRequestOrBuilder>
+        im.turms.turms.pojo.request.TurmsRequest, im.turms.turms.pojo.request.TurmsRequest.Builder, im.turms.turms.pojo.request.TurmsRequestOrBuilder> 
         getNotificationFieldBuilder() {
       if (notificationBuilder_ == null) {
         notificationBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

@@ -109,7 +109,7 @@ public enum ResponseAction
 
   private final int value;
 
-  ResponseAction(int value) {
+  private ResponseAction(int value) {
     this.value = value;
   }
 

@@ -16,7 +16,7 @@ public final class GroupOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_Group_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_Group_fieldAccessorTable;
 
@@ -30,7 +30,7 @@ public final class GroupOuterClass {
     java.lang.String[] descriptorData = {
       "\n\025dto/group/group.proto\022\016im.turms.proto\032" +
       "\036google/protobuf/wrappers.proto\"\316\004\n\005Grou" +
-              "p\022'\n\002id\030\001 \001(\0132\033.google.protobuf.Int64Val" +
+      "p\022\'\n\002id\030\001 \001(\0132\033.google.protobuf.Int64Val" +
       "ue\022,\n\007type_id\030\002 \001(\0132\033.google.protobuf.In" +
       "t64Value\022/\n\ncreator_id\030\003 \001(\0132\033.google.pr" +
       "otobuf.Int64Value\022-\n\010owner_id\030\004 \001(\0132\033.go" +

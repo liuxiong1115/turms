@@ -180,7 +180,7 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs =
+      com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       text_ = s;
@@ -195,7 +195,7 @@ private static final long serialVersionUID = 0L;
       getTextBytes() {
     java.lang.Object ref = text_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
+      com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
       text_ = b;
@@ -352,7 +352,8 @@ private static final long serialVersionUID = 0L;
       if (!getBurnAfter()
           .equals(other.getBurnAfter())) return false;
     }
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -710,7 +711,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       chatType_ = value.getNumber();
       onChanged();
       return this;
@@ -720,7 +721,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearChatType() {
-
+      
       chatType_ = 0;
       onChanged();
       return this;
@@ -740,7 +741,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setToId(long value) {
-
+      
       toId_ = value;
       onChanged();
       return this;
@@ -750,7 +751,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearToId() {
-
+      
       toId_ = 0L;
       onChanged();
       return this;
@@ -770,7 +771,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setDeliveryDate(long value) {
-
+      
       deliveryDate_ = value;
       onChanged();
       return this;
@@ -780,7 +781,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearDeliveryDate() {
-
+      
       deliveryDate_ = 0L;
       onChanged();
       return this;
@@ -811,7 +812,7 @@ private static final long serialVersionUID = 0L;
         getTextBytes() {
       java.lang.Object ref = text_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         text_ = b;
@@ -830,7 +831,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
     throw new NullPointerException();
   }
-
+  
       text_ = value;
       onChanged();
       return this;
@@ -840,7 +841,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearText() {
-
+      
       text_ = getDefaultInstance().getText();
       onChanged();
       return this;
@@ -856,7 +857,7 @@ private static final long serialVersionUID = 0L;
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-
+      
       text_ = value;
       onChanged();
       return this;
@@ -1034,7 +1035,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value burn_after = 6;</code>
      */
     public com.google.protobuf.Int32Value.Builder getBurnAfterBuilder() {
-
+      
       onChanged();
       return getBurnAfterFieldBuilder().getBuilder();
     }
@@ -1053,7 +1054,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value burn_after = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getBurnAfterFieldBuilder() {
       if (burnAfterBuilder_ == null) {
         burnAfterBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

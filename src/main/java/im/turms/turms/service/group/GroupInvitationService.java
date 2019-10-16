@@ -126,7 +126,7 @@ public class GroupInvitationService {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         return groupMemberService
-                .isAllowedToInviteOrAdd(groupId, inviterId)
+                .isAllowedToInviteOrAdd(groupId, inviterId, null)
                 .flatMap(strategy -> {
                     if (!strategy.isInvitable()) {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));

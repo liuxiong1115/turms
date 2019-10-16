@@ -105,7 +105,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <code>repeated .im.turms.proto.Message messages = 1;</code>
    */
-  public java.util.List<? extends im.turms.turms.pojo.dto.MessageOrBuilder>
+  public java.util.List<? extends im.turms.turms.pojo.dto.MessageOrBuilder> 
       getMessagesOrBuilderList() {
     return messages_;
   }
@@ -176,7 +176,8 @@ private static final long serialVersionUID = 0L;
 
     if (!getMessagesList()
         .equals(other.getMessagesList())) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -432,7 +433,7 @@ private static final long serialVersionUID = 0L;
             messagesBuilder_ = null;
             messages_ = other.messages_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            messagesBuilder_ =
+            messagesBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getMessagesFieldBuilder() : null;
           } else {
@@ -665,7 +666,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.Message messages = 1;</code>
      */
-    public java.util.List<? extends im.turms.turms.pojo.dto.MessageOrBuilder>
+    public java.util.List<? extends im.turms.turms.pojo.dto.MessageOrBuilder> 
          getMessagesOrBuilderList() {
       if (messagesBuilder_ != null) {
         return messagesBuilder_.getMessageOrBuilderList();
@@ -691,12 +692,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.Message messages = 1;</code>
      */
-    public java.util.List<im.turms.turms.pojo.dto.Message.Builder>
+    public java.util.List<im.turms.turms.pojo.dto.Message.Builder> 
          getMessagesBuilderList() {
       return getMessagesFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        im.turms.turms.pojo.dto.Message, im.turms.turms.pojo.dto.Message.Builder, im.turms.turms.pojo.dto.MessageOrBuilder>
+        im.turms.turms.pojo.dto.Message, im.turms.turms.pojo.dto.Message.Builder, im.turms.turms.pojo.dto.MessageOrBuilder> 
         getMessagesFieldBuilder() {
       if (messagesBuilder_ == null) {
         messagesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<

@@ -152,7 +152,8 @@ private static final long serialVersionUID = 0L;
     im.turms.turms.pojo.request.UpdateUserOnlineStatusRequest other = (im.turms.turms.pojo.request.UpdateUserOnlineStatusRequest) obj;
 
     if (userStatus_ != other.userStatus_) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -442,7 +443,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       userStatus_ = value.getNumber();
       onChanged();
       return this;
@@ -452,7 +453,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearUserStatus() {
-
+      
       userStatus_ = 0;
       onChanged();
       return this;

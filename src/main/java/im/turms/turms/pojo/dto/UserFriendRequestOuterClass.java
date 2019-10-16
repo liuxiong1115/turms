@@ -16,7 +16,7 @@ public final class UserFriendRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UserFriendRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UserFriendRequest_fieldAccessorTable;
 
@@ -31,7 +31,7 @@ public final class UserFriendRequestOuterClass {
       "\n\"dto/user/user_friend_request.proto\022\016im" +
       ".turms.proto\032\036google/protobuf/wrappers.p" +
       "roto\032\035constant/request_status.proto\"\240\003\n\021" +
-              "UserFriendRequest\022'\n\002id\030\001 \001(\0132\033.google.p" +
+      "UserFriendRequest\022\'\n\002id\030\001 \001(\0132\033.google.p" +
       "rotobuf.Int64Value\0222\n\rcreation_date\030\002 \001(" +
       "\0132\033.google.protobuf.Int64Value\022-\n\007conten" +
       "t\030\003 \001(\0132\034.google.protobuf.StringValue\0225\n" +

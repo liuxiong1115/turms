@@ -213,7 +213,7 @@ private static final long serialVersionUID = 0L;
   /**
    * <code>repeated .google.protobuf.StringValue answers = 4;</code>
    */
-  public java.util.List<? extends com.google.protobuf.StringValueOrBuilder>
+  public java.util.List<? extends com.google.protobuf.StringValueOrBuilder> 
       getAnswersOrBuilderList() {
     return answers_;
   }
@@ -320,7 +320,8 @@ private static final long serialVersionUID = 0L;
     }
     if (!getAnswersList()
         .equals(other.getAnswersList())) return false;
-    return unknownFields.equals(other.unknownFields);
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -630,7 +631,7 @@ private static final long serialVersionUID = 0L;
             answersBuilder_ = null;
             answers_ = other.answers_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            answersBuilder_ =
+            answersBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getAnswersFieldBuilder() : null;
           } else {
@@ -755,7 +756,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value id = 1;</code>
      */
     public com.google.protobuf.Int64Value.Builder getIdBuilder() {
-
+      
       onChanged();
       return getIdFieldBuilder().getBuilder();
     }
@@ -774,7 +775,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value id = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getIdFieldBuilder() {
       if (idBuilder_ == null) {
         idBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -874,7 +875,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value group_id = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getGroupIdBuilder() {
-
+      
       onChanged();
       return getGroupIdFieldBuilder().getBuilder();
     }
@@ -893,7 +894,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value group_id = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getGroupIdFieldBuilder() {
       if (groupIdBuilder_ == null) {
         groupIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -993,7 +994,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue question = 3;</code>
      */
     public com.google.protobuf.StringValue.Builder getQuestionBuilder() {
-
+      
       onChanged();
       return getQuestionFieldBuilder().getBuilder();
     }
@@ -1012,7 +1013,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue question = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getQuestionFieldBuilder() {
       if (questionBuilder_ == null) {
         questionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1220,7 +1221,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .google.protobuf.StringValue answers = 4;</code>
      */
-    public java.util.List<? extends com.google.protobuf.StringValueOrBuilder>
+    public java.util.List<? extends com.google.protobuf.StringValueOrBuilder> 
          getAnswersOrBuilderList() {
       if (answersBuilder_ != null) {
         return answersBuilder_.getMessageOrBuilderList();
@@ -1246,12 +1247,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .google.protobuf.StringValue answers = 4;</code>
      */
-    public java.util.List<com.google.protobuf.StringValue.Builder>
+    public java.util.List<com.google.protobuf.StringValue.Builder> 
          getAnswersBuilderList() {
       return getAnswersFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getAnswersFieldBuilder() {
       if (answersBuilder_ == null) {
         answersBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<

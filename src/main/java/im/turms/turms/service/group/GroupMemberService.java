@@ -72,19 +72,20 @@ public class GroupMemberService {
         this.turmsClusterManager = turmsClusterManager;
     }
 
-    //TODO: member's name
     public Mono<Boolean> addGroupMember(
             @NotNull Long groupId,
             @NotNull Long userId,
             @NotNull GroupMemberRole groupMemberRole,
+            @Nullable String name,
+            @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
         GroupMember groupMember = new GroupMember(
                 groupId,
                 userId,
-                null,
+                name,
                 groupMemberRole,
                 new Date(),
-                null);
+                muteEndDate);
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.insert(groupMember)
                 .zipWith(groupVersionService.updateMembersVersion(groupId))
@@ -96,15 +97,17 @@ public class GroupMemberService {
             @NotNull Long groupId,
             @NotNull Long userId,
             @NotNull GroupMemberRole groupMemberRole,
+            @Nullable String name,
+            @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        return isAllowedToInviteOrAdd(groupId, requesterId)
+        return isAllowedToInviteOrAdd(groupId, requesterId, groupMemberRole)
                 .flatMap(allowed -> {
                     if (allowed.isInvitable()) {
                         return Mono.zip(isBlacklisted(groupId, userId),
                                 groupService.isGroupActive(groupId))
                                 .flatMap(results -> {
                                     if (!results.getT1() && results.getT2()) {
-                                        return addGroupMember(groupId, userId, groupMemberRole, operations);
+                                        return addGroupMember(groupId, userId, groupMemberRole, name, muteEndDate, operations);
                                     } else {
                                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.TARGET_USERS_UNAUTHORIZED));
                                     }
@@ -227,7 +230,8 @@ public class GroupMemberService {
 
     public Mono<InvitableAndInvitationStrategy> isAllowedToInviteOrAdd(
             @NotNull Long groupId,
-            @NotNull Long inviterId) {
+            @NotNull Long inviterId,
+            @Nullable GroupMemberRole targetRole) {
         return groupService.queryGroupType(groupId)
                 .flatMap(groupType -> {
                     GroupInvitationStrategy groupInvitationStrategy = groupType.getInvitationStrategy();
@@ -240,16 +244,31 @@ public class GroupMemberService {
                                     switch (groupInvitationStrategy) {
                                         case OWNER:
                                         case OWNER_REQUIRING_ACCEPTANCE:
-                                            return groupMemberRole == GroupMemberRole.OWNER;
+                                            return groupMemberRole == GroupMemberRole.OWNER
+                                                    && targetRole != GroupMemberRole.OWNER;
                                         case OWNER_MANAGER:
                                         case OWNER_MANAGER_REQUIRING_ACCEPTANCE:
-                                            return groupMemberRole == GroupMemberRole.OWNER
-                                                    || groupMemberRole == GroupMemberRole.MANAGER;
+                                            if (groupMemberRole == GroupMemberRole.OWNER
+                                                    || groupMemberRole == GroupMemberRole.MANAGER) {
+                                                if (targetRole != null) {
+                                                    return groupMemberRole.getNumber() < targetRole.getNumber();
+                                                } else {
+                                                    return true;
+                                                }
+                                            }
+                                            return false;
                                         case OWNER_MANAGER_MEMBER:
                                         case OWNER_MANAGER_MEMBER_REQUIRING_ACCEPTANCE:
-                                            return groupMemberRole == GroupMemberRole.OWNER
+                                            if (groupMemberRole == GroupMemberRole.OWNER
                                                     || groupMemberRole == GroupMemberRole.MANAGER
-                                                    || groupMemberRole == GroupMemberRole.MEMBER;
+                                                    || groupMemberRole == GroupMemberRole.MEMBER) {
+                                                if (targetRole != null) {
+                                                    return groupMemberRole.getNumber() < targetRole.getNumber();
+                                                } else {
+                                                    return true;
+                                                }
+                                            }
+                                            return false;
                                         default:
                                             return false;
                                     }
