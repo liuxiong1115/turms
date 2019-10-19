@@ -109,6 +109,9 @@ public class WsMessageController {
             return messageStatusService.queryMessageStatuses(request.getMessageId())
                     .collectList()
                     .map(messageStatuses -> {
+                        if (messageStatuses == null || messageStatuses.isEmpty()) {
+                            return RequestResult.NOT_FOUND;
+                        }
                         MessageStatuses.Builder builder = MessageStatuses.newBuilder();
                         for (MessageStatus messageStatus : messageStatuses) {
                             builder.addMessageStatuses(ProtoUtil.messageStatus2proto(messageStatus));

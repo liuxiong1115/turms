@@ -34,7 +34,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestResult {
-    public static final RequestResult EMPTY_RESULT = new RequestResult(
+    public static final RequestResult NOT_FOUND = new RequestResult(
             null,
             null,
             null,

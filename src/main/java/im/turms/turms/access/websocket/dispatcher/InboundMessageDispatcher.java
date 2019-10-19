@@ -151,7 +151,7 @@ public class InboundMessageDispatcher {
             @NotNull Mono<RequestResult> result,
             @Nullable Long requestId) {//TODO
         return result
-                .defaultIfEmpty(RequestResult.EMPTY_RESULT)
+                .defaultIfEmpty(RequestResult.NOT_FOUND)
                 .onErrorResume(throwable -> {
                     if (throwable instanceof TurmsBusinessException) {
                         TurmsStatusCode code = ((TurmsBusinessException) throwable).getCode();
@@ -163,7 +163,7 @@ public class InboundMessageDispatcher {
                     }
                 })
                 .flatMap(requestResult -> {
-                    if (requestResult == RequestResult.EMPTY_RESULT) {
+                    if (requestResult == RequestResult.NOT_FOUND) {
                         if (requestId != null) {
                             TurmsResponse response = TurmsResponse.newBuilder()
                                     .setCode(TurmsStatusCode.NOT_FOUND.getBusinessCode())
