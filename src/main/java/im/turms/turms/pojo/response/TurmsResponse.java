@@ -209,19 +209,19 @@ private static final long serialVersionUID = 0L;
     im.turms.turms.pojo.response.MessagesOrBuilder getMessagesOrBuilder();
 
     /**
-     * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
-     * @return Whether the messageStatus field is set.
+     * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
+     * @return Whether the messageStatuses field is set.
      */
-    boolean hasMessageStatus();
+    boolean hasMessageStatuses();
     /**
-     * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
-     * @return The messageStatus.
+     * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
+     * @return The messageStatuses.
      */
-    im.turms.turms.pojo.dto.MessageStatus getMessageStatus();
+    im.turms.turms.pojo.response.MessageStatuses getMessageStatuses();
     /**
-     * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+     * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
      */
-    im.turms.turms.pojo.dto.MessageStatusOrBuilder getMessageStatusOrBuilder();
+    im.turms.turms.pojo.response.MessageStatusesOrBuilder getMessageStatusesOrBuilder();
 
     /**
      * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 7;</code>
@@ -506,14 +506,14 @@ private static final long serialVersionUID = 0L;
               break;
             }
             case 50: {
-              im.turms.turms.pojo.dto.MessageStatus.Builder subBuilder = null;
+              im.turms.turms.pojo.response.MessageStatuses.Builder subBuilder = null;
               if (kindCase_ == 6) {
-                subBuilder = ((im.turms.turms.pojo.dto.MessageStatus) kind_).toBuilder();
+                subBuilder = ((im.turms.turms.pojo.response.MessageStatuses) kind_).toBuilder();
               }
               kind_ =
-                  input.readMessage(im.turms.turms.pojo.dto.MessageStatus.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.response.MessageStatuses.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom((im.turms.turms.pojo.dto.MessageStatus) kind_);
+                subBuilder.mergeFrom((im.turms.turms.pojo.response.MessageStatuses) kind_);
                 kind_ = subBuilder.buildPartial();
               }
               kindCase_ = 6;
@@ -715,7 +715,7 @@ private static final long serialVersionUID = 0L;
       SUCCESS(3),
       ACKNOWLEDGE(4),
       MESSAGES(5),
-      MESSAGE_STATUS(6),
+      MESSAGE_STATUSES(6),
       MESSAGES_WITH_TOTAL_LIST(7),
       USERS_INFOS_WITH_VERSION(8),
       USERS_ONLINE_STATUSES(9),
@@ -749,7 +749,7 @@ private static final long serialVersionUID = 0L;
           case 3: return SUCCESS;
           case 4: return ACKNOWLEDGE;
           case 5: return MESSAGES;
-          case 6: return MESSAGE_STATUS;
+          case 6: return MESSAGE_STATUSES;
           case 7: return MESSAGES_WITH_TOTAL_LIST;
           case 8: return USERS_INFOS_WITH_VERSION;
           case 9: return USERS_ONLINE_STATUSES;
@@ -916,32 +916,32 @@ private static final long serialVersionUID = 0L;
       return im.turms.turms.pojo.response.Messages.getDefaultInstance();
     }
 
-    public static final int MESSAGE_STATUS_FIELD_NUMBER = 6;
+    public static final int MESSAGE_STATUSES_FIELD_NUMBER = 6;
     /**
-     * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
-     * @return Whether the messageStatus field is set.
+     * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
+     * @return Whether the messageStatuses field is set.
      */
-    public boolean hasMessageStatus() {
+    public boolean hasMessageStatuses() {
       return kindCase_ == 6;
     }
     /**
-     * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
-     * @return The messageStatus.
+     * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
+     * @return The messageStatuses.
      */
-    public im.turms.turms.pojo.dto.MessageStatus getMessageStatus() {
+    public im.turms.turms.pojo.response.MessageStatuses getMessageStatuses() {
       if (kindCase_ == 6) {
-         return (im.turms.turms.pojo.dto.MessageStatus) kind_;
+         return (im.turms.turms.pojo.response.MessageStatuses) kind_;
       }
-      return im.turms.turms.pojo.dto.MessageStatus.getDefaultInstance();
+      return im.turms.turms.pojo.response.MessageStatuses.getDefaultInstance();
     }
     /**
-     * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+     * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
      */
-    public im.turms.turms.pojo.dto.MessageStatusOrBuilder getMessageStatusOrBuilder() {
+    public im.turms.turms.pojo.response.MessageStatusesOrBuilder getMessageStatusesOrBuilder() {
       if (kindCase_ == 6) {
-         return (im.turms.turms.pojo.dto.MessageStatus) kind_;
+         return (im.turms.turms.pojo.response.MessageStatuses) kind_;
       }
-      return im.turms.turms.pojo.dto.MessageStatus.getDefaultInstance();
+      return im.turms.turms.pojo.response.MessageStatuses.getDefaultInstance();
     }
 
     public static final int MESSAGES_WITH_TOTAL_LIST_FIELD_NUMBER = 7;
@@ -1282,7 +1282,7 @@ private static final long serialVersionUID = 0L;
         output.writeMessage(5, (im.turms.turms.pojo.response.Messages) kind_);
       }
       if (kindCase_ == 6) {
-        output.writeMessage(6, (im.turms.turms.pojo.dto.MessageStatus) kind_);
+        output.writeMessage(6, (im.turms.turms.pojo.response.MessageStatuses) kind_);
       }
       if (kindCase_ == 7) {
         output.writeMessage(7, (im.turms.turms.pojo.response.MessagesWithTotalList) kind_);
@@ -1348,7 +1348,7 @@ private static final long serialVersionUID = 0L;
       }
       if (kindCase_ == 6) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, (im.turms.turms.pojo.dto.MessageStatus) kind_);
+          .computeMessageSize(6, (im.turms.turms.pojo.response.MessageStatuses) kind_);
       }
       if (kindCase_ == 7) {
         size += com.google.protobuf.CodedOutputStream
@@ -1432,8 +1432,8 @@ private static final long serialVersionUID = 0L;
               .equals(other.getMessages())) return false;
           break;
         case 6:
-          if (!getMessageStatus()
-              .equals(other.getMessageStatus())) return false;
+          if (!getMessageStatuses()
+              .equals(other.getMessageStatuses())) return false;
           break;
         case 7:
           if (!getMessagesWithTotalList()
@@ -1515,8 +1515,8 @@ private static final long serialVersionUID = 0L;
           hash = (53 * hash) + getMessages().hashCode();
           break;
         case 6:
-          hash = (37 * hash) + MESSAGE_STATUS_FIELD_NUMBER;
-          hash = (53 * hash) + getMessageStatus().hashCode();
+          hash = (37 * hash) + MESSAGE_STATUSES_FIELD_NUMBER;
+          hash = (53 * hash) + getMessageStatuses().hashCode();
           break;
         case 7:
           hash = (37 * hash) + MESSAGES_WITH_TOTAL_LIST_FIELD_NUMBER;
@@ -1762,10 +1762,10 @@ private static final long serialVersionUID = 0L;
           }
         }
         if (kindCase_ == 6) {
-          if (messageStatusBuilder_ == null) {
+          if (messageStatusesBuilder_ == null) {
             result.kind_ = kind_;
           } else {
-            result.kind_ = messageStatusBuilder_.build();
+            result.kind_ = messageStatusesBuilder_.build();
           }
         }
         if (kindCase_ == 7) {
@@ -1915,8 +1915,8 @@ private static final long serialVersionUID = 0L;
             mergeMessages(other.getMessages());
             break;
           }
-          case MESSAGE_STATUS: {
-            mergeMessageStatus(other.getMessageStatus());
+          case MESSAGE_STATUSES: {
+            mergeMessageStatuses(other.getMessageStatuses());
             break;
           }
           case MESSAGES_WITH_TOTAL_LIST: {
@@ -2702,69 +2702,69 @@ private static final long serialVersionUID = 0L;
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.dto.MessageStatus, im.turms.turms.pojo.dto.MessageStatus.Builder, im.turms.turms.pojo.dto.MessageStatusOrBuilder> messageStatusBuilder_;
+          im.turms.turms.pojo.response.MessageStatuses, im.turms.turms.pojo.response.MessageStatuses.Builder, im.turms.turms.pojo.response.MessageStatusesOrBuilder> messageStatusesBuilder_;
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
-       * @return Whether the messageStatus field is set.
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
+       * @return Whether the messageStatuses field is set.
        */
-      public boolean hasMessageStatus() {
+      public boolean hasMessageStatuses() {
         return kindCase_ == 6;
       }
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
-       * @return The messageStatus.
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
+       * @return The messageStatuses.
        */
-      public im.turms.turms.pojo.dto.MessageStatus getMessageStatus() {
-        if (messageStatusBuilder_ == null) {
+      public im.turms.turms.pojo.response.MessageStatuses getMessageStatuses() {
+        if (messageStatusesBuilder_ == null) {
           if (kindCase_ == 6) {
-            return (im.turms.turms.pojo.dto.MessageStatus) kind_;
+            return (im.turms.turms.pojo.response.MessageStatuses) kind_;
           }
-          return im.turms.turms.pojo.dto.MessageStatus.getDefaultInstance();
+          return im.turms.turms.pojo.response.MessageStatuses.getDefaultInstance();
         } else {
           if (kindCase_ == 6) {
-            return messageStatusBuilder_.getMessage();
+            return messageStatusesBuilder_.getMessage();
           }
-          return im.turms.turms.pojo.dto.MessageStatus.getDefaultInstance();
+          return im.turms.turms.pojo.response.MessageStatuses.getDefaultInstance();
         }
       }
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
        */
-      public Builder setMessageStatus(im.turms.turms.pojo.dto.MessageStatus value) {
-        if (messageStatusBuilder_ == null) {
+      public Builder setMessageStatuses(im.turms.turms.pojo.response.MessageStatuses value) {
+        if (messageStatusesBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           kind_ = value;
           onChanged();
         } else {
-          messageStatusBuilder_.setMessage(value);
+          messageStatusesBuilder_.setMessage(value);
         }
         kindCase_ = 6;
         return this;
       }
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
        */
-      public Builder setMessageStatus(
-          im.turms.turms.pojo.dto.MessageStatus.Builder builderForValue) {
-        if (messageStatusBuilder_ == null) {
+      public Builder setMessageStatuses(
+          im.turms.turms.pojo.response.MessageStatuses.Builder builderForValue) {
+        if (messageStatusesBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
         } else {
-          messageStatusBuilder_.setMessage(builderForValue.build());
+          messageStatusesBuilder_.setMessage(builderForValue.build());
         }
         kindCase_ = 6;
         return this;
       }
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
        */
-      public Builder mergeMessageStatus(im.turms.turms.pojo.dto.MessageStatus value) {
-        if (messageStatusBuilder_ == null) {
+      public Builder mergeMessageStatuses(im.turms.turms.pojo.response.MessageStatuses value) {
+        if (messageStatusesBuilder_ == null) {
           if (kindCase_ == 6 &&
-              kind_ != im.turms.turms.pojo.dto.MessageStatus.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.dto.MessageStatus.newBuilder((im.turms.turms.pojo.dto.MessageStatus) kind_)
+              kind_ != im.turms.turms.pojo.response.MessageStatuses.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.response.MessageStatuses.newBuilder((im.turms.turms.pojo.response.MessageStatuses) kind_)
                 .mergeFrom(value).buildPartial();
           } else {
             kind_ = value;
@@ -2772,18 +2772,18 @@ private static final long serialVersionUID = 0L;
           onChanged();
         } else {
           if (kindCase_ == 6) {
-            messageStatusBuilder_.mergeFrom(value);
+            messageStatusesBuilder_.mergeFrom(value);
           }
-          messageStatusBuilder_.setMessage(value);
+          messageStatusesBuilder_.setMessage(value);
         }
         kindCase_ = 6;
         return this;
       }
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
        */
-      public Builder clearMessageStatus() {
-        if (messageStatusBuilder_ == null) {
+      public Builder clearMessageStatuses() {
+        if (messageStatusesBuilder_ == null) {
           if (kindCase_ == 6) {
             kindCase_ = 0;
             kind_ = null;
@@ -2794,49 +2794,49 @@ private static final long serialVersionUID = 0L;
             kindCase_ = 0;
             kind_ = null;
           }
-          messageStatusBuilder_.clear();
+          messageStatusesBuilder_.clear();
         }
         return this;
       }
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
        */
-      public im.turms.turms.pojo.dto.MessageStatus.Builder getMessageStatusBuilder() {
-        return getMessageStatusFieldBuilder().getBuilder();
+      public im.turms.turms.pojo.response.MessageStatuses.Builder getMessageStatusesBuilder() {
+        return getMessageStatusesFieldBuilder().getBuilder();
       }
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
        */
-      public im.turms.turms.pojo.dto.MessageStatusOrBuilder getMessageStatusOrBuilder() {
-        if ((kindCase_ == 6) && (messageStatusBuilder_ != null)) {
-          return messageStatusBuilder_.getMessageOrBuilder();
+      public im.turms.turms.pojo.response.MessageStatusesOrBuilder getMessageStatusesOrBuilder() {
+        if ((kindCase_ == 6) && (messageStatusesBuilder_ != null)) {
+          return messageStatusesBuilder_.getMessageOrBuilder();
         } else {
           if (kindCase_ == 6) {
-            return (im.turms.turms.pojo.dto.MessageStatus) kind_;
+            return (im.turms.turms.pojo.response.MessageStatuses) kind_;
           }
-          return im.turms.turms.pojo.dto.MessageStatus.getDefaultInstance();
+          return im.turms.turms.pojo.response.MessageStatuses.getDefaultInstance();
         }
       }
       /**
-       * <code>.im.turms.proto.MessageStatus message_status = 6;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          im.turms.turms.pojo.dto.MessageStatus, im.turms.turms.pojo.dto.MessageStatus.Builder, im.turms.turms.pojo.dto.MessageStatusOrBuilder> 
-          getMessageStatusFieldBuilder() {
-        if (messageStatusBuilder_ == null) {
+          im.turms.turms.pojo.response.MessageStatuses, im.turms.turms.pojo.response.MessageStatuses.Builder, im.turms.turms.pojo.response.MessageStatusesOrBuilder> 
+          getMessageStatusesFieldBuilder() {
+        if (messageStatusesBuilder_ == null) {
           if (!(kindCase_ == 6)) {
-            kind_ = im.turms.turms.pojo.dto.MessageStatus.getDefaultInstance();
+            kind_ = im.turms.turms.pojo.response.MessageStatuses.getDefaultInstance();
           }
-          messageStatusBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.dto.MessageStatus, im.turms.turms.pojo.dto.MessageStatus.Builder, im.turms.turms.pojo.dto.MessageStatusOrBuilder>(
-                  (im.turms.turms.pojo.dto.MessageStatus) kind_,
+          messageStatusesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.response.MessageStatuses, im.turms.turms.pojo.response.MessageStatuses.Builder, im.turms.turms.pojo.response.MessageStatusesOrBuilder>(
+                  (im.turms.turms.pojo.response.MessageStatuses) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
         kindCase_ = 6;
         onChanged();;
-        return messageStatusBuilder_;
+        return messageStatusesBuilder_;
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<

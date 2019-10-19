@@ -16,7 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private Message() {
-    chatType_ = 0;
     records_ = java.util.Collections.emptyList();
   }
 
@@ -64,13 +63,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 16: {
-            int rawValue = input.readEnum();
-
-            chatType_ = rawValue;
-            break;
-          }
-          case 26: {
+          case 18: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (deliveryDate_ != null) {
               subBuilder = deliveryDate_.toBuilder();
@@ -83,7 +76,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 34: {
+          case 26: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (deletionDate_ != null) {
               subBuilder = deletionDate_.toBuilder();
@@ -96,7 +89,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 42: {
+          case 34: {
             com.google.protobuf.StringValue.Builder subBuilder = null;
             if (text_ != null) {
               subBuilder = text_.toBuilder();
@@ -109,28 +102,41 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
+          case 42: {
+            com.google.protobuf.Int64Value.Builder subBuilder = null;
+            if (senderId_ != null) {
+              subBuilder = senderId_.toBuilder();
+            }
+            senderId_ = input.readMessage(com.google.protobuf.Int64Value.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(senderId_);
+              senderId_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
           case 50: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
-            if (fromId_ != null) {
-              subBuilder = fromId_.toBuilder();
+            if (groupId_ != null) {
+              subBuilder = groupId_.toBuilder();
             }
-            fromId_ = input.readMessage(com.google.protobuf.Int64Value.parser(), extensionRegistry);
+            groupId_ = input.readMessage(com.google.protobuf.Int64Value.parser(), extensionRegistry);
             if (subBuilder != null) {
-              subBuilder.mergeFrom(fromId_);
-              fromId_ = subBuilder.buildPartial();
+              subBuilder.mergeFrom(groupId_);
+              groupId_ = subBuilder.buildPartial();
             }
 
             break;
           }
           case 58: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
-            if (toId_ != null) {
-              subBuilder = toId_.toBuilder();
+            if (recipientId_ != null) {
+              subBuilder = recipientId_.toBuilder();
             }
-            toId_ = input.readMessage(com.google.protobuf.Int64Value.parser(), extensionRegistry);
+            recipientId_ = input.readMessage(com.google.protobuf.Int64Value.parser(), extensionRegistry);
             if (subBuilder != null) {
-              subBuilder.mergeFrom(toId_);
-              toId_ = subBuilder.buildPartial();
+              subBuilder.mergeFrom(recipientId_);
+              recipientId_ = subBuilder.buildPartial();
             }
 
             break;
@@ -202,138 +208,142 @@ private static final long serialVersionUID = 0L;
     return getId();
   }
 
-  public static final int CHAT_TYPE_FIELD_NUMBER = 2;
-  private int chatType_;
-  /**
-   * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-   * @return The enum numeric value on the wire for chatType.
-   */
-  public int getChatTypeValue() {
-    return chatType_;
-  }
-  /**
-   * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-   * @return The chatType.
-   */
-  public im.turms.turms.constant.ChatType getChatType() {
-    @SuppressWarnings("deprecation")
-    im.turms.turms.constant.ChatType result = im.turms.turms.constant.ChatType.valueOf(chatType_);
-    return result == null ? im.turms.turms.constant.ChatType.UNRECOGNIZED : result;
-  }
-
-  public static final int DELIVERY_DATE_FIELD_NUMBER = 3;
+  public static final int DELIVERY_DATE_FIELD_NUMBER = 2;
   private com.google.protobuf.Int64Value deliveryDate_;
   /**
-   * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+   * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
    * @return Whether the deliveryDate field is set.
    */
   public boolean hasDeliveryDate() {
     return deliveryDate_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+   * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
    * @return The deliveryDate.
    */
   public com.google.protobuf.Int64Value getDeliveryDate() {
     return deliveryDate_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : deliveryDate_;
   }
   /**
-   * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+   * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getDeliveryDateOrBuilder() {
     return getDeliveryDate();
   }
 
-  public static final int DELETION_DATE_FIELD_NUMBER = 4;
+  public static final int DELETION_DATE_FIELD_NUMBER = 3;
   private com.google.protobuf.Int64Value deletionDate_;
   /**
-   * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+   * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
    * @return Whether the deletionDate field is set.
    */
   public boolean hasDeletionDate() {
     return deletionDate_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+   * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
    * @return The deletionDate.
    */
   public com.google.protobuf.Int64Value getDeletionDate() {
     return deletionDate_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : deletionDate_;
   }
   /**
-   * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+   * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getDeletionDateOrBuilder() {
     return getDeletionDate();
   }
 
-  public static final int TEXT_FIELD_NUMBER = 5;
+  public static final int TEXT_FIELD_NUMBER = 4;
   private com.google.protobuf.StringValue text_;
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 4;</code>
    * @return Whether the text field is set.
    */
   public boolean hasText() {
     return text_ != null;
   }
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 4;</code>
    * @return The text.
    */
   public com.google.protobuf.StringValue getText() {
     return text_ == null ? com.google.protobuf.StringValue.getDefaultInstance() : text_;
   }
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 4;</code>
    */
   public com.google.protobuf.StringValueOrBuilder getTextOrBuilder() {
     return getText();
   }
 
-  public static final int FROM_ID_FIELD_NUMBER = 6;
-  private com.google.protobuf.Int64Value fromId_;
+  public static final int SENDER_ID_FIELD_NUMBER = 5;
+  private com.google.protobuf.Int64Value senderId_;
   /**
-   * <code>.google.protobuf.Int64Value from_id = 6;</code>
-   * @return Whether the fromId field is set.
+   * <code>.google.protobuf.Int64Value sender_id = 5;</code>
+   * @return Whether the senderId field is set.
    */
-  public boolean hasFromId() {
-    return fromId_ != null;
+  public boolean hasSenderId() {
+    return senderId_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value from_id = 6;</code>
-   * @return The fromId.
+   * <code>.google.protobuf.Int64Value sender_id = 5;</code>
+   * @return The senderId.
    */
-  public com.google.protobuf.Int64Value getFromId() {
-    return fromId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : fromId_;
+  public com.google.protobuf.Int64Value getSenderId() {
+    return senderId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : senderId_;
   }
   /**
-   * <code>.google.protobuf.Int64Value from_id = 6;</code>
+   * <code>.google.protobuf.Int64Value sender_id = 5;</code>
    */
-  public com.google.protobuf.Int64ValueOrBuilder getFromIdOrBuilder() {
-    return getFromId();
+  public com.google.protobuf.Int64ValueOrBuilder getSenderIdOrBuilder() {
+    return getSenderId();
   }
 
-  public static final int TO_ID_FIELD_NUMBER = 7;
-  private com.google.protobuf.Int64Value toId_;
+  public static final int GROUP_ID_FIELD_NUMBER = 6;
+  private com.google.protobuf.Int64Value groupId_;
   /**
-   * <code>.google.protobuf.Int64Value to_id = 7;</code>
-   * @return Whether the toId field is set.
+   * <code>.google.protobuf.Int64Value group_id = 6;</code>
+   * @return Whether the groupId field is set.
    */
-  public boolean hasToId() {
-    return toId_ != null;
+  public boolean hasGroupId() {
+    return groupId_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value to_id = 7;</code>
-   * @return The toId.
+   * <code>.google.protobuf.Int64Value group_id = 6;</code>
+   * @return The groupId.
    */
-  public com.google.protobuf.Int64Value getToId() {
-    return toId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : toId_;
+  public com.google.protobuf.Int64Value getGroupId() {
+    return groupId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : groupId_;
   }
   /**
-   * <code>.google.protobuf.Int64Value to_id = 7;</code>
+   * <code>.google.protobuf.Int64Value group_id = 6;</code>
    */
-  public com.google.protobuf.Int64ValueOrBuilder getToIdOrBuilder() {
-    return getToId();
+  public com.google.protobuf.Int64ValueOrBuilder getGroupIdOrBuilder() {
+    return getGroupId();
+  }
+
+  public static final int RECIPIENT_ID_FIELD_NUMBER = 7;
+  private com.google.protobuf.Int64Value recipientId_;
+  /**
+   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * @return Whether the recipientId field is set.
+   */
+  public boolean hasRecipientId() {
+    return recipientId_ != null;
+  }
+  /**
+   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * @return The recipientId.
+   */
+  public com.google.protobuf.Int64Value getRecipientId() {
+    return recipientId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : recipientId_;
+  }
+  /**
+   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   */
+  public com.google.protobuf.Int64ValueOrBuilder getRecipientIdOrBuilder() {
+    return getRecipientId();
   }
 
   public static final int RECORDS_FIELD_NUMBER = 8;
@@ -388,23 +398,23 @@ private static final long serialVersionUID = 0L;
     if (id_ != null) {
       output.writeMessage(1, getId());
     }
-    if (chatType_ != im.turms.turms.constant.ChatType.PRIVATE.getNumber()) {
-      output.writeEnum(2, chatType_);
-    }
     if (deliveryDate_ != null) {
-      output.writeMessage(3, getDeliveryDate());
+      output.writeMessage(2, getDeliveryDate());
     }
     if (deletionDate_ != null) {
-      output.writeMessage(4, getDeletionDate());
+      output.writeMessage(3, getDeletionDate());
     }
     if (text_ != null) {
-      output.writeMessage(5, getText());
+      output.writeMessage(4, getText());
     }
-    if (fromId_ != null) {
-      output.writeMessage(6, getFromId());
+    if (senderId_ != null) {
+      output.writeMessage(5, getSenderId());
     }
-    if (toId_ != null) {
-      output.writeMessage(7, getToId());
+    if (groupId_ != null) {
+      output.writeMessage(6, getGroupId());
+    }
+    if (recipientId_ != null) {
+      output.writeMessage(7, getRecipientId());
     }
     for (int i = 0; i < records_.size(); i++) {
       output.writeMessage(8, records_.get(i));
@@ -422,29 +432,29 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getId());
     }
-    if (chatType_ != im.turms.turms.constant.ChatType.PRIVATE.getNumber()) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(2, chatType_);
-    }
     if (deliveryDate_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, getDeliveryDate());
+        .computeMessageSize(2, getDeliveryDate());
     }
     if (deletionDate_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, getDeletionDate());
+        .computeMessageSize(3, getDeletionDate());
     }
     if (text_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getText());
+        .computeMessageSize(4, getText());
     }
-    if (fromId_ != null) {
+    if (senderId_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, getFromId());
+        .computeMessageSize(5, getSenderId());
     }
-    if (toId_ != null) {
+    if (groupId_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, getToId());
+        .computeMessageSize(6, getGroupId());
+    }
+    if (recipientId_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(7, getRecipientId());
     }
     for (int i = 0; i < records_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
@@ -470,7 +480,6 @@ private static final long serialVersionUID = 0L;
       if (!getId()
           .equals(other.getId())) return false;
     }
-    if (chatType_ != other.chatType_) return false;
     if (hasDeliveryDate() != other.hasDeliveryDate()) return false;
     if (hasDeliveryDate()) {
       if (!getDeliveryDate()
@@ -486,15 +495,20 @@ private static final long serialVersionUID = 0L;
       if (!getText()
           .equals(other.getText())) return false;
     }
-    if (hasFromId() != other.hasFromId()) return false;
-    if (hasFromId()) {
-      if (!getFromId()
-          .equals(other.getFromId())) return false;
+    if (hasSenderId() != other.hasSenderId()) return false;
+    if (hasSenderId()) {
+      if (!getSenderId()
+          .equals(other.getSenderId())) return false;
     }
-    if (hasToId() != other.hasToId()) return false;
-    if (hasToId()) {
-      if (!getToId()
-          .equals(other.getToId())) return false;
+    if (hasGroupId() != other.hasGroupId()) return false;
+    if (hasGroupId()) {
+      if (!getGroupId()
+          .equals(other.getGroupId())) return false;
+    }
+    if (hasRecipientId() != other.hasRecipientId()) return false;
+    if (hasRecipientId()) {
+      if (!getRecipientId()
+          .equals(other.getRecipientId())) return false;
     }
     if (!getRecordsList()
         .equals(other.getRecordsList())) return false;
@@ -513,8 +527,6 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ID_FIELD_NUMBER;
       hash = (53 * hash) + getId().hashCode();
     }
-    hash = (37 * hash) + CHAT_TYPE_FIELD_NUMBER;
-    hash = (53 * hash) + chatType_;
     if (hasDeliveryDate()) {
       hash = (37 * hash) + DELIVERY_DATE_FIELD_NUMBER;
       hash = (53 * hash) + getDeliveryDate().hashCode();
@@ -527,13 +539,17 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + TEXT_FIELD_NUMBER;
       hash = (53 * hash) + getText().hashCode();
     }
-    if (hasFromId()) {
-      hash = (37 * hash) + FROM_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getFromId().hashCode();
+    if (hasSenderId()) {
+      hash = (37 * hash) + SENDER_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getSenderId().hashCode();
     }
-    if (hasToId()) {
-      hash = (37 * hash) + TO_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getToId().hashCode();
+    if (hasGroupId()) {
+      hash = (37 * hash) + GROUP_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getGroupId().hashCode();
+    }
+    if (hasRecipientId()) {
+      hash = (37 * hash) + RECIPIENT_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRecipientId().hashCode();
     }
     if (getRecordsCount() > 0) {
       hash = (37 * hash) + RECORDS_FIELD_NUMBER;
@@ -679,8 +695,6 @@ private static final long serialVersionUID = 0L;
         id_ = null;
         idBuilder_ = null;
       }
-      chatType_ = 0;
-
       if (deliveryDateBuilder_ == null) {
         deliveryDate_ = null;
       } else {
@@ -699,17 +713,23 @@ private static final long serialVersionUID = 0L;
         text_ = null;
         textBuilder_ = null;
       }
-      if (fromIdBuilder_ == null) {
-        fromId_ = null;
+      if (senderIdBuilder_ == null) {
+        senderId_ = null;
       } else {
-        fromId_ = null;
-        fromIdBuilder_ = null;
+        senderId_ = null;
+        senderIdBuilder_ = null;
       }
-      if (toIdBuilder_ == null) {
-        toId_ = null;
+      if (groupIdBuilder_ == null) {
+        groupId_ = null;
       } else {
-        toId_ = null;
-        toIdBuilder_ = null;
+        groupId_ = null;
+        groupIdBuilder_ = null;
+      }
+      if (recipientIdBuilder_ == null) {
+        recipientId_ = null;
+      } else {
+        recipientId_ = null;
+        recipientIdBuilder_ = null;
       }
       if (recordsBuilder_ == null) {
         records_ = java.util.Collections.emptyList();
@@ -749,7 +769,6 @@ private static final long serialVersionUID = 0L;
       } else {
         result.id_ = idBuilder_.build();
       }
-      result.chatType_ = chatType_;
       if (deliveryDateBuilder_ == null) {
         result.deliveryDate_ = deliveryDate_;
       } else {
@@ -765,15 +784,20 @@ private static final long serialVersionUID = 0L;
       } else {
         result.text_ = textBuilder_.build();
       }
-      if (fromIdBuilder_ == null) {
-        result.fromId_ = fromId_;
+      if (senderIdBuilder_ == null) {
+        result.senderId_ = senderId_;
       } else {
-        result.fromId_ = fromIdBuilder_.build();
+        result.senderId_ = senderIdBuilder_.build();
       }
-      if (toIdBuilder_ == null) {
-        result.toId_ = toId_;
+      if (groupIdBuilder_ == null) {
+        result.groupId_ = groupId_;
       } else {
-        result.toId_ = toIdBuilder_.build();
+        result.groupId_ = groupIdBuilder_.build();
+      }
+      if (recipientIdBuilder_ == null) {
+        result.recipientId_ = recipientId_;
+      } else {
+        result.recipientId_ = recipientIdBuilder_.build();
       }
       if (recordsBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0)) {
@@ -835,9 +859,6 @@ private static final long serialVersionUID = 0L;
       if (other.hasId()) {
         mergeId(other.getId());
       }
-      if (other.chatType_ != 0) {
-        setChatTypeValue(other.getChatTypeValue());
-      }
       if (other.hasDeliveryDate()) {
         mergeDeliveryDate(other.getDeliveryDate());
       }
@@ -847,11 +868,14 @@ private static final long serialVersionUID = 0L;
       if (other.hasText()) {
         mergeText(other.getText());
       }
-      if (other.hasFromId()) {
-        mergeFromId(other.getFromId());
+      if (other.hasSenderId()) {
+        mergeSenderId(other.getSenderId());
       }
-      if (other.hasToId()) {
-        mergeToId(other.getToId());
+      if (other.hasGroupId()) {
+        mergeGroupId(other.getGroupId());
+      }
+      if (other.hasRecipientId()) {
+        mergeRecipientId(other.getRecipientId());
       }
       if (recordsBuilder_ == null) {
         if (!other.records_.isEmpty()) {
@@ -1028,70 +1052,18 @@ private static final long serialVersionUID = 0L;
       return idBuilder_;
     }
 
-    private int chatType_ = 0;
-    /**
-     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-     * @return The enum numeric value on the wire for chatType.
-     */
-    public int getChatTypeValue() {
-      return chatType_;
-    }
-    /**
-     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-     * @param value The enum numeric value on the wire for chatType to set.
-     * @return This builder for chaining.
-     */
-    public Builder setChatTypeValue(int value) {
-      chatType_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-     * @return The chatType.
-     */
-    public im.turms.turms.constant.ChatType getChatType() {
-      @SuppressWarnings("deprecation")
-      im.turms.turms.constant.ChatType result = im.turms.turms.constant.ChatType.valueOf(chatType_);
-      return result == null ? im.turms.turms.constant.ChatType.UNRECOGNIZED : result;
-    }
-    /**
-     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-     * @param value The chatType to set.
-     * @return This builder for chaining.
-     */
-    public Builder setChatType(im.turms.turms.constant.ChatType value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      
-      chatType_ = value.getNumber();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearChatType() {
-      
-      chatType_ = 0;
-      onChanged();
-      return this;
-    }
-
     private com.google.protobuf.Int64Value deliveryDate_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> deliveryDateBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      * @return Whether the deliveryDate field is set.
      */
     public boolean hasDeliveryDate() {
       return deliveryDateBuilder_ != null || deliveryDate_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      * @return The deliveryDate.
      */
     public com.google.protobuf.Int64Value getDeliveryDate() {
@@ -1102,7 +1074,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     public Builder setDeliveryDate(com.google.protobuf.Int64Value value) {
       if (deliveryDateBuilder_ == null) {
@@ -1118,7 +1090,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     public Builder setDeliveryDate(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1132,7 +1104,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     public Builder mergeDeliveryDate(com.google.protobuf.Int64Value value) {
       if (deliveryDateBuilder_ == null) {
@@ -1150,7 +1122,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     public Builder clearDeliveryDate() {
       if (deliveryDateBuilder_ == null) {
@@ -1164,7 +1136,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getDeliveryDateBuilder() {
       
@@ -1172,7 +1144,7 @@ private static final long serialVersionUID = 0L;
       return getDeliveryDateFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getDeliveryDateOrBuilder() {
       if (deliveryDateBuilder_ != null) {
@@ -1183,7 +1155,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+     * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
@@ -1203,14 +1175,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> deletionDateBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      * @return Whether the deletionDate field is set.
      */
     public boolean hasDeletionDate() {
       return deletionDateBuilder_ != null || deletionDate_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      * @return The deletionDate.
      */
     public com.google.protobuf.Int64Value getDeletionDate() {
@@ -1221,7 +1193,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     public Builder setDeletionDate(com.google.protobuf.Int64Value value) {
       if (deletionDateBuilder_ == null) {
@@ -1237,7 +1209,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     public Builder setDeletionDate(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1251,7 +1223,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     public Builder mergeDeletionDate(com.google.protobuf.Int64Value value) {
       if (deletionDateBuilder_ == null) {
@@ -1269,7 +1241,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     public Builder clearDeletionDate() {
       if (deletionDateBuilder_ == null) {
@@ -1283,7 +1255,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     public com.google.protobuf.Int64Value.Builder getDeletionDateBuilder() {
       
@@ -1291,7 +1263,7 @@ private static final long serialVersionUID = 0L;
       return getDeletionDateFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getDeletionDateOrBuilder() {
       if (deletionDateBuilder_ != null) {
@@ -1302,7 +1274,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+     * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
@@ -1322,14 +1294,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> textBuilder_;
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      * @return Whether the text field is set.
      */
     public boolean hasText() {
       return textBuilder_ != null || text_ != null;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      * @return The text.
      */
     public com.google.protobuf.StringValue getText() {
@@ -1340,7 +1312,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      */
     public Builder setText(com.google.protobuf.StringValue value) {
       if (textBuilder_ == null) {
@@ -1356,7 +1328,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      */
     public Builder setText(
         com.google.protobuf.StringValue.Builder builderForValue) {
@@ -1370,7 +1342,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      */
     public Builder mergeText(com.google.protobuf.StringValue value) {
       if (textBuilder_ == null) {
@@ -1388,7 +1360,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      */
     public Builder clearText() {
       if (textBuilder_ == null) {
@@ -1402,7 +1374,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      */
     public com.google.protobuf.StringValue.Builder getTextBuilder() {
       
@@ -1410,7 +1382,7 @@ private static final long serialVersionUID = 0L;
       return getTextFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      */
     public com.google.protobuf.StringValueOrBuilder getTextOrBuilder() {
       if (textBuilder_ != null) {
@@ -1421,7 +1393,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
@@ -1437,242 +1409,361 @@ private static final long serialVersionUID = 0L;
       return textBuilder_;
     }
 
-    private com.google.protobuf.Int64Value fromId_;
+    private com.google.protobuf.Int64Value senderId_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> fromIdBuilder_;
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> senderIdBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
-     * @return Whether the fromId field is set.
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
+     * @return Whether the senderId field is set.
      */
-    public boolean hasFromId() {
-      return fromIdBuilder_ != null || fromId_ != null;
+    public boolean hasSenderId() {
+      return senderIdBuilder_ != null || senderId_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
-     * @return The fromId.
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
+     * @return The senderId.
      */
-    public com.google.protobuf.Int64Value getFromId() {
-      if (fromIdBuilder_ == null) {
-        return fromId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : fromId_;
+    public com.google.protobuf.Int64Value getSenderId() {
+      if (senderIdBuilder_ == null) {
+        return senderId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : senderId_;
       } else {
-        return fromIdBuilder_.getMessage();
+        return senderIdBuilder_.getMessage();
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
-    public Builder setFromId(com.google.protobuf.Int64Value value) {
-      if (fromIdBuilder_ == null) {
+    public Builder setSenderId(com.google.protobuf.Int64Value value) {
+      if (senderIdBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        fromId_ = value;
+        senderId_ = value;
         onChanged();
       } else {
-        fromIdBuilder_.setMessage(value);
+        senderIdBuilder_.setMessage(value);
       }
 
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
-    public Builder setFromId(
+    public Builder setSenderId(
         com.google.protobuf.Int64Value.Builder builderForValue) {
-      if (fromIdBuilder_ == null) {
-        fromId_ = builderForValue.build();
+      if (senderIdBuilder_ == null) {
+        senderId_ = builderForValue.build();
         onChanged();
       } else {
-        fromIdBuilder_.setMessage(builderForValue.build());
+        senderIdBuilder_.setMessage(builderForValue.build());
       }
 
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
-    public Builder mergeFromId(com.google.protobuf.Int64Value value) {
-      if (fromIdBuilder_ == null) {
-        if (fromId_ != null) {
-          fromId_ =
-            com.google.protobuf.Int64Value.newBuilder(fromId_).mergeFrom(value).buildPartial();
+    public Builder mergeSenderId(com.google.protobuf.Int64Value value) {
+      if (senderIdBuilder_ == null) {
+        if (senderId_ != null) {
+          senderId_ =
+            com.google.protobuf.Int64Value.newBuilder(senderId_).mergeFrom(value).buildPartial();
         } else {
-          fromId_ = value;
+          senderId_ = value;
         }
         onChanged();
       } else {
-        fromIdBuilder_.mergeFrom(value);
+        senderIdBuilder_.mergeFrom(value);
       }
 
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
-    public Builder clearFromId() {
-      if (fromIdBuilder_ == null) {
-        fromId_ = null;
+    public Builder clearSenderId() {
+      if (senderIdBuilder_ == null) {
+        senderId_ = null;
         onChanged();
       } else {
-        fromId_ = null;
-        fromIdBuilder_ = null;
+        senderId_ = null;
+        senderIdBuilder_ = null;
       }
 
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
-    public com.google.protobuf.Int64Value.Builder getFromIdBuilder() {
+    public com.google.protobuf.Int64Value.Builder getSenderIdBuilder() {
       
       onChanged();
-      return getFromIdFieldBuilder().getBuilder();
+      return getSenderIdFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
-    public com.google.protobuf.Int64ValueOrBuilder getFromIdOrBuilder() {
-      if (fromIdBuilder_ != null) {
-        return fromIdBuilder_.getMessageOrBuilder();
+    public com.google.protobuf.Int64ValueOrBuilder getSenderIdOrBuilder() {
+      if (senderIdBuilder_ != null) {
+        return senderIdBuilder_.getMessageOrBuilder();
       } else {
-        return fromId_ == null ?
-            com.google.protobuf.Int64Value.getDefaultInstance() : fromId_;
+        return senderId_ == null ?
+            com.google.protobuf.Int64Value.getDefaultInstance() : senderId_;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 6;</code>
+     * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
-        getFromIdFieldBuilder() {
-      if (fromIdBuilder_ == null) {
-        fromIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+        getSenderIdFieldBuilder() {
+      if (senderIdBuilder_ == null) {
+        senderIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
             com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
-                getFromId(),
+                getSenderId(),
                 getParentForChildren(),
                 isClean());
-        fromId_ = null;
+        senderId_ = null;
       }
-      return fromIdBuilder_;
+      return senderIdBuilder_;
     }
 
-    private com.google.protobuf.Int64Value toId_;
+    private com.google.protobuf.Int64Value groupId_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> toIdBuilder_;
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> groupIdBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
-     * @return Whether the toId field is set.
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
+     * @return Whether the groupId field is set.
      */
-    public boolean hasToId() {
-      return toIdBuilder_ != null || toId_ != null;
+    public boolean hasGroupId() {
+      return groupIdBuilder_ != null || groupId_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
-     * @return The toId.
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
+     * @return The groupId.
      */
-    public com.google.protobuf.Int64Value getToId() {
-      if (toIdBuilder_ == null) {
-        return toId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : toId_;
+    public com.google.protobuf.Int64Value getGroupId() {
+      if (groupIdBuilder_ == null) {
+        return groupId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : groupId_;
       } else {
-        return toIdBuilder_.getMessage();
+        return groupIdBuilder_.getMessage();
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
-    public Builder setToId(com.google.protobuf.Int64Value value) {
-      if (toIdBuilder_ == null) {
+    public Builder setGroupId(com.google.protobuf.Int64Value value) {
+      if (groupIdBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        toId_ = value;
+        groupId_ = value;
         onChanged();
       } else {
-        toIdBuilder_.setMessage(value);
+        groupIdBuilder_.setMessage(value);
       }
 
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
-    public Builder setToId(
+    public Builder setGroupId(
         com.google.protobuf.Int64Value.Builder builderForValue) {
-      if (toIdBuilder_ == null) {
-        toId_ = builderForValue.build();
+      if (groupIdBuilder_ == null) {
+        groupId_ = builderForValue.build();
         onChanged();
       } else {
-        toIdBuilder_.setMessage(builderForValue.build());
+        groupIdBuilder_.setMessage(builderForValue.build());
       }
 
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
-    public Builder mergeToId(com.google.protobuf.Int64Value value) {
-      if (toIdBuilder_ == null) {
-        if (toId_ != null) {
-          toId_ =
-            com.google.protobuf.Int64Value.newBuilder(toId_).mergeFrom(value).buildPartial();
+    public Builder mergeGroupId(com.google.protobuf.Int64Value value) {
+      if (groupIdBuilder_ == null) {
+        if (groupId_ != null) {
+          groupId_ =
+            com.google.protobuf.Int64Value.newBuilder(groupId_).mergeFrom(value).buildPartial();
         } else {
-          toId_ = value;
+          groupId_ = value;
         }
         onChanged();
       } else {
-        toIdBuilder_.mergeFrom(value);
+        groupIdBuilder_.mergeFrom(value);
       }
 
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
-    public Builder clearToId() {
-      if (toIdBuilder_ == null) {
-        toId_ = null;
+    public Builder clearGroupId() {
+      if (groupIdBuilder_ == null) {
+        groupId_ = null;
         onChanged();
       } else {
-        toId_ = null;
-        toIdBuilder_ = null;
+        groupId_ = null;
+        groupIdBuilder_ = null;
       }
 
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
-    public com.google.protobuf.Int64Value.Builder getToIdBuilder() {
+    public com.google.protobuf.Int64Value.Builder getGroupIdBuilder() {
       
       onChanged();
-      return getToIdFieldBuilder().getBuilder();
+      return getGroupIdFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
-    public com.google.protobuf.Int64ValueOrBuilder getToIdOrBuilder() {
-      if (toIdBuilder_ != null) {
-        return toIdBuilder_.getMessageOrBuilder();
+    public com.google.protobuf.Int64ValueOrBuilder getGroupIdOrBuilder() {
+      if (groupIdBuilder_ != null) {
+        return groupIdBuilder_.getMessageOrBuilder();
       } else {
-        return toId_ == null ?
-            com.google.protobuf.Int64Value.getDefaultInstance() : toId_;
+        return groupId_ == null ?
+            com.google.protobuf.Int64Value.getDefaultInstance() : groupId_;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value to_id = 7;</code>
+     * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
-        getToIdFieldBuilder() {
-      if (toIdBuilder_ == null) {
-        toIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+        getGroupIdFieldBuilder() {
+      if (groupIdBuilder_ == null) {
+        groupIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
             com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
-                getToId(),
+                getGroupId(),
                 getParentForChildren(),
                 isClean());
-        toId_ = null;
+        groupId_ = null;
       }
-      return toIdBuilder_;
+      return groupIdBuilder_;
+    }
+
+    private com.google.protobuf.Int64Value recipientId_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> recipientIdBuilder_;
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * @return Whether the recipientId field is set.
+     */
+    public boolean hasRecipientId() {
+      return recipientIdBuilder_ != null || recipientId_ != null;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * @return The recipientId.
+     */
+    public com.google.protobuf.Int64Value getRecipientId() {
+      if (recipientIdBuilder_ == null) {
+        return recipientId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : recipientId_;
+      } else {
+        return recipientIdBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     */
+    public Builder setRecipientId(com.google.protobuf.Int64Value value) {
+      if (recipientIdBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        recipientId_ = value;
+        onChanged();
+      } else {
+        recipientIdBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     */
+    public Builder setRecipientId(
+        com.google.protobuf.Int64Value.Builder builderForValue) {
+      if (recipientIdBuilder_ == null) {
+        recipientId_ = builderForValue.build();
+        onChanged();
+      } else {
+        recipientIdBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     */
+    public Builder mergeRecipientId(com.google.protobuf.Int64Value value) {
+      if (recipientIdBuilder_ == null) {
+        if (recipientId_ != null) {
+          recipientId_ =
+            com.google.protobuf.Int64Value.newBuilder(recipientId_).mergeFrom(value).buildPartial();
+        } else {
+          recipientId_ = value;
+        }
+        onChanged();
+      } else {
+        recipientIdBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     */
+    public Builder clearRecipientId() {
+      if (recipientIdBuilder_ == null) {
+        recipientId_ = null;
+        onChanged();
+      } else {
+        recipientId_ = null;
+        recipientIdBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     */
+    public com.google.protobuf.Int64Value.Builder getRecipientIdBuilder() {
+      
+      onChanged();
+      return getRecipientIdFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     */
+    public com.google.protobuf.Int64ValueOrBuilder getRecipientIdOrBuilder() {
+      if (recipientIdBuilder_ != null) {
+        return recipientIdBuilder_.getMessageOrBuilder();
+      } else {
+        return recipientId_ == null ?
+            com.google.protobuf.Int64Value.getDefaultInstance() : recipientId_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
+        getRecipientIdFieldBuilder() {
+      if (recipientIdBuilder_ == null) {
+        recipientIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
+                getRecipientId(),
+                getParentForChildren(),
+                isClean());
+        recipientId_ = null;
+      }
+      return recipientIdBuilder_;
     }
 
     private java.util.List<com.google.protobuf.BytesValue> records_ =

@@ -89,4 +89,8 @@ public class Message {
         this.records = records;
         this.burnAfter = burnAfter;
     }
+
+    public Long groupId() {
+        return chatType == ChatType.GROUP ? targetId : null;
+    }
 }

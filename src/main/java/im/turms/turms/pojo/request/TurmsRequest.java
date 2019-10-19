@@ -107,14 +107,14 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 50: {
-            im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder subBuilder = null;
+            im.turms.turms.pojo.request.QueryMessageStatusesRequest.Builder subBuilder = null;
             if (kindCase_ == 6) {
-              subBuilder = ((im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_).toBuilder();
+              subBuilder = ((im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_).toBuilder();
             }
             kind_ =
-                input.readMessage(im.turms.turms.pojo.request.QueryMessageStatusRequest.parser(), extensionRegistry);
+                input.readMessage(im.turms.turms.pojo.request.QueryMessageStatusesRequest.parser(), extensionRegistry);
             if (subBuilder != null) {
-              subBuilder.mergeFrom((im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_);
+              subBuilder.mergeFrom((im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_);
               kind_ = subBuilder.buildPartial();
             }
             kindCase_ = 6;
@@ -845,7 +845,7 @@ private static final long serialVersionUID = 0L;
           com.google.protobuf.AbstractMessage.InternalOneOfEnum {
     ACK_REQUEST(3),
     CREATE_MESSAGE_REQUEST(5),
-    QUERY_MESSAGE_STATUS_REQUEST(6),
+    QUERY_MESSAGE_STATUSES_REQUEST(6),
     QUERY_MESSAGES_REQUEST(7),
     QUERY_PENDING_MESSAGES_WITH_TOTAL_REQUEST(8),
     UPDATE_MESSAGE_REQUEST(9),
@@ -914,7 +914,7 @@ private static final long serialVersionUID = 0L;
       switch (value) {
         case 3: return ACK_REQUEST;
         case 5: return CREATE_MESSAGE_REQUEST;
-        case 6: return QUERY_MESSAGE_STATUS_REQUEST;
+        case 6: return QUERY_MESSAGE_STATUSES_REQUEST;
         case 7: return QUERY_MESSAGES_REQUEST;
         case 8: return QUERY_PENDING_MESSAGES_WITH_TOTAL_REQUEST;
         case 9: return UPDATE_MESSAGE_REQUEST;
@@ -1135,32 +1135,32 @@ private static final long serialVersionUID = 0L;
     return im.turms.turms.pojo.request.CreateMessageRequest.getDefaultInstance();
   }
 
-  public static final int QUERY_MESSAGE_STATUS_REQUEST_FIELD_NUMBER = 6;
+  public static final int QUERY_MESSAGE_STATUSES_REQUEST_FIELD_NUMBER = 6;
   /**
-   * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
-   * @return Whether the queryMessageStatusRequest field is set.
+   * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
+   * @return Whether the queryMessageStatusesRequest field is set.
    */
-  public boolean hasQueryMessageStatusRequest() {
+  public boolean hasQueryMessageStatusesRequest() {
     return kindCase_ == 6;
   }
   /**
-   * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
-   * @return The queryMessageStatusRequest.
+   * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
+   * @return The queryMessageStatusesRequest.
    */
-  public im.turms.turms.pojo.request.QueryMessageStatusRequest getQueryMessageStatusRequest() {
+  public im.turms.turms.pojo.request.QueryMessageStatusesRequest getQueryMessageStatusesRequest() {
     if (kindCase_ == 6) {
-       return (im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_;
+       return (im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_;
     }
-    return im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance();
+    return im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance();
   }
   /**
-   * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+   * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
    */
-  public im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder getQueryMessageStatusRequestOrBuilder() {
+  public im.turms.turms.pojo.request.QueryMessageStatusesRequestOrBuilder getQueryMessageStatusesRequestOrBuilder() {
     if (kindCase_ == 6) {
-       return (im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_;
+       return (im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_;
     }
-    return im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance();
+    return im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance();
   }
 
   public static final int QUERY_MESSAGES_REQUEST_FIELD_NUMBER = 7;
@@ -2634,7 +2634,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(5, (im.turms.turms.pojo.request.CreateMessageRequest) kind_);
     }
     if (kindCase_ == 6) {
-      output.writeMessage(6, (im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_);
+      output.writeMessage(6, (im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_);
     }
     if (kindCase_ == 7) {
       output.writeMessage(7, (im.turms.turms.pojo.request.QueryMessagesRequest) kind_);
@@ -2810,7 +2810,7 @@ private static final long serialVersionUID = 0L;
     }
     if (kindCase_ == 6) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, (im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_);
+        .computeMessageSize(6, (im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_);
     }
     if (kindCase_ == 7) {
       size += com.google.protobuf.CodedOutputStream
@@ -3044,8 +3044,8 @@ private static final long serialVersionUID = 0L;
             .equals(other.getCreateMessageRequest())) return false;
         break;
       case 6:
-        if (!getQueryMessageStatusRequest()
-            .equals(other.getQueryMessageStatusRequest())) return false;
+        if (!getQueryMessageStatusesRequest()
+            .equals(other.getQueryMessageStatusesRequest())) return false;
         break;
       case 7:
         if (!getQueryMessagesRequest()
@@ -3275,8 +3275,8 @@ private static final long serialVersionUID = 0L;
         hash = (53 * hash) + getCreateMessageRequest().hashCode();
         break;
       case 6:
-        hash = (37 * hash) + QUERY_MESSAGE_STATUS_REQUEST_FIELD_NUMBER;
-        hash = (53 * hash) + getQueryMessageStatusRequest().hashCode();
+        hash = (37 * hash) + QUERY_MESSAGE_STATUSES_REQUEST_FIELD_NUMBER;
+        hash = (53 * hash) + getQueryMessageStatusesRequest().hashCode();
         break;
       case 7:
         hash = (37 * hash) + QUERY_MESSAGES_REQUEST_FIELD_NUMBER;
@@ -3679,10 +3679,10 @@ private static final long serialVersionUID = 0L;
         }
       }
       if (kindCase_ == 6) {
-        if (queryMessageStatusRequestBuilder_ == null) {
+        if (queryMessageStatusesRequestBuilder_ == null) {
           result.kind_ = kind_;
         } else {
-          result.kind_ = queryMessageStatusRequestBuilder_.build();
+          result.kind_ = queryMessageStatusesRequestBuilder_.build();
         }
       }
       if (kindCase_ == 7) {
@@ -4092,8 +4092,8 @@ private static final long serialVersionUID = 0L;
           mergeCreateMessageRequest(other.getCreateMessageRequest());
           break;
         }
-        case QUERY_MESSAGE_STATUS_REQUEST: {
-          mergeQueryMessageStatusRequest(other.getQueryMessageStatusRequest());
+        case QUERY_MESSAGE_STATUSES_REQUEST: {
+          mergeQueryMessageStatusesRequest(other.getQueryMessageStatusesRequest());
           break;
         }
         case QUERY_MESSAGES_REQUEST: {
@@ -5017,69 +5017,69 @@ private static final long serialVersionUID = 0L;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryMessageStatusRequest, im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder, im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder> queryMessageStatusRequestBuilder_;
+        im.turms.turms.pojo.request.QueryMessageStatusesRequest, im.turms.turms.pojo.request.QueryMessageStatusesRequest.Builder, im.turms.turms.pojo.request.QueryMessageStatusesRequestOrBuilder> queryMessageStatusesRequestBuilder_;
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
-     * @return Whether the queryMessageStatusRequest field is set.
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
+     * @return Whether the queryMessageStatusesRequest field is set.
      */
-    public boolean hasQueryMessageStatusRequest() {
+    public boolean hasQueryMessageStatusesRequest() {
       return kindCase_ == 6;
     }
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
-     * @return The queryMessageStatusRequest.
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
+     * @return The queryMessageStatusesRequest.
      */
-    public im.turms.turms.pojo.request.QueryMessageStatusRequest getQueryMessageStatusRequest() {
-      if (queryMessageStatusRequestBuilder_ == null) {
+    public im.turms.turms.pojo.request.QueryMessageStatusesRequest getQueryMessageStatusesRequest() {
+      if (queryMessageStatusesRequestBuilder_ == null) {
         if (kindCase_ == 6) {
-          return (im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_;
+          return (im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_;
         }
-        return im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance();
+        return im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance();
       } else {
         if (kindCase_ == 6) {
-          return queryMessageStatusRequestBuilder_.getMessage();
+          return queryMessageStatusesRequestBuilder_.getMessage();
         }
-        return im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance();
+        return im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance();
       }
     }
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
      */
-    public Builder setQueryMessageStatusRequest(im.turms.turms.pojo.request.QueryMessageStatusRequest value) {
-      if (queryMessageStatusRequestBuilder_ == null) {
+    public Builder setQueryMessageStatusesRequest(im.turms.turms.pojo.request.QueryMessageStatusesRequest value) {
+      if (queryMessageStatusesRequestBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
         kind_ = value;
         onChanged();
       } else {
-        queryMessageStatusRequestBuilder_.setMessage(value);
+        queryMessageStatusesRequestBuilder_.setMessage(value);
       }
       kindCase_ = 6;
       return this;
     }
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
      */
-    public Builder setQueryMessageStatusRequest(
-        im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder builderForValue) {
-      if (queryMessageStatusRequestBuilder_ == null) {
+    public Builder setQueryMessageStatusesRequest(
+        im.turms.turms.pojo.request.QueryMessageStatusesRequest.Builder builderForValue) {
+      if (queryMessageStatusesRequestBuilder_ == null) {
         kind_ = builderForValue.build();
         onChanged();
       } else {
-        queryMessageStatusRequestBuilder_.setMessage(builderForValue.build());
+        queryMessageStatusesRequestBuilder_.setMessage(builderForValue.build());
       }
       kindCase_ = 6;
       return this;
     }
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
      */
-    public Builder mergeQueryMessageStatusRequest(im.turms.turms.pojo.request.QueryMessageStatusRequest value) {
-      if (queryMessageStatusRequestBuilder_ == null) {
+    public Builder mergeQueryMessageStatusesRequest(im.turms.turms.pojo.request.QueryMessageStatusesRequest value) {
+      if (queryMessageStatusesRequestBuilder_ == null) {
         if (kindCase_ == 6 &&
-            kind_ != im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance()) {
-          kind_ = im.turms.turms.pojo.request.QueryMessageStatusRequest.newBuilder((im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_)
+            kind_ != im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance()) {
+          kind_ = im.turms.turms.pojo.request.QueryMessageStatusesRequest.newBuilder((im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_)
               .mergeFrom(value).buildPartial();
         } else {
           kind_ = value;
@@ -5087,18 +5087,18 @@ private static final long serialVersionUID = 0L;
         onChanged();
       } else {
         if (kindCase_ == 6) {
-          queryMessageStatusRequestBuilder_.mergeFrom(value);
+          queryMessageStatusesRequestBuilder_.mergeFrom(value);
         }
-        queryMessageStatusRequestBuilder_.setMessage(value);
+        queryMessageStatusesRequestBuilder_.setMessage(value);
       }
       kindCase_ = 6;
       return this;
     }
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
      */
-    public Builder clearQueryMessageStatusRequest() {
-      if (queryMessageStatusRequestBuilder_ == null) {
+    public Builder clearQueryMessageStatusesRequest() {
+      if (queryMessageStatusesRequestBuilder_ == null) {
         if (kindCase_ == 6) {
           kindCase_ = 0;
           kind_ = null;
@@ -5109,49 +5109,49 @@ private static final long serialVersionUID = 0L;
           kindCase_ = 0;
           kind_ = null;
         }
-        queryMessageStatusRequestBuilder_.clear();
+        queryMessageStatusesRequestBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
      */
-    public im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder getQueryMessageStatusRequestBuilder() {
-      return getQueryMessageStatusRequestFieldBuilder().getBuilder();
+    public im.turms.turms.pojo.request.QueryMessageStatusesRequest.Builder getQueryMessageStatusesRequestBuilder() {
+      return getQueryMessageStatusesRequestFieldBuilder().getBuilder();
     }
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
      */
-    public im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder getQueryMessageStatusRequestOrBuilder() {
-      if ((kindCase_ == 6) && (queryMessageStatusRequestBuilder_ != null)) {
-        return queryMessageStatusRequestBuilder_.getMessageOrBuilder();
+    public im.turms.turms.pojo.request.QueryMessageStatusesRequestOrBuilder getQueryMessageStatusesRequestOrBuilder() {
+      if ((kindCase_ == 6) && (queryMessageStatusesRequestBuilder_ != null)) {
+        return queryMessageStatusesRequestBuilder_.getMessageOrBuilder();
       } else {
         if (kindCase_ == 6) {
-          return (im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_;
+          return (im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_;
         }
-        return im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance();
+        return im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance();
       }
     }
     /**
-     * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+     * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.QueryMessageStatusRequest, im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder, im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder> 
-        getQueryMessageStatusRequestFieldBuilder() {
-      if (queryMessageStatusRequestBuilder_ == null) {
+        im.turms.turms.pojo.request.QueryMessageStatusesRequest, im.turms.turms.pojo.request.QueryMessageStatusesRequest.Builder, im.turms.turms.pojo.request.QueryMessageStatusesRequestOrBuilder> 
+        getQueryMessageStatusesRequestFieldBuilder() {
+      if (queryMessageStatusesRequestBuilder_ == null) {
         if (!(kindCase_ == 6)) {
-          kind_ = im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance();
+          kind_ = im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance();
         }
-        queryMessageStatusRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            im.turms.turms.pojo.request.QueryMessageStatusRequest, im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder, im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder>(
-                (im.turms.turms.pojo.request.QueryMessageStatusRequest) kind_,
+        queryMessageStatusesRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            im.turms.turms.pojo.request.QueryMessageStatusesRequest, im.turms.turms.pojo.request.QueryMessageStatusesRequest.Builder, im.turms.turms.pojo.request.QueryMessageStatusesRequestOrBuilder>(
+                (im.turms.turms.pojo.request.QueryMessageStatusesRequest) kind_,
                 getParentForChildren(),
                 isClean());
         kind_ = null;
       }
       kindCase_ = 6;
       onChanged();;
-      return queryMessageStatusRequestBuilder_;
+      return queryMessageStatusesRequestBuilder_;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<

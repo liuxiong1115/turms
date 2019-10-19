@@ -61,7 +61,7 @@ import "request/group/member/query_group_members_request.proto";
 import "request/group/member/update_group_member_request.proto";
 
 import "request/message/create_message_request.proto";
-import "request/message/query_message_status_request.proto";
+import "request/message/query_message_statuses_request.proto";
 import "request/message/query_messages_request.proto";
 import "request/message/query_pending_messages_with_total_request.proto";
 import "request/message/update_message_request.proto";
@@ -82,7 +82,7 @@ message TurmsRequest {
 
         // Message
         CreateMessageRequest create_message_request = 5;
-        QueryMessageStatusRequest query_message_status_request = 6;
+        QueryMessageStatusesRequest query_message_statuses_request = 6;
         QueryMessagesRequest query_messages_request = 7;
         QueryPendingMessagesWithTotalRequest query_pending_messages_with_total_request = 8;
         UpdateMessageRequest update_message_request = 9;

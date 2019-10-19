@@ -92,10 +92,9 @@ public class MessageService {
 
     public Mono<Boolean> isMessageSentToUser(@NotNull Long messageId, @NotNull Long recipientId) {
         // Warning: Do not check whether a user is the recipient of a message
-        // according to the Message collection because a message can be sent or forwarded to multiple users.
+        // according to the Message collection because a message can be sent to user or group.
         Query query = new Query()
-                .addCriteria(Criteria.where(ID).is(messageId))
-                .addCriteria(Criteria.where(ID_CHAT_TYPE).is(ChatType.PRIVATE))
+                .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
                 .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId));
         return mongoTemplate.exists(query, MessageStatus.class);
     }
@@ -236,7 +235,7 @@ public class MessageService {
             case PRIVATE:
                 MessageStatus messageStatus = new MessageStatus(
                         message.getId(),
-                        ChatType.PRIVATE,
+                        null,
                         message.getSenderId(),
                         message.getTargetId(),
                         MessageDeliveryStatus.READY);
@@ -251,16 +250,10 @@ public class MessageService {
                                 return Mono.just(true);
                             }
                             List<MessageStatus> messageStatuses = new ArrayList<>(membersIds.size());
-                            messageStatuses.add(new MessageStatus(
-                                    message.getId(),
-                                    ChatType.GROUP,
-                                    message.getSenderId(),
-                                    message.getTargetId(),
-                                    MessageDeliveryStatus.READY));
                             for (Long memberId : membersIds) {
                                 messageStatuses.add(new MessageStatus(
                                         message.getId(),
-                                        ChatType.PRIVATE,
+                                        message.getTargetId(),
                                         message.getSenderId(),
                                         memberId,
                                         MessageDeliveryStatus.READY));
@@ -305,14 +298,6 @@ public class MessageService {
                 .single();
     }
 
-    public Mono<Boolean> deleteMessage(
-            @NotNull Long messageId,
-            boolean deleteMessageStatus,
-            @Nullable Boolean logicalDelete) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
-        return executeDeleteMessage(deleteMessageStatus, query, logicalDelete);
-    }
-
     public Flux<Long> queryExpiryMessagesIds(@NotNull Integer timeToLiveHours) {
         Date beforeDate = Date.from(Instant.now().minus(timeToLiveHours, ChronoUnit.HOURS));
         Query query = new Query()
@@ -344,17 +329,12 @@ public class MessageService {
             @Nullable Set<Long> messagesIds,
             boolean deleteMessageStatus,
             @Nullable Boolean logicalDelete) {
-        Query query = new Query();
+        Query queryMessage = new Query();
+        Query queryMessageStatus = new Query();
         if (messagesIds != null && !messagesIds.isEmpty()) {
-            query = query.addCriteria(Criteria.where(ID).in(messagesIds));
+            queryMessage.addCriteria(Criteria.where(ID).in(messagesIds));
+            queryMessageStatus.addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds));
         }
-        return executeDeleteMessage(deleteMessageStatus, query, logicalDelete);
-    }
-
-    private Mono<Boolean> executeDeleteMessage(
-            boolean deleteMessageStatus,
-            Query query,
-            @Nullable Boolean logicalDelete) {
         if (logicalDelete == null) {
             logicalDelete = turmsClusterManager.getTurmsProperties()
                     .getMessage().isLogicallyDeleteMessageByDefault();
@@ -364,26 +344,33 @@ public class MessageService {
             if (deleteMessageStatus) {
                 return mongoTemplate.inTransaction()
                         .execute(operations -> Mono.zip(
-                                operations.updateMulti(query, update, Message.class),
-                                operations.remove(query, MessageStatus.class))
+                                operations.updateMulti(queryMessage, update, Message.class),
+                                operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
                         .single();
             } else {
-                return mongoTemplate.updateMulti(query, update, Message.class)
+                return mongoTemplate.updateMulti(queryMessage, update, Message.class)
                         .map(UpdateResult::wasAcknowledged);
             }
         } else {
             if (deleteMessageStatus) {
                 return mongoTemplate.inTransaction()
                         .execute(operations -> Mono.zip(
-                                operations.remove(query, Message.class),
-                                operations.remove(query, MessageStatus.class))
+                                operations.remove(queryMessage, Message.class),
+                                operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
                         .single();
             }
-            return mongoTemplate.remove(query, Message.class)
+            return mongoTemplate.remove(queryMessage, Message.class)
                     .map(DeleteResult::wasAcknowledged);
         }
+    }
+
+    public Mono<Boolean> deleteMessage(
+            @NotNull Long messageId,
+            boolean deleteMessageStatus,
+            @Nullable Boolean logicalDelete) {
+        return deleteMessages(Set.of(messageId), deleteMessageStatus, logicalDelete);
     }
 
     public Mono<Boolean> updateMessage(
@@ -476,24 +463,26 @@ public class MessageService {
     }
 
     public Flux<Long> queryMessageRecipients(@NotNull Long messageId) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
-        query.fields().include(ID_TARGET_ID);
+        Query query = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId));
+        query.fields().include(ID_RECIPIENT_ID);
         return mongoTemplate.find(query, MessageStatus.class)
-                .map(status -> status.getKey().getTargetId());
+                .map(status -> status.getKey().getRecipientId());
     }
 
     public Mono<Long> queryPrivateMessageRecipient(@NotNull Long messageId) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
-        query.fields().include(ID_TARGET_ID);
+        Query query = new Query()
+                .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
+                .addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null));
+        query.fields().include(ID_RECIPIENT_ID);
         return mongoTemplate.findOne(query, MessageStatus.class)
-                .map(status -> status.getKey().getTargetId());
+                .map(status -> status.getKey().getRecipientId());
     }
 
     public Mono<Long> queryMessageSenderId(@NotNull Long messageId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
-        query.fields().include(MessageStatus.Fields.senderId);
-        return mongoTemplate.findOne(query, MessageStatus.class)
-                .map(MessageStatus::getSenderId);
+        query.fields().include(Message.Fields.senderId);
+        return mongoTemplate.findOne(query, Message.class)
+                .map(Message::getSenderId);
     }
 
     // messageId - recipientsIds

@@ -122,19 +122,19 @@ public interface TurmsRequestOrBuilder extends
   im.turms.turms.pojo.request.CreateMessageRequestOrBuilder getCreateMessageRequestOrBuilder();
 
   /**
-   * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
-   * @return Whether the queryMessageStatusRequest field is set.
+   * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
+   * @return Whether the queryMessageStatusesRequest field is set.
    */
-  boolean hasQueryMessageStatusRequest();
+  boolean hasQueryMessageStatusesRequest();
   /**
-   * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
-   * @return The queryMessageStatusRequest.
+   * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
+   * @return The queryMessageStatusesRequest.
    */
-  im.turms.turms.pojo.request.QueryMessageStatusRequest getQueryMessageStatusRequest();
+  im.turms.turms.pojo.request.QueryMessageStatusesRequest getQueryMessageStatusesRequest();
   /**
-   * <code>.im.turms.proto.QueryMessageStatusRequest query_message_status_request = 6;</code>
+   * <code>.im.turms.proto.QueryMessageStatusesRequest query_message_statuses_request = 6;</code>
    */
-  im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder getQueryMessageStatusRequestOrBuilder();
+  im.turms.turms.pojo.request.QueryMessageStatusesRequestOrBuilder getQueryMessageStatusesRequestOrBuilder();
 
   /**
    * <code>.im.turms.proto.QueryMessagesRequest query_messages_request = 7;</code>

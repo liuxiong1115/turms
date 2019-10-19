@@ -30,15 +30,17 @@ import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.domain.Message;
+import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.pojo.dto.MessagesWithTotal;
 import im.turms.turms.pojo.dto.TurmsRequestWrapper;
 import im.turms.turms.pojo.request.*;
+import im.turms.turms.pojo.response.MessageStatuses;
 import im.turms.turms.pojo.response.Messages;
 import im.turms.turms.pojo.response.MessagesWithTotalList;
 import im.turms.turms.pojo.response.TurmsResponse;
 import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.message.MessageStatusService;
-import org.springframework.data.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
@@ -100,16 +102,20 @@ public class WsMessageController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_MESSAGE_STATUS_REQUEST)
+    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_MESSAGE_STATUSES_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryMessageStatusRequest() {
         return turmsRequestWrapper -> {
-            QueryMessageStatusRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessageStatusRequest();
-            return messageStatusService.queryMessageStatus(request.getMessageId())
-                    .map(messageStatus -> {
-                        im.turms.turms.pojo.dto.MessageStatus status = ProtoUtil.messageStatus2proto(messageStatus).build();
+            QueryMessageStatusesRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessageStatusesRequest();
+            return messageStatusService.queryMessageStatuses(request.getMessageId())
+                    .collectList()
+                    .map(messageStatuses -> {
+                        MessageStatuses.Builder builder = MessageStatuses.newBuilder();
+                        for (MessageStatus messageStatus : messageStatuses) {
+                            builder.addMessageStatuses(ProtoUtil.messageStatus2proto(messageStatus));
+                        }
                         TurmsResponse.Data data = TurmsResponse.Data
                                 .newBuilder()
-                                .setMessageStatus(status)
+                                .setMessageStatuses(builder)
                                 .build();
                         return RequestResult.responseData(data);
                     });
@@ -120,7 +126,7 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryPendingMessagesWithTotalRequest() {
         return turmsRequestWrapper -> {
             QueryPendingMessagesWithTotalRequest request = turmsRequestWrapper.getTurmsRequest().getQueryPendingMessagesWithTotalRequest();
-            // chat type, sender id -> message
+            // chat type, group id or sender id -> message
             Multimap<Pair<ChatType, Long>, Message> multimap = LinkedListMultimap.create();
             Integer size = request.hasSize() ? request.getSize().getValue() : null;
             if (size == null) {
@@ -131,7 +137,8 @@ public class WsMessageController {
                     false, null, null,
                     turmsRequestWrapper.getUserId(), null, null,
                     MessageDeliveryStatus.READY, size)
-                    .doOnNext(message -> multimap.put(Pair.of(message.getChatType(), message.getSenderId()), message))
+                    .doOnNext(message -> multimap.put(Pair.of(message.getChatType(),
+                            message.getChatType() == ChatType.GROUP ? message.getTargetId() : message.getSenderId()), message))
                     .collectList()
                     .flatMap(messages -> {
                         if (messages.isEmpty()) {
@@ -140,20 +147,20 @@ public class WsMessageController {
                         MessagesWithTotalList.Builder listBuilder = MessagesWithTotalList.newBuilder();
                         List<Mono<Long>> countMonos = new ArrayList<>(multimap.size());
                         for (Pair<ChatType, Long> key : multimap.keys()) {
-                            countMonos.add(messageStatusService.countPendingMessages(key.getFirst(),
-                                    key.getSecond(),
+                            countMonos.add(messageStatusService.countPendingMessages(key.getLeft(),
+                                    key.getRight(),
                                     turmsRequestWrapper.getUserId()));
                         }
                         return Mono.zip(countMonos, objects -> objects)
                                 .map(numberObjects -> {
-                                    Iterator<Pair<ChatType, Long>> iterator = multimap.keys().iterator();
+                                    Iterator<Pair<ChatType, Long>> keyIterator = multimap.keys().iterator();
                                     for (int i = 0; i < multimap.keys().size(); i++) {
-                                        Pair<ChatType, Long> key = iterator.next();
+                                        Pair<ChatType, Long> key = keyIterator.next();
                                         int number = ((Long) numberObjects[i]).intValue();
                                         MessagesWithTotal.Builder messagesWithTotalBuilder = MessagesWithTotal.newBuilder()
                                                 .setTotal(number)
-                                                .setChatType(key.getFirst())
-                                                .setFromId(key.getSecond());
+                                                .setChatType(key.getLeft())
+                                                .setFromId(key.getRight());
                                         for (Message message : multimap.get(key)) {
                                             messagesWithTotalBuilder.addMessages(ProtoUtil.message2proto(message));
                                         }

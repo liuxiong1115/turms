@@ -3,8 +3,8 @@
 
 package im.turms.turms.pojo.request;
 
-public interface QueryMessageStatusRequestOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:im.turms.proto.QueryMessageStatusRequest)
+public interface QueryMessageStatusesRequestOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:im.turms.proto.QueryMessageStatusesRequest)
     com.google.protobuf.MessageOrBuilder {
 
   /**

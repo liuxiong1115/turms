@@ -17,7 +17,6 @@
 
 package im.turms.turms.pojo.domain;
 
-import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,6 +38,9 @@ public class MessageStatus {
     private Key key;
 
     @Indexed
+    private Long groupId;
+
+    @Indexed
     private Long senderId;
 
     @Indexed
@@ -55,11 +57,12 @@ public class MessageStatus {
 
     public MessageStatus(
             Long id,
-            ChatType chatType,
+            Long groupId,
             Long senderId,
-            Long targetId,
+            Long recipientId,
             MessageDeliveryStatus status) {
-        this.key = new Key(id, chatType, targetId);
+        this.key = new Key(id, recipientId);
+        this.groupId = groupId;
         this.senderId = senderId;
         this.deliveryStatus = status;
     }
@@ -72,9 +75,6 @@ public class MessageStatus {
         private Long messageId;
 
         @Indexed
-        private ChatType chatType;
-
-        @Indexed
-        private Long targetId;
+        private Long recipientId;
     }
 }

@@ -3,8 +3,8 @@
 
 package im.turms.turms.pojo.request;
 
-public final class QueryMessageStatusRequestOuterClass {
-  private QueryMessageStatusRequestOuterClass() {}
+public final class QueryMessageStatusesRequestOuterClass {
+  private QueryMessageStatusesRequestOuterClass() {}
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -15,10 +15,10 @@ public final class QueryMessageStatusRequestOuterClass {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_im_turms_proto_QueryMessageStatusRequest_descriptor;
-  static final
+    internal_static_im_turms_proto_QueryMessageStatusesRequest_descriptor;
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_im_turms_proto_QueryMessageStatusRequest_fieldAccessorTable;
+      internal_static_im_turms_proto_QueryMessageStatusesRequest_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -28,20 +28,21 @@ public final class QueryMessageStatusRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n2request/message/query_message_status_r" +
-      "equest.proto\022\016im.turms.proto\"/\n\031QueryMes" +
-      "sageStatusRequest\022\022\n\nmessage_id\030\001 \001(\003B\037\n" +
-      "\033im.turms.turms.pojo.requestP\001b\006proto3"
+      "\n4request/message/query_message_statuses" +
+      "_request.proto\022\016im.turms.proto\"1\n\033QueryM" +
+      "essageStatusesRequest\022\022\n\nmessage_id\030\001 \001(" +
+      "\003B\037\n\033im.turms.turms.pojo.requestP\001b\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_im_turms_proto_QueryMessageStatusRequest_descriptor =
+    internal_static_im_turms_proto_QueryMessageStatusesRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
-    internal_static_im_turms_proto_QueryMessageStatusRequest_fieldAccessorTable = new
+    internal_static_im_turms_proto_QueryMessageStatusesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_im_turms_proto_QueryMessageStatusRequest_descriptor,
+        internal_static_im_turms_proto_QueryMessageStatusesRequest_descriptor,
         new java.lang.String[] { "MessageId", });
   }
 

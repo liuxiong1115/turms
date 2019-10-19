@@ -8,7 +8,6 @@ option java_multiple_files = true;
 import "google/protobuf/wrappers.proto";
 
 import "dto/signal/acknowledge.proto";
-import "dto/message/message_status.proto";
 
 import "request/turms_request.proto";
 
@@ -19,6 +18,7 @@ import "response/group/group_join_questions_with_version.proto";
 import "response/group/group_join_requests_with_version.proto";
 import "response/group/group_members_with_version.proto";
 import "response/group/groups_with_version.proto";
+import "response/message/message_statuses.proto";
 import "response/message/messages.proto";
 import "response/message/messages_with_total_list.proto";
 import "response/user/user_friend_requests_with_version.proto";
@@ -45,7 +45,7 @@ message TurmsResponse {
             Acknowledge acknowledge = 4;
 
             Messages messages = 5;
-            MessageStatus message_status = 6;
+            MessageStatuses message_statuses = 6;
             MessagesWithTotalList messages_with_total_list = 7;
 
             UsersInfosWithVersion users_infos_with_version = 8;

@@ -23,90 +23,94 @@ public interface MessageOrBuilder extends
   com.google.protobuf.Int64ValueOrBuilder getIdOrBuilder();
 
   /**
-   * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-   * @return The enum numeric value on the wire for chatType.
-   */
-  int getChatTypeValue();
-  /**
-   * <code>.im.turms.proto.ChatType chat_type = 2;</code>
-   * @return The chatType.
-   */
-  im.turms.turms.constant.ChatType getChatType();
-
-  /**
-   * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+   * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
    * @return Whether the deliveryDate field is set.
    */
   boolean hasDeliveryDate();
   /**
-   * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+   * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
    * @return The deliveryDate.
    */
   com.google.protobuf.Int64Value getDeliveryDate();
   /**
-   * <code>.google.protobuf.Int64Value delivery_date = 3;</code>
+   * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
    */
   com.google.protobuf.Int64ValueOrBuilder getDeliveryDateOrBuilder();
 
   /**
-   * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+   * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
    * @return Whether the deletionDate field is set.
    */
   boolean hasDeletionDate();
   /**
-   * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+   * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
    * @return The deletionDate.
    */
   com.google.protobuf.Int64Value getDeletionDate();
   /**
-   * <code>.google.protobuf.Int64Value deletion_date = 4;</code>
+   * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
    */
   com.google.protobuf.Int64ValueOrBuilder getDeletionDateOrBuilder();
 
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 4;</code>
    * @return Whether the text field is set.
    */
   boolean hasText();
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 4;</code>
    * @return The text.
    */
   com.google.protobuf.StringValue getText();
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 4;</code>
    */
   com.google.protobuf.StringValueOrBuilder getTextOrBuilder();
 
   /**
-   * <code>.google.protobuf.Int64Value from_id = 6;</code>
-   * @return Whether the fromId field is set.
+   * <code>.google.protobuf.Int64Value sender_id = 5;</code>
+   * @return Whether the senderId field is set.
    */
-  boolean hasFromId();
+  boolean hasSenderId();
   /**
-   * <code>.google.protobuf.Int64Value from_id = 6;</code>
-   * @return The fromId.
+   * <code>.google.protobuf.Int64Value sender_id = 5;</code>
+   * @return The senderId.
    */
-  com.google.protobuf.Int64Value getFromId();
+  com.google.protobuf.Int64Value getSenderId();
   /**
-   * <code>.google.protobuf.Int64Value from_id = 6;</code>
+   * <code>.google.protobuf.Int64Value sender_id = 5;</code>
    */
-  com.google.protobuf.Int64ValueOrBuilder getFromIdOrBuilder();
+  com.google.protobuf.Int64ValueOrBuilder getSenderIdOrBuilder();
 
   /**
-   * <code>.google.protobuf.Int64Value to_id = 7;</code>
-   * @return Whether the toId field is set.
+   * <code>.google.protobuf.Int64Value group_id = 6;</code>
+   * @return Whether the groupId field is set.
    */
-  boolean hasToId();
+  boolean hasGroupId();
   /**
-   * <code>.google.protobuf.Int64Value to_id = 7;</code>
-   * @return The toId.
+   * <code>.google.protobuf.Int64Value group_id = 6;</code>
+   * @return The groupId.
    */
-  com.google.protobuf.Int64Value getToId();
+  com.google.protobuf.Int64Value getGroupId();
   /**
-   * <code>.google.protobuf.Int64Value to_id = 7;</code>
+   * <code>.google.protobuf.Int64Value group_id = 6;</code>
    */
-  com.google.protobuf.Int64ValueOrBuilder getToIdOrBuilder();
+  com.google.protobuf.Int64ValueOrBuilder getGroupIdOrBuilder();
+
+  /**
+   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * @return Whether the recipientId field is set.
+   */
+  boolean hasRecipientId();
+  /**
+   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * @return The recipientId.
+   */
+  com.google.protobuf.Int64Value getRecipientId();
+  /**
+   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   */
+  com.google.protobuf.Int64ValueOrBuilder getRecipientIdOrBuilder();
 
   /**
    * <code>repeated .google.protobuf.BytesValue records = 8;</code>

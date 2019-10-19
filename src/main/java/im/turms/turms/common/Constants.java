@@ -46,8 +46,6 @@ public class Constants {
     public static final String ID_INDEX = "_id.index";
     public static final String ID_MESSAGE_ID = "_id.messageId";
     public static final String ID_RECIPIENT_ID = "_id.recipientId";
-    public static final String ID_TARGET_ID = "_id.targetId";
-    public static final String ID_CHAT_TYPE = "_id.chatType";
 
     public static final String HAZELCAST_ADMINS_MAP = "admins";
     public static final String HAZELCAST_ROLES_MAP = "adminRoles";

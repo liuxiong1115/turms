@@ -29,33 +29,31 @@ public final class MessageOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\031dto/message/message.proto\022\016im.turms.pr" +
-      "oto\032\036google/protobuf/wrappers.proto\032\030con" +
-      "stant/chat_type.proto\"\373\002\n\007Message\022\'\n\002id\030" +
-      "\001 \001(\0132\033.google.protobuf.Int64Value\022+\n\tch" +
-      "at_type\030\002 \001(\0162\030.im.turms.proto.ChatType\022" +
-      "2\n\rdelivery_date\030\003 \001(\0132\033.google.protobuf" +
-      ".Int64Value\0222\n\rdeletion_date\030\004 \001(\0132\033.goo" +
-      "gle.protobuf.Int64Value\022*\n\004text\030\005 \001(\0132\034." +
-      "google.protobuf.StringValue\022,\n\007from_id\030\006" +
-      " \001(\0132\033.google.protobuf.Int64Value\022*\n\005to_" +
-      "id\030\007 \001(\0132\033.google.protobuf.Int64Value\022,\n" +
-      "\007records\030\010 \003(\0132\033.google.protobuf.BytesVa" +
-      "lueB\033\n\027im.turms.turms.pojo.dtoP\001b\006proto3"
+      "oto\032\036google/protobuf/wrappers.proto\"\206\003\n\007" +
+      "Message\022\'\n\002id\030\001 \001(\0132\033.google.protobuf.In" +
+      "t64Value\0222\n\rdelivery_date\030\002 \001(\0132\033.google" +
+      ".protobuf.Int64Value\0222\n\rdeletion_date\030\003 " +
+      "\001(\0132\033.google.protobuf.Int64Value\022*\n\004text" +
+      "\030\004 \001(\0132\034.google.protobuf.StringValue\022.\n\t" +
+      "sender_id\030\005 \001(\0132\033.google.protobuf.Int64V" +
+      "alue\022-\n\010group_id\030\006 \001(\0132\033.google.protobuf" +
+      ".Int64Value\0221\n\014recipient_id\030\007 \001(\0132\033.goog" +
+      "le.protobuf.Int64Value\022,\n\007records\030\010 \003(\0132" +
+      "\033.google.protobuf.BytesValueB\033\n\027im.turms" +
+      ".turms.pojo.dtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.protobuf.WrappersProto.getDescriptor(),
-          im.turms.turms.constant.ChatTypeOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_Message_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_im_turms_proto_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_im_turms_proto_Message_descriptor,
-        new java.lang.String[] { "Id", "ChatType", "DeliveryDate", "DeletionDate", "Text", "FromId", "ToId", "Records", });
+        new java.lang.String[] { "Id", "DeliveryDate", "DeletionDate", "Text", "SenderId", "GroupId", "RecipientId", "Records", });
     com.google.protobuf.WrappersProto.getDescriptor();
-    im.turms.turms.constant.ChatTypeOuterClass.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

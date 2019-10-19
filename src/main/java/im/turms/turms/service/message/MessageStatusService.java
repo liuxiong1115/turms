@@ -98,7 +98,7 @@ public class MessageStatusService {
             @NotNull Long messageId,
             @NotNull Date readDate) {
         Query query = new Query()
-                .addCriteria(Criteria.where(ID).is(messageId))
+                .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
                 .addCriteria(Criteria.where(MessageStatus.Fields.readDate).is(null));
         Update update = new Update().set(MessageStatus.Fields.readDate, readDate);
         return mongoTemplate.findAndModify(query, update, MessageStatus.class)
@@ -106,20 +106,29 @@ public class MessageStatusService {
                 .map(status -> EMPTY_MESSAGE_STATUS != status);
     }
 
-    public Mono<MessageStatus> queryMessageStatus(@NotNull Long messageId) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
-        return mongoTemplate.findOne(query, MessageStatus.class);
+    public Flux<MessageStatus> queryMessageStatuses(@NotNull Long messageId) {
+        Query query = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId));
+        return mongoTemplate.find(query, MessageStatus.class);
     }
 
     public Mono<Long> countPendingMessages(
             @NotNull ChatType chatType,
-            @NotNull Long fromId,
+            @NotNull Long groupOrSenderId,
             @NotNull Long recipientId) {
         Query query = new Query()
-                .addCriteria(Criteria.where(MessageStatus.Fields.senderId).is(fromId))
                 .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId))
-                .addCriteria(Criteria.where(ID_CHAT_TYPE).is(chatType))
                 .addCriteria(Criteria.where(MessageStatus.Fields.deliveryStatus).is(MessageDeliveryStatus.READY));
+        switch (chatType) {
+            case PRIVATE:
+                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null))
+                        .addCriteria(Criteria.where(MessageStatus.Fields.senderId).is(groupOrSenderId));
+                break;
+            case GROUP:
+                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(groupOrSenderId));
+                break;
+            default:
+                throw new UnsupportedOperationException("");
+        }
         return mongoTemplate.count(query, MessageStatus.class);
     }
 

@@ -4,25 +4,25 @@
 package im.turms.turms.pojo.request;
 
 /**
- * Protobuf type {@code im.turms.proto.QueryMessageStatusRequest}
+ * Protobuf type {@code im.turms.proto.QueryMessageStatusesRequest}
  */
-public  final class QueryMessageStatusRequest extends
+public  final class QueryMessageStatusesRequest extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:im.turms.proto.QueryMessageStatusRequest)
-    QueryMessageStatusRequestOrBuilder {
+    // @@protoc_insertion_point(message_implements:im.turms.proto.QueryMessageStatusesRequest)
+    QueryMessageStatusesRequestOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use QueryMessageStatusRequest.newBuilder() to construct.
-  private QueryMessageStatusRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use QueryMessageStatusesRequest.newBuilder() to construct.
+  private QueryMessageStatusesRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private QueryMessageStatusRequest() {
+  private QueryMessageStatusesRequest() {
   }
 
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new QueryMessageStatusRequest();
+    return new QueryMessageStatusesRequest();
   }
 
   @java.lang.Override
@@ -30,7 +30,7 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private QueryMessageStatusRequest(
+  private QueryMessageStatusesRequest(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -74,15 +74,15 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return im.turms.turms.pojo.request.QueryMessageStatusRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusRequest_descriptor;
+    return im.turms.turms.pojo.request.QueryMessageStatusesRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusesRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.request.QueryMessageStatusRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusRequest_fieldAccessorTable
+    return im.turms.turms.pojo.request.QueryMessageStatusesRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusesRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            im.turms.turms.pojo.request.QueryMessageStatusRequest.class, im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder.class);
+            im.turms.turms.pojo.request.QueryMessageStatusesRequest.class, im.turms.turms.pojo.request.QueryMessageStatusesRequest.Builder.class);
   }
 
   public static final int MESSAGE_ID_FIELD_NUMBER = 1;
@@ -135,10 +135,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof im.turms.turms.pojo.request.QueryMessageStatusRequest)) {
+    if (!(obj instanceof im.turms.turms.pojo.request.QueryMessageStatusesRequest)) {
       return super.equals(obj);
     }
-    im.turms.turms.pojo.request.QueryMessageStatusRequest other = (im.turms.turms.pojo.request.QueryMessageStatusRequest) obj;
+    im.turms.turms.pojo.request.QueryMessageStatusesRequest other = (im.turms.turms.pojo.request.QueryMessageStatusesRequest) obj;
 
     if (getMessageId()
         != other.getMessageId()) return false;
@@ -161,69 +161,69 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(byte[] data)
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(java.io.InputStream input)
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseDelimitedFrom(java.io.InputStream input)
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseDelimitedFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest parseFrom(
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -236,7 +236,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(im.turms.turms.pojo.request.QueryMessageStatusRequest prototype) {
+  public static Builder newBuilder(im.turms.turms.pojo.request.QueryMessageStatusesRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -252,26 +252,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code im.turms.proto.QueryMessageStatusRequest}
+   * Protobuf type {@code im.turms.proto.QueryMessageStatusesRequest}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:im.turms.proto.QueryMessageStatusRequest)
-      im.turms.turms.pojo.request.QueryMessageStatusRequestOrBuilder {
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.QueryMessageStatusesRequest)
+      im.turms.turms.pojo.request.QueryMessageStatusesRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return im.turms.turms.pojo.request.QueryMessageStatusRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusRequest_descriptor;
+      return im.turms.turms.pojo.request.QueryMessageStatusesRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusesRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return im.turms.turms.pojo.request.QueryMessageStatusRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusRequest_fieldAccessorTable
+      return im.turms.turms.pojo.request.QueryMessageStatusesRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusesRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              im.turms.turms.pojo.request.QueryMessageStatusRequest.class, im.turms.turms.pojo.request.QueryMessageStatusRequest.Builder.class);
+              im.turms.turms.pojo.request.QueryMessageStatusesRequest.class, im.turms.turms.pojo.request.QueryMessageStatusesRequest.Builder.class);
     }
 
-    // Construct using im.turms.turms.pojo.request.QueryMessageStatusRequest.newBuilder()
+    // Construct using im.turms.turms.pojo.request.QueryMessageStatusesRequest.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -297,17 +297,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return im.turms.turms.pojo.request.QueryMessageStatusRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusRequest_descriptor;
+      return im.turms.turms.pojo.request.QueryMessageStatusesRequestOuterClass.internal_static_im_turms_proto_QueryMessageStatusesRequest_descriptor;
     }
 
     @java.lang.Override
-    public im.turms.turms.pojo.request.QueryMessageStatusRequest getDefaultInstanceForType() {
-      return im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance();
+    public im.turms.turms.pojo.request.QueryMessageStatusesRequest getDefaultInstanceForType() {
+      return im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance();
     }
 
     @java.lang.Override
-    public im.turms.turms.pojo.request.QueryMessageStatusRequest build() {
-      im.turms.turms.pojo.request.QueryMessageStatusRequest result = buildPartial();
+    public im.turms.turms.pojo.request.QueryMessageStatusesRequest build() {
+      im.turms.turms.pojo.request.QueryMessageStatusesRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -315,8 +315,8 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public im.turms.turms.pojo.request.QueryMessageStatusRequest buildPartial() {
-      im.turms.turms.pojo.request.QueryMessageStatusRequest result = new im.turms.turms.pojo.request.QueryMessageStatusRequest(this);
+    public im.turms.turms.pojo.request.QueryMessageStatusesRequest buildPartial() {
+      im.turms.turms.pojo.request.QueryMessageStatusesRequest result = new im.turms.turms.pojo.request.QueryMessageStatusesRequest(this);
       result.messageId_ = messageId_;
       onBuilt();
       return result;
@@ -356,16 +356,16 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof im.turms.turms.pojo.request.QueryMessageStatusRequest) {
-        return mergeFrom((im.turms.turms.pojo.request.QueryMessageStatusRequest)other);
+      if (other instanceof im.turms.turms.pojo.request.QueryMessageStatusesRequest) {
+        return mergeFrom((im.turms.turms.pojo.request.QueryMessageStatusesRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(im.turms.turms.pojo.request.QueryMessageStatusRequest other) {
-      if (other == im.turms.turms.pojo.request.QueryMessageStatusRequest.getDefaultInstance()) return this;
+    public Builder mergeFrom(im.turms.turms.pojo.request.QueryMessageStatusesRequest other) {
+      if (other == im.turms.turms.pojo.request.QueryMessageStatusesRequest.getDefaultInstance()) return this;
       if (other.getMessageId() != 0L) {
         setMessageId(other.getMessageId());
       }
@@ -384,11 +384,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      im.turms.turms.pojo.request.QueryMessageStatusRequest parsedMessage = null;
+      im.turms.turms.pojo.request.QueryMessageStatusesRequest parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (im.turms.turms.pojo.request.QueryMessageStatusRequest) e.getUnfinishedMessage();
+        parsedMessage = (im.turms.turms.pojo.request.QueryMessageStatusesRequest) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -412,7 +412,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setMessageId(long value) {
-
+      
       messageId_ = value;
       onChanged();
       return this;
@@ -422,7 +422,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearMessageId() {
-
+      
       messageId_ = 0L;
       onChanged();
       return this;
@@ -440,41 +440,41 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:im.turms.proto.QueryMessageStatusRequest)
+    // @@protoc_insertion_point(builder_scope:im.turms.proto.QueryMessageStatusesRequest)
   }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.QueryMessageStatusRequest)
-  private static final im.turms.turms.pojo.request.QueryMessageStatusRequest DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:im.turms.proto.QueryMessageStatusesRequest)
+  private static final im.turms.turms.pojo.request.QueryMessageStatusesRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.QueryMessageStatusRequest();
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.QueryMessageStatusesRequest();
   }
 
-  public static im.turms.turms.pojo.request.QueryMessageStatusRequest getDefaultInstance() {
+  public static im.turms.turms.pojo.request.QueryMessageStatusesRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<QueryMessageStatusRequest>
-      PARSER = new com.google.protobuf.AbstractParser<QueryMessageStatusRequest>() {
+  private static final com.google.protobuf.Parser<QueryMessageStatusesRequest>
+      PARSER = new com.google.protobuf.AbstractParser<QueryMessageStatusesRequest>() {
     @java.lang.Override
-    public QueryMessageStatusRequest parsePartialFrom(
+    public QueryMessageStatusesRequest parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new QueryMessageStatusRequest(input, extensionRegistry);
+      return new QueryMessageStatusesRequest(input, extensionRegistry);
     }
   };
 
-  public static com.google.protobuf.Parser<QueryMessageStatusRequest> parser() {
+  public static com.google.protobuf.Parser<QueryMessageStatusesRequest> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<QueryMessageStatusRequest> getParserForType() {
+  public com.google.protobuf.Parser<QueryMessageStatusesRequest> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public im.turms.turms.pojo.request.QueryMessageStatusRequest getDefaultInstanceForType() {
+  public im.turms.turms.pojo.request.QueryMessageStatusesRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 
