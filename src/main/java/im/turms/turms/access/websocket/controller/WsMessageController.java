@@ -36,59 +36,67 @@ import im.turms.turms.pojo.request.*;
 import im.turms.turms.pojo.response.Messages;
 import im.turms.turms.pojo.response.MessagesWithTotalList;
 import im.turms.turms.pojo.response.TurmsResponse;
-import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.message.MessageStatusService;
-import im.turms.turms.service.user.UserService;
-import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-//TODO: Extract logic to services
 @Controller
 public class WsMessageController {
     private final TurmsClusterManager turmsClusterManager;
     private final MessageService messageService;
     private final MessageStatusService messageStatusService;
-    private final UserService userService;
-    private final UserRelationshipService userRelationshipService;
-    private final GroupMemberService groupMemberService;
     private final PageUtil pageUtil;
 
-    public WsMessageController(MessageService messageService, UserService userService, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService, PageUtil pageUtil, UserRelationshipService userRelationshipService, MessageStatusService messageStatusService) {
+    public WsMessageController(MessageService messageService, TurmsClusterManager turmsClusterManager, PageUtil pageUtil, MessageStatusService messageStatusService) {
         this.messageService = messageService;
-        this.userService = userService;
         this.turmsClusterManager = turmsClusterManager;
-        this.groupMemberService = groupMemberService;
         this.pageUtil = pageUtil;
-        this.userRelationshipService = userRelationshipService;
         this.messageStatusService = messageStatusService;
     }
 
     @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_MESSAGE_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateMessageRequest() {
         return turmsRequestWrapper -> {
-            boolean messagePersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent();
-            boolean messageStatusPersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent();
-            switch (turmsRequestWrapper.getTurmsRequest().getCreateMessageRequest().getChatType()) {
-                case PRIVATE:
-                    return handleToPrivateCreateMessageRequest(turmsRequestWrapper, messagePersistent, messageStatusPersistent);
-                case GROUP:
-                    return handleToGroupCreateMessageRequest(turmsRequestWrapper, messagePersistent, messageStatusPersistent);
-                case UNRECOGNIZED:
-                case SYSTEM:
-                default:
-                    return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
-            }
+            CreateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getCreateMessageRequest();
+            List<byte[]> records = request.getRecordsCount() != 0 ? request.getRecordsList()
+                    .stream()
+                    .map(ByteString::toByteArray)
+                    .collect(Collectors.toList())
+                    : null;
+            Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
+            Date deliveryDate = new Date(request.getDeliveryDate());
+            return messageService.authAndSendMessage(
+                    turmsRequestWrapper.getUserId(),
+                    request.getToId(),
+                    request.getChatType(),
+                    request.getText(),
+                    records,
+                    burnAfter,
+                    deliveryDate)
+                    .map(pair -> {
+                        Long messageId = pair.getLeft();
+                        Set<Long> recipientsIds = pair.getRight();
+                        if (messageId != null && recipientsIds != null && !recipientsIds.isEmpty()) {
+                            return RequestResult.responseIdAndRecipientData(
+                                    messageId,
+                                    recipientsIds,
+                                    turmsRequestWrapper.getTurmsRequest());
+                        } else if (messageId != null) {
+                            return RequestResult.responseId(messageId);
+                        } else if (recipientsIds != null && !recipientsIds.isEmpty()) {
+                            return RequestResult.recipientData(
+                                    recipientsIds,
+                                    turmsRequestWrapper.getTurmsRequest());
+                        } else {
+                            return RequestResult.status(TurmsStatusCode.OK);
+                        }
+                    });
         };
     }
 
@@ -120,7 +128,8 @@ public class WsMessageController {
             }
             size = pageUtil.getSize(size);
             return messageService.queryCompleteMessages(
-                    false, null, null, turmsRequestWrapper.getUserId(), null, null,
+                    false, null, null,
+                    turmsRequestWrapper.getUserId(), null, null,
                     MessageDeliveryStatus.READY, size)
                     .doOnNext(message -> multimap.put(Pair.of(message.getChatType(), message.getSenderId()), message))
                     .collectList()
@@ -131,7 +140,9 @@ public class WsMessageController {
                         MessagesWithTotalList.Builder listBuilder = MessagesWithTotalList.newBuilder();
                         List<Mono<Long>> countMonos = new ArrayList<>(multimap.size());
                         for (Pair<ChatType, Long> key : multimap.keys()) {
-                            countMonos.add(messageStatusService.countPendingMessages(key.getFirst(), key.getSecond(), turmsRequestWrapper.getUserId()));
+                            countMonos.add(messageStatusService.countPendingMessages(key.getFirst(),
+                                    key.getSecond(),
+                                    turmsRequestWrapper.getUserId()));
                         }
                         return Mono.zip(countMonos, objects -> objects)
                                 .map(numberObjects -> {
@@ -193,8 +204,12 @@ public class WsMessageController {
                         TurmsResponse.Data data = TurmsResponse.Data.newBuilder()
                                 .setMessages(messagesList)
                                 .build();
-                        messageStatusService.acknowledge(messages.stream().mapToLong(Message::getId).toArray());
-                        return Mono.just(RequestResult.responseData(data));
+                        Set<Long> messagesIds = messages.stream()
+                                .mapToLong(Message::getId).boxed()
+                                .collect(Collectors.toSet());
+                        return Mono.just(RequestResult.responseData(data))
+                                .flatMap(response -> messageStatusService.acknowledge(messagesIds)
+                                        .thenReturn(response));
                     });
         };
     }
@@ -316,121 +331,6 @@ public class WsMessageController {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RESOURCES_HAVE_CHANGED));
                     }
-                });
-    }
-
-    private Mono<RequestResult> handleToPrivateCreateMessageRequest(
-            @NotNull TurmsRequestWrapper turmsRequestWrapper,
-            boolean messagePersistent,
-            boolean messageStatusPersistent) {
-        CreateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getCreateMessageRequest();
-        return userService.isAllowedToSendMessageToTarget(
-                request.getChatType(),
-                turmsRequestWrapper.getUserId(),
-                request.getToId())
-                .flatMap(allowed -> {
-                    if (allowed == null || !allowed) {
-                        return Mono.just(RequestResult.status(TurmsStatusCode.UNAUTHORIZED));
-                    }
-                    List<byte[]> records = request.getRecordsCount() != 0 ?
-                            request.getRecordsList()
-                                    .stream()
-                                    .map(ByteString::toByteArray)
-                                    .collect(Collectors.toList())
-                            : null;
-                    Mono<Message> save;
-                    Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
-                    if (!messagePersistent) {
-                        return Mono.just(RequestResult.recipientData(
-                                request.getToId(),
-                                turmsRequestWrapper.getTurmsRequest()));
-                    }
-                    if (messageStatusPersistent) {
-                        save = messageService.saveMessageAndMessagesStatus(
-                                turmsRequestWrapper.getUserId(),
-                                request.getToId(),
-                                request.getChatType(),
-                                request.getText(),
-                                records,
-                                burnAfter,
-                                new Date(request.getDeliveryDate()));
-                    } else {
-                        save = messageService.saveMessage(
-                                turmsRequestWrapper.getUserId(),
-                                request.getToId(),
-                                request.getChatType(),
-                                request.getText(),
-                                records,
-                                burnAfter,
-                                new Date(request.getDeliveryDate()),
-                                null);
-                    }
-                    return save.map(message -> RequestResult.responseIdAndRecipientData(
-                            message.getId(),
-                            request.getToId(),
-                            turmsRequestWrapper.getTurmsRequest()));
-                });
-    }
-
-    private Mono<RequestResult> handleToGroupCreateMessageRequest(
-            TurmsRequestWrapper turmsRequestWrapper,
-            boolean messagePersistent,
-            boolean messageStatusPersistent) {
-        CreateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getCreateMessageRequest();
-        return groupMemberService.isAllowedToSendMessage(request.getToId(), turmsRequestWrapper.getUserId())
-                .flatMap(allowed -> {
-                    if (allowed == null || !allowed) {
-                        return Mono.just(RequestResult.status(TurmsStatusCode.UNAUTHORIZED));
-                    }
-                    return groupMemberService.getMembersIdsByGroupId(request.getToId())
-                            .collect(Collectors.toSet())
-                            .flatMap(membersIds -> {
-                                Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
-                                if (!messagePersistent) {
-                                    if (membersIds.isEmpty()) {
-                                        return Mono.just(RequestResult.ok());
-                                    } else {
-                                        return Mono.just(RequestResult.recipientData(
-                                                membersIds,
-                                                turmsRequestWrapper.getTurmsRequest()));
-                                    }
-                                }
-                                List<byte[]> records = request.getRecordsCount() != 0 ?
-                                        request.getRecordsList()
-                                                .stream()
-                                                .map(ByteString::toByteArray)
-                                                .collect(Collectors.toList())
-                                        : null;
-                                Mono<Message> saveMono;
-                                if (messageStatusPersistent) {
-                                    saveMono = messageService.saveMessageAndMessagesStatus(
-                                            turmsRequestWrapper.getUserId(),
-                                            request.getToId(),
-                                            request.getChatType(),
-                                            request.getText(),
-                                            records,
-                                            burnAfter,
-                                            new Date(request.getDeliveryDate()));
-                                } else {
-                                    saveMono = messageService.saveMessage(
-                                            turmsRequestWrapper.getUserId(),
-                                            request.getToId(),
-                                            request.getChatType(),
-                                            request.getText(),
-                                            records,
-                                            burnAfter,
-                                            new Date(request.getDeliveryDate()),
-                                            null);
-                                }
-                                if (membersIds.isEmpty()) {
-                                    return saveMono.map(message -> RequestResult.responseId(message.getId()));
-                                } else {
-                                    return saveMono.map(message -> RequestResult.responseIdAndRecipientData(
-                                            message.getId(),
-                                            membersIds,
-                                            turmsRequestWrapper.getTurmsRequest()));
-                                }
-                            });
                 });
     }
 }

@@ -21,6 +21,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -122,7 +123,7 @@ public class MessageStatusService {
         return mongoTemplate.count(query, MessageStatus.class);
     }
 
-    public Mono<Boolean> acknowledge(@NotEmpty long[] messagesIds) {
+    public Mono<Boolean> acknowledge(@NotEmpty Set<Long> messagesIds) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(messagesIds));
         Update update = new Update().set(MessageStatus.Fields.deliveryStatus, MessageDeliveryStatus.RECEIVED);
         if (turmsClusterManager.getTurmsProperties().getMessage()

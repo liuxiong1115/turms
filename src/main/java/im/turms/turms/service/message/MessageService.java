@@ -30,6 +30,8 @@ import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.service.group.GroupMemberService;
+import im.turms.turms.service.user.UserService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -48,10 +50,7 @@ import javax.validation.constraints.NotNull;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
@@ -62,13 +61,15 @@ public class MessageService {
     private final TurmsClusterManager turmsClusterManager;
     private final MessageStatusService messageStatusService;
     private final GroupMemberService groupMemberService;
+    private final UserService userService;
 
     @Autowired
-    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService) {
+    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.messageStatusService = messageStatusService;
         this.groupMemberService = groupMemberService;
+        this.userService = userService;
     }
 
     @Scheduled(cron = EXPIRY_MESSAGES_CLEANER_CRON)
@@ -187,12 +188,12 @@ public class MessageService {
             @NotNull Long senderId,
             @NotNull Long targetId,
             @NotNull ChatType chatType,
-            @NotNull String text,
+            @Nullable String text,
             @Nullable List<byte[]> records,
             @Nullable Integer burnAfter,
             @Nullable Date deliveryDate,
             @Nullable ReactiveMongoOperations operations) {
-        if (text.length() > turmsClusterManager.getTurmsProperties().getMessage().getMaxTextLimit()) {
+        if (text != null && text.length() > turmsClusterManager.getTurmsProperties().getMessage().getMaxTextLimit()) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         int maxRecordsSize = turmsClusterManager.getTurmsProperties()
@@ -245,6 +246,7 @@ public class MessageService {
                         .queryGroupMembersIds(message.getTargetId())
                         .collect(Collectors.toSet())
                         .flatMap(membersIds -> {
+                            //TODO: duplicated query for membersIds
                             if (membersIds.isEmpty()) {
                                 return Mono.just(true);
                             }
@@ -494,8 +496,53 @@ public class MessageService {
                 .map(MessageStatus::getSenderId);
     }
 
-    //TODO: in 0.9.0
-    public void forwardMessage() {
-        throw new UnsupportedOperationException("done in 0.9.0");
+    // messageId - recipientsIds
+    public Mono<Pair<Long, Set<Long>>> authAndSendMessage(
+            @NotNull Long senderId,
+            @NotNull Long targetId,
+            @NotNull ChatType chatType,
+            @NotNull String text,
+            @Nullable List<byte[]> records,
+            @Nullable Integer burnAfter,
+            @Nullable Date deliveryDate) {
+        boolean messagePersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent();
+        boolean messageStatusPersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent();
+        if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP) {
+            return userService.isAllowedToSendMessageToTarget(chatType, senderId, targetId)
+                    .flatMap(allowed -> {
+                        if (allowed == null || !allowed) {
+                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                        }
+                        Mono<Set<Long>> queryRecipientsIds;
+                        if (chatType == ChatType.PRIVATE) {
+                            queryRecipientsIds = Mono.just(Collections.singleton(targetId));
+                        } else {
+                            queryRecipientsIds = groupMemberService.getMembersIdsByGroupId(targetId)
+                                    .collect(Collectors.toSet());
+                        }
+                        return queryRecipientsIds.flatMap(recipientsIds -> {
+                            if (!messagePersistent) {
+                                if (recipientsIds.isEmpty()) {
+                                    return Mono.empty();
+                                } else {
+                                    return Mono.just(Pair.of(null, recipientsIds));
+                                }
+                            }
+                            Mono<Message> saveMono;
+                            if (messageStatusPersistent) {
+                                saveMono = saveMessageAndMessagesStatus(
+                                        senderId, targetId, chatType, text,
+                                        records, burnAfter, deliveryDate);
+                            } else {
+                                saveMono = saveMessage(
+                                        senderId, targetId, chatType, text,
+                                        records, burnAfter, deliveryDate, null);
+                            }
+                            return saveMono.map(message -> Pair.of(message.getId(), recipientsIds));
+                        });
+                    });
+        } else {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
     }
 }

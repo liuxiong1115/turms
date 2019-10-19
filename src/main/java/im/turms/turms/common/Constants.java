@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 
@@ -74,6 +75,7 @@ public class Constants {
     public static final int DEFAULT_RELATIONSHIP_GROUP_INDEX = 0;
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final Object EMPTY_OBJECT = new Object();
+    public static final Pair EMPTY_PAIR = Pair.of(null, null);
     public static final Date EPOCH = new Date(0);
     public static final Date MAX_DATE = new Date(Long.MAX_VALUE);
     public static final Set<DeviceType> ALL_DEVICE_TYPES = Arrays.stream(DeviceType.values()).collect(Collectors.toSet());
@@ -90,4 +92,8 @@ public class Constants {
      * So, DO NOT remove "static final"
      */
     public static final boolean DEV_MODE = true;
+
+    public static <T, R> Pair<T, R> emptyPair() {
+        return EMPTY_PAIR;
+    }
 }
