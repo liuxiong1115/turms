@@ -66,39 +66,49 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateMessageRequest() {
         return turmsRequestWrapper -> {
             CreateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getCreateMessageRequest();
-            List<byte[]> records = request.getRecordsCount() != 0 ? request.getRecordsList()
-                    .stream()
-                    .map(ByteString::toByteArray)
-                    .collect(Collectors.toList())
-                    : null;
-            Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
-            Date deliveryDate = new Date(request.getDeliveryDate());
-            return messageService.authAndSendMessage(
-                    turmsRequestWrapper.getUserId(),
-                    request.getToId(),
-                    request.getChatType(),
-                    request.getText(),
-                    records,
-                    burnAfter,
-                    deliveryDate)
-                    .map(pair -> {
-                        Long messageId = pair.getLeft();
-                        Set<Long> recipientsIds = pair.getRight();
-                        if (messageId != null && recipientsIds != null && !recipientsIds.isEmpty()) {
-                            return RequestResult.responseIdAndRecipientData(
-                                    messageId,
-                                    recipientsIds,
-                                    turmsRequestWrapper.getTurmsRequest());
-                        } else if (messageId != null) {
-                            return RequestResult.responseId(messageId);
-                        } else if (recipientsIds != null && !recipientsIds.isEmpty()) {
-                            return RequestResult.recipientData(
-                                    recipientsIds,
-                                    turmsRequestWrapper.getTurmsRequest());
-                        } else {
-                            return RequestResult.status(TurmsStatusCode.OK);
-                        }
-                    });
+            Mono<Pair<Long, Set<Long>>> pairMono;
+            if (request.hasMessageId()) {
+                pairMono = messageService.authAndCloneAndSendMessage(
+                        turmsRequestWrapper.getUserId(),
+                        request.getMessageId().getValue(),
+                        request.getChatType(),
+                        request.getToId());
+            } else {
+                List<byte[]> records = request.getRecordsCount() != 0 ? request.getRecordsList()
+                        .stream()
+                        .map(ByteString::toByteArray)
+                        .collect(Collectors.toList())
+                        : null;
+                Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
+                Date deliveryDate = new Date(request.getDeliveryDate());
+                pairMono = messageService.authAndSendMessage(
+                        turmsRequestWrapper.getUserId(),
+                        request.getToId(),
+                        request.getChatType(),
+                        request.hasText() ? request.getText().getValue() : null,
+                        records,
+                        burnAfter,
+                        deliveryDate,
+                        null);
+            }
+            return pairMono.map(pair -> {
+                Long messageId = pair.getLeft();
+                Set<Long> recipientsIds = pair.getRight();
+                if (messageId != null && recipientsIds != null && !recipientsIds.isEmpty()) {
+                    return RequestResult.responseIdAndRecipientData(
+                            messageId,
+                            recipientsIds,
+                            turmsRequestWrapper.getTurmsRequest());
+                } else if (messageId != null) {
+                    return RequestResult.responseId(messageId);
+                } else if (recipientsIds != null && !recipientsIds.isEmpty()) {
+                    return RequestResult.recipientData(
+                            recipientsIds,
+                            turmsRequestWrapper.getTurmsRequest());
+                } else {
+                    return RequestResult.status(TurmsStatusCode.OK);
+                }
+            });
         };
     }
 

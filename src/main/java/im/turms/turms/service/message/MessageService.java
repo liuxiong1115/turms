@@ -133,6 +133,11 @@ public class MessageService {
         }
     }
 
+    public Mono<Message> queryMessage(@NotNull Long messageId) {
+        Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
+        return mongoTemplate.findOne(query, Message.class);
+    }
+
     public Flux<Message> queryCompleteMessages(
             @NotNull boolean closeToDate,
             @Nullable ChatType chatType,
@@ -171,6 +176,7 @@ public class MessageService {
 
     public Mono<Message> saveMessage(
             @NotNull Message message,
+            @Nullable Long referenceId,
             @Nullable ReactiveMongoOperations operations) {
         return saveMessage(
                 message.getSenderId(),
@@ -180,6 +186,7 @@ public class MessageService {
                 message.getRecords(),
                 message.getBurnAfter(),
                 message.getDeliveryDate(),
+                referenceId,
                 operations);
     }
 
@@ -191,6 +198,7 @@ public class MessageService {
             @Nullable List<byte[]> records,
             @Nullable Integer burnAfter,
             @Nullable Date deliveryDate,
+            @Nullable Long referenceId,
             @Nullable ReactiveMongoOperations operations) {
         if (text != null && text.length() > turmsClusterManager.getTurmsProperties().getMessage().getMaxTextLimit()) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
@@ -222,7 +230,8 @@ public class MessageService {
                 senderId,
                 targetId,
                 records,
-                burnAfter);
+                burnAfter,
+                referenceId);
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.insert(message);
     }
@@ -272,7 +281,8 @@ public class MessageService {
             @NotNull String text,
             @Nullable List<byte[]> records,
             @Nullable Integer burnAfter,
-            @Nullable Date deliveryDate) {
+            @Nullable Date deliveryDate,
+            @Nullable Long referenceId) {
         if (turmsClusterManager.getTurmsProperties().getMessage().getTimeType()
                 != im.turms.turms.property.business.Message.TimeType.CLIENT_TIME
                 || deliveryDate == null) {
@@ -286,13 +296,14 @@ public class MessageService {
                 senderId,
                 targetId,
                 records,
-                burnAfter);
-        return saveMessageAndMessagesStatus(message);
+                burnAfter,
+                referenceId);
+        return saveMessageAndMessagesStatus(message, referenceId);
     }
 
-    public Mono<Message> saveMessageAndMessagesStatus(@NotNull Message message) {
+    public Mono<Message> saveMessageAndMessagesStatus(@NotNull Message message, @Nullable Long referenceId) {
         return mongoTemplate.inTransaction()
-                .execute(operations -> saveMessage(message, operations)
+                .execute(operations -> saveMessage(message, referenceId, operations)
                         .zipWith(saveMessageStatuses(message, operations))
                         .map(Tuple2::getT1))
                 .single();
@@ -490,10 +501,11 @@ public class MessageService {
             @NotNull Long senderId,
             @NotNull Long targetId,
             @NotNull ChatType chatType,
-            @NotNull String text,
+            @Nullable String text,
             @Nullable List<byte[]> records,
             @Nullable Integer burnAfter,
-            @Nullable Date deliveryDate) {
+            @Nullable Date deliveryDate,
+            @Nullable Long referenceId) {
         boolean messagePersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent();
         boolean messageStatusPersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent();
         if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP) {
@@ -521,11 +533,11 @@ public class MessageService {
                             if (messageStatusPersistent) {
                                 saveMono = saveMessageAndMessagesStatus(
                                         senderId, targetId, chatType, text,
-                                        records, burnAfter, deliveryDate);
+                                        records, burnAfter, deliveryDate, referenceId);
                             } else {
                                 saveMono = saveMessage(
                                         senderId, targetId, chatType, text,
-                                        records, burnAfter, deliveryDate, null);
+                                        records, burnAfter, deliveryDate, referenceId, null);
                             }
                             return saveMono.map(message -> Pair.of(message.getId(), recipientsIds));
                         });
@@ -533,5 +545,25 @@ public class MessageService {
         } else {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
+    }
+
+    /**
+     * Use clone rather than reference
+     */
+    public Mono<Pair<Long, Set<Long>>> authAndCloneAndSendMessage(
+            @NotNull Long requesterId,
+            @NotNull Long messageId,
+            @NotNull ChatType chatType,
+            @NotNull Long targetId) {
+        return queryMessage(messageId)
+                .flatMap(message -> authAndSendMessage(
+                        requesterId,
+                        targetId,
+                        chatType,
+                        message.getText(),
+                        message.getRecords(),
+                        message.getBurnAfter(),
+                        message.getDeliveryDate(),
+                        messageId));
     }
 }

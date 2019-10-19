@@ -9,10 +9,11 @@ import "google/protobuf/wrappers.proto";
 import "constant/chat_type.proto";
 
 message CreateMessageRequest {
-    ChatType chat_type = 1;
-    int64 to_id = 2;
-    int64 delivery_date = 3;
-    string text = 4;
-    repeated bytes records = 5;
-    google.protobuf.Int32Value burn_after = 6;
+    google.protobuf.Int64Value message_id = 1;
+    ChatType chat_type = 2;
+    int64 to_id = 3;
+    int64 delivery_date = 4;
+    google.protobuf.StringValue text = 5;
+    repeated bytes records = 6;
+    google.protobuf.Int32Value burn_after = 7;
 }

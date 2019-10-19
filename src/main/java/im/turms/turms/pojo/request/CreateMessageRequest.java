@@ -17,7 +17,6 @@ private static final long serialVersionUID = 0L;
   }
   private CreateMessageRequest() {
     chatType_ = 0;
-    text_ = "";
     records_ = java.util.Collections.emptyList();
   }
 
@@ -52,29 +51,49 @@ private static final long serialVersionUID = 0L;
           case 0:
             done = true;
             break;
-          case 8: {
+          case 10: {
+            com.google.protobuf.Int64Value.Builder subBuilder = null;
+            if (messageId_ != null) {
+              subBuilder = messageId_.toBuilder();
+            }
+            messageId_ = input.readMessage(com.google.protobuf.Int64Value.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(messageId_);
+              messageId_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
+          case 16: {
             int rawValue = input.readEnum();
 
             chatType_ = rawValue;
             break;
           }
-          case 16: {
+          case 24: {
 
             toId_ = input.readInt64();
             break;
           }
-          case 24: {
+          case 32: {
 
             deliveryDate_ = input.readInt64();
             break;
           }
-          case 34: {
-            java.lang.String s = input.readStringRequireUtf8();
+          case 42: {
+            com.google.protobuf.StringValue.Builder subBuilder = null;
+            if (text_ != null) {
+              subBuilder = text_.toBuilder();
+            }
+            text_ = input.readMessage(com.google.protobuf.StringValue.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(text_);
+              text_ = subBuilder.buildPartial();
+            }
 
-            text_ = s;
             break;
           }
-          case 42: {
+          case 50: {
             if (!((mutable_bitField0_ & 0x00000001) != 0)) {
               records_ = new java.util.ArrayList<com.google.protobuf.ByteString>();
               mutable_bitField0_ |= 0x00000001;
@@ -82,7 +101,7 @@ private static final long serialVersionUID = 0L;
             records_.add(input.readBytes());
             break;
           }
-          case 50: {
+          case 58: {
             com.google.protobuf.Int32Value.Builder subBuilder = null;
             if (burnAfter_ != null) {
               subBuilder = burnAfter_.toBuilder();
@@ -130,17 +149,40 @@ private static final long serialVersionUID = 0L;
             im.turms.turms.pojo.request.CreateMessageRequest.class, im.turms.turms.pojo.request.CreateMessageRequest.Builder.class);
   }
 
-  public static final int CHAT_TYPE_FIELD_NUMBER = 1;
+  public static final int MESSAGE_ID_FIELD_NUMBER = 1;
+  private com.google.protobuf.Int64Value messageId_;
+  /**
+   * <code>.google.protobuf.Int64Value message_id = 1;</code>
+   * @return Whether the messageId field is set.
+   */
+  public boolean hasMessageId() {
+    return messageId_ != null;
+  }
+  /**
+   * <code>.google.protobuf.Int64Value message_id = 1;</code>
+   * @return The messageId.
+   */
+  public com.google.protobuf.Int64Value getMessageId() {
+    return messageId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : messageId_;
+  }
+  /**
+   * <code>.google.protobuf.Int64Value message_id = 1;</code>
+   */
+  public com.google.protobuf.Int64ValueOrBuilder getMessageIdOrBuilder() {
+    return getMessageId();
+  }
+
+  public static final int CHAT_TYPE_FIELD_NUMBER = 2;
   private int chatType_;
   /**
-   * <code>.im.turms.proto.ChatType chat_type = 1;</code>
+   * <code>.im.turms.proto.ChatType chat_type = 2;</code>
    * @return The enum numeric value on the wire for chatType.
    */
   public int getChatTypeValue() {
     return chatType_;
   }
   /**
-   * <code>.im.turms.proto.ChatType chat_type = 1;</code>
+   * <code>.im.turms.proto.ChatType chat_type = 2;</code>
    * @return The chatType.
    */
   public im.turms.turms.constant.ChatType getChatType() {
@@ -149,66 +191,53 @@ private static final long serialVersionUID = 0L;
     return result == null ? im.turms.turms.constant.ChatType.UNRECOGNIZED : result;
   }
 
-  public static final int TO_ID_FIELD_NUMBER = 2;
+  public static final int TO_ID_FIELD_NUMBER = 3;
   private long toId_;
   /**
-   * <code>int64 to_id = 2;</code>
+   * <code>int64 to_id = 3;</code>
    * @return The toId.
    */
   public long getToId() {
     return toId_;
   }
 
-  public static final int DELIVERY_DATE_FIELD_NUMBER = 3;
+  public static final int DELIVERY_DATE_FIELD_NUMBER = 4;
   private long deliveryDate_;
   /**
-   * <code>int64 delivery_date = 3;</code>
+   * <code>int64 delivery_date = 4;</code>
    * @return The deliveryDate.
    */
   public long getDeliveryDate() {
     return deliveryDate_;
   }
 
-  public static final int TEXT_FIELD_NUMBER = 4;
-  private volatile java.lang.Object text_;
+  public static final int TEXT_FIELD_NUMBER = 5;
+  private com.google.protobuf.StringValue text_;
   /**
-   * <code>string text = 4;</code>
+   * <code>.google.protobuf.StringValue text = 5;</code>
+   * @return Whether the text field is set.
+   */
+  public boolean hasText() {
+    return text_ != null;
+  }
+  /**
+   * <code>.google.protobuf.StringValue text = 5;</code>
    * @return The text.
    */
-  public java.lang.String getText() {
-    java.lang.Object ref = text_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      text_ = s;
-      return s;
-    }
+  public com.google.protobuf.StringValue getText() {
+    return text_ == null ? com.google.protobuf.StringValue.getDefaultInstance() : text_;
   }
   /**
-   * <code>string text = 4;</code>
-   * @return The bytes for text.
+   * <code>.google.protobuf.StringValue text = 5;</code>
    */
-  public com.google.protobuf.ByteString
-      getTextBytes() {
-    java.lang.Object ref = text_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      text_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public com.google.protobuf.StringValueOrBuilder getTextOrBuilder() {
+    return getText();
   }
 
-  public static final int RECORDS_FIELD_NUMBER = 5;
+  public static final int RECORDS_FIELD_NUMBER = 6;
   private java.util.List<com.google.protobuf.ByteString> records_;
   /**
-   * <code>repeated bytes records = 5;</code>
+   * <code>repeated bytes records = 6;</code>
    * @return A list containing the records.
    */
   public java.util.List<com.google.protobuf.ByteString>
@@ -216,14 +245,14 @@ private static final long serialVersionUID = 0L;
     return records_;
   }
   /**
-   * <code>repeated bytes records = 5;</code>
+   * <code>repeated bytes records = 6;</code>
    * @return The count of records.
    */
   public int getRecordsCount() {
     return records_.size();
   }
   /**
-   * <code>repeated bytes records = 5;</code>
+   * <code>repeated bytes records = 6;</code>
    * @param index The index of the element to return.
    * @return The records at the given index.
    */
@@ -231,24 +260,24 @@ private static final long serialVersionUID = 0L;
     return records_.get(index);
   }
 
-  public static final int BURN_AFTER_FIELD_NUMBER = 6;
+  public static final int BURN_AFTER_FIELD_NUMBER = 7;
   private com.google.protobuf.Int32Value burnAfter_;
   /**
-   * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+   * <code>.google.protobuf.Int32Value burn_after = 7;</code>
    * @return Whether the burnAfter field is set.
    */
   public boolean hasBurnAfter() {
     return burnAfter_ != null;
   }
   /**
-   * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+   * <code>.google.protobuf.Int32Value burn_after = 7;</code>
    * @return The burnAfter.
    */
   public com.google.protobuf.Int32Value getBurnAfter() {
     return burnAfter_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : burnAfter_;
   }
   /**
-   * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+   * <code>.google.protobuf.Int32Value burn_after = 7;</code>
    */
   public com.google.protobuf.Int32ValueOrBuilder getBurnAfterOrBuilder() {
     return getBurnAfter();
@@ -268,23 +297,26 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    if (messageId_ != null) {
+      output.writeMessage(1, getMessageId());
+    }
     if (chatType_ != im.turms.turms.constant.ChatType.PRIVATE.getNumber()) {
-      output.writeEnum(1, chatType_);
+      output.writeEnum(2, chatType_);
     }
     if (toId_ != 0L) {
-      output.writeInt64(2, toId_);
+      output.writeInt64(3, toId_);
     }
     if (deliveryDate_ != 0L) {
-      output.writeInt64(3, deliveryDate_);
+      output.writeInt64(4, deliveryDate_);
     }
-    if (!getTextBytes().isEmpty()) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, text_);
+    if (text_ != null) {
+      output.writeMessage(5, getText());
     }
     for (int i = 0; i < records_.size(); i++) {
-      output.writeBytes(5, records_.get(i));
+      output.writeBytes(6, records_.get(i));
     }
     if (burnAfter_ != null) {
-      output.writeMessage(6, getBurnAfter());
+      output.writeMessage(7, getBurnAfter());
     }
     unknownFields.writeTo(output);
   }
@@ -295,20 +327,25 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+    if (messageId_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getMessageId());
+    }
     if (chatType_ != im.turms.turms.constant.ChatType.PRIVATE.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(1, chatType_);
+        .computeEnumSize(2, chatType_);
     }
     if (toId_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(2, toId_);
+        .computeInt64Size(3, toId_);
     }
     if (deliveryDate_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(3, deliveryDate_);
+        .computeInt64Size(4, deliveryDate_);
     }
-    if (!getTextBytes().isEmpty()) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, text_);
+    if (text_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(5, getText());
     }
     {
       int dataSize = 0;
@@ -321,7 +358,7 @@ private static final long serialVersionUID = 0L;
     }
     if (burnAfter_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, getBurnAfter());
+        .computeMessageSize(7, getBurnAfter());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -338,13 +375,21 @@ private static final long serialVersionUID = 0L;
     }
     im.turms.turms.pojo.request.CreateMessageRequest other = (im.turms.turms.pojo.request.CreateMessageRequest) obj;
 
+    if (hasMessageId() != other.hasMessageId()) return false;
+    if (hasMessageId()) {
+      if (!getMessageId()
+          .equals(other.getMessageId())) return false;
+    }
     if (chatType_ != other.chatType_) return false;
     if (getToId()
         != other.getToId()) return false;
     if (getDeliveryDate()
         != other.getDeliveryDate()) return false;
-    if (!getText()
-        .equals(other.getText())) return false;
+    if (hasText() != other.hasText()) return false;
+    if (hasText()) {
+      if (!getText()
+          .equals(other.getText())) return false;
+    }
     if (!getRecordsList()
         .equals(other.getRecordsList())) return false;
     if (hasBurnAfter() != other.hasBurnAfter()) return false;
@@ -363,6 +408,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    if (hasMessageId()) {
+      hash = (37 * hash) + MESSAGE_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getMessageId().hashCode();
+    }
     hash = (37 * hash) + CHAT_TYPE_FIELD_NUMBER;
     hash = (53 * hash) + chatType_;
     hash = (37 * hash) + TO_ID_FIELD_NUMBER;
@@ -371,8 +420,10 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + DELIVERY_DATE_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getDeliveryDate());
-    hash = (37 * hash) + TEXT_FIELD_NUMBER;
-    hash = (53 * hash) + getText().hashCode();
+    if (hasText()) {
+      hash = (37 * hash) + TEXT_FIELD_NUMBER;
+      hash = (53 * hash) + getText().hashCode();
+    }
     if (getRecordsCount() > 0) {
       hash = (37 * hash) + RECORDS_FIELD_NUMBER;
       hash = (53 * hash) + getRecordsList().hashCode();
@@ -514,14 +565,24 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      if (messageIdBuilder_ == null) {
+        messageId_ = null;
+      } else {
+        messageId_ = null;
+        messageIdBuilder_ = null;
+      }
       chatType_ = 0;
 
       toId_ = 0L;
 
       deliveryDate_ = 0L;
 
-      text_ = "";
-
+      if (textBuilder_ == null) {
+        text_ = null;
+      } else {
+        text_ = null;
+        textBuilder_ = null;
+      }
       records_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000001);
       if (burnAfterBuilder_ == null) {
@@ -557,10 +618,19 @@ private static final long serialVersionUID = 0L;
     public im.turms.turms.pojo.request.CreateMessageRequest buildPartial() {
       im.turms.turms.pojo.request.CreateMessageRequest result = new im.turms.turms.pojo.request.CreateMessageRequest(this);
       int from_bitField0_ = bitField0_;
+      if (messageIdBuilder_ == null) {
+        result.messageId_ = messageId_;
+      } else {
+        result.messageId_ = messageIdBuilder_.build();
+      }
       result.chatType_ = chatType_;
       result.toId_ = toId_;
       result.deliveryDate_ = deliveryDate_;
-      result.text_ = text_;
+      if (textBuilder_ == null) {
+        result.text_ = text_;
+      } else {
+        result.text_ = textBuilder_.build();
+      }
       if (((bitField0_ & 0x00000001) != 0)) {
         records_ = java.util.Collections.unmodifiableList(records_);
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -619,6 +689,9 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(im.turms.turms.pojo.request.CreateMessageRequest other) {
       if (other == im.turms.turms.pojo.request.CreateMessageRequest.getDefaultInstance()) return this;
+      if (other.hasMessageId()) {
+        mergeMessageId(other.getMessageId());
+      }
       if (other.chatType_ != 0) {
         setChatTypeValue(other.getChatTypeValue());
       }
@@ -628,9 +701,8 @@ private static final long serialVersionUID = 0L;
       if (other.getDeliveryDate() != 0L) {
         setDeliveryDate(other.getDeliveryDate());
       }
-      if (!other.getText().isEmpty()) {
-        text_ = other.text_;
-        onChanged();
+      if (other.hasText()) {
+        mergeText(other.getText());
       }
       if (!other.records_.isEmpty()) {
         if (records_.isEmpty()) {
@@ -675,16 +747,135 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
+    private com.google.protobuf.Int64Value messageId_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> messageIdBuilder_;
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     * @return Whether the messageId field is set.
+     */
+    public boolean hasMessageId() {
+      return messageIdBuilder_ != null || messageId_ != null;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     * @return The messageId.
+     */
+    public com.google.protobuf.Int64Value getMessageId() {
+      if (messageIdBuilder_ == null) {
+        return messageId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : messageId_;
+      } else {
+        return messageIdBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     */
+    public Builder setMessageId(com.google.protobuf.Int64Value value) {
+      if (messageIdBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        messageId_ = value;
+        onChanged();
+      } else {
+        messageIdBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     */
+    public Builder setMessageId(
+        com.google.protobuf.Int64Value.Builder builderForValue) {
+      if (messageIdBuilder_ == null) {
+        messageId_ = builderForValue.build();
+        onChanged();
+      } else {
+        messageIdBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     */
+    public Builder mergeMessageId(com.google.protobuf.Int64Value value) {
+      if (messageIdBuilder_ == null) {
+        if (messageId_ != null) {
+          messageId_ =
+            com.google.protobuf.Int64Value.newBuilder(messageId_).mergeFrom(value).buildPartial();
+        } else {
+          messageId_ = value;
+        }
+        onChanged();
+      } else {
+        messageIdBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     */
+    public Builder clearMessageId() {
+      if (messageIdBuilder_ == null) {
+        messageId_ = null;
+        onChanged();
+      } else {
+        messageId_ = null;
+        messageIdBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     */
+    public com.google.protobuf.Int64Value.Builder getMessageIdBuilder() {
+      
+      onChanged();
+      return getMessageIdFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     */
+    public com.google.protobuf.Int64ValueOrBuilder getMessageIdOrBuilder() {
+      if (messageIdBuilder_ != null) {
+        return messageIdBuilder_.getMessageOrBuilder();
+      } else {
+        return messageId_ == null ?
+            com.google.protobuf.Int64Value.getDefaultInstance() : messageId_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int64Value message_id = 1;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
+        getMessageIdFieldBuilder() {
+      if (messageIdBuilder_ == null) {
+        messageIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
+                getMessageId(),
+                getParentForChildren(),
+                isClean());
+        messageId_ = null;
+      }
+      return messageIdBuilder_;
+    }
+
     private int chatType_ = 0;
     /**
-     * <code>.im.turms.proto.ChatType chat_type = 1;</code>
+     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
      * @return The enum numeric value on the wire for chatType.
      */
     public int getChatTypeValue() {
       return chatType_;
     }
     /**
-     * <code>.im.turms.proto.ChatType chat_type = 1;</code>
+     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
      * @param value The enum numeric value on the wire for chatType to set.
      * @return This builder for chaining.
      */
@@ -694,7 +885,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.im.turms.proto.ChatType chat_type = 1;</code>
+     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
      * @return The chatType.
      */
     public im.turms.turms.constant.ChatType getChatType() {
@@ -703,7 +894,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? im.turms.turms.constant.ChatType.UNRECOGNIZED : result;
     }
     /**
-     * <code>.im.turms.proto.ChatType chat_type = 1;</code>
+     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
      * @param value The chatType to set.
      * @return This builder for chaining.
      */
@@ -717,7 +908,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.im.turms.proto.ChatType chat_type = 1;</code>
+     * <code>.im.turms.proto.ChatType chat_type = 2;</code>
      * @return This builder for chaining.
      */
     public Builder clearChatType() {
@@ -729,14 +920,14 @@ private static final long serialVersionUID = 0L;
 
     private long toId_ ;
     /**
-     * <code>int64 to_id = 2;</code>
+     * <code>int64 to_id = 3;</code>
      * @return The toId.
      */
     public long getToId() {
       return toId_;
     }
     /**
-     * <code>int64 to_id = 2;</code>
+     * <code>int64 to_id = 3;</code>
      * @param value The toId to set.
      * @return This builder for chaining.
      */
@@ -747,7 +938,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>int64 to_id = 2;</code>
+     * <code>int64 to_id = 3;</code>
      * @return This builder for chaining.
      */
     public Builder clearToId() {
@@ -759,14 +950,14 @@ private static final long serialVersionUID = 0L;
 
     private long deliveryDate_ ;
     /**
-     * <code>int64 delivery_date = 3;</code>
+     * <code>int64 delivery_date = 4;</code>
      * @return The deliveryDate.
      */
     public long getDeliveryDate() {
       return deliveryDate_;
     }
     /**
-     * <code>int64 delivery_date = 3;</code>
+     * <code>int64 delivery_date = 4;</code>
      * @param value The deliveryDate to set.
      * @return This builder for chaining.
      */
@@ -777,7 +968,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>int64 delivery_date = 3;</code>
+     * <code>int64 delivery_date = 4;</code>
      * @return This builder for chaining.
      */
     public Builder clearDeliveryDate() {
@@ -787,80 +978,123 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private java.lang.Object text_ = "";
+    private com.google.protobuf.StringValue text_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> textBuilder_;
     /**
-     * <code>string text = 4;</code>
+     * <code>.google.protobuf.StringValue text = 5;</code>
+     * @return Whether the text field is set.
+     */
+    public boolean hasText() {
+      return textBuilder_ != null || text_ != null;
+    }
+    /**
+     * <code>.google.protobuf.StringValue text = 5;</code>
      * @return The text.
      */
-    public java.lang.String getText() {
-      java.lang.Object ref = text_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        text_ = s;
-        return s;
+    public com.google.protobuf.StringValue getText() {
+      if (textBuilder_ == null) {
+        return text_ == null ? com.google.protobuf.StringValue.getDefaultInstance() : text_;
       } else {
-        return (java.lang.String) ref;
+        return textBuilder_.getMessage();
       }
     }
     /**
-     * <code>string text = 4;</code>
-     * @return The bytes for text.
+     * <code>.google.protobuf.StringValue text = 5;</code>
      */
-    public com.google.protobuf.ByteString
-        getTextBytes() {
-      java.lang.Object ref = text_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        text_ = b;
-        return b;
+    public Builder setText(com.google.protobuf.StringValue value) {
+      if (textBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        text_ = value;
+        onChanged();
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        textBuilder_.setMessage(value);
       }
+
+      return this;
     }
     /**
-     * <code>string text = 4;</code>
-     * @param value The text to set.
-     * @return This builder for chaining.
+     * <code>.google.protobuf.StringValue text = 5;</code>
      */
     public Builder setText(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      text_ = value;
-      onChanged();
+        com.google.protobuf.StringValue.Builder builderForValue) {
+      if (textBuilder_ == null) {
+        text_ = builderForValue.build();
+        onChanged();
+      } else {
+        textBuilder_.setMessage(builderForValue.build());
+      }
+
       return this;
     }
     /**
-     * <code>string text = 4;</code>
-     * @return This builder for chaining.
+     * <code>.google.protobuf.StringValue text = 5;</code>
+     */
+    public Builder mergeText(com.google.protobuf.StringValue value) {
+      if (textBuilder_ == null) {
+        if (text_ != null) {
+          text_ =
+            com.google.protobuf.StringValue.newBuilder(text_).mergeFrom(value).buildPartial();
+        } else {
+          text_ = value;
+        }
+        onChanged();
+      } else {
+        textBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.StringValue text = 5;</code>
      */
     public Builder clearText() {
-      
-      text_ = getDefaultInstance().getText();
-      onChanged();
+      if (textBuilder_ == null) {
+        text_ = null;
+        onChanged();
+      } else {
+        text_ = null;
+        textBuilder_ = null;
+      }
+
       return this;
     }
     /**
-     * <code>string text = 4;</code>
-     * @param value The bytes for text to set.
-     * @return This builder for chaining.
+     * <code>.google.protobuf.StringValue text = 5;</code>
      */
-    public Builder setTextBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+    public com.google.protobuf.StringValue.Builder getTextBuilder() {
       
-      text_ = value;
       onChanged();
-      return this;
+      return getTextFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.StringValue text = 5;</code>
+     */
+    public com.google.protobuf.StringValueOrBuilder getTextOrBuilder() {
+      if (textBuilder_ != null) {
+        return textBuilder_.getMessageOrBuilder();
+      } else {
+        return text_ == null ?
+            com.google.protobuf.StringValue.getDefaultInstance() : text_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.StringValue text = 5;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
+        getTextFieldBuilder() {
+      if (textBuilder_ == null) {
+        textBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>(
+                getText(),
+                getParentForChildren(),
+                isClean());
+        text_ = null;
+      }
+      return textBuilder_;
     }
 
     private java.util.List<com.google.protobuf.ByteString> records_ = java.util.Collections.emptyList();
@@ -871,7 +1105,7 @@ private static final long serialVersionUID = 0L;
        }
     }
     /**
-     * <code>repeated bytes records = 5;</code>
+     * <code>repeated bytes records = 6;</code>
      * @return A list containing the records.
      */
     public java.util.List<com.google.protobuf.ByteString>
@@ -880,14 +1114,14 @@ private static final long serialVersionUID = 0L;
                java.util.Collections.unmodifiableList(records_) : records_;
     }
     /**
-     * <code>repeated bytes records = 5;</code>
+     * <code>repeated bytes records = 6;</code>
      * @return The count of records.
      */
     public int getRecordsCount() {
       return records_.size();
     }
     /**
-     * <code>repeated bytes records = 5;</code>
+     * <code>repeated bytes records = 6;</code>
      * @param index The index of the element to return.
      * @return The records at the given index.
      */
@@ -895,7 +1129,7 @@ private static final long serialVersionUID = 0L;
       return records_.get(index);
     }
     /**
-     * <code>repeated bytes records = 5;</code>
+     * <code>repeated bytes records = 6;</code>
      * @param index The index to set the value at.
      * @param value The records to set.
      * @return This builder for chaining.
@@ -911,7 +1145,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated bytes records = 5;</code>
+     * <code>repeated bytes records = 6;</code>
      * @param value The records to add.
      * @return This builder for chaining.
      */
@@ -925,7 +1159,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated bytes records = 5;</code>
+     * <code>repeated bytes records = 6;</code>
      * @param values The records to add.
      * @return This builder for chaining.
      */
@@ -938,7 +1172,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated bytes records = 5;</code>
+     * <code>repeated bytes records = 6;</code>
      * @return This builder for chaining.
      */
     public Builder clearRecords() {
@@ -952,14 +1186,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> burnAfterBuilder_;
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      * @return Whether the burnAfter field is set.
      */
     public boolean hasBurnAfter() {
       return burnAfterBuilder_ != null || burnAfter_ != null;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      * @return The burnAfter.
      */
     public com.google.protobuf.Int32Value getBurnAfter() {
@@ -970,7 +1204,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      */
     public Builder setBurnAfter(com.google.protobuf.Int32Value value) {
       if (burnAfterBuilder_ == null) {
@@ -986,7 +1220,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      */
     public Builder setBurnAfter(
         com.google.protobuf.Int32Value.Builder builderForValue) {
@@ -1000,7 +1234,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      */
     public Builder mergeBurnAfter(com.google.protobuf.Int32Value value) {
       if (burnAfterBuilder_ == null) {
@@ -1018,7 +1252,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      */
     public Builder clearBurnAfter() {
       if (burnAfterBuilder_ == null) {
@@ -1032,7 +1266,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      */
     public com.google.protobuf.Int32Value.Builder getBurnAfterBuilder() {
       
@@ -1040,7 +1274,7 @@ private static final long serialVersionUID = 0L;
       return getBurnAfterFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      */
     public com.google.protobuf.Int32ValueOrBuilder getBurnAfterOrBuilder() {
       if (burnAfterBuilder_ != null) {
@@ -1051,7 +1285,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 6;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 

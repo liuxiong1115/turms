@@ -40,10 +40,6 @@ public class Message {
     @Id
     private Long id;
 
-    // TODO: used for forwarding message in 0.9.0
-//    @Indexed
-//    private Long referenceId;
-
     @Indexed
     private ChatType chatType;
 
@@ -71,6 +67,9 @@ public class Message {
 
     private Integer burnAfter;
 
+    @Indexed
+    private Long referenceId;
+
     public Message(
             @NotNull Long id,
             @NotNull ChatType chatType,
@@ -79,7 +78,8 @@ public class Message {
             @NotNull Long senderId,
             @NotNull Long targetId,
             @Nullable List<byte[]> records,
-            @Nullable Integer burnAfter) {
+            @Nullable Integer burnAfter,
+            @Nullable Long referenceId) {
         this.id = id;
         this.text = text;
         this.chatType = chatType;
@@ -88,6 +88,7 @@ public class Message {
         this.deliveryDate = deliveryDate;
         this.records = records;
         this.burnAfter = burnAfter;
+        this.referenceId = referenceId;
     }
 
     public Long groupId() {
