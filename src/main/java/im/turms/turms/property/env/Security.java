@@ -44,6 +44,13 @@ public class Security implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private int defaultReturnedRecordsPerRequest = 10;
 
+    /**
+     * If 0, there is no debounce.
+     * Better set the same value as client's for better UX.
+     */
+    @JsonView(MutablePropertiesView.class)
+    private int minClientRequestsIntervalMillis = 1000;
+
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
@@ -61,6 +68,7 @@ public class Security implements IdentifiedDataSerializable {
         out.writeInt(maxDaysDifferencePerRequest);
         out.writeInt(maxReturnedRecordsPerRequest);
         out.writeInt(defaultReturnedRecordsPerRequest);
+        out.writeInt(minClientRequestsIntervalMillis);
     }
 
     @Override
@@ -70,6 +78,7 @@ public class Security implements IdentifiedDataSerializable {
         maxDaysDifferencePerRequest = in.readInt();
         maxReturnedRecordsPerRequest = in.readInt();
         defaultReturnedRecordsPerRequest = in.readInt();
+        minClientRequestsIntervalMillis = in.readInt();
     }
 
     public enum PasswordEncodeStrategy {

@@ -41,6 +41,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 
@@ -111,8 +112,12 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
                                 }
                             })
                             .subscribe());
-
-            Flux<WebSocketMessage> responseOutput = session.receive()
+            Flux<WebSocketMessage> responseOutput = session.receive();
+            int requestInterval = turmsClusterManager.getTurmsProperties().getSecurity().getMinClientRequestsIntervalMillis();
+            if (requestInterval != 0) {
+                responseOutput = responseOutput.sample(Duration.ofMillis(requestInterval));
+            }
+            responseOutput = responseOutput
                     .doFinally(signalType -> onlineUserService.setLocalUserDeviceOffline(userId, finalDeviceType, CloseStatus.NORMAL))
                     .flatMap(inboundMessage -> inboundMessageDispatcher.dispatch(session, inboundMessage));
             return session.send(notificationOutput.mergeWith(responseOutput));
