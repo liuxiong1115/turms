@@ -115,7 +115,9 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
             Flux<WebSocketMessage> responseOutput = session.receive();
             int requestInterval = turmsClusterManager.getTurmsProperties().getSecurity().getMinClientRequestsIntervalMillis();
             if (requestInterval != 0) {
-                responseOutput = responseOutput.sample(Duration.ofMillis(requestInterval));
+                responseOutput = responseOutput
+                        .doOnNext(WebSocketMessage::retain)
+                        .sample(Duration.ofMillis(requestInterval));
             }
             responseOutput = responseOutput
                     .doFinally(signalType -> onlineUserService.setLocalUserDeviceOffline(userId, finalDeviceType, CloseStatus.NORMAL))

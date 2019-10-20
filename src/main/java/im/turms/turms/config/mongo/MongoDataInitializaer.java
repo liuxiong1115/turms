@@ -172,7 +172,8 @@ public class MongoDataInitializaer {
                         0L,
                         (long) (i + 50),
                         null,
-                        30);
+                        30,
+                        null);
                 MessageStatus privateMessageStatus = new MessageStatus(
                         id,
                         null,
@@ -189,7 +190,8 @@ public class MongoDataInitializaer {
                         0L,
                         0L,
                         null,
-                        30);
+                        30,
+                        null);
                 for (int j = 1; j < USER_COUNT / 10; j++) {
                     MessageStatus groupMessageStatus = new MessageStatus(
                             id,
