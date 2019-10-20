@@ -49,7 +49,7 @@ public class Security implements IdentifiedDataSerializable {
      * Better set the same value as client's for better UX.
      */
     @JsonView(MutablePropertiesView.class)
-    private int minClientRequestsIntervalMillis = 1000;
+    private int minClientRequestsIntervalMillis = 0;
 
     @Override
     public int getFactoryId() {
