@@ -66,11 +66,12 @@ public class Constants {
     public static final String AUTHENTICATED = "authenticated";
     public static final String STATUS = "status";
 
-    public static final long ADMIN_ROLE_ROOT_ID = 0L;
+    public static final long RESERVED_ID = 0L;
+    public static final long ADMIN_ROLE_ROOT_ID = RESERVED_ID;
     public static final String ADMIN_ROLE_ROOT_NAME = "ROOT";
-    public static final long DEFAULT_GROUP_TYPE_ID = 0L;
+    public static final long DEFAULT_GROUP_TYPE_ID = RESERVED_ID;
     public static final String DEFAULT_GROUP_TYPE_NAME = "DEFAULT";
-    public static final int DEFAULT_RELATIONSHIP_GROUP_INDEX = 0;
+    public static final int DEFAULT_RELATIONSHIP_GROUP_INDEX = (int) RESERVED_ID;
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final Object EMPTY_OBJECT = new Object();
     public static final Pair EMPTY_PAIR = Pair.of(null, null);

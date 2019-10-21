@@ -1,10 +1,12 @@
 package im.turms.turms.config.mongo;
 
+import com.google.common.net.InetAddresses;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.constant.*;
 import im.turms.turms.pojo.domain.AdminRole;
 import im.turms.turms.pojo.domain.*;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Component;
@@ -12,12 +14,13 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static im.turms.turms.common.Constants.DEFAULT_GROUP_TYPE_ID;
-import static im.turms.turms.common.Constants.DEV_MODE;
+import static im.turms.turms.common.Constants.*;
 
 @Component
 public class MongoDataInitializaer {
@@ -69,116 +72,116 @@ public class MongoDataInitializaer {
     }
 
     // Note: Better not to remove all mock data after turms closed
-    private void mockIfDev() {
+    private void mockIfDev() throws UnknownHostException {
         if (DEV_MODE && mongoTemplate.getMongoDatabase().getName().contains("-dev")) {
             TurmsLogger.log("Start mocking...");
             // Admin
-            final int ADMIN_COUNT = 50;
-            final int USER_COUNT = 1000;
+            final int ADMIN_COUNT = 5;
+            final int USER_COUNT = 100;
             final Date now = new Date();
             List<Object> objects = new LinkedList<>();
-            for (int i = 0; i < ADMIN_COUNT; i++) {
+            for (int i = 1; i <= ADMIN_COUNT; i++) {
                 Admin admin = new Admin(
                         "account" + i,
                         "123",
                         "myname",
-                        0L,
+                        ADMIN_ROLE_ROOT_ID,
                         now);
                 objects.add(admin);
             }
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 1; i <= 100; i++) {
                 AdminActionLog adminActionLog = new AdminActionLog(
                         turmsClusterManager.generateRandomId(),
-                        "account" + (i % ADMIN_COUNT),
+                        "account" + (1 + i % ADMIN_COUNT),
                         new Date(),
-                        turmsClusterManager.generateRandomId().intValue(),
+                        InetAddresses.coerceToInteger(InetAddress.getLocalHost()),
                         "testaction");
                 objects.add(adminActionLog);
             }
             // Group
             Group group = new Group(
-                    turmsClusterManager.generateRandomId(),
+                    1L,
                     DEFAULT_GROUP_TYPE_ID,
-                    0L,
-                    0L,
+                    1L,
+                    1L,
                     "Turms Developers Group",
                     "This is a group for the developers who are interested in Turms",
                     "nope",
-                    null,
+                    "https://avatars2.githubusercontent.com/u/50931793?s=200&v=4",
                     now,
                     null,
                     null,
                     true);
             objects.add(group);
-            GroupVersion groupVersion = new GroupVersion(0L, now, now, now, now, now, now);
+            GroupVersion groupVersion = new GroupVersion(1L, now, now, now, now, now, now);
             objects.add(groupVersion);
-            for (int i = USER_COUNT / 10 * 9; i < USER_COUNT; i++) {
+            for (int i = 1 + USER_COUNT / 10 * 9; i <= USER_COUNT; i++) {
                 GroupBlacklistedUser groupBlacklistedUser = new GroupBlacklistedUser(
-                        0L,
+                        1L,
                         (long) i,
-                        new Date(),
-                        0L);
+                        now,
+                        1L);
                 objects.add(groupBlacklistedUser);
             }
-            for (int i = USER_COUNT / 10 * 8; i < USER_COUNT / 10 * 9; i++) {
+            for (int i = 1 + USER_COUNT / 10 * 8; i <= USER_COUNT / 10 * 9; i++) {
                 GroupInvitation groupInvitation = new GroupInvitation(
                         turmsClusterManager.generateRandomId(),
-                        new Date(),
+                        now,
                         "test-content",
                         RequestStatus.PENDING,
                         null,
-                        0L,
-                        0L,
+                        1L,
+                        1L,
                         (long) i);
                 objects.add(groupInvitation);
             }
             GroupJoinQuestion groupJoinQuestion = new GroupJoinQuestion(
                     turmsClusterManager.generateRandomId(),
-                    0L,
+                    1L,
                     "test-question",
                     List.of("a", "b", "c"));
             objects.add(groupJoinQuestion);
-            for (int i = USER_COUNT / 10 * 7; i < USER_COUNT / 10 * 8; i++) {
+            for (int i = 1 + USER_COUNT / 10 * 7; i <= USER_COUNT / 10 * 8; i++) {
                 GroupJoinRequest groupJoinRequest = new GroupJoinRequest(
                         turmsClusterManager.generateRandomId(),
-                        new Date(),
+                        now,
                         "test-content",
                         RequestStatus.PENDING,
                         null,
-                        0L,
+                        1L,
                         (long) i,
                         null);
                 objects.add(groupJoinRequest);
             }
-            for (int i = 0; i < USER_COUNT / 10; i++) {
+            for (int i = 1; i <= USER_COUNT / 10; i++) {
                 GroupMember groupMember = new GroupMember(
-                        0L,
+                        1L,
                         (long) i,
                         "test-name",
-                        i == 0 ? GroupMemberRole.OWNER : GroupMemberRole.MEMBER,
+                        i == 1 ? GroupMemberRole.OWNER : GroupMemberRole.MEMBER,
                         new Date(),
-                        null);
+                        i > USER_COUNT / 10 / 2 ? new Date(9999999999999L) : null);
                 objects.add(groupMember);
             }
 
             // Message
-            for (int i = 0; i < 100; i++) {
+            for (int i = 1; i <= 100; i++) {
                 long id = turmsClusterManager.generateRandomId();
                 Message privateMessage = new Message(
                         id,
                         ChatType.PRIVATE,
                         now,
-                        "message-text",
-                        0L,
-                        (long) (i + 50),
+                        "private-message-text" + RandomStringUtils.randomAlphanumeric(16),
+                        1L,
+                        (long) 2 + (i % 9),
                         null,
                         30,
                         null);
                 MessageStatus privateMessageStatus = new MessageStatus(
                         id,
                         null,
-                        (long) (i % 10),
-                        0L,
+                        1L,
+                        (long) 2 + (i % 9),
                         MessageDeliveryStatus.READY);
                 objects.add(privateMessageStatus);
                 id = turmsClusterManager.generateRandomId();
@@ -186,17 +189,17 @@ public class MongoDataInitializaer {
                         id,
                         ChatType.GROUP,
                         now,
-                        "message-text",
-                        0L,
-                        0L,
+                        "group-message-text" + RandomStringUtils.randomAlphanumeric(16),
+                        1L,
+                        1L,
                         null,
                         30,
                         null);
-                for (int j = 1; j < USER_COUNT / 10; j++) {
+                for (int j = 2; j <= USER_COUNT / 10; j++) {
                     MessageStatus groupMessageStatus = new MessageStatus(
                             id,
-                            0L,
-                            0L,
+                            1L,
+                            1L,
                             (long) j,
                             MessageDeliveryStatus.READY);
                     objects.add(groupMessageStatus);
@@ -206,7 +209,7 @@ public class MongoDataInitializaer {
             }
 
             // User
-            for (int i = 0; i < USER_COUNT; i++) {
+            for (int i = 1; i <= USER_COUNT; i++) {
                 User user = new User(
                         (long) i,
                         "123",
@@ -222,7 +225,7 @@ public class MongoDataInitializaer {
                 objects.add(user);
                 objects.add(userVersion);
             }
-            for (int i = 1; i < USER_COUNT / 10 * 2; i++) {
+            for (int i = 1 + USER_COUNT / 10; i <= USER_COUNT / 10 * 2; i++) {
                 UserFriendRequest userFriendRequest = new UserFriendRequest(
                         turmsClusterManager.generateRandomId(),
                         now,
@@ -230,17 +233,18 @@ public class MongoDataInitializaer {
                         RequestStatus.PENDING,
                         null,
                         null,
-                        0L,
+                        1L,
                         (long) i);
                 objects.add(userFriendRequest);
             }
-            for (int i = 1; i < USER_COUNT / 10; i++) {
+            // P.S. Do not need to put them into the default relationship group
+            for (int i = 2; i <= USER_COUNT / 10; i++) {
                 UserRelationship userRelationship = new UserRelationship(
-                        new UserRelationship.Key(0L, (long) i),
+                        new UserRelationship.Key(1L, (long) i),
                         false,
                         now);
                 UserRelationship userRelationship1 = new UserRelationship(
-                        new UserRelationship.Key((long) i, 0L),
+                        new UserRelationship.Key((long) i, 1L),
                         false,
                         now);
                 objects.add(userRelationship);

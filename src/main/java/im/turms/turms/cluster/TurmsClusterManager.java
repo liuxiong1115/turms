@@ -240,6 +240,9 @@ public class TurmsClusterManager {
         return sharedTurmsProperties;
     }
 
+    /**
+     * Note: It's unnecessary to check if the ID is 0L because of its mechanism
+     */
     public Long generateRandomId() {
         return idGenerator.newId();
     }
