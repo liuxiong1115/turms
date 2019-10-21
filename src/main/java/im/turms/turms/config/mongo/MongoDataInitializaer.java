@@ -66,7 +66,11 @@ public class MongoDataInitializaer {
                 createCollectionIfNotExist(UserVersion.class, null))
                 .doOnTerminate(() -> {
                     TurmsLogger.log("All collections are created");
-                    mockIfDev();
+                    try {
+                        mockIfDev();
+                    } catch (UnknownHostException e) {
+                        TurmsLogger.logThrowable(e);
+                    }
                 })
                 .subscribe();
     }

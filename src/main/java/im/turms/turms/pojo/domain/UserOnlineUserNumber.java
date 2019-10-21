@@ -23,14 +23,21 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Data
 @Document
 @FieldNameConstants
 public class UserOnlineUserNumber {
+    /**
+     * Use Instant rather than Date to fix the bug of Spring Data Mongo itself.
+     * If persisting Date as ID, the timestamp will be persisted as ObjectID rather than Date in MongoDB
+     * while Instant can be persisted as Date in MongoDB.
+     * As a result, use Instant until Spring Data Mongo fixes this bug.
+     */
+    //
     @Id
-    private Date timestamp;
+    private Instant timestamp;
 
     @Indexed
     private Integer number;

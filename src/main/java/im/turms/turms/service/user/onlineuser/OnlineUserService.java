@@ -50,6 +50,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
@@ -256,7 +257,7 @@ public class OnlineUserService {
 
     public Mono<UserOnlineUserNumber> saveOnlineUsersNumber(@NotNull Integer onlineUsersNumber) {
         UserOnlineUserNumber userOnlineUserNumber = new UserOnlineUserNumber();
-        userOnlineUserNumber.setTimestamp(new Date());
+        userOnlineUserNumber.setTimestamp(Instant.now());
         userOnlineUserNumber.setNumber(onlineUsersNumber);
         return mongoTemplate.save(userOnlineUserNumber);
     }
