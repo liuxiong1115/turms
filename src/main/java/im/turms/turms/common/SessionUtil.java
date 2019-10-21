@@ -26,7 +26,6 @@ import im.turms.turms.constant.UserStatus;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.socket.WebSocketSession;
 
@@ -40,7 +39,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Component
 public class SessionUtil {
     private static final String USER_ID_FIELD = "uid";
     private static final String PASSWORD_FIELD = "pwd";
@@ -99,7 +97,6 @@ public class SessionUtil {
             return null;
         }
         return UserStatus.forNumber(Integer.parseInt((String) userOnlineStatus));
-
     }
 
     public static DeviceType getDeviceTypeFromRequest(ServerHttpRequest request) {
@@ -122,6 +119,25 @@ public class SessionUtil {
         } else {
             return DeviceType.UNKNOWN;
         }
+    }
+
+    public static DeviceType parseDeviceTypeFromRequest(
+            @NotNull ServerHttpRequest request,
+            @NotNull Boolean isUseOsAsDefaultDeviceType) {
+        DeviceType deviceType = getDeviceTypeFromRequest(request);
+        if (deviceType == null || deviceType == DeviceType.UNKNOWN) {
+            String agent = request.getHeaders().getFirst("User-Agent");
+            if (agent != null && !agent.isEmpty()) {
+                Map<String, String> deviceDetails = UserAgentUtil.parse(agent);
+                deviceType = UserAgentUtil.detectDeviceTypeIfUnset(
+                        deviceType,
+                        deviceDetails,
+                        isUseOsAsDefaultDeviceType);
+            } else {
+                deviceType = DeviceType.UNKNOWN;
+            }
+        }
+        return deviceType;
     }
 
     public static String getUserStatusFromRequest(ServerHttpRequest request) {

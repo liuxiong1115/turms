@@ -55,34 +55,38 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         }
         ServerHttpRequest request = exchange.getRequest();
         Long userId = SessionUtil.getUserIdFromRequest(request);
-        DeviceType loggingDeviceType = SessionUtil.getDeviceTypeFromRequest(request);
         if (userId == null) {
             return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
         } else if (!turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
             return Mono.error(new ResponseStatusException(HttpStatus.TEMPORARY_REDIRECT));
-        } else if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, loggingDeviceType)) {
-            return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT));
         } else {
-            String password = SessionUtil.getPasswordFromRequest(request);
-            return userService.authenticate(userId, password)
-                    .flatMap(authenticated -> {
-                        if (authenticated != null && authenticated) {
-                            return userSimultaneousLoginService.setConflictedDevicesOffline(userId, loggingDeviceType)
-                                    .flatMap(success -> {
-                                        if (success) {
-                                            if (password != null && !password.isBlank()) {
-                                                return super.handleRequest(exchange, handler);
+            DeviceType loggingDeviceType = SessionUtil.parseDeviceTypeFromRequest(
+                    request,
+                    turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
+            if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, loggingDeviceType)) {
+                return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT));
+            } else {
+                String password = SessionUtil.getPasswordFromRequest(request);
+                return userService.authenticate(userId, password)
+                        .flatMap(authenticated -> {
+                            if (authenticated != null && authenticated) {
+                                return userSimultaneousLoginService.setConflictedDevicesOffline(userId, loggingDeviceType)
+                                        .flatMap(success -> {
+                                            if (success) {
+                                                if (password != null && !password.isBlank()) {
+                                                    return super.handleRequest(exchange, handler);
+                                                } else {
+                                                    return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                                                }
                                             } else {
-                                                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                                                return Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
                                             }
-                                        } else {
-                                            return Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-                                        }
-                                    });
-                        } else {
-                            return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-                        }
-                    });
+                                        });
+                            } else {
+                                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                            }
+                        });
+            }
         }
     }
 }
