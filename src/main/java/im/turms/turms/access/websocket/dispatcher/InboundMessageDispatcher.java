@@ -110,7 +110,11 @@ public class InboundMessageDispatcher {
             final byte[][] dataInBytes = new byte[1][1];
             WebSocketMessage messagesForRecipients = session
                     .binaryMessage(dataBufferFactory -> {
-                        dataInBytes[0] = dataForRecipients.toByteArray();
+                        TurmsResponse response = TurmsResponse
+                                .newBuilder()
+                                .setNotification(dataForRecipients)
+                                .buildPartial();
+                        dataInBytes[0] = response.toByteArray();
                         return dataBufferFactory.wrap(dataInBytes[0]);
                     });
             boolean onlyOneRecipient = requestResult.getRecipients().size() == 1;
