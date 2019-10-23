@@ -19,25 +19,19 @@ package im.turms.turms.pojo.domain;
 
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Data
 @Document
 @FieldNameConstants
 public class UserOnlineUserNumber {
-    /**
-     * Use Instant rather than Date to fix the bug of Spring Data Mongo itself.
-     * If persisting Date as ID, the timestamp will be persisted as ObjectID rather than Date in MongoDB
-     * while Instant can be persisted as Date in MongoDB.
-     * As a result, use Instant until Spring Data Mongo fixes this bug.
-     */
-    //
-    @Id
-    private Instant timestamp;
+    @MongoId(FieldType.DATE_TIME)
+    private Date timestamp;
 
     @Indexed
     private Integer number;
