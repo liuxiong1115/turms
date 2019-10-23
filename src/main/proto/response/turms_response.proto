@@ -35,6 +35,10 @@ message TurmsResponse {
     google.protobuf.StringValue reason = 3;
     Data data = 4;
     TurmsRequest notification = 5;
+    // requester_id only exists when a requester trigger a notification to its recipients
+    // Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsResponse
+    // when recipients need the requester_id.
+    google.protobuf.Int64Value requester_id = 6;
 
     message Data {
         oneof kind {

@@ -97,6 +97,19 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
+          case 50: {
+            com.google.protobuf.Int64Value.Builder subBuilder = null;
+            if (requesterId_ != null) {
+              subBuilder = requesterId_.toBuilder();
+            }
+            requesterId_ = input.readMessage(com.google.protobuf.Int64Value.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(requesterId_);
+              requesterId_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -4503,6 +4516,41 @@ private static final long serialVersionUID = 0L;
     return getNotification();
   }
 
+  public static final int REQUESTER_ID_FIELD_NUMBER = 6;
+  private com.google.protobuf.Int64Value requesterId_;
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   * @return Whether the requesterId field is set.
+   */
+  public boolean hasRequesterId() {
+    return requesterId_ != null;
+  }
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   * @return The requesterId.
+   */
+  public com.google.protobuf.Int64Value getRequesterId() {
+    return requesterId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : requesterId_;
+  }
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   */
+  public com.google.protobuf.Int64ValueOrBuilder getRequesterIdOrBuilder() {
+    return getRequesterId();
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -4532,6 +4580,9 @@ private static final long serialVersionUID = 0L;
     if (notification_ != null) {
       output.writeMessage(5, getNotification());
     }
+    if (requesterId_ != null) {
+      output.writeMessage(6, getRequesterId());
+    }
     unknownFields.writeTo(output);
   }
 
@@ -4560,6 +4611,10 @@ private static final long serialVersionUID = 0L;
     if (notification_ != null) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(5, getNotification());
+    }
+    if (requesterId_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(6, getRequesterId());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -4595,6 +4650,11 @@ private static final long serialVersionUID = 0L;
       if (!getNotification()
           .equals(other.getNotification())) return false;
     }
+    if (hasRequesterId() != other.hasRequesterId()) return false;
+    if (hasRequesterId()) {
+      if (!getRequesterId()
+          .equals(other.getRequesterId())) return false;
+    }
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -4622,6 +4682,10 @@ private static final long serialVersionUID = 0L;
     if (hasNotification()) {
       hash = (37 * hash) + NOTIFICATION_FIELD_NUMBER;
       hash = (53 * hash) + getNotification().hashCode();
+    }
+    if (hasRequesterId()) {
+      hash = (37 * hash) + REQUESTER_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequesterId().hashCode();
     }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
@@ -4778,6 +4842,12 @@ private static final long serialVersionUID = 0L;
         notification_ = null;
         notificationBuilder_ = null;
       }
+      if (requesterIdBuilder_ == null) {
+        requesterId_ = null;
+      } else {
+        requesterId_ = null;
+        requesterIdBuilder_ = null;
+      }
       return this;
     }
 
@@ -4820,6 +4890,11 @@ private static final long serialVersionUID = 0L;
         result.notification_ = notification_;
       } else {
         result.notification_ = notificationBuilder_.build();
+      }
+      if (requesterIdBuilder_ == null) {
+        result.requesterId_ = requesterId_;
+      } else {
+        result.requesterId_ = requesterIdBuilder_.build();
       }
       onBuilt();
       return result;
@@ -4883,6 +4958,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasNotification()) {
         mergeNotification(other.getNotification());
+      }
+      if (other.hasRequesterId()) {
+        mergeRequesterId(other.getRequesterId());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -5343,6 +5421,161 @@ private static final long serialVersionUID = 0L;
         notification_ = null;
       }
       return notificationBuilder_;
+    }
+
+    private com.google.protobuf.Int64Value requesterId_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> requesterIdBuilder_;
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     * @return Whether the requesterId field is set.
+     */
+    public boolean hasRequesterId() {
+      return requesterIdBuilder_ != null || requesterId_ != null;
+    }
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     * @return The requesterId.
+     */
+    public com.google.protobuf.Int64Value getRequesterId() {
+      if (requesterIdBuilder_ == null) {
+        return requesterId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : requesterId_;
+      } else {
+        return requesterIdBuilder_.getMessage();
+      }
+    }
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     */
+    public Builder setRequesterId(com.google.protobuf.Int64Value value) {
+      if (requesterIdBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        requesterId_ = value;
+        onChanged();
+      } else {
+        requesterIdBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     */
+    public Builder setRequesterId(
+        com.google.protobuf.Int64Value.Builder builderForValue) {
+      if (requesterIdBuilder_ == null) {
+        requesterId_ = builderForValue.build();
+        onChanged();
+      } else {
+        requesterIdBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     */
+    public Builder mergeRequesterId(com.google.protobuf.Int64Value value) {
+      if (requesterIdBuilder_ == null) {
+        if (requesterId_ != null) {
+          requesterId_ =
+            com.google.protobuf.Int64Value.newBuilder(requesterId_).mergeFrom(value).buildPartial();
+        } else {
+          requesterId_ = value;
+        }
+        onChanged();
+      } else {
+        requesterIdBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     */
+    public Builder clearRequesterId() {
+      if (requesterIdBuilder_ == null) {
+        requesterId_ = null;
+        onChanged();
+      } else {
+        requesterId_ = null;
+        requesterIdBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     */
+    public com.google.protobuf.Int64Value.Builder getRequesterIdBuilder() {
+      
+      onChanged();
+      return getRequesterIdFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     */
+    public com.google.protobuf.Int64ValueOrBuilder getRequesterIdOrBuilder() {
+      if (requesterIdBuilder_ != null) {
+        return requesterIdBuilder_.getMessageOrBuilder();
+      } else {
+        return requesterId_ == null ?
+            com.google.protobuf.Int64Value.getDefaultInstance() : requesterId_;
+      }
+    }
+    /**
+     * <pre>
+     * requester_id only exists when a requester trigger a notification to its recipients
+     * </pre>
+     *
+     * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
+        getRequesterIdFieldBuilder() {
+      if (requesterIdBuilder_ == null) {
+        requesterIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
+                getRequesterId(),
+                getParentForChildren(),
+                isClean());
+        requesterId_ = null;
+      }
+      return requesterIdBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

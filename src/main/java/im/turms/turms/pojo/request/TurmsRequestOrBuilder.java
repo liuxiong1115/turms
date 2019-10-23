@@ -39,40 +39,10 @@ public interface TurmsRequestOrBuilder extends
 
   /**
    * <pre>
-   * requester_id only exists when server relays this request to downstream clients.
-   * Turms server never accept the requester_id from the requests of client because it can be fake
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-   * @return Whether the requesterId field is set.
-   */
-  boolean hasRequesterId();
-  /**
-   * <pre>
-   * requester_id only exists when server relays this request to downstream clients.
-   * Turms server never accept the requester_id from the requests of client because it can be fake
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-   * @return The requesterId.
-   */
-  com.google.protobuf.Int64Value getRequesterId();
-  /**
-   * <pre>
-   * requester_id only exists when server relays this request to downstream clients.
-   * Turms server never accept the requester_id from the requests of client because it can be fake
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-   */
-  com.google.protobuf.Int64ValueOrBuilder getRequesterIdOrBuilder();
-
-  /**
-   * <pre>
    * Signal
    * </pre>
    *
-   * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+   * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
    * @return Whether the ackRequest field is set.
    */
   boolean hasAckRequest();
@@ -81,7 +51,7 @@ public interface TurmsRequestOrBuilder extends
    * Signal
    * </pre>
    *
-   * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+   * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
    * @return The ackRequest.
    */
   im.turms.turms.pojo.request.AckRequest getAckRequest();
@@ -90,7 +60,7 @@ public interface TurmsRequestOrBuilder extends
    * Signal
    * </pre>
    *
-   * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+   * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
    */
   im.turms.turms.pojo.request.AckRequestOrBuilder getAckRequestOrBuilder();
 

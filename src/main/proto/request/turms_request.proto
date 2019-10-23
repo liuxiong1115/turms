@@ -72,13 +72,10 @@ message TurmsRequest {
     // Note: request_id is allowed to be duplicated because
     // it is used for clients to identify the response of the same request id in a session
     google.protobuf.Int64Value request_id = 1;
-    // requester_id only exists when server relays this request to downstream clients.
-    // Turms server never accept the requester_id from the requests of client because it can be fake
-    google.protobuf.Int64Value requester_id = 2;
 
     oneof kind {
         // Signal
-        AckRequest ack_request = 3;
+        AckRequest ack_request = 2;
 
         // Message
         CreateMessageRequest create_message_request = 5;

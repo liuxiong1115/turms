@@ -17,6 +17,7 @@
 
 package im.turms.turms.access.websocket.dispatcher;
 
+import com.google.protobuf.Int64Value;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
@@ -104,17 +105,20 @@ public class InboundMessageDispatcher {
 
     private Mono<Boolean> handleResultsForRecipients(
             @NotNull RequestResult requestResult,
-            @NotNull WebSocketSession session) {
+            @NotNull WebSocketSession session,
+            @Nullable Long requesterId) {
         TurmsRequest dataForRecipients = requestResult.getDataForRecipients();
         if (dataForRecipients != null && !requestResult.getRecipients().isEmpty()) {
             final byte[][] dataInBytes = new byte[1][1];
             WebSocketMessage messagesForRecipients = session
                     .binaryMessage(dataBufferFactory -> {
-                        TurmsResponse response = TurmsResponse
+                        TurmsResponse.Builder builder = TurmsResponse
                                 .newBuilder()
-                                .setNotification(dataForRecipients)
-                                .buildPartial();
-                        dataInBytes[0] = response.toByteArray();
+                                .setNotification(dataForRecipients);
+                        if (requesterId != null) {
+                            builder.setRequesterId(Int64Value.newBuilder().setValue(requesterId).build());
+                        }
+                        dataInBytes[0] = builder.buildPartial().toByteArray();
                         return dataBufferFactory.wrap(dataInBytes[0]);
                     });
             boolean onlyOneRecipient = requestResult.getRecipients().size() == 1;
@@ -153,7 +157,8 @@ public class InboundMessageDispatcher {
     private Mono<WebSocketMessage> handleResult(
             @NotNull WebSocketSession session,
             @NotNull Mono<RequestResult> result,
-            @Nullable Long requestId) {//TODO
+            @Nullable Long requestId,
+            @Nullable Long requesterId) {
         return result
                 .defaultIfEmpty(RequestResult.NOT_FOUND)
                 .onErrorResume(throwable -> {
@@ -179,7 +184,7 @@ public class InboundMessageDispatcher {
                             return Mono.empty();
                         }
                     } else {
-                        return handleResultsForRecipients(requestResult, session)
+                        return handleResultsForRecipients(requestResult, session, requesterId)
                                 .flatMap(success -> {
                                     if (requestId != null) {
                                         if (success == null || !success) {
@@ -218,7 +223,7 @@ public class InboundMessageDispatcher {
                             request, userId, deviceType, message, session);
                     Mono<RequestResult> result = handler.apply(wrapper);
                     Long requestId = request.hasRequestId() ? request.getRequestId().getValue() : null;
-                    return handleResult(session, result, requestId);
+                    return handleResult(session, result, requestId, userId);
                 } else {
                     onlineUserService.getLocalOnlineUserManager(userId).setOfflineByDeviceType(deviceType, CloseStatus.NOT_ACCEPTABLE);
                 }

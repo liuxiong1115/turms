@@ -66,21 +66,8 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 18: {
-            com.google.protobuf.Int64Value.Builder subBuilder = null;
-            if (requesterId_ != null) {
-              subBuilder = requesterId_.toBuilder();
-            }
-            requesterId_ = input.readMessage(com.google.protobuf.Int64Value.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(requesterId_);
-              requesterId_ = subBuilder.buildPartial();
-            }
-
-            break;
-          }
-          case 26: {
             im.turms.turms.pojo.request.AckRequest.Builder subBuilder = null;
-            if (kindCase_ == 3) {
+            if (kindCase_ == 2) {
               subBuilder = ((im.turms.turms.pojo.request.AckRequest) kind_).toBuilder();
             }
             kind_ =
@@ -89,7 +76,7 @@ private static final long serialVersionUID = 0L;
               subBuilder.mergeFrom((im.turms.turms.pojo.request.AckRequest) kind_);
               kind_ = subBuilder.buildPartial();
             }
-            kindCase_ = 3;
+            kindCase_ = 2;
             break;
           }
           case 42: {
@@ -843,7 +830,7 @@ private static final long serialVersionUID = 0L;
   public enum KindCase
       implements com.google.protobuf.Internal.EnumLite,
           com.google.protobuf.AbstractMessage.InternalOneOfEnum {
-    ACK_REQUEST(3),
+    ACK_REQUEST(2),
     CREATE_MESSAGE_REQUEST(5),
     QUERY_MESSAGE_STATUSES_REQUEST(6),
     QUERY_MESSAGES_REQUEST(7),
@@ -912,7 +899,7 @@ private static final long serialVersionUID = 0L;
 
     public static KindCase forNumber(int value) {
       switch (value) {
-        case 3: return ACK_REQUEST;
+        case 2: return ACK_REQUEST;
         case 5: return CREATE_MESSAGE_REQUEST;
         case 6: return QUERY_MESSAGE_STATUSES_REQUEST;
         case 7: return QUERY_MESSAGES_REQUEST;
@@ -1017,66 +1004,28 @@ private static final long serialVersionUID = 0L;
     return getRequestId();
   }
 
-  public static final int REQUESTER_ID_FIELD_NUMBER = 2;
-  private com.google.protobuf.Int64Value requesterId_;
-  /**
-   * <pre>
-   * requester_id only exists when server relays this request to downstream clients.
-   * Turms server never accept the requester_id from the requests of client because it can be fake
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-   * @return Whether the requesterId field is set.
-   */
-  public boolean hasRequesterId() {
-    return requesterId_ != null;
-  }
-  /**
-   * <pre>
-   * requester_id only exists when server relays this request to downstream clients.
-   * Turms server never accept the requester_id from the requests of client because it can be fake
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-   * @return The requesterId.
-   */
-  public com.google.protobuf.Int64Value getRequesterId() {
-    return requesterId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : requesterId_;
-  }
-  /**
-   * <pre>
-   * requester_id only exists when server relays this request to downstream clients.
-   * Turms server never accept the requester_id from the requests of client because it can be fake
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-   */
-  public com.google.protobuf.Int64ValueOrBuilder getRequesterIdOrBuilder() {
-    return getRequesterId();
-  }
-
-  public static final int ACK_REQUEST_FIELD_NUMBER = 3;
+  public static final int ACK_REQUEST_FIELD_NUMBER = 2;
   /**
    * <pre>
    * Signal
    * </pre>
    *
-   * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+   * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
    * @return Whether the ackRequest field is set.
    */
   public boolean hasAckRequest() {
-    return kindCase_ == 3;
+    return kindCase_ == 2;
   }
   /**
    * <pre>
    * Signal
    * </pre>
    *
-   * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+   * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
    * @return The ackRequest.
    */
   public im.turms.turms.pojo.request.AckRequest getAckRequest() {
-    if (kindCase_ == 3) {
+    if (kindCase_ == 2) {
        return (im.turms.turms.pojo.request.AckRequest) kind_;
     }
     return im.turms.turms.pojo.request.AckRequest.getDefaultInstance();
@@ -1086,10 +1035,10 @@ private static final long serialVersionUID = 0L;
    * Signal
    * </pre>
    *
-   * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+   * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
    */
   public im.turms.turms.pojo.request.AckRequestOrBuilder getAckRequestOrBuilder() {
-    if (kindCase_ == 3) {
+    if (kindCase_ == 2) {
        return (im.turms.turms.pojo.request.AckRequest) kind_;
     }
     return im.turms.turms.pojo.request.AckRequest.getDefaultInstance();
@@ -2624,11 +2573,8 @@ private static final long serialVersionUID = 0L;
     if (requestId_ != null) {
       output.writeMessage(1, getRequestId());
     }
-    if (requesterId_ != null) {
-      output.writeMessage(2, getRequesterId());
-    }
-    if (kindCase_ == 3) {
-      output.writeMessage(3, (im.turms.turms.pojo.request.AckRequest) kind_);
+    if (kindCase_ == 2) {
+      output.writeMessage(2, (im.turms.turms.pojo.request.AckRequest) kind_);
     }
     if (kindCase_ == 5) {
       output.writeMessage(5, (im.turms.turms.pojo.request.CreateMessageRequest) kind_);
@@ -2796,13 +2742,9 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getRequestId());
     }
-    if (requesterId_ != null) {
+    if (kindCase_ == 2) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, getRequesterId());
-    }
-    if (kindCase_ == 3) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, (im.turms.turms.pojo.request.AckRequest) kind_);
+        .computeMessageSize(2, (im.turms.turms.pojo.request.AckRequest) kind_);
     }
     if (kindCase_ == 5) {
       size += com.google.protobuf.CodedOutputStream
@@ -3028,14 +2970,9 @@ private static final long serialVersionUID = 0L;
       if (!getRequestId()
           .equals(other.getRequestId())) return false;
     }
-    if (hasRequesterId() != other.hasRequesterId()) return false;
-    if (hasRequesterId()) {
-      if (!getRequesterId()
-          .equals(other.getRequesterId())) return false;
-    }
     if (!getKindCase().equals(other.getKindCase())) return false;
     switch (kindCase_) {
-      case 3:
+      case 2:
         if (!getAckRequest()
             .equals(other.getAckRequest())) return false;
         break;
@@ -3261,12 +3198,8 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
       hash = (53 * hash) + getRequestId().hashCode();
     }
-    if (hasRequesterId()) {
-      hash = (37 * hash) + REQUESTER_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getRequesterId().hashCode();
-    }
     switch (kindCase_) {
-      case 3:
+      case 2:
         hash = (37 * hash) + ACK_REQUEST_FIELD_NUMBER;
         hash = (53 * hash) + getAckRequest().hashCode();
         break;
@@ -3620,12 +3553,6 @@ private static final long serialVersionUID = 0L;
         requestId_ = null;
         requestIdBuilder_ = null;
       }
-      if (requesterIdBuilder_ == null) {
-        requesterId_ = null;
-      } else {
-        requesterId_ = null;
-        requesterIdBuilder_ = null;
-      }
       kindCase_ = 0;
       kind_ = null;
       return this;
@@ -3659,12 +3586,7 @@ private static final long serialVersionUID = 0L;
       } else {
         result.requestId_ = requestIdBuilder_.build();
       }
-      if (requesterIdBuilder_ == null) {
-        result.requesterId_ = requesterId_;
-      } else {
-        result.requesterId_ = requesterIdBuilder_.build();
-      }
-      if (kindCase_ == 3) {
+      if (kindCase_ == 2) {
         if (ackRequestBuilder_ == null) {
           result.kind_ = kind_;
         } else {
@@ -4079,9 +4001,6 @@ private static final long serialVersionUID = 0L;
       if (other == im.turms.turms.pojo.request.TurmsRequest.getDefaultInstance()) return this;
       if (other.hasRequestId()) {
         mergeRequestId(other.getRequestId());
-      }
-      if (other.hasRequesterId()) {
-        mergeRequesterId(other.getRequesterId());
       }
       switch (other.getKindCase()) {
         case ACK_REQUEST: {
@@ -4504,170 +4423,6 @@ private static final long serialVersionUID = 0L;
       return requestIdBuilder_;
     }
 
-    private com.google.protobuf.Int64Value requesterId_;
-    private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> requesterIdBuilder_;
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     * @return Whether the requesterId field is set.
-     */
-    public boolean hasRequesterId() {
-      return requesterIdBuilder_ != null || requesterId_ != null;
-    }
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     * @return The requesterId.
-     */
-    public com.google.protobuf.Int64Value getRequesterId() {
-      if (requesterIdBuilder_ == null) {
-        return requesterId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : requesterId_;
-      } else {
-        return requesterIdBuilder_.getMessage();
-      }
-    }
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     */
-    public Builder setRequesterId(com.google.protobuf.Int64Value value) {
-      if (requesterIdBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        requesterId_ = value;
-        onChanged();
-      } else {
-        requesterIdBuilder_.setMessage(value);
-      }
-
-      return this;
-    }
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     */
-    public Builder setRequesterId(
-        com.google.protobuf.Int64Value.Builder builderForValue) {
-      if (requesterIdBuilder_ == null) {
-        requesterId_ = builderForValue.build();
-        onChanged();
-      } else {
-        requesterIdBuilder_.setMessage(builderForValue.build());
-      }
-
-      return this;
-    }
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     */
-    public Builder mergeRequesterId(com.google.protobuf.Int64Value value) {
-      if (requesterIdBuilder_ == null) {
-        if (requesterId_ != null) {
-          requesterId_ =
-            com.google.protobuf.Int64Value.newBuilder(requesterId_).mergeFrom(value).buildPartial();
-        } else {
-          requesterId_ = value;
-        }
-        onChanged();
-      } else {
-        requesterIdBuilder_.mergeFrom(value);
-      }
-
-      return this;
-    }
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     */
-    public Builder clearRequesterId() {
-      if (requesterIdBuilder_ == null) {
-        requesterId_ = null;
-        onChanged();
-      } else {
-        requesterId_ = null;
-        requesterIdBuilder_ = null;
-      }
-
-      return this;
-    }
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     */
-    public com.google.protobuf.Int64Value.Builder getRequesterIdBuilder() {
-      
-      onChanged();
-      return getRequesterIdFieldBuilder().getBuilder();
-    }
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     */
-    public com.google.protobuf.Int64ValueOrBuilder getRequesterIdOrBuilder() {
-      if (requesterIdBuilder_ != null) {
-        return requesterIdBuilder_.getMessageOrBuilder();
-      } else {
-        return requesterId_ == null ?
-            com.google.protobuf.Int64Value.getDefaultInstance() : requesterId_;
-      }
-    }
-    /**
-     * <pre>
-     * requester_id only exists when server relays this request to downstream clients.
-     * Turms server never accept the requester_id from the requests of client because it can be fake
-     * </pre>
-     *
-     * <code>.google.protobuf.Int64Value requester_id = 2;</code>
-     */
-    private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
-        getRequesterIdFieldBuilder() {
-      if (requesterIdBuilder_ == null) {
-        requesterIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
-                getRequesterId(),
-                getParentForChildren(),
-                isClean());
-        requesterId_ = null;
-      }
-      return requesterIdBuilder_;
-    }
-
     private com.google.protobuf.SingleFieldBuilderV3<
         im.turms.turms.pojo.request.AckRequest, im.turms.turms.pojo.request.AckRequest.Builder, im.turms.turms.pojo.request.AckRequestOrBuilder> ackRequestBuilder_;
     /**
@@ -4675,28 +4430,28 @@ private static final long serialVersionUID = 0L;
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      * @return Whether the ackRequest field is set.
      */
     public boolean hasAckRequest() {
-      return kindCase_ == 3;
+      return kindCase_ == 2;
     }
     /**
      * <pre>
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      * @return The ackRequest.
      */
     public im.turms.turms.pojo.request.AckRequest getAckRequest() {
       if (ackRequestBuilder_ == null) {
-        if (kindCase_ == 3) {
+        if (kindCase_ == 2) {
           return (im.turms.turms.pojo.request.AckRequest) kind_;
         }
         return im.turms.turms.pojo.request.AckRequest.getDefaultInstance();
       } else {
-        if (kindCase_ == 3) {
+        if (kindCase_ == 2) {
           return ackRequestBuilder_.getMessage();
         }
         return im.turms.turms.pojo.request.AckRequest.getDefaultInstance();
@@ -4707,7 +4462,7 @@ private static final long serialVersionUID = 0L;
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      */
     public Builder setAckRequest(im.turms.turms.pojo.request.AckRequest value) {
       if (ackRequestBuilder_ == null) {
@@ -4719,7 +4474,7 @@ private static final long serialVersionUID = 0L;
       } else {
         ackRequestBuilder_.setMessage(value);
       }
-      kindCase_ = 3;
+      kindCase_ = 2;
       return this;
     }
     /**
@@ -4727,7 +4482,7 @@ private static final long serialVersionUID = 0L;
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      */
     public Builder setAckRequest(
         im.turms.turms.pojo.request.AckRequest.Builder builderForValue) {
@@ -4737,7 +4492,7 @@ private static final long serialVersionUID = 0L;
       } else {
         ackRequestBuilder_.setMessage(builderForValue.build());
       }
-      kindCase_ = 3;
+      kindCase_ = 2;
       return this;
     }
     /**
@@ -4745,11 +4500,11 @@ private static final long serialVersionUID = 0L;
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      */
     public Builder mergeAckRequest(im.turms.turms.pojo.request.AckRequest value) {
       if (ackRequestBuilder_ == null) {
-        if (kindCase_ == 3 &&
+        if (kindCase_ == 2 &&
             kind_ != im.turms.turms.pojo.request.AckRequest.getDefaultInstance()) {
           kind_ = im.turms.turms.pojo.request.AckRequest.newBuilder((im.turms.turms.pojo.request.AckRequest) kind_)
               .mergeFrom(value).buildPartial();
@@ -4758,12 +4513,12 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (kindCase_ == 3) {
+        if (kindCase_ == 2) {
           ackRequestBuilder_.mergeFrom(value);
         }
         ackRequestBuilder_.setMessage(value);
       }
-      kindCase_ = 3;
+      kindCase_ = 2;
       return this;
     }
     /**
@@ -4771,17 +4526,17 @@ private static final long serialVersionUID = 0L;
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      */
     public Builder clearAckRequest() {
       if (ackRequestBuilder_ == null) {
-        if (kindCase_ == 3) {
+        if (kindCase_ == 2) {
           kindCase_ = 0;
           kind_ = null;
           onChanged();
         }
       } else {
-        if (kindCase_ == 3) {
+        if (kindCase_ == 2) {
           kindCase_ = 0;
           kind_ = null;
         }
@@ -4794,7 +4549,7 @@ private static final long serialVersionUID = 0L;
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      */
     public im.turms.turms.pojo.request.AckRequest.Builder getAckRequestBuilder() {
       return getAckRequestFieldBuilder().getBuilder();
@@ -4804,13 +4559,13 @@ private static final long serialVersionUID = 0L;
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      */
     public im.turms.turms.pojo.request.AckRequestOrBuilder getAckRequestOrBuilder() {
-      if ((kindCase_ == 3) && (ackRequestBuilder_ != null)) {
+      if ((kindCase_ == 2) && (ackRequestBuilder_ != null)) {
         return ackRequestBuilder_.getMessageOrBuilder();
       } else {
-        if (kindCase_ == 3) {
+        if (kindCase_ == 2) {
           return (im.turms.turms.pojo.request.AckRequest) kind_;
         }
         return im.turms.turms.pojo.request.AckRequest.getDefaultInstance();
@@ -4821,13 +4576,13 @@ private static final long serialVersionUID = 0L;
      * Signal
      * </pre>
      *
-     * <code>.im.turms.proto.AckRequest ack_request = 3;</code>
+     * <code>.im.turms.proto.AckRequest ack_request = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         im.turms.turms.pojo.request.AckRequest, im.turms.turms.pojo.request.AckRequest.Builder, im.turms.turms.pojo.request.AckRequestOrBuilder> 
         getAckRequestFieldBuilder() {
       if (ackRequestBuilder_ == null) {
-        if (!(kindCase_ == 3)) {
+        if (!(kindCase_ == 2)) {
           kind_ = im.turms.turms.pojo.request.AckRequest.getDefaultInstance();
         }
         ackRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -4837,7 +4592,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         kind_ = null;
       }
-      kindCase_ = 3;
+      kindCase_ = 2;
       onChanged();;
       return ackRequestBuilder_;
     }

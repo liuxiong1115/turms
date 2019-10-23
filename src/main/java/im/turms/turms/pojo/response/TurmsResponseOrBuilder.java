@@ -68,4 +68,31 @@ public interface TurmsResponseOrBuilder extends
    * <code>.im.turms.proto.TurmsRequest notification = 5;</code>
    */
   im.turms.turms.pojo.request.TurmsRequestOrBuilder getNotificationOrBuilder();
+
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   * @return Whether the requesterId field is set.
+   */
+  boolean hasRequesterId();
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   * @return The requesterId.
+   */
+  com.google.protobuf.Int64Value getRequesterId();
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   */
+  com.google.protobuf.Int64ValueOrBuilder getRequesterIdOrBuilder();
 }
