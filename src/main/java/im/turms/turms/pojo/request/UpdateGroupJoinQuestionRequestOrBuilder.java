@@ -52,4 +52,19 @@ public interface UpdateGroupJoinQuestionRequestOrBuilder extends
    */
   com.google.protobuf.ByteString
       getAnswersBytes(int index);
+
+  /**
+   * <code>.google.protobuf.Int32Value score = 4;</code>
+   * @return Whether the score field is set.
+   */
+  boolean hasScore();
+  /**
+   * <code>.google.protobuf.Int32Value score = 4;</code>
+   * @return The score.
+   */
+  com.google.protobuf.Int32Value getScore();
+  /**
+   * <code>.google.protobuf.Int32Value score = 4;</code>
+   */
+  com.google.protobuf.Int32ValueOrBuilder getScoreOrBuilder();
 }

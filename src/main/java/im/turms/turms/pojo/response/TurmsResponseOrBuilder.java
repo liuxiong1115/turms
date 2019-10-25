@@ -72,6 +72,8 @@ public interface TurmsResponseOrBuilder extends
   /**
    * <pre>
    * requester_id only exists when a requester trigger a notification to its recipients
+   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsResponse
+   * when recipients need the requester_id.
    * </pre>
    *
    * <code>.google.protobuf.Int64Value requester_id = 6;</code>
@@ -81,6 +83,8 @@ public interface TurmsResponseOrBuilder extends
   /**
    * <pre>
    * requester_id only exists when a requester trigger a notification to its recipients
+   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsResponse
+   * when recipients need the requester_id.
    * </pre>
    *
    * <code>.google.protobuf.Int64Value requester_id = 6;</code>
@@ -90,6 +94,8 @@ public interface TurmsResponseOrBuilder extends
   /**
    * <pre>
    * requester_id only exists when a requester trigger a notification to its recipients
+   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsResponse
+   * when recipients need the requester_id.
    * </pre>
    *
    * <code>.google.protobuf.Int64Value requester_id = 6;</code>

@@ -75,4 +75,19 @@ public interface GroupJoinQuestionOrBuilder extends
    */
   com.google.protobuf.StringValueOrBuilder getAnswersOrBuilder(
       int index);
+
+  /**
+   * <code>.google.protobuf.Int32Value score = 5;</code>
+   * @return Whether the score field is set.
+   */
+  boolean hasScore();
+  /**
+   * <code>.google.protobuf.Int32Value score = 5;</code>
+   * @return The score.
+   */
+  com.google.protobuf.Int32Value getScore();
+  /**
+   * <code>.google.protobuf.Int32Value score = 5;</code>
+   */
+  com.google.protobuf.Int32ValueOrBuilder getScoreOrBuilder();
 }

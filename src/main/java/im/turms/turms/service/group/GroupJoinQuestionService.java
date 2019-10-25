@@ -25,7 +25,9 @@ import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.GroupJoinQuestion;
+import im.turms.turms.pojo.response.GroupJoinQuestionsAnswerResult;
 import im.turms.turms.pojo.response.GroupJoinQuestionsWithVersion;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -38,9 +40,7 @@ import reactor.util.function.Tuple2;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.ID;
@@ -51,74 +51,114 @@ public class GroupJoinQuestionService {
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
     private final GroupMemberService groupMemberService;
-    private final GroupBlacklistService groupBlacklistService;
     private final GroupService groupService;
     private final GroupVersionService groupVersionService;
 
-    public GroupJoinQuestionService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService, GroupVersionService groupVersionService, GroupBlacklistService groupBlacklistService, GroupService groupService) {
+    public GroupJoinQuestionService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService, GroupVersionService groupVersionService, GroupService groupService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.groupMemberService = groupMemberService;
         this.groupVersionService = groupVersionService;
-        this.groupBlacklistService = groupBlacklistService;
         this.groupService = groupService;
     }
 
-    public Mono<Boolean> checkGroupQuestionAnswer(@NotNull Long questionId, @NotNull String answer) {
+    public Mono<Integer> checkGroupQuestionAnswerAndCountScore(
+            @NotNull Long questionId,
+            @NotNull String answer,
+            @Nullable Long groupId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(questionId))
                 .addCriteria(Criteria.where(GroupJoinQuestion.Fields.answers).in(answer));
-        return mongoTemplate.exists(query, GroupJoinQuestion.class);
+        if (groupId != null) {
+            query.addCriteria(Criteria.where(GroupJoinQuestion.Fields.groupId).is(groupId));
+        }
+        return mongoTemplate.findOne(query, GroupJoinQuestion.class)
+                .map(GroupJoinQuestion::getScore);
     }
 
-    public Mono<Boolean> checkGroupQuestionAnswerAndJoin(
-            @NotNull Long requesterId,
-            @NotNull Long questionId,
-            @NotNull String answer) {
-        return checkGroupQuestionAnswer(questionId, answer)
-                .flatMap(correct -> {
-                    if (correct != null && correct) {
-                        return queryGroupId(questionId)
-                                .flatMap(groupId -> groupMemberService.isBlacklisted(groupId, requesterId)
-                                        .flatMap(isBlacklisted -> {
-                                            if (isBlacklisted != null && isBlacklisted) {
-                                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                                            } else {
-                                                return groupMemberService.exists(groupId, requesterId);
-                                            }
-                                        })
-                                        .flatMap(exists -> {
-                                            if (exists != null && exists) {
-                                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RESOURCES_HAVE_BEEN_HANDLED));
-                                            } else {
-                                                return groupService.isGroupActive(groupId);
-                                            }
-                                        })
-                                        .flatMap(isActive -> {
-                                            if (isActive != null && isActive) {
-                                                return groupMemberService.addGroupMember(
-                                                        groupId,
-                                                        requesterId,
-                                                        GroupMemberRole.MEMBER,
-                                                        null,
-                                                        null, //TODO: GroupType: allow add a mute end date for new members
-                                                        null)
-                                                        .thenReturn(true);
-                                            } else {
-                                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION));
-                                            }
-                                        }));
-                    } else {
-                        return Mono.just(false);
+    /**
+     * group join questions ids -> score
+     */
+    public Mono<Pair<List<Long>, Integer>> checkGroupQuestionAnswersAndCountScore(
+            @NotEmpty Map<Long, String> questionIdAndAnswerMap,
+            @Nullable Long groupId) {
+        List<Mono<Pair<Long, Integer>>> checks = new ArrayList<>(questionIdAndAnswerMap.entrySet().size());
+        for (Map.Entry<Long, String> entry : questionIdAndAnswerMap.entrySet()) {
+            checks.add(checkGroupQuestionAnswerAndCountScore(entry.getKey(), entry.getValue(), groupId)
+                    .map(score -> Pair.of(entry.getKey(), score)));
+        }
+        return Flux.merge(checks)
+                .collectList()
+                .map(pairs -> {
+                    List<Long> questionsIds = new ArrayList<>(pairs.size());
+                    int score = 0;
+                    for (Pair<Long, Integer> pair : pairs) {
+                        questionsIds.add(pair.getLeft());
+                        score += pair.getRight();
                     }
+                    return Pair.of(questionsIds, score);
                 });
+    }
+
+    public Mono<GroupJoinQuestionsAnswerResult> checkGroupQuestionAnswerAndJoin(
+            @NotNull Long requesterId,
+            @NotEmpty Map<Long, String> questionIdAndAnswerMap) {
+        Long firstQuestionId = questionIdAndAnswerMap.keySet().toArray(new Long[0])[0];
+        return queryGroupId(firstQuestionId)
+                .flatMap(groupId -> groupMemberService.isBlacklisted(groupId, requesterId)
+                        .flatMap(isBlacklisted -> {
+                            if (isBlacklisted != null && isBlacklisted) {
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                            } else {
+                                return groupMemberService.exists(groupId, requesterId);
+                            }
+                        })
+                        .flatMap(exists -> {
+                            if (exists != null && exists) {
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RESOURCES_HAVE_BEEN_HANDLED));
+                            } else {
+                                return groupService.isGroupActive(groupId);
+                            }
+                        })
+                        .flatMap(isActive -> {
+                            if (isActive != null && isActive) {
+                                return checkGroupQuestionAnswersAndCountScore(questionIdAndAnswerMap, groupId);
+                            } else {
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION));
+                            }
+                        })
+                        .flatMap(idsAndScore -> groupService.queryGroupMinimumScore(groupId)
+                                .flatMap(minimumScore -> {
+                                    if (idsAndScore.getRight() >= minimumScore) {
+                                        return groupMemberService.addGroupMember(
+                                                groupId,
+                                                requesterId,
+                                                GroupMemberRole.MEMBER,
+                                                null,
+                                                null, //TODO: GroupType: allow add a mute end date for new members
+                                                null)
+                                                .thenReturn(true);
+                                    } else {
+                                        return Mono.just(false);
+                                    }
+                                })
+                                .map(joined -> GroupJoinQuestionsAnswerResult
+                                        .newBuilder()
+                                        .setJoined(joined)
+                                        .addAllQuestionsIds(idsAndScore.getKey())
+                                        .setScore(idsAndScore.getRight())
+                                        .build())));
     }
 
     public Mono<GroupJoinQuestion> createGroupJoinQuestion(
             @NotNull Long requesterId,
             @NotNull Long groupId,
             @NotNull String question,
-            @NotEmpty List<String> answers) {
+            @NotEmpty List<String> answers,
+            @NotNull Integer score) {
+        if (score < 0) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         return groupMemberService.isAllowedToCreateJoinQuestion(requesterId, groupId)
                 .flatMap(allowed -> {
                     if (allowed != null && allowed) {
@@ -126,7 +166,8 @@ public class GroupJoinQuestionService {
                                 turmsClusterManager.generateRandomId(),
                                 groupId,
                                 question,
-                                answers);
+                                answers,
+                                score);
                         return mongoTemplate.insert(groupJoinQuestion)
                                 .zipWith(groupVersionService.updateJoinQuestionsVersion(groupId))
                                 .map(Tuple2::getT1);
@@ -220,8 +261,9 @@ public class GroupJoinQuestionService {
             @NotNull Long requesterId,
             @NotNull Long questionId,
             @Nullable String question,
-            @Nullable Set<String> answers) {
-        if (question == null && answers == null) {
+            @Nullable Set<String> answers,
+            @Nullable Integer score) {
+        if ((question == null && answers == null && score == null) || (score != null && score < 0)) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         return queryGroupId(questionId)
@@ -232,6 +274,7 @@ public class GroupJoinQuestionService {
                                 Update update = UpdateBuilder.newBuilder()
                                         .setIfNotNull(GroupJoinQuestion.Fields.question, question)
                                         .setIfNotNull(GroupJoinQuestion.Fields.answers, answers)
+                                        .setIfNotNull(GroupJoinQuestion.Fields.score, score)
                                         .build();
                                 return mongoTemplate.updateFirst(query, update, GroupJoinQuestion.class)
                                         .flatMap(result -> {

@@ -77,6 +77,19 @@ private static final long serialVersionUID = 0L;
             answers_.add(s);
             break;
           }
+          case 34: {
+            com.google.protobuf.Int32Value.Builder subBuilder = null;
+            if (score_ != null) {
+              subBuilder = score_.toBuilder();
+            }
+            score_ = input.readMessage(com.google.protobuf.Int32Value.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(score_);
+              score_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -180,6 +193,29 @@ private static final long serialVersionUID = 0L;
     return answers_.getByteString(index);
   }
 
+  public static final int SCORE_FIELD_NUMBER = 4;
+  private com.google.protobuf.Int32Value score_;
+  /**
+   * <code>.google.protobuf.Int32Value score = 4;</code>
+   * @return Whether the score field is set.
+   */
+  public boolean hasScore() {
+    return score_ != null;
+  }
+  /**
+   * <code>.google.protobuf.Int32Value score = 4;</code>
+   * @return The score.
+   */
+  public com.google.protobuf.Int32Value getScore() {
+    return score_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : score_;
+  }
+  /**
+   * <code>.google.protobuf.Int32Value score = 4;</code>
+   */
+  public com.google.protobuf.Int32ValueOrBuilder getScoreOrBuilder() {
+    return getScore();
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -202,6 +238,9 @@ private static final long serialVersionUID = 0L;
     }
     for (int i = 0; i < answers_.size(); i++) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 3, answers_.getRaw(i));
+    }
+    if (score_ != null) {
+      output.writeMessage(4, getScore());
     }
     unknownFields.writeTo(output);
   }
@@ -228,6 +267,10 @@ private static final long serialVersionUID = 0L;
       size += dataSize;
       size += 1 * getAnswersList().size();
     }
+    if (score_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(4, getScore());
+    }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
@@ -252,6 +295,11 @@ private static final long serialVersionUID = 0L;
     }
     if (!getAnswersList()
         .equals(other.getAnswersList())) return false;
+    if (hasScore() != other.hasScore()) return false;
+    if (hasScore()) {
+      if (!getScore()
+          .equals(other.getScore())) return false;
+    }
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -273,6 +321,10 @@ private static final long serialVersionUID = 0L;
     if (getAnswersCount() > 0) {
       hash = (37 * hash) + ANSWERS_FIELD_NUMBER;
       hash = (53 * hash) + getAnswersList().hashCode();
+    }
+    if (hasScore()) {
+      hash = (37 * hash) + SCORE_FIELD_NUMBER;
+      hash = (53 * hash) + getScore().hashCode();
     }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
@@ -417,6 +469,12 @@ private static final long serialVersionUID = 0L;
       }
       answers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       bitField0_ = (bitField0_ & ~0x00000001);
+      if (scoreBuilder_ == null) {
+        score_ = null;
+      } else {
+        score_ = null;
+        scoreBuilder_ = null;
+      }
       return this;
     }
 
@@ -455,6 +513,11 @@ private static final long serialVersionUID = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
       }
       result.answers_ = answers_;
+      if (scoreBuilder_ == null) {
+        result.score_ = score_;
+      } else {
+        result.score_ = scoreBuilder_.build();
+      }
       onBuilt();
       return result;
     }
@@ -518,6 +581,9 @@ private static final long serialVersionUID = 0L;
           answers_.addAll(other.answers_);
         }
         onChanged();
+      }
+      if (other.hasScore()) {
+        mergeScore(other.getScore());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -806,6 +872,125 @@ private static final long serialVersionUID = 0L;
       answers_.add(value);
       onChanged();
       return this;
+    }
+
+    private com.google.protobuf.Int32Value score_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> scoreBuilder_;
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     * @return Whether the score field is set.
+     */
+    public boolean hasScore() {
+      return scoreBuilder_ != null || score_ != null;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     * @return The score.
+     */
+    public com.google.protobuf.Int32Value getScore() {
+      if (scoreBuilder_ == null) {
+        return score_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : score_;
+      } else {
+        return scoreBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     */
+    public Builder setScore(com.google.protobuf.Int32Value value) {
+      if (scoreBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        score_ = value;
+        onChanged();
+      } else {
+        scoreBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     */
+    public Builder setScore(
+        com.google.protobuf.Int32Value.Builder builderForValue) {
+      if (scoreBuilder_ == null) {
+        score_ = builderForValue.build();
+        onChanged();
+      } else {
+        scoreBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     */
+    public Builder mergeScore(com.google.protobuf.Int32Value value) {
+      if (scoreBuilder_ == null) {
+        if (score_ != null) {
+          score_ =
+            com.google.protobuf.Int32Value.newBuilder(score_).mergeFrom(value).buildPartial();
+        } else {
+          score_ = value;
+        }
+        onChanged();
+      } else {
+        scoreBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     */
+    public Builder clearScore() {
+      if (scoreBuilder_ == null) {
+        score_ = null;
+        onChanged();
+      } else {
+        score_ = null;
+        scoreBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     */
+    public com.google.protobuf.Int32Value.Builder getScoreBuilder() {
+      
+      onChanged();
+      return getScoreFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     */
+    public com.google.protobuf.Int32ValueOrBuilder getScoreOrBuilder() {
+      if (scoreBuilder_ != null) {
+        return scoreBuilder_.getMessageOrBuilder();
+      } else {
+        return score_ == null ?
+            com.google.protobuf.Int32Value.getDefaultInstance() : score_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int32Value score = 4;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
+        getScoreFieldBuilder() {
+      if (scoreBuilder_ == null) {
+        scoreBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>(
+                getScore(),
+                getParentForChildren(),
+                isClean());
+        score_ = null;
+      }
+      return scoreBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

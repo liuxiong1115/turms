@@ -17,7 +17,6 @@
 
 package im.turms.turms.access.websocket.controller;
 
-import com.google.protobuf.BoolValue;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsStatusCode;
@@ -272,18 +271,16 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CHECK_GROUP_JOIN_QUESTION_ANSWER_REQUEST)
+    @TurmsRequestMapping(TurmsRequest.KindCase.CHECK_GROUP_JOIN_QUESTIONS_ANSWERS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCheckGroupQuestionAnswerRequest() {
         return turmsRequestWrapper -> {
-            CheckGroupJoinQuestionAnswerRequest request = turmsRequestWrapper.getTurmsRequest()
-                    .getCheckGroupJoinQuestionAnswerRequest();
+            CheckGroupJoinQuestionsAnswersRequest request = turmsRequestWrapper.getTurmsRequest()
+                    .getCheckGroupJoinQuestionsAnswersRequest();
             return groupJoinQuestionService.checkGroupQuestionAnswerAndJoin(
                     turmsRequestWrapper.getUserId(),
-                    request.getQuestionId(),
-                    request.getAnswer())
-                    .map(correct -> RequestResult.responseData(TurmsResponse.Data.newBuilder()
-                            .setSuccess(BoolValue.newBuilder().setValue(correct).build())
-                            .build()));
+                    request.getQuestionIdAndAnswerMap())
+                    .map(answerResult -> RequestResult.responseData(TurmsResponse.Data.newBuilder()
+                            .setGroupJoinQuestionAnswerResult(answerResult).build()));
         };
     }
 
@@ -347,12 +344,18 @@ public class WsGroupController {
                 return Mono.just(RequestResult.fail());
             } else {
                 List<String> answers = new ArrayList<>(request.getAnswersList());
-                return groupJoinQuestionService.createGroupJoinQuestion(
-                        turmsRequestWrapper.getUserId(),
-                        request.getGroupId(),
-                        request.getQuestion(),
-                        answers)
-                        .map(question -> RequestResult.responseId(question.getId()));
+                int score = request.getScore();
+                if (score >= 0) {
+                    return groupJoinQuestionService.createGroupJoinQuestion(
+                            turmsRequestWrapper.getUserId(),
+                            request.getGroupId(),
+                            request.getQuestion(),
+                            answers,
+                            score)
+                            .map(question -> RequestResult.responseId(question.getId()));
+                } else {
+                    return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                }
             }
         };
     }
@@ -482,11 +485,13 @@ public class WsGroupController {
             Set<String> answers = request.getAnswersList().isEmpty() ?
                     null : new HashSet<>(request.getAnswersList());
             String question = request.hasQuestion() ? request.getQuestion().getValue() : null;
+            Integer score = request.hasScore() ? request.getScore().getValue() : null;
             return groupJoinQuestionService.updateGroupJoinQuestion(
                     turmsRequestWrapper.getUserId(),
                     request.getQuestionId(),
                     question,
-                    answers)
+                    answers,
+                    score)
                     .map(RequestResult::okIfTrue);
         };
     }

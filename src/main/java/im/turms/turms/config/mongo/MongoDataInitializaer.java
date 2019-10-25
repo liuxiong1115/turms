@@ -112,6 +112,7 @@ public class MongoDataInitializaer {
                     "This is a group for the developers who are interested in Turms",
                     "nope",
                     "https://avatars2.githubusercontent.com/u/50931793?s=200&v=4",
+                    0,
                     now,
                     null,
                     null,
@@ -143,7 +144,8 @@ public class MongoDataInitializaer {
                     turmsClusterManager.generateRandomId(),
                     1L,
                     "test-question",
-                    List.of("a", "b", "c"));
+                    List.of("a", "b", "c"),
+                    20);
             objects.add(groupJoinQuestion);
             for (int i = 1 + USER_COUNT / 10 * 7; i <= USER_COUNT / 10 * 8; i++) {
                 GroupJoinRequest groupJoinRequest = new GroupJoinRequest(

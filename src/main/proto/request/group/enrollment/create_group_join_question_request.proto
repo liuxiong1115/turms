@@ -9,4 +9,5 @@ message CreateGroupJoinQuestionRequest {
     int64 group_id = 1;
     string question = 2;
     repeated string answers = 3;
+    int32 score = 4;
 }

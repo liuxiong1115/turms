@@ -14,6 +14,7 @@ import "request/turms_request.proto";
 import "response/common/int64_values.proto";
 import "response/common/int64_values_with_version.proto";
 import "response/group/group_invitations_with_version.proto";
+import "response/group/group_join_questions_answer_result.proto";
 import "response/group/group_join_questions_with_version.proto";
 import "response/group/group_join_requests_with_version.proto";
 import "response/group/group_members_with_version.proto";
@@ -59,10 +60,11 @@ message TurmsResponse {
             UserRelationshipsWithVersion user_relationships_with_version = 12;
 
             GroupInvitationsWithVersion group_invitations_with_version = 13;
-            GroupJoinRequestsWithVersion group_join_requests_with_version = 14;
-            GroupJoinQuestionsWithVersion group_join_questions_with_version = 15;
-            GroupMembersWithVersion group_members_with_version = 16;
-            GroupsWithVersion groups_with_version = 17;
+            GroupJoinQuestionsAnswerResult group_join_question_answer_result = 14;
+            GroupJoinRequestsWithVersion group_join_requests_with_version = 15;
+            GroupJoinQuestionsWithVersion group_join_questions_with_version = 16;
+            GroupMembersWithVersion group_members_with_version = 17;
+            GroupsWithVersion groups_with_version = 18;
         }
     }
 }

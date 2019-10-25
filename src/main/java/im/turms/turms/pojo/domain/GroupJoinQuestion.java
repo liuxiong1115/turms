@@ -42,4 +42,6 @@ public class GroupJoinQuestion {
     private String question;
 
     private List<String> answers;
+
+    private Integer score;
 }

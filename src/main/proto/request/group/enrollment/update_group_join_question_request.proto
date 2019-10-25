@@ -11,4 +11,5 @@ message UpdateGroupJoinQuestionRequest {
     int64 question_id = 1;
     google.protobuf.StringValue question = 2;
     repeated string answers = 3;
+    google.protobuf.Int32Value score = 4;
 }

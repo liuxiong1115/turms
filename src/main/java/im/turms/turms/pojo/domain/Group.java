@@ -53,6 +53,8 @@ public class Group {
 
     private String profilePictureUrl;
 
+    private Integer minimumScore;
+
     @Indexed
     private Date creationDate;
 

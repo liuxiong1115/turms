@@ -204,6 +204,12 @@ public class GroupService {
                 .map(Group::getTypeId);
     }
 
+    public Mono<Integer> queryGroupMinimumScore(@NotNull Long groupId) {
+        Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
+        return mongoTemplate.findOne(query, Group.class)
+                .map(Group::getMinimumScore);
+    }
+
     public Mono<Boolean> authAndTransferGroupOwnership(
             @NotNull Long requesterId,
             @NotNull Long groupId,

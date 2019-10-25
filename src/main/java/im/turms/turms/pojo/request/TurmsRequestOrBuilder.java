@@ -669,27 +669,27 @@ public interface TurmsRequestOrBuilder extends
    * Group Enrollment
    * </pre>
    *
-   * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
-   * @return Whether the checkGroupJoinQuestionAnswerRequest field is set.
+   * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
+   * @return Whether the checkGroupJoinQuestionsAnswersRequest field is set.
    */
-  boolean hasCheckGroupJoinQuestionAnswerRequest();
+  boolean hasCheckGroupJoinQuestionsAnswersRequest();
   /**
    * <pre>
    * Group Enrollment
    * </pre>
    *
-   * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
-   * @return The checkGroupJoinQuestionAnswerRequest.
+   * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
+   * @return The checkGroupJoinQuestionsAnswersRequest.
    */
-  im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest getCheckGroupJoinQuestionAnswerRequest();
+  im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest getCheckGroupJoinQuestionsAnswersRequest();
   /**
    * <pre>
    * Group Enrollment
    * </pre>
    *
-   * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+   * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
    */
-  im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequestOrBuilder getCheckGroupJoinQuestionAnswerRequestOrBuilder();
+  im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequestOrBuilder getCheckGroupJoinQuestionsAnswersRequestOrBuilder();
 
   /**
    * <code>.im.turms.proto.CreateGroupInvitationRequest create_group_invitation_request = 501;</code>

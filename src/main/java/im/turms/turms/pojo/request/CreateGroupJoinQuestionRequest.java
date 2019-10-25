@@ -71,6 +71,11 @@ private static final long serialVersionUID = 0L;
             answers_.add(s);
             break;
           }
+          case 32: {
+
+            score_ = input.readInt32();
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -187,6 +192,16 @@ private static final long serialVersionUID = 0L;
     return answers_.getByteString(index);
   }
 
+  public static final int SCORE_FIELD_NUMBER = 4;
+  private int score_;
+  /**
+   * <code>int32 score = 4;</code>
+   * @return The score.
+   */
+  public int getScore() {
+    return score_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -209,6 +224,9 @@ private static final long serialVersionUID = 0L;
     }
     for (int i = 0; i < answers_.size(); i++) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 3, answers_.getRaw(i));
+    }
+    if (score_ != 0) {
+      output.writeInt32(4, score_);
     }
     unknownFields.writeTo(output);
   }
@@ -234,6 +252,10 @@ private static final long serialVersionUID = 0L;
       size += dataSize;
       size += 1 * getAnswersList().size();
     }
+    if (score_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(4, score_);
+    }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
@@ -255,6 +277,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getQuestion())) return false;
     if (!getAnswersList()
         .equals(other.getAnswersList())) return false;
+    if (getScore()
+        != other.getScore()) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -275,6 +299,8 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ANSWERS_FIELD_NUMBER;
       hash = (53 * hash) + getAnswersList().hashCode();
     }
+    hash = (37 * hash) + SCORE_FIELD_NUMBER;
+    hash = (53 * hash) + getScore();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -414,6 +440,8 @@ private static final long serialVersionUID = 0L;
 
       answers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       bitField0_ = (bitField0_ & ~0x00000001);
+      score_ = 0;
+
       return this;
     }
 
@@ -448,6 +476,7 @@ private static final long serialVersionUID = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
       }
       result.answers_ = answers_;
+      result.score_ = score_;
       onBuilt();
       return result;
     }
@@ -512,6 +541,9 @@ private static final long serialVersionUID = 0L;
           answers_.addAll(other.answers_);
         }
         onChanged();
+      }
+      if (other.getScore() != 0) {
+        setScore(other.getScore());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -755,6 +787,36 @@ private static final long serialVersionUID = 0L;
   checkByteStringIsUtf8(value);
       ensureAnswersIsMutable();
       answers_.add(value);
+      onChanged();
+      return this;
+    }
+
+    private int score_ ;
+    /**
+     * <code>int32 score = 4;</code>
+     * @return The score.
+     */
+    public int getScore() {
+      return score_;
+    }
+    /**
+     * <code>int32 score = 4;</code>
+     * @param value The score to set.
+     * @return This builder for chaining.
+     */
+    public Builder setScore(int value) {
+      
+      score_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 score = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearScore() {
+      
+      score_ = 0;
       onChanged();
       return this;
     }

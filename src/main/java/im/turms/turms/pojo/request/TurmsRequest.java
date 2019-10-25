@@ -584,14 +584,14 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 4002: {
-            im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.Builder subBuilder = null;
+            im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.Builder subBuilder = null;
             if (kindCase_ == 500) {
-              subBuilder = ((im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_).toBuilder();
+              subBuilder = ((im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_).toBuilder();
             }
             kind_ =
-                input.readMessage(im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.parser(), extensionRegistry);
+                input.readMessage(im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.parser(), extensionRegistry);
             if (subBuilder != null) {
-              subBuilder.mergeFrom((im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_);
+              subBuilder.mergeFrom((im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_);
               kind_ = subBuilder.buildPartial();
             }
             kindCase_ = 500;
@@ -867,7 +867,7 @@ private static final long serialVersionUID = 0L;
     DELETE_GROUP_BLACKLISTED_USER_REQUEST(401),
     QUERY_GROUP_BLACKLISTED_USERS_IDS_REQUEST(402),
     QUERY_GROUP_BLACKLISTED_USERS_INFOS_REQUEST(403),
-    CHECK_GROUP_JOIN_QUESTION_ANSWER_REQUEST(500),
+    CHECK_GROUP_JOIN_QUESTIONS_ANSWERS_REQUEST(500),
     CREATE_GROUP_INVITATION_REQUEST(501),
     CREATE_GROUP_JOIN_REQUEST_REQUEST(502),
     CREATE_GROUP_JOIN_QUESTION_REQUEST(503),
@@ -936,7 +936,7 @@ private static final long serialVersionUID = 0L;
         case 401: return DELETE_GROUP_BLACKLISTED_USER_REQUEST;
         case 402: return QUERY_GROUP_BLACKLISTED_USERS_IDS_REQUEST;
         case 403: return QUERY_GROUP_BLACKLISTED_USERS_INFOS_REQUEST;
-        case 500: return CHECK_GROUP_JOIN_QUESTION_ANSWER_REQUEST;
+        case 500: return CHECK_GROUP_JOIN_QUESTIONS_ANSWERS_REQUEST;
         case 501: return CREATE_GROUP_INVITATION_REQUEST;
         case 502: return CREATE_GROUP_JOIN_REQUEST_REQUEST;
         case 503: return CREATE_GROUP_JOIN_QUESTION_REQUEST;
@@ -2112,16 +2112,16 @@ private static final long serialVersionUID = 0L;
     return im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequest.getDefaultInstance();
   }
 
-  public static final int CHECK_GROUP_JOIN_QUESTION_ANSWER_REQUEST_FIELD_NUMBER = 500;
+  public static final int CHECK_GROUP_JOIN_QUESTIONS_ANSWERS_REQUEST_FIELD_NUMBER = 500;
   /**
    * <pre>
    * Group Enrollment
    * </pre>
    *
-   * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
-   * @return Whether the checkGroupJoinQuestionAnswerRequest field is set.
+   * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
+   * @return Whether the checkGroupJoinQuestionsAnswersRequest field is set.
    */
-  public boolean hasCheckGroupJoinQuestionAnswerRequest() {
+  public boolean hasCheckGroupJoinQuestionsAnswersRequest() {
     return kindCase_ == 500;
   }
   /**
@@ -2129,27 +2129,27 @@ private static final long serialVersionUID = 0L;
    * Group Enrollment
    * </pre>
    *
-   * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
-   * @return The checkGroupJoinQuestionAnswerRequest.
+   * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
+   * @return The checkGroupJoinQuestionsAnswersRequest.
    */
-  public im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest getCheckGroupJoinQuestionAnswerRequest() {
+  public im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest getCheckGroupJoinQuestionsAnswersRequest() {
     if (kindCase_ == 500) {
-       return (im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_;
+       return (im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_;
     }
-    return im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.getDefaultInstance();
+    return im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.getDefaultInstance();
   }
   /**
    * <pre>
    * Group Enrollment
    * </pre>
    *
-   * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+   * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
    */
-  public im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequestOrBuilder getCheckGroupJoinQuestionAnswerRequestOrBuilder() {
+  public im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequestOrBuilder getCheckGroupJoinQuestionsAnswersRequestOrBuilder() {
     if (kindCase_ == 500) {
-       return (im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_;
+       return (im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_;
     }
-    return im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.getDefaultInstance();
+    return im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.getDefaultInstance();
   }
 
   public static final int CREATE_GROUP_INVITATION_REQUEST_FIELD_NUMBER = 501;
@@ -2685,7 +2685,7 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(403, (im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequest) kind_);
     }
     if (kindCase_ == 500) {
-      output.writeMessage(500, (im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_);
+      output.writeMessage(500, (im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_);
     }
     if (kindCase_ == 501) {
       output.writeMessage(501, (im.turms.turms.pojo.request.CreateGroupInvitationRequest) kind_);
@@ -2892,7 +2892,7 @@ private static final long serialVersionUID = 0L;
     }
     if (kindCase_ == 500) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(500, (im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_);
+        .computeMessageSize(500, (im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_);
     }
     if (kindCase_ == 501) {
       size += com.google.protobuf.CodedOutputStream
@@ -3121,8 +3121,8 @@ private static final long serialVersionUID = 0L;
             .equals(other.getQueryGroupBlacklistedUsersInfosRequest())) return false;
         break;
       case 500:
-        if (!getCheckGroupJoinQuestionAnswerRequest()
-            .equals(other.getCheckGroupJoinQuestionAnswerRequest())) return false;
+        if (!getCheckGroupJoinQuestionsAnswersRequest()
+            .equals(other.getCheckGroupJoinQuestionsAnswersRequest())) return false;
         break;
       case 501:
         if (!getCreateGroupInvitationRequest()
@@ -3348,8 +3348,8 @@ private static final long serialVersionUID = 0L;
         hash = (53 * hash) + getQueryGroupBlacklistedUsersInfosRequest().hashCode();
         break;
       case 500:
-        hash = (37 * hash) + CHECK_GROUP_JOIN_QUESTION_ANSWER_REQUEST_FIELD_NUMBER;
-        hash = (53 * hash) + getCheckGroupJoinQuestionAnswerRequest().hashCode();
+        hash = (37 * hash) + CHECK_GROUP_JOIN_QUESTIONS_ANSWERS_REQUEST_FIELD_NUMBER;
+        hash = (53 * hash) + getCheckGroupJoinQuestionsAnswersRequest().hashCode();
         break;
       case 501:
         hash = (37 * hash) + CREATE_GROUP_INVITATION_REQUEST_FIELD_NUMBER;
@@ -3846,10 +3846,10 @@ private static final long serialVersionUID = 0L;
         }
       }
       if (kindCase_ == 500) {
-        if (checkGroupJoinQuestionAnswerRequestBuilder_ == null) {
+        if (checkGroupJoinQuestionsAnswersRequestBuilder_ == null) {
           result.kind_ = kind_;
         } else {
-          result.kind_ = checkGroupJoinQuestionAnswerRequestBuilder_.build();
+          result.kind_ = checkGroupJoinQuestionsAnswersRequestBuilder_.build();
         }
       }
       if (kindCase_ == 501) {
@@ -4151,8 +4151,8 @@ private static final long serialVersionUID = 0L;
           mergeQueryGroupBlacklistedUsersInfosRequest(other.getQueryGroupBlacklistedUsersInfosRequest());
           break;
         }
-        case CHECK_GROUP_JOIN_QUESTION_ANSWER_REQUEST: {
-          mergeCheckGroupJoinQuestionAnswerRequest(other.getCheckGroupJoinQuestionAnswerRequest());
+        case CHECK_GROUP_JOIN_QUESTIONS_ANSWERS_REQUEST: {
+          mergeCheckGroupJoinQuestionsAnswersRequest(other.getCheckGroupJoinQuestionsAnswersRequest());
           break;
         }
         case CREATE_GROUP_INVITATION_REQUEST: {
@@ -9746,16 +9746,16 @@ private static final long serialVersionUID = 0L;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.Builder, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequestOrBuilder> checkGroupJoinQuestionAnswerRequestBuilder_;
+        im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest, im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.Builder, im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequestOrBuilder> checkGroupJoinQuestionsAnswersRequestBuilder_;
     /**
      * <pre>
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
-     * @return Whether the checkGroupJoinQuestionAnswerRequest field is set.
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
+     * @return Whether the checkGroupJoinQuestionsAnswersRequest field is set.
      */
-    public boolean hasCheckGroupJoinQuestionAnswerRequest() {
+    public boolean hasCheckGroupJoinQuestionsAnswersRequest() {
       return kindCase_ == 500;
     }
     /**
@@ -9763,20 +9763,20 @@ private static final long serialVersionUID = 0L;
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
-     * @return The checkGroupJoinQuestionAnswerRequest.
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
+     * @return The checkGroupJoinQuestionsAnswersRequest.
      */
-    public im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest getCheckGroupJoinQuestionAnswerRequest() {
-      if (checkGroupJoinQuestionAnswerRequestBuilder_ == null) {
+    public im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest getCheckGroupJoinQuestionsAnswersRequest() {
+      if (checkGroupJoinQuestionsAnswersRequestBuilder_ == null) {
         if (kindCase_ == 500) {
-          return (im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_;
+          return (im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_;
         }
-        return im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.getDefaultInstance();
+        return im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.getDefaultInstance();
       } else {
         if (kindCase_ == 500) {
-          return checkGroupJoinQuestionAnswerRequestBuilder_.getMessage();
+          return checkGroupJoinQuestionsAnswersRequestBuilder_.getMessage();
         }
-        return im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.getDefaultInstance();
+        return im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.getDefaultInstance();
       }
     }
     /**
@@ -9784,17 +9784,17 @@ private static final long serialVersionUID = 0L;
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
      */
-    public Builder setCheckGroupJoinQuestionAnswerRequest(im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest value) {
-      if (checkGroupJoinQuestionAnswerRequestBuilder_ == null) {
+    public Builder setCheckGroupJoinQuestionsAnswersRequest(im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest value) {
+      if (checkGroupJoinQuestionsAnswersRequestBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
         kind_ = value;
         onChanged();
       } else {
-        checkGroupJoinQuestionAnswerRequestBuilder_.setMessage(value);
+        checkGroupJoinQuestionsAnswersRequestBuilder_.setMessage(value);
       }
       kindCase_ = 500;
       return this;
@@ -9804,15 +9804,15 @@ private static final long serialVersionUID = 0L;
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
      */
-    public Builder setCheckGroupJoinQuestionAnswerRequest(
-        im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.Builder builderForValue) {
-      if (checkGroupJoinQuestionAnswerRequestBuilder_ == null) {
+    public Builder setCheckGroupJoinQuestionsAnswersRequest(
+        im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.Builder builderForValue) {
+      if (checkGroupJoinQuestionsAnswersRequestBuilder_ == null) {
         kind_ = builderForValue.build();
         onChanged();
       } else {
-        checkGroupJoinQuestionAnswerRequestBuilder_.setMessage(builderForValue.build());
+        checkGroupJoinQuestionsAnswersRequestBuilder_.setMessage(builderForValue.build());
       }
       kindCase_ = 500;
       return this;
@@ -9822,13 +9822,13 @@ private static final long serialVersionUID = 0L;
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
      */
-    public Builder mergeCheckGroupJoinQuestionAnswerRequest(im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest value) {
-      if (checkGroupJoinQuestionAnswerRequestBuilder_ == null) {
+    public Builder mergeCheckGroupJoinQuestionsAnswersRequest(im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest value) {
+      if (checkGroupJoinQuestionsAnswersRequestBuilder_ == null) {
         if (kindCase_ == 500 &&
-            kind_ != im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.getDefaultInstance()) {
-          kind_ = im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.newBuilder((im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_)
+            kind_ != im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.getDefaultInstance()) {
+          kind_ = im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.newBuilder((im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_)
               .mergeFrom(value).buildPartial();
         } else {
           kind_ = value;
@@ -9836,9 +9836,9 @@ private static final long serialVersionUID = 0L;
         onChanged();
       } else {
         if (kindCase_ == 500) {
-          checkGroupJoinQuestionAnswerRequestBuilder_.mergeFrom(value);
+          checkGroupJoinQuestionsAnswersRequestBuilder_.mergeFrom(value);
         }
-        checkGroupJoinQuestionAnswerRequestBuilder_.setMessage(value);
+        checkGroupJoinQuestionsAnswersRequestBuilder_.setMessage(value);
       }
       kindCase_ = 500;
       return this;
@@ -9848,10 +9848,10 @@ private static final long serialVersionUID = 0L;
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
      */
-    public Builder clearCheckGroupJoinQuestionAnswerRequest() {
-      if (checkGroupJoinQuestionAnswerRequestBuilder_ == null) {
+    public Builder clearCheckGroupJoinQuestionsAnswersRequest() {
+      if (checkGroupJoinQuestionsAnswersRequestBuilder_ == null) {
         if (kindCase_ == 500) {
           kindCase_ = 0;
           kind_ = null;
@@ -9862,7 +9862,7 @@ private static final long serialVersionUID = 0L;
           kindCase_ = 0;
           kind_ = null;
         }
-        checkGroupJoinQuestionAnswerRequestBuilder_.clear();
+        checkGroupJoinQuestionsAnswersRequestBuilder_.clear();
       }
       return this;
     }
@@ -9871,26 +9871,26 @@ private static final long serialVersionUID = 0L;
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
      */
-    public im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.Builder getCheckGroupJoinQuestionAnswerRequestBuilder() {
-      return getCheckGroupJoinQuestionAnswerRequestFieldBuilder().getBuilder();
+    public im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.Builder getCheckGroupJoinQuestionsAnswersRequestBuilder() {
+      return getCheckGroupJoinQuestionsAnswersRequestFieldBuilder().getBuilder();
     }
     /**
      * <pre>
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
      */
-    public im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequestOrBuilder getCheckGroupJoinQuestionAnswerRequestOrBuilder() {
-      if ((kindCase_ == 500) && (checkGroupJoinQuestionAnswerRequestBuilder_ != null)) {
-        return checkGroupJoinQuestionAnswerRequestBuilder_.getMessageOrBuilder();
+    public im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequestOrBuilder getCheckGroupJoinQuestionsAnswersRequestOrBuilder() {
+      if ((kindCase_ == 500) && (checkGroupJoinQuestionsAnswersRequestBuilder_ != null)) {
+        return checkGroupJoinQuestionsAnswersRequestBuilder_.getMessageOrBuilder();
       } else {
         if (kindCase_ == 500) {
-          return (im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_;
+          return (im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_;
         }
-        return im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.getDefaultInstance();
+        return im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.getDefaultInstance();
       }
     }
     /**
@@ -9898,25 +9898,25 @@ private static final long serialVersionUID = 0L;
      * Group Enrollment
      * </pre>
      *
-     * <code>.im.turms.proto.CheckGroupJoinQuestionAnswerRequest check_group_join_question_answer_request = 500;</code>
+     * <code>.im.turms.proto.CheckGroupJoinQuestionsAnswersRequest check_group_join_questions_answers_request = 500;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.Builder, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequestOrBuilder> 
-        getCheckGroupJoinQuestionAnswerRequestFieldBuilder() {
-      if (checkGroupJoinQuestionAnswerRequestBuilder_ == null) {
+        im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest, im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.Builder, im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequestOrBuilder> 
+        getCheckGroupJoinQuestionsAnswersRequestFieldBuilder() {
+      if (checkGroupJoinQuestionsAnswersRequestBuilder_ == null) {
         if (!(kindCase_ == 500)) {
-          kind_ = im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.getDefaultInstance();
+          kind_ = im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.getDefaultInstance();
         }
-        checkGroupJoinQuestionAnswerRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest.Builder, im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequestOrBuilder>(
-                (im.turms.turms.pojo.request.CheckGroupJoinQuestionAnswerRequest) kind_,
+        checkGroupJoinQuestionsAnswersRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest, im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest.Builder, im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequestOrBuilder>(
+                (im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequest) kind_,
                 getParentForChildren(),
                 isClean());
         kind_ = null;
       }
       kindCase_ = 500;
       onChanged();;
-      return checkGroupJoinQuestionAnswerRequestBuilder_;
+      return checkGroupJoinQuestionsAnswersRequestBuilder_;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<

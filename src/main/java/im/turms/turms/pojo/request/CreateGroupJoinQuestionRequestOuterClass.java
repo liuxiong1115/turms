@@ -30,10 +30,10 @@ public final class CreateGroupJoinQuestionRequestOuterClass {
     java.lang.String[] descriptorData = {
       "\nArequest/group/enrollment/create_group_" +
       "join_question_request.proto\022\016im.turms.pr" +
-      "oto\"U\n\036CreateGroupJoinQuestionRequest\022\020\n" +
+      "oto\"d\n\036CreateGroupJoinQuestionRequest\022\020\n" +
       "\010group_id\030\001 \001(\003\022\020\n\010question\030\002 \001(\t\022\017\n\007ans" +
-      "wers\030\003 \003(\tB\037\n\033im.turms.turms.pojo.reques" +
-      "tP\001b\006proto3"
+      "wers\030\003 \003(\t\022\r\n\005score\030\004 \001(\005B\037\n\033im.turms.tu" +
+      "rms.pojo.requestP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -44,7 +44,7 @@ public final class CreateGroupJoinQuestionRequestOuterClass {
     internal_static_im_turms_proto_CreateGroupJoinQuestionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_im_turms_proto_CreateGroupJoinQuestionRequest_descriptor,
-        new java.lang.String[] { "GroupId", "Question", "Answers", });
+        new java.lang.String[] { "GroupId", "Question", "Answers", "Score", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

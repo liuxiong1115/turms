@@ -30,11 +30,13 @@ public final class UpdateGroupJoinQuestionRequestOuterClass {
     java.lang.String[] descriptorData = {
       "\nArequest/group/enrollment/update_group_" +
       "join_question_request.proto\022\016im.turms.pr" +
-      "oto\032\036google/protobuf/wrappers.proto\"v\n\036U" +
-      "pdateGroupJoinQuestionRequest\022\023\n\013questio" +
-      "n_id\030\001 \001(\003\022.\n\010question\030\002 \001(\0132\034.google.pr" +
-      "otobuf.StringValue\022\017\n\007answers\030\003 \003(\tB\037\n\033i" +
-      "m.turms.turms.pojo.requestP\001b\006proto3"
+      "oto\032\036google/protobuf/wrappers.proto\"\242\001\n\036" +
+      "UpdateGroupJoinQuestionRequest\022\023\n\013questi" +
+      "on_id\030\001 \001(\003\022.\n\010question\030\002 \001(\0132\034.google.p" +
+      "rotobuf.StringValue\022\017\n\007answers\030\003 \003(\t\022*\n\005" +
+      "score\030\004 \001(\0132\033.google.protobuf.Int32Value" +
+      "B\037\n\033im.turms.turms.pojo.requestP\001b\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -46,7 +48,7 @@ public final class UpdateGroupJoinQuestionRequestOuterClass {
     internal_static_im_turms_proto_UpdateGroupJoinQuestionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_im_turms_proto_UpdateGroupJoinQuestionRequest_descriptor,
-        new java.lang.String[] { "QuestionId", "Question", "Answers", });
+        new java.lang.String[] { "QuestionId", "Question", "Answers", "Score", });
     com.google.protobuf.WrappersProto.getDescriptor();
   }
 

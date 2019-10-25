@@ -49,4 +49,10 @@ public interface CreateGroupJoinQuestionRequestOrBuilder extends
    */
   com.google.protobuf.ByteString
       getAnswersBytes(int index);
+
+  /**
+   * <code>int32 score = 4;</code>
+   * @return The score.
+   */
+  int getScore();
 }
