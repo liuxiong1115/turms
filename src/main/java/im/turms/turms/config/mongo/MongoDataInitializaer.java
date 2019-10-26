@@ -77,7 +77,8 @@ public class MongoDataInitializaer {
 
     // Note: Better not to remove all mock data after turms closed
     private void mockIfDev() throws UnknownHostException {
-        if (DEV_MODE && mongoTemplate.getMongoDatabase().getName().contains("-dev")) {
+        if (mongoTemplate.getMongoDatabase().getName().contains("-dev")
+                || mongoTemplate.getMongoDatabase().getName().contains("-test")) {
             TurmsLogger.log("Start mocking...");
             // Admin
             final int ADMIN_COUNT = 5;

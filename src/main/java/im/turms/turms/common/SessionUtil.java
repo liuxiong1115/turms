@@ -40,13 +40,13 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SessionUtil {
-    private static final String USER_ID_FIELD = "uid";
-    private static final String PASSWORD_FIELD = "pwd";
-    private static final String DEVICE_TYPE_FIELD = "dt";
-    private static final String USER_ONLINE_STATUS_FIELD = "us";
-    private static final String USER_LOCATION_FIELD = "loc";
+    public static final String USER_ID_FIELD = "uid";
+    public static final String PASSWORD_FIELD = "pwd";
+    public static final String DEVICE_TYPE_FIELD = "dt";
+    public static final String USER_ONLINE_STATUS_FIELD = "us";
+    public static final String USER_LOCATION_FIELD = "loc";
+    public static final String USER_DEVICE_DETAILS = "dd";
     private static final String LOCATION_SPLIT = ":";
-    private static final String USER_DEVICE_DETAILS = "dd";
 
     private static String getFirstCookieValue(MultiValueMap<String, HttpCookie> cookies, String key) {
         if (cookies != null && !cookies.isEmpty() && key != null && !key.isBlank()) {
