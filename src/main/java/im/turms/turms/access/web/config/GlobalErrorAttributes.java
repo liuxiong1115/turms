@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 
 import java.util.Map;
 
+import static im.turms.turms.common.Constants.DEV_MODE;
 import static im.turms.turms.common.Constants.STATUS;
 
 @Component
@@ -31,6 +32,9 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     public Map<String, Object> getErrorAttributes(
             ServerRequest request,
             boolean includeStackTrace) {
+        if (DEV_MODE) {
+            return super.getErrorAttributes(request, true);
+        }
         Map<String, Object> errorAttributes = super.getErrorAttributes(request, false);
         if ((Integer) errorAttributes.get(STATUS) == 500) {
             Object messageObj = errorAttributes.get("message");
