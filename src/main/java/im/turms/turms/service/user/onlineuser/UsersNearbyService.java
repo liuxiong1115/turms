@@ -59,6 +59,10 @@ public class UsersNearbyService {
     private final TurmsTaskExecutor turmsTaskExecutor;
     private final UserService userService;
     private final OnlineUserService onlineUserService;
+    /**
+     * search is O(log(n)) on average
+     * insert, delete are O(n) worst case
+     */
     private RTree<Long, PointFloat> tree;
     // userId -> location, order by time asc
     private SortedSetMultimap<Long, UserLocation> userLocations; //TODO: max capacity

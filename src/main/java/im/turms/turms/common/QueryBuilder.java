@@ -23,11 +23,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 public class QueryBuilder {
+    public static Criteria EMPTY_CRITERIA = new Criteria();
     private List<Criteria> criteriaList;
     private Criteria finalCriteria;
     private Query outputQuery;
@@ -40,13 +42,19 @@ public class QueryBuilder {
         return new QueryBuilder();
     }
 
-    public QueryBuilder addBetweenIfNotNull(String key, Object start, Object end) {
+    /**
+     * [start, end)
+     */
+    public QueryBuilder addBetweenIfNotNull(
+            @NotNull String key,
+            @Nullable Object start,
+            @Nullable Object end) {
         if (start != null && end == null) {
             criteriaList.add(Criteria.where(key).gte(start));
         } else if (start == null && end != null) {
-            criteriaList.add(Criteria.where(key).lte(end));
+            criteriaList.add(Criteria.where(key).lt(end));
         } else if (start != null) {
-            criteriaList.add(Criteria.where(key).gte(start).lte(end));
+            criteriaList.add(Criteria.where(key).gte(start).lt(end));
         }
         return this;
     }
@@ -123,7 +131,7 @@ public class QueryBuilder {
 
     private void buildReadyCriteria() {
         Criteria criteria = buildCriteria();
-        if (criteria != null) {
+        if (criteria != EMPTY_CRITERIA) {
             finalCriteria = criteria;
         }
     }
@@ -134,7 +142,7 @@ public class QueryBuilder {
             criteria.andOperator(criteriaList.toArray(new Criteria[0]));
             return criteria;
         } else {
-            return null;
+            return EMPTY_CRITERIA;
         }
     }
 

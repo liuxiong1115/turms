@@ -24,19 +24,19 @@ import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.constant.ChatType;
+import im.turms.turms.constant.DivideBy;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.service.message.MessageService;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.Function3;
 
-import java.text.ParseException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/messages")
@@ -85,41 +85,104 @@ public class MessageController {
     @GetMapping("/count")
     @RequiredPermission(AdminPermission.MESSAGE_QUERY)
     public Mono<ResponseEntity> countMessages(
-            @RequestParam String chatType,
-            @RequestParam(required = false) String sendStartDate,
-            @RequestParam(required = false) String sendEndDate,
-            @RequestParam(required = false) String averageSendStartDate,
-            @RequestParam(required = false) String averageSendEndDate,
-            @RequestParam(required = false) String receiveStartDate,
-            @RequestParam(required = false) String receiveEndDate,
-            @RequestParam(required = false) String averageReceiveStartDate,
-            @RequestParam(required = false) String averageReceiveEndDate) {
-        ChatType type = EnumUtils.getEnum(ChatType.class, chatType);
-        Mono<Long> count = Mono.empty();
-        if (type != ChatType.UNRECOGNIZED) {
-            try {
-                if (sendStartDate != null || sendEndDate != null) {
-                    count = messageService.countSendMessages(
-                            DateTimeUtil.parseDay(sendStartDate),
-                            DateTimeUtil.endOfDay(sendEndDate),
-                            type);
-                } else if (averageSendStartDate != null || averageSendEndDate != null) {
-//                    count = messageService.countAverageSentMessages(averageSendStartDate, averageSendEndDate, type);
-                } else if (receiveStartDate != null || receiveEndDate != null) {
-                    count = messageService.countReceivedMessages(receiveStartDate, receiveEndDate, type);
-                } else if (averageReceiveStartDate != null || averageReceiveEndDate != null) {
-//                    count = messageService.countAverageReceivedMessages(
-//                            averageReceiveStartDate,
-//                            averageReceiveEndDate, type);
-                }
-                return ResponseFactory.okWhenTruthy(
-                        count.map(number -> Collections.singletonMap("count", number)),
-                        true);
-            } catch (ParseException e) {
-                return ResponseFactory.code(TurmsStatusCode.ILLEGAL_DATE_FORMAT);
-            }
-        } else {
+            @RequestParam(required = false) ChatType chatType,
+            @RequestParam(required = false) Date deliveredStartDate,
+            @RequestParam(required = false) Date deliveredEndDate,
+            @RequestParam(required = false) Date deliveredOnAverageStartDate,
+            @RequestParam(required = false) Date deliveredOnAverageEndDate,
+            @RequestParam(required = false) Date acknowledgedStartDate,
+            @RequestParam(required = false) Date acknowledgedEndDate,
+            @RequestParam(required = false) Date acknowledgedOnAverageStartDate,
+            @RequestParam(required = false) Date acknowledgedOnAverageEndDate,
+            @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
+        if (chatType == ChatType.UNRECOGNIZED) {
             return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
+        if (divideBy == null || divideBy == DivideBy.NOOP) {
+            List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
+            if (deliveredStartDate != null || deliveredEndDate != null) {
+                counts.add(messageService.countDeliveredMessages(
+                        deliveredStartDate,
+                        deliveredEndDate,
+                        chatType)
+                        .map(total -> Pair.of("deliveredMessages", total)));
+            }
+            if (deliveredOnAverageStartDate != null || deliveredOnAverageEndDate != null) {
+                counts.add(messageService.countDeliveredMessagesOnAverage(
+                        deliveredOnAverageStartDate,
+                        deliveredOnAverageEndDate,
+                        chatType)
+                        .map(total -> Pair.of("deliveredMessagesOnAverage", total)));
+            }
+            if (acknowledgedStartDate != null || acknowledgedEndDate != null) {
+                counts.add(messageService.countAcknowledgedMessages(
+                        acknowledgedStartDate,
+                        acknowledgedEndDate,
+                        chatType)
+                        .map(total -> Pair.of("acknowledgedMessages", total)));
+            }
+            if (acknowledgedOnAverageStartDate != null || acknowledgedOnAverageEndDate != null) {
+                counts.add(messageService.countAcknowledgedMessagesOnAverage(
+                        acknowledgedOnAverageStartDate,
+                        acknowledgedOnAverageEndDate,
+                        chatType)
+                        .map(total -> Pair.of("acknowledgedMessagesOnAverage", total)));
+            }
+            if (counts.isEmpty()) {
+                return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            }
+            Mono<Map<String, Long>> resultMono = Flux.merge(counts)
+                    .collectList()
+                    .map(pairs -> {
+                        Map<String, Long> resultMap = new HashMap<>(counts.size());
+                        for (Pair<String, ?> pair : pairs) {
+                            resultMap.put(pair.getLeft(), (Long) pair.getRight());
+                        }
+                        return resultMap;
+                    });
+            return ResponseFactory.okWhenTruthy(resultMono);
+        } else {
+            List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
+            if (deliveredStartDate != null && deliveredEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "deliveredMessages",
+                        deliveredStartDate,
+                        deliveredEndDate,
+                        divideBy,
+                        (Function3<Date, Date, ChatType, Mono<Long>>) messageService::countDeliveredMessages,
+                        chatType));
+            }
+            if (deliveredOnAverageStartDate != null && deliveredOnAverageEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "deliveredMessagesOnAverage",
+                        deliveredOnAverageStartDate,
+                        deliveredOnAverageEndDate,
+                        divideBy,
+                        (Function3<Date, Date, ChatType, Mono<Long>>) messageService::countDeliveredMessagesOnAverage,
+                        chatType));
+            }
+            if (acknowledgedStartDate != null && acknowledgedEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "acknowledgedMessages",
+                        acknowledgedStartDate,
+                        acknowledgedEndDate,
+                        divideBy,
+                        (Function3<Date, Date, ChatType, Mono<Long>>) messageService::countAcknowledgedMessages,
+                        chatType));
+            }
+            if (acknowledgedOnAverageStartDate != null && acknowledgedOnAverageEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "acknowledgedMessagesOnAverage",
+                        acknowledgedOnAverageStartDate,
+                        acknowledgedOnAverageEndDate,
+                        divideBy,
+                        (Function3<Date, Date, ChatType, Mono<Long>>) messageService::countAcknowledgedMessagesOnAverage,
+                        chatType));
+            }
+            if (counts.isEmpty()) {
+                return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            }
+            return ResponseFactory.okWhenTruthy(Flux.merge(counts));
         }
     }
 }

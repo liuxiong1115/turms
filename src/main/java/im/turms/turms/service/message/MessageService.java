@@ -20,7 +20,7 @@ package im.turms.turms.service.message;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.DateTimeUtil;
+import im.turms.turms.common.AggregationUtil;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
@@ -47,7 +47,6 @@ import reactor.util.function.Tuple2;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -402,50 +401,111 @@ public class MessageService {
                 .map(UpdateResult::wasAcknowledged);
     }
 
-    public Mono<Long> countSendMessages(
-            @Nullable Date deliveryDateStart,
-            @Nullable Date deliveryDateEnd,
+    public Mono<Long> countUsersWhoSentMessage(
+            @Nullable Date startDate,
+            @Nullable Date endDate,
+            @Nullable ChatType chatType) {
+        Criteria criteria = QueryBuilder.newBuilder()
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
+                .addIfNotNull(Criteria.where(Message.Fields.chatType).is(chatType), chatType)
+                .buildCriteria();
+        return AggregationUtil.countDistinct(
+                mongoTemplate,
+                criteria,
+                Message.Fields.senderId,
+                Message.class);
+    }
+
+    public Mono<Long> countUsersWhoAcknowledgedMessage(
+            @Nullable Date startDate,
+            @Nullable Date endDate,
+            @Nullable ChatType chatType) {
+        Criteria criteria = QueryBuilder.newBuilder()
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, startDate, endDate)
+                .buildCriteria();
+        if (chatType != null) {
+            if (chatType == ChatType.GROUP) {
+                criteria.and(MessageStatus.Fields.groupId).ne(null);
+            } else if (chatType == ChatType.PRIVATE) {
+                criteria.and(MessageStatus.Fields.groupId).is(null);
+            }
+        }
+        return AggregationUtil.countDistinct(
+                mongoTemplate,
+                criteria,
+                ID_RECIPIENT_ID,
+                MessageStatus.class);
+    }
+
+    public Mono<Long> countDeliveredMessages(
+            @Nullable Date startDate,
+            @Nullable Date endDate,
             @Nullable ChatType chatType) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateStart, deliveryDateEnd)
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
                 .addIfNotNull(Criteria.where(Message.Fields.chatType).is(chatType), chatType)
                 .buildQuery();
         return mongoTemplate.count(query, Message.class);
     }
 
-    public Long countAverageMessagesPerUser(String sendPerUserStartDate, String sendPerUserEndDate, ChatType chatType) throws ParseException {
-        Date start = DateTimeUtil.parseDay(sendPerUserStartDate);
-        Date end = DateTimeUtil.endOfDay(sendPerUserEndDate);
-//        if (start != null) {
-//            if (end != null) {
-//                return messageRepository.countAverageMessagesByDeliveryDateBetweenOrEqualAndChatType(start, end, chatType);
-//            } else {
-//                return messageRepository.countAverageMessagesByDeliveryDateGreaterThanOrEqualAndChatType(start, chatType);
-//            }
-//        } else {
-//            return end != null ? messageRepository.countAverageMessagesByDeliveryDateLessThanOrEqualAndChatType(end, chatType) : null;
-//        }
-        return null;
+    public Mono<Long> countDeliveredMessagesOnAverage(
+            @Nullable Date startDate,
+            @Nullable Date endDate,
+            @Nullable ChatType chatType) {
+        return countDeliveredMessages(startDate, endDate, chatType)
+                .flatMap(totalDeliveredMessages -> {
+                    if (totalDeliveredMessages == 0) {
+                        return Mono.just(0L);
+                    } else {
+                        return countUsersWhoSentMessage(startDate, endDate, chatType)
+                                .map(totalUsers -> {
+                                    if (totalUsers == 0) {
+                                        return Long.MAX_VALUE;
+                                    } else {
+                                        return totalDeliveredMessages / totalUsers;
+                                    }
+                                });
+                    }
+                });
     }
 
-    public Mono<Long> countReceivedMessages(String receiveStartDate, String receiveEndDate, ChatType chatType) throws ParseException {
-        Date start = DateTimeUtil.parseDay(receiveStartDate);
-        Date end = DateTimeUtil.endOfDay(receiveEndDate);
-//        if (start != null) {
-//            if (end != null) {
-//                return messageRepository.countByReceptionDateBetweenOrEqualAndChatType(start, end, chatType);
-//            } else {
-//                return messageRepository.countByReceptionDateGreaterThanEqualAndChatType(start, chatType);
-//            }
-//        } else {
-//            return end != null ? messageRepository.countByReceptionDateLessThanOrEqualAndChatType(end, chatType) : null;
-//        }
-        return null;
+    public Mono<Long> countAcknowledgedMessages(
+            @Nullable Date startDate,
+            @Nullable Date endDate,
+            @Nullable ChatType chatType) {
+        Query query = QueryBuilder.newBuilder()
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, startDate, endDate)
+                .buildQuery();
+        if (chatType != null) {
+            if (chatType == ChatType.GROUP) {
+                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).ne(null));
+            } else if (chatType == ChatType.PRIVATE) {
+                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null));
+            }
+        }
+        return mongoTemplate.count(query, MessageStatus.class);
     }
 
-    public Long countAverageReceiveMessages(String averageReceiveDate, ChatType chatType) {
-        return null;
-    }
+    public Mono<Long> countAcknowledgedMessagesOnAverage(
+        @Nullable Date startDate,
+        @Nullable Date endDate,
+        @Nullable ChatType chatType) {
+            return countAcknowledgedMessages(startDate, endDate, chatType)
+                    .flatMap(totalAcknowledgedMessages -> {
+                        if (totalAcknowledgedMessages == 0) {
+                            return Mono.just(0L);
+                        } else {
+                            return countUsersWhoAcknowledgedMessage(startDate, endDate, chatType)
+                                    .map(totalUsers -> {
+                                        if (totalUsers == 0) {
+                                            return Long.MAX_VALUE;
+                                        } else {
+                                            return totalAcknowledgedMessages / totalUsers;
+                                        }
+                                    });
+                        }
+                    });
+        }
 
     public Mono<Boolean> updateMessageAndMessageStatus(
             @NotNull Long messageId,
