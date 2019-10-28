@@ -30,6 +30,7 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.function.Function;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -243,14 +244,9 @@ public class ResponseFactory {
 
     public static <T> Mono<ResponseEntity> collectCountResults(List<Mono<Pair<String, T>>> counts) {
         Mono<Map<String, T>> resultMono = Flux.merge(counts)
-                .collectList()
-                .map(pairs -> {
-                    Map<String, T> resultMap = new HashMap<>(counts.size());
-                    for (Pair<String, T> pair : pairs) {
-                        resultMap.put(pair.getLeft(), pair.getRight());
-                    }
-                    return resultMap;
-                });
+                .collectMap(
+                        (Function<? super Pair<String, T>, String>) Pair::getLeft,
+                        (Function<? super Pair<String, T>, T>) Pair::getRight);
         return okWhenTruthy(resultMono);
     }
 }
