@@ -23,15 +23,13 @@ import im.turms.turms.exception.TurmsBusinessException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -241,5 +239,18 @@ public class ResponseFactory {
 
     public static ResponseEntity authenticated(Boolean data) {
         return okWhenTruthy(Collections.singletonMap(AUTHENTICATED, data), true);
+    }
+
+    public static <T> Mono<ResponseEntity> collectCountResults(List<Mono<Pair<String, T>>> counts) {
+        Mono<Map<String, T>> resultMono = Flux.merge(counts)
+                .collectList()
+                .map(pairs -> {
+                    Map<String, T> resultMap = new HashMap<>(counts.size());
+                    for (Pair<String, T> pair : pairs) {
+                        resultMap.put(pair.getLeft(), pair.getRight());
+                    }
+                    return resultMap;
+                });
+        return okWhenTruthy(resultMono);
     }
 }

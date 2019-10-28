@@ -25,21 +25,18 @@ import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
-import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.constant.GroupUpdateStrategy;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.pojo.domain.GroupType;
-import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.response.GroupsWithVersion;
 import im.turms.turms.pojo.response.Int64ValuesWithVersion;
 import im.turms.turms.service.user.UserVersionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -576,36 +573,27 @@ public class GroupService {
         return mongoTemplate.count(query, Group.class);
     }
 
-    public Mono<Long> countOwnedGroups(
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd) {
+    public Mono<Long> countCreatedGroups(
+            @Nullable Date createdStartDate,
+            @Nullable Date createdEndDate) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Group.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(Group.Fields.creationDate, createdStartDate, createdEndDate)
+                .add(Criteria.where(Group.Fields.deletionDate).is(null))
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
+    }
+
+    public Mono<Long> countGroups() {
+        return mongoTemplate.count(new Query(), Group.class);
     }
 
     public Mono<Long> countDeletedGroups(
-            @Nullable Date deletionDateStart,
-            @Nullable Date deletionDateEnd) {
+            @Nullable Date deletedStartDate,
+            @Nullable Date deletedEndDate) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateStart, deletionDateEnd)
+                .addBetweenIfNotNull(Group.Fields.deletionDate, deletedStartDate, deletedEndDate)
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
-    }
-
-    public Mono<Long> countGroupsThatSentMessages(
-            @NotNull Date deliveryMessageDateStart,
-            @NotNull Date deliveryMessageDateEnd) {
-        Criteria criteria = QueryBuilder.newBuilder()
-                .addIfNotNull(Criteria.where(Message.Fields.chatType).is(ChatType.GROUP), ChatType.GROUP)
-                .addBetweenIfNotNull(Message.Fields.deliveryDate,
-                        deliveryMessageDateStart,
-                        deliveryMessageDateEnd)
-                .buildCriteria();
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(criteria), Aggregation.group().count().as("count"));
-        return mongoTemplate.aggregate(aggregation, Message.class, Long.class).single();
     }
 
     public Mono<Long> count() {

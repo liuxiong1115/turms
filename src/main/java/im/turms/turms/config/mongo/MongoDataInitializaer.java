@@ -56,7 +56,6 @@ public class MongoDataInitializaer {
                 createCollectionIfNotExist(UserLocation.class, null),
                 createCollectionIfNotExist(UserLoginLog.class,
                         CollectionOptions.empty().size(1024L * 1024 * 1024).capped()),
-                createCollectionIfNotExist(UserMaxDailyOnlineUserNumber.class, null),
                 createCollectionIfNotExist(UserOnlineUserNumber.class, null),
                 createCollectionIfNotExist(UserPermissionGroup.class, null),
                 createCollectionIfNotExist(UserPermissionGroupMember.class, null),

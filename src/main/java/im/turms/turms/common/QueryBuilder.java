@@ -81,7 +81,8 @@ public class QueryBuilder {
         if (outputQuery == null) {
             buildQuery();
         }
-        this.outputQuery = outputQuery.limit(1)
+        this.outputQuery = outputQuery
+                .limit(1)
                 .with(Sort.by(Sort.Direction.DESC, field));
         return this;
     }

@@ -26,6 +26,8 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 
+import java.util.NoSuchElementException;
+
 import static im.turms.turms.common.Constants.TOTAL;
 
 public class AggregationUtil {
@@ -45,6 +47,6 @@ public class AggregationUtil {
                 , clazz, Document.class)
                 .single()
                 .map(document -> Long.valueOf((Integer) document.get(TOTAL)))
-                .defaultIfEmpty(0L);
+                .onErrorReturn(NoSuchElementException.class, 0L);
     }
 }

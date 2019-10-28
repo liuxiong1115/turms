@@ -34,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.function.Function3;
 
 import java.util.*;
 
@@ -100,13 +99,6 @@ public class MessageController {
         }
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
-            if (deliveredStartDate != null || deliveredEndDate != null) {
-                counts.add(messageService.countDeliveredMessages(
-                        deliveredStartDate,
-                        deliveredEndDate,
-                        chatType)
-                        .map(total -> Pair.of("deliveredMessages", total)));
-            }
             if (deliveredOnAverageStartDate != null || deliveredOnAverageEndDate != null) {
                 counts.add(messageService.countDeliveredMessagesOnAverage(
                         deliveredOnAverageStartDate,
@@ -128,37 +120,23 @@ public class MessageController {
                         chatType)
                         .map(total -> Pair.of("acknowledgedMessagesOnAverage", total)));
             }
-            if (counts.isEmpty()) {
-                return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-            }
-            Mono<Map<String, Long>> resultMono = Flux.merge(counts)
-                    .collectList()
-                    .map(pairs -> {
-                        Map<String, Long> resultMap = new HashMap<>(counts.size());
-                        for (Pair<String, ?> pair : pairs) {
-                            resultMap.put(pair.getLeft(), (Long) pair.getRight());
-                        }
-                        return resultMap;
-                    });
-            return ResponseFactory.okWhenTruthy(resultMono);
-        } else {
-            List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
-            if (deliveredStartDate != null && deliveredEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
-                        "deliveredMessages",
+            if (counts.isEmpty() || deliveredStartDate != null || deliveredEndDate != null) {
+                counts.add(messageService.countDeliveredMessages(
                         deliveredStartDate,
                         deliveredEndDate,
-                        divideBy,
-                        (Function3<Date, Date, ChatType, Mono<Long>>) messageService::countDeliveredMessages,
-                        chatType));
+                        chatType)
+                        .map(total -> Pair.of("deliveredMessages", total)));
             }
+            return ResponseFactory.collectCountResults(counts);
+        } else {
+            List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
             if (deliveredOnAverageStartDate != null && deliveredOnAverageEndDate != null) {
                 counts.add(DateTimeUtil.queryBetweenDate(
                         "deliveredMessagesOnAverage",
                         deliveredOnAverageStartDate,
                         deliveredOnAverageEndDate,
                         divideBy,
-                        (Function3<Date, Date, ChatType, Mono<Long>>) messageService::countDeliveredMessagesOnAverage,
+                        messageService::countDeliveredMessagesOnAverage,
                         chatType));
             }
             if (acknowledgedStartDate != null && acknowledgedEndDate != null) {
@@ -167,7 +145,7 @@ public class MessageController {
                         acknowledgedStartDate,
                         acknowledgedEndDate,
                         divideBy,
-                        (Function3<Date, Date, ChatType, Mono<Long>>) messageService::countAcknowledgedMessages,
+                        messageService::countAcknowledgedMessages,
                         chatType));
             }
             if (acknowledgedOnAverageStartDate != null && acknowledgedOnAverageEndDate != null) {
@@ -176,13 +154,22 @@ public class MessageController {
                         acknowledgedOnAverageStartDate,
                         acknowledgedOnAverageEndDate,
                         divideBy,
-                        (Function3<Date, Date, ChatType, Mono<Long>>) messageService::countAcknowledgedMessagesOnAverage,
+                        messageService::countAcknowledgedMessagesOnAverage,
+                        chatType));
+            }
+            if (deliveredStartDate != null && deliveredEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "deliveredMessages",
+                        deliveredStartDate,
+                        deliveredEndDate,
+                        divideBy,
+                        messageService::countDeliveredMessages,
                         chatType));
             }
             if (counts.isEmpty()) {
                 return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
             }
-            return ResponseFactory.okWhenTruthy(Flux.merge(counts));
+            return ResponseFactory.collectCountResults(counts);
         }
     }
 }

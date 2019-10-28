@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.BiFunction;
 
 public class DateTimeUtil {
     @Getter
@@ -86,8 +87,8 @@ public class DateTimeUtil {
                         throw new IllegalStateException("Unexpected value: " + divideBy);
                 }
                 List<Pair<Date, Date>> lists = new LinkedList<>();
-                while (true){
-                    // Note: Do not use Instant because it doesn't support plus months
+                while (true) {
+                    // Note: Do not use Instant because it doesn't support to plus months
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(startDate);
                     calendar.add(unit, 1);
@@ -105,24 +106,48 @@ public class DateTimeUtil {
         }
     }
 
+    //TODO: moves to somewhere more suitable
     public static Mono<Pair<String, List<Map<String, ?>>>> queryBetweenDate(
             @NotNull String title,
             @NotNull Date startDate,
             @NotNull Date endDate,
             @NotNull DivideBy divideBy,
-            @NotNull Function3 function,
+            @NotNull Function3<Date, Date, ChatType, Mono<Long>> function,
             @Nullable ChatType chatType) {
         List<Pair<Date, Date>> dates = DateTimeUtil.divide(startDate, endDate, divideBy);
-        List<Mono<Map<String, Object>>> monos = new ArrayList<>(dates.size());
+        List<Mono<Map<String, ?>>> monos = new ArrayList<>(dates.size());
         for (Pair<Date, Date> datePair : dates) {
-            Mono<Long> result = (Mono<Long>) function.apply(
+            Mono<Long> result = function.apply(
                     datePair.getLeft(),
                     datePair.getRight(),
                     chatType);
             monos.add(result.map(total -> Map.of("startDate", datePair.getLeft(),
-                            "endDate", datePair.getRight(),
-                            "total", total)));
+                    "endDate", datePair.getRight(),
+                    "total", total)));
         }
+        return merge(title, monos);
+    }
+
+    public static Mono<Pair<String, List<Map<String, ?>>>> queryBetweenDate(
+            @NotNull String title,
+            @NotNull Date startDate,
+            @NotNull Date endDate,
+            @NotNull DivideBy divideBy,
+            @NotNull BiFunction<Date, Date, Mono<Long>> function) {
+        List<Pair<Date, Date>> dates = DateTimeUtil.divide(startDate, endDate, divideBy);
+        List<Mono<Map<String, ?>>> monos = new ArrayList<>(dates.size());
+        for (Pair<Date, Date> datePair : dates) {
+            Mono<Long> result = function.apply(
+                    datePair.getLeft(),
+                    datePair.getRight());
+            monos.add(result.map(total -> Map.of("startDate", datePair.getLeft(),
+                    "endDate", datePair.getRight(),
+                    "total", total)));
+        }
+        return merge(title, monos);
+    }
+
+    private static Mono<Pair<String, List<Map<String, ?>>>> merge(@NotNull String title, List<Mono<Map<String, ?>>> monos) {
         Flux<Map<String, ?>> resultFlux = Flux.mergeOrdered((o1, o2) -> {
             Date startDate1 = (Date) o1.get("startDate");
             Date startDate2 = (Date) o2.get("startDate");

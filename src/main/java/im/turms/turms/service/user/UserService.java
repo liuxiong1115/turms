@@ -20,28 +20,26 @@ package im.turms.turms.service.user;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.ProfileAccessStrategy;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.GroupInvitation;
-import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLoginLog;
+import im.turms.turms.pojo.domain.UserOnlineUserNumber;
 import im.turms.turms.pojo.response.GroupInvitationsWithVersion;
 import im.turms.turms.service.group.GroupInvitationService;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -363,10 +361,10 @@ public class UserService {
     }
 
     public Mono<Long> countRegisteredUsers(
-            @Nullable Date registerStartDate,
-            @Nullable Date registerEndDate) {
+            @Nullable Date startDate,
+            @Nullable Date endDate) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(User.Fields.registrationDate, registerStartDate, registerEndDate)
+                .addBetweenIfNotNull(User.Fields.registrationDate, startDate, endDate)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
@@ -379,101 +377,28 @@ public class UserService {
     }
 
     public Mono<Long> countLoggedInUsers(@Nullable Date startDate, @Nullable Date endDate) {
-        Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, startDate, endDate)
-                .buildQuery();
-        return mongoTemplate.count(query, UserLoginLog.class);
-    }
-
-    public Mono<Long> countUsersWhoSentMessages(@Nullable Date startDate, @Nullable Date endDate) {
         Criteria criteria = QueryBuilder.newBuilder()
-                .add(Criteria.where(Message.Fields.chatType).is(ChatType.PRIVATE))
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
+                .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, startDate, endDate)
                 .buildCriteria();
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(criteria),
-                Aggregation.group(Message.Fields.senderId).count().as("count"));
-        return mongoTemplate.aggregate(aggregation, Message.class, Long.class).single();
+        return AggregationUtil.countDistinct(
+                mongoTemplate,
+                criteria,
+                UserLoginLog.Fields.userId,
+                UserLoginLog.class);
     }
 
     public Mono<Long> countUsers() {
         return mongoTemplate.count(new Query(), User.class);
     }
 
-    public Mono<Long> countMaxOnlineUsers(Date maxOnlineUsersStartDate, Date maxOnlineUsersEndDate) {
-        //TODO
-        return Mono.just(1000L);
-    }
-
-    //TODO: extract
-    public Mono<ResponseEntity> countUsersByDateTime(
-            @Nullable Date startDateTime,
-            @Nullable Date endDateTime,
-            boolean countRegisteredUsers,
-            boolean countDeletedUsers,
-            boolean countUsersWhoSentMessage,
-            boolean countLoggedInUsers,
-            boolean countMaxOnlineUsers,
-            boolean groupify) {
-        try {
-            if (startDateTime != null && endDateTime != null) {
-                List<Mono<Map<String, Long>>> monoList = new LinkedList<>();
-                if (countRegisteredUsers) {
-                    monoList.add(ReactorUtil.objectToMap(
-                            REGISTERED_USERS,
-                            countRegisteredUsers(startDateTime, endDateTime)));
-                }
-                if (countDeletedUsers) {
-                    monoList.add(ReactorUtil.objectToMap(
-                            DELETED_USERS,
-                            countDeletedUsers(startDateTime, endDateTime)));
-                }
-                if (countUsersWhoSentMessage) {
-                    monoList.add(ReactorUtil.objectToMap(
-                            USERS_WHO_SENT_MESSAGES,
-                            countUsersWhoSentMessages(startDateTime, endDateTime)));
-                }
-                if (countLoggedInUsers) {
-                    monoList.add(ReactorUtil.objectToMap(
-                            LOGGED_IN_USERS,
-                            countLoggedInUsers(startDateTime, endDateTime)));
-                }
-                if (countMaxOnlineUsers) {
-                    monoList.add(ReactorUtil.objectToMap(
-                            MAX_ONLINE_USERS,
-                            countMaxOnlineUsers(startDateTime, endDateTime)));
-                }
-                if (monoList.isEmpty()) {
-                    monoList.add(ReactorUtil.objectToMap(
-                            USERS,
-                            countUsers()));
-                }
-                Mono<Map<String, Long>> result = Mono.zip(monoList, counts -> {
-                    Map<String, Long> resultMap = new HashMap<>(monoList.size());
-                    for (Object count : counts) {
-                        resultMap.putAll((Map<String, Long>) count);
-                    }
-                    return resultMap;
-                });
-                return ResponseFactory.okWhenTruthy(result, true);
-            } else {
-                return ResponseFactory.codeInMono(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseFactory.code(TurmsStatusCode.ILLEGAL_DATE_FORMAT);
-        }
-    }
-
-    public Mono<ResponseEntity> countUsersByDate(
-            String startDate,
-            String endDate,
-            boolean countRegisteredUsers,
-            boolean countDeletedUsers,
-            boolean countUsersWhoSentMessage,
-            boolean countLoggedInUsers,
-            boolean countMaxOnlineUsers,
-            boolean groupify) {
-        return null;
+    public Mono<Long> countMaxOnlineUsers(@Nullable Date startDate, @Nullable Date endDate) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addBetweenIfNotNull(UserOnlineUserNumber.Fields.timestamp, startDate, endDate)
+                .max(UserOnlineUserNumber.Fields.number)
+                .buildQuery();
+        return mongoTemplate.findOne(query, UserOnlineUserNumber.class)
+                .map(entity -> (long) entity.getNumber());
     }
 
     public Mono<Boolean> updateUsers(

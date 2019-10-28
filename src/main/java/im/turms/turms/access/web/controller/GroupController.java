@@ -23,29 +23,34 @@ import im.turms.turms.common.DateTimeUtil;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.constant.DivideBy;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.GroupType;
 import im.turms.turms.pojo.dto.GroupDTO;
 import im.turms.turms.service.group.GroupService;
 import im.turms.turms.service.group.GroupTypeService;
+import im.turms.turms.service.message.MessageService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.text.ParseException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
     private final GroupService groupService;
     private final GroupTypeService groupTypeService;
+    private final MessageService messageService;
     private final PageUtil pageUtil;
 
-    public GroupController(GroupService groupService, GroupTypeService groupTypeService, PageUtil pageUtil) {
+    public GroupController(GroupService groupService, GroupTypeService groupTypeService, PageUtil pageUtil, MessageService messageService) {
         this.groupService = groupService;
         this.groupTypeService = groupTypeService;
         this.pageUtil = pageUtil;
+        this.messageService = messageService;
     }
 
     @GetMapping
@@ -155,34 +160,64 @@ public class GroupController {
 
     @GetMapping("/count")
     public Mono<ResponseEntity> countGroups(
-            @RequestParam(required = false) String createStartDate,
-            @RequestParam(required = false) String createEndDate,
-            @RequestParam(required = false) String deleteStartDate,
-            @RequestParam(required = false) String deleteEndDate,
-            @RequestParam(required = false) String sendMessageStartDate,
-            @RequestParam(required = false) String sendMessageEndDate) {
-        try {
-            Mono<Long> count;
-            if (createStartDate != null || createEndDate != null) {
-                count = groupService.countOwnedGroups(
-                        DateTimeUtil.parseDay(createStartDate),
-                        DateTimeUtil.endOfDay(createEndDate));
-            } else if (deleteStartDate != null || deleteEndDate != null) {
-                count = groupService.countDeletedGroups(
-                        DateTimeUtil.parseDay(deleteStartDate),
-                        DateTimeUtil.endOfDay(deleteEndDate)
-                );
-            } else if (sendMessageStartDate != null || sendMessageEndDate != null) {
-                count = groupService.countGroupsThatSentMessages(
-                        DateTimeUtil.parseDay(sendMessageStartDate),
-                        DateTimeUtil.endOfDay(sendMessageEndDate));
-
-            } else {
-                count = groupService.count();
+            @RequestParam(required = false) Date createdStartDate,
+            @RequestParam(required = false) Date createdEndDate,
+            @RequestParam(required = false) Date deletedStartDate,
+            @RequestParam(required = false) Date deletedEndDate,
+            @RequestParam(required = false) Date deliveredMessageStartDate,
+            @RequestParam(required = false) Date deliveredMessageEndDate,
+            @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
+        if (divideBy == null || divideBy == DivideBy.NOOP) {
+            List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
+            if (deletedStartDate != null || deletedEndDate != null) {
+                counts.add(groupService.countDeletedGroups(
+                        deletedStartDate,
+                        deletedEndDate)
+                        .map(total -> Pair.of("deletedGroups", total)));
             }
-            return ResponseFactory.okWhenTruthy(count);
-        } catch (ParseException | IllegalArgumentException e) {
-            return ResponseFactory.code(TurmsStatusCode.ILLEGAL_DATE_FORMAT);
+            if (deliveredMessageStartDate != null || deliveredMessageEndDate != null) {
+                counts.add(messageService.countGroupsThatSentMessages(
+                        deliveredMessageStartDate,
+                        deliveredMessageEndDate)
+                        .map(total -> Pair.of("groupsThatSentMessages", total)));
+            }
+            if (counts.isEmpty() || createdStartDate != null || createdEndDate != null) {
+                counts.add(groupService.countCreatedGroups(
+                        createdStartDate,
+                        createdEndDate)
+                        .map(total -> Pair.of("createdGroups", total)));
+            }
+            return ResponseFactory.collectCountResults(counts);
+        } else {
+            List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
+            if (deletedStartDate != null && deletedEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "deletedGroups",
+                        deletedStartDate,
+                        deletedEndDate,
+                        divideBy,
+                        groupService::countDeletedGroups));
+            }
+            if (deliveredMessageStartDate != null && deliveredMessageEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "groupsThatSentMessages",
+                        deliveredMessageStartDate,
+                        deliveredMessageEndDate,
+                        divideBy,
+                        messageService::countGroupsThatSentMessages));
+            }
+            if (createdStartDate != null && createdEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "createdGroups",
+                        createdStartDate,
+                        createdEndDate,
+                        divideBy,
+                        groupService::countCreatedGroups));
+            }
+            if (counts.isEmpty()) {
+                return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            }
+            return ResponseFactory.collectCountResults(counts);
         }
     }
 }

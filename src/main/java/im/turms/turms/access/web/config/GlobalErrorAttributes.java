@@ -23,7 +23,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 
 import java.util.Map;
 
-import static im.turms.turms.common.Constants.DEV_MODE;
 import static im.turms.turms.common.Constants.STATUS;
 
 @Component
@@ -32,21 +31,18 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     public Map<String, Object> getErrorAttributes(
             ServerRequest request,
             boolean includeStackTrace) {
-        if (DEV_MODE) {
-            return super.getErrorAttributes(request, true);
-        }
         Map<String, Object> errorAttributes = super.getErrorAttributes(request, false);
         if ((Integer) errorAttributes.get(STATUS) == 500) {
             Object messageObj = errorAttributes.get("message");
             boolean isClientError;
-            if (messageObj == null) {
+            if (messageObj == null) { // For NullPointerException
                 isClientError = true;
             } else {
                 String message = messageObj.toString();
                 isClientError = message.contains("WebFlux") || message.contains("cast");
             }
             if (isClientError) {
-                errorAttributes.put(STATUS, 404);
+                errorAttributes.put(STATUS, 400);
                 errorAttributes.remove("error");
             }
         }

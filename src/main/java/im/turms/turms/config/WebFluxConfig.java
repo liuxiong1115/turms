@@ -19,9 +19,10 @@ package im.turms.turms.config;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
@@ -36,26 +37,5 @@ public class WebFluxConfig implements WebFluxConfigurer {
                 .allowedOrigins("*")
                 .allowCredentials(true)
                 .allowedMethods("*").allowedHeaders("*");
-    }
-
-    @Bean
-    public Converter<String, Date> dateConverter() {
-        return source -> {
-            if (StringUtils.isBlank(source)) {
-                return null;
-            }
-            try {
-                return DateUtils.parseDate(source,
-                        "yyyy-MM-dd HH:mm:ss",
-                        "yyyy-MM-dd HH:mm",
-                        "yyyy-MM-dd",
-                        "yyyy-MM",
-                        "yyyy/MM/dd",
-                        "yyyyMMddHHmmss",
-                        "yyyyMMdd");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        };
     }
 }

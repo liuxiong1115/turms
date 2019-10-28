@@ -416,6 +416,20 @@ public class MessageService {
                 Message.class);
     }
 
+    public Mono<Long> countGroupsThatSentMessages(
+            @NotNull Date startDate,
+            @NotNull Date endDate) {
+        Criteria criteria = QueryBuilder.newBuilder()
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
+                .add(Criteria.where(Message.Fields.chatType).is(ChatType.GROUP))
+                .buildCriteria();
+        return AggregationUtil.countDistinct(
+                mongoTemplate,
+                criteria,
+                Message.Fields.targetId,
+                Message.class);
+    }
+
     public Mono<Long> countUsersWhoAcknowledgedMessage(
             @Nullable Date startDate,
             @Nullable Date endDate,

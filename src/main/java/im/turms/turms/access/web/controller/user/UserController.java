@@ -19,22 +19,25 @@ package im.turms.turms.access.web.controller.user;
 
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
-import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.common.DateTimeUtil;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.constant.DeviceType;
+import im.turms.turms.constant.DivideBy;
 import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLocation;
 import im.turms.turms.service.group.GroupService;
+import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.user.UserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.onlineuser.UsersNearbyService;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,16 +55,16 @@ public class UserController {
     private final OnlineUserService onlineUserService;
     private final UsersNearbyService usersNearbyService;
     private final GroupService groupService;
-    private final TurmsClusterManager turmsClusterManager;
+    private final MessageService messageService;
     private final PageUtil pageUtil;
 
-    public UserController(UserService userService, OnlineUserService onlineUserService, GroupService groupService, TurmsClusterManager turmsClusterManager, PageUtil pageUtil, UsersNearbyService usersNearbyService) {
+    public UserController(UserService userService, OnlineUserService onlineUserService, GroupService groupService, PageUtil pageUtil, UsersNearbyService usersNearbyService, MessageService messageService) {
         this.userService = userService;
         this.onlineUserService = onlineUserService;
         this.groupService = groupService;
-        this.turmsClusterManager = turmsClusterManager;
         this.pageUtil = pageUtil;
         this.usersNearbyService = usersNearbyService;
+        this.messageService = messageService;
     }
 
     @GetMapping
@@ -147,40 +150,102 @@ public class UserController {
     @GetMapping("/count")
     @RequiredPermission(AdminPermission.USER_QUERY)
     public Mono<ResponseEntity> countUsers(
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestParam(required = false) Date startDateTime,
-            @RequestParam(required = false) Date endDateTime,
-            @RequestParam(defaultValue = "false") boolean countRegisteredUsers,
-            @RequestParam(defaultValue = "false") boolean countDeletedUsers,
-            @RequestParam(defaultValue = "false") boolean countUsersWhoSentMessage,
-            @RequestParam(defaultValue = "false") boolean countLoggedInUsers,
-            @RequestParam(defaultValue = "false") boolean countMaxOnlineUsers,
-            @RequestParam(defaultValue = "false") boolean countOnlineUsers,
-            @RequestParam(defaultValue = "false") boolean groupify) {
+            @RequestParam(required = false) Date registeredUsersStartDate,
+            @RequestParam(required = false) Date registeredUsersEndDate,
+            @RequestParam(required = false) Date deletedUsersStartDate,
+            @RequestParam(required = false) Date deletedUsersEndDate,
+            @RequestParam(required = false) Date deliveredMessageStartDate,
+            @RequestParam(required = false) Date deliveredMessageEndDate,
+            @RequestParam(required = false) Date loggedInUsersStartDate,
+            @RequestParam(required = false) Date loggedInUsersEndDate,
+            @RequestParam(required = false) Date maxOnlineUsersStartDate,
+            @RequestParam(required = false) Date maxOnlineUsersEndDate,
+            @RequestParam(defaultValue = "false") Boolean countOnlineUsers,
+            @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
         if (countOnlineUsers) {
-            return ResponseFactory.withKey("count", onlineUserService.countOnlineUsers());
+            return ResponseFactory.withKey("total", onlineUserService.countOnlineUsers());
         }
-        if (startDateTime != null || endDateTime != null) {
-            return userService.countUsersByDateTime(
-                    startDateTime,
-                    endDateTime,
-                    countRegisteredUsers,
-                    countDeletedUsers,
-                    countUsersWhoSentMessage,
-                    countLoggedInUsers,
-                    countMaxOnlineUsers,
-                    groupify);
+        if (divideBy == null || divideBy == DivideBy.NOOP) {
+            List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
+            if (deletedUsersStartDate != null || deletedUsersEndDate != null) {
+                counts.add(userService.countDeletedUsers(
+                        deletedUsersStartDate,
+                        deletedUsersEndDate)
+                        .map(total -> Pair.of("deletedUsers", total)));
+            }
+            if (deliveredMessageStartDate != null || deliveredMessageEndDate != null) {
+                counts.add(messageService.countUsersWhoSentMessage(
+                        deliveredMessageStartDate,
+                        deliveredMessageEndDate,
+                        null)
+                        .map(total -> Pair.of("usersWhoSentMessages", total)));
+            }
+            if (loggedInUsersStartDate != null || loggedInUsersEndDate != null) {
+                counts.add(userService.countLoggedInUsers(
+                        loggedInUsersStartDate,
+                        loggedInUsersEndDate)
+                        .map(total -> Pair.of("loggedInUsers", total)));
+            }
+            if (maxOnlineUsersStartDate != null || maxOnlineUsersEndDate != null) {
+                counts.add(userService.countMaxOnlineUsers(
+                        maxOnlineUsersStartDate,
+                        maxOnlineUsersEndDate)
+                        .map(total -> Pair.of("maxOnlineUsers", total)));
+            }
+            if (counts.isEmpty() || registeredUsersStartDate != null || registeredUsersEndDate != null) {
+                counts.add(userService.countRegisteredUsers(
+                        registeredUsersStartDate,
+                        registeredUsersEndDate)
+                        .map(total -> Pair.of("registeredUsers", total)));
+            }
+            return ResponseFactory.collectCountResults(counts);
         } else {
-            return userService.countUsersByDate(
-                    startDate,
-                    endDate,
-                    countRegisteredUsers,
-                    countDeletedUsers,
-                    countUsersWhoSentMessage,
-                    countLoggedInUsers,
-                    countMaxOnlineUsers,
-                    groupify);
+            List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
+            if (deletedUsersStartDate != null && deletedUsersEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "deletedUsers",
+                        deletedUsersStartDate,
+                        deletedUsersEndDate,
+                        divideBy,
+                        userService::countDeletedUsers));
+            }
+            if (deliveredMessageStartDate != null && deliveredMessageEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "usersWhoSentMessages",
+                        deliveredMessageStartDate,
+                        deliveredMessageEndDate,
+                        divideBy,
+                        messageService::countUsersWhoSentMessage,
+                        null));
+            }
+            if (loggedInUsersStartDate != null && loggedInUsersEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "loggedInUsers",
+                        loggedInUsersStartDate,
+                        loggedInUsersEndDate,
+                        divideBy,
+                        userService::countLoggedInUsers));
+            }
+            if (maxOnlineUsersStartDate != null && maxOnlineUsersEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "maxOnlineUsers",
+                        maxOnlineUsersStartDate,
+                        maxOnlineUsersEndDate,
+                        divideBy,
+                        userService::countMaxOnlineUsers));
+            }
+            if (registeredUsersStartDate != null && registeredUsersEndDate != null) {
+                counts.add(DateTimeUtil.queryBetweenDate(
+                        "registeredUsers",
+                        registeredUsersStartDate,
+                        registeredUsersEndDate,
+                        divideBy,
+                        userService::countRegisteredUsers));
+            }
+            if (counts.isEmpty()) {
+                return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            }
+            return ResponseFactory.collectCountResults(counts);
         }
     }
 
