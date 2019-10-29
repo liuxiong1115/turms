@@ -39,7 +39,7 @@ public enum TurmsStatusCode {
     ID_DUPLICATED(4004, "ID must be unique", 400),
     ILLEGAL_ARGUMENTS(4005, "Illegal arguments", 400),
     ILLEGAL_DATE_FORMAT(4006, "Illegal date format", 400),
-    OWNED_RESOURCE_LIMIT_REACHED(4007, "The resource limit has been reached", 400),
+    OWNED_RESOURCE_LIMIT_REACHED(4007, "The resource limit is reached", 400),
     REQUESTED_RECORDS_TOO_MANY(4008, "Too many records are requested", 400),
     RESOURCES_HAVE_BEEN_HANDLED(4009, "The resources have been handled", 400),
     RESOURCES_HAVE_CHANGED(4010, "The resources have been changed", 400),
