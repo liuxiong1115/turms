@@ -75,9 +75,7 @@ public class UserRelationshipController {
             @RequestParam Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
             @RequestBody UserRelationship userRelationship) {
-        boolean validated = userRelationship.getIsBlocked() != null
-                && userRelationship.getEstablishmentDate() != null;
-        if (validated) {
+        if (userRelationship.getIsBlocked() != null && userRelationship.getEstablishmentDate() != null) {
             Mono<Boolean> updated = userRelationshipService.updateUserOneSidedRelationships(
                     ownerId,
                     relatedUsersIds,

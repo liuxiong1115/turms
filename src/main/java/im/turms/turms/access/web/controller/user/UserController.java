@@ -57,14 +57,16 @@ public class UserController {
     private final GroupService groupService;
     private final MessageService messageService;
     private final PageUtil pageUtil;
+    private final DateTimeUtil dateTimeUtil;
 
-    public UserController(UserService userService, OnlineUserService onlineUserService, GroupService groupService, PageUtil pageUtil, UsersNearbyService usersNearbyService, MessageService messageService) {
+    public UserController(UserService userService, OnlineUserService onlineUserService, GroupService groupService, PageUtil pageUtil, UsersNearbyService usersNearbyService, MessageService messageService, DateTimeUtil dateTimeUtil) {
         this.userService = userService;
         this.onlineUserService = onlineUserService;
         this.groupService = groupService;
         this.pageUtil = pageUtil;
         this.usersNearbyService = usersNearbyService;
         this.messageService = messageService;
+        this.dateTimeUtil = dateTimeUtil;
     }
 
     @GetMapping
@@ -150,40 +152,40 @@ public class UserController {
     @GetMapping("/count")
     @RequiredPermission(AdminPermission.USER_QUERY)
     public Mono<ResponseEntity> countUsers(
-            @RequestParam(required = false) Date registeredUsersStartDate,
-            @RequestParam(required = false) Date registeredUsersEndDate,
-            @RequestParam(required = false) Date deletedUsersStartDate,
-            @RequestParam(required = false) Date deletedUsersEndDate,
-            @RequestParam(required = false) Date deliveredMessageStartDate,
-            @RequestParam(required = false) Date deliveredMessageEndDate,
-            @RequestParam(required = false) Date loggedInUsersStartDate,
-            @RequestParam(required = false) Date loggedInUsersEndDate,
+            @RequestParam(required = false) Date registeredStartDate,
+            @RequestParam(required = false) Date registeredEndDate,
+            @RequestParam(required = false) Date deletedStartDate,
+            @RequestParam(required = false) Date deletedEndDate,
+            @RequestParam(required = false) Date deliveredMessagesStartDate,
+            @RequestParam(required = false) Date deliveredMessagesEndDate,
+            @RequestParam(required = false) Date loggedInStartDate,
+            @RequestParam(required = false) Date loggedInEndDate,
             @RequestParam(required = false) Date maxOnlineUsersStartDate,
             @RequestParam(required = false) Date maxOnlineUsersEndDate,
             @RequestParam(defaultValue = "false") Boolean countOnlineUsers,
             @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
-        if (countOnlineUsers) {
+        if (countOnlineUsers != null && countOnlineUsers) {
             return ResponseFactory.withKey("total", onlineUserService.countOnlineUsers());
         }
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
-            if (deletedUsersStartDate != null || deletedUsersEndDate != null) {
+            if (deletedStartDate != null || deletedEndDate != null) {
                 counts.add(userService.countDeletedUsers(
-                        deletedUsersStartDate,
-                        deletedUsersEndDate)
+                        deletedStartDate,
+                        deletedEndDate)
                         .map(total -> Pair.of("deletedUsers", total)));
             }
-            if (deliveredMessageStartDate != null || deliveredMessageEndDate != null) {
+            if (deliveredMessagesStartDate != null || deliveredMessagesEndDate != null) {
                 counts.add(messageService.countUsersWhoSentMessage(
-                        deliveredMessageStartDate,
-                        deliveredMessageEndDate,
+                        deliveredMessagesStartDate,
+                        deliveredMessagesEndDate,
                         null)
                         .map(total -> Pair.of("usersWhoSentMessages", total)));
             }
-            if (loggedInUsersStartDate != null || loggedInUsersEndDate != null) {
+            if (loggedInStartDate != null || loggedInEndDate != null) {
                 counts.add(userService.countLoggedInUsers(
-                        loggedInUsersStartDate,
-                        loggedInUsersEndDate)
+                        loggedInStartDate,
+                        loggedInEndDate)
                         .map(total -> Pair.of("loggedInUsers", total)));
             }
             if (maxOnlineUsersStartDate != null || maxOnlineUsersEndDate != null) {
@@ -192,53 +194,53 @@ public class UserController {
                         maxOnlineUsersEndDate)
                         .map(total -> Pair.of("maxOnlineUsers", total)));
             }
-            if (counts.isEmpty() || registeredUsersStartDate != null || registeredUsersEndDate != null) {
+            if (counts.isEmpty() || registeredStartDate != null || registeredEndDate != null) {
                 counts.add(userService.countRegisteredUsers(
-                        registeredUsersStartDate,
-                        registeredUsersEndDate)
+                        registeredStartDate,
+                        registeredEndDate)
                         .map(total -> Pair.of("registeredUsers", total)));
             }
             return ResponseFactory.collectCountResults(counts);
         } else {
             List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
-            if (deletedUsersStartDate != null && deletedUsersEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+            if (deletedStartDate != null && deletedEndDate != null) {
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "deletedUsers",
-                        deletedUsersStartDate,
-                        deletedUsersEndDate,
+                        deletedStartDate,
+                        deletedEndDate,
                         divideBy,
                         userService::countDeletedUsers));
             }
-            if (deliveredMessageStartDate != null && deliveredMessageEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+            if (deliveredMessagesStartDate != null && deliveredMessagesEndDate != null) {
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "usersWhoSentMessages",
-                        deliveredMessageStartDate,
-                        deliveredMessageEndDate,
+                        deliveredMessagesStartDate,
+                        deliveredMessagesEndDate,
                         divideBy,
                         messageService::countUsersWhoSentMessage,
                         null));
             }
-            if (loggedInUsersStartDate != null && loggedInUsersEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+            if (loggedInStartDate != null && loggedInEndDate != null) {
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "loggedInUsers",
-                        loggedInUsersStartDate,
-                        loggedInUsersEndDate,
+                        loggedInStartDate,
+                        loggedInEndDate,
                         divideBy,
                         userService::countLoggedInUsers));
             }
             if (maxOnlineUsersStartDate != null && maxOnlineUsersEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "maxOnlineUsers",
                         maxOnlineUsersStartDate,
                         maxOnlineUsersEndDate,
                         divideBy,
                         userService::countMaxOnlineUsers));
             }
-            if (registeredUsersStartDate != null && registeredUsersEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+            if (registeredStartDate != null && registeredEndDate != null) {
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "registeredUsers",
-                        registeredUsersStartDate,
-                        registeredUsersEndDate,
+                        registeredStartDate,
+                        registeredEndDate,
                         divideBy,
                         userService::countRegisteredUsers));
             }

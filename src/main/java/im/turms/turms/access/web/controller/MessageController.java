@@ -42,10 +42,12 @@ import java.util.*;
 public class MessageController {
     private final MessageService messageService;
     private final PageUtil pageUtil;
+    private final DateTimeUtil dateTimeUtil;
 
-    public MessageController(MessageService messageService, PageUtil pageUtil) {
+    public MessageController(MessageService messageService, PageUtil pageUtil, DateTimeUtil dateTimeUtil) {
         this.messageService = messageService;
         this.pageUtil = pageUtil;
+        this.dateTimeUtil = dateTimeUtil;
     }
 
     @GetMapping
@@ -131,7 +133,7 @@ public class MessageController {
         } else {
             List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
             if (deliveredOnAverageStartDate != null && deliveredOnAverageEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "deliveredMessagesOnAverage",
                         deliveredOnAverageStartDate,
                         deliveredOnAverageEndDate,
@@ -140,7 +142,7 @@ public class MessageController {
                         chatType));
             }
             if (acknowledgedStartDate != null && acknowledgedEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "acknowledgedMessages",
                         acknowledgedStartDate,
                         acknowledgedEndDate,
@@ -149,7 +151,7 @@ public class MessageController {
                         chatType));
             }
             if (acknowledgedOnAverageStartDate != null && acknowledgedOnAverageEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "acknowledgedMessagesOnAverage",
                         acknowledgedOnAverageStartDate,
                         acknowledgedOnAverageEndDate,
@@ -158,7 +160,7 @@ public class MessageController {
                         chatType));
             }
             if (deliveredStartDate != null && deliveredEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "deliveredMessages",
                         deliveredStartDate,
                         deliveredEndDate,

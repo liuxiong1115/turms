@@ -36,7 +36,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/groups")
@@ -45,12 +48,14 @@ public class GroupController {
     private final GroupTypeService groupTypeService;
     private final MessageService messageService;
     private final PageUtil pageUtil;
+    private final DateTimeUtil dateTimeUtil;
 
-    public GroupController(GroupService groupService, GroupTypeService groupTypeService, PageUtil pageUtil, MessageService messageService) {
+    public GroupController(GroupService groupService, GroupTypeService groupTypeService, PageUtil pageUtil, MessageService messageService, DateTimeUtil dateTimeUtil) {
         this.groupService = groupService;
         this.groupTypeService = groupTypeService;
         this.pageUtil = pageUtil;
         this.messageService = messageService;
+        this.dateTimeUtil = dateTimeUtil;
     }
 
     @GetMapping
@@ -191,7 +196,7 @@ public class GroupController {
         } else {
             List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
             if (deletedStartDate != null && deletedEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "deletedGroups",
                         deletedStartDate,
                         deletedEndDate,
@@ -199,7 +204,7 @@ public class GroupController {
                         groupService::countDeletedGroups));
             }
             if (deliveredMessageStartDate != null && deliveredMessageEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "groupsThatSentMessages",
                         deliveredMessageStartDate,
                         deliveredMessageEndDate,
@@ -207,7 +212,7 @@ public class GroupController {
                         messageService::countGroupsThatSentMessages));
             }
             if (createdStartDate != null && createdEndDate != null) {
-                counts.add(DateTimeUtil.queryBetweenDate(
+                counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         "createdGroups",
                         createdStartDate,
                         createdEndDate,

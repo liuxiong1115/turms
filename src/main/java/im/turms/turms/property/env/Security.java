@@ -37,7 +37,12 @@ public class Security implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     private int maxDaysDifferencePerRequest = 3 * 30;
-
+    @JsonView(MutablePropertiesView.class)
+    private int maxHourRangesPerCountRequest = 24;
+    @JsonView(MutablePropertiesView.class)
+    private int maxDayRangesPerCountRequest = 31;
+    @JsonView(MutablePropertiesView.class)
+    private int maxMonthRangesPerCountRequest = 12;
     @JsonView(MutablePropertiesView.class)
     private int maxReturnedRecordsPerRequest = 100;
 
@@ -66,6 +71,9 @@ public class Security implements IdentifiedDataSerializable {
         out.writeInt(userPasswordEncodeStrategy.ordinal());
         out.writeInt(adminPasswordEncodeStrategy.ordinal());
         out.writeInt(maxDaysDifferencePerRequest);
+        out.writeInt(maxHourRangesPerCountRequest);
+        out.writeInt(maxDayRangesPerCountRequest);
+        out.writeInt(maxMonthRangesPerCountRequest);
         out.writeInt(maxReturnedRecordsPerRequest);
         out.writeInt(defaultReturnedRecordsPerRequest);
         out.writeInt(minClientRequestsIntervalMillis);
@@ -76,6 +84,9 @@ public class Security implements IdentifiedDataSerializable {
         userPasswordEncodeStrategy = PasswordEncodeStrategy.values()[in.readInt()];
         adminPasswordEncodeStrategy = PasswordEncodeStrategy.values()[in.readInt()];
         maxDaysDifferencePerRequest = in.readInt();
+        maxHourRangesPerCountRequest = in.readInt();
+        maxDayRangesPerCountRequest = in.readInt();
+        maxMonthRangesPerCountRequest = in.readInt();
         maxReturnedRecordsPerRequest = in.readInt();
         defaultReturnedRecordsPerRequest = in.readInt();
         minClientRequestsIntervalMillis = in.readInt();
