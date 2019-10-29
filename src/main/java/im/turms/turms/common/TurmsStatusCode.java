@@ -33,24 +33,24 @@ public enum TurmsStatusCode {
     ALREADY_UP_TO_DATE(2002, "Already up-to-date", 204),
     RECIPIENTS_OFFLINE(2003, "The recipients are offline", 200),
 
-    DISABLE_FUNCTION(4001, "The function has been disable in servers", 405),
-    EXPIRY_DATE_BEFORE_NOW(4002, "The expiry date needs to be after now", 400),
+    DISABLE_FUNCTION(4001, "The function has been disabled in servers", 405),
+    EXPIRY_DATE_BEFORE_NOW(4002, "Expiration date must be greater than now", 400),
     EXPIRY_RESOURCE(4003, "The target resource has expired", 400),
-    ID_DUPLICATED(4004, "The ID is duplicated", 400),
+    ID_DUPLICATED(4004, "ID must be unique", 400),
     ILLEGAL_ARGUMENTS(4005, "Illegal arguments", 400),
-    ILLEGAL_DATE_FORMAT(4006, "The date format is illegal", 400),
-    OWNED_RESOURCE_LIMIT_REACHED(4007, "The limit of the resource has been reached", 400),
+    ILLEGAL_DATE_FORMAT(4006, "Illegal date format", 400),
+    OWNED_RESOURCE_LIMIT_REACHED(4007, "The resource limit has been reached", 400),
     REQUESTED_RECORDS_TOO_MANY(4008, "Too many records are requested", 400),
     RESOURCES_HAVE_BEEN_HANDLED(4009, "The resources have been handled", 400),
     RESOURCES_HAVE_CHANGED(4010, "The resources have been changed", 400),
     SESSION_SIMULTANEOUS_CONFLICTS_DECLINE(4011, "A different device has logged into your account", 409),
     SESSION_SIMULTANEOUS_CONFLICTS_NOTIFY(4012, "Someone attempted to log into your account", 409),
     SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE(4013, "A different device has logged into your account", 409),
-    SUCCESSOR_NOT_GROUP_MEMBER(4014, "The successor is not group member", 400),
+    SUCCESSOR_NOT_GROUP_MEMBER(4014, "The successor is not the group member", 400),
     TARGET_USERS_UNAUTHORIZED(4015, "The target users are unauthorized", 400),
     UNAUTHORIZED(4016, "Unauthorized", 401),
 
-    LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged devices offline", 500);
+    LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500);
 
     private int businessCode;
     private String reason;
