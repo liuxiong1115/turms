@@ -29,7 +29,6 @@ import im.turms.turms.pojo.domain.UserRelationshipGroupMember;
 import im.turms.turms.pojo.response.Int64ValuesWithVersion;
 import im.turms.turms.pojo.response.UserRelationshipsWithVersion;
 import im.turms.turms.service.user.UserVersionService;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -226,7 +225,10 @@ public class UserRelationshipService {
             return Mono.zip(
                     queryRelatedUsersIds(ownerId, groupIndex).collect(Collectors.toSet()),
                     queryRelatedUsersIds(ownerId, isBlocked).collect(Collectors.toSet()))
-                    .flatMapIterable(tuple -> CollectionUtils.intersection(tuple.getT1(), tuple.getT2()));
+                    .flatMapIterable(tuple -> {
+                        tuple.getT1().retainAll(tuple.getT2());
+                        return tuple.getT1();
+                    });
         } else if (groupIndex != null) {
             return queryRelatedUsersIds(ownerId, groupIndex);
         } else {

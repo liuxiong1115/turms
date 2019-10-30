@@ -258,7 +258,7 @@ public class MongoDataInitializaer {
             }
             // Execute
             mongoTemplate.insertAll(objects)
-                    .doOnTerminate(() -> TurmsLogger.log("Mock has been finished"))
+                    .doOnTerminate(() -> TurmsLogger.log("Mocking is done"))
                     .subscribe();
         }
     }

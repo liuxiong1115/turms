@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 import java.io.IOException;
 
 @Data
-@JsonIgnoreProperties({"factoryId", "id"})
+@JsonIgnoreProperties({"factoryId", "id", "writeConcern"})
 public class Database implements IdentifiedDataSerializable {
 
     private WriteConcern writeConcern = new WriteConcern();
