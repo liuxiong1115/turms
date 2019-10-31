@@ -126,6 +126,10 @@ public class MessageStatusService {
             case GROUP:
                 query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(groupOrSenderId));
                 break;
+            case SYSTEM:
+                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null))
+                        .addCriteria(Criteria.where(MessageStatus.Fields.senderId).is(ADMIN_REQUESTER_ID));
+                break;
             default:
                 throw new UnsupportedOperationException("");
         }

@@ -244,6 +244,7 @@ public class MessageService {
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         switch (message.getChatType()) {
             case PRIVATE:
+            case SYSTEM:
                 MessageStatus messageStatus = new MessageStatus(
                         message.getId(),
                         null,
