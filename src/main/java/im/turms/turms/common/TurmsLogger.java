@@ -66,7 +66,7 @@ public class TurmsLogger {
 
     public static void logThrowable(Throwable t) {
         if (t != null) {
-            logger.error(t.toString());
+            logger.error("", t);
         }
     }
 
