@@ -19,6 +19,7 @@ package im.turms.turms.access.web.controller.user;
 
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
+import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.DateTimeUtil;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
@@ -41,6 +42,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -56,10 +58,11 @@ public class UserController {
     private final UsersNearbyService usersNearbyService;
     private final GroupService groupService;
     private final MessageService messageService;
+    private final TurmsClusterManager turmsClusterManager;
     private final PageUtil pageUtil;
     private final DateTimeUtil dateTimeUtil;
 
-    public UserController(UserService userService, OnlineUserService onlineUserService, GroupService groupService, PageUtil pageUtil, UsersNearbyService usersNearbyService, MessageService messageService, DateTimeUtil dateTimeUtil) {
+    public UserController(UserService userService, OnlineUserService onlineUserService, GroupService groupService, PageUtil pageUtil, UsersNearbyService usersNearbyService, MessageService messageService, DateTimeUtil dateTimeUtil, TurmsClusterManager turmsClusterManager) {
         this.userService = userService;
         this.onlineUserService = onlineUserService;
         this.groupService = groupService;
@@ -67,6 +70,7 @@ public class UserController {
         this.usersNearbyService = usersNearbyService;
         this.messageService = messageService;
         this.dateTimeUtil = dateTimeUtil;
+        this.turmsClusterManager = turmsClusterManager;
     }
 
     @GetMapping
@@ -251,25 +255,40 @@ public class UserController {
         }
     }
 
+    /**
+     * Note: If userIds is null or empty, turms only queries the online status of local users
+     * @param number this only works when userIds is null or empty
+     */
     @GetMapping("/online-statuses")
     @RequiredPermission(AdminPermission.USER_QUERY)
-    public Mono<ResponseEntity> getOnlineUsersStatus(@RequestParam Set<Long> userIds) {
-        List<Mono<UserOnlineInfo>> queryUsers = new ArrayList<>(userIds.size());
-        for (Long userId : userIds) {
-            Mono<UserOnlineInfo> queryInfo = onlineUserService.queryUserOnlineInfo(userId);
-            queryInfo = queryInfo.map(info -> {
-                if (info == OFFLINE_USER_ONLINE_INFO) {
-                    return UserOnlineInfo.builder()
-                            .userId(userId)
-                            .userStatus(UserStatus.OFFLINE)
-                            .build();
-                } else {
-                    return info;
-                }
-            });
-            queryUsers.add(queryInfo);
+    public Mono<ResponseEntity> getOnlineUsersStatus(
+            @RequestParam(required = false) Set<Long> userIds,
+            @RequestParam(defaultValue = "20") Integer number) {
+        if (userIds != null && !userIds.isEmpty()) {
+            List<Mono<UserOnlineInfo>> queryUsers = new ArrayList<>(userIds.size());
+            for (Long userId : userIds) {
+                Mono<UserOnlineInfo> queryInfo = onlineUserService.queryUserOnlineInfo(userId);
+                queryInfo = queryInfo.map(info -> {
+                    if (info == OFFLINE_USER_ONLINE_INFO) {
+                        return UserOnlineInfo.builder()
+                                .userId(userId)
+                                .userStatus(UserStatus.OFFLINE)
+                                .build();
+                    } else {
+                        return info;
+                    }
+                });
+                queryUsers.add(queryInfo);
+            }
+            return ResponseFactory.okWhenTruthy(Flux.merge(queryUsers));
+        } else {
+            if (number > turmsClusterManager.getTurmsProperties().getSecurity()
+                    .getMaxQueryOnlineUsersStatusPerRequest()) {
+                throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
+            }
+            Flux<UserOnlineInfo> userOnlineInfoFlux = onlineUserService.queryUserOnlineInfos(number);
+            return ResponseFactory.okWhenTruthy(userOnlineInfoFlux);
         }
-        return ResponseFactory.okWhenTruthy(Flux.merge(queryUsers));
     }
 
     @PutMapping("/online-statuses")

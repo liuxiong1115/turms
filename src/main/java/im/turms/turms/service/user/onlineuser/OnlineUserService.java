@@ -35,6 +35,7 @@ import im.turms.turms.task.TurmsTaskExecutor;
 import im.turms.turms.task.UserOfflineTask;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -381,6 +382,36 @@ public class OnlineUserService {
             Future<UserOnlineInfo> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
             return ReactorUtil.future2Mono(future);
+        }
+    }
+
+    public Flux<UserOnlineInfo> queryUserOnlineInfos(@NotNull Integer number) {
+        Pair<Integer, Integer> workingRange = turmsClusterManager.getWorkingRange();
+        if (workingRange == null) {
+            return Flux.empty();
+        } else {
+            Integer start = workingRange.getLeft();
+            Integer end = workingRange.getRight();
+            return Flux.create(sink -> {
+                // Do not use Flux.take()
+                int count = 0;
+                for (int i = start; i < end; i++) {
+                    if (count >= number) {
+                        break;
+                    }
+                    Map<Long, OnlineUserManager> map = onlineUsersManagerAtSlots.get(i);
+                    if (map != null && !map.isEmpty()) {
+                        for (OnlineUserManager manager : map.values()) {
+                            if (count >= number) {
+                                break;
+                            }
+                            sink.next(manager.getOnlineUserInfo());
+                            count++;
+                        }
+                    }
+                }
+                sink.complete();
+            });
         }
     }
 

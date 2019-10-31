@@ -45,6 +45,8 @@ public class Security implements IdentifiedDataSerializable {
     private int maxMonthRangesPerCountRequest = 12;
     @JsonView(MutablePropertiesView.class)
     private int maxReturnedRecordsPerRequest = 100;
+    @JsonView(MutablePropertiesView.class)
+    private int maxQueryOnlineUsersStatusPerRequest = 20;
 
     @JsonView(MutablePropertiesView.class)
     private int defaultReturnedRecordsPerRequest = 10;
@@ -75,6 +77,7 @@ public class Security implements IdentifiedDataSerializable {
         out.writeInt(maxDayRangesPerCountRequest);
         out.writeInt(maxMonthRangesPerCountRequest);
         out.writeInt(maxReturnedRecordsPerRequest);
+        out.writeInt(maxQueryOnlineUsersStatusPerRequest);
         out.writeInt(defaultReturnedRecordsPerRequest);
         out.writeInt(minClientRequestsIntervalMillis);
     }
@@ -88,6 +91,7 @@ public class Security implements IdentifiedDataSerializable {
         maxDayRangesPerCountRequest = in.readInt();
         maxMonthRangesPerCountRequest = in.readInt();
         maxReturnedRecordsPerRequest = in.readInt();
+        maxQueryOnlineUsersStatusPerRequest = in.readInt();
         defaultReturnedRecordsPerRequest = in.readInt();
         minClientRequestsIntervalMillis = in.readInt();
     }

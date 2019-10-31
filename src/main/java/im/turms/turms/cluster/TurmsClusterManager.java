@@ -29,6 +29,7 @@ import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.property.TurmsProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -294,6 +295,23 @@ public class TurmsClusterManager {
         } else {
             return null;
         }
+    }
+
+
+    /**
+     * [start, end)
+     */
+    public Pair<Integer, Integer> getWorkingRange() {
+        int size = membersSnapshot.size();
+        if (size != 0) {
+            Integer localMemberIndex = getLocalMemberIndex();
+            if (localMemberIndex != null) {
+                int step = HASH_SLOTS_NUMBER / size;
+                return Pair.of(localMemberIndex * step,
+                        (localMemberIndex + 1) * step);
+            }
+        }
+        return null;
     }
 
     public Member getMemberByUserId(@NotNull Long userId) {

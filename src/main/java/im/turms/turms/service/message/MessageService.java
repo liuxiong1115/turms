@@ -647,7 +647,8 @@ public class MessageService {
     public Mono<Boolean> sendAdminMessage(
             boolean deliver,
             @NotNull Message message) {
-        if (message.getText() == null && message.getRecords() == null) {
+        if (message.getTargetId() == null
+                || (message.getText() == null && message.getRecords() == null)) {
             throw new IllegalArgumentException();
         }
         if (deliver) {
