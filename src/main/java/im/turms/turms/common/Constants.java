@@ -50,9 +50,6 @@ public class Constants {
     public static final String HAZELCAST_ADMINS_MAP = "admins";
     public static final String HAZELCAST_ROLES_MAP = "adminRoles";
     public static final String HAZELCAST_GROUP_TYPES_MAP = "groupTypes";
-    public static final String HAZELCAST_EXPIRY_USER_FRIEND_REQUESTS_CLEANER_LOCK = "ufrcl";
-    public static final String HAZELCAST_EXPIRY_GROUP_INVITATIONS_CLEANER_LOCK = "gicl";
-    public static final String HAZELCAST_EXPIRY_GROUP_JOIN_REQUESTS_CLEANER_LOCK = "gjrcl";
 
     public static final String EXPIRY_USER_FRIEND_REQUESTS_CLEANER_CRON = "0 0 2 * * ?";
     public static final String EXPIRY_GROUP_INVITATIONS_CLEANER_CRON = "0 15 2 * * ?";
@@ -67,8 +64,22 @@ public class Constants {
     public static final String STATUS = "status";
     public static final String TOTAL = "total";
 
+    public static final String DELETED_USERS = "deletedUsers";
+    public static final String USERS_WHO_SENT_MESSAGES = "usersWhoSentMessages";
+    public static final String LOGGED_IN_USERS = "loggedInUsers";
+    public static final String MAX_ONLINE_USERS = "maxOnlineUsers";
+    public static final String REGISTERED_USERS = "registeredUsers";
+    public static final String DELETED_GROUPS = "deletedGroups";
+    public static final String GROUPS_THAT_SENT_MESSAGES = "groupsThatSentMessages";
+    public static final String CREATED_GROUPS = "createdGroups";
+    public static final String DELIVERED_MESSAGES_ON_AVERAGE = "deliveredMessagesOnAverage";
+    public static final String ACKNOWLEDGED_MESSAGES = "acknowledgedMessages";
+    public static final String ACKNOWLEDGED_MESSAGES_ON_AVERAGE = "acknowledgedMessagesOnAverage";
+    public static final String DELIVERED_MESSAGES = "deliveredMessages";
+
     public static final long RESERVED_ID = 0L;
     public static final long ADMIN_ROLE_ROOT_ID = RESERVED_ID;
+    public static final long ADMIN_REQUESTER_ID = RESERVED_ID;
     public static final String ADMIN_ROLE_ROOT_NAME = "ROOT";
     public static final long DEFAULT_GROUP_TYPE_ID = RESERVED_ID;
     public static final String DEFAULT_GROUP_TYPE_NAME = "DEFAULT";

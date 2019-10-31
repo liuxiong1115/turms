@@ -37,6 +37,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
+import static im.turms.turms.common.Constants.*;
+
 @RestController
 @RequestMapping("/messages")
 public class MessageController {
@@ -70,6 +72,19 @@ public class MessageController {
                 deliveryStatus,
                 pageUtil.getSize(size));
         return ResponseFactory.okWhenTruthy(completeMessages);
+    }
+
+    @PostMapping
+    @RequiredPermission(AdminPermission.MESSAGE_CREATE)
+    public Mono<ResponseEntity> createMessages(
+            @RequestParam(defaultValue = "true") Boolean deliver,
+            @RequestBody Message message) {
+        if (message.getTargetId() == null ||
+                (message.getText() == null && message.getRecords() == null)) {
+            throw new IllegalArgumentException();
+        }
+        Mono<Boolean> success = messageService.sendAdminMessage(deliver, message);
+        return ResponseFactory.okWhenTruthy(success);
     }
 
     @DeleteMapping
@@ -106,35 +121,35 @@ public class MessageController {
                         deliveredOnAverageStartDate,
                         deliveredOnAverageEndDate,
                         chatType)
-                        .map(total -> Pair.of("deliveredMessagesOnAverage", total)));
+                        .map(total -> Pair.of(DELIVERED_MESSAGES_ON_AVERAGE, total)));
             }
             if (acknowledgedStartDate != null || acknowledgedEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessages(
                         acknowledgedStartDate,
                         acknowledgedEndDate,
                         chatType)
-                        .map(total -> Pair.of("acknowledgedMessages", total)));
+                        .map(total -> Pair.of(ACKNOWLEDGED_MESSAGES, total)));
             }
             if (acknowledgedOnAverageStartDate != null || acknowledgedOnAverageEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessagesOnAverage(
                         acknowledgedOnAverageStartDate,
                         acknowledgedOnAverageEndDate,
                         chatType)
-                        .map(total -> Pair.of("acknowledgedMessagesOnAverage", total)));
+                        .map(total -> Pair.of(ACKNOWLEDGED_MESSAGES_ON_AVERAGE, total)));
             }
             if (counts.isEmpty() || deliveredStartDate != null || deliveredEndDate != null) {
                 counts.add(messageService.countDeliveredMessages(
                         deliveredStartDate,
                         deliveredEndDate,
                         chatType)
-                        .map(total -> Pair.of("deliveredMessages", total)));
+                        .map(total -> Pair.of(DELIVERED_MESSAGES, total)));
             }
             return ResponseFactory.collectCountResults(counts);
         } else {
             List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
             if (deliveredOnAverageStartDate != null && deliveredOnAverageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "deliveredMessagesOnAverage",
+                        DELIVERED_MESSAGES_ON_AVERAGE,
                         deliveredOnAverageStartDate,
                         deliveredOnAverageEndDate,
                         divideBy,
@@ -143,7 +158,7 @@ public class MessageController {
             }
             if (acknowledgedStartDate != null && acknowledgedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "acknowledgedMessages",
+                        ACKNOWLEDGED_MESSAGES,
                         acknowledgedStartDate,
                         acknowledgedEndDate,
                         divideBy,
@@ -152,7 +167,7 @@ public class MessageController {
             }
             if (acknowledgedOnAverageStartDate != null && acknowledgedOnAverageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "acknowledgedMessagesOnAverage",
+                        ACKNOWLEDGED_MESSAGES_ON_AVERAGE,
                         acknowledgedOnAverageStartDate,
                         acknowledgedOnAverageEndDate,
                         divideBy,
@@ -161,7 +176,7 @@ public class MessageController {
             }
             if (deliveredStartDate != null && deliveredEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "deliveredMessages",
+                        DELIVERED_MESSAGES,
                         deliveredStartDate,
                         deliveredEndDate,
                         divideBy,

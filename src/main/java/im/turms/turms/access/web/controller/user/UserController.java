@@ -46,7 +46,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-import static im.turms.turms.common.Constants.OFFLINE_USER_ONLINE_INFO;
+import static im.turms.turms.common.Constants.*;
 
 @RestController
 @RequestMapping("/users")
@@ -165,7 +165,7 @@ public class UserController {
             @RequestParam(defaultValue = "false") Boolean countOnlineUsers,
             @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
         if (countOnlineUsers != null && countOnlineUsers) {
-            return ResponseFactory.withKey("total", onlineUserService.countOnlineUsers());
+            return ResponseFactory.withKey(TOTAL, onlineUserService.countOnlineUsers());
         }
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
@@ -173,39 +173,39 @@ public class UserController {
                 counts.add(userService.countDeletedUsers(
                         deletedStartDate,
                         deletedEndDate)
-                        .map(total -> Pair.of("deletedUsers", total)));
+                        .map(total -> Pair.of(DELETED_USERS, total)));
             }
             if (deliveredMessagesStartDate != null || deliveredMessagesEndDate != null) {
                 counts.add(messageService.countUsersWhoSentMessage(
                         deliveredMessagesStartDate,
                         deliveredMessagesEndDate,
                         null)
-                        .map(total -> Pair.of("usersWhoSentMessages", total)));
+                        .map(total -> Pair.of(USERS_WHO_SENT_MESSAGES, total)));
             }
             if (loggedInStartDate != null || loggedInEndDate != null) {
                 counts.add(userService.countLoggedInUsers(
                         loggedInStartDate,
                         loggedInEndDate)
-                        .map(total -> Pair.of("loggedInUsers", total)));
+                        .map(total -> Pair.of(LOGGED_IN_USERS, total)));
             }
             if (maxOnlineUsersStartDate != null || maxOnlineUsersEndDate != null) {
                 counts.add(userService.countMaxOnlineUsers(
                         maxOnlineUsersStartDate,
                         maxOnlineUsersEndDate)
-                        .map(total -> Pair.of("maxOnlineUsers", total)));
+                        .map(total -> Pair.of(MAX_ONLINE_USERS, total)));
             }
             if (counts.isEmpty() || registeredStartDate != null || registeredEndDate != null) {
                 counts.add(userService.countRegisteredUsers(
                         registeredStartDate,
                         registeredEndDate)
-                        .map(total -> Pair.of("registeredUsers", total)));
+                        .map(total -> Pair.of(REGISTERED_USERS, total)));
             }
             return ResponseFactory.collectCountResults(counts);
         } else {
             List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
             if (deletedStartDate != null && deletedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "deletedUsers",
+                        DELETED_USERS,
                         deletedStartDate,
                         deletedEndDate,
                         divideBy,
@@ -213,7 +213,7 @@ public class UserController {
             }
             if (deliveredMessagesStartDate != null && deliveredMessagesEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "usersWhoSentMessages",
+                        USERS_WHO_SENT_MESSAGES,
                         deliveredMessagesStartDate,
                         deliveredMessagesEndDate,
                         divideBy,
@@ -222,7 +222,7 @@ public class UserController {
             }
             if (loggedInStartDate != null && loggedInEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "loggedInUsers",
+                        LOGGED_IN_USERS,
                         loggedInStartDate,
                         loggedInEndDate,
                         divideBy,
@@ -230,7 +230,7 @@ public class UserController {
             }
             if (maxOnlineUsersStartDate != null && maxOnlineUsersEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "maxOnlineUsers",
+                        MAX_ONLINE_USERS,
                         maxOnlineUsersStartDate,
                         maxOnlineUsersEndDate,
                         divideBy,
@@ -238,7 +238,7 @@ public class UserController {
             }
             if (registeredStartDate != null && registeredEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "registeredUsers",
+                        REGISTERED_USERS,
                         registeredStartDate,
                         registeredEndDate,
                         divideBy,

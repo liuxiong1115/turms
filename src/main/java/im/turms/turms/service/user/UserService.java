@@ -50,8 +50,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.common.Constants.ID;
-import static im.turms.turms.common.Constants.MAX_DATE;
+import static im.turms.turms.common.Constants.*;
 
 @Component
 public class UserService {
@@ -131,7 +130,7 @@ public class UserService {
             case GROUP:
                 return groupMemberService.isAllowedToSendMessage(targetId, requesterId);
             case SYSTEM:
-                // TODO: 0.9.0
+                return Mono.just(requesterId.equals(ADMIN_REQUESTER_ID));
             case UNRECOGNIZED:
             default:
                 return Mono.just(false);

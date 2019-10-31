@@ -38,6 +38,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -134,20 +135,20 @@ public class OnlineUserManager {
         return userOnlineInfo.getUsingDeviceTypes();
     }
 
-    public Set<WebSocketSession> getWebSocketSessions() {
+    public List<WebSocketSession> getWebSocketSessions() {
         return userOnlineInfo.getSessionMap()
                 .values()
                 .stream()
                 .map(session -> session.webSocketSession)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
-    public Set<FluxSink<WebSocketMessage>> getOutputSinks() {
+    public List<FluxSink<WebSocketMessage>> getOutputSinks() {
         return userOnlineInfo.getSessionMap()
                 .values()
                 .stream()
                 .map(OnlineUserManager.Session::getNotificationSink)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Data

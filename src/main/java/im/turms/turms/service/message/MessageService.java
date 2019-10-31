@@ -17,18 +17,19 @@
 
 package im.turms.turms.service.message;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.AggregationUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
+import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.turms.pojo.response.TurmsResponse;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -59,16 +60,18 @@ public class MessageService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
     private final MessageStatusService messageStatusService;
+    private final OutboundMessageService outboundMessageService;
     private final GroupMemberService groupMemberService;
     private final UserService userService;
 
     @Autowired
-    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService) {
+    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.messageStatusService = messageStatusService;
         this.groupMemberService = groupMemberService;
         this.userService = userService;
+        this.outboundMessageService = outboundMessageService;
     }
 
     @Scheduled(cron = EXPIRY_MESSAGES_CLEANER_CRON)
@@ -582,14 +585,14 @@ public class MessageService {
             @Nullable Long referenceId) {
         boolean messagePersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent();
         boolean messageStatusPersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent();
-        if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP) {
+        if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP || chatType == ChatType.SYSTEM) {
             return userService.isAllowedToSendMessageToTarget(chatType, senderId, targetId)
                     .flatMap(allowed -> {
                         if (allowed == null || !allowed) {
                             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                         }
                         Mono<Set<Long>> queryRecipientsIds;
-                        if (chatType == ChatType.PRIVATE) {
+                        if (chatType == ChatType.PRIVATE || chatType == ChatType.SYSTEM) {
                             queryRecipientsIds = Mono.just(Collections.singleton(targetId));
                         } else {
                             queryRecipientsIds = groupMemberService.getMembersIdsByGroupId(targetId)
@@ -639,5 +642,49 @@ public class MessageService {
                         message.getBurnAfter(),
                         message.getDeliveryDate(),
                         messageId));
+    }
+
+    public Mono<Boolean> sendAdminMessage(
+            boolean deliver,
+            @NotNull Message message) {
+        if (message.getText() == null && message.getRecords() == null) {
+            throw new IllegalArgumentException();
+        }
+        if (deliver) {
+            return authAndSendMessage(
+                    ADMIN_REQUESTER_ID,
+                    message.getTargetId(),
+                    ChatType.SYSTEM,
+                    message.getText(),
+                    message.getRecords(),
+                    message.getBurnAfter(),
+                    new Date(),
+                    null)
+                    .flatMap(pair -> {
+                        TurmsRequest request = TurmsRequest
+                                .newBuilder()
+                                .setCreateMessageRequest(ProtoUtil.message2createMessageRequest(message))
+                                .build();
+                        byte[] response = TurmsResponse
+                                .newBuilder()
+                                .setNotification(request)
+                                .setRequestId(0)
+                                .buildPartial()
+                                .toByteArray();
+                        return outboundMessageService.relayClientMessageToClient(
+                                null,
+                                response,
+                                message.getTargetId(),
+                                true);
+                    });
+        } else {
+            if (turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent()) {
+                return saveMessageAndMessagesStatus(message, null)
+                        .thenReturn(true);
+            } else {
+                return saveMessage(message, message.getReferenceId(), null)
+                        .thenReturn(true);
+            }
+        }
     }
 }

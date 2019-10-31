@@ -31,8 +31,9 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.Future;
 
 @Component
@@ -45,17 +46,31 @@ public class OutboundMessageService {
         this.turmsClusterManager = turmsClusterManager;
     }
 
+    //TODO: separate the logic
     public Mono<Boolean> relayClientMessageToClient(
-            WebSocketMessage clientMessage,
-            byte[] clientMessageBytes,
+            @Nullable WebSocketMessage clientMessage,
+            @Nullable byte[] clientMessageBytes,
             @NotNull Long recipientId,
             boolean relayable) {
+        if (clientMessage == null && clientMessageBytes == null) {
+            throw new IllegalArgumentException();
+        }
         boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(recipientId);
         if (responsible) {
             OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(recipientId);
             if (onlineUserManager != null) {
-                Set<FluxSink<WebSocketMessage>> sinkList = onlineUserManager.getOutputSinks();
-                for (FluxSink<WebSocketMessage> recipientSink : sinkList) {
+                if (clientMessage == null) {
+                    List<WebSocketSession> sessions = onlineUserManager.getWebSocketSessions();
+                    if (!sessions.isEmpty()) {
+                        WebSocketSession session = sessions.get(0);
+                        clientMessage = session.binaryMessage(dataBufferFactory ->
+                                dataBufferFactory.wrap(clientMessageBytes));
+                    } else {
+                        return Mono.just(true);
+                    }
+                }
+                List<FluxSink<WebSocketMessage>> outputSinks = onlineUserManager.getOutputSinks();
+                for (FluxSink<WebSocketMessage> recipientSink : outputSinks) {
                     recipientSink.next(clientMessage);
                 }
                 return Mono.just(true);
@@ -86,7 +101,7 @@ public class OutboundMessageService {
         //Check whether the recipient connects to the local note.
         OnlineUserManager manager = onlineUserService.getLocalOnlineUserManager(receiverId);
         if (manager != null) {
-            Set<WebSocketSession> recipientSessions = manager.getWebSocketSessions();
+            List<WebSocketSession> recipientSessions = manager.getWebSocketSessions();
             if (recipientSessions != null && !recipientSessions.isEmpty()) {
                 for (WebSocketSession recipientSession : recipientSessions) {
                     sendServerMessageToClient(recipientSession, serverMessage);

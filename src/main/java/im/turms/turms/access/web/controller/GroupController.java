@@ -41,6 +41,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static im.turms.turms.common.Constants.*;
+
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
@@ -178,26 +180,26 @@ public class GroupController {
                 counts.add(groupService.countDeletedGroups(
                         deletedStartDate,
                         deletedEndDate)
-                        .map(total -> Pair.of("deletedGroups", total)));
+                        .map(total -> Pair.of(DELETED_GROUPS, total)));
             }
             if (deliveredMessageStartDate != null || deliveredMessageEndDate != null) {
                 counts.add(messageService.countGroupsThatSentMessages(
                         deliveredMessageStartDate,
                         deliveredMessageEndDate)
-                        .map(total -> Pair.of("groupsThatSentMessages", total)));
+                        .map(total -> Pair.of(GROUPS_THAT_SENT_MESSAGES, total)));
             }
             if (counts.isEmpty() || createdStartDate != null || createdEndDate != null) {
                 counts.add(groupService.countCreatedGroups(
                         createdStartDate,
                         createdEndDate)
-                        .map(total -> Pair.of("createdGroups", total)));
+                        .map(total -> Pair.of(CREATED_GROUPS, total)));
             }
             return ResponseFactory.collectCountResults(counts);
         } else {
             List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
             if (deletedStartDate != null && deletedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "deletedGroups",
+                        DELETED_GROUPS,
                         deletedStartDate,
                         deletedEndDate,
                         divideBy,
@@ -205,7 +207,7 @@ public class GroupController {
             }
             if (deliveredMessageStartDate != null && deliveredMessageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "groupsThatSentMessages",
+                        GROUPS_THAT_SENT_MESSAGES,
                         deliveredMessageStartDate,
                         deliveredMessageEndDate,
                         divideBy,
@@ -213,7 +215,7 @@ public class GroupController {
             }
             if (createdStartDate != null && createdEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        "createdGroups",
+                        CREATED_GROUPS,
                         createdStartDate,
                         createdEndDate,
                         divideBy,
