@@ -83,8 +83,8 @@ public class MessageController {
                 (message.getText() == null && message.getRecords() == null)) {
             throw new IllegalArgumentException();
         }
-        Mono<Boolean> success = messageService.sendAdminMessage(deliver, message);
-        return ResponseFactory.okWhenTruthy(success);
+        Mono<Boolean> acknowledged = messageService.sendAdminMessage(deliver, message);
+        return ResponseFactory.acknowledged(acknowledged);
     }
 
     @DeleteMapping

@@ -17,16 +17,11 @@
 
 package im.turms.turms.config;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.format.FormatterRegistry;
-import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
-
-import java.util.Date;
 
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
@@ -37,5 +32,14 @@ public class WebFluxConfig implements WebFluxConfigurer {
                 .allowedOrigins("*")
                 .allowCredentials(true)
                 .allowedMethods("*").allowedHeaders("*");
+    }
+
+    @Profile("dev")
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/swagger-ui.html**")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 }
