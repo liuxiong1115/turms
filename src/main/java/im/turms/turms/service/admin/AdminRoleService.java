@@ -63,7 +63,6 @@ public class AdminRoleService {
                             ADMIN_ROLE_ROOT_ID,
                             ADMIN_ROLE_ROOT_NAME,
                             AdminPermission.all()));
-
             return null;
         };
     }
@@ -175,8 +174,13 @@ public class AdminRoleService {
                 });
     }
 
+    public AdminRole getRootRole() {
+        return roles.get(ADMIN_ROLE_ROOT_ID);
+    }
+
     public Flux<AdminRole> queryAllAdminRoles() {
-        return mongoTemplate.findAll(AdminRole.class);
+        return Flux.from(mongoTemplate.findAll(AdminRole.class)
+                .concatWithValues(getRootRole()));
     }
 
     public Mono<AdminRole> queryAndUpdateRole(@NotNull Long roleId) {
