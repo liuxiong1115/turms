@@ -17,6 +17,7 @@
 
 package im.turms.turms.pojo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
  *     permissions: all permissions
  * } hardcoded in Turms
  */
+@JsonIgnoreProperties({"factoryId", "id"})
 public class AdminRole implements IdentifiedDataSerializable {
     @Id
     @Setter(AccessLevel.NONE)
