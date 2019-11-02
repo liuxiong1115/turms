@@ -17,17 +17,18 @@
 
 package im.turms.turms.access.web.controller;
 
-import com.hazelcast.nio.Address;
+import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.AdminPermission;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.util.Map;
 
 /**
  * Used to inform clients of which servers they should connect.
@@ -47,10 +48,9 @@ public class RouteController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.CUSTOM)
-    public Map<String, String> getResponsibleServerAddress(@RequestParam Long userId) {
-        Address address = turmsClusterManager
-                .getMemberByUserId(userId)
-                .getAddress();
-        return Collections.singletonMap("address", address.getHost() + ":" + address.getPort());
+    public Mono<ResponseEntity> getResponsibleServerAddress(@RequestParam Long userId) {
+        Mono<String> address = turmsClusterManager.getResponsibleTurmsServerAddress(userId);
+        return ResponseFactory.okWhenTruthy(address
+                .map(addr -> Collections.singletonMap("address", addr)));
     }
 }

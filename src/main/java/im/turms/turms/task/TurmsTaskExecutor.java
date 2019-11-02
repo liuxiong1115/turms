@@ -24,6 +24,7 @@ import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
@@ -50,5 +51,10 @@ public class TurmsTaskExecutor {
     public <T> Flux<T> callAll(@NotNull Callable<T> task, @NotNull Duration duration) {
         Map<Member, Future<T>> futureMap = executor.submitToAllMembers(task);
         return ReactorUtil.futures2Flux(futureMap.values()).timeout(duration);
+    }
+
+    public <T> Mono<T> call(@NotNull Member member, @NotNull Callable<T> task) {
+        Future<T> future = executor.submitToMember(task, member);
+        return ReactorUtil.future2Mono(future);
     }
 }

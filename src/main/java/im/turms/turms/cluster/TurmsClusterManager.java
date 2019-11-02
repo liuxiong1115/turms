@@ -17,6 +17,8 @@
 
 package im.turms.turms.cluster;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
 import com.hazelcast.config.ListenerConfig;
@@ -27,11 +29,15 @@ import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import im.turms.turms.annotation.cluster.HazelcastConfig;
 import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.property.TurmsProperties;
+import im.turms.turms.task.QueryResponsibleTurmsServerAddressTask;
+import im.turms.turms.task.TurmsTaskExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -40,6 +46,9 @@ import java.util.function.Function;
 
 @Component
 public class TurmsClusterManager {
+    @Value("${server.port}")
+    Integer port;
+
     public static final int HASH_SLOTS_NUMBER = 127;
     private static final String HAZELCAST_KEY_SHARED_PROPERTIES = "sharedProperties";
     private static final String HAZELCAST_KEY_DEFAULT = "default";
@@ -47,7 +56,8 @@ public class TurmsClusterManager {
     private static final String CLUSTER_TIME = "clusterTime";
     private static final String CLUSTER_VERSION = "clusterVersion";
     private static final String MEMBERS = "members";
-    @Getter @Setter
+    @Getter
+    @Setter
     private HazelcastInstance hazelcastInstance;
     private TurmsProperties sharedTurmsProperties;
     private ReplicatedMap<SharedPropertiesKey, Object> sharedProperties;
@@ -57,13 +67,21 @@ public class TurmsClusterManager {
     private boolean hasJoinedCluster = false;
     private List<Function<MembershipEvent, Void>> listenersOnMembersChange;
     private FlakeIdGenerator idGenerator;
+    private Cache<String, String> memberAddressCache;
+    private final TurmsTaskExecutor turmsTaskExecutor;
 
     public TurmsClusterManager(
             TurmsProperties localTurmsProperties,
-            @Lazy HazelcastInstance hazelcastInstance) {
+            @Lazy HazelcastInstance hazelcastInstance,
+            @Lazy TurmsTaskExecutor turmsTaskExecutor) {
         sharedTurmsProperties = localTurmsProperties;
         listenersOnMembersChange = new LinkedList<>();
         this.hazelcastInstance = hazelcastInstance;
+        memberAddressCache = Caffeine
+                .newBuilder()
+                .maximumSize(HASH_SLOTS_NUMBER)
+                .build();
+        this.turmsTaskExecutor = turmsTaskExecutor;
     }
 
     @HazelcastConfig
@@ -76,6 +94,7 @@ public class TurmsClusterManager {
                 @Override
                 public void memberAdded(MembershipEvent membershipEvent) {
                     membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
+                    memberAddressCache.invalidateAll();
                     if (membersSnapshot.size() > HASH_SLOTS_NUMBER) {
                         hazelcastInstance.shutdown();
                         throw new RuntimeException("The members of cluster should be not more than " + HASH_SLOTS_NUMBER);
@@ -102,6 +121,7 @@ public class TurmsClusterManager {
                 @Override
                 public void memberRemoved(MembershipEvent membershipEvent) {
                     membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
+                    memberAddressCache.invalidateAll();
                     localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
                     logWorkingRanges(
                             membershipEvent.getCluster().getMembers(),
@@ -327,6 +347,33 @@ public class TurmsClusterManager {
         int slotIndex = getSlotIndexByUserId(userId);
         Member member = getClusterMemberBySlotIndex(slotIndex);
         return member != null && member == getLocalMember() ? slotIndex : null;
+    }
+
+    public String getLocalTurmsServerAddress() {
+        return String.format("%s:%d",
+                getLocalMember().getAddress().getHost(),
+                port);
+    }
+
+    public Mono<String> getResponsibleTurmsServerAddress(@NotNull Long userId) {
+        Member member = getMemberByUserId(userId);
+        if (member == null) {
+            return Mono.empty();
+        } else {
+            if (member.getUuid().equals(getLocalMember().getUuid())) {
+                return Mono.just(getLocalTurmsServerAddress());
+            } else {
+                String address = memberAddressCache.getIfPresent(member.getUuid());
+                if (address != null) {
+                    return Mono.just(address);
+            } else {
+                return turmsTaskExecutor.call(member,
+                            new QueryResponsibleTurmsServerAddressTask())
+                            .doOnSuccess(addr -> memberAddressCache.put(
+                                    member.getUuid(), addr));
+                }
+            }
+        }
     }
 
     private enum SharedPropertiesKey {
