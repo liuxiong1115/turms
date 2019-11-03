@@ -22,14 +22,14 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.UserRelationship;
+import im.turms.turms.pojo.dto.AddRelationshipDTO;
+import im.turms.turms.pojo.dto.UpdateRelationshipDTO;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 
 import static im.turms.turms.common.Constants.DEFAULT_RELATIONSHIP_GROUP_INDEX;
@@ -45,16 +45,14 @@ public class UserRelationshipController {
 
     @PostMapping
     @RequiredPermission(AdminPermission.USER_RELATIONSHIP_CREATE)
-    public Mono<ResponseEntity> addRelationship(@RequestBody Map<String, Object> map) {
-        Object ownerId = map.get("ownerId");
-        Object relatedUserId = map.get("relatedUserId");
+    public Mono<ResponseEntity> addRelationship(@RequestBody AddRelationshipDTO addRelationshipDTO) {
         Mono<Boolean> upsert = userRelationshipService.upsertOneSidedRelationship(
-                ownerId instanceof Integer ? ((Integer) ownerId).longValue() : (Long) ownerId,
-                relatedUserId instanceof Integer ? ((Integer) relatedUserId).longValue() : (Long) relatedUserId,
-                (Boolean) map.get("isBlocked"),
+                addRelationshipDTO.getOwnerId(),
+                addRelationshipDTO.getRelatedUserId(),
+                addRelationshipDTO.getIsBlocked(),
                 DEFAULT_RELATIONSHIP_GROUP_INDEX,
                 null,
-                (Date) map.get("establishmentDate"),
+                addRelationshipDTO.getEstablishmentDate(),
                 false,
                 null);
         return ResponseFactory.acknowledged(upsert);
@@ -74,13 +72,13 @@ public class UserRelationshipController {
     public Mono<ResponseEntity> updateRelationships(
             @RequestParam Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
-            @RequestBody UserRelationship userRelationship) {
-        if (userRelationship.getIsBlocked() != null && userRelationship.getEstablishmentDate() != null) {
+            @RequestBody UpdateRelationshipDTO updateRelationshipDTO) {
+        if (updateRelationshipDTO.getIsBlocked() != null && updateRelationshipDTO.getEstablishmentDate() != null) {
             Mono<Boolean> updated = userRelationshipService.updateUserOneSidedRelationships(
                     ownerId,
                     relatedUsersIds,
-                    userRelationship.getIsBlocked(),
-                    userRelationship.getEstablishmentDate());
+                    updateRelationshipDTO.getIsBlocked(),
+                    updateRelationshipDTO.getEstablishmentDate());
             return ResponseFactory.acknowledged(updated);
         } else {
             return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);

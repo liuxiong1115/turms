@@ -106,6 +106,19 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 50: {
+            com.google.protobuf.Int32Value.Builder subBuilder = null;
+            if (minimumScore_ != null) {
+              subBuilder = minimumScore_.toBuilder();
+            }
+            minimumScore_ = input.readMessage(com.google.protobuf.Int32Value.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(minimumScore_);
+              minimumScore_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
+          case 58: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (groupTypeId_ != null) {
               subBuilder = groupTypeId_.toBuilder();
@@ -118,7 +131,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 58: {
+          case 66: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (muteEndDate_ != null) {
               subBuilder = muteEndDate_.toBuilder();
@@ -131,7 +144,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 66: {
+          case 74: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (successorId_ != null) {
               subBuilder = successorId_.toBuilder();
@@ -144,7 +157,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 74: {
+          case 82: {
             com.google.protobuf.BoolValue.Builder subBuilder = null;
             if (quitAfterTransfer_ != null) {
               subBuilder = quitAfterTransfer_.toBuilder();
@@ -291,93 +304,116 @@ private static final long serialVersionUID = 0L;
     return getProfilePictureUrl();
   }
 
-  public static final int GROUP_TYPE_ID_FIELD_NUMBER = 6;
+  public static final int MINIMUM_SCORE_FIELD_NUMBER = 6;
+  private com.google.protobuf.Int32Value minimumScore_;
+  /**
+   * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+   * @return Whether the minimumScore field is set.
+   */
+  public boolean hasMinimumScore() {
+    return minimumScore_ != null;
+  }
+  /**
+   * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+   * @return The minimumScore.
+   */
+  public com.google.protobuf.Int32Value getMinimumScore() {
+    return minimumScore_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : minimumScore_;
+  }
+  /**
+   * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+   */
+  public com.google.protobuf.Int32ValueOrBuilder getMinimumScoreOrBuilder() {
+    return getMinimumScore();
+  }
+
+  public static final int GROUP_TYPE_ID_FIELD_NUMBER = 7;
   private com.google.protobuf.Int64Value groupTypeId_;
   /**
-   * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+   * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
    * @return Whether the groupTypeId field is set.
    */
   public boolean hasGroupTypeId() {
     return groupTypeId_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+   * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
    * @return The groupTypeId.
    */
   public com.google.protobuf.Int64Value getGroupTypeId() {
     return groupTypeId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : groupTypeId_;
   }
   /**
-   * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+   * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getGroupTypeIdOrBuilder() {
     return getGroupTypeId();
   }
 
-  public static final int MUTE_END_DATE_FIELD_NUMBER = 7;
+  public static final int MUTE_END_DATE_FIELD_NUMBER = 8;
   private com.google.protobuf.Int64Value muteEndDate_;
   /**
-   * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+   * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
    * @return Whether the muteEndDate field is set.
    */
   public boolean hasMuteEndDate() {
     return muteEndDate_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+   * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
    * @return The muteEndDate.
    */
   public com.google.protobuf.Int64Value getMuteEndDate() {
     return muteEndDate_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : muteEndDate_;
   }
   /**
-   * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+   * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getMuteEndDateOrBuilder() {
     return getMuteEndDate();
   }
 
-  public static final int SUCCESSOR_ID_FIELD_NUMBER = 8;
+  public static final int SUCCESSOR_ID_FIELD_NUMBER = 9;
   private com.google.protobuf.Int64Value successorId_;
   /**
-   * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+   * <code>.google.protobuf.Int64Value successor_id = 9;</code>
    * @return Whether the successorId field is set.
    */
   public boolean hasSuccessorId() {
     return successorId_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+   * <code>.google.protobuf.Int64Value successor_id = 9;</code>
    * @return The successorId.
    */
   public com.google.protobuf.Int64Value getSuccessorId() {
     return successorId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : successorId_;
   }
   /**
-   * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+   * <code>.google.protobuf.Int64Value successor_id = 9;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getSuccessorIdOrBuilder() {
     return getSuccessorId();
   }
 
-  public static final int QUIT_AFTER_TRANSFER_FIELD_NUMBER = 9;
+  public static final int QUIT_AFTER_TRANSFER_FIELD_NUMBER = 10;
   private com.google.protobuf.BoolValue quitAfterTransfer_;
   /**
-   * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+   * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
    * @return Whether the quitAfterTransfer field is set.
    */
   public boolean hasQuitAfterTransfer() {
     return quitAfterTransfer_ != null;
   }
   /**
-   * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+   * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
    * @return The quitAfterTransfer.
    */
   public com.google.protobuf.BoolValue getQuitAfterTransfer() {
     return quitAfterTransfer_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : quitAfterTransfer_;
   }
   /**
-   * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+   * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
    */
   public com.google.protobuf.BoolValueOrBuilder getQuitAfterTransferOrBuilder() {
     return getQuitAfterTransfer();
@@ -412,17 +448,20 @@ private static final long serialVersionUID = 0L;
     if (profilePictureUrl_ != null) {
       output.writeMessage(5, getProfilePictureUrl());
     }
+    if (minimumScore_ != null) {
+      output.writeMessage(6, getMinimumScore());
+    }
     if (groupTypeId_ != null) {
-      output.writeMessage(6, getGroupTypeId());
+      output.writeMessage(7, getGroupTypeId());
     }
     if (muteEndDate_ != null) {
-      output.writeMessage(7, getMuteEndDate());
+      output.writeMessage(8, getMuteEndDate());
     }
     if (successorId_ != null) {
-      output.writeMessage(8, getSuccessorId());
+      output.writeMessage(9, getSuccessorId());
     }
     if (quitAfterTransfer_ != null) {
-      output.writeMessage(9, getQuitAfterTransfer());
+      output.writeMessage(10, getQuitAfterTransfer());
     }
     unknownFields.writeTo(output);
   }
@@ -453,21 +492,25 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(5, getProfilePictureUrl());
     }
+    if (minimumScore_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(6, getMinimumScore());
+    }
     if (groupTypeId_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, getGroupTypeId());
+        .computeMessageSize(7, getGroupTypeId());
     }
     if (muteEndDate_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, getMuteEndDate());
+        .computeMessageSize(8, getMuteEndDate());
     }
     if (successorId_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(8, getSuccessorId());
+        .computeMessageSize(9, getSuccessorId());
     }
     if (quitAfterTransfer_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(9, getQuitAfterTransfer());
+        .computeMessageSize(10, getQuitAfterTransfer());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -505,6 +548,11 @@ private static final long serialVersionUID = 0L;
     if (hasProfilePictureUrl()) {
       if (!getProfilePictureUrl()
           .equals(other.getProfilePictureUrl())) return false;
+    }
+    if (hasMinimumScore() != other.hasMinimumScore()) return false;
+    if (hasMinimumScore()) {
+      if (!getMinimumScore()
+          .equals(other.getMinimumScore())) return false;
     }
     if (hasGroupTypeId() != other.hasGroupTypeId()) return false;
     if (hasGroupTypeId()) {
@@ -555,6 +603,10 @@ private static final long serialVersionUID = 0L;
     if (hasProfilePictureUrl()) {
       hash = (37 * hash) + PROFILE_PICTURE_URL_FIELD_NUMBER;
       hash = (53 * hash) + getProfilePictureUrl().hashCode();
+    }
+    if (hasMinimumScore()) {
+      hash = (37 * hash) + MINIMUM_SCORE_FIELD_NUMBER;
+      hash = (53 * hash) + getMinimumScore().hashCode();
     }
     if (hasGroupTypeId()) {
       hash = (37 * hash) + GROUP_TYPE_ID_FIELD_NUMBER;
@@ -731,6 +783,12 @@ private static final long serialVersionUID = 0L;
         profilePictureUrl_ = null;
         profilePictureUrlBuilder_ = null;
       }
+      if (minimumScoreBuilder_ == null) {
+        minimumScore_ = null;
+      } else {
+        minimumScore_ = null;
+        minimumScoreBuilder_ = null;
+      }
       if (groupTypeIdBuilder_ == null) {
         groupTypeId_ = null;
       } else {
@@ -801,6 +859,11 @@ private static final long serialVersionUID = 0L;
         result.profilePictureUrl_ = profilePictureUrl_;
       } else {
         result.profilePictureUrl_ = profilePictureUrlBuilder_.build();
+      }
+      if (minimumScoreBuilder_ == null) {
+        result.minimumScore_ = minimumScore_;
+      } else {
+        result.minimumScore_ = minimumScoreBuilder_.build();
       }
       if (groupTypeIdBuilder_ == null) {
         result.groupTypeId_ = groupTypeId_;
@@ -884,6 +947,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasProfilePictureUrl()) {
         mergeProfilePictureUrl(other.getProfilePictureUrl());
+      }
+      if (other.hasMinimumScore()) {
+        mergeMinimumScore(other.getMinimumScore());
       }
       if (other.hasGroupTypeId()) {
         mergeGroupTypeId(other.getGroupTypeId());
@@ -1432,18 +1498,137 @@ private static final long serialVersionUID = 0L;
       return profilePictureUrlBuilder_;
     }
 
+    private com.google.protobuf.Int32Value minimumScore_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> minimumScoreBuilder_;
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     * @return Whether the minimumScore field is set.
+     */
+    public boolean hasMinimumScore() {
+      return minimumScoreBuilder_ != null || minimumScore_ != null;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     * @return The minimumScore.
+     */
+    public com.google.protobuf.Int32Value getMinimumScore() {
+      if (minimumScoreBuilder_ == null) {
+        return minimumScore_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : minimumScore_;
+      } else {
+        return minimumScoreBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     */
+    public Builder setMinimumScore(com.google.protobuf.Int32Value value) {
+      if (minimumScoreBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        minimumScore_ = value;
+        onChanged();
+      } else {
+        minimumScoreBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     */
+    public Builder setMinimumScore(
+        com.google.protobuf.Int32Value.Builder builderForValue) {
+      if (minimumScoreBuilder_ == null) {
+        minimumScore_ = builderForValue.build();
+        onChanged();
+      } else {
+        minimumScoreBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     */
+    public Builder mergeMinimumScore(com.google.protobuf.Int32Value value) {
+      if (minimumScoreBuilder_ == null) {
+        if (minimumScore_ != null) {
+          minimumScore_ =
+            com.google.protobuf.Int32Value.newBuilder(minimumScore_).mergeFrom(value).buildPartial();
+        } else {
+          minimumScore_ = value;
+        }
+        onChanged();
+      } else {
+        minimumScoreBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     */
+    public Builder clearMinimumScore() {
+      if (minimumScoreBuilder_ == null) {
+        minimumScore_ = null;
+        onChanged();
+      } else {
+        minimumScore_ = null;
+        minimumScoreBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     */
+    public com.google.protobuf.Int32Value.Builder getMinimumScoreBuilder() {
+      
+      onChanged();
+      return getMinimumScoreFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     */
+    public com.google.protobuf.Int32ValueOrBuilder getMinimumScoreOrBuilder() {
+      if (minimumScoreBuilder_ != null) {
+        return minimumScoreBuilder_.getMessageOrBuilder();
+      } else {
+        return minimumScore_ == null ?
+            com.google.protobuf.Int32Value.getDefaultInstance() : minimumScore_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int32Value minimum_score = 6;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
+        getMinimumScoreFieldBuilder() {
+      if (minimumScoreBuilder_ == null) {
+        minimumScoreBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>(
+                getMinimumScore(),
+                getParentForChildren(),
+                isClean());
+        minimumScore_ = null;
+      }
+      return minimumScoreBuilder_;
+    }
+
     private com.google.protobuf.Int64Value groupTypeId_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> groupTypeIdBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      * @return Whether the groupTypeId field is set.
      */
     public boolean hasGroupTypeId() {
       return groupTypeIdBuilder_ != null || groupTypeId_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      * @return The groupTypeId.
      */
     public com.google.protobuf.Int64Value getGroupTypeId() {
@@ -1454,7 +1639,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      */
     public Builder setGroupTypeId(com.google.protobuf.Int64Value value) {
       if (groupTypeIdBuilder_ == null) {
@@ -1470,7 +1655,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      */
     public Builder setGroupTypeId(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1484,7 +1669,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      */
     public Builder mergeGroupTypeId(com.google.protobuf.Int64Value value) {
       if (groupTypeIdBuilder_ == null) {
@@ -1502,7 +1687,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      */
     public Builder clearGroupTypeId() {
       if (groupTypeIdBuilder_ == null) {
@@ -1516,7 +1701,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      */
     public com.google.protobuf.Int64Value.Builder getGroupTypeIdBuilder() {
       
@@ -1524,7 +1709,7 @@ private static final long serialVersionUID = 0L;
       return getGroupTypeIdFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getGroupTypeIdOrBuilder() {
       if (groupTypeIdBuilder_ != null) {
@@ -1535,7 +1720,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value group_type_id = 6;</code>
+     * <code>.google.protobuf.Int64Value group_type_id = 7;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
@@ -1555,14 +1740,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> muteEndDateBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      * @return Whether the muteEndDate field is set.
      */
     public boolean hasMuteEndDate() {
       return muteEndDateBuilder_ != null || muteEndDate_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      * @return The muteEndDate.
      */
     public com.google.protobuf.Int64Value getMuteEndDate() {
@@ -1573,7 +1758,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      */
     public Builder setMuteEndDate(com.google.protobuf.Int64Value value) {
       if (muteEndDateBuilder_ == null) {
@@ -1589,7 +1774,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      */
     public Builder setMuteEndDate(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1603,7 +1788,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      */
     public Builder mergeMuteEndDate(com.google.protobuf.Int64Value value) {
       if (muteEndDateBuilder_ == null) {
@@ -1621,7 +1806,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      */
     public Builder clearMuteEndDate() {
       if (muteEndDateBuilder_ == null) {
@@ -1635,7 +1820,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      */
     public com.google.protobuf.Int64Value.Builder getMuteEndDateBuilder() {
       
@@ -1643,7 +1828,7 @@ private static final long serialVersionUID = 0L;
       return getMuteEndDateFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getMuteEndDateOrBuilder() {
       if (muteEndDateBuilder_ != null) {
@@ -1654,7 +1839,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value mute_end_date = 7;</code>
+     * <code>.google.protobuf.Int64Value mute_end_date = 8;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
@@ -1674,14 +1859,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> successorIdBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      * @return Whether the successorId field is set.
      */
     public boolean hasSuccessorId() {
       return successorIdBuilder_ != null || successorId_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      * @return The successorId.
      */
     public com.google.protobuf.Int64Value getSuccessorId() {
@@ -1692,7 +1877,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      */
     public Builder setSuccessorId(com.google.protobuf.Int64Value value) {
       if (successorIdBuilder_ == null) {
@@ -1708,7 +1893,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      */
     public Builder setSuccessorId(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1722,7 +1907,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      */
     public Builder mergeSuccessorId(com.google.protobuf.Int64Value value) {
       if (successorIdBuilder_ == null) {
@@ -1740,7 +1925,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      */
     public Builder clearSuccessorId() {
       if (successorIdBuilder_ == null) {
@@ -1754,7 +1939,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      */
     public com.google.protobuf.Int64Value.Builder getSuccessorIdBuilder() {
       
@@ -1762,7 +1947,7 @@ private static final long serialVersionUID = 0L;
       return getSuccessorIdFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getSuccessorIdOrBuilder() {
       if (successorIdBuilder_ != null) {
@@ -1773,7 +1958,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value successor_id = 8;</code>
+     * <code>.google.protobuf.Int64Value successor_id = 9;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
@@ -1793,14 +1978,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> quitAfterTransferBuilder_;
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      * @return Whether the quitAfterTransfer field is set.
      */
     public boolean hasQuitAfterTransfer() {
       return quitAfterTransferBuilder_ != null || quitAfterTransfer_ != null;
     }
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      * @return The quitAfterTransfer.
      */
     public com.google.protobuf.BoolValue getQuitAfterTransfer() {
@@ -1811,7 +1996,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      */
     public Builder setQuitAfterTransfer(com.google.protobuf.BoolValue value) {
       if (quitAfterTransferBuilder_ == null) {
@@ -1827,7 +2012,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      */
     public Builder setQuitAfterTransfer(
         com.google.protobuf.BoolValue.Builder builderForValue) {
@@ -1841,7 +2026,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      */
     public Builder mergeQuitAfterTransfer(com.google.protobuf.BoolValue value) {
       if (quitAfterTransferBuilder_ == null) {
@@ -1859,7 +2044,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      */
     public Builder clearQuitAfterTransfer() {
       if (quitAfterTransferBuilder_ == null) {
@@ -1873,7 +2058,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      */
     public com.google.protobuf.BoolValue.Builder getQuitAfterTransferBuilder() {
       
@@ -1881,7 +2066,7 @@ private static final long serialVersionUID = 0L;
       return getQuitAfterTransferFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      */
     public com.google.protobuf.BoolValueOrBuilder getQuitAfterTransferOrBuilder() {
       if (quitAfterTransferBuilder_ != null) {
@@ -1892,7 +2077,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.BoolValue quit_after_transfer = 9;</code>
+     * <code>.google.protobuf.BoolValue quit_after_transfer = 10;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 

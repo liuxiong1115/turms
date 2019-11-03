@@ -26,7 +26,10 @@ import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.GroupType;
-import im.turms.turms.pojo.dto.GroupDTO;
+import im.turms.turms.pojo.dto.AddGroupDTO;
+import im.turms.turms.pojo.dto.AddGroupTypeDTO;
+import im.turms.turms.pojo.dto.UpdateGroupDTO;
+import im.turms.turms.pojo.dto.UpdateGroupTypeDTO;
 import im.turms.turms.service.group.GroupService;
 import im.turms.turms.service.group.GroupTypeService;
 import im.turms.turms.service.message.MessageService;
@@ -79,14 +82,19 @@ public class GroupController {
 
     @PostMapping
     @RequiredPermission(AdminPermission.GROUP_CREATE)
-    public Mono<ResponseEntity> addGroup(@RequestBody Group group) {
+    public Mono<ResponseEntity> addGroup(@RequestBody AddGroupDTO addGroupDTO) {
+        Long ownerId = addGroupDTO.getOwnerId();
         Mono<Group> createdGroup = groupService.authAndCreateGroup(
-                group.getCreatorId(),
-                group.getName(),
-                group.getIntro(),
-                group.getAnnouncement(),
-                group.getProfilePictureUrl(),
-                group.getTypeId());
+                addGroupDTO.getCreatorId(),
+                ownerId != null ? ownerId : addGroupDTO.getCreatorId(),
+                addGroupDTO.getName(),
+                addGroupDTO.getIntro(),
+                addGroupDTO.getAnnouncement(),
+                addGroupDTO.getProfilePictureUrl(),
+                addGroupDTO.getMinimumScore(),
+                addGroupDTO.getTypeId(),
+                addGroupDTO.getMuteEndDate(),
+                addGroupDTO.getActive());
         return ResponseFactory.okWhenTruthy(createdGroup);
     }
 
@@ -94,17 +102,18 @@ public class GroupController {
     @RequiredPermission(AdminPermission.GROUP_UPDATE)
     public Mono<ResponseEntity> updateGroup(
             @RequestParam Long groupId,
-            @RequestBody GroupDTO group) {
+            @RequestBody UpdateGroupDTO updateGroupDTO) {
         Mono<Boolean> updated = groupService.updateGroup(
                 groupId,
-                group.getMuteEndDate(),
-                group.getName(),
-                group.getUrl(),
-                group.getIntro(),
-                group.getAnnouncement(),
-                group.getTypeId(),
-                group.getSuccessorId(),
-                group.getQuitAfterTransfer());
+                updateGroupDTO.getMuteEndDate(),
+                updateGroupDTO.getName(),
+                updateGroupDTO.getUrl(),
+                updateGroupDTO.getIntro(),
+                updateGroupDTO.getAnnouncement(),
+                updateGroupDTO.getMinimumScore(),
+                updateGroupDTO.getTypeId(),
+                updateGroupDTO.getSuccessorId(),
+                updateGroupDTO.getQuitAfterTransfer());
         return ResponseFactory.acknowledged(updated);
     }
 
@@ -126,17 +135,17 @@ public class GroupController {
 
     @PostMapping("/types")
     @RequiredPermission(AdminPermission.GROUP_TYPE_CREATE)
-    public Mono<ResponseEntity> addGroupType(@RequestBody GroupType groupType) {
-        Mono<GroupType> addedGroupType = groupTypeService.addGroupType(groupType.getName(),
-                groupType.getGroupSizeLimit(),
-                groupType.getInvitationStrategy(),
-                groupType.getJoinStrategy(),
-                groupType.getGroupInfoUpdateStrategy(),
-                groupType.getMemberInfoUpdateStrategy(),
-                groupType.getGuestSpeakable(),
-                groupType.getSelfInfoUpdatable(),
-                groupType.getEnableReadReceipt(),
-                groupType.getMessageEditable());
+    public Mono<ResponseEntity> addGroupType(@RequestBody AddGroupTypeDTO addGroupTypeDTO) {
+        Mono<GroupType> addedGroupType = groupTypeService.addGroupType(addGroupTypeDTO.getName(),
+                addGroupTypeDTO.getGroupSizeLimit(),
+                addGroupTypeDTO.getInvitationStrategy(),
+                addGroupTypeDTO.getJoinStrategy(),
+                addGroupTypeDTO.getGroupInfoUpdateStrategy(),
+                addGroupTypeDTO.getMemberInfoUpdateStrategy(),
+                addGroupTypeDTO.getGuestSpeakable(),
+                addGroupTypeDTO.getSelfInfoUpdatable(),
+                addGroupTypeDTO.getEnableReadReceipt(),
+                addGroupTypeDTO.getMessageEditable());
         return ResponseFactory.okWhenTruthy(addedGroupType);
     }
 
@@ -144,18 +153,19 @@ public class GroupController {
     @RequiredPermission(AdminPermission.GROUP_TYPE_QUERY)
     public Mono<ResponseEntity> updateGroupType(
             @RequestParam Long typeId,
-            @RequestBody GroupType groupType) {
+            @RequestBody UpdateGroupTypeDTO updateGroupTypeDTO) {
         Mono<Boolean> updated = groupTypeService.updateGroupType(
                 typeId,
-                groupType.getName(),
-                groupType.getGroupSizeLimit(),
-                groupType.getInvitationStrategy(),
-                groupType.getJoinStrategy(),
-                groupType.getGroupInfoUpdateStrategy(),
-                groupType.getMemberInfoUpdateStrategy(),
-                groupType.getSelfInfoUpdatable(),
-                groupType.getEnableReadReceipt(),
-                groupType.getMessageEditable());
+                updateGroupTypeDTO.getName(),
+                updateGroupTypeDTO.getGroupSizeLimit(),
+                updateGroupTypeDTO.getInvitationStrategy(),
+                updateGroupTypeDTO.getJoinStrategy(),
+                updateGroupTypeDTO.getGroupInfoUpdateStrategy(),
+                updateGroupTypeDTO.getMemberInfoUpdateStrategy(),
+                updateGroupTypeDTO.getGuestSpeakable(),
+                updateGroupTypeDTO.getSelfInfoUpdatable(),
+                updateGroupTypeDTO.getEnableReadReceipt(),
+                updateGroupTypeDTO.getMessageEditable());
         return ResponseFactory.acknowledged(updated);
     }
 

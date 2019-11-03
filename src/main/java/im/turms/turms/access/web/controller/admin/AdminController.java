@@ -23,7 +23,9 @@ import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.Admin;
+import im.turms.turms.pojo.dto.AddAdminDTO;
 import im.turms.turms.pojo.dto.PageResult;
+import im.turms.turms.pojo.dto.UpdateAdminDTO;
 import im.turms.turms.service.admin.AdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
 import java.util.Set;
 
 @RestController
@@ -59,13 +62,13 @@ public class AdminController {
 
     @PostMapping
     @RequiredPermission(AdminPermission.ADMIN_CREATE)
-    public Mono<ResponseEntity> addAdmin(@RequestBody Admin admin) {
+    public Mono<ResponseEntity> addAdmin(@RequestBody AddAdminDTO addAdminDTO) {
         Mono<Admin> generatedAdmin = adminService.addAdmin(
-                admin.getAccount(),
-                admin.getPassword(),
-                admin.getRoleId(),
-                admin.getName(),
-                admin.getRegistrationDate(),
+                addAdminDTO.getAccount(),
+                addAdminDTO.getPassword(),
+                addAdminDTO.getRoleId(),
+                addAdminDTO.getName(),
+                new Date(),
                 false);
         return ResponseFactory.okWhenTruthy(generatedAdmin);
     }
@@ -81,12 +84,12 @@ public class AdminController {
     @RequiredPermission(AdminPermission.ADMIN_UPDATE)
     public Mono<ResponseEntity> updateAdmins(
             @RequestParam Set<String> accounts,
-            @RequestBody Admin admin) {
+            @RequestBody UpdateAdminDTO updateAdminDTO) {
         Mono<Boolean> updated = adminService.updateAdmins(
                 accounts,
-                admin.getPassword(),
-                admin.getName(),
-                admin.getRoleId());
+                updateAdminDTO.getPassword(),
+                updateAdminDTO.getName(),
+                updateAdminDTO.getRoleId());
         return ResponseFactory.acknowledged(updated);
     }
 

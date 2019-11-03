@@ -13,8 +13,9 @@ message UpdateGroupRequest {
     google.protobuf.StringValue intro = 3;
     google.protobuf.StringValue announcement = 4;
     google.protobuf.StringValue profile_picture_url = 5;
-    google.protobuf.Int64Value group_type_id = 6;
-    google.protobuf.Int64Value mute_end_date = 7;
-    google.protobuf.Int64Value successor_id = 8;
-    google.protobuf.BoolValue quit_after_transfer = 9;
+    google.protobuf.Int32Value minimum_score = 6;
+    google.protobuf.Int64Value group_type_id = 7;
+    google.protobuf.Int64Value mute_end_date = 8;
+    google.protobuf.Int64Value successor_id = 9;
+    google.protobuf.BoolValue quit_after_transfer = 10;
 }

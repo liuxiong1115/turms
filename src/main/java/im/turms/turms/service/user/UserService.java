@@ -35,7 +35,6 @@ import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -143,6 +142,7 @@ public class UserService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String profilePictureUrl,
+            @Nullable ProfileAccessStrategy profileAccess,
             @Nullable Date registrationDate,
             @Nullable Boolean active) {
         User user = new User();
@@ -151,6 +151,7 @@ public class UserService {
         name = name != null ? name : "";
         intro = intro != null ? intro : "";
         profilePictureUrl = profilePictureUrl != null ? profilePictureUrl : "";
+        profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
         registrationDate = registrationDate != null ? registrationDate : new Date();
         active = active != null ? active : true;
         user.setId(id);
@@ -158,6 +159,7 @@ public class UserService {
         user.setName(name);
         user.setIntro(intro);
         user.setProfilePictureUrl(profilePictureUrl);
+        user.setProfileAccess(profileAccess);
         user.setRegistrationDate(registrationDate);
         user.setActive(active);
         return mongoTemplate.inTransaction()

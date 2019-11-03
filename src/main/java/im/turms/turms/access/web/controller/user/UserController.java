@@ -31,13 +31,15 @@ import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLocation;
+import im.turms.turms.pojo.dto.AddUserDTO;
+import im.turms.turms.pojo.dto.UpdateOnlineStatusDTO;
+import im.turms.turms.pojo.dto.UpdateUserDTO;
 import im.turms.turms.service.group.GroupService;
 import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.user.UserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.onlineuser.UsersNearbyService;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -104,15 +106,16 @@ public class UserController {
 
     @PostMapping
     @RequiredPermission(AdminPermission.USER_CREATE)
-    public Mono<ResponseEntity> addUser(@RequestBody User user) {
+    public Mono<ResponseEntity> addUser(@RequestBody AddUserDTO addUserDTO) {
         Mono<User> addUser = userService.addUser(
-                user.getId(),
-                user.getPassword(),
-                user.getName(),
-                user.getIntro(),
-                user.getProfilePictureUrl(),
-                user.getRegistrationDate(),
-                user.getActive());
+                addUserDTO.getId(),
+                addUserDTO.getPassword(),
+                addUserDTO.getName(),
+                addUserDTO.getIntro(),
+                addUserDTO.getProfilePictureUrl(),
+                addUserDTO.getProfileAccess(),
+                addUserDTO.getRegistrationDate(),
+                addUserDTO.getActive());
         return ResponseFactory.okWhenTruthy(addUser);
     }
 
@@ -130,23 +133,23 @@ public class UserController {
     @RequiredPermission(AdminPermission.USER_UPDATE)
     public Mono<ResponseEntity> updateUser(
             @RequestParam Set<Long> userIds,
-            @RequestBody User user) {
-        boolean validated = user.getPassword() != null
-                && user.getName() != null
-                && user.getIntro() != null
-                && user.getProfilePictureUrl() != null
-                && user.getRegistrationDate() != null
-                && user.getActive() != null;
+            @RequestBody UpdateUserDTO updateUserDTO) {
+        boolean validated = updateUserDTO.getPassword() != null
+                && updateUserDTO.getName() != null
+                && updateUserDTO.getIntro() != null
+                && updateUserDTO.getProfilePictureUrl() != null
+                && updateUserDTO.getRegistrationDate() != null
+                && updateUserDTO.getActive() != null;
         if (validated) {
             Mono<Boolean> updated = userService.updateUsers(
                     userIds,
-                    user.getPassword(),
-                    user.getName(),
-                    user.getIntro(),
-                    user.getProfilePictureUrl(),
-                    user.getProfileAccess(),
-                    user.getRegistrationDate(),
-                    user.getActive());
+                    updateUserDTO.getPassword(),
+                    updateUserDTO.getName(),
+                    updateUserDTO.getIntro(),
+                    updateUserDTO.getProfilePictureUrl(),
+                    updateUserDTO.getProfileAccess(),
+                    updateUserDTO.getRegistrationDate(),
+                    updateUserDTO.getActive());
             return ResponseFactory.acknowledged(updated);
         } else {
             return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
@@ -257,6 +260,7 @@ public class UserController {
 
     /**
      * Note: If userIds is null or empty, turms only queries the online status of local users
+     *
      * @param number this only works when userIds is null or empty
      */
     @GetMapping("/online-statuses")
@@ -295,24 +299,16 @@ public class UserController {
     @RequiredPermission(AdminPermission.USER_UPDATE)
     public ResponseEntity updateUserOnlineStatus(
             @RequestParam Long userId,
-            @RequestBody Map<String, String> onlineStatusMap) {
-        String onlineStatus = onlineStatusMap.get("onlineStatus");
-        if (onlineStatus != null) {
-            UserStatus userStatus = EnumUtils.getEnum(UserStatus.class, onlineStatus);
-            if (userStatus == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
-            OnlineUserManager manager = onlineUserService.getLocalOnlineUserManager(userId);
-            boolean updated;
-            if (manager != null) {
-                updated = manager.setUserOnlineStatus(userStatus);
-            } else {
-                updated = false;
-            }
-            return ResponseFactory.acknowledged(updated);
+            @RequestBody UpdateOnlineStatusDTO updateOnlineStatusDTO) {
+        //TODO: support updating the status of remote users
+        OnlineUserManager manager = onlineUserService.getLocalOnlineUserManager(userId);
+        boolean updated;
+        if (manager != null) {
+            updated = manager.setUserOnlineStatus(updateOnlineStatusDTO.getOnlineStatus());
         } else {
-            return ResponseFactory.entity(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            updated = false;
         }
+        return ResponseFactory.acknowledged(updated);
     }
 
     @GetMapping("/users-nearby")

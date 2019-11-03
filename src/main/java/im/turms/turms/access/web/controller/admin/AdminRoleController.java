@@ -21,7 +21,8 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
-import im.turms.turms.pojo.domain.AdminRole;
+import im.turms.turms.pojo.dto.AddAdminRoleDTO;
+import im.turms.turms.pojo.dto.UpdateAdminRoleDTO;
 import im.turms.turms.service.admin.AdminRoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -42,11 +43,14 @@ public class AdminRoleController {
 
     @PostMapping
     @RequiredPermission(AdminPermission.ADMIN_ROLE_CREATE)
-    public Mono<ResponseEntity> addAdminRole(@RequestBody AdminRole adminRole) {
-        if (adminRole.getRoleId() != null
-                && !CollectionUtils.isEmpty(adminRole.getPermissions())
-                && StringUtils.hasText(adminRole.getName())) {
-            return ResponseFactory.okWhenTruthy(adminRoleService.addAdminRole(adminRole));
+    public Mono<ResponseEntity> addAdminRole(@RequestBody AddAdminRoleDTO addAdminRoleDTO) {
+        if (addAdminRoleDTO.getId() != null
+                && !CollectionUtils.isEmpty(addAdminRoleDTO.getPermissions())
+                && StringUtils.hasText(addAdminRoleDTO.getName())) {
+            return ResponseFactory.okWhenTruthy(adminRoleService.addAdminRole(
+                    addAdminRoleDTO.getId(),
+                    addAdminRoleDTO.getName(),
+                    addAdminRoleDTO.getPermissions()));
         } else {
             return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
@@ -63,9 +67,9 @@ public class AdminRoleController {
     @RequiredPermission(AdminPermission.ADMIN_ROLE_UPDATE)
     public Mono<ResponseEntity> updateAdminRole(
             @RequestParam Long id,
-            @RequestBody AdminRole role) {
-        if (StringUtils.hasText(role.getName()) || !CollectionUtils.isEmpty(role.getPermissions())) {
-            Mono<Boolean> updated = adminRoleService.updateAdminRole(id, role.getName(), role.getPermissions());
+            @RequestBody UpdateAdminRoleDTO updateAdminRoleDTO) {
+        if (StringUtils.hasText(updateAdminRoleDTO.getName()) || !CollectionUtils.isEmpty(updateAdminRoleDTO.getPermissions())) {
+            Mono<Boolean> updated = adminRoleService.updateAdminRole(id, updateAdminRoleDTO.getName(), updateAdminRoleDTO.getPermissions());
             return ResponseFactory.acknowledged(updated);
         } else {
             return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);

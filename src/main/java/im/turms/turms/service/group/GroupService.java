@@ -80,21 +80,29 @@ public class GroupService {
 
     public Mono<Group> createGroup(
             @NotNull Long creatorId,
+            @NotNull Long ownerId,
             @Nullable String groupName,
             @Nullable String intro,
             @Nullable String announcement,
             @Nullable String profilePictureUrl,
-            @Nullable Long groupTypeId) {
+            @Nullable Integer minimumScore,
+            @Nullable Long groupTypeId,
+            @Nullable Date muteEndDate,
+            @Nullable Boolean active) {
         Long groupId = turmsClusterManager.generateRandomId();
         Group group = new Group();
         group.setId(groupId);
         group.setCreatorId(creatorId);
+        group.setOwnerId(ownerId);
         group.setOwnerId(creatorId);
         group.setName(groupName);
         group.setIntro(intro);
         group.setAnnouncement(announcement);
         group.setProfilePictureUrl(profilePictureUrl);
+        group.setMinimumScore(minimumScore);
         group.setTypeId(groupTypeId);
+        group.setMuteEndDate(muteEndDate);
+        group.setActive(active);
         return mongoTemplate
                 .inTransaction()
                 .execute(operations -> operations.insert(group)
@@ -112,11 +120,15 @@ public class GroupService {
 
     public Mono<Group> authAndCreateGroup(
             @NotNull Long creatorId,
+            @NotNull Long ownerId,
             @Nullable String groupName,
             @Nullable String intro,
             @Nullable String announcement,
             @Nullable String profilePictureUrl,
-            @Nullable Long groupTypeId) {
+            @Nullable Integer minimumScore,
+            @Nullable Long groupTypeId,
+            @Nullable Date muteEndDate,
+            @Nullable Boolean active) {
         if (groupTypeId == null) {
             groupTypeId = DEFAULT_GROUP_TYPE_ID;
         }
@@ -138,7 +150,16 @@ public class GroupService {
                 })
                 .flatMap(allowed -> {
                     if (allowed != null && allowed) {
-                        return createGroup(creatorId, groupName, intro, announcement, profilePictureUrl, finalGroupTypeId);
+                        return createGroup(creatorId,
+                                ownerId,
+                                groupName,
+                                intro,
+                                announcement,
+                                profilePictureUrl,
+                                minimumScore,
+                                finalGroupTypeId,
+                                muteEndDate,
+                                active);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED));
                     }
@@ -295,6 +316,7 @@ public class GroupService {
             @Nullable String profileUrl,
             @Nullable String intro,
             @Nullable String announcement,
+            @Nullable Integer minimumScore,
             @Nullable Long typeId,
             @Nullable ReactiveMongoOperations operations) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
@@ -302,6 +324,7 @@ public class GroupService {
                 .setIfNotNull(Group.Fields.name, name)
                 .setIfNotNull(Group.Fields.intro, intro)
                 .setIfNotNull(Group.Fields.announcement, announcement)
+                .setIfNotNull(Group.Fields.minimumScore, minimumScore)
                 .setIfNotNull(Group.Fields.profilePictureUrl, profileUrl)
                 .setIfNotNull(Group.Fields.typeId, typeId)
                 .build();
@@ -324,6 +347,7 @@ public class GroupService {
             @Nullable String profileUrl,
             @Nullable String intro,
             @Nullable String announcement,
+            @Nullable Integer minimumScore,
             @Nullable Long typeId,
             @Nullable ReactiveMongoOperations operations) {
         return queryGroupType(groupId)
@@ -346,7 +370,7 @@ public class GroupService {
                 })
                 .flatMap(authenticated -> {
                     if (authenticated != null && authenticated) {
-                        return updateGroupInformation(groupId, name, profileUrl, intro, announcement, typeId, operations);
+                        return updateGroupInformation(groupId, name, profileUrl, intro, announcement, minimumScore, typeId, operations);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -473,6 +497,7 @@ public class GroupService {
             @Nullable String url,
             @Nullable String intro,
             @Nullable String announcement,
+            @Nullable Integer minimumScore,
             @Nullable Long groupTypeId,
             @Nullable Long successorId,
             boolean quitAfterTransfer) {
@@ -493,6 +518,7 @@ public class GroupService {
                                 url,
                                 intro,
                                 announcement,
+                                minimumScore,
                                 groupTypeId,
                                 operations));
                     }
@@ -513,6 +539,7 @@ public class GroupService {
             @Nullable String url,
             @Nullable String intro,
             @Nullable String announcement,
+            @Nullable Integer minimumScore,
             @Nullable Long groupTypeId,
             @Nullable Long successorId,
             boolean quitAfterTransfer) {
@@ -548,6 +575,7 @@ public class GroupService {
                                 url,
                                 intro,
                                 announcement,
+                                minimumScore,
                                 groupTypeId,
                                 operations);
                         monos.add(updateMono);

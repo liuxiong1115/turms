@@ -73,6 +73,17 @@ public class AdminRoleService {
                 .subscribe();
     }
 
+    public Mono<AdminRole> addAdminRole(
+            @NotNull Long id,
+            @NotNull String name,
+            @NotEmpty Set<AdminPermission> permissions) {
+        AdminRole adminRole = new AdminRole(id, name, permissions);
+        return mongoTemplate.insert(adminRole).map(role -> {
+            roles.put(adminRole.getRoleId(), role);
+            return role;
+        });
+    }
+
     public Mono<AdminRole> addAdminRole(@NotNull AdminRole adminRole) {
         return mongoTemplate.insert(adminRole).map(role -> {
             roles.put(adminRole.getRoleId(), role);

@@ -12,5 +12,7 @@ message CreateGroupRequest {
     google.protobuf.StringValue intro = 2;
     google.protobuf.StringValue announcement = 3;
     google.protobuf.StringValue profile_picture_url = 4;
-    google.protobuf.Int64Value group_type_id = 5;
+    google.protobuf.Int32Value minimum_score = 5;
+    google.protobuf.Int64Value group_type_id = 6;
+    google.protobuf.Int64Value mute_end_date = 7;
 }

@@ -60,14 +60,20 @@ public class WsGroupController {
             String intro = request.hasIntro() ? request.getIntro().getValue() : null;
             String announcement = request.hasAnnouncement() ? request.getAnnouncement().getValue() : null;
             String url = request.hasProfilePictureUrl() ? request.getProfilePictureUrl().getValue() : null;
+            Integer minimumScore = request.hasMinimumScore() ? request.getMinimumScore().getValue() : null;
             Long groupTypeId = request.hasGroupTypeId() ? request.getGroupTypeId().getValue() : null;
+            Date muteEndDate = request.hasMuteEndDate() ? new Date(request.getMuteEndDate().getValue()) : null;
             return groupService.authAndCreateGroup(
+                    turmsRequestWrapper.getUserId(),
                     turmsRequestWrapper.getUserId(),
                     request.getName(),
                     intro,
                     announcement,
                     url,
-                    groupTypeId)
+                    minimumScore,
+                    groupTypeId,
+                    muteEndDate,
+                    true)
                     .map(group -> RequestResult.responseId(group.getId()));
         };
     }
@@ -157,6 +163,7 @@ public class WsGroupController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateGroupRequest() {
         return turmsRequestWrapper -> {
             UpdateGroupRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateGroupRequest();
+            Integer minimumScore = request.hasMinimumScore() ? request.getMinimumScore().getValue() : null;
             Long groupTypeId = request.hasGroupTypeId() ? request.getGroupTypeId().getValue() : null;
             Long successorId = request.hasSuccessorId() ? request.getSuccessorId().getValue() : null;
             String groupName = request.hasGroupName() ? request.getGroupName().getValue() : null;
@@ -173,6 +180,7 @@ public class WsGroupController {
                     profilePictureUrl,
                     intro,
                     announcement,
+                    minimumScore,
                     groupTypeId,
                     successorId,
                     quitAfterTransfer)

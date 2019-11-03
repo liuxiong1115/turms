@@ -30,6 +30,7 @@ import im.turms.turms.plugin.ExpiryMessageAutoDeletionNotificationHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
+import im.turms.turms.pojo.dto.CreateMessageDTO;
 import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.pojo.response.TurmsResponse;
 import im.turms.turms.service.group.GroupMemberService;
@@ -673,6 +674,20 @@ public class MessageService {
                         message.getBurnAfter(),
                         message.getDeliveryDate(),
                         messageId));
+    }
+
+    public Mono<Boolean> sendAdminMessage(
+            boolean deliver,
+            @NotNull CreateMessageDTO createMessageDTO) {
+        Message message = new Message();
+        message.setChatType(createMessageDTO.getChatType());
+        message.setText(createMessageDTO.getText());
+        message.setSenderId(createMessageDTO.getSenderId());
+        message.setTargetId(createMessageDTO.getTargetId());
+        message.setRecords(createMessageDTO.getRecords());
+        message.setBurnAfter(createMessageDTO.getBurnAfter());
+        message.setReferenceId(createMessageDTO.getReferenceId());
+        return sendAdminMessage(deliver, message);
     }
 
     public Mono<Boolean> sendAdminMessage(

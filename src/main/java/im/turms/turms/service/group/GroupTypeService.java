@@ -116,6 +116,7 @@ public class GroupTypeService {
             @Nullable GroupJoinStrategy groupJoinStrategy,
             @Nullable GroupUpdateStrategy groupInfoUpdateStrategy,
             @Nullable GroupUpdateStrategy memberInfoUpdateStrategy,
+            @Nullable Boolean guestSpeakable,
             @Nullable Boolean selfInfoUpdatable,
             @Nullable Boolean enableReadReceipt,
             @Nullable Boolean messageEditable) {
@@ -127,6 +128,7 @@ public class GroupTypeService {
                 .setIfNotNull(GroupType.Fields.joinStrategy, groupJoinStrategy)
                 .setIfNotNull(GroupType.Fields.groupInfoUpdateStrategy, groupInfoUpdateStrategy)
                 .setIfNotNull(GroupType.Fields.memberInfoUpdateStrategy, memberInfoUpdateStrategy)
+                .setIfNotNull(GroupType.Fields.guestSpeakable, guestSpeakable)
                 .setIfNotNull(GroupType.Fields.selfInfoUpdatable, selfInfoUpdatable)
                 .setIfNotNull(GroupType.Fields.enableReadReceipt, enableReadReceipt)
                 .setIfNotNull(GroupType.Fields.messageEditable, messageEditable)

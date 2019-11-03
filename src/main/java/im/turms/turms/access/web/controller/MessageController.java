@@ -27,6 +27,7 @@ import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.pojo.domain.Message;
+import im.turms.turms.pojo.dto.CreateMessageDTO;
 import im.turms.turms.service.message.MessageService;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -78,12 +79,12 @@ public class MessageController {
     @RequiredPermission(AdminPermission.MESSAGE_CREATE)
     public Mono<ResponseEntity> createMessages(
             @RequestParam(defaultValue = "true") Boolean deliver,
-            @RequestBody Message message) {
-        if (message.getTargetId() == null ||
-                (message.getText() == null && message.getRecords() == null)) {
+            @RequestBody CreateMessageDTO createMessageDTO) {
+        if (createMessageDTO.getTargetId() == null ||
+                (createMessageDTO.getText() == null && createMessageDTO.getRecords() == null)) {
             throw new IllegalArgumentException();
         }
-        Mono<Boolean> acknowledged = messageService.sendAdminMessage(deliver, message);
+        Mono<Boolean> acknowledged = messageService.sendAdminMessage(deliver, createMessageDTO);
         return ResponseFactory.acknowledged(acknowledged);
     }
 
