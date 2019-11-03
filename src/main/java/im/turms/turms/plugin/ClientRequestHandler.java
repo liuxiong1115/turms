@@ -17,14 +17,21 @@
 
 package im.turms.turms.plugin;
 
-import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.turms.pojo.bo.RequestResult;
+import im.turms.turms.pojo.dto.TurmsRequestWrapper;
+import org.pf4j.ExtensionPoint;
+import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * ClientRequestPlugin works as an interceptor between client and server
- * so all the params can be read/updated/add/remove
- */
-public abstract class AbstractClientRequestPlugin extends AbstractTurmsPlugin {
-    public abstract TurmsRequest handleTurmsRequest(@NotNull TurmsRequest turmsRequest);
+public interface ClientRequestHandler extends ExtensionPoint {
+    /**
+     * @return the returned {@link TurmsRequestWrapper} will be passed to downstream.
+     */
+    Mono<TurmsRequestWrapper> transform(@NotNull TurmsRequestWrapper turmsRequestWrapper);
+
+    /**
+     * @return returning Mono.empty() will pass the request to downstream to handle.
+     */
+    Mono<RequestResult> handleTurmsRequest(@NotNull TurmsRequestWrapper turmsRequestWrapper);
 }

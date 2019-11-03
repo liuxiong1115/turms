@@ -17,14 +17,11 @@
 
 package im.turms.turms.plugin;
 
-import lombok.Data;
+import org.pf4j.Plugin;
+import org.pf4j.PluginWrapper;
 
-/**
- * WARNING: The plugin folder and the classes under it will be removed
- * after publishing the plugins as a independent jar
- * TODO: extract plugin folder as an independent jar
- */
-@Data
-public abstract class AbstractTurmsPlugin {
-    int order = 0;
+public abstract class TurmsPlugin extends Plugin {
+    public TurmsPlugin(PluginWrapper wrapper) {
+        super(wrapper);
+    }
 }

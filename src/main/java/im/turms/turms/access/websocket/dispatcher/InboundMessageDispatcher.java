@@ -25,6 +25,8 @@ import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.plugin.ClientRequestHandler;
+import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.dto.TurmsRequestWrapper;
 import im.turms.turms.pojo.request.TurmsRequest;
@@ -52,9 +54,10 @@ public class InboundMessageDispatcher {
     private final OutboundMessageService outboundMessageService;
     private final OnlineUserService onlineUserService;
     private final TurmsClusterManager turmsClusterManager;
+    private final TurmsPluginManager turmsPluginManager;
     private EnumMap<TurmsRequest.KindCase, Function<TurmsRequestWrapper, Mono<RequestResult>>> router;
 
-    public InboundMessageDispatcher(ApplicationContext context, OutboundMessageService outboundMessageService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager) {
+    public InboundMessageDispatcher(ApplicationContext context, OutboundMessageService outboundMessageService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager) {
         router = new EnumMap<>(TurmsRequest.KindCase.class);
         this.outboundMessageService = outboundMessageService;
         Map<String, Object> beans = context.getBeansWithAnnotation(TurmsRequestMapping.class);
@@ -67,6 +70,7 @@ public class InboundMessageDispatcher {
         }
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
+        this.turmsPluginManager = turmsPluginManager;
     }
 
     private TurmsRequestMapping getMapping(Function<TurmsRequestWrapper, Mono<RequestResult>> request, String methodName) {
@@ -219,9 +223,25 @@ public class InboundMessageDispatcher {
             if (request.getKindCase() != TurmsRequest.KindCase.KIND_NOT_SET) {
                 Function<TurmsRequestWrapper, Mono<RequestResult>> handler = router.get(request.getKindCase());
                 if (handler != null) {
-                    TurmsRequestWrapper wrapper = new TurmsRequestWrapper(
-                            request, userId, deviceType, message, session);
-                    Mono<RequestResult> result = handler.apply(wrapper);
+                    Mono<TurmsRequestWrapper> wrapperMono = Mono.just(new TurmsRequestWrapper(
+                            request, userId, deviceType, message, session));
+                    if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                        List<ClientRequestHandler> handlerList = turmsPluginManager.getClientRequestHandlerList();
+                        for (ClientRequestHandler clientRequestHandler : handlerList) {
+                            wrapperMono = wrapperMono.flatMap(clientRequestHandler::transform);
+                        }
+                    }
+                    Mono<RequestResult> result = wrapperMono.flatMap(requestWrapper -> {
+                        Mono<RequestResult> requestResultMono = Mono.empty();
+                        if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                            List<ClientRequestHandler> handlerList = turmsPluginManager.getClientRequestHandlerList();
+                            for (ClientRequestHandler clientRequestHandler : handlerList) {
+                                requestResultMono = requestResultMono
+                                        .switchIfEmpty(clientRequestHandler.handleTurmsRequest(requestWrapper));
+                            }
+                        }
+                        return requestResultMono.switchIfEmpty(handler.apply(requestWrapper));
+                    });
                     Long requestId = request.hasRequestId() ? request.getRequestId().getValue() : null;
                     return handleResult(session, result, requestId, userId);
                 } else {

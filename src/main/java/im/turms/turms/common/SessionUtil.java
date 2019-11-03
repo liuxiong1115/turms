@@ -24,6 +24,7 @@ import com.mongodb.DBObject;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
@@ -121,7 +122,7 @@ public class SessionUtil {
         }
     }
 
-    public static DeviceType parseDeviceTypeFromRequest(
+    public static Pair<String, DeviceType> parseDeviceTypeFromRequest(
             @NotNull ServerHttpRequest request,
             @NotNull Boolean isUseOsAsDefaultDeviceType) {
         DeviceType deviceType = getDeviceTypeFromRequest(request);
@@ -136,8 +137,10 @@ public class SessionUtil {
             } else {
                 deviceType = DeviceType.UNKNOWN;
             }
+            return Pair.of(agent, deviceType);
+        } else {
+            return Pair.of(null, deviceType);
         }
-        return deviceType;
     }
 
     public static String getUserStatusFromRequest(ServerHttpRequest request) {

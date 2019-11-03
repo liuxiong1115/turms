@@ -17,10 +17,17 @@
 
 package im.turms.turms.plugin;
 
-import im.turms.turms.pojo.domain.Message;
+import im.turms.turms.pojo.bo.UserLoginInfo;
+import org.pf4j.ExtensionPoint;
+import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 
-public abstract class AbstractMessageDeletionNotificationPlugin extends AbstractTurmsPlugin {
-    public abstract void handleMessageDeletion(@NotNull Message message);
+public interface UserAuthenticator extends ExtensionPoint {
+    /**
+     * @return 1. Return Mono.just(true) if the user is authenticated.<br/>
+     * 2. Return Mono.just(false) if the user is unauthenticated.<br/>
+     * 3. Return Mono.empty() if the authentication should be passed.
+     */
+    Mono<Boolean> authenticate(@NotNull UserLoginInfo userLoginInfo);
 }
