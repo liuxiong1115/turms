@@ -3,7 +3,7 @@
 
 hazelcast:
   group:
-    name: turms-0.8.0-beta
+    name: turms-0.9.0-beta-SNAPSHOT
 
   network:
     port:
