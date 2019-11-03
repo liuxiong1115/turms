@@ -26,6 +26,8 @@ import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.plugin.ExpiryMessageAutoDeletionNotificationHandler;
+import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.pojo.request.TurmsRequest;
@@ -63,6 +65,7 @@ public class MessageService {
     private final OutboundMessageService outboundMessageService;
     private final GroupMemberService groupMemberService;
     private final UserService userService;
+    private TurmsPluginManager turmsPluginManager;
 
     @Autowired
     public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService) {
@@ -330,11 +333,38 @@ public class MessageService {
                     } else {
                         Query messagesQuery = new Query().addCriteria(Criteria.where(ID).in(messagesIds));
                         Query messagesStatusesQuery = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds));
+                        Mono<Boolean> allowedMono = Mono.just(true);
+                        if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                            allowedMono = mongoTemplate.find(messagesQuery, Message.class)
+                                    .collectList()
+                                    .flatMap(messages -> {
+                                        Mono<Boolean> mono = Mono.just(true);
+                                        for (ExpiryMessageAutoDeletionNotificationHandler handler : turmsPluginManager
+                                                .getExpiryMessageAutoDeletionNotificationHandlerList()) {
+                                            mono = mono
+                                                    .defaultIfEmpty(true)
+                                                    .flatMap(allowed -> {
+                                                        if (allowed) {
+                                                            return handler.allowDeleting(messages);
+                                                        } else {
+                                                            return Mono.just(false);
+                                                        }
+                                                    });
+                                        }
+                                        return mono;
+                                    });
+                        }
+                        return allowedMono.flatMap(allowed -> {
+                            if (allowed) {
                         return mongoTemplate.inTransaction().execute(operations -> Mono.zip(
                                 operations.remove(messagesQuery, Message.class),
                                 operations.remove(messagesStatusesQuery, MessageStatus.class))
                                 .thenReturn(true))
                                 .single();
+                            } else {
+                                return Mono.just(false);
+                            }
+                        });
                     }
                 });
     }

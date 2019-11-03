@@ -17,23 +17,36 @@
 
 package im.turms.turms.plugin;
 
+import lombok.Data;
+import org.pf4j.DefaultPluginManager;
+import org.pf4j.PluginManager;
 import org.springframework.stereotype.Component;
 
-//TODO: 0.9.0
+import javax.annotation.PostConstruct;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+
 @Component
+@Data
 public class TurmsPluginManager {
-//    private static final String pluginsUrl = TurmsPluginManager.class
-//            .getProtectionDomain().getCodeSource().getLocation().toString();
-//    private TurmsClusterManager turmsClusterManager;
-//    private AbstractClientRequestPlugin abstractClientRequestPlugin;
-//
-//    @PostHazelcastInitialized
-//    public Function<TurmsClusterManager, Void> initTurmsPluginManager() {
-//        return turmsClusterManager -> {
-//        };
-//    }
-//
-//    public AbstractClientRequestPlugin getAbstractClientRequestPlugin() {
-//        return abstractClientRequestPlugin;
-//    }
+    private List<ClientRequestHandler> clientRequestHandlerList;
+    private List<ExpiryMessageAutoDeletionNotificationHandler> expiryMessageAutoDeletionNotificationHandlerList;
+    private List<UserAuthenticator> userAuthenticatorList;
+
+    public TurmsPluginManager() {
+        clientRequestHandlerList = Collections.emptyList();
+        expiryMessageAutoDeletionNotificationHandlerList = Collections.emptyList();
+        userAuthenticatorList = Collections.emptyList();
+    }
+
+    @PostConstruct
+    public void init() {
+        PluginManager pluginManager = new DefaultPluginManager(Paths.get("../plugins"));
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+        clientRequestHandlerList = pluginManager.getExtensions(ClientRequestHandler.class);
+        expiryMessageAutoDeletionNotificationHandlerList = pluginManager.getExtensions(ExpiryMessageAutoDeletionNotificationHandler.class);
+        userAuthenticatorList = pluginManager.getExtensions(UserAuthenticator.class);
+    }
 }

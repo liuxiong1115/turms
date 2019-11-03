@@ -17,7 +17,15 @@
 
 package im.turms.turms.pojo.bo;
 
-public interface UserIdAndRole {
-    Long getUserId();
-    String getRole();
+import im.turms.turms.constant.DeviceType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class UserLoginInfo {
+    private Long userId;
+    private String password;
+    private DeviceType loggingDeviceType;
+    private String userAgent;
 }

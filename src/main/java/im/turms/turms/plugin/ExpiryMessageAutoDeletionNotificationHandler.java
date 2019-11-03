@@ -15,12 +15,19 @@
  * limitations under the License.
  */
 
-package im.turms.turms.pojo.bo;
+package im.turms.turms.plugin;
 
-import lombok.Data;
+import im.turms.turms.pojo.domain.Message;
+import org.pf4j.ExtensionPoint;
+import reactor.core.publisher.Mono;
 
-@Data
-public class ResponderIdAndStatus {
-    private Long responderId;
-    private String status;
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
+
+/**
+ * The plugin is useful when developers needing to persist messages in other places
+ * while deleting them in the databases for turms servers.
+ */
+public interface ExpiryMessageAutoDeletionNotificationHandler extends ExtensionPoint {
+    Mono<Boolean> allowDeleting(@NotEmpty List<Message> message);
 }
