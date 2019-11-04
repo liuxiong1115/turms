@@ -24,6 +24,8 @@ import im.turms.turms.common.ReactorUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
+import im.turms.turms.plugin.TurmsPluginManager;
+import im.turms.turms.plugin.UserOnlineStatusChangeHandler;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
 import im.turms.turms.pojo.domain.UserOnlineUserNumber;
@@ -62,11 +64,11 @@ import static im.turms.turms.common.Constants.*;
 
 @Service
 public class OnlineUserService {
-    private static final String COUNT_ONLINE_USER_NUMBER = "COUNT_ONLINE_USER_NUMBER";
     private static final int DEFAULT_ONLINE_USERS_MANAGER_CAPACITY = 1024;
     private static final UserLocation EMPTY_USER_LOCATION = new UserLocation();
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
+    private final TurmsPluginManager turmsPluginManager;
     private final UsersNearbyService usersNearbyService;
     private final UserLoginLogService userLoginLogService;
     private final UserLocationService userLocationService;
@@ -84,7 +86,7 @@ public class OnlineUserService {
             ReactiveMongoTemplate mongoTemplate,
             UserLoginLogService userLoginLogService,
             UserLocationService userLocationService,
-            TurmsTaskExecutor turmsTaskExecutor) {
+            TurmsTaskExecutor turmsTaskExecutor, TurmsPluginManager turmsPluginManager) {
         this.turmsClusterManager = turmsClusterManager;
         this.usersNearbyService = usersNearbyService;
         turmsClusterManager.addListenerOnMembersChange(
@@ -98,6 +100,7 @@ public class OnlineUserService {
         this.timer = new HashedWheelTimer();
         this.userLocationService = userLocationService;
         this.turmsTaskExecutor = turmsTaskExecutor;
+        this.turmsPluginManager = turmsPluginManager;
     }
 
     @Scheduled(cron = ONLINE_USERS_NUMBER_PERSISTER_CRON)
@@ -148,6 +151,14 @@ public class OnlineUserService {
                             .subscribe();
                 }
                 manager.setAllDevicesOffline(closeStatus);
+                if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                    List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
+                    if (!handlerList.isEmpty()) {
+                        for (UserOnlineStatusChangeHandler handler : handlerList) {
+                            handler.goOffline(manager, closeStatus).subscribe();
+                        }
+                    }
+                }
             }
         }
     }
@@ -165,6 +176,7 @@ public class OnlineUserService {
         return setLocalUserDevicesOffline(userId, Collections.singleton(deviceType), closeStatus);
     }
 
+    //TODO: consolidate setLocalUserDevicesOffline() with setManagersOffline()
     public boolean setLocalUserDevicesOffline(
             @NotNull Long userId,
             @NotEmpty Set<DeviceType> deviceTypes,
@@ -180,6 +192,14 @@ public class OnlineUserService {
                 }
             }
             manager.setSpecificDevicesOffline(deviceTypes, closeStatus);
+            if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
+                if (!handlerList.isEmpty()) {
+                    for (UserOnlineStatusChangeHandler handler : handlerList) {
+                        handler.goOffline(manager, closeStatus).subscribe();
+                    }
+                }
+            }
             return true;
         } else {
             return false;
@@ -275,7 +295,7 @@ public class OnlineUserService {
     public Mono<TurmsStatusCode> addOnlineUser(
             @NotNull Long userId,
             @NotNull UserStatus userStatus,
-            @NotNull DeviceType usingDeviceType,
+            @NotNull DeviceType loggingInDeviceType,
             @Nullable Map<String, String> deviceDetails,
             @NotNull Integer ip,
             @Nullable PointFloat userLocation,
@@ -295,20 +315,20 @@ public class OnlineUserService {
                     if (EMPTY_USER_LOCATION != location) {
                         locationId = location.getId();
                     }
-                    return logUserOnline(userId, ip, usingDeviceType, deviceDetails, locationId)
+                    return logUserOnline(userId, ip, loggingInDeviceType, deviceDetails, locationId)
                             .map(logId -> {
                                 Integer slotIndex = turmsClusterManager.getSlotIndexByUserIdForCurrentNode(userId);
                                 if (slotIndex == null) {
                                     return TurmsStatusCode.NOT_RESPONSIBLE;
                                 } else {
                                     OnlineUserManager onlineUserManager = getLocalOnlineUserManager(userId);
-                                    Timeout heartbeatTimeout = newHeartbeatTimeout(userId, usingDeviceType);
+                                    Timeout heartbeatTimeout = newHeartbeatTimeout(userId, loggingInDeviceType);
                                     if (onlineUserManager != null) {
                                         onlineUserManager.setUserOnlineStatus(
                                                 userStatus == UserStatus.OFFLINE || userStatus == UserStatus.UNRECOGNIZED ?
                                                         UserStatus.AVAILABLE : userStatus);
                                         onlineUserManager.setDeviceTypeOnline(
-                                                usingDeviceType,
+                                                loggingInDeviceType,
                                                 location == EMPTY_USER_LOCATION ? null : location,
                                                 webSocketSession,
                                                 notificationSink,
@@ -318,7 +338,7 @@ public class OnlineUserService {
                                         onlineUserManager = new OnlineUserManager(
                                                 userId,
                                                 userStatus,
-                                                usingDeviceType,
+                                                loggingInDeviceType,
                                                 location == EMPTY_USER_LOCATION ? null : location,
                                                 webSocketSession,
                                                 notificationSink,
@@ -326,6 +346,14 @@ public class OnlineUserService {
                                                 logId);
                                     }
                                     getOrAddOnlineUsersManager(slotIndex).put(userId, onlineUserManager);
+                                    if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                                        List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
+                                        if (!handlerList.isEmpty()) {
+                                            for (UserOnlineStatusChangeHandler handler : handlerList) {
+                                                handler.goOnline(onlineUserManager, loggingInDeviceType).subscribe();
+                                            }
+                                        }
+                                    }
                                     return TurmsStatusCode.OK;
                                 }
                             })
