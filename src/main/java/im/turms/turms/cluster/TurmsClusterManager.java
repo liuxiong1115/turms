@@ -350,6 +350,7 @@ public class TurmsClusterManager {
     }
 
     public String getLocalTurmsServerAddress() {
+        //TODO: cache
         return String.format("%s:%d",
                 getLocalMember().getAddress().getHost(),
                 port);

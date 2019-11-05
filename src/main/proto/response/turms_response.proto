@@ -8,6 +8,7 @@ option java_multiple_files = true;
 import "google/protobuf/wrappers.proto";
 
 import "dto/signal/acknowledge.proto";
+import "dto/signal/session.proto";
 
 import "request/turms_request.proto";
 
@@ -48,23 +49,24 @@ message TurmsResponse {
             google.protobuf.BoolValue success = 3;
 
             Acknowledge acknowledge = 4;
+            Session session = 5;
 
-            Messages messages = 5;
-            MessageStatuses message_statuses = 6;
-            MessagesWithTotalList messages_with_total_list = 7;
+            Messages messages = 6;
+            MessageStatuses message_statuses = 7;
+            MessagesWithTotalList messages_with_total_list = 8;
 
-            UsersInfosWithVersion users_infos_with_version = 8;
-            UsersOnlineStatuses users_online_statuses = 9;
-            UserFriendRequestsWithVersion user_friend_requests_with_version = 10;
-            UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 11;
-            UserRelationshipsWithVersion user_relationships_with_version = 12;
+            UsersInfosWithVersion users_infos_with_version = 9;
+            UsersOnlineStatuses users_online_statuses = 10;
+            UserFriendRequestsWithVersion user_friend_requests_with_version = 11;
+            UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;
+            UserRelationshipsWithVersion user_relationships_with_version = 13;
 
-            GroupInvitationsWithVersion group_invitations_with_version = 13;
-            GroupJoinQuestionsAnswerResult group_join_question_answer_result = 14;
-            GroupJoinRequestsWithVersion group_join_requests_with_version = 15;
-            GroupJoinQuestionsWithVersion group_join_questions_with_version = 16;
-            GroupMembersWithVersion group_members_with_version = 17;
-            GroupsWithVersion groups_with_version = 18;
+            GroupInvitationsWithVersion group_invitations_with_version = 14;
+            GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;
+            GroupJoinRequestsWithVersion group_join_requests_with_version = 16;
+            GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;
+            GroupMembersWithVersion group_members_with_version = 18;
+            GroupsWithVersion groups_with_version = 19;
         }
     }
 }

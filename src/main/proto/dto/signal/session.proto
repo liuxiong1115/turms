@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package im.turms.proto;
+
+option java_package = "im.turms.turms.pojo.dto";
+option java_multiple_files = true;
+
+message Session {
+    string session_id = 1;
+    string address = 2;
+}

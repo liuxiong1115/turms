@@ -26,6 +26,8 @@ import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UserAgentUtil;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
+import im.turms.turms.pojo.dto.Session;
+import im.turms.turms.pojo.response.TurmsResponse;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
@@ -109,6 +111,11 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
                                             userId,
                                             Collections.singleton(finalDeviceType),
                                             CloseStatus.SERVER_ERROR);
+                                } else if (turmsClusterManager.getTurmsProperties().getSession()
+                                        .isNotifyClientsOfSessionInfoAfterConnected()) {
+                                    String address = turmsClusterManager.getLocalTurmsServerAddress();
+                                    WebSocketMessage message = generateSessionNotification(session, address);
+                                    notificationSink.next(message);
                                 }
                             })
                             .subscribe());
@@ -137,5 +144,20 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);
         return corsConfiguration;
+    }
+
+    private WebSocketMessage generateSessionNotification(
+            @NotNull WebSocketSession session,
+            @NotNull String serverAddress) {
+        return session.binaryMessage(factory -> {
+            Session result = Session.newBuilder()
+                    .setSessionId(session.getId())
+                    .setAddress(serverAddress)
+                    .build();
+            TurmsResponse response = TurmsResponse.newBuilder()
+                    .setData(TurmsResponse.Data.newBuilder().setSession(result))
+                    .buildPartial();
+            return factory.wrap(response.toByteArray());
+        });
     }
 }
