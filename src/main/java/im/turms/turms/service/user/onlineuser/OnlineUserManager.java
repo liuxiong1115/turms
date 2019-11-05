@@ -143,6 +143,19 @@ public class OnlineUserManager {
                 .collect(Collectors.toList());
     }
 
+    public List<WebSocketSession> getWebSocketSessions(@NotEmpty Set<DeviceType> deviceTypes) {
+        return userOnlineInfo.getSessionMap()
+                .values()
+                .stream()
+                .filter(session -> session != null && deviceTypes.contains(session.deviceType))
+                .map(session -> session.webSocketSession)
+                .collect(Collectors.toList());
+    }
+
+    public WebSocketSession getWebSocketSession(@NotNull DeviceType deviceType) {
+        return userOnlineInfo.getSessionMap().get(deviceType).webSocketSession;
+    }
+
     public List<FluxSink<WebSocketMessage>> getOutputSinks() {
         return userOnlineInfo.getSessionMap()
                 .values()

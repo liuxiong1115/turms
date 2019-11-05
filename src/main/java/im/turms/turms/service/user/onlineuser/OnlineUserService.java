@@ -17,6 +17,8 @@
 
 package im.turms.turms.service.user.onlineuser;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.hazelcast.core.Member;
 import im.turms.turms.cluster.TurmsClusterManager;
@@ -74,11 +76,14 @@ public class OnlineUserService {
     private final UserLocationService userLocationService;
     private final HashedWheelTimer timer;
     private final TurmsTaskExecutor turmsTaskExecutor;
-
     /**
      * Integer(Slot) -> Long(userId) -> OnlineUserManager
      */
     private List<Map<Long, OnlineUserManager>> onlineUsersManagerAtSlots;
+    /**
+     * Pair<user ID, session ID> -> CloseStatus
+     */
+    private Cache<Pair<Long, String>, Integer> disconnectionReasonCache;
 
     public OnlineUserService(
             TurmsClusterManager turmsClusterManager,
@@ -96,11 +101,15 @@ public class OnlineUserService {
                 });
         this.mongoTemplate = mongoTemplate;
         this.userLoginLogService = userLoginLogService;
-        this.onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
-        this.timer = new HashedWheelTimer();
         this.userLocationService = userLocationService;
         this.turmsTaskExecutor = turmsTaskExecutor;
         this.turmsPluginManager = turmsPluginManager;
+        this.timer = new HashedWheelTimer();
+        this.disconnectionReasonCache = Caffeine
+                .newBuilder()
+                .expireAfterWrite(Duration.ofMinutes(10))
+                .build();
+        this.onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
     }
 
     @Scheduled(cron = ONLINE_USERS_NUMBER_PERSISTER_CRON)
@@ -144,11 +153,14 @@ public class OnlineUserService {
             if (manager != null) {
                 ConcurrentMap<DeviceType, OnlineUserManager.Session> sessionMap = manager.getOnlineUserInfo().getSessionMap();
                 Date now = new Date();
+                Long userId = manager.getOnlineUserInfo().getUserId();
                 for (OnlineUserManager.Session session : sessionMap.values()) {
                     Long logId = session.getLogId();
                     userLoginLogService
                             .updateLogoutDate(logId, now)
                             .subscribe();
+                    disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
+                            closeStatus.getCode());
                 }
                 manager.setAllDevicesOffline(closeStatus);
                 if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
@@ -189,6 +201,8 @@ public class OnlineUserService {
                 if (session != null) {
                     Long logId = session.getLogId();
                     userLoginLogService.updateLogoutDate(logId, now).subscribe();
+                    disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
+                            closeStatus.getCode());
                 }
             }
             manager.setSpecificDevicesOffline(deviceTypes, closeStatus);
@@ -487,5 +501,13 @@ public class OnlineUserService {
             }
         }
         return false;
+    }
+
+    public Integer getDisconnectionReason(@NotNull Long userId, @NotNull String sessionId) {
+        if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryingLoginFailedReason()) {
+            return disconnectionReasonCache.getIfPresent(Pair.of(userId, sessionId));
+        } else {
+            return null;
+        }
     }
 }

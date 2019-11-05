@@ -39,6 +39,10 @@ public class Session implements IdentifiedDataSerializable {
     private int requestHeartbeatTimeoutSeconds = 50;
     @JsonView(MutablePropertiesView.class)
     private int minHeartbeatRefreshIntervalSeconds = 3;
+    @JsonView(MutablePropertiesView.class)
+    private boolean enableQueryingLoginFailedReason = true;
+    @JsonView(MutablePropertiesView.class)
+    private boolean enableQueryingDisconnectionReason = true;
     /**
      * If the Turms server only receives heartbeat requests from the client during maxIdleTime,
      * the session will be closed when the Session Cleaner detects it.
@@ -60,6 +64,8 @@ public class Session implements IdentifiedDataSerializable {
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeInt(requestHeartbeatTimeoutSeconds);
         out.writeInt(minHeartbeatRefreshIntervalSeconds);
+        out.writeBoolean(enableQueryingLoginFailedReason);
+        out.writeBoolean(enableQueryingDisconnectionReason);
 //        out.writeInt(idleHeartbeatTimeoutSeconds);
     }
 
@@ -67,6 +73,8 @@ public class Session implements IdentifiedDataSerializable {
     public void readData(ObjectDataInput in) throws IOException {
         requestHeartbeatTimeoutSeconds = in.readInt();
         minHeartbeatRefreshIntervalSeconds = in.readInt();
+        enableQueryingLoginFailedReason = in.readBoolean();
+        enableQueryingDisconnectionReason = in.readBoolean();
 //        idleHeartbeatTimeoutSeconds = in.readInt();
     }
 }

@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SessionUtil {
+    public static final String REQUEST_ID_FIELD = "rid";
     public static final String USER_ID_FIELD = "uid";
     public static final String PASSWORD_FIELD = "pwd";
     public static final String DEVICE_TYPE_FIELD = "dt";
@@ -160,15 +161,23 @@ public class SessionUtil {
         attributes.put(DEVICE_TYPE_FIELD, deviceType);
     }
 
+    public static Long getRequestIdFromRequest(ServerHttpRequest request) {
+        return getLongFromRequest(request, REQUEST_ID_FIELD);
+    }
+
     public static Long getUserIdFromRequest(ServerHttpRequest request) {
-        String uid = getFirstCookieValue(request.getCookies(), USER_ID_FIELD);
+        return getLongFromRequest(request, USER_ID_FIELD);
+    }
+
+    private static Long getLongFromRequest(ServerHttpRequest request, String fieldName) {
+        String longValue = getFirstCookieValue(request.getCookies(), fieldName);
         try {
-            if (uid != null && !uid.isBlank()) {
-                return Long.parseLong(uid);
+            if (longValue != null && !longValue.isBlank()) {
+                return Long.parseLong(longValue);
             } else {
-                uid = request.getHeaders().getFirst("uid");
-                if (uid != null && !uid.isBlank()) {
-                    return Long.parseLong(uid);
+                longValue = request.getHeaders().getFirst(fieldName);
+                if (longValue != null && !longValue.isBlank()) {
+                    return Long.parseLong(longValue);
                 }
             }
             return null;
