@@ -115,6 +115,7 @@ public class GroupService {
                                 operations))
                         .flatMap(results -> groupVersionService.upsert(groupId)
                                 .thenReturn(results.getT1())))
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -174,26 +175,29 @@ public class GroupService {
                     .getGroup().isLogicallyDeleteGroupByDefault();
         }
         boolean finalUseLogicalDeletion = useLogicalDeletion;
-        return mongoTemplate.inTransaction().execute(operations -> {
-            Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
-            Mono<Boolean> updateOrRemoveMono;
-            if (finalUseLogicalDeletion) {
-                Update update = new Update().set(Group.Fields.deletionDate, new Date());
-                updateOrRemoveMono = operations.updateFirst(query, update, Group.class)
-                        .map(UpdateResult::wasAcknowledged);
-            } else {
-                updateOrRemoveMono = operations.remove(query, Group.class)
-                        .map(DeleteResult::wasAcknowledged);
-            }
-            return updateOrRemoveMono.flatMap(acknowledged -> {
-                if (acknowledged != null && acknowledged) {
-                    return groupMemberService.deleteAllGroupMembers(groupId, operations)
-                            .then(groupVersionService.delete(groupId, operations));
-                } else {
-                    return Mono.just(false);
-                }
-            });
-        }).single();
+        return mongoTemplate.inTransaction()
+                .execute(operations -> {
+                    Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
+                    Mono<Boolean> updateOrRemoveMono;
+                    if (finalUseLogicalDeletion) {
+                        Update update = new Update().set(Group.Fields.deletionDate, new Date());
+                        updateOrRemoveMono = operations.updateFirst(query, update, Group.class)
+                                .map(UpdateResult::wasAcknowledged);
+                    } else {
+                        updateOrRemoveMono = operations.remove(query, Group.class)
+                                .map(DeleteResult::wasAcknowledged);
+                    }
+                    return updateOrRemoveMono.flatMap(acknowledged -> {
+                        if (acknowledged != null && acknowledged) {
+                            return groupMemberService.deleteAllGroupMembers(groupId, operations)
+                                    .then(groupVersionService.delete(groupId, operations));
+                        } else {
+                            return Mono.just(false);
+                        }
+                    });
+                })
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                .single();
     }
 
     public Mono<Boolean> authAndDeleteGroupAndGroupMembers(
@@ -528,6 +532,7 @@ public class GroupService {
                         return Mono.zip(monos, objects -> objects).thenReturn(true);
                     }
                 })
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -559,33 +564,36 @@ public class GroupService {
         }
         return authorizeMono.flatMap(authorized -> {
             if (authorized != null && authorized) {
-                return mongoTemplate.inTransaction().execute(operations -> {
-                    List<Mono<Boolean>> monos = new LinkedList<>();
-                    if (successorId != null) {
-                        Mono<Boolean> transferMono = authAndTransferGroupOwnership(
-                                requesterId, groupId, successorId, quitAfterTransfer, operations);
-                        monos.add(transferMono);
-                    }
-                    if (muteEndDate != null || groupName != null || url != null
-                            || intro != null || announcement != null || groupTypeId != null) {
-                        Mono<Boolean> updateMono = authAndUpdateGroupInformation(
-                                requesterId,
-                                groupId,
-                                groupName,
-                                url,
-                                intro,
-                                announcement,
-                                minimumScore,
-                                groupTypeId,
-                                operations);
-                        monos.add(updateMono);
-                    }
-                    if (monos.isEmpty()) {
-                        return Mono.just(true);
-                    } else {
-                        return Mono.zip(monos, objects -> objects).thenReturn(true);
-                    }
-                }).single();
+                return mongoTemplate.inTransaction()
+                        .execute(operations -> {
+                            List<Mono<Boolean>> monos = new LinkedList<>();
+                            if (successorId != null) {
+                                Mono<Boolean> transferMono = authAndTransferGroupOwnership(
+                                        requesterId, groupId, successorId, quitAfterTransfer, operations);
+                                monos.add(transferMono);
+                            }
+                            if (muteEndDate != null || groupName != null || url != null
+                                    || intro != null || announcement != null || groupTypeId != null) {
+                                Mono<Boolean> updateMono = authAndUpdateGroupInformation(
+                                        requesterId,
+                                        groupId,
+                                        groupName,
+                                        url,
+                                        intro,
+                                        announcement,
+                                        minimumScore,
+                                        groupTypeId,
+                                        operations);
+                                monos.add(updateMono);
+                            }
+                            if (monos.isEmpty()) {
+                                return Mono.just(true);
+                            } else {
+                                return Mono.zip(monos, objects -> objects).thenReturn(true);
+                            }
+                        })
+                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                        .single();
             } else {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
             }

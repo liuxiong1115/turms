@@ -96,6 +96,7 @@ public class GroupBlacklistService {
                                                     newOperations.insert(blacklistedUser),
                                                     updateVersion)
                                                     .thenReturn(true))
+                                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                                     .single();
                         }
                     } else {

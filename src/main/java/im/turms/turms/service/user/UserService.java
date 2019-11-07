@@ -166,6 +166,7 @@ public class UserService {
                 .execute(operations -> operations.insert(user)
                         .then(userVersionService.upsertEmptyUserVersion(user.getId(), operations))
                         .thenReturn(user))
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -302,6 +303,7 @@ public class UserService {
                                     }
                                 });
                     })
+                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                     .single();
         } else {
             if (logicalDelete) {

@@ -17,8 +17,6 @@
 
 package im.turms.turms.service.message;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
@@ -313,6 +311,7 @@ public class MessageService {
                 .execute(operations -> saveMessage(message, referenceId, operations)
                         .zipWith(saveMessageStatuses(message, operations))
                         .map(Tuple2::getT1))
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -357,11 +356,13 @@ public class MessageService {
                         }
                         return allowedMono.flatMap(allowed -> {
                             if (allowed) {
-                        return mongoTemplate.inTransaction().execute(operations -> Mono.zip(
-                                operations.remove(messagesQuery, Message.class),
-                                operations.remove(messagesStatusesQuery, MessageStatus.class))
-                                .thenReturn(true))
-                                .single();
+                                return mongoTemplate.inTransaction()
+                                        .execute(operations -> Mono.zip(
+                                                operations.remove(messagesQuery, Message.class),
+                                                operations.remove(messagesStatusesQuery, MessageStatus.class))
+                                                .thenReturn(true))
+                                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                                        .single();
                             } else {
                                 return Mono.just(false);
                             }
@@ -392,6 +393,7 @@ public class MessageService {
                                 operations.updateMulti(queryMessage, update, Message.class),
                                 operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
+                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                         .single();
             } else {
                 return mongoTemplate.updateMulti(queryMessage, update, Message.class)
@@ -404,6 +406,7 @@ public class MessageService {
                                 operations.remove(queryMessage, Message.class),
                                 operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
+                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                         .single();
             }
             return mongoTemplate.remove(queryMessage, Message.class)
@@ -536,25 +539,25 @@ public class MessageService {
     }
 
     public Mono<Long> countAcknowledgedMessagesOnAverage(
-        @Nullable Date startDate,
-        @Nullable Date endDate,
-        @Nullable ChatType chatType) {
-            return countAcknowledgedMessages(startDate, endDate, chatType)
-                    .flatMap(totalAcknowledgedMessages -> {
-                        if (totalAcknowledgedMessages == 0) {
-                            return Mono.just(0L);
-                        } else {
-                            return countUsersWhoAcknowledgedMessage(startDate, endDate, chatType)
-                                    .map(totalUsers -> {
-                                        if (totalUsers == 0) {
-                                            return Long.MAX_VALUE;
-                                        } else {
-                                            return totalAcknowledgedMessages / totalUsers;
-                                        }
-                                    });
-                        }
-                    });
-        }
+            @Nullable Date startDate,
+            @Nullable Date endDate,
+            @Nullable ChatType chatType) {
+        return countAcknowledgedMessages(startDate, endDate, chatType)
+                .flatMap(totalAcknowledgedMessages -> {
+                    if (totalAcknowledgedMessages == 0) {
+                        return Mono.just(0L);
+                    } else {
+                        return countUsersWhoAcknowledgedMessage(startDate, endDate, chatType)
+                                .map(totalUsers -> {
+                                    if (totalUsers == 0) {
+                                        return Long.MAX_VALUE;
+                                    } else {
+                                        return totalAcknowledgedMessages / totalUsers;
+                                    }
+                                });
+                    }
+                });
+    }
 
     public Mono<Boolean> updateMessageAndMessageStatus(
             @NotNull Long messageId,
@@ -566,17 +569,20 @@ public class MessageService {
         boolean readyUpdateMessage = text != null || (records != null && !records.isEmpty());
         boolean readyUpdateMessageStatus = recallDate != null || readDate != null;
         if (readyUpdateMessage || readyUpdateMessageStatus) {
-            return mongoTemplate.inTransaction().execute(operations -> {
-                List<Mono<Boolean>> updateMonos = new ArrayList<>(2);
-                if (readyUpdateMessage) {
-                    updateMonos.add(updateMessage(messageId, text, records, operations));
-                }
-                if (readyUpdateMessageStatus) {
-                    updateMonos.add(messageStatusService.updateMessageStatus(messageId, recipientId, recallDate, readDate, operations));
-                }
-                return Mono.zip(updateMonos, objects -> objects)
-                        .thenReturn(true);
-            }).single();
+            return mongoTemplate.inTransaction()
+                    .execute(operations -> {
+                        List<Mono<Boolean>> updateMonos = new ArrayList<>(2);
+                        if (readyUpdateMessage) {
+                            updateMonos.add(updateMessage(messageId, text, records, operations));
+                        }
+                        if (readyUpdateMessageStatus) {
+                            updateMonos.add(messageStatusService.updateMessageStatus(messageId, recipientId, recallDate, readDate, operations));
+                        }
+                        return Mono.zip(updateMonos, objects -> objects)
+                                .thenReturn(true);
+                    })
+                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                    .single();
         } else {
             return Mono.just(true);
         }

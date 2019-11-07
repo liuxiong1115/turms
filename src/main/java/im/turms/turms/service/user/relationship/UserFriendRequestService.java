@@ -231,6 +231,7 @@ public class UserFriendRequestService {
                                             .execute(operations -> updatePendingFriendRequestStatus(friendRequestId, RequestStatus.ACCEPTED, reason, operations)
                                                     .zipWith(userRelationshipService.friendTwoUsers(request.getRequesterId(), requesterId, operations))
                                                     .thenReturn(true))
+                                            .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
                                             .single();
                                 case IGNORE:
                                     return updatePendingFriendRequestStatus(friendRequestId, RequestStatus.IGNORED, reason, null);

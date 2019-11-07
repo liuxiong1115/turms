@@ -26,6 +26,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
@@ -93,6 +94,9 @@ public class Constants {
     public static final UserOnlineInfo OFFLINE_USER_ONLINE_INFO = UserOnlineInfo.builder()
             .userStatus(UserStatus.OFFLINE)
             .build();
+
+    public static final int MONGO_TRANSACTION_RETRIES_NUMBER = 3;
+    public static final Duration MONGO_TRANSACTION_BACKOFF = Duration.ofSeconds(3);
 
     public static final TaskScheduler TASK_SCHEDULER = new DefaultManagedTaskScheduler();
     public static final ObjectMapper MAPPER = new ObjectMapper()
