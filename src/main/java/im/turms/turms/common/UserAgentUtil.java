@@ -17,12 +17,9 @@
 
 package im.turms.turms.common;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import im.turms.turms.constant.DeviceType;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
-import org.springframework.util.DigestUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -56,26 +53,13 @@ public class UserAgentUtil {
             .hideMatcherLoadStats()
             .withFields(REQUIRED_FIELDS)
             .build();
-    /**
-     * agent(MD5) -> result map
-     */
-    private static Cache<byte[], Map<String, String>> agentCache = Caffeine
-            .newBuilder()
-            .maximumSize(1024 * 1024)
-            .build();
 
     public static Map<String, String> parse(@NotNull String agent) {
-        byte[] key = DigestUtils.md5Digest(agent.getBytes());
-        Map<String, String> valueCache = agentCache.getIfPresent(key);
-        if (valueCache != null) {
-            return valueCache;
-        }
         Map<String, String> map = new HashMap<>(REQUIRED_FIELDS.size());
         UserAgent userAgent = agentAnalyzer.parse(agent);
         for (String field : REQUIRED_FIELDS) {
             putIfNotDefault(map, userAgent, field);
         }
-        agentCache.put(key, map);
         return map;
     }
 
