@@ -21,6 +21,8 @@ import im.turms.turms.access.websocket.config.TurmsHandshakeWebSocketService;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,7 +44,14 @@ public class ReasonController {
     public Object getLoginFailedReason(
             @RequestParam Long userId,
             @RequestParam Long requestId) {
-        return handshakeService.getFailedReason(userId, requestId);
+        Object reason = handshakeService.getFailedReason(userId, requestId);
+        if (reason instanceof String) {
+            return ResponseEntity
+                    .status(HttpStatus.TEMPORARY_REDIRECT)
+                    .body(reason);
+        } else {
+            return reason;
+        }
     }
 
     @GetMapping("/disconnection")
