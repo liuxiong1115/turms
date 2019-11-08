@@ -21,12 +21,12 @@ import helper.client.SimpleTurmsClient;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BaseControllerTests {
+public class BaseControllerIT {
     public SimpleTurmsClient simpleTurmsClient;
 
     public Integer port;
 
-    protected BaseControllerTests(Integer port) throws InterruptedException {
+    protected BaseControllerIT(Integer port) throws InterruptedException {
         this.port = port;
         this.simpleTurmsClient = new SimpleTurmsClient(port);
     }

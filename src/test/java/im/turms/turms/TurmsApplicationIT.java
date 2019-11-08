@@ -22,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 // Integration tests instead of unit tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TurmsApplicationTests {
+public class TurmsApplicationIT {
     @Test
     public void contextLoads() {
     }

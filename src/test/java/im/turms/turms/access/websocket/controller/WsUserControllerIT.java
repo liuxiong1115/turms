@@ -26,9 +26,9 @@ import org.springframework.boot.web.server.LocalServerPort;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public class WsUserControllerTests extends BaseControllerTests {
+public class WsUserControllerIT extends BaseControllerIT {
 
-    protected WsUserControllerTests(@LocalServerPort Integer port) throws InterruptedException {
+    protected WsUserControllerIT(@LocalServerPort Integer port) throws InterruptedException {
         super(port);
     }
 
