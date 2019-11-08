@@ -280,7 +280,7 @@ public class TurmsClusterManager {
     }
 
     public Member getLocalMember() {
-        return hazelcastInstance.getCluster().getLocalMember();
+        return localMembersSnapshot;
     }
 
     public Integer getLocalMemberIndex() {
