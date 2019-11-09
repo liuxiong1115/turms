@@ -17,10 +17,10 @@
 
 package im.turms.turms.task;
 
-import com.github.davidmoten.rtree2.Entry;
-import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.hazelcast.spring.context.SpringAware;
-import im.turms.turms.service.user.onlineuser.UsersNearbyService;
+import im.turms.turms.constant.UserStatus;
+import im.turms.turms.service.user.onlineuser.OnlineUserManager;
+import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -31,26 +31,27 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 @SpringAware
-public class QueryNearestUsersTask implements Callable<Iterable<Entry<Long, PointFloat>>>, Serializable, ApplicationContextAware {
-    private static final long serialVersionUID = 3220885919318177439L;
-    private final PointFloat pointFloat;
-    private final Double maxDistance;
-    private final Integer maxNumber;
+public class UpdateOnlineUserStatusTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
+    private static final long serialVersionUID = 3056833768547804518L;
+    private final Long userId;
+    private final Integer userStatus;
     private transient ApplicationContext context;
-    private transient UsersNearbyService usersNearbyService;
+    private transient OnlineUserService onlineUserService;
 
-    public QueryNearestUsersTask(
-            @NotNull PointFloat pointFloat,
-            @NotNull Double maxDistance,
-            @NotNull Integer maxNumber) {
-        this.pointFloat = pointFloat;
-        this.maxDistance = maxDistance;
-        this.maxNumber = maxNumber;
+    public UpdateOnlineUserStatusTask(@NotNull Long userId, @NotNull Integer userStatus) {
+        this.userId = userId;
+        this.userStatus = userStatus;
     }
 
     @Override
-    public Iterable<Entry<Long, PointFloat>> call() {
-        return usersNearbyService.getNearestPoints(pointFloat, maxDistance, maxNumber);
+    public Boolean call() {
+        OnlineUserManager userManager = onlineUserService.getLocalOnlineUserManager(userId);
+        UserStatus status = UserStatus.forNumber(userStatus);
+        if (userManager != null && status != UserStatus.UNRECOGNIZED && status != UserStatus.OFFLINE) {
+            return userManager.setUserOnlineStatus(status);
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -59,7 +60,7 @@ public class QueryNearestUsersTask implements Callable<Iterable<Entry<Long, Poin
     }
 
     @Autowired
-    public void setOnlineUserService(final UsersNearbyService usersNearbyService) {
-        this.usersNearbyService = usersNearbyService;
+    public void setOnlineUserService(final OnlineUserService onlineUserService) {
+        this.onlineUserService = onlineUserService;
     }
 }

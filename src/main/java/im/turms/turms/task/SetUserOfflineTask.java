@@ -33,15 +33,14 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 @SpringAware
-public class UserOfflineTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
-    private static final long serialVersionUID = -1625876227422489616L;
+public class SetUserOfflineTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
     private final Long userId;
     private final Set<Integer> deviceTypes;
     private final Integer closeStatus;
     private transient ApplicationContext context;
     private transient OnlineUserService onlineUserService;
 
-    public UserOfflineTask(
+    public SetUserOfflineTask(
             @NotNull Long userId,
             @NotEmpty Set<Integer> deviceTypes,
             @NotNull Integer closeStatus) {

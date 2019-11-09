@@ -263,12 +263,8 @@ public class WsMessageController {
                             .map(recipientsIds -> RequestResult.recipientData(
                                     recipientsIds,
                                     turmsRequestWrapper.getTurmsRequest())));
-        });
-        ;
+        };
     }
-
-    ;
-}
 
     /**
      * To save a lot of resources, allow sending typing status to recipients without checking their relationships.

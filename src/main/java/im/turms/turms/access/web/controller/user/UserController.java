@@ -37,7 +37,6 @@ import im.turms.turms.pojo.dto.UpdateUserDTO;
 import im.turms.turms.service.group.GroupService;
 import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.user.UserService;
-import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.onlineuser.UsersNearbyService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -297,18 +296,11 @@ public class UserController {
 
     @PutMapping("/online-statuses")
     @RequiredPermission(AdminPermission.USER_UPDATE)
-    public ResponseEntity updateUserOnlineStatus(
+    public Mono<ResponseEntity> updateUserOnlineStatus(
             @RequestParam Long userId,
             @RequestBody UpdateOnlineStatusDTO updateOnlineStatusDTO) {
-        //TODO: support updating the status of remote users
-        OnlineUserManager manager = onlineUserService.getLocalOnlineUserManager(userId);
-        boolean updated;
-        if (manager != null) {
-            updated = manager.setUserOnlineStatus(updateOnlineStatusDTO.getOnlineStatus());
-        } else {
-            updated = false;
-        }
-        return ResponseFactory.acknowledged(updated);
+        Mono<Boolean> updated = onlineUserService.updateOnlineUserStatus(userId, updateOnlineStatusDTO.getOnlineStatus());
+        return ResponseFactory.okWhenTruthy(updated);
     }
 
     @GetMapping("/users-nearby")

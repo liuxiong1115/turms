@@ -26,6 +26,7 @@ import im.turms.turms.common.ReactorUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.plugin.UserOnlineStatusChangeHandler;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
@@ -33,10 +34,7 @@ import im.turms.turms.pojo.domain.UserLocation;
 import im.turms.turms.pojo.domain.UserOnlineUserNumber;
 import im.turms.turms.service.user.UserLocationService;
 import im.turms.turms.service.user.UserLoginLogService;
-import im.turms.turms.task.CountOnlineUsersTask;
-import im.turms.turms.task.QueryUserOnlineInfoTask;
-import im.turms.turms.task.TurmsTaskExecutor;
-import im.turms.turms.task.UserOfflineTask;
+import im.turms.turms.task.*;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import org.apache.commons.lang3.tuple.Pair;
@@ -237,7 +235,7 @@ public class OnlineUserService {
                         .collect(Collectors.toSet());
                 Future<Boolean> future = turmsClusterManager
                         .getExecutor()
-                        .submitToMember(new UserOfflineTask(userId, types, closeStatus.getCode()), member);
+                        .submitToMember(new SetUserOfflineTask(userId, types, closeStatus.getCode()), member);
                 return ReactorUtil.future2Mono(future);
             } else {
                 return Mono.just(false);
@@ -404,6 +402,26 @@ public class OnlineUserService {
             return managersMap.get(userId);
         } else {
             return null;
+        }
+    }
+
+    public Mono<Boolean> updateOnlineUserStatus(@NotNull Long userId, @NotNull UserStatus userStatus) {
+        if (userStatus == UserStatus.UNRECOGNIZED || userStatus == UserStatus.OFFLINE) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
+        if (turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
+            OnlineUserManager manager = getLocalOnlineUserManager(userId);
+            if (manager != null) {
+                return Mono.just(manager.setUserOnlineStatus(userStatus));
+            } else {
+                return Mono.just(false);
+            }
+        } else {
+            Member member = turmsClusterManager.getMemberByUserId(userId);
+            UpdateOnlineUserStatusTask task = new UpdateOnlineUserStatusTask(userId, userStatus.getNumber());
+            Future<Boolean> future = turmsClusterManager.getExecutor()
+                    .submitToMember(task, member);
+            return ReactorUtil.future2Mono(future);
         }
     }
 

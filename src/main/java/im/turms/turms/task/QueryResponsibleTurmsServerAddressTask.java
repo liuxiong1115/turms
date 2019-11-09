@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 
 @SpringAware
 public class QueryResponsibleTurmsServerAddressTask implements Callable<String>, Serializable, ApplicationContextAware {
+    private static final long serialVersionUID = -8893782558073996509L;
     private transient ApplicationContext context;
     private transient TurmsClusterManager turmsClusterManager;
 
