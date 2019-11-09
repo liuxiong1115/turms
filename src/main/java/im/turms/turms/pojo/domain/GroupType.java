@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -43,7 +43,6 @@ import java.io.IOException;
  *     name: "DEFAULT"
  * } hardcoded in Turms
  */
-@JsonIgnoreProperties({"factoryId", "id"})
 public class GroupType implements IdentifiedDataSerializable {
     @Id
     @Setter(AccessLevel.NONE)
@@ -73,13 +72,15 @@ public class GroupType implements IdentifiedDataSerializable {
         return this.id;
     }
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.DOMAIN_GROUP_TYPE.getValue();
     }
 

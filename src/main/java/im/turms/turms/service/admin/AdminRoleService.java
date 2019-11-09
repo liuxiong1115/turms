@@ -17,7 +17,7 @@
 
 package im.turms.turms.service.admin;
 
-import com.hazelcast.core.ReplicatedMap;
+import com.hazelcast.replicatedmap.ReplicatedMap;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.Constants;

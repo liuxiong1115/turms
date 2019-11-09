@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -39,7 +39,6 @@ import java.util.Date;
 @FieldNameConstants
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties({"factoryId", "id"})
 public class Admin implements IdentifiedDataSerializable {
     @Id
     @Length(min = 1, max = 32)
@@ -57,13 +56,15 @@ public class Admin implements IdentifiedDataSerializable {
     @Indexed
     private Date registrationDate;
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.DOMAIN_ADMIN.getValue();
     }
 

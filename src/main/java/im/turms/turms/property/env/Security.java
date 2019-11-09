@@ -18,7 +18,7 @@
 package im.turms.turms.property.env;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -30,7 +30,6 @@ import lombok.Data;
 import java.io.IOException;
 
 @Data
-@JsonIgnoreProperties({"factoryId", "id"})
 public class Security implements IdentifiedDataSerializable {
     private PasswordEncodeStrategy userPasswordEncodeStrategy = PasswordEncodeStrategy.SALTED_SHA256;
     private PasswordEncodeStrategy adminPasswordEncodeStrategy = PasswordEncodeStrategy.BCRYPT;
@@ -58,13 +57,15 @@ public class Security implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private int minClientRequestsIntervalMillis = 0;
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.PROPERTY_SECURITY.getValue();
     }
 

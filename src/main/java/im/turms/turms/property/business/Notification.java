@@ -17,7 +17,7 @@
 
 package im.turms.turms.property.business;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -29,7 +29,6 @@ import lombok.Data;
 import java.io.IOException;
 
 @Data
-@JsonIgnoreProperties({"factoryId", "id"})
 public class Notification implements IdentifiedDataSerializable {
     // User
     @JsonView(MutablePropertiesView.class)
@@ -77,13 +76,15 @@ public class Notification implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private boolean notifyMemberAfterUpdatedByOthers = true;
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.PROPERTY_NOTIFICATION.getValue();
     }
 

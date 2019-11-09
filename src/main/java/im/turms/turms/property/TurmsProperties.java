@@ -17,7 +17,7 @@
 
 package im.turms.turms.property;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +42,6 @@ import java.io.IOException;
 @ConfigurationProperties(prefix = "turms")
 @Data
 @NoArgsConstructor
-@JsonIgnoreProperties({"factoryId", "id"})
 public class TurmsProperties implements IdentifiedDataSerializable {
     public static final ObjectWriter MUTABLE_PROPERTIES_WRITER = new ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
@@ -63,13 +62,15 @@ public class TurmsProperties implements IdentifiedDataSerializable {
     private User user = new User();
     private Notification notification = new Notification();
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.PROPERTIES.getValue();
     }
 

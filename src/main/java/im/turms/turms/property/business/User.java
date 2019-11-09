@@ -17,7 +17,7 @@
 
 package im.turms.turms.property.business;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -29,7 +29,6 @@ import lombok.Data;
 import java.io.IOException;
 
 @Data
-@JsonIgnoreProperties({"factoryId", "id"})
 public class User implements IdentifiedDataSerializable {
     /**
      * If 0, these requests will not to be deleted
@@ -56,13 +55,15 @@ public class User implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private boolean logicallyDeleteUser = true;
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.PROPERTY_USER.getValue();
     }
 
@@ -99,7 +100,6 @@ public class User implements IdentifiedDataSerializable {
     }
 
     @Data
-    @JsonIgnoreProperties({"factoryId", "id"})
     public static class Location implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         private boolean enabled = true;
@@ -112,13 +112,15 @@ public class User implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         private String removeLocationsCron = ""; //TODO
 
+        @JsonIgnore
         @Override
         public int getFactoryId() {
             return IdentifiedDataFactory.FACTORY_ID;
         }
 
+        @JsonIgnore
         @Override
-        public int getId() {
+        public int getClassId() {
             return IdentifiedDataFactory.Type.PROPERTY_USER_LOCATION.getValue();
         }
 
@@ -142,7 +144,6 @@ public class User implements IdentifiedDataSerializable {
     }
 
     @Data
-    @JsonIgnoreProperties({"factoryId", "id"})
     public static class FriendRequest implements IdentifiedDataSerializable {
         /**
          * if 0, there is no length limit.
@@ -154,13 +155,15 @@ public class User implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         private boolean allowResendRequestAfterDeclinedOrIgnoredOrExpired = false;
 
+        @JsonIgnore
         @Override
         public int getFactoryId() {
             return IdentifiedDataFactory.FACTORY_ID;
         }
 
+        @JsonIgnore
         @Override
-        public int getId() {
+        public int getClassId() {
             return IdentifiedDataFactory.Type.PROPERTY_USER_FRIEND_REQUEST.getValue();
         }
 
@@ -180,7 +183,6 @@ public class User implements IdentifiedDataSerializable {
     }
 
     @Data
-    @JsonIgnoreProperties({"factoryId", "id"})
     public static class SimultaneousLogin implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         private SimultaneousLoginStrategy strategy = SimultaneousLoginStrategy.ALLOW_ONE_DEVICE_OF_DESKTOP_AND_ONE_DEVICE_OF_MOBILE_ONLINE;
@@ -189,13 +191,15 @@ public class User implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         private boolean allowUnknownDeviceCoexistsWithKnownDevice = false;
 
+        @JsonIgnore
         @Override
         public int getFactoryId() {
             return IdentifiedDataFactory.FACTORY_ID;
         }
 
+        @JsonIgnore
         @Override
-        public int getId() {
+        public int getClassId() {
             return IdentifiedDataFactory.Type.PROPERTY_USER_SIMULTANEOUS_LOGIN.getValue();
         }
 

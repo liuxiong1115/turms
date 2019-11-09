@@ -17,7 +17,7 @@
 
 package im.turms.turms.property.env;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -32,18 +32,19 @@ import java.io.IOException;
  * Convention over configuration
  */
 @Data
-@JsonIgnoreProperties({"factoryId", "id"})
 public class Plugin implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private boolean enabled = true;
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.PROPERTY_PLUGIN.getValue();
     }
 

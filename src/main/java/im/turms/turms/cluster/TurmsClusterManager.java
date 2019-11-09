@@ -19,12 +19,19 @@ package im.turms.turms.cluster;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.hazelcast.cluster.Member;
+import com.hazelcast.cluster.MembershipAdapter;
+import com.hazelcast.cluster.MembershipEvent;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.ReplicatedMapConfig;
-import com.hazelcast.core.*;
+import com.hazelcast.core.EntryAdapter;
+import com.hazelcast.core.EntryEvent;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IExecutorService;
 import com.hazelcast.flakeidgen.FlakeIdGenerator;
+import com.hazelcast.replicatedmap.ReplicatedMap;
 import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import im.turms.turms.annotation.cluster.HazelcastConfig;
 import im.turms.turms.common.TurmsLogger;
@@ -67,7 +74,7 @@ public class TurmsClusterManager {
     private boolean hasJoinedCluster = false;
     private List<Function<MembershipEvent, Void>> listenersOnMembersChange;
     private FlakeIdGenerator idGenerator;
-    private Cache<String, String> memberAddressCache;
+    private Cache<UUID, String> memberAddressCache;
     private final TurmsTaskExecutor turmsTaskExecutor;
 
     public TurmsClusterManager(

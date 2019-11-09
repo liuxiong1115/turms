@@ -17,7 +17,7 @@
 
 package im.turms.turms.property.env;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -35,7 +35,6 @@ import java.io.IOException;
  * The most important
  */
 @Data
-@JsonIgnoreProperties({"factoryId", "id"})
 public class Cluster implements IdentifiedDataSerializable {
     /**
      * Note: The minimumQuorumToRun is different from the quorum of Hazelcast
@@ -49,13 +48,15 @@ public class Cluster implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private int minimumQuorumToRun = 1;
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.PROPERTY_CLUSTER.getValue();
     }
 

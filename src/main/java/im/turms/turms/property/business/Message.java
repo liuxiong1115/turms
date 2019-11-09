@@ -17,7 +17,7 @@
 
 package im.turms.turms.property.business;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -29,7 +29,6 @@ import lombok.Data;
 import java.io.IOException;
 
 @Data
-@JsonIgnoreProperties({"factoryId", "id"})
 public class Message implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private TimeType timeType = TimeType.LOCAL_SERVER_TIME;
@@ -86,13 +85,15 @@ public class Message implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private boolean updateReadDateAutomaticallyAfterUserQueryingMessage = true;
 
+    @JsonIgnore
     @Override
     public int getFactoryId() {
         return IdentifiedDataFactory.FACTORY_ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return IdentifiedDataFactory.Type.PROPERTY_MESSAGE.getValue();
     }
 
@@ -148,18 +149,19 @@ public class Message implements IdentifiedDataSerializable {
     }
 
     @Data
-    @JsonIgnoreProperties({"factoryId", "id"})
     public static class TypingStatus implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         boolean enabled = true;
 
+        @JsonIgnore
         @Override
         public int getFactoryId() {
             return IdentifiedDataFactory.FACTORY_ID;
         }
 
+        @JsonIgnore
         @Override
-        public int getId() {
+        public int getClassId() {
             return IdentifiedDataFactory.Type.PROPERTY_MESSAGE_TYPING_STATUS.getValue();
         }
 
@@ -175,20 +177,21 @@ public class Message implements IdentifiedDataSerializable {
     }
 
     @Data
-    @JsonIgnoreProperties({"factoryId", "id"})
     public static class ReadReceipt implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         private boolean enabled = true;
         @JsonView(MutablePropertiesView.class)
         private boolean useServerTime = true;
 
+        @JsonIgnore
         @Override
         public int getFactoryId() {
             return IdentifiedDataFactory.FACTORY_ID;
         }
 
+        @JsonIgnore
         @Override
-        public int getId() {
+        public int getClassId() {
             return IdentifiedDataFactory.Type.PROPERTY_MESSAGE_READ_RECEIPT.getValue();
         }
 

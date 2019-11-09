@@ -17,7 +17,7 @@
 
 package im.turms.turms.service.message;
 
-import com.hazelcast.core.Member;
+import com.hazelcast.cluster.Member;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
 import im.turms.turms.pojo.request.TurmsRequest;

@@ -18,8 +18,8 @@
 package im.turms.turms.task;
 
 import com.google.common.annotations.Beta;
+import com.hazelcast.cluster.Member;
 import com.hazelcast.core.IExecutorService;
-import com.hazelcast.core.Member;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
 import org.springframework.stereotype.Component;

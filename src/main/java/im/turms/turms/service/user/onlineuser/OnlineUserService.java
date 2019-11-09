@@ -20,7 +20,7 @@ package im.turms.turms.service.user.onlineuser;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
-import com.hazelcast.core.Member;
+import com.hazelcast.cluster.Member;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
 import im.turms.turms.common.TurmsStatusCode;

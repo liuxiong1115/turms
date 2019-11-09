@@ -17,13 +17,12 @@
 
 package im.turms.turms.common;
 
-import com.hazelcast.core.ExecutionCallback;
-import com.hazelcast.core.ICompletableFuture;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class ReactorUtil {
@@ -44,19 +43,6 @@ public class ReactorUtil {
     }
 
     public static <T> Mono<T> future2Mono(Future<T> future) {
-        return Mono.create(monoSink -> {
-            ICompletableFuture<T> completableFuture = (ICompletableFuture<T>) future;
-            completableFuture.andThen(new ExecutionCallback<T>() {
-                @Override
-                public void onResponse(T response) {
-                    monoSink.success(response);
-                }
-
-                @Override
-                public void onFailure(Throwable t) {
-                    monoSink.error(t);
-                }
-            });
-        });
+        return Mono.fromCompletionStage((CompletableFuture<T>)future);
     }
 }
