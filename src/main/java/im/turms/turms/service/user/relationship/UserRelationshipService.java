@@ -103,7 +103,7 @@ public class UserRelationshipService {
                                     return Mono.just(false);
                                 }
                             }))
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
         }
     }
@@ -128,7 +128,7 @@ public class UserRelationshipService {
                                     ownerId, relatedUserId, operations))
                             .zipWith(userVersionService.updateRelationshipsVersion(ownerId))
                             .thenReturn(true))
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
         }
     }
@@ -140,7 +140,7 @@ public class UserRelationshipService {
                 .execute(operations -> deleteOneSidedRelationship(userOneId, userTwoId, operations)
                         .zipWith(deleteOneSidedRelationship(userTwoId, userOneId, operations))
                         .map(results -> results.getT1() && results.getT2()))
-                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -297,7 +297,7 @@ public class UserRelationshipService {
             return mongoTemplate.inTransaction()
                     .execute(newOperations -> friendTwoUsers(userOneId, userTwoId, newOperations)
                             .map(objects -> objects))
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
         }
     }
@@ -313,7 +313,7 @@ public class UserRelationshipService {
         } else {
             return mongoTemplate.inTransaction()
                     .execute(newOperations -> unfriendTwoUsers(ownerId, relatedUserId, newOperations))
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
         }
     }

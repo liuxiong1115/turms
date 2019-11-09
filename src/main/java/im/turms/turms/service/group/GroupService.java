@@ -115,7 +115,7 @@ public class GroupService {
                                 operations))
                         .flatMap(results -> groupVersionService.upsert(groupId)
                                 .thenReturn(results.getT1())))
-                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -196,7 +196,7 @@ public class GroupService {
                         }
                     });
                 })
-                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -532,7 +532,7 @@ public class GroupService {
                         return Mono.zip(monos, objects -> objects).thenReturn(true);
                     }
                 })
-                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -592,7 +592,7 @@ public class GroupService {
                                 return Mono.zip(monos, objects -> objects).thenReturn(true);
                             }
                         })
-                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                         .single();
             } else {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));

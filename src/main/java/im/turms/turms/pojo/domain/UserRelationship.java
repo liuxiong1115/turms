@@ -42,6 +42,12 @@ public class UserRelationship {
     @Indexed
     private Date establishmentDate;
 
+    public UserRelationship(Long ownerId, Long relatedUserId, Boolean isBlocked, Date establishmentDate) {
+        this.key = new Key(ownerId, relatedUserId);
+        this.isBlocked = isBlocked;
+        this.establishmentDate = establishmentDate;
+    }
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

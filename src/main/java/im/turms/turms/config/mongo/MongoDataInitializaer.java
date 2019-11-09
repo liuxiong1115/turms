@@ -20,7 +20,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.common.Constants.ADMIN_ROLE_ROOT_ID;
+import static im.turms.turms.common.Constants.DEFAULT_GROUP_TYPE_ID;
 
 @Component
 public class MongoDataInitializaer {
@@ -76,8 +77,7 @@ public class MongoDataInitializaer {
 
     // Note: Better not to remove all mock data after turms closed
     private void mockIfDev() throws UnknownHostException {
-        if (mongoTemplate.getMongoDatabase().getName().contains("-dev")
-                || mongoTemplate.getMongoDatabase().getName().contains("-test")) {
+        if (mongoTemplate.getMongoDatabase().getName().contains("-dev")) {
             TurmsLogger.log("Start mocking...");
             // Admin
             final int ADMIN_COUNT = 5;

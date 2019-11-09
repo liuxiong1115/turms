@@ -313,7 +313,7 @@ public class MessageService {
                 .execute(operations -> saveMessage(message, referenceId, operations)
                         .zipWith(saveMessageStatuses(message, operations))
                         .map(Tuple2::getT1))
-                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
 
@@ -363,7 +363,7 @@ public class MessageService {
                                                 operations.remove(messagesQuery, Message.class),
                                                 operations.remove(messagesStatusesQuery, MessageStatus.class))
                                                 .thenReturn(true))
-                                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                                         .single();
                             } else {
                                 return Mono.just(false);
@@ -395,7 +395,7 @@ public class MessageService {
                                 operations.updateMulti(queryMessage, update, Message.class),
                                 operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
-                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                         .single();
             } else {
                 return mongoTemplate.updateMulti(queryMessage, update, Message.class)
@@ -408,7 +408,7 @@ public class MessageService {
                                 operations.remove(queryMessage, Message.class),
                                 operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
-                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                         .single();
             }
             return mongoTemplate.remove(queryMessage, Message.class)
@@ -622,7 +622,7 @@ public class MessageService {
                         return Mono.zip(updateMonos, objects -> objects)
                                 .thenReturn(true);
                     })
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF, MONGO_TRANSACTION_BACKOFF)
+                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
         } else {
             return Mono.just(true);

@@ -18,24 +18,48 @@
 package im.turms.turms.access.websocket.controller;
 
 import com.google.protobuf.Int64Value;
+import helper.client.SimpleTurmsClient;
+import im.turms.turms.constant.ProfileAccessStrategy;
+import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.pojo.request.user.QueryUserGroupInvitationsRequest;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+
+import java.util.Date;
+import java.util.function.Function;
 
 import static im.turms.turms.pojo.notification.TurmsNotification.Data.KindCase.GROUP_INVITATIONS_WITH_VERSION;
+import static org.mockito.Mockito.*;
 
 public class WsUserControllerIT extends BaseControllerIT {
+    @LocalServerPort Integer port;
 
-    protected WsUserControllerIT(@LocalServerPort Integer port) throws InterruptedException {
-        super(port);
+    @BeforeAll
+    public static void initUser(@Autowired MongoTemplate mongoTemplate) {
+        User user = new User(1L, "123", "", "",
+                "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
+        mongoTemplate.save(user);
+    }
+
+    @AfterAll
+    public static void tearDown(@Autowired MongoTemplate mongoTemplate) {
+        mongoTemplate.remove(new Query(), User.class);
     }
 
     @Test
-    public void queryUserGroupInvitations_shouldReturn() {
+    public void queryUserGroupInvitations_shouldReturn() throws InterruptedException {
+        SimpleTurmsClient simpleTurmsClient = new SimpleTurmsClient(
+                port,
+                1L,
+                "123",
+                null);
         TurmsRequest.Builder builder = TurmsRequest
                 .newBuilder()
                 .setRequestId(Int64Value.newBuilder().setValue(1).build())
@@ -43,10 +67,9 @@ public class WsUserControllerIT extends BaseControllerIT {
                         QueryUserGroupInvitationsRequest
                                 .newBuilder()
                                 .build());
-        Mono<TurmsNotification> response = simpleTurmsClient.send(builder);
-        StepVerifier.create(response)
-                .expectNextMatches(turmsNotification ->
-                        turmsNotification.getData().getKindCase() == GROUP_INVITATIONS_WITH_VERSION)
-                .verifyComplete();
+        Function<TurmsNotification, Void> callback = mock(Function.class);
+        simpleTurmsClient.send(builder, callback);
+        verify(callback, timeout(5000)).apply(argThat(argument ->
+                argument.hasData() && argument.getData().getKindCase() == GROUP_INVITATIONS_WITH_VERSION));
     }
 }

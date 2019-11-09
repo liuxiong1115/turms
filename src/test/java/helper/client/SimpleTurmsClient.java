@@ -21,6 +21,7 @@ import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
+import lombok.Setter;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.socket.WebSocketMessage;
@@ -28,16 +29,16 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static helper.util.LoginUtil.getLoginParams;
 import static helper.util.LoginUtil.getServerUrl;
@@ -47,25 +48,34 @@ import static helper.util.LoginUtil.getServerUrl;
  */
 public class SimpleTurmsClient {
     private Integer port;
+    private Long userId;
+    private String password;
     private FluxSink<WebSocketMessage> outputSink;
     // request id -> callback
-    private Map<Long, MonoSink<TurmsNotification>> requestCallbackMap;
-    private FluxSink<TurmsNotification> notificationsSink;
+    private Map<Long, Function<TurmsNotification, Void>> requestCallbackMap;
+    @Setter
+    private Function<TurmsNotification, Void> notificationsCallback;
     private WebSocketSession webSocketSession;
+    private CountDownLatch latch;
 
-    public SimpleTurmsClient(Integer port) throws InterruptedException {
+    public SimpleTurmsClient(
+            @NotNull Integer port,
+            @NotNull Long userId,
+            @NotNull String password,
+            @Nullable Function<TurmsNotification, Void> notificationsCallback) throws InterruptedException {
         this.port = port;
+        this.userId = userId;
+        this.password = password;
+        this.notificationsCallback = notificationsCallback;
         requestCallbackMap = new HashMap<>();
-        Flux.create((Consumer<FluxSink<TurmsNotification>>) TurmsNotificationFluxSink ->
-                notificationsSink = TurmsNotificationFluxSink).subscribe();
+        latch = new CountDownLatch(1);
         initWebSocketClient();
     }
 
     private void initWebSocketClient() throws InterruptedException {
         ReactorNettyWebSocketClient client = new ReactorNettyWebSocketClient();
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.COOKIE, getLoginParams(1L, "123"));
-        CountDownLatch latch = new CountDownLatch(1);
+        headers.add(HttpHeaders.COOKIE, getLoginParams(this.userId, this.password));
         Executors.newSingleThreadExecutor()
                 .execute(() -> {
                     try {
@@ -78,12 +88,15 @@ public class SimpleTurmsClient {
                                                 ByteBuffer byteBuffer = message.getPayload().asByteBuffer();
                                                 try {
                                                     TurmsNotification turmsNotification = TurmsNotification.parseFrom(byteBuffer);
+                                                    if (notificationsCallback != null) {
+                                                        notificationsCallback.apply(turmsNotification);
+                                                    }
                                                     if (turmsNotification.hasRequestId()) {
-                                                        MonoSink<TurmsNotification> callback = requestCallbackMap
+                                                        Function<TurmsNotification, Void> requestCallback = requestCallbackMap
                                                                 .get(turmsNotification.getRequestId().getValue());
-                                                        callback.success(turmsNotification);
-                                                    } else {
-                                                        notificationsSink.next(turmsNotification);
+                                                        if (requestCallback != null) {
+                                                            requestCallback.apply(turmsNotification);
+                                                        }
                                                     }
                                                 } catch (InvalidProtocolBufferException e) {
                                                     e.printStackTrace();
@@ -100,7 +113,24 @@ public class SimpleTurmsClient {
         latch.await();
     }
 
-    public Mono<TurmsNotification> send(TurmsRequest.Builder builder) {
+    public boolean isClosed() {
+        return webSocketSession == null;
+    }
+
+    public synchronized void close() {
+        if (webSocketSession != null) {
+            webSocketSession.close();
+            webSocketSession = null;
+        }
+        if (outputSink != null && !outputSink.isCancelled()) {
+            outputSink.complete();
+            outputSink = null;
+        }
+    }
+
+    public void send(
+            @NotNull TurmsRequest.Builder builder,
+            @Nullable Function<TurmsNotification, Void> callback) {
         long requestId = RandomUtils.nextLong();
         TurmsRequest request = builder
                 .setRequestId(Int64Value
@@ -110,9 +140,13 @@ public class SimpleTurmsClient {
                 .build();
         WebSocketMessage message = webSocketSession.binaryMessage(dataBufferFactory ->
                 dataBufferFactory.wrap(request.toByteArray()));
-        return Mono.create(monoSink -> {
-            requestCallbackMap.put(requestId, monoSink);
-            outputSink.next(message);
-        });
+        if (callback != null) {
+            requestCallbackMap.put(requestId, callback);
+        }
+        outputSink.next(message);
+    }
+
+    public void returnAfterConnectedOrFailed() throws InterruptedException {
+        latch.await();
     }
 }

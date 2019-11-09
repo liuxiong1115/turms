@@ -15,12 +15,25 @@
  * limitations under the License.
  */
 
-package im.turms.turms.access.websocket.controller;
+package helper.util;
 
-import org.springframework.boot.test.context.SpringBootTest;
+import im.turms.turms.pojo.notification.TurmsNotification;
+import im.turms.turms.pojo.request.TurmsRequest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BaseControllerIT {
-    protected BaseControllerIT() {
+import javax.validation.constraints.NotNull;
+
+public class NotificationUtil {
+    private NotificationUtil() {
+
+    }
+
+    public static boolean isSessionOrSpecificRequest(
+            @NotNull TurmsNotification notification,
+            @NotNull TurmsRequest.KindCase kindCase) {
+        if (notification.hasData()) {
+            return notification.getData().getKindCase() == TurmsNotification.Data.KindCase.SESSION;
+        } else {
+            return notification.getRelayedRequest().getKindCase() == kindCase;
+        }
     }
 }

@@ -17,9 +17,16 @@
 
 package im.turms.turms.access.websocket.config;
 
+import im.turms.turms.constant.ProfileAccessStrategy;
+import im.turms.turms.pojo.domain.User;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.socket.HandshakeInfo;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -27,6 +34,7 @@ import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClien
 
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.util.Date;
 
 import static helper.util.LoginUtil.getLoginParams;
 import static helper.util.LoginUtil.getServerUrl;
@@ -38,6 +46,18 @@ public class TurmsHandshakeWebSocketServiceIT {
 
     @LocalServerPort
     Integer port;
+
+    @BeforeAll
+    public static void initUser(@Autowired MongoTemplate mongoTemplate) {
+        User user = new User(1L, "123", "", "",
+                "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
+        mongoTemplate.save(user);
+    }
+
+    @AfterAll
+    public static void tearDown(@Autowired MongoTemplate mongoTemplate) {
+        mongoTemplate.remove(new Query(), User.class);
+    }
 
     @Test
     public void handleRequest_shouldLogin_withCorrectCredential() throws URISyntaxException {
