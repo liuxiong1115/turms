@@ -407,9 +407,6 @@ public class OnlineUserService {
         }
     }
 
-    // TODO: WARNING: The method may throw exception
-    // until hazelcast provide the serializer for map in next version.
-    // So wait for it.
     public Mono<UserOnlineInfo> queryUserOnlineInfo(@NotNull Long userId) {
         if (turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
             OnlineUserManager localOnlineUserManager = getLocalOnlineUserManager(userId);

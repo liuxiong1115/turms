@@ -21,6 +21,7 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.pojo.domain.AdminRole;
 import im.turms.turms.pojo.dto.AddAdminRoleDTO;
 import im.turms.turms.pojo.dto.UpdateAdminRoleDTO;
 import im.turms.turms.service.admin.AdminRoleService;
@@ -28,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;
@@ -78,8 +80,11 @@ public class AdminRoleController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.ADMIN_ROLE_QUERY)
-    public Mono<ResponseEntity> getAdminRoles() {
-        //TODO: provide filters
-        return ResponseFactory.okWhenTruthy(adminRoleService.queryAllAdminRoles());
+    public Mono<ResponseEntity> getAdminRoles(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Set<String> names,
+            @RequestParam(required = false) Set<AdminPermission> includedPermissions) {
+        Flux<AdminRole> queryAdminRoles = adminRoleService.queryAdminRoles(ids, names, includedPermissions);
+        return ResponseFactory.okWhenTruthy(queryAdminRoles);
     }
 }

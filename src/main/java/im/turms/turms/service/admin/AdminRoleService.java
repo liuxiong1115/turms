@@ -38,8 +38,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 import java.util.function.Function;
 
-import static im.turms.turms.common.Constants.ADMIN_ROLE_ROOT_ID;
-import static im.turms.turms.common.Constants.ADMIN_ROLE_ROOT_NAME;
+import static im.turms.turms.common.Constants.*;
 
 @Service
 public class AdminRoleService {
@@ -191,6 +190,24 @@ public class AdminRoleService {
 
     public Flux<AdminRole> queryAllAdminRoles() {
         return Flux.from(mongoTemplate.findAll(AdminRole.class)
+                .concatWithValues(getRootRole()));
+    }
+
+    public Flux<AdminRole> queryAdminRoles(
+            @Nullable Set<Long> ids,
+            @Nullable Set<String> names,
+            @Nullable Set<AdminPermission> includedPermissions) {
+        Query query = new Query();
+        if (ids != null && !ids.isEmpty()) {
+            query.addCriteria(Criteria.where(ID).in(ids));
+        }
+        if (names != null && !names.isEmpty()) {
+            query.addCriteria(Criteria.where(AdminRole.Fields.name).in(names));
+        }
+        if (includedPermissions != null && !includedPermissions.isEmpty()) {
+            query.addCriteria(Criteria.where(AdminRole.Fields.permissions).in(includedPermissions));
+        }
+        return Flux.from(mongoTemplate.find(query, AdminRole.class)
                 .concatWithValues(getRootRole()));
     }
 
