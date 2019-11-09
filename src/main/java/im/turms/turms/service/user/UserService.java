@@ -125,7 +125,7 @@ public class UserService {
                                     return userRelationshipService.isRelatedAndAllowed(targetId, requesterId);
                                 }
                             }
-                });
+                        });
             case GROUP:
                 return groupMemberService.isAllowedToSendMessage(targetId, requesterId);
             case SYSTEM:
@@ -311,9 +311,18 @@ public class UserService {
                 return mongoTemplate.updateFirst(query, update, User.class)
                         .map(UpdateResult::wasAcknowledged);
             } else {
-                return mongoTemplate.remove(query, User.class)
-                        .zipWith(userVersionService.delete(userIds, null)) //TODO -> transaction
-                        .map(result -> result.getT1().wasAcknowledged());
+                return mongoTemplate.inTransaction()
+                        .execute(operations -> operations.remove(query, User.class)
+                                .flatMap(result -> {
+                                    if (result.wasAcknowledged()) {
+                                        return userVersionService.delete(userIds, operations)
+                                                .thenReturn(true);
+                                    } else {
+                                        return Mono.just(false);
+                                    }
+                                }))
+                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                        .single();
             }
         }
     }
