@@ -245,51 +245,30 @@ public class WsMessageController {
             String text = request.hasText() ? request.getText().getValue() : null;
             List<byte[]> records = request.getRecordsCount() != 0 ?
                     request.getRecordsList()
-                    .stream()
-                    .map(ByteString::toByteArray)
-                    .collect(Collectors.toList())
+                            .stream()
+                            .map(ByteString::toByteArray)
+                            .collect(Collectors.toList())
                     : null;
             Date recallDate = request.hasRecallDate() ? new Date(request.getRecallDate().getValue()) : null;
-            boolean updateMessageContent = text != null || (records != null && !records.isEmpty());
-            if (updateMessageContent || recallDate != null) {
-                if (recallDate != null && !turmsClusterManager.getTurmsProperties()
-                        .getMessage().isAllowRecallingMessage()) {
-                    return Mono.just(RequestResult.status(TurmsStatusCode.DISABLE_FUNCTION));
-                }
-                if (updateMessageContent && !turmsClusterManager.getTurmsProperties()
-                        .getMessage().isAllowEditingMessageBySender()) {
-                    return Mono.just(RequestResult.status(TurmsStatusCode.DISABLE_FUNCTION));
-                }
-                return messageService.isMessageSentByUser(request.getMessageId(), turmsRequestWrapper.getUserId())
-                        .flatMap(authenticated -> {
-                            if (authenticated == null || !authenticated) {
-                                return Mono.just(RequestResult.status(TurmsStatusCode.UNAUTHORIZED));
-                            }
-                            return messageService.isMessageRecallable(request.getMessageId())
-                                    .flatMap(recallable -> {
-                                        if (recallable == null || !recallable) {
-                                            return Mono.just(RequestResult.status(TurmsStatusCode.EXPIRY_RESOURCE));
-                                        }
-                                        //TODO: Enable/Disable the same authentication logic with message creating in 0.9.0
-                                        return messageService.updateMessageAndMessageStatus(
-                                                request.getMessageId(),
-                                                turmsRequestWrapper.getUserId(),
-                                                text,
-                                                records,
-                                                recallDate,
-                                                null);
-                                    })
-                                    .flatMap(success -> messageService.queryMessageRecipients(request.getMessageId())
-                                            .collect(Collectors.toSet())
-                                            .map(recipientsIds -> RequestResult.recipientData(
-                                                    recipientsIds,
-                                                    turmsRequestWrapper.getTurmsRequest())));
-                        });
-            } else {
-                return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
-            }
-        };
+            return messageService.authAndUpdateMessageAndMessageStatus(
+                    turmsRequestWrapper.getUserId(),
+                    request.getMessageId(),
+                    turmsRequestWrapper.getUserId(),
+                    text,
+                    records,
+                    recallDate,
+                    null)
+                    .flatMap(success -> messageService.queryMessageRecipients(request.getMessageId())
+                            .collect(Collectors.toSet())
+                            .map(recipientsIds -> RequestResult.recipientData(
+                                    recipientsIds,
+                                    turmsRequestWrapper.getTurmsRequest())));
+        });
+        ;
     }
+
+    ;
+}
 
     /**
      * To save a lot of resources, allow sending typing status to recipients without checking their relationships.

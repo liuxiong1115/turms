@@ -55,6 +55,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.common.TurmsStatusCode.*;
 
 @Service
 public class MessageService {
@@ -133,7 +134,7 @@ public class MessageService {
                 || deliveryStatus == MessageDeliveryStatus.RECEIVED) {
             return queryCompleteMessages(closeToDate, chatType, senderId, targetId, startDate, endDate, deliveryStatus, size);
         } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
     }
 
@@ -205,7 +206,7 @@ public class MessageService {
             @Nullable Long referenceId,
             @Nullable ReactiveMongoOperations operations) {
         if (text != null && text.length() > turmsClusterManager.getTurmsProperties().getMessage().getMaxTextLimit()) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
         int maxRecordsSize = turmsClusterManager.getTurmsProperties()
                 .getMessage().getMaxRecordsSizeBytes();
@@ -215,7 +216,7 @@ public class MessageService {
                 count = record.length;
             }
             if (count > maxRecordsSize) {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
             }
         }
         if (turmsClusterManager.getTurmsProperties().getMessage().getTimeType()
@@ -275,7 +276,7 @@ public class MessageService {
                             return mongoOperations.insertAll(messageStatuses).then(Mono.just(true));
                         });
             default:
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
     }
 
@@ -427,7 +428,7 @@ public class MessageService {
             @Nullable List<byte[]> records,
             @Nullable ReactiveMongoOperations operations) {
         if (text == null && records == null) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
         Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
         Update update = UpdateBuilder.newBuilder()
@@ -559,6 +560,45 @@ public class MessageService {
                 });
     }
 
+    public Mono<Boolean> authAndUpdateMessageAndMessageStatus(
+            @NotNull Long requesterId,
+            @NotNull Long messageId,
+            @NotNull Long recipientId,
+            @Nullable String text,
+            @Nullable List<byte[]> records,
+            @Nullable Date recallDate,
+            @Nullable Date readDate) {
+        boolean updateMessageContent = text != null || (records != null && !records.isEmpty());
+        if (updateMessageContent || recallDate != null) {
+            if (recallDate != null && !turmsClusterManager.getTurmsProperties()
+                    .getMessage().isAllowRecallingMessage()) {
+                throw TurmsBusinessException.get(DISABLE_FUNCTION);
+            }
+            if (updateMessageContent && !turmsClusterManager.getTurmsProperties()
+                    .getMessage().isAllowEditingMessageBySender()) {
+                throw TurmsBusinessException.get(DISABLE_FUNCTION);
+            }
+            return isMessageSentByUser(messageId, requesterId)
+                    .flatMap(isSentByUser -> {
+                        if (isSentByUser == null || !isSentByUser) {
+                            return Mono.error(TurmsBusinessException.get(UNAUTHORIZED));
+                        } else if (recallDate != null) {
+                            return isMessageRecallable(messageId)
+                                    .flatMap(recallable -> {
+                                        if (recallable == null || !recallable) {
+                                            return Mono.error(TurmsBusinessException.get(EXPIRY_RESOURCE));
+                                        }
+                                        return updateMessageAndMessageStatus(messageId, recipientId, text, records, recallDate, readDate);
+                                    });
+                        } else {
+                            return updateMessageAndMessageStatus(messageId, recipientId, text, records, recallDate, readDate);
+                        }
+                    });
+        } else {
+            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
+        }
+    }
+
     public Mono<Boolean> updateMessageAndMessageStatus(
             @NotNull Long messageId,
             @NotNull Long recipientId,
@@ -658,7 +698,7 @@ public class MessageService {
                         });
                     });
         } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
     }
 
