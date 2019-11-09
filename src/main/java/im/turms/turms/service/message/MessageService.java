@@ -17,6 +17,7 @@
 
 package im.turms.turms.service.message;
 
+import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
@@ -29,8 +30,8 @@ import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.pojo.dto.CreateMessageDTO;
+import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.response.TurmsResponse;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -758,10 +759,10 @@ public class MessageService {
                                 .newBuilder()
                                 .setCreateMessageRequest(ProtoUtil.message2createMessageRequest(message))
                                 .build();
-                        byte[] response = TurmsResponse
+                        byte[] response = TurmsNotification
                                 .newBuilder()
-                                .setNotification(request)
-                                .setRequestId(0)
+                                .setRelayedRequest(request)
+                                .setRequestId(Int64Value.newBuilder().setValue(0).build())
                                 .buildPartial()
                                 .toByteArray();
                         return outboundMessageService.relayClientMessageToClient(

@@ -20,8 +20,8 @@ package im.turms.turms.service.message;
 import com.hazelcast.cluster.Member;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
+import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.response.TurmsResponse;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.task.DeliveryUserMessageTask;
@@ -97,7 +97,7 @@ public class OutboundMessageService {
     }
 
     // Server message -> client
-    public boolean sendServerMessageToClient(TurmsResponse serverMessage, Long receiverId) {
+    public boolean sendServerMessageToClient(TurmsNotification serverMessage, Long receiverId) {
         //Check whether the recipient connects to the local note.
         OnlineUserManager manager = onlineUserService.getLocalOnlineUserManager(receiverId);
         if (manager != null) {
@@ -112,7 +112,7 @@ public class OutboundMessageService {
         return false;
     }
 
-    public void sendServerMessageToClient(WebSocketSession session, TurmsResponse serverMessage) {
+    public void sendServerMessageToClient(WebSocketSession session, TurmsNotification serverMessage) {
         if (session != null && serverMessage != null) {
             WebSocketMessage binaryMessage = session.binaryMessage(dataBufferFactory ->
                     dataBufferFactory.wrap(serverMessage.toByteArray())

@@ -24,10 +24,10 @@ import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
+import im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion;
 import im.turms.turms.pojo.domain.UserRelationship;
 import im.turms.turms.pojo.domain.UserRelationshipGroupMember;
-import im.turms.turms.pojo.response.Int64ValuesWithVersion;
-import im.turms.turms.pojo.response.UserRelationshipsWithVersion;
 import im.turms.turms.service.user.UserVersionService;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -197,7 +197,7 @@ public class UserRelationshipService {
                                     UserRelationshipsWithVersion.Builder builder = UserRelationshipsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(date.getTime()).build());
                                     for (UserRelationship relationship : relationships) {
-                                        im.turms.turms.pojo.dto.UserRelationship userRelationship = ProtoUtil.relationship2proto(relationship).build();
+                                        im.turms.turms.pojo.bo.user.UserRelationship userRelationship = ProtoUtil.relationship2proto(relationship).build();
                                         builder.addUserRelationships(userRelationship);
                                     }
                                     return builder.build();

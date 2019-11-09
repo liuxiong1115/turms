@@ -18,13 +18,15 @@
 package im.turms.turms.access.websocket.controller;
 
 import com.google.protobuf.Int64Value;
-import im.turms.turms.pojo.request.QueryUserGroupInvitationsRequest;
+import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.response.TurmsResponse;
+import im.turms.turms.pojo.request.user.QueryUserGroupInvitationsRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.web.server.LocalServerPort;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import static im.turms.turms.pojo.notification.TurmsNotification.Data.KindCase.GROUP_INVITATIONS_WITH_VERSION;
 
 public class WsUserControllerIT extends BaseControllerIT {
 
@@ -41,10 +43,10 @@ public class WsUserControllerIT extends BaseControllerIT {
                         QueryUserGroupInvitationsRequest
                                 .newBuilder()
                                 .build());
-        Mono<TurmsResponse> response = simpleTurmsClient.send(builder);
+        Mono<TurmsNotification> response = simpleTurmsClient.send(builder);
         StepVerifier.create(response)
-                .expectNextMatches(turmsResponse -> turmsResponse.getData().getKindCase() ==
-                        TurmsResponse.Data.KindCase.GROUP_INVITATIONS_WITH_VERSION)
+                .expectNextMatches(turmsNotification ->
+                        turmsNotification.getData().getKindCase() == GROUP_INVITATIONS_WITH_VERSION)
                 .verifyComplete();
     }
 }

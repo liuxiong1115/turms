@@ -18,9 +18,9 @@
 package im.turms.turms.pojo.bo;
 
 import im.turms.turms.common.TurmsStatusCode;
+import im.turms.turms.pojo.bo.common.Int64Values;
+import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.response.Int64Values;
-import im.turms.turms.pojo.response.TurmsResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +40,7 @@ public class RequestResult {
             null,
             TurmsStatusCode.NOT_FOUND);
 
-    private TurmsResponse.Data dataForRequester;
+    private TurmsNotification.Data dataForRequester;
     private Set<Long> recipients;
     private TurmsRequest dataForRecipients;
     private TurmsStatusCode code;
@@ -62,7 +62,7 @@ public class RequestResult {
     }
 
     public static RequestResult responseId(@NotNull Long id) {
-        TurmsResponse.Data data = TurmsResponse.Data
+        TurmsNotification.Data data = TurmsNotification.Data
                 .newBuilder()
                 .setIds(Int64Values.newBuilder().addValues(id).build())
                 .build();
@@ -74,7 +74,7 @@ public class RequestResult {
     }
 
     public static RequestResult responseIds(@NotEmpty Set<Long> ids) {
-        TurmsResponse.Data data = TurmsResponse.Data
+        TurmsNotification.Data data = TurmsNotification.Data
                 .newBuilder()
                 .setIds(Int64Values.newBuilder().addAllValues(ids).build())
                 .build();
@@ -89,7 +89,7 @@ public class RequestResult {
             @NotNull Long id,
             @NotNull Long recipientId,
             @NotNull TurmsRequest dataForRecipient) {
-        TurmsResponse.Data data = TurmsResponse.Data
+        TurmsNotification.Data data = TurmsNotification.Data
                 .newBuilder()
                 .setIds(Int64Values.newBuilder().addValues(id).build())
                 .build();
@@ -103,7 +103,7 @@ public class RequestResult {
         if (recipients == null || recipients.isEmpty()) {
             return responseId(id);
         } else {
-            TurmsResponse.Data data = TurmsResponse.Data
+            TurmsNotification.Data data = TurmsNotification.Data
                     .newBuilder()
                     .setIds(Int64Values.newBuilder().addValues(id).build())
                     .build();
@@ -115,7 +115,7 @@ public class RequestResult {
         }
     }
 
-    public static RequestResult responseData(@NotNull TurmsResponse.Data data) {
+    public static RequestResult responseData(@NotNull TurmsNotification.Data data) {
         return new RequestResult(data, Collections.emptySet(), null, TurmsStatusCode.OK);
     }
 

@@ -19,8 +19,8 @@ package helper.client;
 
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
+import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.response.TurmsResponse;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.socket.WebSocketMessage;
@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import static helper.util.LoginUtil.getLoginParams;
 import static helper.util.LoginUtil.getServerUrl;
@@ -48,12 +49,15 @@ public class SimpleTurmsClient {
     private Integer port;
     private FluxSink<WebSocketMessage> outputSink;
     // request id -> callback
-    private Map<Long, MonoSink<TurmsResponse>> requestCallbackMap;
+    private Map<Long, MonoSink<TurmsNotification>> requestCallbackMap;
+    private FluxSink<TurmsNotification> notificationsSink;
     private WebSocketSession webSocketSession;
 
     public SimpleTurmsClient(Integer port) throws InterruptedException {
         this.port = port;
         requestCallbackMap = new HashMap<>();
+        Flux.create((Consumer<FluxSink<TurmsNotification>>) TurmsNotificationFluxSink ->
+                notificationsSink = TurmsNotificationFluxSink).subscribe();
         initWebSocketClient();
     }
 
@@ -73,10 +77,14 @@ public class SimpleTurmsClient {
                                             .doOnNext(message -> {
                                                 ByteBuffer byteBuffer = message.getPayload().asByteBuffer();
                                                 try {
-                                                    TurmsResponse turmsResponse = TurmsResponse.parseFrom(byteBuffer);
-                                                    MonoSink<TurmsResponse> callback = requestCallbackMap
-                                                            .get(turmsResponse.getRequestId());
-                                                    callback.success(turmsResponse);
+                                                    TurmsNotification turmsNotification = TurmsNotification.parseFrom(byteBuffer);
+                                                    if (turmsNotification.hasRequestId()) {
+                                                        MonoSink<TurmsNotification> callback = requestCallbackMap
+                                                                .get(turmsNotification.getRequestId().getValue());
+                                                        callback.success(turmsNotification);
+                                                    } else {
+                                                        notificationsSink.next(turmsNotification);
+                                                    }
                                                 } catch (InvalidProtocolBufferException e) {
                                                     e.printStackTrace();
                                                 }
@@ -92,7 +100,7 @@ public class SimpleTurmsClient {
         latch.await();
     }
 
-    public Mono<TurmsResponse> send(TurmsRequest.Builder builder) {
+    public Mono<TurmsNotification> send(TurmsRequest.Builder builder) {
         long requestId = RandomUtils.nextLong();
         TurmsRequest request = builder
                 .setRequestId(Int64Value

@@ -24,9 +24,9 @@ import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult;
+import im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion;
 import im.turms.turms.pojo.domain.GroupJoinQuestion;
-import im.turms.turms.pojo.response.GroupJoinQuestionsAnswerResult;
-import im.turms.turms.pojo.response.GroupJoinQuestionsWithVersion;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -246,7 +246,7 @@ public class GroupJoinQuestionService {
                                     GroupJoinQuestionsWithVersion.Builder builder = GroupJoinQuestionsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                     for (GroupJoinQuestion question : groupJoinQuestions) {
-                                        im.turms.turms.pojo.dto.GroupJoinQuestion.Builder questionBuilder = ProtoUtil.groupJoinQuestion2proto(question);
+                                        im.turms.turms.pojo.bo.group.GroupJoinQuestion.Builder questionBuilder = ProtoUtil.groupJoinQuestion2proto(question);
                                         builder.addGroupJoinQuestions(questionBuilder.build());
                                     }
                                     return builder.build();

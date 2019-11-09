@@ -18,7 +18,7 @@
 package im.turms.turms.plugin;
 
 import im.turms.turms.pojo.bo.RequestResult;
-import im.turms.turms.pojo.dto.TurmsRequestWrapper;
+import im.turms.turms.pojo.bo.TurmsRequestWrapper;
 import org.pf4j.ExtensionPoint;
 import reactor.core.publisher.Mono;
 

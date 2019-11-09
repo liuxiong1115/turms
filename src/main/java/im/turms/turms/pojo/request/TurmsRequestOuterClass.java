@@ -16,7 +16,7 @@ public final class TurmsRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_TurmsRequest_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_TurmsRequest_fieldAccessorTable;
 
@@ -52,27 +52,27 @@ public final class TurmsRequestOuterClass {
       "uest/user/relationship/query_friend_requ" +
       "ests_request.proto\032?request/user/relatio" +
       "nship/query_related_users_ids_request.pr" +
-      "oto\032Arequest/user/relationship/query_rel" +
-      "ationship_groups_request.proto\032;request/" +
-      "user/relationship/query_relationships_re" +
-      "quest.proto\032=request/user/relationship/u" +
-      "pdate_friend_request_request.proto\032Arequ" +
-      "est/user/relationship/update_relationshi" +
-      "p_group_request.proto\032;request/user/rela" +
-      "tionship/update_relationship_request.pro" +
-      "to\032(request/group/create_group_request.p" +
-      "roto\032(request/group/delete_group_request" +
-      ".proto\032\'request/group/query_group_reques" +
-      "t.proto\0323request/group/query_joined_grou" +
-      "ps_ids_request.proto\0325request/group/quer" +
-      "y_joined_groups_infos_request.proto\032(req" +
-      "uest/group/update_group_request.proto\032Cr" +
-      "equest/group/blacklist/create_group_blac" +
-      "klisted_user_request.proto\032Crequest/grou" +
-      "p/blacklist/delete_group_blacklisted_use" +
-      "r_request.proto\032Grequest/group/blacklist" +
-      "/query_group_blacklisted_users_ids_reque" +
-      "st.proto\032Irequest/group/blacklist/query_" +
+              "oto\032Arequest/user/relationship/query_rel" +
+              "ationship_groups_request.proto\032;request/" +
+              "user/relationship/query_relationships_re" +
+              "quest.proto\032=request/user/relationship/u" +
+              "pdate_friend_request_request.proto\032Arequ" +
+              "est/user/relationship/update_relationshi" +
+              "p_group_request.proto\032;request/user/rela" +
+              "tionship/update_relationship_request.pro" +
+              "to\032(request/group/create_group_request.p" +
+              "roto\032(request/group/delete_group_request" +
+              ".proto\032'request/group/query_group_reques" +
+              "t.proto\0323request/group/query_joined_grou" +
+              "ps_ids_request.proto\0325request/group/quer" +
+              "y_joined_groups_infos_request.proto\032(req" +
+              "uest/group/update_group_request.proto\032Cr" +
+              "equest/group/blacklist/create_group_blac" +
+              "klisted_user_request.proto\032Crequest/grou" +
+              "p/blacklist/delete_group_blacklisted_use" +
+              "r_request.proto\032Grequest/group/blacklist" +
+              "/query_group_blacklisted_users_ids_reque" +
+              "st.proto\032Irequest/group/blacklist/query_" +
       "group_blacklisted_users_infos_request.pr" +
       "oto\032Irequest/group/enrollment/check_grou" +
       "p_join_questions_answers_request.proto\032>" +
@@ -114,27 +114,27 @@ public final class TurmsRequestOuterClass {
       "uses_request\030\006 \001(\0132+.im.turms.proto.Quer" +
       "yMessageStatusesRequestH\000\022F\n\026query_messa" +
       "ges_request\030\007 \001(\0132$.im.turms.proto.Query" +
-      "MessagesRequestH\000\022i\n)query_pending_messa" +
-      "ges_with_total_request\030\010 \001(\01324.im.turms." +
-      "proto.QueryPendingMessagesWithTotalReque" +
-      "stH\000\022F\n\026update_message_request\030\t \001(\0132$.i" +
-      "m.turms.proto.UpdateMessageRequestH\000\022Q\n\034" +
-      "update_typing_status_request\030\n \001(\0132).im." +
-      "turms.proto.UpdateTypingStatusRequestH\000\022" +
-      "`\n$query_user_group_invitations_request\030" +
-      "d \001(\01320.im.turms.proto.QueryUserGroupInv" +
-      "itationsRequestH\000\022M\n\032query_user_profile_" +
-      "request\030e \001(\0132\'.im.turms.proto.QueryUser" +
-      "ProfileRequestH\000\022T\n\036query_users_ids_near" +
-      "by_request\030f \001(\0132*.im.turms.proto.QueryU" +
-      "sersIdsNearbyRequestH\000\022X\n query_users_in" +
-      "fos_nearby_request\030g \001(\0132,.im.turms.prot" +
-      "o.QueryUsersInfosNearbyRequestH\000\022Z\n!quer" +
-      "y_users_online_status_request\030h \001(\0132-.im" +
-      ".turms.proto.QueryUsersOnlineStatusReque" +
-      "stH\000\022Q\n\034update_user_location_request\030i \001" +
-      "(\0132).im.turms.proto.UpdateUserLocationRe" +
-      "questH\000\022Z\n!update_user_online_status_req" +
+              "MessagesRequestH\000\022i\n)query_pending_messa" +
+              "ges_with_total_request\030\010 \001(\01324.im.turms." +
+              "proto.QueryPendingMessagesWithTotalReque" +
+              "stH\000\022F\n\026update_message_request\030\t \001(\0132$.i" +
+              "m.turms.proto.UpdateMessageRequestH\000\022Q\n\034" +
+              "update_typing_status_request\030\n \001(\0132).im." +
+              "turms.proto.UpdateTypingStatusRequestH\000\022" +
+              "`\n$query_user_group_invitations_request\030" +
+              "d \001(\01320.im.turms.proto.QueryUserGroupInv" +
+              "itationsRequestH\000\022M\n\032query_user_profile_" +
+              "request\030e \001(\0132'.im.turms.proto.QueryUser" +
+              "ProfileRequestH\000\022T\n\036query_users_ids_near" +
+              "by_request\030f \001(\0132*.im.turms.proto.QueryU" +
+              "sersIdsNearbyRequestH\000\022X\n query_users_in" +
+              "fos_nearby_request\030g \001(\0132,.im.turms.prot" +
+              "o.QueryUsersInfosNearbyRequestH\000\022Z\n!quer" +
+              "y_users_online_status_request\030h \001(\0132-.im" +
+              ".turms.proto.QueryUsersOnlineStatusReque" +
+              "stH\000\022Q\n\034update_user_location_request\030i \001" +
+              "(\0132).im.turms.proto.UpdateUserLocationRe" +
+              "questH\000\022Z\n!update_user_online_status_req" +
       "uest\030j \001(\0132-.im.turms.proto.UpdateUserOn" +
       "lineStatusRequestH\000\022@\n\023update_user_reque" +
       "st\030k \001(\0132!.im.turms.proto.UpdateUserRequ" +
@@ -225,120 +225,120 @@ public final class TurmsRequestOuterClass {
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.google.protobuf.WrappersProto.getDescriptor(),
-          im.turms.turms.pojo.request.AckRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryUserGroupInvitationsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryUserProfileRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryUsersIdsNearbyRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryUsersInfosNearbyRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryUsersOnlineStatusRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateUserLocationRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateUserOnlineStatusRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateUserRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateFriendRequestRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateRelationshipGroupRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateRelationshipRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.DeleteRelationshipGroupRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.DeleteRelationshipRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryFriendRequestsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryRelatedUsersIdsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryRelationshipGroupsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryRelationshipsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateFriendRequestRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateRelationshipGroupRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateRelationshipRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateGroupRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.DeleteGroupRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryGroupRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryJoinedGroupsIdsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryJoinedGroupsInfosRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateGroupRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateGroupBlacklistedUserRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.DeleteGroupBlacklistedUserRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryGroupBlacklistedUsersIdsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateGroupInvitationRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateGroupJoinRequestRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateGroupJoinQuestionRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.DeleteGroupInvitationRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.DeleteGroupJoinRequestRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.DeleteGroupJoinQuestionRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryGroupInvitationsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryGroupJoinRequestsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryGroupJoinQuestionsRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateGroupJoinQuestionRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateGroupMemberRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.DeleteGroupMemberRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryGroupMembersRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateGroupMemberRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.CreateMessageRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryMessageStatusesRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryMessagesRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.QueryPendingMessagesWithTotalRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateMessageRequestOuterClass.getDescriptor(),
-          im.turms.turms.pojo.request.UpdateTypingStatusRequestOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[]{
+                com.google.protobuf.WrappersProto.getDescriptor(),
+                im.turms.turms.pojo.request.signal.AckRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.QueryUserGroupInvitationsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.QueryUserProfileRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.QueryUsersIdsNearbyRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.QueryUsersInfosNearbyRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.QueryUsersOnlineStatusRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.UpdateUserLocationRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.UpdateUserOnlineStatusRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.UpdateUserRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.CreateFriendRequestRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.CreateRelationshipGroupRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.CreateRelationshipRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.DeleteRelationshipRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.QueryFriendRequestsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.QueryRelatedUsersIdsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.QueryRelationshipGroupsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.UpdateFriendRequestRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.UpdateRelationshipGroupRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.user.relationship.UpdateRelationshipRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.CreateGroupRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.DeleteGroupRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.QueryGroupRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.QueryJoinedGroupsIdsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.QueryJoinedGroupsInfosRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.UpdateGroupRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.blacklist.CreateGroupBlacklistedUserRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.blacklist.DeleteGroupBlacklistedUserRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.blacklist.QueryGroupBlacklistedUsersIdsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.blacklist.QueryGroupBlacklistedUsersInfosRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.CheckGroupJoinQuestionsAnswersRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.CreateGroupInvitationRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinQuestionRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.DeleteGroupInvitationRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.DeleteGroupJoinRequestRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.DeleteGroupJoinQuestionRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.QueryGroupInvitationsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.QueryGroupJoinRequestsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.QueryGroupJoinQuestionsRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.enrollment.UpdateGroupJoinQuestionRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.member.CreateGroupMemberRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.member.DeleteGroupMemberRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.member.QueryGroupMembersRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.group.member.UpdateGroupMemberRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.message.CreateMessageRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.message.QueryMessageStatusesRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.message.QueryMessagesRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.message.QueryPendingMessagesWithTotalRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.message.UpdateMessageRequestOuterClass.getDescriptor(),
+                im.turms.turms.pojo.request.message.UpdateTypingStatusRequestOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_TurmsRequest_descriptor =
-      getDescriptor().getMessageTypes().get(0);
+            getDescriptor().getMessageTypes().get(0);
     internal_static_im_turms_proto_TurmsRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_im_turms_proto_TurmsRequest_descriptor,
-        new java.lang.String[] { "RequestId", "AckRequest", "CreateMessageRequest", "QueryMessageStatusesRequest", "QueryMessagesRequest", "QueryPendingMessagesWithTotalRequest", "UpdateMessageRequest", "UpdateTypingStatusRequest", "QueryUserGroupInvitationsRequest", "QueryUserProfileRequest", "QueryUsersIdsNearbyRequest", "QueryUsersInfosNearbyRequest", "QueryUsersOnlineStatusRequest", "UpdateUserLocationRequest", "UpdateUserOnlineStatusRequest", "UpdateUserRequest", "CreateFriendRequestRequest", "CreateRelationshipGroupRequest", "CreateRelationshipRequest", "DeleteRelationshipGroupRequest", "DeleteRelationshipRequest", "QueryFriendRequestsRequest", "QueryRelatedUsersIdsRequest", "QueryRelationshipGroupsRequest", "QueryRelationshipsRequest", "UpdateFriendRequestRequest", "UpdateRelationshipGroupRequest", "UpdateRelationshipRequest", "CreateGroupRequest", "DeleteGroupRequest", "QueryGroupRequest", "QueryJoinedGroupsIdsRequest", "QueryJoinedGroupsInfosRequest", "UpdateGroupRequest", "CreateGroupBlacklistedUserRequest", "DeleteGroupBlacklistedUserRequest", "QueryGroupBlacklistedUsersIdsRequest", "QueryGroupBlacklistedUsersInfosRequest", "CheckGroupJoinQuestionsAnswersRequest", "CreateGroupInvitationRequest", "CreateGroupJoinRequestRequest", "CreateGroupJoinQuestionRequest", "DeleteGroupInvitationRequest", "DeleteGroupJoinRequestRequest", "DeleteGroupJoinQuestionRequest", "QueryGroupInvitationsRequest", "QueryGroupJoinRequestsRequest", "QueryGroupJoinQuestionsRequest", "UpdateGroupJoinQuestionRequest", "CreateGroupMemberRequest", "DeleteGroupMemberRequest", "QueryGroupMembersRequest", "UpdateGroupMemberRequest", "Kind", });
+            com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+            internal_static_im_turms_proto_TurmsRequest_descriptor,
+            new java.lang.String[]{"RequestId", "AckRequest", "CreateMessageRequest", "QueryMessageStatusesRequest", "QueryMessagesRequest", "QueryPendingMessagesWithTotalRequest", "UpdateMessageRequest", "UpdateTypingStatusRequest", "QueryUserGroupInvitationsRequest", "QueryUserProfileRequest", "QueryUsersIdsNearbyRequest", "QueryUsersInfosNearbyRequest", "QueryUsersOnlineStatusRequest", "UpdateUserLocationRequest", "UpdateUserOnlineStatusRequest", "UpdateUserRequest", "CreateFriendRequestRequest", "CreateRelationshipGroupRequest", "CreateRelationshipRequest", "DeleteRelationshipGroupRequest", "DeleteRelationshipRequest", "QueryFriendRequestsRequest", "QueryRelatedUsersIdsRequest", "QueryRelationshipGroupsRequest", "QueryRelationshipsRequest", "UpdateFriendRequestRequest", "UpdateRelationshipGroupRequest", "UpdateRelationshipRequest", "CreateGroupRequest", "DeleteGroupRequest", "QueryGroupRequest", "QueryJoinedGroupsIdsRequest", "QueryJoinedGroupsInfosRequest", "UpdateGroupRequest", "CreateGroupBlacklistedUserRequest", "DeleteGroupBlacklistedUserRequest", "QueryGroupBlacklistedUsersIdsRequest", "QueryGroupBlacklistedUsersInfosRequest", "CheckGroupJoinQuestionsAnswersRequest", "CreateGroupInvitationRequest", "CreateGroupJoinRequestRequest", "CreateGroupJoinQuestionRequest", "DeleteGroupInvitationRequest", "DeleteGroupJoinRequestRequest", "DeleteGroupJoinQuestionRequest", "QueryGroupInvitationsRequest", "QueryGroupJoinRequestsRequest", "QueryGroupJoinQuestionsRequest", "UpdateGroupJoinQuestionRequest", "CreateGroupMemberRequest", "DeleteGroupMemberRequest", "QueryGroupMembersRequest", "UpdateGroupMemberRequest", "Kind",});
     com.google.protobuf.WrappersProto.getDescriptor();
-    im.turms.turms.pojo.request.AckRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryUserGroupInvitationsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryUserProfileRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryUsersIdsNearbyRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryUsersInfosNearbyRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryUsersOnlineStatusRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateUserLocationRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateUserOnlineStatusRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateUserRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateFriendRequestRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateRelationshipGroupRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateRelationshipRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.DeleteRelationshipGroupRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.DeleteRelationshipRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryFriendRequestsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryRelatedUsersIdsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryRelationshipGroupsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryRelationshipsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateFriendRequestRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateRelationshipGroupRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateRelationshipRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateGroupRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.DeleteGroupRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryGroupRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryJoinedGroupsIdsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryJoinedGroupsInfosRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateGroupRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateGroupBlacklistedUserRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.DeleteGroupBlacklistedUserRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryGroupBlacklistedUsersIdsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryGroupBlacklistedUsersInfosRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CheckGroupJoinQuestionsAnswersRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateGroupInvitationRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateGroupJoinRequestRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateGroupJoinQuestionRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.DeleteGroupInvitationRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.DeleteGroupJoinRequestRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.DeleteGroupJoinQuestionRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryGroupInvitationsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryGroupJoinRequestsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryGroupJoinQuestionsRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateGroupJoinQuestionRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateGroupMemberRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.DeleteGroupMemberRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryGroupMembersRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateGroupMemberRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.CreateMessageRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryMessageStatusesRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryMessagesRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.QueryPendingMessagesWithTotalRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateMessageRequestOuterClass.getDescriptor();
-    im.turms.turms.pojo.request.UpdateTypingStatusRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.signal.AckRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.QueryUserGroupInvitationsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.QueryUserProfileRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.QueryUsersIdsNearbyRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.QueryUsersInfosNearbyRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.QueryUsersOnlineStatusRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.UpdateUserLocationRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.UpdateUserOnlineStatusRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.UpdateUserRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.CreateFriendRequestRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.CreateRelationshipGroupRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.CreateRelationshipRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.DeleteRelationshipRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.QueryFriendRequestsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.QueryRelatedUsersIdsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.QueryRelationshipGroupsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.UpdateFriendRequestRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.UpdateRelationshipGroupRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.user.relationship.UpdateRelationshipRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.CreateGroupRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.DeleteGroupRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.QueryGroupRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.QueryJoinedGroupsIdsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.QueryJoinedGroupsInfosRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.UpdateGroupRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.blacklist.CreateGroupBlacklistedUserRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.blacklist.DeleteGroupBlacklistedUserRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.blacklist.QueryGroupBlacklistedUsersIdsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.blacklist.QueryGroupBlacklistedUsersInfosRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.CheckGroupJoinQuestionsAnswersRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.CreateGroupInvitationRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinQuestionRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.DeleteGroupInvitationRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.DeleteGroupJoinRequestRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.DeleteGroupJoinQuestionRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.QueryGroupInvitationsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.QueryGroupJoinRequestsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.QueryGroupJoinQuestionsRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.enrollment.UpdateGroupJoinQuestionRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.member.CreateGroupMemberRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.member.DeleteGroupMemberRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.member.QueryGroupMembersRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.group.member.UpdateGroupMemberRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.message.CreateMessageRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.message.QueryMessageStatusesRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.message.QueryMessagesRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.message.QueryPendingMessagesWithTotalRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.message.UpdateMessageRequestOuterClass.getDescriptor();
+    im.turms.turms.pojo.request.message.UpdateTypingStatusRequestOuterClass.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

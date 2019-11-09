@@ -26,8 +26,8 @@ import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UserAgentUtil;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
-import im.turms.turms.pojo.dto.Session;
-import im.turms.turms.pojo.response.TurmsResponse;
+import im.turms.turms.pojo.bo.signal.Session;
+import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
@@ -154,8 +154,8 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
                     .setSessionId(session.getId())
                     .setAddress(serverAddress)
                     .build();
-            TurmsResponse response = TurmsResponse.newBuilder()
-                    .setData(TurmsResponse.Data.newBuilder().setSession(result))
+            TurmsNotification response = TurmsNotification.newBuilder()
+                    .setData(TurmsNotification.Data.newBuilder().setSession(result))
                     .buildPartial();
             return factory.wrap(response.toByteArray());
         });

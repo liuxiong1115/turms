@@ -17,6 +17,7 @@
 
 package im.turms.turms.access.websocket.dispatcher;
 
+import com.google.protobuf.Int32Value;
 import com.google.protobuf.Int64Value;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
@@ -28,9 +29,9 @@ import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.plugin.ClientRequestHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.bo.RequestResult;
-import im.turms.turms.pojo.dto.TurmsRequestWrapper;
+import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.response.TurmsResponse;
 import im.turms.turms.service.message.OutboundMessageService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.apache.commons.lang3.BooleanUtils;
@@ -116,9 +117,9 @@ public class InboundMessageDispatcher {
             final byte[][] dataInBytes = new byte[1][1];
             WebSocketMessage messagesForRecipients = session
                     .binaryMessage(dataBufferFactory -> {
-                        TurmsResponse.Builder builder = TurmsResponse
+                        TurmsNotification.Builder builder = TurmsNotification
                                 .newBuilder()
-                                .setNotification(dataForRecipients);
+                                .setRelayedRequest(dataForRecipients);
                         if (requesterId != null) {
                             builder.setRequesterId(Int64Value.newBuilder().setValue(requesterId).build());
                         }
@@ -178,9 +179,10 @@ public class InboundMessageDispatcher {
                 .flatMap(requestResult -> {
                     if (requestResult == RequestResult.NOT_FOUND) {
                         if (requestId != null) {
-                            TurmsResponse response = TurmsResponse.newBuilder()
-                                    .setCode(TurmsStatusCode.NOT_FOUND.getBusinessCode())
-                                    .setRequestId(requestId)
+                            TurmsNotification response = TurmsNotification.newBuilder()
+                                    .setCode(Int32Value.newBuilder()
+                                            .setValue(TurmsStatusCode.NOT_FOUND.getBusinessCode()).build())
+                                    .setRequestId(Int64Value.newBuilder().setValue(requestId).build())
                                     .build();
                             return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory
                                     .wrap(response.toByteArray())));
@@ -194,13 +196,14 @@ public class InboundMessageDispatcher {
                                         if (success == null || !success) {
                                             requestResult.setCode(TurmsStatusCode.RECIPIENTS_OFFLINE);
                                         }
-                                        TurmsResponse.Builder builder = TurmsResponse.newBuilder()
-                                                .setCode(requestResult.getCode().getBusinessCode())
-                                                .setRequestId(requestId);
+                                        TurmsNotification.Builder builder = TurmsNotification.newBuilder()
+                                                .setCode(Int32Value.newBuilder()
+                                                        .setValue(requestResult.getCode().getBusinessCode()).build())
+                                                .setRequestId(Int64Value.newBuilder().setValue(requestId).build());
                                         if (requestResult.getDataForRequester() != null) {
                                             builder.setData(requestResult.getDataForRequester());
                                         }
-                                        TurmsResponse response = builder.build();
+                                        TurmsNotification response = builder.build();
                                         return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory.wrap(response.toByteArray())));
                                     } else {
                                         return Mono.empty();

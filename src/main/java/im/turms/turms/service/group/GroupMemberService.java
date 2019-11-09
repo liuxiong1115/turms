@@ -27,10 +27,10 @@ import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.InvitableAndInvitationStrategy;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
+import im.turms.turms.pojo.bo.group.GroupMembersWithVersion;
 import im.turms.turms.pojo.domain.GroupBlacklistedUser;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.pojo.domain.UserPermissionGroup;
-import im.turms.turms.pojo.response.GroupMembersWithVersion;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -459,7 +459,7 @@ public class GroupMemberService {
                         return fillMembersBuilderWithStatus(members, builder);
                     } else {
                         for (GroupMember member : members) {
-                            im.turms.turms.pojo.dto.GroupMember groupMember = ProtoUtil
+                            im.turms.turms.pojo.bo.group.GroupMember groupMember = ProtoUtil
                                     .groupMember2proto(member).build();
                             builder.addGroupMembers(groupMember);
                         }
@@ -495,7 +495,7 @@ public class GroupMemberService {
                                         return fillMembersBuilderWithStatus(members, builder);
                                     } else {
                                         for (GroupMember member : members) {
-                                            im.turms.turms.pojo.dto.GroupMember groupMember = ProtoUtil
+                                            im.turms.turms.pojo.bo.group.GroupMember groupMember = ProtoUtil
                                                     .groupMember2proto(member).build();
                                             builder.addGroupMembers(groupMember);
                                         }
@@ -575,7 +575,7 @@ public class GroupMemberService {
                     for (int i = 0; i < members.size(); i++) {
                         GroupMember member = members.get(i);
                         UserOnlineInfo info = (UserOnlineInfo) results[i];
-                        im.turms.turms.pojo.dto.GroupMember groupMember = ProtoUtil
+                        im.turms.turms.pojo.bo.group.GroupMember groupMember = ProtoUtil
                                 .userOnlineInfo2groupMember(member.getKey().getUserId(), info)
                                 .build();
                         builder.addGroupMembers(groupMember);

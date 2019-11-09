@@ -25,8 +25,8 @@ import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion;
 import im.turms.turms.pojo.domain.GroupJoinRequest;
-import im.turms.turms.pojo.response.GroupJoinRequestsWithVersion;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -221,7 +221,7 @@ public class GroupJoinRequestService {
                                     GroupJoinRequestsWithVersion.Builder builder = GroupJoinRequestsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                     for (GroupJoinRequest groupJoinRequest : groupJoinRequests) {
-                                        im.turms.turms.pojo.dto.GroupJoinRequest request = ProtoUtil.groupJoinRequest2proto(groupJoinRequest).build();
+                                        im.turms.turms.pojo.bo.group.GroupJoinRequest request = ProtoUtil.groupJoinRequest2proto(groupJoinRequest).build();
                                         builder.addGroupJoinRequests(request);
                                     }
                                     return builder.build();

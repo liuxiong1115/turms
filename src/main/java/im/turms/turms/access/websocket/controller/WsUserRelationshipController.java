@@ -21,9 +21,10 @@ import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.ResponseAction;
 import im.turms.turms.pojo.bo.RequestResult;
-import im.turms.turms.pojo.dto.TurmsRequestWrapper;
-import im.turms.turms.pojo.request.*;
-import im.turms.turms.pojo.response.TurmsResponse;
+import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.pojo.notification.TurmsNotification;
+import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.turms.pojo.request.user.relationship.*;
 import im.turms.turms.service.user.relationship.UserFriendRequestService;
 import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
@@ -186,7 +187,7 @@ public class WsUserRelationshipController {
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
                     .map(friendRequestsWithVersion -> RequestResult
-                            .responseData(TurmsResponse.Data
+                            .responseData(TurmsNotification.Data
                                     .newBuilder()
                                     .setUserFriendRequestsWithVersion(friendRequestsWithVersion)
                                     .build()));
@@ -206,7 +207,7 @@ public class WsUserRelationshipController {
                     isBlocked,
                     lastUpdatedDate)
                     .map(idsWithVersion -> RequestResult
-                            .responseData(TurmsResponse.Data
+                            .responseData(TurmsNotification.Data
                                     .newBuilder()
                                     .setIdsWithVersion(idsWithVersion)
                                     .build()));
@@ -224,7 +225,7 @@ public class WsUserRelationshipController {
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
                     .map(groupsWithVersion -> RequestResult
-                            .responseData(TurmsResponse.Data
+                            .responseData(TurmsNotification.Data
                                     .newBuilder()
                                     .setUserRelationshipGroupsWithVersion(groupsWithVersion)
                                     .build()));
@@ -250,7 +251,7 @@ public class WsUserRelationshipController {
                     isBlocked,
                     lastUpdatedDate)
                     .map(relationshipsWithVersion -> RequestResult
-                            .responseData(TurmsResponse.Data
+                            .responseData(TurmsNotification.Data
                                     .newBuilder()
                                     .setUserRelationshipsWithVersion(relationshipsWithVersion)
                                     .build()));

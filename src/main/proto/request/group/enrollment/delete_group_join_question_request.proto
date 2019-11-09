@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package im.turms.proto;
 
-option java_package = "im.turms.turms.pojo.request";
+option java_package = "im.turms.turms.pojo.request.group.enrollment";
 option java_multiple_files = true;
 
 message DeleteGroupJoinQuestionRequest {

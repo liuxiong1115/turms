@@ -122,7 +122,7 @@ public class OnlineUserService {
     public void setAllLocalUsersOffline(@NotNull CloseStatus closeStatus) {
         for (Map<Long, OnlineUserManager> managersMap : onlineUsersManagerAtSlots) {
             if (managersMap != null) {
-                setManagersOffline(closeStatus, managersMap);
+                setManagersOffline(closeStatus, managersMap.values());
                 managersMap.clear();
             }
         }
@@ -141,13 +141,44 @@ public class OnlineUserService {
         if (slotIndex >= 0 && slotIndex < HASH_SLOTS_NUMBER) {
             Map<Long, OnlineUserManager> managerMap = getOnlineUsersManager(slotIndex);
             if (managerMap != null) {
-                setManagersOffline(closeStatus, managerMap);
+                setManagersOffline(closeStatus, managerMap.values());
             }
         }
     }
 
-    private void setManagersOffline(@NotNull CloseStatus closeStatus, Map<Long, OnlineUserManager> managerMap) {
-        for (OnlineUserManager manager : managerMap.values()) {
+    public boolean setLocalUserDevicesOffline(
+            @NotNull Long userId,
+            @NotEmpty Set<DeviceType> deviceTypes,
+            @NotNull CloseStatus closeStatus) {
+        OnlineUserManager manager = getLocalOnlineUserManager(userId);
+        if (manager != null) {
+            Date now = new Date();
+            for (DeviceType deviceType : deviceTypes) {
+                OnlineUserManager.Session session = manager.getSession(deviceType);
+                if (session != null) {
+                    Long logId = session.getLogId();
+                    userLoginLogService.updateLogoutDate(logId, now).subscribe();
+                    disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
+                            closeStatus.getCode());
+                }
+            }
+            manager.setSpecificDevicesOffline(deviceTypes, closeStatus);
+            if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
+                if (!handlerList.isEmpty()) {
+                    for (UserOnlineStatusChangeHandler handler : handlerList) {
+                        handler.goOffline(manager, closeStatus).subscribe();
+                    }
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void setManagersOffline(@NotNull CloseStatus closeStatus, @NotNull Collection<OnlineUserManager> managers) {
+        for (OnlineUserManager manager : managers) {
             if (manager != null) {
                 ConcurrentMap<DeviceType, OnlineUserManager.Session> sessionMap = manager.getOnlineUserInfo().getSessionMap();
                 Date now = new Date();
@@ -184,38 +215,6 @@ public class OnlineUserService {
             @NotNull DeviceType deviceType,
             @NotNull CloseStatus closeStatus) {
         return setLocalUserDevicesOffline(userId, Collections.singleton(deviceType), closeStatus);
-    }
-
-    //TODO: consolidate setLocalUserDevicesOffline() with setManagersOffline()
-    public boolean setLocalUserDevicesOffline(
-            @NotNull Long userId,
-            @NotEmpty Set<DeviceType> deviceTypes,
-            @NotNull CloseStatus closeStatus) {
-        OnlineUserManager manager = getLocalOnlineUserManager(userId);
-        if (manager != null) {
-            Date now = new Date();
-            for (DeviceType deviceType : deviceTypes) {
-                OnlineUserManager.Session session = manager.getSession(deviceType);
-                if (session != null) {
-                    Long logId = session.getLogId();
-                    userLoginLogService.updateLogoutDate(logId, now).subscribe();
-                    disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
-                            closeStatus.getCode());
-                }
-            }
-            manager.setSpecificDevicesOffline(deviceTypes, closeStatus);
-            if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
-                List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
-                if (!handlerList.isEmpty()) {
-                    for (UserOnlineStatusChangeHandler handler : handlerList) {
-                        handler.goOffline(manager, closeStatus).subscribe();
-                    }
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public Mono<Boolean> setUserDevicesOffline(

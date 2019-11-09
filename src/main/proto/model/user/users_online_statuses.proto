@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package im.turms.proto;
+
+option java_package = "im.turms.turms.pojo.bo.user";
+option java_multiple_files = true;
+
+import "model/user/user_status_detail.proto";
+
+message UsersOnlineStatuses {
+    repeated UserStatusDetail user_statuses = 1;
+}

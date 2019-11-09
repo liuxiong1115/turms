@@ -22,9 +22,19 @@ import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.pojo.bo.RequestResult;
-import im.turms.turms.pojo.dto.TurmsRequestWrapper;
-import im.turms.turms.pojo.request.*;
-import im.turms.turms.pojo.response.TurmsResponse;
+import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.pojo.notification.TurmsNotification;
+import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.turms.pojo.request.group.*;
+import im.turms.turms.pojo.request.group.blacklist.CreateGroupBlacklistedUserRequest;
+import im.turms.turms.pojo.request.group.blacklist.DeleteGroupBlacklistedUserRequest;
+import im.turms.turms.pojo.request.group.blacklist.QueryGroupBlacklistedUsersIdsRequest;
+import im.turms.turms.pojo.request.group.blacklist.QueryGroupBlacklistedUsersInfosRequest;
+import im.turms.turms.pojo.request.group.enrollment.*;
+import im.turms.turms.pojo.request.group.member.CreateGroupMemberRequest;
+import im.turms.turms.pojo.request.group.member.DeleteGroupMemberRequest;
+import im.turms.turms.pojo.request.group.member.QueryGroupMembersRequest;
+import im.turms.turms.pojo.request.group.member.UpdateGroupMemberRequest;
 import im.turms.turms.service.group.*;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
@@ -121,7 +131,7 @@ public class WsGroupController {
             Date lastUpdatedDate = request.hasLastUpdatedDate() ?
                     new Date(request.getLastUpdatedDate().getValue()) : null;
             return groupService.queryGroupWithVersion(request.getGroupId(), lastUpdatedDate)
-                    .map(groupsWithVersion -> RequestResult.responseData(TurmsResponse.Data.newBuilder()
+                    .map(groupsWithVersion -> RequestResult.responseData(TurmsNotification.Data.newBuilder()
                             .setGroupsWithVersion(groupsWithVersion)
                             .build()));
         };
@@ -136,7 +146,7 @@ public class WsGroupController {
             return groupService.queryJoinedGroupsIdsWithVersion(
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
-                    .map(idsWithVersion -> RequestResult.responseData(TurmsResponse.Data
+                    .map(idsWithVersion -> RequestResult.responseData(TurmsNotification.Data
                             .newBuilder()
                             .setIdsWithVersion(idsWithVersion)
                             .build()));
@@ -152,7 +162,7 @@ public class WsGroupController {
             return groupService.queryJoinedGroupsWithVersion(
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
-                    .map(groupsWithVersion -> RequestResult.responseData(TurmsResponse.Data
+                    .map(groupsWithVersion -> RequestResult.responseData(TurmsNotification.Data
                             .newBuilder()
                             .setGroupsWithVersion(groupsWithVersion)
                             .build()));
@@ -256,7 +266,7 @@ public class WsGroupController {
             return groupBlacklistService.queryGroupBlacklistedUsersIdsWithVersion(
                     request.getGroupId(),
                     lastUpdatedDate)
-                    .map(version -> RequestResult.responseData(TurmsResponse.Data
+                    .map(version -> RequestResult.responseData(TurmsNotification.Data
                             .newBuilder()
                             .setIdsWithVersion(version)
                             .build()));
@@ -272,7 +282,7 @@ public class WsGroupController {
             return groupBlacklistService.queryGroupBlacklistedUsersInfosWithVersion(
                     request.getGroupId(),
                     lastUpdatedDate)
-                    .map(version -> RequestResult.responseData(TurmsResponse.Data
+                    .map(version -> RequestResult.responseData(TurmsNotification.Data
                             .newBuilder()
                             .setUsersInfosWithVersion(version)
                             .build()));
@@ -287,7 +297,7 @@ public class WsGroupController {
             return groupJoinQuestionService.checkGroupQuestionAnswerAndJoin(
                     turmsRequestWrapper.getUserId(),
                     request.getQuestionIdAndAnswerMap())
-                    .map(answerResult -> RequestResult.responseData(TurmsResponse.Data.newBuilder()
+                    .map(answerResult -> RequestResult.responseData(TurmsNotification.Data.newBuilder()
                             .setGroupJoinQuestionAnswerResult(answerResult).build()));
         };
     }
@@ -445,7 +455,7 @@ public class WsGroupController {
                     groupId,
                     lastUpdatedDate)
                     .map(groupInvitationsWithVersion -> RequestResult.responseData(
-                            TurmsResponse.Data.newBuilder()
+                            TurmsNotification.Data.newBuilder()
                                     .setGroupInvitationsWithVersion(groupInvitationsWithVersion)
                                     .build()));
         };
@@ -462,7 +472,7 @@ public class WsGroupController {
                     turmsRequestWrapper.getUserId(),
                     request.getGroupId(),
                     lastUpdatedDate)
-                    .map(groupJoinRequestsWithVersion -> RequestResult.responseData(TurmsResponse.Data.newBuilder()
+                    .map(groupJoinRequestsWithVersion -> RequestResult.responseData(TurmsNotification.Data.newBuilder()
                             .setGroupJoinRequestsWithVersion(groupJoinRequestsWithVersion)
                             .build()));
         };
@@ -479,7 +489,7 @@ public class WsGroupController {
                     request.getGroupId(),
                     request.getWithAnswers(),
                     lastUpdatedDate)
-                    .map(groupJoinQuestionsWithVersion -> RequestResult.responseData(TurmsResponse.Data.newBuilder()
+                    .map(groupJoinQuestionsWithVersion -> RequestResult.responseData(TurmsNotification.Data.newBuilder()
                             .setGroupJoinQuestionsWithVersion(groupJoinQuestionsWithVersion)
                             .build()));
         };
@@ -576,7 +586,7 @@ public class WsGroupController {
                         membersIds,
                         withStatus)
                         .map(groupMembersWithVersion -> RequestResult.responseData(
-                                TurmsResponse.Data.newBuilder()
+                                TurmsNotification.Data.newBuilder()
                                         .setGroupMembersWithVersion(groupMembersWithVersion)
                                         .build()));
             } else {
@@ -586,7 +596,7 @@ public class WsGroupController {
                         lastUpdatedDate,
                         withStatus)
                         .map(groupMembersWithVersion -> RequestResult.responseData(
-                                TurmsResponse.Data.newBuilder()
+                                TurmsNotification.Data.newBuilder()
                                         .setGroupMembersWithVersion(groupMembersWithVersion)
                                         .build()));
             }

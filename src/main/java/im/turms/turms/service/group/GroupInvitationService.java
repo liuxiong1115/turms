@@ -25,8 +25,8 @@ import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
 import im.turms.turms.pojo.domain.GroupInvitation;
-import im.turms.turms.pojo.response.GroupInvitationsWithVersion;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserVersionService;
 import org.springframework.context.annotation.Lazy;
@@ -257,7 +257,7 @@ public class GroupInvitationService {
                                                 GroupInvitationsWithVersion.Builder builder = GroupInvitationsWithVersion.newBuilder();
                                                 builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                                 for (GroupInvitation invitation : groupInvitations) {
-                                                    im.turms.turms.pojo.dto.GroupInvitation groupInvitation = ProtoUtil.groupInvitation2proto(invitation).build();
+                                                    im.turms.turms.pojo.bo.group.GroupInvitation groupInvitation = ProtoUtil.groupInvitation2proto(invitation).build();
                                                     builder.addGroupInvitations(groupInvitation);
                                                 }
                                                 return builder.build();

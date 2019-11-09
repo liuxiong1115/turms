@@ -29,15 +29,16 @@ import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.RequestResult;
+import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.pojo.bo.message.MessageStatuses;
+import im.turms.turms.pojo.bo.message.Messages;
+import im.turms.turms.pojo.bo.message.MessagesWithTotal;
+import im.turms.turms.pojo.bo.message.MessagesWithTotalList;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
-import im.turms.turms.pojo.dto.MessagesWithTotal;
-import im.turms.turms.pojo.dto.TurmsRequestWrapper;
-import im.turms.turms.pojo.request.*;
-import im.turms.turms.pojo.response.MessageStatuses;
-import im.turms.turms.pojo.response.Messages;
-import im.turms.turms.pojo.response.MessagesWithTotalList;
-import im.turms.turms.pojo.response.TurmsResponse;
+import im.turms.turms.pojo.notification.TurmsNotification;
+import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.turms.pojo.request.message.*;
 import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.message.MessageStatusService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -126,7 +127,7 @@ public class WsMessageController {
                         for (MessageStatus messageStatus : messageStatuses) {
                             builder.addMessageStatuses(ProtoUtil.messageStatus2proto(messageStatus));
                         }
-                        TurmsResponse.Data data = TurmsResponse.Data
+                        TurmsNotification.Data data = TurmsNotification.Data
                                 .newBuilder()
                                 .setMessageStatuses(builder)
                                 .build();
@@ -179,7 +180,7 @@ public class WsMessageController {
                                         }
                                         listBuilder.addMessagesWithTotalList(messagesWithTotalBuilder);
                                     }
-                                    return RequestResult.responseData(TurmsResponse.Data.newBuilder()
+                                    return RequestResult.responseData(TurmsNotification.Data.newBuilder()
                                             .setMessagesWithTotalList(listBuilder).build());
                                 });
                     });
@@ -217,11 +218,11 @@ public class WsMessageController {
                         }
                         Messages.Builder messagesListBuilder = Messages.newBuilder();
                         for (Message message : messages) {
-                            im.turms.turms.pojo.dto.Message.Builder builder = ProtoUtil.message2proto(message);
+                            im.turms.turms.pojo.bo.message.Message.Builder builder = ProtoUtil.message2proto(message);
                             messagesListBuilder.addMessages(builder);
                         }
                         Messages messagesList = messagesListBuilder.build();
-                        TurmsResponse.Data data = TurmsResponse.Data.newBuilder()
+                        TurmsNotification.Data data = TurmsNotification.Data.newBuilder()
                                 .setMessages(messagesList)
                                 .build();
                         Set<Long> messagesIds = messages.stream()
