@@ -1,6 +1,7 @@
 package im.turms.turms.config.mongo;
 
 import com.google.common.net.InetAddresses;
+import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.common.TurmsPasswordUtil;
@@ -10,18 +11,19 @@ import im.turms.turms.pojo.domain.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.BaseSubscriber;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -39,17 +41,20 @@ public class MongoDataInitializaer {
     }
 
     @PostConstruct
-    public void createCollectionsIfNotExist() throws InterruptedException {
+    public void createCollectionsIfNotExist() {
         TurmsLogger.log("Start creating collections...");
         if (DEV_MODE && mongoTemplate.getMongoDatabase().getName().contains("-dev")) {
-            CountDownLatch latch = new CountDownLatch(1);
-            mongoTemplate.getMongoDatabase().drop().subscribe(new BaseSubscriber<>() {
-                @Override
-                protected void hookOnComplete() {
-                    latch.countDown();
-                }
-            });
-            latch.await();
+            mongoTemplate.getCollectionNames()
+                    .collectList()
+                    .map(names -> {
+                        Query queryAll = new Query();
+                        List<Mono<DeleteResult>> removeMonos = new ArrayList<>(names.size());
+                        for (String name : names) {
+                            removeMonos.add(mongoTemplate.remove(queryAll, name));
+                        }
+                        return Flux.fromIterable(removeMonos);
+                    })
+                    .subscribe();
         }
         Mono.zip(
                 objects -> objects,
