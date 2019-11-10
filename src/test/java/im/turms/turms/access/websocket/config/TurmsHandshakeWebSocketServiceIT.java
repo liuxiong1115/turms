@@ -17,6 +17,7 @@
 
 package im.turms.turms.access.websocket.config;
 
+import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.constant.ProfileAccessStrategy;
 import im.turms.turms.pojo.domain.User;
 import org.junit.jupiter.api.AfterAll;
@@ -48,8 +49,8 @@ public class TurmsHandshakeWebSocketServiceIT {
     Integer port;
 
     @BeforeAll
-    public static void initUser(@Autowired MongoTemplate mongoTemplate) {
-        User user = new User(1L, "123", "", "",
+    public static void initUser(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
+        User user = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
                 "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
         mongoTemplate.save(user);
     }

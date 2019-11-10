@@ -19,6 +19,7 @@ package im.turms.turms.access.websocket.controller;
 
 import com.google.protobuf.Int64Value;
 import helper.client.SimpleTurmsClient;
+import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.constant.ProfileAccessStrategy;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.notification.TurmsNotification;
@@ -42,8 +43,8 @@ public class WsUserControllerIT extends BaseControllerIT {
     @LocalServerPort Integer port;
 
     @BeforeAll
-    public static void initUser(@Autowired MongoTemplate mongoTemplate) {
-        User user = new User(1L, "123", "", "",
+    public static void initUser(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
+        User user = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
                 "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
         mongoTemplate.save(user);
     }

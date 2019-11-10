@@ -20,6 +20,7 @@ package im.turms.turms.access.websocket.controller;
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.StringValue;
 import helper.client.SimpleTurmsClient;
+import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.ProfileAccessStrategy;
 import im.turms.turms.pojo.domain.User;
@@ -46,12 +47,12 @@ public class WsMessageControllerIT extends BaseControllerIT {
     private Integer port;
 
     @BeforeEach
-    void setUp(@Autowired MongoTemplate mongoTemplate) {
-        User userOne = new User(1L, "123", "", "",
+    void setUp(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
+        User userOne = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
                 "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
-        User userTwo = new User(2L, "123", "", "",
+        User userTwo = new User(2L, passwordUtil.encodeUserPassword("123"), "", "",
                 "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
-        User userThree = new User(3L, "123", "", "",
+        User userThree = new User(3L, passwordUtil.encodeUserPassword("123"), "", "",
                 "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
         UserRelationship relationshipOne = new UserRelationship(1L, 2L, false, new Date());
         UserRelationship relationshipTwo = new UserRelationship(2L, 1L, false, new Date());
