@@ -37,7 +37,7 @@ public class UserLoginLog {
     @Indexed
     private Long userId;
 
-    @Indexed
+    @Indexed(expireAfter = "90d")
     private Date loginDate;
 
     @Indexed

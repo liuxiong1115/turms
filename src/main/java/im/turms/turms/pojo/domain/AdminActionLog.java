@@ -39,7 +39,7 @@ public class AdminActionLog {
     @Indexed
     private String account;
 
-    @Indexed
+    @Indexed(expireAfter = "90d")
     private Date timestamp;
 
     @Indexed
