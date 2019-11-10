@@ -20,13 +20,13 @@ package im.turms.turms.access.web.controller.admin;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.bo.PageResult;
 import im.turms.turms.pojo.domain.Admin;
 import im.turms.turms.pojo.dto.AddAdminDTO;
 import im.turms.turms.pojo.dto.UpdateAdminDTO;
 import im.turms.turms.service.admin.AdminService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -50,13 +50,19 @@ public class AdminController {
     @RequestMapping(method = RequestMethod.HEAD)
     @RequiredPermission(AdminPermission.CUSTOM)
     public Mono<ResponseEntity> checkAccountAndPassword(
-            @RequestParam String account,
-            @RequestParam String password) {
+            @RequestHeader String account,
+            @RequestHeader String password) {
         if (!account.isBlank() && !password.isBlank()) {
-            Mono<Boolean> authenticated = adminService.authenticate(account, password);
-            return ResponseFactory.authenticated(authenticated);
+            return adminService.authenticate(account, password)
+                    .map(authenticated -> {
+                        if (authenticated != null && authenticated) {
+                            return ResponseEntity.ok().build();
+                        } else {
+                            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                        }
+                    });
         } else {
-            return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
         }
     }
 

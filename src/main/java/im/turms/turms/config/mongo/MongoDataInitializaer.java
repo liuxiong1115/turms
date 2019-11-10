@@ -3,6 +3,7 @@ package im.turms.turms.config.mongo;
 import com.google.common.net.InetAddresses;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsLogger;
+import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.constant.*;
 import im.turms.turms.pojo.domain.AdminRole;
 import im.turms.turms.pojo.domain.*;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
@@ -19,24 +21,36 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
-import static im.turms.turms.common.Constants.ADMIN_ROLE_ROOT_ID;
-import static im.turms.turms.common.Constants.DEFAULT_GROUP_TYPE_ID;
+import static im.turms.turms.common.Constants.*;
 
 @Component
 public class MongoDataInitializaer {
 
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
+    private final TurmsPasswordUtil passwordUtil;
 
-    public MongoDataInitializaer(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate) {
+    public MongoDataInitializaer(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, TurmsPasswordUtil passwordUtil) {
         this.turmsClusterManager = turmsClusterManager;
         this.mongoTemplate = mongoTemplate;
+        this.passwordUtil = passwordUtil;
     }
 
     @PostConstruct
-    public void createCollectionsIfNotExist() {
+    public void createCollectionsIfNotExist() throws InterruptedException {
         TurmsLogger.log("Start creating collections...");
+        if (DEV_MODE && mongoTemplate.getMongoDatabase().getName().contains("-dev")) {
+            CountDownLatch latch = new CountDownLatch(1);
+            mongoTemplate.getMongoDatabase().drop().subscribe(new BaseSubscriber<>() {
+                @Override
+                protected void hookOnComplete() {
+                    latch.countDown();
+                }
+            });
+            latch.await();
+        }
         Mono.zip(
                 objects -> objects,
                 createCollectionIfNotExist(Admin.class, null),
@@ -87,7 +101,7 @@ public class MongoDataInitializaer {
             for (int i = 1; i <= ADMIN_COUNT; i++) {
                 Admin admin = new Admin(
                         "account" + i,
-                        "123",
+                        passwordUtil.encodeAdminPassword("123"),
                         "myname",
                         ADMIN_ROLE_ROOT_ID,
                         now);
@@ -218,7 +232,7 @@ public class MongoDataInitializaer {
             for (int i = 1; i <= USER_COUNT; i++) {
                 User user = new User(
                         (long) i,
-                        "123",
+                        passwordUtil.encodeUserPassword("123"),
                         "user-name",
                         "user-intro",
                         null,

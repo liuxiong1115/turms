@@ -18,6 +18,7 @@
 package im.turms.turms.common;
 
 import im.turms.turms.property.TurmsProperties;
+import im.turms.turms.property.env.Security;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -34,8 +35,8 @@ public class TurmsPasswordUtil {
         this.turmsProperties = turmsProperties;
     }
 
-    public String encodeAdminPassword(String rawPassword) {
-        switch (turmsProperties.getSecurity().getAdminPasswordEncodeStrategy()) {
+    public String encodePassword(Security.PasswordEncodeStrategy strategy, String rawPassword) {
+        switch (strategy) {
             case BCRYPT:
                 return bCryptPasswordEncoder.encode(rawPassword);
             case SALTED_SHA256:
@@ -46,23 +47,41 @@ public class TurmsPasswordUtil {
         }
     }
 
-    public boolean matchesAdminPassword(String rawPassword, String encodedPassword) {
-        return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
+    public String encodeAdminPassword(String rawPassword) {
+        return encodePassword(turmsProperties.getSecurity().getAdminPasswordEncodeStrategy(),
+                rawPassword);
     }
 
     public String encodeUserPassword(String rawPassword) {
-        switch (turmsProperties.getSecurity().getUserPasswordEncodeStrategy()) {
-            case BCRYPT:
-                return bCryptPasswordEncoder.encode(rawPassword);
-            case SALTED_SHA256:
-                return messageDigestPasswordEncoder.encode(rawPassword);
-            case RAW:
-            default:
-                return rawPassword;
-        }
+        return encodePassword(turmsProperties.getSecurity().getUserPasswordEncodeStrategy(),
+                rawPassword);
+    }
+
+    public boolean matchesAdminPassword(String rawPassword, String encodedPassword) {
+        return matchesPassword(turmsProperties.getSecurity().getAdminPasswordEncodeStrategy(),
+                rawPassword,
+                encodedPassword);
     }
 
     public boolean matchesUserPassword(String rawPassword, String encodedPassword) {
-        return messageDigestPasswordEncoder.matches(rawPassword, encodedPassword);
+        return matchesPassword(turmsProperties.getSecurity().getUserPasswordEncodeStrategy(),
+                rawPassword,
+                encodedPassword);
+    }
+
+    public boolean matchesPassword(
+            Security.PasswordEncodeStrategy strategy,
+            String rawPassword,
+            String encodedPassword) {
+        switch (strategy) {
+            case BCRYPT:
+                return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
+            case SALTED_SHA256:
+                return messageDigestPasswordEncoder.matches(rawPassword, encodedPassword);
+            case RAW:
+                return rawPassword.equals(encodedPassword);
+            default:
+                return false;
+        }
     }
 }

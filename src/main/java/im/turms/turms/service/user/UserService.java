@@ -84,11 +84,16 @@ public class UserService {
      * @return return the userId If the user information is matched.
      * return null If the userId and the token are unmatched.
      */
-    public Mono<Boolean> authenticate(@NotNull Long userId, @NotNull String password) {
+    public Mono<Boolean> authenticate(@NotNull Long userId, @NotNull String rawPassword) {
         Query query = new Query()
-                .addCriteria(Criteria.where(ID).is(userId))
-                .addCriteria(Criteria.where(User.Fields.password).is(password));
-        return mongoTemplate.exists(query, User.class);
+                .addCriteria(Criteria.where(ID).is(userId));
+        query.fields().include(User.Fields.password);
+        return mongoTemplate.findOne(query, User.class)
+                .map(user -> {
+                    String encodedPassword = user.getPassword();
+                    return encodedPassword != null && turmsPasswordUtil.matchesUserPassword(rawPassword, encodedPassword);
+                })
+                .defaultIfEmpty(false);
     }
 
     public Mono<Boolean> isActive(@NotNull Long userId) {

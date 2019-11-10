@@ -143,11 +143,12 @@ public class AdminService {
     }
 
     public Mono<Boolean> authenticate(@NotNull String account, @NotNull String rawPassword) {
-        String password = turmsPasswordUtil.encodeAdminPassword(rawPassword);
         Query query = new Query()
-                .addCriteria(Criteria.where(ID).is(account))
-                .addCriteria(Criteria.where(Admin.Fields.password).is(password));
-        return mongoTemplate.exists(query, Admin.class);
+                .addCriteria(Criteria.where(ID).is(account));
+        query.fields().include(Admin.Fields.password);
+        return mongoTemplate.findOne(query, Admin.class)
+                .map(admin -> turmsPasswordUtil.matchesAdminPassword(rawPassword, admin.getPassword()))
+                .defaultIfEmpty(false);
     }
 
     public Mono<Boolean> deleteAdmin(@NotNull String account) {

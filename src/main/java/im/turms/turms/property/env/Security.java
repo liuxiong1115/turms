@@ -100,6 +100,6 @@ public class Security implements IdentifiedDataSerializable {
     public enum PasswordEncodeStrategy {
         BCRYPT,
         SALTED_SHA256,
-        RAW
+        RAW //NO-OP
     }
 }

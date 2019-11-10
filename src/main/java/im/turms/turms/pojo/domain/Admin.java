@@ -44,7 +44,6 @@ public class Admin implements IdentifiedDataSerializable {
     @Length(min = 1, max = 32)
     private String account;
 
-    @Length(min = 1, max = 32)
     private String password;
 
     @Length(min = 1, max = 50)
