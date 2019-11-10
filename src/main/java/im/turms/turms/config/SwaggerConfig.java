@@ -37,7 +37,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(new ApiInfoBuilder()
                         .title("Turms")
-                        .version("0.8.0")
+                        .version("0.9.0")
                         .build());
     }
 }
