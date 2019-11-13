@@ -96,11 +96,16 @@ public class MessageStatusService {
 
     public Mono<Boolean> updateMessagesReadDate(
             @NotNull Long messageId,
-            @NotNull Date readDate) {
+            @Nullable Date readDate) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
                 .addCriteria(Criteria.where(MessageStatus.Fields.readDate).is(null));
-        Update update = new Update().set(MessageStatus.Fields.readDate, readDate);
+        Update update;
+        if (readDate != null) {
+            update = new Update().set(MessageStatus.Fields.readDate, readDate);
+        } else {
+            update = new Update().unset(MessageStatus.Fields.readDate);
+        }
         return mongoTemplate.findAndModify(query, update, MessageStatus.class)
                 .defaultIfEmpty(EMPTY_MESSAGE_STATUS)
                 .map(status -> EMPTY_MESSAGE_STATUS != status);

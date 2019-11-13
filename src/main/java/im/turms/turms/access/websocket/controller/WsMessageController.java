@@ -45,6 +45,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -239,9 +241,33 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateMessageRequest() {
         return turmsRequestWrapper -> {
             UpdateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateMessageRequest();
-            Date readDate = request.hasReadDate() ? new Date(request.getReadDate().getValue()) : null;
-            if (readDate != null) {
-                return updateMessageReadDate(turmsRequestWrapper);
+            long messageId = request.getMessageId();
+            if (request.hasReadDate()) {
+                long readDateValue = request.getReadDate().getValue();
+                Date readDate = readDateValue > 0 ? new Date(readDateValue) : null;
+                return authAndUpdateMessageReadDate(
+                        turmsRequestWrapper.getUserId(),
+                        messageId,
+                        readDate)
+                        .flatMap(updatedOrDeleted -> {
+                            if (updatedOrDeleted != null && updatedOrDeleted) {
+                                if (turmsClusterManager.getTurmsProperties().getMessage().getReadReceipt().isEnabled()) {
+                                    return messageService.queryMessageSenderId(messageId)
+                                            .flatMap(senderId -> {
+                                                RequestResult result = RequestResult.recipientData(
+                                                        senderId,
+                                                        turmsRequestWrapper.getTurmsRequest(),
+                                                        TurmsStatusCode.OK);
+                                                return Mono.just(result);
+                                            });
+                                } else {
+                                    // return OK because the update operation was successful
+                                    return Mono.just(RequestResult.ok());
+                                }
+                            } else {
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RESOURCES_HAVE_CHANGED));
+                            }
+                        });
             }
             String text = request.hasText() ? request.getText().getValue() : null;
             List<byte[]> records = request.getRecordsCount() != 0 ?
@@ -253,13 +279,13 @@ public class WsMessageController {
             Date recallDate = request.hasRecallDate() ? new Date(request.getRecallDate().getValue()) : null;
             return messageService.authAndUpdateMessageAndMessageStatus(
                     turmsRequestWrapper.getUserId(),
-                    request.getMessageId(),
+                    messageId,
                     turmsRequestWrapper.getUserId(),
                     text,
                     records,
                     recallDate,
                     null)
-                    .flatMap(success -> messageService.queryMessageRecipients(request.getMessageId())
+                    .flatMap(success -> messageService.queryMessageRecipients(messageId)
                             .collect(Collectors.toSet())
                             .map(recipientsIds -> RequestResult.recipientData(
                                     recipientsIds,
@@ -286,9 +312,11 @@ public class WsMessageController {
         };
     }
 
-    private Mono<RequestResult> updateMessageReadDate(TurmsRequestWrapper turmsRequestWrapper) {
-        UpdateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateMessageRequest();
-        return messageService.isMessageSentToUser(request.getMessageId(), turmsRequestWrapper.getUserId())
+    private Mono<Boolean> authAndUpdateMessageReadDate(
+            @NotNull Long userId,
+            @NotNull Long messageId,
+            @Nullable Date readDate) {
+        return messageService.isMessageSentToUser(messageId, userId)
                 .flatMap(authenticated -> {
                     if (authenticated != null && authenticated) {
                         Date date;
@@ -296,36 +324,18 @@ public class WsMessageController {
                                 .getReadReceipt().isUseServerTime()) {
                             date = new Date();
                         } else {
-                            date = new Date(request.getReadDate().getValue());
+                            date = readDate;
                         }
                         if (turmsClusterManager.getTurmsProperties().getMessage()
                                 .isDeletePrivateMessageAfterAcknowledged()) {
-                            return messageService.deleteMessage(request.getMessageId(), true, false);
+                            return messageService.deleteMessage(messageId, true, false);
                         } else {
                             return messageStatusService.updateMessagesReadDate(
-                                    request.getMessageId(),
+                                    messageId,
                                     date);
                         }
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                    }
-                })
-                .flatMap(updatedOrDeleted -> {
-                    if (updatedOrDeleted != null && updatedOrDeleted) {
-                        if (turmsClusterManager.getTurmsProperties().getMessage().getReadReceipt().isEnabled()) {
-                            return messageService.queryMessageSenderId(request.getMessageId())
-                                    .flatMap(senderId -> {
-                                        RequestResult result = RequestResult.recipientData(
-                                                senderId,
-                                                turmsRequestWrapper.getTurmsRequest(),
-                                                TurmsStatusCode.OK);
-                                        return Mono.just(result);
-                                    });
-                        } else {
-                            return Mono.just(RequestResult.ok());
-                        }
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RESOURCES_HAVE_CHANGED));
                     }
                 });
     }
