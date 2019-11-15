@@ -53,6 +53,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
     private Cache cache = new Cache();
     private Cluster cluster = new Cluster();
     private Database database = new Database();
+    private Log log = new Log();
     private Session session = new Session();
     private Security security = new Security();
     private Plugin plugin = new Plugin();
@@ -94,6 +95,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         cache.writeData(out);
         cluster.writeData(out);
         database.writeData(out);
+        log.writeData(out);
         session.writeData(out);
         security.writeData(out);
         plugin.writeData(out);
@@ -109,6 +111,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         cache.readData(in);
         cluster.readData(in);
         database.readData(in);
+        log.readData(in);
         session.readData(in);
         security.readData(in);
         plugin.readData(in);

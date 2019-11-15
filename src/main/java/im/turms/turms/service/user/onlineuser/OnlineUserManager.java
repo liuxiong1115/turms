@@ -55,7 +55,7 @@ public class OnlineUserManager {
             @NonNull WebSocketSession webSocketSession,
             @NotNull FluxSink<WebSocketMessage> outputSink,
             @NotNull Timeout timeout,
-            @NotNull Long logId) {
+            @Nullable Long logId) {
         Session session = new Session(
                 usingDeviceType,
                 new Date(),

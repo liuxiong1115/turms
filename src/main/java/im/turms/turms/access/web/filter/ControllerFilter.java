@@ -18,6 +18,7 @@
 package im.turms.turms.access.web.filter;
 
 import im.turms.turms.annotation.web.RequiredPermission;
+import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.Constants;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.service.admin.AdminActionLogService;
@@ -48,11 +49,13 @@ public class ControllerFilter implements WebFilter {
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final AdminService adminService;
     private final AdminActionLogService adminActionLogService;
+    private final TurmsClusterManager turmsClusterManager;
 
-    public ControllerFilter(RequestMappingHandlerMapping requestMappingHandlerMapping, AdminService adminService, AdminActionLogService adminActionLogService) {
+    public ControllerFilter(RequestMappingHandlerMapping requestMappingHandlerMapping, AdminService adminService, AdminActionLogService adminActionLogService, TurmsClusterManager turmsClusterManager) {
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.adminService = adminService;
         this.adminActionLogService = adminActionLogService;
+        this.turmsClusterManager = turmsClusterManager;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class ControllerFilter implements WebFilter {
             String password = request.getHeaders().getFirst(PASSWORD);
             if (Constants.DEV_MODE) {
                 if (account != null && password != null) {
-                    return persistAndPass(account, exchange, chain, handlerMethod);
+                    return tryPersistingAndPass(account, exchange, chain, handlerMethod);
                 }
                 return chain.filter(exchange);
             }
@@ -83,14 +86,14 @@ public class ControllerFilter implements WebFilter {
                                         return adminService.isAdminAuthorized(account, requiredPermission.value())
                                                 .flatMap(authorized -> {
                                                     if (authorized != null && authorized) {
-                                                        return persistAndPass(account, exchange, chain, handlerMethod);
+                                                        return tryPersistingAndPass(account, exchange, chain, handlerMethod);
                                                     } else {
                                                         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                                                         return Mono.empty();
                                                     }
                                                 });
                                     } else {
-                                        return persistAndPass(account, exchange, chain, handlerMethod);
+                                        return tryPersistingAndPass(account, exchange, chain, handlerMethod);
                                     }
                                 } else {
                                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -120,38 +123,42 @@ public class ControllerFilter implements WebFilter {
      * https://github.com/spring-projects/spring-framework/issues/24004
      */
     @Deprecated
-    private Mono<Void> persistAndPass(
+    private Mono<Void> tryPersistingAndPass(
             @NotNull String account,
             @NotNull ServerWebExchange exchange,
             @NotNull WebFilterChain chain,
             @NotNull HandlerMethod handlerMethod) {
-        String action = handlerMethod.getMethod().getName();
-        MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
-        ServerHttpRequest request = exchange.getRequest();
-        MultiValueMap<String, String> queryParams = request.getQueryParams();
-        Map<String, String> attributes = null;
-        if (methodParameters.length > 0 && !queryParams.isEmpty()) {
-            attributes = new HashMap<>(methodParameters.length);
-            for (MethodParameter methodParameter : methodParameters) {
-                String parameterName = methodParameter.getParameterName();
-                if (parameterName != null) {
-                    String value = queryParams.getFirst(parameterName);
-                    if (value != null) {
-                        attributes.put(parameterName, value);
+        if (turmsClusterManager.getTurmsProperties().getLog().isLogAdminAction()) {
+            String action = handlerMethod.getMethod().getName();
+            MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
+            ServerHttpRequest request = exchange.getRequest();
+            MultiValueMap<String, String> queryParams = request.getQueryParams();
+            Map<String, String> attributes = null;
+            if (methodParameters.length > 0 && !queryParams.isEmpty()) {
+                attributes = new HashMap<>(methodParameters.length);
+                for (MethodParameter methodParameter : methodParameters) {
+                    String parameterName = methodParameter.getParameterName();
+                    if (parameterName != null) {
+                        String value = queryParams.getFirst(parameterName);
+                        if (value != null) {
+                            attributes.put(parameterName, value);
+                        }
                     }
                 }
             }
+            String host = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
+            return chain.filter(exchange)
+                    .mergeWith(adminActionLogService.saveAdminActionLog(
+                            account,
+                            new Date(),
+                            host,
+                            action,
+                            attributes,
+                            null)
+                            .then())
+                    .single();
+        } else {
+            return chain.filter(exchange);
         }
-        String host = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
-        return chain.filter(exchange)
-                .mergeWith(adminActionLogService.saveAdminActionLog(
-                        account,
-                        new Date(),
-                        host,
-                        action,
-                        attributes,
-                        null)
-                        .then())
-                .single();
     }
 }

@@ -157,7 +157,11 @@ public class OnlineUserService {
                 OnlineUserManager.Session session = manager.getSession(deviceType);
                 if (session != null) {
                     Long logId = session.getLogId();
-                    userLoginLogService.updateLogoutDate(logId, now).subscribe();
+                    if (logId != null) {
+                        userLoginLogService
+                                .updateLogoutDate(logId, now)
+                                .subscribe();
+                    }
                     disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
                             closeStatus.getCode());
                 }
@@ -185,9 +189,11 @@ public class OnlineUserService {
                 Long userId = manager.getOnlineUserInfo().getUserId();
                 for (OnlineUserManager.Session session : sessionMap.values()) {
                     Long logId = session.getLogId();
-                    userLoginLogService
-                            .updateLogoutDate(logId, now)
-                            .subscribe();
+                    if (logId != null) {
+                        userLoginLogService
+                                .updateLogoutDate(logId, now)
+                                .subscribe();
+                    }
                     disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
                             closeStatus.getCode());
                 }
@@ -326,50 +332,63 @@ public class OnlineUserService {
                     if (EMPTY_USER_LOCATION != location) {
                         locationId = location.getId();
                     }
-                    return logUserOnline(userId, ip, loggingInDeviceType, deviceDetails, locationId)
-                            .map(logId -> {
-                                Integer slotIndex = turmsClusterManager.getSlotIndexByUserIdForCurrentNode(userId);
-                                if (slotIndex == null) {
-                                    return TurmsStatusCode.NOT_RESPONSIBLE;
-                                } else {
-                                    OnlineUserManager onlineUserManager = getLocalOnlineUserManager(userId);
-                                    Timeout heartbeatTimeout = newHeartbeatTimeout(userId, loggingInDeviceType);
-                                    if (onlineUserManager != null) {
-                                        onlineUserManager.setUserOnlineStatus(
-                                                userStatus == UserStatus.OFFLINE || userStatus == UserStatus.UNRECOGNIZED ?
-                                                        UserStatus.AVAILABLE : userStatus);
-                                        onlineUserManager.setDeviceTypeOnline(
-                                                loggingInDeviceType,
-                                                location == EMPTY_USER_LOCATION ? null : location,
-                                                webSocketSession,
-                                                notificationSink,
-                                                heartbeatTimeout,
-                                                logId);
-                                    } else {
-                                        onlineUserManager = new OnlineUserManager(
-                                                userId,
-                                                userStatus,
-                                                loggingInDeviceType,
-                                                location == EMPTY_USER_LOCATION ? null : location,
-                                                webSocketSession,
-                                                notificationSink,
-                                                heartbeatTimeout,
-                                                logId);
-                                    }
-                                    getOrAddOnlineUsersManager(slotIndex).put(userId, onlineUserManager);
-                                    if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
-                                        List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
-                                        if (!handlerList.isEmpty()) {
-                                            for (UserOnlineStatusChangeHandler handler : handlerList) {
-                                                handler.goOnline(onlineUserManager, loggingInDeviceType).subscribe();
-                                            }
-                                        }
-                                    }
-                                    return TurmsStatusCode.OK;
-                                }
-                            })
-                            .onErrorReturn(TurmsStatusCode.FAILED);
+                    if (turmsClusterManager.getTurmsProperties().getLog().isLogUserLogin()) {
+                        return logUserOnline(userId, ip, loggingInDeviceType, deviceDetails, locationId)
+                                .map(logId -> setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, logId))
+                                .onErrorReturn(TurmsStatusCode.FAILED);
+                    } else {
+                        return Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, null));
+                    }
                 });
+    }
+
+    private TurmsStatusCode setUpOnlineUserManager(
+            @NotNull Long userId,
+            @NotNull DeviceType loggingInDeviceType,
+            @NotNull UserStatus userStatus,
+            @NotNull UserLocation location,
+            @NotNull WebSocketSession webSocketSession,
+            @NotNull FluxSink<WebSocketMessage> notificationSink,
+            @Nullable Long logId) {
+        Integer slotIndex = turmsClusterManager.getSlotIndexByUserIdForCurrentNode(userId);
+        if (slotIndex == null) {
+            return TurmsStatusCode.NOT_RESPONSIBLE;
+        } else {
+            OnlineUserManager onlineUserManager = getLocalOnlineUserManager(userId);
+            Timeout heartbeatTimeout = newHeartbeatTimeout(userId, loggingInDeviceType);
+            if (onlineUserManager != null) {
+                onlineUserManager.setUserOnlineStatus(
+                        userStatus == UserStatus.OFFLINE || userStatus == UserStatus.UNRECOGNIZED ?
+                                UserStatus.AVAILABLE : userStatus);
+                onlineUserManager.setDeviceTypeOnline(
+                        loggingInDeviceType,
+                        location == EMPTY_USER_LOCATION ? null : location,
+                        webSocketSession,
+                        notificationSink,
+                        heartbeatTimeout,
+                        logId);
+            } else {
+                onlineUserManager = new OnlineUserManager(
+                        userId,
+                        userStatus,
+                        loggingInDeviceType,
+                        location == EMPTY_USER_LOCATION ? null : location,
+                        webSocketSession,
+                        notificationSink,
+                        heartbeatTimeout,
+                        logId);
+            }
+            getOrAddOnlineUsersManager(slotIndex).put(userId, onlineUserManager);
+            if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
+                if (!handlerList.isEmpty()) {
+                    for (UserOnlineStatusChangeHandler handler : handlerList) {
+                        handler.goOnline(onlineUserManager, loggingInDeviceType).subscribe();
+                    }
+                }
+            }
+            return TurmsStatusCode.OK;
+        }
     }
 
     private Map<Long, OnlineUserManager> getOrAddOnlineUsersManager(@NotNull Integer slotIndex) {
