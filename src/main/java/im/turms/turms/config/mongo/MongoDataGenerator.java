@@ -28,13 +28,13 @@ import java.util.List;
 import static im.turms.turms.common.Constants.*;
 
 @Component
-public class MongoDataInitializaer {
+public class MongoDataGenerator {
 
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsPasswordUtil passwordUtil;
 
-    public MongoDataInitializaer(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, TurmsPasswordUtil passwordUtil) {
+    public MongoDataGenerator(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, TurmsPasswordUtil passwordUtil) {
         this.turmsClusterManager = turmsClusterManager;
         this.mongoTemplate = mongoTemplate;
         this.passwordUtil = passwordUtil;
@@ -116,7 +116,9 @@ public class MongoDataInitializaer {
                         "account" + (1 + i % ADMIN_COUNT),
                         new Date(),
                         InetAddresses.coerceToInteger(InetAddress.getLocalHost()),
-                        "testaction");
+                        "testaction",
+                        null,
+                        null);
                 objects.add(adminActionLog);
             }
             // Group

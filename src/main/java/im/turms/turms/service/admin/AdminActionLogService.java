@@ -33,6 +33,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.net.InetAddress;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import static im.turms.turms.common.Constants.ID;
@@ -51,15 +52,18 @@ public class AdminActionLogService {
             @NotNull String account,
             @NotNull Date timestamp,
             @NotNull String ip,
-            @NotNull String action
-    ) {
-        AdminActionLog adminActionLog = new AdminActionLog();
-        adminActionLog.setId(turmsClusterManager.generateRandomId());
-        adminActionLog.setAccount(account);
-        adminActionLog.setTimestamp(timestamp);
+            @NotNull String action,
+            @Nullable Map<String, String> params,
+            @Nullable String body) {
         InetAddress inetAddress = InetAddresses.forString(ip);
-        adminActionLog.setIp(InetAddresses.coerceToInteger(inetAddress));
-        adminActionLog.setAction(action);
+        AdminActionLog adminActionLog = new AdminActionLog(
+                turmsClusterManager.generateRandomId(),
+                account,
+                timestamp,
+                InetAddresses.coerceToInteger(inetAddress),
+                action,
+                params,
+                body);
         return mongoTemplate.insert(adminActionLog);
     }
 

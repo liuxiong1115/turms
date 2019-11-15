@@ -26,12 +26,16 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.Map;
 
 @Data
 @Document
 @FieldNameConstants
 @AllArgsConstructor
 @NoArgsConstructor
+/**
+ * Note: This is not the final model and will certainly change in the future
+ */
 public class AdminActionLog {
     @Id
     private Long id;
@@ -47,4 +51,9 @@ public class AdminActionLog {
 
     @Indexed
     private String action;
+
+    @Indexed
+    private Map<String, String> params;
+
+    private String body;
 }
