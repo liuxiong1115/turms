@@ -27,6 +27,8 @@ import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.service.admin.AdminActionLogService;
 import im.turms.turms.service.admin.AdminService;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -112,6 +114,8 @@ public class ControllerFilter implements WebFilter {
             String upgrade = exchange.getRequest().getHeaders().getFirst("Upgrade");
             if (upgrade != null && upgrade.equals("websocket")) {
                 return chain.filter(exchange);
+            } else if (isCorsPreflightRequest(exchange)) {
+                return chain.filter(exchange);
             } else {
                 exchange.getResponse().setStatusCode(HttpStatus.METHOD_NOT_ALLOWED);
                 return Mono.empty();
@@ -131,8 +135,7 @@ public class ControllerFilter implements WebFilter {
             @NotNull ServerWebExchange exchange,
             @NotNull WebFilterChain chain,
             @NotNull HandlerMethod handlerMethod) {
-        boolean logAdminAction = turmsClusterManager.getTurmsProperties().getLog().isLogAdminAction()
-                && turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
+        boolean logAdminAction = turmsClusterManager.getTurmsProperties().getLog().isLogAdminAction();
         boolean callHandlers = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()
                 && !turmsPluginManager.getLogHandlerList().isEmpty();
         if (logAdminAction || callHandlers) {
@@ -184,5 +187,12 @@ public class ControllerFilter implements WebFilter {
             }
         }
         return chain.filter(exchange);
+    }
+
+    private boolean isCorsPreflightRequest(@NotNull ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
+        return request.getMethodValue().equals(HttpMethod.OPTIONS.name())
+                && request.getHeaders().containsKey(HttpHeaders.ORIGIN)
+                && request.getHeaders().containsKey(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD);
     }
 }

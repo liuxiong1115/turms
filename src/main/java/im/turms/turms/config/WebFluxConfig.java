@@ -30,8 +30,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .allowedOrigins("*")
-                .allowCredentials(true)
-                .allowedMethods("*").allowedHeaders("*");
+                .allowedMethods("*")
+                .allowedHeaders("*");
     }
 
     @Profile("dev")
