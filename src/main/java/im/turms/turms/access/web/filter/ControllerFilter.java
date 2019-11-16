@@ -183,7 +183,7 @@ public class ControllerFilter implements WebFilter {
                                     }
                                 })
                                 .then())
-                        .single();
+                        .then();
             }
         }
         return chain.filter(exchange);
