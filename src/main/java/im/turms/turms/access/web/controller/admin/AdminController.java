@@ -30,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -49,20 +50,20 @@ public class AdminController {
 
     @RequestMapping(method = RequestMethod.HEAD)
     @RequiredPermission(AdminPermission.CUSTOM)
-    public Mono<ResponseEntity> checkAccountAndPassword(
+    public Mono<Void> checkAccountAndPassword(
             @RequestHeader String account,
             @RequestHeader String password) {
         if (!account.isBlank() && !password.isBlank()) {
             return adminService.authenticate(account, password)
                     .map(authenticated -> {
                         if (authenticated != null && authenticated) {
-                            return ResponseEntity.ok().build();
+                            throw new ResponseStatusException(HttpStatus.OK);
                         } else {
-                            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
                         }
                     });
         } else {
-            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
 

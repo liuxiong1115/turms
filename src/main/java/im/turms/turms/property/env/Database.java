@@ -30,6 +30,7 @@ import java.io.IOException;
 @Data
 public class Database implements IdentifiedDataSerializable {
 
+    @JsonIgnore
     private WriteConcern writeConcern = new WriteConcern();
 
     @JsonIgnore

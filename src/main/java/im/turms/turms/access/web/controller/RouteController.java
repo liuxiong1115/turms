@@ -32,9 +32,9 @@ import java.util.Collections;
 
 /**
  * Used to inform clients of which servers they should connect.
- * Note: This is a service degradation because the javascript in any browsers
- * is not allowed to get the response information in the handshake of WebSocket
- * i.e. Turms server will tell which servers they should connect in the response of handshake
+ * Note: This is a service degradation because JavaScript in any browsers
+ * is not allowed to get the response information in the handshake of WebSocket.
+ * i.e. Turms server will tell to which server they should connect in the response of handshake
  * but the clients in browsers cannot get the response.
  */
 @RestController

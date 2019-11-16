@@ -181,8 +181,8 @@ public class GroupController {
             @RequestParam(required = false) Date createdEndDate,
             @RequestParam(required = false) Date deletedStartDate,
             @RequestParam(required = false) Date deletedEndDate,
-            @RequestParam(required = false) Date deliveredMessageStartDate,
-            @RequestParam(required = false) Date deliveredMessageEndDate,
+            @RequestParam(required = false) Date sentMessageStartDate,
+            @RequestParam(required = false) Date sentMessageEndDate,
             @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
@@ -192,10 +192,10 @@ public class GroupController {
                         deletedEndDate)
                         .map(total -> Pair.of(DELETED_GROUPS, total)));
             }
-            if (deliveredMessageStartDate != null || deliveredMessageEndDate != null) {
+            if (sentMessageStartDate != null || sentMessageEndDate != null) {
                 counts.add(messageService.countGroupsThatSentMessages(
-                        deliveredMessageStartDate,
-                        deliveredMessageEndDate)
+                        sentMessageStartDate,
+                        sentMessageEndDate)
                         .map(total -> Pair.of(GROUPS_THAT_SENT_MESSAGES, total)));
             }
             if (counts.isEmpty() || createdStartDate != null || createdEndDate != null) {
@@ -215,11 +215,11 @@ public class GroupController {
                         divideBy,
                         groupService::countDeletedGroups));
             }
-            if (deliveredMessageStartDate != null && deliveredMessageEndDate != null) {
+            if (sentMessageStartDate != null && sentMessageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         GROUPS_THAT_SENT_MESSAGES,
-                        deliveredMessageStartDate,
-                        deliveredMessageEndDate,
+                        sentMessageStartDate,
+                        sentMessageEndDate,
                         divideBy,
                         messageService::countGroupsThatSentMessages));
             }

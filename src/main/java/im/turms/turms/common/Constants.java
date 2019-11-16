@@ -73,10 +73,10 @@ public class Constants {
     public static final String DELETED_GROUPS = "deletedGroups";
     public static final String GROUPS_THAT_SENT_MESSAGES = "groupsThatSentMessages";
     public static final String CREATED_GROUPS = "createdGroups";
-    public static final String DELIVERED_MESSAGES_ON_AVERAGE = "deliveredMessagesOnAverage";
+    public static final String SENT_MESSAGES_ON_AVERAGE = "sentMessagesOnAverage";
     public static final String ACKNOWLEDGED_MESSAGES = "acknowledgedMessages";
     public static final String ACKNOWLEDGED_MESSAGES_ON_AVERAGE = "acknowledgedMessagesOnAverage";
-    public static final String DELIVERED_MESSAGES = "deliveredMessages";
+    public static final String SENT_MESSAGES = "sentMessages";
 
     public static final long RESERVED_ID = 0L;
     public static final long ADMIN_ROLE_ROOT_ID = RESERVED_ID;

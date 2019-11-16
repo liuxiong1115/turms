@@ -491,7 +491,7 @@ public class MessageService {
                 MessageStatus.class);
     }
 
-    public Mono<Long> countDeliveredMessages(
+    public Mono<Long> countSentMessages(
             @Nullable Date startDate,
             @Nullable Date endDate,
             @Nullable ChatType chatType) {
@@ -506,7 +506,7 @@ public class MessageService {
             @Nullable Date startDate,
             @Nullable Date endDate,
             @Nullable ChatType chatType) {
-        return countDeliveredMessages(startDate, endDate, chatType)
+        return countSentMessages(startDate, endDate, chatType)
                 .flatMap(totalDeliveredMessages -> {
                     if (totalDeliveredMessages == 0) {
                         return Mono.just(0L);

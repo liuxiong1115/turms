@@ -44,7 +44,7 @@ public class ClusterController {
     @GetMapping
     public ResponseEntity getClusterInfo(@RequestParam(defaultValue = "false") boolean withConfigs) {
         Map<String, Object> clusterInfo = turmsClusterManager.getClusterInfo(withConfigs);
-        return ResponseFactory.okWhenTruthy(clusterInfo, true);
+        return ResponseFactory.okWhenTruthy(clusterInfo);
     }
 
     @GetMapping("/server")

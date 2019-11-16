@@ -103,10 +103,10 @@ public class MessageController {
     @RequiredPermission(AdminPermission.MESSAGE_QUERY)
     public Mono<ResponseEntity> countMessages(
             @RequestParam(required = false) ChatType chatType,
-            @RequestParam(required = false) Date deliveredStartDate,
-            @RequestParam(required = false) Date deliveredEndDate,
-            @RequestParam(required = false) Date deliveredOnAverageStartDate,
-            @RequestParam(required = false) Date deliveredOnAverageEndDate,
+            @RequestParam(required = false) Date sentStartDate,
+            @RequestParam(required = false) Date sentEndDate,
+            @RequestParam(required = false) Date sentOnAverageStartDate,
+            @RequestParam(required = false) Date sentOnAverageEndDate,
             @RequestParam(required = false) Date acknowledgedStartDate,
             @RequestParam(required = false) Date acknowledgedEndDate,
             @RequestParam(required = false) Date acknowledgedOnAverageStartDate,
@@ -117,12 +117,12 @@ public class MessageController {
         }
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
-            if (deliveredOnAverageStartDate != null || deliveredOnAverageEndDate != null) {
+            if (sentOnAverageStartDate != null || sentOnAverageEndDate != null) {
                 counts.add(messageService.countDeliveredMessagesOnAverage(
-                        deliveredOnAverageStartDate,
-                        deliveredOnAverageEndDate,
+                        sentOnAverageStartDate,
+                        sentOnAverageEndDate,
                         chatType)
-                        .map(total -> Pair.of(DELIVERED_MESSAGES_ON_AVERAGE, total)));
+                        .map(total -> Pair.of(SENT_MESSAGES_ON_AVERAGE, total)));
             }
             if (acknowledgedStartDate != null || acknowledgedEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessages(
@@ -138,21 +138,21 @@ public class MessageController {
                         chatType)
                         .map(total -> Pair.of(ACKNOWLEDGED_MESSAGES_ON_AVERAGE, total)));
             }
-            if (counts.isEmpty() || deliveredStartDate != null || deliveredEndDate != null) {
-                counts.add(messageService.countDeliveredMessages(
-                        deliveredStartDate,
-                        deliveredEndDate,
+            if (counts.isEmpty() || sentStartDate != null || sentEndDate != null) {
+                counts.add(messageService.countSentMessages(
+                        sentStartDate,
+                        sentEndDate,
                         chatType)
-                        .map(total -> Pair.of(DELIVERED_MESSAGES, total)));
+                        .map(total -> Pair.of(SENT_MESSAGES, total)));
             }
             return ResponseFactory.collectCountResults(counts);
         } else {
             List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
-            if (deliveredOnAverageStartDate != null && deliveredOnAverageEndDate != null) {
+            if (sentOnAverageStartDate != null && sentOnAverageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        DELIVERED_MESSAGES_ON_AVERAGE,
-                        deliveredOnAverageStartDate,
-                        deliveredOnAverageEndDate,
+                        SENT_MESSAGES_ON_AVERAGE,
+                        sentOnAverageStartDate,
+                        sentOnAverageEndDate,
                         divideBy,
                         messageService::countDeliveredMessagesOnAverage,
                         chatType));
@@ -175,13 +175,13 @@ public class MessageController {
                         messageService::countAcknowledgedMessagesOnAverage,
                         chatType));
             }
-            if (deliveredStartDate != null && deliveredEndDate != null) {
+            if (sentStartDate != null && sentEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        DELIVERED_MESSAGES,
-                        deliveredStartDate,
-                        deliveredEndDate,
+                        SENT_MESSAGES,
+                        sentStartDate,
+                        sentEndDate,
                         divideBy,
-                        messageService::countDeliveredMessages,
+                        messageService::countSentMessages,
                         chatType));
             }
             if (counts.isEmpty()) {

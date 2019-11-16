@@ -162,8 +162,8 @@ public class UserController {
             @RequestParam(required = false) Date registeredEndDate,
             @RequestParam(required = false) Date deletedStartDate,
             @RequestParam(required = false) Date deletedEndDate,
-            @RequestParam(required = false) Date deliveredMessagesStartDate,
-            @RequestParam(required = false) Date deliveredMessagesEndDate,
+            @RequestParam(required = false) Date sentMessageStartDate,
+            @RequestParam(required = false) Date sentMessageEndDate,
             @RequestParam(required = false) Date loggedInStartDate,
             @RequestParam(required = false) Date loggedInEndDate,
             @RequestParam(required = false) Date maxOnlineUsersStartDate,
@@ -181,10 +181,10 @@ public class UserController {
                         deletedEndDate)
                         .map(total -> Pair.of(DELETED_USERS, total)));
             }
-            if (deliveredMessagesStartDate != null || deliveredMessagesEndDate != null) {
+            if (sentMessageStartDate != null || sentMessageEndDate != null) {
                 counts.add(messageService.countUsersWhoSentMessage(
-                        deliveredMessagesStartDate,
-                        deliveredMessagesEndDate,
+                        sentMessageStartDate,
+                        sentMessageEndDate,
                         null)
                         .map(total -> Pair.of(USERS_WHO_SENT_MESSAGES, total)));
             }
@@ -217,11 +217,11 @@ public class UserController {
                         divideBy,
                         userService::countDeletedUsers));
             }
-            if (deliveredMessagesStartDate != null && deliveredMessagesEndDate != null) {
+            if (sentMessageStartDate != null && sentMessageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         USERS_WHO_SENT_MESSAGES,
-                        deliveredMessagesStartDate,
-                        deliveredMessagesEndDate,
+                        sentMessageStartDate,
+                        sentMessageEndDate,
                         divideBy,
                         messageService::countUsersWhoSentMessage,
                         null));

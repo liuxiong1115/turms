@@ -415,7 +415,8 @@ public class UserService {
                 .max(UserOnlineUserNumber.Fields.number)
                 .buildQuery();
         return mongoTemplate.findOne(query, UserOnlineUserNumber.class)
-                .map(entity -> (long) entity.getNumber());
+                .map(entity -> (long) entity.getNumber())
+                .defaultIfEmpty(0L);
     }
 
     public Mono<Boolean> updateUsers(
