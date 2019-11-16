@@ -32,12 +32,14 @@ import java.util.List;
 public class TurmsPluginManager {
     private List<ClientRequestHandler> clientRequestHandlerList;
     private List<ExpiryMessageAutoDeletionNotificationHandler> expiryMessageAutoDeletionNotificationHandlerList;
+    private List<LogHandler> logHandlerList;
     private List<UserAuthenticator> userAuthenticatorList;
     private List<UserOnlineStatusChangeHandler> userOnlineStatusChangeHandlerList;
 
     public TurmsPluginManager() {
         clientRequestHandlerList = Collections.emptyList();
         expiryMessageAutoDeletionNotificationHandlerList = Collections.emptyList();
+        logHandlerList = Collections.emptyList();
         userAuthenticatorList = Collections.emptyList();
         userOnlineStatusChangeHandlerList = Collections.emptyList();
     }
@@ -49,6 +51,7 @@ public class TurmsPluginManager {
         pluginManager.startPlugins();
         clientRequestHandlerList = pluginManager.getExtensions(ClientRequestHandler.class);
         expiryMessageAutoDeletionNotificationHandlerList = pluginManager.getExtensions(ExpiryMessageAutoDeletionNotificationHandler.class);
+        logHandlerList = pluginManager.getExtensions(LogHandler.class);
         userAuthenticatorList = pluginManager.getExtensions(UserAuthenticator.class);
         userOnlineStatusChangeHandlerList = pluginManager.getExtensions(UserOnlineStatusChangeHandler.class);
     }

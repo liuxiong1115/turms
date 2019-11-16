@@ -18,14 +18,18 @@
 package im.turms.turms.service.admin;
 
 import com.google.common.net.InetAddresses;
+import com.mongodb.DBObject;
 import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.plugin.LogHandler;
+import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.AdminActionLog;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -33,7 +37,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.net.InetAddress;
 import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 
 import static im.turms.turms.common.Constants.ID;
@@ -42,10 +45,12 @@ import static im.turms.turms.common.Constants.ID;
 public class AdminActionLogService {
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
+    private final TurmsPluginManager turmsPluginManager;
 
-    public AdminActionLogService(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate) {
+    public AdminActionLogService(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, TurmsPluginManager turmsPluginManager) {
         this.turmsClusterManager = turmsClusterManager;
         this.mongoTemplate = mongoTemplate;
+        this.turmsPluginManager = turmsPluginManager;
     }
 
     public Mono<AdminActionLog> saveAdminActionLog(
@@ -53,8 +58,8 @@ public class AdminActionLogService {
             @NotNull Date timestamp,
             @NotNull String ip,
             @NotNull String action,
-            @Nullable Map<String, String> params,
-            @Nullable String body) {
+            @Nullable DBObject params,
+            @Nullable DBObject body) {
         InetAddress inetAddress = InetAddresses.forString(ip);
         AdminActionLog adminActionLog = new AdminActionLog(
                 turmsClusterManager.generateRandomId(),
@@ -102,5 +107,36 @@ public class AdminActionLogService {
             query.addCriteria(Criteria.where(AdminActionLog.Fields.account).in(accounts));
         }
         return mongoTemplate.find(query, AdminActionLog.class);
+    }
+
+    public void triggeringLogHandlers(
+            @NotNull ServerWebExchange exchange,
+            @Nullable Long id,
+            @Nullable String account,
+            @Nullable Date timestamp,
+            @Nullable String host,
+            @Nullable String action,
+            @Nullable DBObject params,
+            @Nullable DBObject body) {
+        InetAddress inetAddress = InetAddresses.forString(host);
+        AdminActionLog adminActionLog = new AdminActionLog(
+                id,
+                account,
+                timestamp,
+                InetAddresses.coerceToInteger(inetAddress),
+                action,
+                params,
+                body);
+        for (LogHandler logHandler : turmsPluginManager.getLogHandlerList()) {
+            logHandler.handleAdminActionLog(exchange, adminActionLog);
+        }
+    }
+
+    public void triggeringLogHandlers(
+            @NotNull ServerWebExchange exchange,
+            @NotNull AdminActionLog log) {
+        for (LogHandler logHandler : turmsPluginManager.getLogHandlerList()) {
+            logHandler.handleAdminActionLog(exchange, log);
+        }
     }
 }

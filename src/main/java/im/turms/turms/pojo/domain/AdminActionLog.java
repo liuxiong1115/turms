@@ -17,6 +17,7 @@
 
 package im.turms.turms.pojo.domain;
 
+import com.mongodb.DBObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
-import java.util.Map;
 
 @Data
 @Document
@@ -52,8 +52,7 @@ public class AdminActionLog {
     @Indexed
     private String action;
 
-    @Indexed
-    private Map<String, String> params;
+    private DBObject params;
 
-    private String body;
+    private DBObject body;
 }

@@ -31,6 +31,7 @@ import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.plugin.UserOnlineStatusChangeHandler;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
+import im.turms.turms.pojo.domain.UserLoginLog;
 import im.turms.turms.pojo.domain.UserOnlineUserNumber;
 import im.turms.turms.service.user.UserLocationService;
 import im.turms.turms.service.user.UserLoginLogService;
@@ -299,7 +300,7 @@ public class OnlineUserService {
         return mongoTemplate.save(userOnlineUserNumber);
     }
 
-    private Mono<Long> logUserOnline(
+    private Mono<UserLoginLog> logUserOnline(
             @NotNull Long userId,
             @NotNull Integer ip,
             @NotNull DeviceType usingDeviceType,
@@ -334,9 +335,17 @@ public class OnlineUserService {
                     }
                     if (turmsClusterManager.getTurmsProperties().getLog().isLogUserLogin()) {
                         return logUserOnline(userId, ip, loggingInDeviceType, deviceDetails, locationId)
-                                .map(logId -> setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, logId))
+                                .map(log -> {
+                                    if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                                        userLoginLogService.triggerLogHandlers(log);
+                                    }
+                                    return setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId());
+                                })
                                 .onErrorReturn(TurmsStatusCode.FAILED);
                     } else {
+                        if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                            userLoginLogService.triggerLogHandlers(userId, ip, loggingInDeviceType, deviceDetails, locationId);
+                        }
                         return Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, null));
                     }
                 });

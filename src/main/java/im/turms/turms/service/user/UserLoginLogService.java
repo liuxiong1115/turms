@@ -20,6 +20,8 @@ package im.turms.turms.service.user;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.DeviceType;
+import im.turms.turms.plugin.LogHandler;
+import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.UserLoginLog;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -39,13 +41,15 @@ import static im.turms.turms.common.Constants.ID;
 public class UserLoginLogService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
+    private final TurmsPluginManager turmsPluginManager;
 
-    public UserLoginLogService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager) {
+    public UserLoginLogService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
+        this.turmsPluginManager = turmsPluginManager;
     }
 
-    public Mono<Long> save(
+    public Mono<UserLoginLog> save(
             @NotNull Long userId,
             @Nullable Integer ip,
             @NotNull DeviceType deviceType,
@@ -60,7 +64,7 @@ public class UserLoginLogService {
         userLoginLog.setIp(ip);
         userLoginLog.setDeviceType(deviceType);
         userLoginLog.setDeviceDetails(deviceDetails);
-        return mongoTemplate.save(userLoginLog).map(UserLoginLog::getId);
+        return mongoTemplate.save(userLoginLog);
     }
 
     public Mono<Boolean> updateLogoutDate(
@@ -70,5 +74,29 @@ public class UserLoginLogService {
         Update update = new Update().set(UserLoginLog.Fields.logoutDate, logoutDate);
         return mongoTemplate.updateFirst(query, update, UserLoginLog.class)
                 .map(UpdateResult::wasAcknowledged);
+    }
+
+    public void triggerLogHandlers(@NotNull UserLoginLog log) {
+        for (LogHandler handler : turmsPluginManager.getLogHandlerList()) {
+            handler.handleUserLoginLog(log);
+        }
+    }
+
+    public void triggerLogHandlers(
+            @Nullable Long userId,
+            @Nullable Integer ip,
+            @Nullable DeviceType loggingInDeviceType,
+            @Nullable Map<String, String> deviceDetails,
+            @Nullable Long locationId) {
+        if (!turmsPluginManager.getLogHandlerList().isEmpty()) {
+            UserLoginLog userLoginLog = new UserLoginLog();
+            userLoginLog.setUserId(userId);
+            userLoginLog.setLoginDate(new Date());
+            userLoginLog.setLocationId(locationId);
+            userLoginLog.setIp(ip);
+            userLoginLog.setDeviceType(loggingInDeviceType);
+            userLoginLog.setDeviceDetails(deviceDetails);
+            triggerLogHandlers(userLoginLog);
+        }
     }
 }

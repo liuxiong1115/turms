@@ -17,10 +17,13 @@
 
 package im.turms.turms.access.web.filter;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.Constants;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.service.admin.AdminActionLogService;
 import im.turms.turms.service.admin.AdminService;
 import org.springframework.core.MethodParameter;
@@ -37,8 +40,6 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import static im.turms.turms.common.Constants.ACCOUNT;
@@ -50,12 +51,14 @@ public class ControllerFilter implements WebFilter {
     private final AdminService adminService;
     private final AdminActionLogService adminActionLogService;
     private final TurmsClusterManager turmsClusterManager;
+    private final TurmsPluginManager turmsPluginManager;
 
-    public ControllerFilter(RequestMappingHandlerMapping requestMappingHandlerMapping, AdminService adminService, AdminActionLogService adminActionLogService, TurmsClusterManager turmsClusterManager) {
+    public ControllerFilter(RequestMappingHandlerMapping requestMappingHandlerMapping, AdminService adminService, AdminActionLogService adminActionLogService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager) {
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.adminService = adminService;
         this.adminActionLogService = adminActionLogService;
         this.turmsClusterManager = turmsClusterManager;
+        this.turmsPluginManager = turmsPluginManager;
     }
 
     @Override
@@ -128,37 +131,58 @@ public class ControllerFilter implements WebFilter {
             @NotNull ServerWebExchange exchange,
             @NotNull WebFilterChain chain,
             @NotNull HandlerMethod handlerMethod) {
-        if (turmsClusterManager.getTurmsProperties().getLog().isLogAdminAction()) {
+        boolean logAdminAction = turmsClusterManager.getTurmsProperties().getLog().isLogAdminAction()
+                && turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
+        boolean callHandlers = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()
+                && !turmsPluginManager.getLogHandlerList().isEmpty();
+        if (logAdminAction || callHandlers) {
             String action = handlerMethod.getMethod().getName();
             MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
             ServerHttpRequest request = exchange.getRequest();
             MultiValueMap<String, String> queryParams = request.getQueryParams();
-            Map<String, String> attributes = null;
+            DBObject params = null;
             if (methodParameters.length > 0 && !queryParams.isEmpty()) {
-                attributes = new HashMap<>(methodParameters.length);
+                params = new BasicDBObject(methodParameters.length);
                 for (MethodParameter methodParameter : methodParameters) {
                     String parameterName = methodParameter.getParameterName();
                     if (parameterName != null) {
                         String value = queryParams.getFirst(parameterName);
                         if (value != null) {
-                            attributes.put(parameterName, value);
+                            params.put(parameterName, value);
                         }
                     }
                 }
             }
             String host = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
-            return chain.filter(exchange)
-                    .mergeWith(adminActionLogService.saveAdminActionLog(
-                            account,
-                            new Date(),
-                            host,
-                            action,
-                            attributes,
-                            null)
-                            .then())
-                    .single();
-        } else {
-            return chain.filter(exchange);
+            if (callHandlers) {
+                adminActionLogService.triggeringLogHandlers(
+                        exchange,
+                        null,
+                        account,
+                        new Date(),
+                        host,
+                        action,
+                        params,
+                        null);
+            }
+            if (logAdminAction) {
+                return chain.filter(exchange)
+                        .mergeWith(adminActionLogService.saveAdminActionLog(
+                                account,
+                                new Date(),
+                                host,
+                                action,
+                                params,
+                                null)
+                                .doOnSuccess(log -> {
+                                    if (callHandlers) {
+                                        adminActionLogService.triggeringLogHandlers(exchange, log);
+                                    }
+                                })
+                                .then())
+                        .single();
+            }
         }
+        return chain.filter(exchange);
     }
 }
