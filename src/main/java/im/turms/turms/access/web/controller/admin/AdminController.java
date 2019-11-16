@@ -99,7 +99,6 @@ public class AdminController {
         return ResponseFactory.acknowledged(updated);
     }
 
-    //TODO: always allow querying oneself
     @GetMapping
     @RequiredPermission(AdminPermission.ADMIN_QUERY)
     public Mono<ResponseEntity> getAdmins(

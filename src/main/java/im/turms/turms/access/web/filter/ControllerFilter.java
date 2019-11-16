@@ -88,7 +88,7 @@ public class ControllerFilter implements WebFilter {
                             .flatMap(authenticated -> {
                                 if (authenticated != null && authenticated) {
                                     if (requiredPermission != null) {
-                                        return adminService.isAdminAuthorized(account, requiredPermission.value())
+                                        return adminService.isAdminAuthorized(exchange, account, requiredPermission.value())
                                                 .flatMap(authorized -> {
                                                     if (authorized != null && authorized) {
                                                         return tryPersistingAndPass(account, exchange, chain, handlerMethod);

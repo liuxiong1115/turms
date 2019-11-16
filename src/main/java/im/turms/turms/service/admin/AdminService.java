@@ -32,6 +32,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -136,10 +137,36 @@ public class AdminService {
         }
     }
 
-    public Mono<Boolean> isAdminAuthorized(@NotNull String account, @NotNull AdminPermission permission) {
+    public Mono<Boolean> isAdminAuthorized(
+            @NotNull String account,
+            @NotNull AdminPermission permission) {
         return queryRoleId(account)
                 .flatMap(roleId -> adminRoleService.hasPermission(roleId, permission))
                 .switchIfEmpty(Mono.just(false));
+    }
+
+    public Mono<Boolean> isAdminAuthorized(
+            @NotNull ServerWebExchange exchange,
+            @NotNull String account,
+            @NotNull AdminPermission permission) {
+        boolean isQueryingOneselfInfo = isQueryingOneselfInfo(exchange, account, permission);
+        if (isQueryingOneselfInfo) {
+            return Mono.just(true);
+        } else {
+            return isAdminAuthorized(account, permission);
+        }
+    }
+
+    private boolean isQueryingOneselfInfo(
+            @NotNull ServerWebExchange exchange,
+            @NotNull String account,
+            @NotNull AdminPermission permission) {
+        if (permission == AdminPermission.ADMIN_QUERY) {
+            String accounts = exchange.getRequest().getQueryParams().getFirst("accounts");
+            return accounts != null && accounts.equals(account);
+        } else {
+            return false;
+        }
     }
 
     public Mono<Boolean> authenticate(@NotNull String account, @NotNull String rawPassword) {
