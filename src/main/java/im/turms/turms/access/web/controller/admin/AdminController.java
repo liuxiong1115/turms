@@ -116,7 +116,7 @@ public class AdminController {
     public Mono<ResponseEntity> queryAdmins(
             @RequestParam(required = false) Set<String> accounts,
             @RequestParam(required = false) String account,
-            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Long roleId,
             @RequestParam(defaultValue = "false") boolean withPassword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "0") int size) {
@@ -125,8 +125,8 @@ public class AdminController {
             return ResponseFactory.okWhenTruthy(getAdmin);
         } else {
             size = pageUtil.getSize(size);
-            Flux<Admin> admins = adminService.queryAdmins(accounts, role, withPassword, page, size);
-            Mono<Long> total = adminService.countAdmins(accounts, role);
+            Flux<Admin> admins = adminService.queryAdmins(accounts, roleId, withPassword, page, size);
+            Mono<Long> total = adminService.countAdmins(accounts, roleId);
             return ResponseFactory.okWhenTruthy(PageResult.getResult(total, admins));
         }
     }

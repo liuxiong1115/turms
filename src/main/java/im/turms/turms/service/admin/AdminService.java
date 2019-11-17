@@ -261,12 +261,12 @@ public class AdminService {
 
     public Flux<Admin> queryAdmins(
             @Nullable Set<String> accounts,
-            @Nullable String role,
+            @Nullable Long roleId,
             boolean withPassword,
             int page,
             int size) {
         Query query = QueryBuilder.newBuilder()
-                .addIfNotNull(Criteria.where(Admin.Fields.roleId).is(role), role)
+                .addIfNotNull(Criteria.where(Admin.Fields.roleId).is(roleId), roleId)
                 .paginateIfNotNull(page, size);
         if (accounts != null && !accounts.isEmpty()) {
             query.addCriteria(Criteria.where(ID).in(accounts));
@@ -350,9 +350,9 @@ public class AdminService {
         return mongoTemplate.updateMulti(query, update, Admin.class).map(UpdateResult::wasAcknowledged);
     }
 
-    public Mono<Long> countAdmins(@Nullable Set<String> accounts, @Nullable String role) {
+    public Mono<Long> countAdmins(@Nullable Set<String> accounts, @Nullable Long roleId) {
         Query query = QueryBuilder.newBuilder()
-                .addIfNotNull(Criteria.where(Admin.Fields.roleId).is(role), role)
+                .addIfNotNull(Criteria.where(Admin.Fields.roleId).is(roleId), roleId)
                 .buildQuery();
         if (accounts != null && !accounts.isEmpty()) {
             query.addCriteria(Criteria.where(ID).in(accounts));
