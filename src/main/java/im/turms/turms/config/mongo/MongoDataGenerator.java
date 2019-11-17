@@ -11,6 +11,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -43,7 +44,15 @@ public class MongoDataGenerator {
             TurmsLogger.log("Start clearing collections...");
             Query queryAll = new Query();
             mongoTemplate.getCollectionNames()
-                    .flatMap(name -> mongoTemplate.remove(queryAll, name))
+                    .flatMap(name -> {
+                        if (name.equals("admin")) {
+                            Query query = new Query();
+                            query.addCriteria(Criteria.where(Admin.Fields.roleId).ne(ADMIN_ROLE_ROOT_ID));
+                            return mongoTemplate.remove(query, name);
+                        } else {
+                            return mongoTemplate.remove(queryAll, name);
+                        }
+                    })
                     .blockLast();
             TurmsLogger.log("All collections are cleared");
         }
@@ -102,7 +111,7 @@ public class MongoDataGenerator {
                         "account" + i,
                         passwordUtil.encodeAdminPassword("123"),
                         "myname",
-                        ADMIN_ROLE_ROOT_ID,
+                        1L,
                         now);
                 objects.add(admin);
             }
@@ -117,6 +126,12 @@ public class MongoDataGenerator {
                         null);
                 objects.add(adminActionLog);
             }
+            AdminRole adminRole = new AdminRole(
+                    1L,
+                    "ADMIN",
+                    AdminPermission.all(),
+                    0);
+            objects.add(adminRole);
             // Group
             Group group = new Group(
                     1L,

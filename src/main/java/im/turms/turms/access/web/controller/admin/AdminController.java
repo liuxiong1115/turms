@@ -73,6 +73,9 @@ public class AdminController {
     public Mono<ResponseEntity> addAdmin(
             @RequestHeader String account,
             @RequestBody AddAdminDTO addAdminDTO) {
+        if (addAdminDTO.getRoleId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         Mono<Admin> generatedAdmin = adminService.authAndAddAdmin(
                 account,
                 addAdminDTO.getAccount(),
@@ -110,7 +113,7 @@ public class AdminController {
 
     @GetMapping
     @RequiredPermission(ADMIN_QUERY)
-    public Mono<ResponseEntity> getAdmins(
+    public Mono<ResponseEntity> queryAdmins(
             @RequestParam(required = false) Set<String> accounts,
             @RequestParam(required = false) String account,
             @RequestParam(required = false) String role,

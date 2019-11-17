@@ -84,6 +84,7 @@ public class AdminRole implements IdentifiedDataSerializable {
                 .stream()
                 .mapToInt(Enum::ordinal)
                 .toArray());
+        out.writeInt(rank);
     }
 
     @Override
@@ -93,5 +94,6 @@ public class AdminRole implements IdentifiedDataSerializable {
         permissions = Arrays.stream(in.readIntArray())
                 .mapToObj(value -> AdminPermission.values()[value])
                 .collect(Collectors.toSet());
+        rank = in.readInt();
     }
 }

@@ -49,6 +49,7 @@ import static im.turms.turms.common.Constants.*;
 
 @Service
 public class AdminService {
+    public static String ROOT_ADMIN_ACCOUNT;
     private static final String DESC_ACCOUNT = "Account";
     private static final String DESC_RAW_PASSWORD = "Raw Password";
     //Account -> Admin
@@ -67,25 +68,28 @@ public class AdminService {
 
     @PostHazelcastInitialized
     public Function<TurmsClusterManager, Void> initAdminsCache() {
-        return turmsClusterManager -> {
-            admins = turmsClusterManager.getHazelcastInstance().getReplicatedMap(HAZELCAST_ADMINS_MAP);
+        return clusterManager -> {
+            admins = clusterManager.getHazelcastInstance().getReplicatedMap(HAZELCAST_ADMINS_MAP);
             if (admins.size() == 0) {
                 loadAllAdmins();
             }
             countRootAdmins().subscribe(number -> {
                 if (number == 0) {
                     String account = RandomStringUtils.randomAlphabetic(16);
-                    String rawPassword = RandomStringUtils.randomAscii(32);
+                    String rawPassword = RandomStringUtils.randomAlphanumeric(32);
                     Map<String, String> map = new HashMap<>(2);
                     map.put(DESC_ACCOUNT, account);
                     map.put(DESC_RAW_PASSWORD, rawPassword);
-                    TurmsLogger.logJson("Root admin", map);
                     addAdmin(account,
                             rawPassword,
                             ADMIN_ROLE_ROOT_ID,
                             RandomStringUtils.randomAlphabetic(8),
                             new Date(),
                             false)
+                            .doOnSuccess(admin -> {
+                                ROOT_ADMIN_ACCOUNT = account;
+                                TurmsLogger.logJson("Root admin", map);
+                            })
                             .subscribe();
                 }
             });
@@ -291,12 +295,26 @@ public class AdminService {
     public Mono<Boolean> deleteAdmins(@NotEmpty Set<String> accounts) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).in(accounts));
-        return mongoTemplate.remove(query, Admin.class).map(result -> {
-            for (String account : accounts) {
-                admins.remove(account);
-            }
-            return result.wasAcknowledged();
-        });
+        Set<String> rootAdminsAccounts = getRootAdminsAccounts();
+        rootAdminsAccounts.removeAll(accounts);
+        if (!rootAdminsAccounts.isEmpty()) {
+            return mongoTemplate.remove(query, Admin.class)
+                    .map(result -> {
+                        for (String account : accounts) {
+                            admins.remove(account);
+                        }
+                        return result.wasAcknowledged();
+                    });
+        } else {
+            return Mono.just(false);
+        }
+    }
+
+    public Set<String> getRootAdminsAccounts() {
+        return admins.values()
+                .stream()
+                .map(Admin::getAccount)
+                .collect(Collectors.toSet());
     }
 
     public Mono<Boolean> authAndUpdateAdmins(
