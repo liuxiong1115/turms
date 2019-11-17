@@ -31,4 +31,5 @@ public class AddAdminRoleDTO {
     private Long id;
     private String name;
     private Set<AdminPermission> permissions;
+    private Integer rank;
 }

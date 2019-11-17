@@ -40,7 +40,7 @@ public class ReasonController {
     }
 
     @GetMapping("/login-failed")
-    @RequiredPermission(AdminPermission.CUSTOM)
+    @RequiredPermission(AdminPermission.NONE)
     public Object getLoginFailedReason(
             @RequestParam Long userId,
             @RequestParam Long requestId) {
@@ -55,7 +55,7 @@ public class ReasonController {
     }
 
     @GetMapping("/disconnection")
-    @RequiredPermission(AdminPermission.CUSTOM)
+    @RequiredPermission(AdminPermission.NONE)
     public Integer getDisconnectionReason(
             @RequestParam Long userId,
             @RequestParam String sessionId) {

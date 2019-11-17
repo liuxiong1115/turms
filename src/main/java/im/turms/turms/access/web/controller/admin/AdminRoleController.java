@@ -48,11 +48,13 @@ public class AdminRoleController {
     public Mono<ResponseEntity> addAdminRole(@RequestBody AddAdminRoleDTO addAdminRoleDTO) {
         if (addAdminRoleDTO.getId() != null
                 && !CollectionUtils.isEmpty(addAdminRoleDTO.getPermissions())
-                && StringUtils.hasText(addAdminRoleDTO.getName())) {
+                && StringUtils.hasText(addAdminRoleDTO.getName())
+                && addAdminRoleDTO.getRank() != null) {
             return ResponseFactory.okWhenTruthy(adminRoleService.addAdminRole(
                     addAdminRoleDTO.getId(),
                     addAdminRoleDTO.getName(),
-                    addAdminRoleDTO.getPermissions()));
+                    addAdminRoleDTO.getPermissions(),
+                    addAdminRoleDTO.getRank()));
         } else {
             return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
@@ -70,8 +72,14 @@ public class AdminRoleController {
     public Mono<ResponseEntity> updateAdminRole(
             @RequestParam Long id,
             @RequestBody UpdateAdminRoleDTO updateAdminRoleDTO) {
-        if (StringUtils.hasText(updateAdminRoleDTO.getName()) || !CollectionUtils.isEmpty(updateAdminRoleDTO.getPermissions())) {
-            Mono<Boolean> updated = adminRoleService.updateAdminRole(id, updateAdminRoleDTO.getName(), updateAdminRoleDTO.getPermissions());
+        if (StringUtils.hasText(updateAdminRoleDTO.getName())
+                || !CollectionUtils.isEmpty(updateAdminRoleDTO.getPermissions())
+                || updateAdminRoleDTO.getRank() != null) {
+            Mono<Boolean> updated = adminRoleService.updateAdminRole(
+                    id,
+                    updateAdminRoleDTO.getName(),
+                    updateAdminRoleDTO.getPermissions(),
+                    updateAdminRoleDTO.getRank());
             return ResponseFactory.acknowledged(updated);
         } else {
             return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
@@ -83,8 +91,13 @@ public class AdminRoleController {
     public Mono<ResponseEntity> getAdminRoles(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> names,
-            @RequestParam(required = false) Set<AdminPermission> includedPermissions) {
-        Flux<AdminRole> queryAdminRoles = adminRoleService.queryAdminRoles(ids, names, includedPermissions);
+            @RequestParam(required = false) Set<AdminPermission> includedPermissions,
+            @RequestParam(required = false) Set<Integer> ranks) {
+        Flux<AdminRole> queryAdminRoles = adminRoleService.queryAdminRoles(
+                ids,
+                names,
+                includedPermissions,
+                ranks);
         return ResponseFactory.okWhenTruthy(queryAdminRoles);
     }
 }

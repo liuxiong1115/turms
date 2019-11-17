@@ -20,7 +20,6 @@ package im.turms.turms.access.web.controller.admin;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.bo.PageResult;
 import im.turms.turms.pojo.domain.Admin;
 import im.turms.turms.pojo.dto.AddAdminDTO;
@@ -37,6 +36,8 @@ import reactor.core.publisher.Mono;
 import java.util.Date;
 import java.util.Set;
 
+import static im.turms.turms.constant.AdminPermission.*;
+
 @RestController
 @RequestMapping("/admins")
 public class AdminController {
@@ -49,7 +50,7 @@ public class AdminController {
     }
 
     @RequestMapping(method = RequestMethod.HEAD)
-    @RequiredPermission(AdminPermission.CUSTOM)
+    @RequiredPermission(NONE)
     public Mono<Void> checkAccountAndPassword(
             @RequestHeader String account,
             @RequestHeader String password) {
@@ -68,9 +69,12 @@ public class AdminController {
     }
 
     @PostMapping
-    @RequiredPermission(AdminPermission.ADMIN_CREATE)
-    public Mono<ResponseEntity> addAdmin(@RequestBody AddAdminDTO addAdminDTO) {
-        Mono<Admin> generatedAdmin = adminService.addAdmin(
+    @RequiredPermission(ADMIN_CREATE)
+    public Mono<ResponseEntity> addAdmin(
+            @RequestHeader String account,
+            @RequestBody AddAdminDTO addAdminDTO) {
+        Mono<Admin> generatedAdmin = adminService.authAndAddAdmin(
+                account,
                 addAdminDTO.getAccount(),
                 addAdminDTO.getPassword(),
                 addAdminDTO.getRoleId(),
@@ -81,18 +85,22 @@ public class AdminController {
     }
 
     @DeleteMapping
-    @RequiredPermission(AdminPermission.ADMIN_DELETE)
-    public Mono<ResponseEntity> deleteAdmins(@RequestParam Set<String> accounts) {
-        Mono<Boolean> deleted = adminService.deleteAdmins(accounts);
+    @RequiredPermission(ADMIN_DELETE)
+    public Mono<ResponseEntity> deleteAdmins(
+            @RequestHeader String account,
+            @RequestParam Set<String> accounts) {
+        Mono<Boolean> deleted = adminService.authAndDeleteAdmins(account, accounts);
         return ResponseFactory.acknowledged(deleted);
     }
 
     @PutMapping
-    @RequiredPermission(AdminPermission.ADMIN_UPDATE)
+    @RequiredPermission(ADMIN_UPDATE)
     public Mono<ResponseEntity> updateAdmins(
+            @RequestHeader String account,
             @RequestParam Set<String> accounts,
             @RequestBody UpdateAdminDTO updateAdminDTO) {
-        Mono<Boolean> updated = adminService.updateAdmins(
+        Mono<Boolean> updated = adminService.authAndUpdateAdmins(
+                account,
                 accounts,
                 updateAdminDTO.getPassword(),
                 updateAdminDTO.getName(),
@@ -101,7 +109,7 @@ public class AdminController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.ADMIN_QUERY)
+    @RequiredPermission(ADMIN_QUERY)
     public Mono<ResponseEntity> getAdmins(
             @RequestParam(required = false) Set<String> accounts,
             @RequestParam(required = false) String account,

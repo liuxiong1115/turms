@@ -42,18 +42,21 @@ public class ClusterController {
     }
 
     @GetMapping
+    @RequiredPermission(AdminPermission.CLUSTER_CONFIG_QUERY)
     public ResponseEntity getClusterInfo(@RequestParam(defaultValue = "false") boolean withConfigs) {
         Map<String, Object> clusterInfo = turmsClusterManager.getClusterInfo(withConfigs);
         return ResponseFactory.okWhenTruthy(clusterInfo);
     }
 
     @GetMapping("/server")
+    @RequiredPermission(AdminPermission.NONE)
     public ResponseEntity getServerHost(@RequestParam Long userId) {
         String host = turmsClusterManager.getMemberByUserId(userId).getAddress().getHost();
         return ResponseFactory.okWhenTruthy(host);
     }
 
     @GetMapping("/config")
+    @RequiredPermission(AdminPermission.CLUSTER_CONFIG_QUERY)
     public ResponseEntity getClusterConfig(@RequestParam(defaultValue = "false") boolean mutable) {
         TurmsProperties properties = turmsClusterManager.getTurmsProperties();
         if (mutable) {

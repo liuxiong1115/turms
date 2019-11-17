@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum AdminPermission {
-    CUSTOM,
+    NONE,
 
     STATISTICS_USER_QUERY,
     STATISTICS_GROUP_QUERY,
@@ -63,10 +63,11 @@ public enum AdminPermission {
     ADMIN_ROLE_UPDATE,
     ADMIN_ROLE_QUERY,
 
-    ADMIN_ACTION_LOG_QUERY,
     ADMIN_ACTION_LOG_DELETE,
+    ADMIN_ACTION_LOG_QUERY,
 
-    CLUSTER_CONFIG_UPDATE;
+    CLUSTER_CONFIG_UPDATE,
+    CLUSTER_CONFIG_QUERY;
 
     public static Set<AdminPermission> all() {
         return new HashSet<>(Arrays.asList(AdminPermission.values()));

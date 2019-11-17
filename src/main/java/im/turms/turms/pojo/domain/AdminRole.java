@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
  *     id: 0,
  *     name: "ROOT",
  *     permissions: all permissions
+ *     rank: Integer.MAX_VALUE
  * } hardcoded in Turms
  */
 public class AdminRole implements IdentifiedDataSerializable {
@@ -53,6 +54,11 @@ public class AdminRole implements IdentifiedDataSerializable {
     private String name;
     @Indexed
     private Set<AdminPermission> permissions;
+    /**
+     * Only the admins with higher rank can add/delete/update
+     * the records of admins with lower rank.
+     */
+    private Integer rank;
 
     @JsonIgnore
     @Override

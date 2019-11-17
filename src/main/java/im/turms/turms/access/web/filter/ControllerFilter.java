@@ -80,7 +80,7 @@ public class ControllerFilter implements WebFilter {
                 return chain.filter(exchange);
             }
             RequiredPermission requiredPermission = handlerMethod.getMethodAnnotation(RequiredPermission.class);
-            if (requiredPermission != null && requiredPermission.value().equals(AdminPermission.CUSTOM)) {
+            if (requiredPermission != null && requiredPermission.value().equals(AdminPermission.NONE)) {
                 return chain.filter(exchange);
             } else {
                 if (account != null && password != null) {

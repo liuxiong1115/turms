@@ -47,7 +47,7 @@ public class RouteController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.CUSTOM)
+    @RequiredPermission(AdminPermission.NONE)
     public Mono<ResponseEntity> getResponsibleServerAddress(@RequestParam Long userId) {
         Mono<String> address = turmsClusterManager.getResponsibleTurmsServerAddress(userId);
         return ResponseFactory.okWhenTruthy(address

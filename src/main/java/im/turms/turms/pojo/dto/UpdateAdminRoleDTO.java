@@ -30,4 +30,5 @@ import java.util.Set;
 public class UpdateAdminRoleDTO {
     private String name;
     private Set<AdminPermission> permissions;
+    private Integer rank;
 }

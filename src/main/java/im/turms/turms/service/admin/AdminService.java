@@ -31,7 +31,9 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,11 +41,9 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -99,6 +99,25 @@ public class AdminService {
         return mongoTemplate.count(query, Admin.class);
     }
 
+    public Mono<Admin> authAndAddAdmin(
+            @NotNull String requester,
+            @Nullable String account,
+            @Nullable String rawPassword,
+            @NotNull Long roleId,
+            @Nullable String name,
+            @Nullable Date registrationDate,
+            boolean upsert) {
+        return adminRoleService.isAdminHigherThanRole(requester, roleId)
+                .flatMap(isHigher -> {
+                    if (isHigher) {
+                        return addAdmin(account, rawPassword, roleId, name, registrationDate, upsert);
+                    } else {
+                        return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                    }
+                })
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+    }
+
     public Mono<Admin> addAdmin(
             @Nullable String account,
             @Nullable String rawPassword,
@@ -132,6 +151,30 @@ public class AdminService {
             return mongoTemplate.findOne(query, Admin.class)
                     .map(administrator -> {
                         admins.put(account, administrator);
+                        return administrator.getRoleId();
+                    });
+        }
+    }
+
+    public Flux<Long> queryRolesIds(@NotEmpty Set<String> accounts) {
+        List<Admin> cacheAdmins = new ArrayList<>(accounts.size());
+        for (String account : accounts) {
+            Admin admin = admins.get(account);
+            cacheAdmins.add(admin);
+        }
+        if (cacheAdmins.size() == accounts.size()) {
+            Set<Long> rolesIds = cacheAdmins.stream()
+                    .map(Admin::getRoleId)
+                    .mapToLong(value -> value)
+                    .boxed()
+                    .collect(Collectors.toSet());
+            return Flux.fromIterable(rolesIds);
+        } else {
+            Query query = new Query().addCriteria(Criteria.where(ID).in(accounts));
+            query.fields().include(Admin.Fields.roleId);
+            return mongoTemplate.find(query, Admin.class)
+                    .map(administrator -> {
+                        admins.put(administrator.getAccount(), administrator);
                         return administrator.getRoleId();
                     });
         }
@@ -230,6 +273,21 @@ public class AdminService {
         return mongoTemplate.find(query, Admin.class);
     }
 
+
+    public Mono<Boolean> authAndDeleteAdmins(
+            @NotNull String requester,
+            @NotEmpty Set<String> accounts) {
+        return adminRoleService.isAdminHigherThanAdmins(requester, accounts)
+                .flatMap(higher -> {
+                    if (higher) {
+                        return deleteAdmins(accounts);
+                    } else {
+                        return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                    }
+                })
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+    }
+
     public Mono<Boolean> deleteAdmins(@NotEmpty Set<String> accounts) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).in(accounts));
@@ -239,6 +297,23 @@ public class AdminService {
             }
             return result.wasAcknowledged();
         });
+    }
+
+    public Mono<Boolean> authAndUpdateAdmins(
+            @NotNull String requester,
+            @NotEmpty Set<String> targetAccounts,
+            @Nullable String password,
+            @Nullable String name,
+            @Nullable Long roleId) {
+        return adminRoleService.isAdminHigherThanAdmins(requester, targetAccounts)
+                .flatMap(higher -> {
+                    if (higher) {
+                        return updateAdmins(targetAccounts, password, name, roleId);
+                    } else {
+                        return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                    }
+                })
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     public Mono<Boolean> updateAdmins(
