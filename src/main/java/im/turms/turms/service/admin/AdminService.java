@@ -282,8 +282,8 @@ public class AdminService {
             @NotNull String requester,
             @NotEmpty Set<String> accounts) {
         return adminRoleService.isAdminHigherThanAdmins(requester, accounts)
-                .flatMap(higher -> {
-                    if (higher) {
+                .flatMap(triple -> {
+                    if (triple.getLeft()) {
                         return deleteAdmins(accounts);
                     } else {
                         return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
@@ -324,9 +324,16 @@ public class AdminService {
             @Nullable String name,
             @Nullable Long roleId) {
         return adminRoleService.isAdminHigherThanAdmins(requester, targetAccounts)
-                .flatMap(higher -> {
-                    if (higher) {
-                        return updateAdmins(targetAccounts, password, name, roleId);
+                .flatMap(triple -> {
+                    if (triple.getLeft()) {
+                        return adminRoleService.queryRankByRole(roleId)
+                                .flatMap(rank -> {
+                                    if (triple.getMiddle() > rank) {
+                                        return updateAdmins(targetAccounts, password, name, roleId);
+                                    } else {
+                                        return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                                    }
+                                });
                     } else {
                         return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
                     }

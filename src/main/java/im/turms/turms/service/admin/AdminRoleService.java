@@ -24,6 +24,7 @@ import im.turms.turms.common.Constants;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.AdminRole;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -267,7 +268,7 @@ public class AdminRoleService {
                         .map(roleRank -> rank > roleRank));
     }
 
-    public Mono<Boolean> isAdminHigherThanAdmins(
+    public Mono<Triple<Boolean, Integer, Set<Integer>>> isAdminHigherThanAdmins(
             @NotNull String account,
             @NotNull Set<String> accounts) {
         return queryRankByAccount(account)
@@ -276,10 +277,10 @@ public class AdminRoleService {
                         .map(ranks -> {
                             for (Integer targetRank : ranks) {
                                 if (targetRank >= rank) {
-                                    return false;
+                                    return Triple.of(false, rank, ranks);
                                 }
                             }
-                            return true;
+                            return Triple.of(true, rank, ranks);
                         }));
     }
 
