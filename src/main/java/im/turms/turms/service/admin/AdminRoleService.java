@@ -83,10 +83,7 @@ public class AdminRoleService {
             @NotEmpty Set<AdminPermission> permissions,
             @NotNull Integer rank) {
         AdminRole adminRole = new AdminRole(id, name, permissions, rank);
-        return mongoTemplate.insert(adminRole).map(role -> {
-            roles.put(adminRole.getRoleId(), role);
-            return role;
-        });
+        return addAdminRole(adminRole);
     }
 
     public Mono<AdminRole> addAdminRole(@NotNull AdminRole adminRole) {
@@ -97,6 +94,7 @@ public class AdminRoleService {
     }
 
     public Mono<Boolean> deleteAdminRoles(@NotEmpty Set<Long> rolesIds) {
+        rolesIds.remove(ADMIN_ROLE_ROOT_ID);
         Query query = new Query().addCriteria(Criteria.where(Constants.ID).in(rolesIds));
         return mongoTemplate.remove(query, AdminRole.class)
                 .map(result -> {
@@ -150,7 +148,6 @@ public class AdminRoleService {
                     if (result.wasAcknowledged()) {
                         AdminRole adminRole = roles.get(roleId);
                         if (adminRole != null) {
-                            //TODO: check
                             adminRole.getPermissions().addAll(permissions);
                             return Mono.just(true);
                         } else {
@@ -177,7 +174,6 @@ public class AdminRoleService {
                     if (result.wasAcknowledged()) {
                         AdminRole adminRole = roles.get(roleId);
                         if (adminRole != null) {
-                            //TODO: check
                             adminRole.getPermissions().removeAll(permissions);
                             return Mono.just(true);
                         } else {
@@ -236,19 +232,31 @@ public class AdminRoleService {
     }
 
     public Mono<Integer> queryRankByRole(@NotNull Long roleId) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where(ID).is(roleId));
-        query.fields().include(AdminRole.Fields.rank);
-        return mongoTemplate.findOne(query, AdminRole.class)
-                .map(AdminRole::getRank);
+        if (roleId == ADMIN_ROLE_ROOT_ID) {
+            return Mono.just(getRootRole().getRank());
+        } else {
+            Query query = new Query();
+            query.addCriteria(Criteria.where(ID).is(roleId));
+            query.fields().include(AdminRole.Fields.rank);
+            return mongoTemplate.findOne(query, AdminRole.class)
+                    .map(AdminRole::getRank);
+        }
     }
 
-    public Flux<Integer> queryRanksByRoles(@NotNull Set<Long> rolesIds) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where(ID).in(rolesIds));
-        query.fields().include(AdminRole.Fields.rank);
-        return mongoTemplate.find(query, AdminRole.class)
-                .map(AdminRole::getRank);
+    public Flux<Integer> queryRanksByRoles(@NotEmpty Set<Long> rolesIds) {
+        boolean containsRoot = rolesIds.contains(ADMIN_ROLE_ROOT_ID);
+        if (containsRoot && rolesIds.size() == 1) {
+            return Flux.just(getRootRole().getRank());
+        } else {
+            Query query = new Query();
+            query.addCriteria(Criteria.where(ID).in(rolesIds));
+            query.fields().include(AdminRole.Fields.rank);
+            Flux<AdminRole> roleFlux = mongoTemplate.find(query, AdminRole.class);
+            if (containsRoot) {
+                roleFlux = roleFlux.concatWithValues(getRootRole());
+            }
+            return roleFlux.map(AdminRole::getRank);
+        }
     }
 
     public Mono<Boolean> isAdminHigherThanRole(
@@ -276,11 +284,15 @@ public class AdminRoleService {
     }
 
     public Mono<AdminRole> queryAndUpdateRole(@NotNull Long roleId) {
-        return mongoTemplate.findById(roleId, AdminRole.class)
-                .map(role -> {
-                    roles.put(roleId, role);
-                    return role;
-                });
+        if (roleId == ADMIN_ROLE_ROOT_ID) {
+            return Mono.just(getRootRole());
+        } else {
+            return mongoTemplate.findById(roleId, AdminRole.class)
+                    .map(role -> {
+                        roles.put(roleId, role);
+                        return role;
+                    });
+        }
     }
 
     public Mono<Set<AdminPermission>> queryPermissions(@NotNull Long roleId) {

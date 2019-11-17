@@ -88,7 +88,7 @@ public class AdminRoleController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.ADMIN_ROLE_QUERY)
-    public Mono<ResponseEntity> getAdminRoles(
+    public Mono<ResponseEntity> queryAdminRoles(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> names,
             @RequestParam(required = false) Set<AdminPermission> includedPermissions,
