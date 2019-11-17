@@ -1,26 +1,23 @@
 package im.turms.turms.config.mongo;
 
 import com.google.common.net.InetAddresses;
-import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.constant.*;
-import im.turms.turms.pojo.domain.AdminRole;
 import im.turms.turms.pojo.domain.*;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,22 +37,17 @@ public class MongoDataGenerator {
         this.passwordUtil = passwordUtil;
     }
 
-    @PostConstruct
+    @EventListener(classes = ContextRefreshedEvent.class)
     public void createCollectionsIfNotExist() {
-        TurmsLogger.log("Start creating collections...");
-        if (DEV_MODE && mongoTemplate.getMongoDatabase().getName().contains("-dev")) {
+        if (isDevEnv()) {
+            TurmsLogger.log("Start clearing collections...");
+            Query queryAll = new Query();
             mongoTemplate.getCollectionNames()
-                    .collectList()
-                    .map(names -> {
-                        Query queryAll = new Query();
-                        List<Mono<DeleteResult>> removeMonos = new ArrayList<>(names.size());
-                        for (String name : names) {
-                            removeMonos.add(mongoTemplate.remove(queryAll, name));
-                        }
-                        return Flux.fromIterable(removeMonos);
-                    })
-                    .subscribe();
+                    .flatMap(name -> mongoTemplate.remove(queryAll, name))
+                    .blockLast();
+            TurmsLogger.log("All collections are cleared");
         }
+        TurmsLogger.log("Start creating collections...");
         Mono.zip(
                 objects -> objects,
                 createCollectionIfNotExist(Admin.class, null),
@@ -92,9 +84,13 @@ public class MongoDataGenerator {
                 .subscribe();
     }
 
+    private boolean isDevEnv() {
+        return DEV_MODE && mongoTemplate.getMongoDatabase().getName().contains("-dev");
+    }
+
     // Note: Better not to remove all mock data after turms closed
     private void mockIfDev() throws UnknownHostException {
-        if (mongoTemplate.getMongoDatabase().getName().contains("-dev")) {
+        if (isDevEnv()) {
             TurmsLogger.log("Start mocking...");
             // Admin
             final int ADMIN_COUNT = 5;
