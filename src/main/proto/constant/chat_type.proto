@@ -8,5 +8,4 @@ option java_multiple_files = true;
 enum ChatType {
     PRIVATE = 0;
     GROUP = 1;
-    SYSTEM = 2;
 }

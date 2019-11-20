@@ -70,17 +70,30 @@ private static final long serialVersionUID = 0L;
             chatType_ = rawValue;
             break;
           }
-          case 24: {
+          case 26: {
+            com.google.protobuf.BoolValue.Builder subBuilder = null;
+            if (isSystemMessage_ != null) {
+              subBuilder = isSystemMessage_.toBuilder();
+            }
+            isSystemMessage_ = input.readMessage(com.google.protobuf.BoolValue.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(isSystemMessage_);
+              isSystemMessage_ = subBuilder.buildPartial();
+            }
 
-            toId_ = input.readInt64();
             break;
           }
           case 32: {
 
+            toId_ = input.readInt64();
+            break;
+          }
+          case 40: {
+
             deliveryDate_ = input.readInt64();
             break;
           }
-          case 42: {
+          case 50: {
             com.google.protobuf.StringValue.Builder subBuilder = null;
             if (text_ != null) {
               subBuilder = text_.toBuilder();
@@ -93,7 +106,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 50: {
+          case 58: {
             if (!((mutable_bitField0_ & 0x00000001) != 0)) {
               records_ = new java.util.ArrayList<com.google.protobuf.ByteString>();
               mutable_bitField0_ |= 0x00000001;
@@ -101,7 +114,7 @@ private static final long serialVersionUID = 0L;
             records_.add(input.readBytes());
             break;
           }
-          case 58: {
+          case 66: {
             com.google.protobuf.Int32Value.Builder subBuilder = null;
             if (burnAfter_ != null) {
               subBuilder = burnAfter_.toBuilder();
@@ -127,7 +140,7 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       if (((mutable_bitField0_ & 0x00000001) != 0)) {
         records_ = java.util.Collections.unmodifiableList(records_); // C
@@ -136,20 +149,23 @@ private static final long serialVersionUID = 0L;
       makeExtensionsImmutable();
     }
   }
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+    return im.turms.turms.pojo.request.message.CreateMessageRequestOuterClass.internal_static_im_turms_proto_CreateMessageRequest_descriptor;
+  }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.CreateMessageRequest)
-  private static final im.turms.turms.pojo.request.message.CreateMessageRequest DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.message.CreateMessageRequest();
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.request.message.CreateMessageRequestOuterClass.internal_static_im_turms_proto_CreateMessageRequest_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.request.message.CreateMessageRequest.class, im.turms.turms.pojo.request.message.CreateMessageRequest.Builder.class);
   }
 
   public static final int MESSAGE_ID_FIELD_NUMBER = 1;
   private com.google.protobuf.Int64Value messageId_;
-
   /**
    * <code>.google.protobuf.Int64Value message_id = 1;</code>
-   *
    * @return Whether the messageId field is set.
    */
   public boolean hasMessageId() {
@@ -188,53 +204,88 @@ private static final long serialVersionUID = 0L;
     return result == null ? im.turms.turms.constant.ChatType.UNRECOGNIZED : result;
   }
 
-  public static final int TO_ID_FIELD_NUMBER = 3;
+  public static final int IS_SYSTEM_MESSAGE_FIELD_NUMBER = 3;
+  private com.google.protobuf.BoolValue isSystemMessage_;
+  /**
+   * <pre>
+   * Client can never set this to true
+   * </pre>
+   *
+   * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+   * @return Whether the isSystemMessage field is set.
+   */
+  public boolean hasIsSystemMessage() {
+    return isSystemMessage_ != null;
+  }
+  /**
+   * <pre>
+   * Client can never set this to true
+   * </pre>
+   *
+   * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+   * @return The isSystemMessage.
+   */
+  public com.google.protobuf.BoolValue getIsSystemMessage() {
+    return isSystemMessage_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : isSystemMessage_;
+  }
+  /**
+   * <pre>
+   * Client can never set this to true
+   * </pre>
+   *
+   * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+   */
+  public com.google.protobuf.BoolValueOrBuilder getIsSystemMessageOrBuilder() {
+    return getIsSystemMessage();
+  }
+
+  public static final int TO_ID_FIELD_NUMBER = 4;
   private long toId_;
   /**
-   * <code>int64 to_id = 3;</code>
+   * <code>int64 to_id = 4;</code>
    * @return The toId.
    */
   public long getToId() {
     return toId_;
   }
 
-  public static final int DELIVERY_DATE_FIELD_NUMBER = 4;
+  public static final int DELIVERY_DATE_FIELD_NUMBER = 5;
   private long deliveryDate_;
   /**
-   * <code>int64 delivery_date = 4;</code>
+   * <code>int64 delivery_date = 5;</code>
    * @return The deliveryDate.
    */
   public long getDeliveryDate() {
     return deliveryDate_;
   }
 
-  public static final int TEXT_FIELD_NUMBER = 5;
+  public static final int TEXT_FIELD_NUMBER = 6;
   private com.google.protobuf.StringValue text_;
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 6;</code>
    * @return Whether the text field is set.
    */
   public boolean hasText() {
     return text_ != null;
   }
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 6;</code>
    * @return The text.
    */
   public com.google.protobuf.StringValue getText() {
     return text_ == null ? com.google.protobuf.StringValue.getDefaultInstance() : text_;
   }
   /**
-   * <code>.google.protobuf.StringValue text = 5;</code>
+   * <code>.google.protobuf.StringValue text = 6;</code>
    */
   public com.google.protobuf.StringValueOrBuilder getTextOrBuilder() {
     return getText();
   }
 
-  public static final int RECORDS_FIELD_NUMBER = 6;
+  public static final int RECORDS_FIELD_NUMBER = 7;
   private java.util.List<com.google.protobuf.ByteString> records_;
   /**
-   * <code>repeated bytes records = 6;</code>
+   * <code>repeated bytes records = 7;</code>
    * @return A list containing the records.
    */
   public java.util.List<com.google.protobuf.ByteString>
@@ -242,14 +293,14 @@ private static final long serialVersionUID = 0L;
     return records_;
   }
   /**
-   * <code>repeated bytes records = 6;</code>
+   * <code>repeated bytes records = 7;</code>
    * @return The count of records.
    */
   public int getRecordsCount() {
     return records_.size();
   }
   /**
-   * <code>repeated bytes records = 6;</code>
+   * <code>repeated bytes records = 7;</code>
    * @param index The index of the element to return.
    * @return The records at the given index.
    */
@@ -257,24 +308,24 @@ private static final long serialVersionUID = 0L;
     return records_.get(index);
   }
 
-  public static final int BURN_AFTER_FIELD_NUMBER = 7;
+  public static final int BURN_AFTER_FIELD_NUMBER = 8;
   private com.google.protobuf.Int32Value burnAfter_;
   /**
-   * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+   * <code>.google.protobuf.Int32Value burn_after = 8;</code>
    * @return Whether the burnAfter field is set.
    */
   public boolean hasBurnAfter() {
     return burnAfter_ != null;
   }
   /**
-   * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+   * <code>.google.protobuf.Int32Value burn_after = 8;</code>
    * @return The burnAfter.
    */
   public com.google.protobuf.Int32Value getBurnAfter() {
     return burnAfter_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : burnAfter_;
   }
   /**
-   * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+   * <code>.google.protobuf.Int32Value burn_after = 8;</code>
    */
   public com.google.protobuf.Int32ValueOrBuilder getBurnAfterOrBuilder() {
     return getBurnAfter();
@@ -300,20 +351,23 @@ private static final long serialVersionUID = 0L;
     if (chatType_ != im.turms.turms.constant.ChatType.PRIVATE.getNumber()) {
       output.writeEnum(2, chatType_);
     }
+    if (isSystemMessage_ != null) {
+      output.writeMessage(3, getIsSystemMessage());
+    }
     if (toId_ != 0L) {
-      output.writeInt64(3, toId_);
+      output.writeInt64(4, toId_);
     }
     if (deliveryDate_ != 0L) {
-      output.writeInt64(4, deliveryDate_);
+      output.writeInt64(5, deliveryDate_);
     }
     if (text_ != null) {
-      output.writeMessage(5, getText());
+      output.writeMessage(6, getText());
     }
     for (int i = 0; i < records_.size(); i++) {
-      output.writeBytes(6, records_.get(i));
+      output.writeBytes(7, records_.get(i));
     }
     if (burnAfter_ != null) {
-      output.writeMessage(7, getBurnAfter());
+      output.writeMessage(8, getBurnAfter());
     }
     unknownFields.writeTo(output);
   }
@@ -332,17 +386,21 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(2, chatType_);
     }
+    if (isSystemMessage_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, getIsSystemMessage());
+    }
     if (toId_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(3, toId_);
+        .computeInt64Size(4, toId_);
     }
     if (deliveryDate_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(4, deliveryDate_);
+        .computeInt64Size(5, deliveryDate_);
     }
     if (text_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getText());
+        .computeMessageSize(6, getText());
     }
     {
       int dataSize = 0;
@@ -355,16 +413,52 @@ private static final long serialVersionUID = 0L;
     }
     if (burnAfter_ != null) {
       size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(7, getBurnAfter());
+        .computeMessageSize(8, getBurnAfter());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
-    return im.turms.turms.pojo.request.message.CreateMessageRequestOuterClass.internal_static_im_turms_proto_CreateMessageRequest_descriptor;
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.request.message.CreateMessageRequest)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.request.message.CreateMessageRequest other = (im.turms.turms.pojo.request.message.CreateMessageRequest) obj;
+
+    if (hasMessageId() != other.hasMessageId()) return false;
+    if (hasMessageId()) {
+      if (!getMessageId()
+          .equals(other.getMessageId())) return false;
+    }
+    if (chatType_ != other.chatType_) return false;
+    if (hasIsSystemMessage() != other.hasIsSystemMessage()) return false;
+    if (hasIsSystemMessage()) {
+      if (!getIsSystemMessage()
+          .equals(other.getIsSystemMessage())) return false;
+    }
+    if (getToId()
+        != other.getToId()) return false;
+    if (getDeliveryDate()
+        != other.getDeliveryDate()) return false;
+    if (hasText() != other.hasText()) return false;
+    if (hasText()) {
+      if (!getText()
+          .equals(other.getText())) return false;
+    }
+    if (!getRecordsList()
+        .equals(other.getRecordsList())) return false;
+    if (hasBurnAfter() != other.hasBurnAfter()) return false;
+    if (hasBurnAfter()) {
+      if (!getBurnAfter()
+          .equals(other.getBurnAfter())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -380,6 +474,10 @@ private static final long serialVersionUID = 0L;
     }
     hash = (37 * hash) + CHAT_TYPE_FIELD_NUMBER;
     hash = (53 * hash) + chatType_;
+    if (hasIsSystemMessage()) {
+      hash = (37 * hash) + IS_SYSTEM_MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getIsSystemMessage().hashCode();
+    }
     hash = (37 * hash) + TO_ID_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getToId());
@@ -404,206 +502,118 @@ private static final long serialVersionUID = 0L;
   }
 
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.message.CreateMessageRequest parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
   public static Builder newBuilder(im.turms.turms.pojo.request.message.CreateMessageRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  public static im.turms.turms.pojo.request.message.CreateMessageRequest getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.request.message.CreateMessageRequestOuterClass.internal_static_im_turms_proto_CreateMessageRequest_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.request.message.CreateMessageRequest.class, im.turms.turms.pojo.request.message.CreateMessageRequest.Builder.class);
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.request.message.CreateMessageRequest)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.request.message.CreateMessageRequest other = (im.turms.turms.pojo.request.message.CreateMessageRequest) obj;
-
-    if (hasMessageId() != other.hasMessageId()) return false;
-    if (hasMessageId()) {
-      if (!getMessageId()
-              .equals(other.getMessageId())) return false;
-    }
-    if (chatType_ != other.chatType_) return false;
-    if (getToId()
-            != other.getToId()) return false;
-    if (getDeliveryDate()
-            != other.getDeliveryDate()) return false;
-    if (hasText() != other.hasText()) return false;
-    if (hasText()) {
-      if (!getText()
-              .equals(other.getText())) return false;
-    }
-    if (!getRecordsList()
-            .equals(other.getRecordsList())) return false;
-    if (hasBurnAfter() != other.hasBurnAfter()) return false;
-    if (hasBurnAfter()) {
-      if (!getBurnAfter()
-              .equals(other.getBurnAfter())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.request.message.CreateMessageRequest getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<CreateMessageRequest>
-          PARSER = new com.google.protobuf.AbstractParser<CreateMessageRequest>() {
-    @java.lang.Override
-    public CreateMessageRequest parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new CreateMessageRequest(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<CreateMessageRequest> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<CreateMessageRequest> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.CreateMessageRequest}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.CreateMessageRequest)
-          im.turms.turms.pojo.request.message.CreateMessageRequestOrBuilder {
-    // Construct using im.turms.turms.pojo.request.message.CreateMessageRequest.newBuilder()
-    private Builder() {
-      maybeForceBuilderInitialization();
-    }
-
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.CreateMessageRequest)
+      im.turms.turms.pojo.request.message.CreateMessageRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
+        getDescriptor() {
       return im.turms.turms.pojo.request.message.CreateMessageRequestOuterClass.internal_static_im_turms_proto_CreateMessageRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
+        internalGetFieldAccessorTable() {
       return im.turms.turms.pojo.request.message.CreateMessageRequestOuterClass.internal_static_im_turms_proto_CreateMessageRequest_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.request.message.CreateMessageRequest.class, im.turms.turms.pojo.request.message.CreateMessageRequest.Builder.class);
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.request.message.CreateMessageRequest.class, im.turms.turms.pojo.request.message.CreateMessageRequest.Builder.class);
+    }
+
+    // Construct using im.turms.turms.pojo.request.message.CreateMessageRequest.newBuilder()
+    private Builder() {
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
@@ -627,6 +637,12 @@ private static final long serialVersionUID = 0L;
       }
       chatType_ = 0;
 
+      if (isSystemMessageBuilder_ == null) {
+        isSystemMessage_ = null;
+      } else {
+        isSystemMessage_ = null;
+        isSystemMessageBuilder_ = null;
+      }
       toId_ = 0L;
 
       deliveryDate_ = 0L;
@@ -678,6 +694,11 @@ private static final long serialVersionUID = 0L;
         result.messageId_ = messageIdBuilder_.build();
       }
       result.chatType_ = chatType_;
+      if (isSystemMessageBuilder_ == null) {
+        result.isSystemMessage_ = isSystemMessage_;
+      } else {
+        result.isSystemMessage_ = isSystemMessageBuilder_.build();
+      }
       result.toId_ = toId_;
       result.deliveryDate_ = deliveryDate_;
       if (textBuilder_ == null) {
@@ -731,11 +752,10 @@ private static final long serialVersionUID = 0L;
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
-
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.request.message.CreateMessageRequest) {
-        return mergeFrom((im.turms.turms.pojo.request.message.CreateMessageRequest) other);
+        return mergeFrom((im.turms.turms.pojo.request.message.CreateMessageRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -749,6 +769,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.chatType_ != 0) {
         setChatTypeValue(other.getChatTypeValue());
+      }
+      if (other.hasIsSystemMessage()) {
+        mergeIsSystemMessage(other.getIsSystemMessage());
       }
       if (other.getToId() != 0L) {
         setToId(other.getToId());
@@ -889,7 +912,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value message_id = 1;</code>
      */
     public com.google.protobuf.Int64Value.Builder getMessageIdBuilder() {
-
+      
       onChanged();
       return getMessageIdFieldBuilder().getBuilder();
     }
@@ -908,7 +931,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value message_id = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getMessageIdFieldBuilder() {
       if (messageIdBuilder_ == null) {
         messageIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -957,7 +980,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       chatType_ = value.getNumber();
       onChanged();
       return this;
@@ -967,37 +990,192 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearChatType() {
-
+      
       chatType_ = 0;
       onChanged();
       return this;
     }
 
+    private com.google.protobuf.BoolValue isSystemMessage_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> isSystemMessageBuilder_;
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     * @return Whether the isSystemMessage field is set.
+     */
+    public boolean hasIsSystemMessage() {
+      return isSystemMessageBuilder_ != null || isSystemMessage_ != null;
+    }
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     * @return The isSystemMessage.
+     */
+    public com.google.protobuf.BoolValue getIsSystemMessage() {
+      if (isSystemMessageBuilder_ == null) {
+        return isSystemMessage_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : isSystemMessage_;
+      } else {
+        return isSystemMessageBuilder_.getMessage();
+      }
+    }
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     */
+    public Builder setIsSystemMessage(com.google.protobuf.BoolValue value) {
+      if (isSystemMessageBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        isSystemMessage_ = value;
+        onChanged();
+      } else {
+        isSystemMessageBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     */
+    public Builder setIsSystemMessage(
+        com.google.protobuf.BoolValue.Builder builderForValue) {
+      if (isSystemMessageBuilder_ == null) {
+        isSystemMessage_ = builderForValue.build();
+        onChanged();
+      } else {
+        isSystemMessageBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     */
+    public Builder mergeIsSystemMessage(com.google.protobuf.BoolValue value) {
+      if (isSystemMessageBuilder_ == null) {
+        if (isSystemMessage_ != null) {
+          isSystemMessage_ =
+            com.google.protobuf.BoolValue.newBuilder(isSystemMessage_).mergeFrom(value).buildPartial();
+        } else {
+          isSystemMessage_ = value;
+        }
+        onChanged();
+      } else {
+        isSystemMessageBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     */
+    public Builder clearIsSystemMessage() {
+      if (isSystemMessageBuilder_ == null) {
+        isSystemMessage_ = null;
+        onChanged();
+      } else {
+        isSystemMessage_ = null;
+        isSystemMessageBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     */
+    public com.google.protobuf.BoolValue.Builder getIsSystemMessageBuilder() {
+      
+      onChanged();
+      return getIsSystemMessageFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     */
+    public com.google.protobuf.BoolValueOrBuilder getIsSystemMessageOrBuilder() {
+      if (isSystemMessageBuilder_ != null) {
+        return isSystemMessageBuilder_.getMessageOrBuilder();
+      } else {
+        return isSystemMessage_ == null ?
+            com.google.protobuf.BoolValue.getDefaultInstance() : isSystemMessage_;
+      }
+    }
+    /**
+     * <pre>
+     * Client can never set this to true
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue is_system_message = 3;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
+        getIsSystemMessageFieldBuilder() {
+      if (isSystemMessageBuilder_ == null) {
+        isSystemMessageBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>(
+                getIsSystemMessage(),
+                getParentForChildren(),
+                isClean());
+        isSystemMessage_ = null;
+      }
+      return isSystemMessageBuilder_;
+    }
+
     private long toId_ ;
     /**
-     * <code>int64 to_id = 3;</code>
+     * <code>int64 to_id = 4;</code>
      * @return The toId.
      */
     public long getToId() {
       return toId_;
     }
     /**
-     * <code>int64 to_id = 3;</code>
+     * <code>int64 to_id = 4;</code>
      * @param value The toId to set.
      * @return This builder for chaining.
      */
     public Builder setToId(long value) {
-
+      
       toId_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>int64 to_id = 3;</code>
+     * <code>int64 to_id = 4;</code>
      * @return This builder for chaining.
      */
     public Builder clearToId() {
-
+      
       toId_ = 0L;
       onChanged();
       return this;
@@ -1005,29 +1183,29 @@ private static final long serialVersionUID = 0L;
 
     private long deliveryDate_ ;
     /**
-     * <code>int64 delivery_date = 4;</code>
+     * <code>int64 delivery_date = 5;</code>
      * @return The deliveryDate.
      */
     public long getDeliveryDate() {
       return deliveryDate_;
     }
     /**
-     * <code>int64 delivery_date = 4;</code>
+     * <code>int64 delivery_date = 5;</code>
      * @param value The deliveryDate to set.
      * @return This builder for chaining.
      */
     public Builder setDeliveryDate(long value) {
-
+      
       deliveryDate_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>int64 delivery_date = 4;</code>
+     * <code>int64 delivery_date = 5;</code>
      * @return This builder for chaining.
      */
     public Builder clearDeliveryDate() {
-
+      
       deliveryDate_ = 0L;
       onChanged();
       return this;
@@ -1037,14 +1215,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> textBuilder_;
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      * @return Whether the text field is set.
      */
     public boolean hasText() {
       return textBuilder_ != null || text_ != null;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      * @return The text.
      */
     public com.google.protobuf.StringValue getText() {
@@ -1055,7 +1233,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      */
     public Builder setText(com.google.protobuf.StringValue value) {
       if (textBuilder_ == null) {
@@ -1071,7 +1249,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      */
     public Builder setText(
         com.google.protobuf.StringValue.Builder builderForValue) {
@@ -1085,7 +1263,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      */
     public Builder mergeText(com.google.protobuf.StringValue value) {
       if (textBuilder_ == null) {
@@ -1103,7 +1281,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      */
     public Builder clearText() {
       if (textBuilder_ == null) {
@@ -1117,15 +1295,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      */
     public com.google.protobuf.StringValue.Builder getTextBuilder() {
-
+      
       onChanged();
       return getTextFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      */
     public com.google.protobuf.StringValueOrBuilder getTextOrBuilder() {
       if (textBuilder_ != null) {
@@ -1136,10 +1314,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.StringValue text = 5;</code>
+     * <code>.google.protobuf.StringValue text = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getTextFieldBuilder() {
       if (textBuilder_ == null) {
         textBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1160,7 +1338,7 @@ private static final long serialVersionUID = 0L;
        }
     }
     /**
-     * <code>repeated bytes records = 6;</code>
+     * <code>repeated bytes records = 7;</code>
      * @return A list containing the records.
      */
     public java.util.List<com.google.protobuf.ByteString>
@@ -1169,14 +1347,14 @@ private static final long serialVersionUID = 0L;
                java.util.Collections.unmodifiableList(records_) : records_;
     }
     /**
-     * <code>repeated bytes records = 6;</code>
+     * <code>repeated bytes records = 7;</code>
      * @return The count of records.
      */
     public int getRecordsCount() {
       return records_.size();
     }
     /**
-     * <code>repeated bytes records = 6;</code>
+     * <code>repeated bytes records = 7;</code>
      * @param index The index of the element to return.
      * @return The records at the given index.
      */
@@ -1184,7 +1362,7 @@ private static final long serialVersionUID = 0L;
       return records_.get(index);
     }
     /**
-     * <code>repeated bytes records = 6;</code>
+     * <code>repeated bytes records = 7;</code>
      * @param index The index to set the value at.
      * @param value The records to set.
      * @return This builder for chaining.
@@ -1200,7 +1378,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated bytes records = 6;</code>
+     * <code>repeated bytes records = 7;</code>
      * @param value The records to add.
      * @return This builder for chaining.
      */
@@ -1214,7 +1392,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated bytes records = 6;</code>
+     * <code>repeated bytes records = 7;</code>
      * @param values The records to add.
      * @return This builder for chaining.
      */
@@ -1227,7 +1405,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated bytes records = 6;</code>
+     * <code>repeated bytes records = 7;</code>
      * @return This builder for chaining.
      */
     public Builder clearRecords() {
@@ -1241,14 +1419,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> burnAfterBuilder_;
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      * @return Whether the burnAfter field is set.
      */
     public boolean hasBurnAfter() {
       return burnAfterBuilder_ != null || burnAfter_ != null;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      * @return The burnAfter.
      */
     public com.google.protobuf.Int32Value getBurnAfter() {
@@ -1259,7 +1437,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      */
     public Builder setBurnAfter(com.google.protobuf.Int32Value value) {
       if (burnAfterBuilder_ == null) {
@@ -1275,7 +1453,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      */
     public Builder setBurnAfter(
         com.google.protobuf.Int32Value.Builder builderForValue) {
@@ -1289,7 +1467,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      */
     public Builder mergeBurnAfter(com.google.protobuf.Int32Value value) {
       if (burnAfterBuilder_ == null) {
@@ -1307,7 +1485,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      */
     public Builder clearBurnAfter() {
       if (burnAfterBuilder_ == null) {
@@ -1321,15 +1499,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      */
     public com.google.protobuf.Int32Value.Builder getBurnAfterBuilder() {
-
+      
       onChanged();
       return getBurnAfterFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      */
     public com.google.protobuf.Int32ValueOrBuilder getBurnAfterOrBuilder() {
       if (burnAfterBuilder_ != null) {
@@ -1340,10 +1518,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int32Value burn_after = 7;</code>
+     * <code>.google.protobuf.Int32Value burn_after = 8;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getBurnAfterFieldBuilder() {
       if (burnAfterBuilder_ == null) {
         burnAfterBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1369,6 +1547,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.CreateMessageRequest)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.CreateMessageRequest)
+  private static final im.turms.turms.pojo.request.message.CreateMessageRequest DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.message.CreateMessageRequest();
+  }
+
+  public static im.turms.turms.pojo.request.message.CreateMessageRequest getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<CreateMessageRequest>
+      PARSER = new com.google.protobuf.AbstractParser<CreateMessageRequest>() {
+    @java.lang.Override
+    public CreateMessageRequest parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new CreateMessageRequest(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<CreateMessageRequest> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<CreateMessageRequest> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.request.message.CreateMessageRequest getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

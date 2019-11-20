@@ -41,6 +41,9 @@ public class MessageStatus {
     private Long groupId;
 
     @Indexed
+    private Boolean isSystemMessage;
+
+    @Indexed
     private Long senderId;
 
     @Indexed

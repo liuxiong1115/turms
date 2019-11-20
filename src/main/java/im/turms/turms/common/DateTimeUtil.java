@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.function.Function3;
+import reactor.function.Function4;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -158,15 +158,17 @@ public class DateTimeUtil {
             @NotNull Date startDate,
             @NotNull Date endDate,
             @NotNull DivideBy divideBy,
-            @NotNull Function3<Date, Date, ChatType, Mono<Long>> function,
-            @Nullable ChatType chatType) {
+            @NotNull Function4<Date, Date, ChatType, Boolean, Mono<Long>> function,
+            @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages) {
         List<Pair<Date, Date>> dates = divide(startDate, endDate, divideBy);
         List<Mono<Map<String, ?>>> monos = new ArrayList<>(dates.size());
         for (Pair<Date, Date> datePair : dates) {
             Mono<Long> result = function.apply(
                     datePair.getLeft(),
                     datePair.getRight(),
-                    chatType);
+                    chatType,
+                    areSystemMessages);
             monos.add(result.map(total -> Map.of("startDate", datePair.getLeft(),
                     "endDate", datePair.getRight(),
                     "total", total)));
@@ -198,8 +200,9 @@ public class DateTimeUtil {
             @NotNull Date startDate,
             @NotNull Date endDate,
             @NotNull DivideBy divideBy,
-            @NotNull Function3<Date, Date, ChatType, Mono<Long>> function,
-            @Nullable ChatType chatType) {
+            @NotNull Function4<Date, Date, ChatType, Boolean, Mono<Long>> function,
+            @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages) {
         int maxHourRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxHourRangesPerCountRequest();
         int maxDayRanges = turmsClusterManager.getTurmsProperties()
@@ -209,7 +212,7 @@ public class DateTimeUtil {
         boolean checked = checkRangesNumber(startDate, endDate, divideBy,
                 maxHourRanges, maxDayRanges, maxMonthRanges);
         if (checked) {
-            return queryBetweenDate(title, startDate, endDate, divideBy, function, chatType);
+            return queryBetweenDate(title, startDate, endDate, divideBy, function, chatType, areSystemMessages);
         } else {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         }

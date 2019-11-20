@@ -98,40 +98,55 @@ public interface MessageOrBuilder extends
   com.google.protobuf.Int64ValueOrBuilder getGroupIdOrBuilder();
 
   /**
-   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+   * @return Whether the isSystemMessage field is set.
+   */
+  boolean hasIsSystemMessage();
+  /**
+   * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+   * @return The isSystemMessage.
+   */
+  com.google.protobuf.BoolValue getIsSystemMessage();
+  /**
+   * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+   */
+  com.google.protobuf.BoolValueOrBuilder getIsSystemMessageOrBuilder();
+
+  /**
+   * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
    * @return Whether the recipientId field is set.
    */
   boolean hasRecipientId();
   /**
-   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
    * @return The recipientId.
    */
   com.google.protobuf.Int64Value getRecipientId();
   /**
-   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
    */
   com.google.protobuf.Int64ValueOrBuilder getRecipientIdOrBuilder();
 
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   java.util.List<com.google.protobuf.BytesValue> 
       getRecordsList();
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   com.google.protobuf.BytesValue getRecords(int index);
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   int getRecordsCount();
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   java.util.List<? extends com.google.protobuf.BytesValueOrBuilder> 
       getRecordsOrBuilderList();
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   com.google.protobuf.BytesValueOrBuilder getRecordsOrBuilder(
       int index);

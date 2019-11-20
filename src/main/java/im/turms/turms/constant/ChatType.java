@@ -16,10 +16,6 @@ public enum ChatType
    * <code>GROUP = 1;</code>
    */
   GROUP(1),
-  /**
-   * <code>SYSTEM = 2;</code>
-   */
-  SYSTEM(2),
   UNRECOGNIZED(-1),
   ;
 
@@ -31,10 +27,6 @@ public enum ChatType
    * <code>GROUP = 1;</code>
    */
   public static final int GROUP_VALUE = 1;
-  /**
-   * <code>SYSTEM = 2;</code>
-   */
-  public static final int SYSTEM_VALUE = 2;
 
 
   public final int getNumber() {
@@ -63,7 +55,6 @@ public enum ChatType
     switch (value) {
       case 0: return PRIVATE;
       case 1: return GROUP;
-      case 2: return SYSTEM;
       default: return null;
     }
   }

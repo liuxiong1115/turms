@@ -16,7 +16,7 @@ public final class MessageOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_Message_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_Message_fieldAccessorTable;
 
@@ -28,19 +28,21 @@ public final class MessageOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n\033model/message/message.proto\022\016im.turms." +
-                    "proto\032\036google/protobuf/wrappers.proto\"\206\003" +
-                    "\n\007Message\022'\n\002id\030\001 \001(\0132\033.google.protobuf." +
-                    "Int64Value\0222\n\rdelivery_date\030\002 \001(\0132\033.goog" +
-                    "le.protobuf.Int64Value\0222\n\rdeletion_date\030" +
-                    "\003 \001(\0132\033.google.protobuf.Int64Value\022*\n\004te" +
-                    "xt\030\004 \001(\0132\034.google.protobuf.StringValue\022." +
-                    "\n\tsender_id\030\005 \001(\0132\033.google.protobuf.Int6" +
-                    "4Value\022-\n\010group_id\030\006 \001(\0132\033.google.protob" +
-                    "uf.Int64Value\0221\n\014recipient_id\030\007 \001(\0132\033.go" +
-                    "ogle.protobuf.Int64Value\022,\n\007records\030\010 \003(" +
-                    "\0132\033.google.protobuf.BytesValueB\"\n\036im.tur" +
-                    "ms.turms.pojo.bo.messageP\001b\006proto3"
+      "\n\033model/message/message.proto\022\016im.turms." +
+      "proto\032\036google/protobuf/wrappers.proto\"\275\003" +
+      "\n\007Message\022\'\n\002id\030\001 \001(\0132\033.google.protobuf." +
+      "Int64Value\0222\n\rdelivery_date\030\002 \001(\0132\033.goog" +
+      "le.protobuf.Int64Value\0222\n\rdeletion_date\030" +
+      "\003 \001(\0132\033.google.protobuf.Int64Value\022*\n\004te" +
+      "xt\030\004 \001(\0132\034.google.protobuf.StringValue\022." +
+      "\n\tsender_id\030\005 \001(\0132\033.google.protobuf.Int6" +
+      "4Value\022-\n\010group_id\030\006 \001(\0132\033.google.protob" +
+      "uf.Int64Value\0225\n\021is_system_message\030\007 \001(\013" +
+      "2\032.google.protobuf.BoolValue\0221\n\014recipien" +
+      "t_id\030\010 \001(\0132\033.google.protobuf.Int64Value\022" +
+      ",\n\007records\030\t \003(\0132\033.google.protobuf.Bytes" +
+      "ValueB\"\n\036im.turms.turms.pojo.bo.messageP" +
+      "\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -52,7 +54,7 @@ public final class MessageOuterClass {
     internal_static_im_turms_proto_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_im_turms_proto_Message_descriptor,
-        new java.lang.String[] { "Id", "DeliveryDate", "DeletionDate", "Text", "SenderId", "GroupId", "RecipientId", "Records", });
+        new java.lang.String[] { "Id", "DeliveryDate", "DeletionDate", "Text", "SenderId", "GroupId", "IsSystemMessage", "RecipientId", "Records", });
     com.google.protobuf.WrappersProto.getDescriptor();
   }
 

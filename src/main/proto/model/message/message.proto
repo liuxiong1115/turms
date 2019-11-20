@@ -14,6 +14,7 @@ message Message {
     google.protobuf.StringValue text = 4;
     google.protobuf.Int64Value sender_id = 5;
     google.protobuf.Int64Value group_id = 6;
-    google.protobuf.Int64Value recipient_id = 7;
-    repeated google.protobuf.BytesValue records = 8;
+    google.protobuf.BoolValue is_system_message = 7;
+    google.protobuf.Int64Value recipient_id = 8;
+    repeated google.protobuf.BytesValue records = 9;
 }

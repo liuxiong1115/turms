@@ -129,6 +129,19 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 58: {
+            com.google.protobuf.BoolValue.Builder subBuilder = null;
+            if (isSystemMessage_ != null) {
+              subBuilder = isSystemMessage_.toBuilder();
+            }
+            isSystemMessage_ = input.readMessage(com.google.protobuf.BoolValue.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(isSystemMessage_);
+              isSystemMessage_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
+          case 66: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (recipientId_ != null) {
               subBuilder = recipientId_.toBuilder();
@@ -141,7 +154,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 66: {
+          case 74: {
             if (!((mutable_bitField0_ & 0x00000001) != 0)) {
               records_ = new java.util.ArrayList<com.google.protobuf.BytesValue>();
               mutable_bitField0_ |= 0x00000001;
@@ -163,7 +176,7 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       if (((mutable_bitField0_ & 0x00000001) != 0)) {
         records_ = java.util.Collections.unmodifiableList(records_);
@@ -172,20 +185,23 @@ private static final long serialVersionUID = 0L;
       makeExtensionsImmutable();
     }
   }
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+    return im.turms.turms.pojo.bo.message.MessageOuterClass.internal_static_im_turms_proto_Message_descriptor;
+  }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.Message)
-  private static final im.turms.turms.pojo.bo.message.Message DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.message.Message();
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.bo.message.MessageOuterClass.internal_static_im_turms_proto_Message_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.bo.message.Message.class, im.turms.turms.pojo.bo.message.Message.Builder.class);
   }
 
   public static final int ID_FIELD_NUMBER = 1;
   private com.google.protobuf.Int64Value id_;
-
   /**
    * <code>.google.protobuf.Int64Value id = 1;</code>
-   *
    * @return Whether the id field is set.
    */
   public boolean hasId() {
@@ -320,59 +336,81 @@ private static final long serialVersionUID = 0L;
     return getGroupId();
   }
 
-  public static final int RECIPIENT_ID_FIELD_NUMBER = 7;
+  public static final int IS_SYSTEM_MESSAGE_FIELD_NUMBER = 7;
+  private com.google.protobuf.BoolValue isSystemMessage_;
+  /**
+   * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+   * @return Whether the isSystemMessage field is set.
+   */
+  public boolean hasIsSystemMessage() {
+    return isSystemMessage_ != null;
+  }
+  /**
+   * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+   * @return The isSystemMessage.
+   */
+  public com.google.protobuf.BoolValue getIsSystemMessage() {
+    return isSystemMessage_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : isSystemMessage_;
+  }
+  /**
+   * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+   */
+  public com.google.protobuf.BoolValueOrBuilder getIsSystemMessageOrBuilder() {
+    return getIsSystemMessage();
+  }
+
+  public static final int RECIPIENT_ID_FIELD_NUMBER = 8;
   private com.google.protobuf.Int64Value recipientId_;
   /**
-   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
    * @return Whether the recipientId field is set.
    */
   public boolean hasRecipientId() {
     return recipientId_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
    * @return The recipientId.
    */
   public com.google.protobuf.Int64Value getRecipientId() {
     return recipientId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : recipientId_;
   }
   /**
-   * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+   * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getRecipientIdOrBuilder() {
     return getRecipientId();
   }
 
-  public static final int RECORDS_FIELD_NUMBER = 8;
+  public static final int RECORDS_FIELD_NUMBER = 9;
   private java.util.List<com.google.protobuf.BytesValue> records_;
-
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   public java.util.List<com.google.protobuf.BytesValue> getRecordsList() {
     return records_;
   }
-
-  public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
-    return im.turms.turms.pojo.bo.message.MessageOuterClass.internal_static_im_turms_proto_Message_descriptor;
-  }
-
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
+   */
+  public java.util.List<? extends com.google.protobuf.BytesValueOrBuilder> 
+      getRecordsOrBuilderList() {
+    return records_;
+  }
+  /**
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   public int getRecordsCount() {
     return records_.size();
   }
-
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   public com.google.protobuf.BytesValue getRecords(int index) {
     return records_.get(index);
   }
   /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+   * <code>repeated .google.protobuf.BytesValue records = 9;</code>
    */
   public com.google.protobuf.BytesValueOrBuilder getRecordsOrBuilder(
       int index) {
@@ -411,11 +449,14 @@ private static final long serialVersionUID = 0L;
     if (groupId_ != null) {
       output.writeMessage(6, getGroupId());
     }
+    if (isSystemMessage_ != null) {
+      output.writeMessage(7, getIsSystemMessage());
+    }
     if (recipientId_ != null) {
-      output.writeMessage(7, getRecipientId());
+      output.writeMessage(8, getRecipientId());
     }
     for (int i = 0; i < records_.size(); i++) {
-      output.writeMessage(8, records_.get(i));
+      output.writeMessage(9, records_.get(i));
     }
     unknownFields.writeTo(output);
   }
@@ -450,23 +491,77 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(6, getGroupId());
     }
+    if (isSystemMessage_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(7, getIsSystemMessage());
+    }
     if (recipientId_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, getRecipientId());
+        .computeMessageSize(8, getRecipientId());
     }
     for (int i = 0; i < records_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(8, records_.get(i));
+        .computeMessageSize(9, records_.get(i));
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static im.turms.turms.pojo.bo.message.Message parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.bo.message.Message)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.bo.message.Message other = (im.turms.turms.pojo.bo.message.Message) obj;
+
+    if (hasId() != other.hasId()) return false;
+    if (hasId()) {
+      if (!getId()
+          .equals(other.getId())) return false;
+    }
+    if (hasDeliveryDate() != other.hasDeliveryDate()) return false;
+    if (hasDeliveryDate()) {
+      if (!getDeliveryDate()
+          .equals(other.getDeliveryDate())) return false;
+    }
+    if (hasDeletionDate() != other.hasDeletionDate()) return false;
+    if (hasDeletionDate()) {
+      if (!getDeletionDate()
+          .equals(other.getDeletionDate())) return false;
+    }
+    if (hasText() != other.hasText()) return false;
+    if (hasText()) {
+      if (!getText()
+          .equals(other.getText())) return false;
+    }
+    if (hasSenderId() != other.hasSenderId()) return false;
+    if (hasSenderId()) {
+      if (!getSenderId()
+          .equals(other.getSenderId())) return false;
+    }
+    if (hasGroupId() != other.hasGroupId()) return false;
+    if (hasGroupId()) {
+      if (!getGroupId()
+          .equals(other.getGroupId())) return false;
+    }
+    if (hasIsSystemMessage() != other.hasIsSystemMessage()) return false;
+    if (hasIsSystemMessage()) {
+      if (!getIsSystemMessage()
+          .equals(other.getIsSystemMessage())) return false;
+    }
+    if (hasRecipientId() != other.hasRecipientId()) return false;
+    if (hasRecipientId()) {
+      if (!getRecipientId()
+          .equals(other.getRecipientId())) return false;
+    }
+    if (!getRecordsList()
+        .equals(other.getRecordsList())) return false;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -500,6 +595,10 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + GROUP_ID_FIELD_NUMBER;
       hash = (53 * hash) + getGroupId().hashCode();
     }
+    if (hasIsSystemMessage()) {
+      hash = (37 * hash) + IS_SYSTEM_MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getIsSystemMessage().hashCode();
+    }
     if (hasRecipientId()) {
       hash = (37 * hash) + RECIPIENT_ID_FIELD_NUMBER;
       hash = (53 * hash) + getRecipientId().hashCode();
@@ -514,224 +613,118 @@ private static final long serialVersionUID = 0L;
   }
 
   public static im.turms.turms.pojo.bo.message.Message parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.bo.message.Message parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.message.Message parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
+  public static im.turms.turms.pojo.bo.message.Message parseFrom(
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.bo.message.Message parseFrom(
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
   public static im.turms.turms.pojo.bo.message.Message parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.message.Message parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.message.Message parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.message.Message parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.message.Message parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.message.Message parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.message.Message parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.message.Message parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static Builder newBuilder(im.turms.turms.pojo.bo.message.Message prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() {
-    return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
-  public static im.turms.turms.pojo.bo.message.Message getDefaultInstance() {
-    return DEFAULT_INSTANCE;
+  public static Builder newBuilder(im.turms.turms.pojo.bo.message.Message prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.bo.message.MessageOuterClass.internal_static_im_turms_proto_Message_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.bo.message.Message.class, im.turms.turms.pojo.bo.message.Message.Builder.class);
-  }
-
-  /**
-   * <code>repeated .google.protobuf.BytesValue records = 8;</code>
-   */
-  public java.util.List<? extends com.google.protobuf.BytesValueOrBuilder>
-  getRecordsOrBuilderList() {
-    return records_;
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.bo.message.Message)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.bo.message.Message other = (im.turms.turms.pojo.bo.message.Message) obj;
-
-    if (hasId() != other.hasId()) return false;
-    if (hasId()) {
-      if (!getId()
-              .equals(other.getId())) return false;
-    }
-    if (hasDeliveryDate() != other.hasDeliveryDate()) return false;
-    if (hasDeliveryDate()) {
-      if (!getDeliveryDate()
-              .equals(other.getDeliveryDate())) return false;
-    }
-    if (hasDeletionDate() != other.hasDeletionDate()) return false;
-    if (hasDeletionDate()) {
-      if (!getDeletionDate()
-              .equals(other.getDeletionDate())) return false;
-    }
-    if (hasText() != other.hasText()) return false;
-    if (hasText()) {
-      if (!getText()
-              .equals(other.getText())) return false;
-    }
-    if (hasSenderId() != other.hasSenderId()) return false;
-    if (hasSenderId()) {
-      if (!getSenderId()
-              .equals(other.getSenderId())) return false;
-    }
-    if (hasGroupId() != other.hasGroupId()) return false;
-    if (hasGroupId()) {
-      if (!getGroupId()
-              .equals(other.getGroupId())) return false;
-    }
-    if (hasRecipientId() != other.hasRecipientId()) return false;
-    if (hasRecipientId()) {
-      if (!getRecipientId()
-              .equals(other.getRecipientId())) return false;
-    }
-    if (!getRecordsList()
-            .equals(other.getRecordsList())) return false;
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.bo.message.Message getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<Message>
-          PARSER = new com.google.protobuf.AbstractParser<Message>() {
-    @java.lang.Override
-    public Message parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new Message(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<Message> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<Message> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.Message}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.Message)
-          im.turms.turms.pojo.bo.message.MessageOrBuilder {
-    // Construct using im.turms.turms.pojo.bo.message.Message.newBuilder()
-    private Builder() {
-      maybeForceBuilderInitialization();
-    }
-
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.Message)
+      im.turms.turms.pojo.bo.message.MessageOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
+        getDescriptor() {
       return im.turms.turms.pojo.bo.message.MessageOuterClass.internal_static_im_turms_proto_Message_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
+        internalGetFieldAccessorTable() {
       return im.turms.turms.pojo.bo.message.MessageOuterClass.internal_static_im_turms_proto_Message_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.bo.message.Message.class, im.turms.turms.pojo.bo.message.Message.Builder.class);
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.bo.message.Message.class, im.turms.turms.pojo.bo.message.Message.Builder.class);
+    }
+
+    // Construct using im.turms.turms.pojo.bo.message.Message.newBuilder()
+    private Builder() {
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
@@ -783,6 +776,12 @@ private static final long serialVersionUID = 0L;
       } else {
         groupId_ = null;
         groupIdBuilder_ = null;
+      }
+      if (isSystemMessageBuilder_ == null) {
+        isSystemMessage_ = null;
+      } else {
+        isSystemMessage_ = null;
+        isSystemMessageBuilder_ = null;
       }
       if (recipientIdBuilder_ == null) {
         recipientId_ = null;
@@ -853,6 +852,11 @@ private static final long serialVersionUID = 0L;
       } else {
         result.groupId_ = groupIdBuilder_.build();
       }
+      if (isSystemMessageBuilder_ == null) {
+        result.isSystemMessage_ = isSystemMessage_;
+      } else {
+        result.isSystemMessage_ = isSystemMessageBuilder_.build();
+      }
       if (recipientIdBuilder_ == null) {
         result.recipientId_ = recipientId_;
       } else {
@@ -903,11 +907,10 @@ private static final long serialVersionUID = 0L;
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
-
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.bo.message.Message) {
-        return mergeFrom((im.turms.turms.pojo.bo.message.Message) other);
+        return mergeFrom((im.turms.turms.pojo.bo.message.Message)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -934,6 +937,9 @@ private static final long serialVersionUID = 0L;
       if (other.hasGroupId()) {
         mergeGroupId(other.getGroupId());
       }
+      if (other.hasIsSystemMessage()) {
+        mergeIsSystemMessage(other.getIsSystemMessage());
+      }
       if (other.hasRecipientId()) {
         mergeRecipientId(other.getRecipientId());
       }
@@ -955,9 +961,9 @@ private static final long serialVersionUID = 0L;
             recordsBuilder_ = null;
             records_ = other.records_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            recordsBuilder_ =
-                    com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                            getRecordsFieldBuilder() : null;
+            recordsBuilder_ = 
+              com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                 getRecordsFieldBuilder() : null;
           } else {
             recordsBuilder_.addAllMessages(other.records_);
           }
@@ -1080,7 +1086,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value id = 1;</code>
      */
     public com.google.protobuf.Int64Value.Builder getIdBuilder() {
-
+      
       onChanged();
       return getIdFieldBuilder().getBuilder();
     }
@@ -1099,7 +1105,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value id = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getIdFieldBuilder() {
       if (idBuilder_ == null) {
         idBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1199,7 +1205,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getDeliveryDateBuilder() {
-
+      
       onChanged();
       return getDeliveryDateFieldBuilder().getBuilder();
     }
@@ -1218,7 +1224,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value delivery_date = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getDeliveryDateFieldBuilder() {
       if (deliveryDateBuilder_ == null) {
         deliveryDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1318,7 +1324,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     public com.google.protobuf.Int64Value.Builder getDeletionDateBuilder() {
-
+      
       onChanged();
       return getDeletionDateFieldBuilder().getBuilder();
     }
@@ -1337,7 +1343,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value deletion_date = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getDeletionDateFieldBuilder() {
       if (deletionDateBuilder_ == null) {
         deletionDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1437,7 +1443,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue text = 4;</code>
      */
     public com.google.protobuf.StringValue.Builder getTextBuilder() {
-
+      
       onChanged();
       return getTextFieldBuilder().getBuilder();
     }
@@ -1456,7 +1462,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue text = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getTextFieldBuilder() {
       if (textBuilder_ == null) {
         textBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1556,7 +1562,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
     public com.google.protobuf.Int64Value.Builder getSenderIdBuilder() {
-
+      
       onChanged();
       return getSenderIdFieldBuilder().getBuilder();
     }
@@ -1575,7 +1581,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value sender_id = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getSenderIdFieldBuilder() {
       if (senderIdBuilder_ == null) {
         senderIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1675,7 +1681,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
     public com.google.protobuf.Int64Value.Builder getGroupIdBuilder() {
-
+      
       onChanged();
       return getGroupIdFieldBuilder().getBuilder();
     }
@@ -1694,7 +1700,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value group_id = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getGroupIdFieldBuilder() {
       if (groupIdBuilder_ == null) {
         groupIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1707,18 +1713,137 @@ private static final long serialVersionUID = 0L;
       return groupIdBuilder_;
     }
 
+    private com.google.protobuf.BoolValue isSystemMessage_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> isSystemMessageBuilder_;
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     * @return Whether the isSystemMessage field is set.
+     */
+    public boolean hasIsSystemMessage() {
+      return isSystemMessageBuilder_ != null || isSystemMessage_ != null;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     * @return The isSystemMessage.
+     */
+    public com.google.protobuf.BoolValue getIsSystemMessage() {
+      if (isSystemMessageBuilder_ == null) {
+        return isSystemMessage_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : isSystemMessage_;
+      } else {
+        return isSystemMessageBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     */
+    public Builder setIsSystemMessage(com.google.protobuf.BoolValue value) {
+      if (isSystemMessageBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        isSystemMessage_ = value;
+        onChanged();
+      } else {
+        isSystemMessageBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     */
+    public Builder setIsSystemMessage(
+        com.google.protobuf.BoolValue.Builder builderForValue) {
+      if (isSystemMessageBuilder_ == null) {
+        isSystemMessage_ = builderForValue.build();
+        onChanged();
+      } else {
+        isSystemMessageBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     */
+    public Builder mergeIsSystemMessage(com.google.protobuf.BoolValue value) {
+      if (isSystemMessageBuilder_ == null) {
+        if (isSystemMessage_ != null) {
+          isSystemMessage_ =
+            com.google.protobuf.BoolValue.newBuilder(isSystemMessage_).mergeFrom(value).buildPartial();
+        } else {
+          isSystemMessage_ = value;
+        }
+        onChanged();
+      } else {
+        isSystemMessageBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     */
+    public Builder clearIsSystemMessage() {
+      if (isSystemMessageBuilder_ == null) {
+        isSystemMessage_ = null;
+        onChanged();
+      } else {
+        isSystemMessage_ = null;
+        isSystemMessageBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     */
+    public com.google.protobuf.BoolValue.Builder getIsSystemMessageBuilder() {
+      
+      onChanged();
+      return getIsSystemMessageFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     */
+    public com.google.protobuf.BoolValueOrBuilder getIsSystemMessageOrBuilder() {
+      if (isSystemMessageBuilder_ != null) {
+        return isSystemMessageBuilder_.getMessageOrBuilder();
+      } else {
+        return isSystemMessage_ == null ?
+            com.google.protobuf.BoolValue.getDefaultInstance() : isSystemMessage_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.BoolValue is_system_message = 7;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
+        getIsSystemMessageFieldBuilder() {
+      if (isSystemMessageBuilder_ == null) {
+        isSystemMessageBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>(
+                getIsSystemMessage(),
+                getParentForChildren(),
+                isClean());
+        isSystemMessage_ = null;
+      }
+      return isSystemMessageBuilder_;
+    }
+
     private com.google.protobuf.Int64Value recipientId_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> recipientIdBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      * @return Whether the recipientId field is set.
      */
     public boolean hasRecipientId() {
       return recipientIdBuilder_ != null || recipientId_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      * @return The recipientId.
      */
     public com.google.protobuf.Int64Value getRecipientId() {
@@ -1729,7 +1854,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     public Builder setRecipientId(com.google.protobuf.Int64Value value) {
       if (recipientIdBuilder_ == null) {
@@ -1745,7 +1870,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     public Builder setRecipientId(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1759,7 +1884,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     public Builder mergeRecipientId(com.google.protobuf.Int64Value value) {
       if (recipientIdBuilder_ == null) {
@@ -1777,7 +1902,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     public Builder clearRecipientId() {
       if (recipientIdBuilder_ == null) {
@@ -1791,15 +1916,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRecipientIdBuilder() {
-
+      
       onChanged();
       return getRecipientIdFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getRecipientIdOrBuilder() {
       if (recipientIdBuilder_ != null) {
@@ -1810,10 +1935,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value recipient_id = 7;</code>
+     * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getRecipientIdFieldBuilder() {
       if (recipientIdBuilder_ == null) {
         recipientIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1839,7 +1964,7 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder> recordsBuilder_;
 
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public java.util.List<com.google.protobuf.BytesValue> getRecordsList() {
       if (recordsBuilder_ == null) {
@@ -1849,7 +1974,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public int getRecordsCount() {
       if (recordsBuilder_ == null) {
@@ -1859,7 +1984,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public com.google.protobuf.BytesValue getRecords(int index) {
       if (recordsBuilder_ == null) {
@@ -1869,7 +1994,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder setRecords(
         int index, com.google.protobuf.BytesValue value) {
@@ -1886,7 +2011,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder setRecords(
         int index, com.google.protobuf.BytesValue.Builder builderForValue) {
@@ -1900,7 +2025,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder addRecords(com.google.protobuf.BytesValue value) {
       if (recordsBuilder_ == null) {
@@ -1916,7 +2041,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder addRecords(
         int index, com.google.protobuf.BytesValue value) {
@@ -1933,7 +2058,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder addRecords(
         com.google.protobuf.BytesValue.Builder builderForValue) {
@@ -1947,7 +2072,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder addRecords(
         int index, com.google.protobuf.BytesValue.Builder builderForValue) {
@@ -1961,7 +2086,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder addAllRecords(
         java.lang.Iterable<? extends com.google.protobuf.BytesValue> values) {
@@ -1976,7 +2101,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder clearRecords() {
       if (recordsBuilder_ == null) {
@@ -1989,7 +2114,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public Builder removeRecords(int index) {
       if (recordsBuilder_ == null) {
@@ -2002,67 +2127,61 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public com.google.protobuf.BytesValue.Builder getRecordsBuilder(
         int index) {
       return getRecordsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public com.google.protobuf.BytesValueOrBuilder getRecordsOrBuilder(
-            int index) {
+        int index) {
       if (recordsBuilder_ == null) {
-        return records_.get(index);
-      } else {
+        return records_.get(index);  } else {
         return recordsBuilder_.getMessageOrBuilder(index);
       }
     }
-
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
-    public java.util.List<? extends com.google.protobuf.BytesValueOrBuilder>
-    getRecordsOrBuilderList() {
+    public java.util.List<? extends com.google.protobuf.BytesValueOrBuilder> 
+         getRecordsOrBuilderList() {
       if (recordsBuilder_ != null) {
         return recordsBuilder_.getMessageOrBuilderList();
       } else {
         return java.util.Collections.unmodifiableList(records_);
       }
     }
-
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public com.google.protobuf.BytesValue.Builder addRecordsBuilder() {
       return getRecordsFieldBuilder().addBuilder(
           com.google.protobuf.BytesValue.getDefaultInstance());
     }
-
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
     public com.google.protobuf.BytesValue.Builder addRecordsBuilder(
-            int index) {
+        int index) {
       return getRecordsFieldBuilder().addBuilder(
-              index, com.google.protobuf.BytesValue.getDefaultInstance());
+          index, com.google.protobuf.BytesValue.getDefaultInstance());
     }
-
     /**
-     * <code>repeated .google.protobuf.BytesValue records = 8;</code>
+     * <code>repeated .google.protobuf.BytesValue records = 9;</code>
      */
-    public java.util.List<com.google.protobuf.BytesValue.Builder>
-    getRecordsBuilderList() {
+    public java.util.List<com.google.protobuf.BytesValue.Builder> 
+         getRecordsBuilderList() {
       return getRecordsFieldBuilder().getBuilderList();
     }
-
     private com.google.protobuf.RepeatedFieldBuilderV3<
-            com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder>
-    getRecordsFieldBuilder() {
+        com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder> 
+        getRecordsFieldBuilder() {
       if (recordsBuilder_ == null) {
         recordsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-                com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder>(
+            com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder>(
                 records_,
                 ((bitField0_ & 0x00000001) != 0),
                 getParentForChildren(),
@@ -2085,6 +2204,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.Message)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.Message)
+  private static final im.turms.turms.pojo.bo.message.Message DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.message.Message();
+  }
+
+  public static im.turms.turms.pojo.bo.message.Message getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<Message>
+      PARSER = new com.google.protobuf.AbstractParser<Message>() {
+    @java.lang.Override
+    public Message parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new Message(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<Message> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<Message> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.bo.message.Message getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

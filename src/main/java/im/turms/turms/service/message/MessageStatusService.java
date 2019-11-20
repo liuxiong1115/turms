@@ -118,11 +118,15 @@ public class MessageStatusService {
 
     public Mono<Long> countPendingMessages(
             @NotNull ChatType chatType,
+            @Nullable Boolean areSystemMessages,
             @NotNull Long groupOrSenderId,
             @NotNull Long recipientId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId))
                 .addCriteria(Criteria.where(MessageStatus.Fields.deliveryStatus).is(MessageDeliveryStatus.READY));
+        if (areSystemMessages != null) {
+            query.addCriteria(Criteria.where(MessageStatus.Fields.isSystemMessage).is(areSystemMessages));
+        }
         switch (chatType) {
             case PRIVATE:
                 query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null))
@@ -130,10 +134,6 @@ public class MessageStatusService {
                 break;
             case GROUP:
                 query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(groupOrSenderId));
-                break;
-            case SYSTEM:
-                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null))
-                        .addCriteria(Criteria.where(MessageStatus.Fields.senderId).is(ADMIN_REQUESTER_ID));
                 break;
             default:
                 throw new UnsupportedOperationException("");

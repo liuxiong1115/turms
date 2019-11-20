@@ -125,6 +125,7 @@ public class MessageService {
     public Flux<Message> authAndQueryCompleteMessages(
             @NotNull boolean closeToDate,
             @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Long targetId,
             @Nullable Date startDate,
@@ -133,7 +134,7 @@ public class MessageService {
             @Nullable Integer size) {
         if (deliveryStatus == MessageDeliveryStatus.READY
                 || deliveryStatus == MessageDeliveryStatus.RECEIVED) {
-            return queryCompleteMessages(closeToDate, chatType, senderId, targetId, startDate, endDate, deliveryStatus, size);
+            return queryCompleteMessages(closeToDate, chatType, areSystemMessages, senderId, targetId, startDate, endDate, deliveryStatus, size);
         } else {
             throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
@@ -147,6 +148,7 @@ public class MessageService {
     public Flux<Message> queryCompleteMessages(
             @NotNull boolean closeToDate,
             @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Long targetId,
             @Nullable Date startDate,
@@ -155,6 +157,7 @@ public class MessageService {
             @Nullable Integer size) {
         QueryBuilder builder = QueryBuilder.newBuilder()
                 .addIfNotNull(Criteria.where(Message.Fields.chatType).is(chatType), chatType)
+                .addIfNotNull(Criteria.where(Message.Fields.isSystemMessage).is(areSystemMessages), areSystemMessages)
                 .addIfNotNull(Criteria.where(Message.Fields.senderId).is(senderId), senderId)
                 .addIfNotNull(Criteria.where(Message.Fields.targetId).is(targetId), targetId)
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate);
@@ -188,6 +191,7 @@ public class MessageService {
                 message.getSenderId(),
                 message.getTargetId(),
                 message.getChatType(),
+                message.getIsSystemMessage(),
                 message.getText(),
                 message.getRecords(),
                 message.getBurnAfter(),
@@ -200,6 +204,7 @@ public class MessageService {
             @NotNull Long senderId,
             @NotNull Long targetId,
             @NotNull ChatType chatType,
+            @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
             @Nullable Integer burnAfter,
@@ -231,6 +236,7 @@ public class MessageService {
         Message message = new Message(
                 turmsClusterManager.generateRandomId(),
                 chatType,
+                isSystemMessage,
                 deliveryDate,
                 text,
                 senderId,
@@ -248,7 +254,6 @@ public class MessageService {
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         switch (message.getChatType()) {
             case PRIVATE:
-            case SYSTEM:
                 MessageStatus messageStatus = new MessageStatus(
                         message.getId(),
                         null,
@@ -285,6 +290,7 @@ public class MessageService {
             @NotNull Long senderId,
             @NotNull Long targetId,
             @NotNull ChatType chatType,
+            @NotNull Boolean isSystemMessage,
             @NotNull String text,
             @Nullable List<byte[]> records,
             @Nullable Integer burnAfter,
@@ -298,6 +304,7 @@ public class MessageService {
         Message message = new Message(
                 turmsClusterManager.generateRandomId(),
                 chatType,
+                isSystemMessage,
                 deliveryDate,
                 text,
                 senderId,
@@ -444,10 +451,12 @@ public class MessageService {
     public Mono<Long> countUsersWhoSentMessage(
             @Nullable Date startDate,
             @Nullable Date endDate,
-            @Nullable ChatType chatType) {
+            @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages) {
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
                 .addIfNotNull(Criteria.where(Message.Fields.chatType).is(chatType), chatType)
+                .addIfNotNull(Criteria.where(Message.Fields.isSystemMessage).is(areSystemMessages), areSystemMessages)
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
@@ -494,10 +503,12 @@ public class MessageService {
     public Mono<Long> countSentMessages(
             @Nullable Date startDate,
             @Nullable Date endDate,
-            @Nullable ChatType chatType) {
+            @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages) {
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
                 .addIfNotNull(Criteria.where(Message.Fields.chatType).is(chatType), chatType)
+                .addIfNotNull(Criteria.where(Message.Fields.isSystemMessage).is(areSystemMessages), areSystemMessages)
                 .buildQuery();
         return mongoTemplate.count(query, Message.class);
     }
@@ -505,13 +516,14 @@ public class MessageService {
     public Mono<Long> countDeliveredMessagesOnAverage(
             @Nullable Date startDate,
             @Nullable Date endDate,
-            @Nullable ChatType chatType) {
-        return countSentMessages(startDate, endDate, chatType)
+            @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages) {
+        return countSentMessages(startDate, endDate, chatType, areSystemMessages)
                 .flatMap(totalDeliveredMessages -> {
                     if (totalDeliveredMessages == 0) {
                         return Mono.just(0L);
                     } else {
-                        return countUsersWhoSentMessage(startDate, endDate, chatType)
+                        return countUsersWhoSentMessage(startDate, endDate, chatType, areSystemMessages)
                                 .map(totalUsers -> {
                                     if (totalUsers == 0) {
                                         return Long.MAX_VALUE;
@@ -526,9 +538,11 @@ public class MessageService {
     public Mono<Long> countAcknowledgedMessages(
             @Nullable Date startDate,
             @Nullable Date endDate,
-            @Nullable ChatType chatType) {
+            @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages) {
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, startDate, endDate)
+                .addIfNotNull(Criteria.where(MessageStatus.Fields.isSystemMessage).is(areSystemMessages), areSystemMessages)
                 .buildQuery();
         if (chatType != null) {
             if (chatType == ChatType.GROUP) {
@@ -543,8 +557,9 @@ public class MessageService {
     public Mono<Long> countAcknowledgedMessagesOnAverage(
             @Nullable Date startDate,
             @Nullable Date endDate,
-            @Nullable ChatType chatType) {
-        return countAcknowledgedMessages(startDate, endDate, chatType)
+            @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages) {
+        return countAcknowledgedMessages(startDate, endDate, chatType, areSystemMessages)
                 .flatMap(totalAcknowledgedMessages -> {
                     if (totalAcknowledgedMessages == 0) {
                         return Mono.just(0L);
@@ -657,6 +672,7 @@ public class MessageService {
             @NotNull Long senderId,
             @NotNull Long targetId,
             @NotNull ChatType chatType,
+            @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
             @Nullable Integer burnAfter,
@@ -664,14 +680,14 @@ public class MessageService {
             @Nullable Long referenceId) {
         boolean messagePersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent();
         boolean messageStatusPersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent();
-        if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP || chatType == ChatType.SYSTEM) {
-            return userService.isAllowedToSendMessageToTarget(chatType, senderId, targetId)
+        if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP) {
+            return userService.isAllowedToSendMessageToTarget(chatType, isSystemMessage, senderId, targetId)
                     .flatMap(allowed -> {
                         if (allowed == null || !allowed) {
                             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                         }
                         Mono<Set<Long>> queryRecipientsIds;
-                        if (chatType == ChatType.PRIVATE || chatType == ChatType.SYSTEM) {
+                        if (chatType == ChatType.PRIVATE) {
                             queryRecipientsIds = Mono.just(Collections.singleton(targetId));
                         } else {
                             queryRecipientsIds = groupMemberService.getMembersIdsByGroupId(targetId)
@@ -688,11 +704,11 @@ public class MessageService {
                             Mono<Message> saveMono;
                             if (messageStatusPersistent) {
                                 saveMono = saveMessageAndMessagesStatus(
-                                        senderId, targetId, chatType, text,
+                                        senderId, targetId, chatType, isSystemMessage, text,
                                         records, burnAfter, deliveryDate, referenceId);
                             } else {
                                 saveMono = saveMessage(
-                                        senderId, targetId, chatType, text,
+                                        senderId, targetId, chatType, isSystemMessage, text,
                                         records, burnAfter, deliveryDate, referenceId, null);
                             }
                             return saveMono.map(message -> Pair.of(message.getId(), recipientsIds));
@@ -710,12 +726,14 @@ public class MessageService {
             @NotNull Long requesterId,
             @NotNull Long messageId,
             @NotNull ChatType chatType,
+            @NotNull Boolean isSystemMessage,
             @NotNull Long targetId) {
         return queryMessage(messageId)
                 .flatMap(message -> authAndSendMessage(
                         requesterId,
                         targetId,
                         chatType,
+                        isSystemMessage,
                         message.getText(),
                         message.getRecords(),
                         message.getBurnAfter(),
@@ -728,6 +746,9 @@ public class MessageService {
             @NotNull CreateMessageDTO createMessageDTO) {
         Message message = new Message();
         message.setChatType(createMessageDTO.getChatType());
+        Boolean areSystemMessages = createMessageDTO.getIsSystemMessage();
+        areSystemMessages = areSystemMessages != null ? areSystemMessages : true;
+        message.setIsSystemMessage(areSystemMessages);
         message.setText(createMessageDTO.getText());
         message.setSenderId(createMessageDTO.getSenderId());
         message.setTargetId(createMessageDTO.getTargetId());
@@ -741,6 +762,9 @@ public class MessageService {
             boolean deliver,
             @NotNull Message message) {
         if (message.getTargetId() == null
+                || message.getChatType() == null
+                || message.getChatType() == ChatType.UNRECOGNIZED
+                || message.getIsSystemMessage() == null
                 || (message.getText() == null && message.getRecords() == null)) {
             throw new IllegalArgumentException();
         }
@@ -748,7 +772,8 @@ public class MessageService {
             return authAndSendMessage(
                     ADMIN_REQUESTER_ID,
                     message.getTargetId(),
-                    ChatType.SYSTEM,
+                    message.getChatType(),
+                    message.getIsSystemMessage(),
                     message.getText(),
                     message.getRecords(),
                     message.getBurnAfter(),

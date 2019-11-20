@@ -42,6 +42,7 @@ import im.turms.turms.pojo.request.message.*;
 import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.message.MessageStatusService;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
@@ -69,12 +70,16 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateMessageRequest() {
         return turmsRequestWrapper -> {
             CreateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getCreateMessageRequest();
+            if (request.hasIsSystemMessage() && request.getIsSystemMessage().getValue()) {
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+            }
             Mono<Pair<Long, Set<Long>>> pairMono;
             if (request.hasMessageId()) {
                 pairMono = messageService.authAndCloneAndSendMessage(
                         turmsRequestWrapper.getUserId(),
                         request.getMessageId().getValue(),
                         request.getChatType(),
+                        false,
                         request.getToId());
             } else {
                 List<byte[]> records = request.getRecordsCount() != 0 ? request.getRecordsList()
@@ -88,6 +93,7 @@ public class WsMessageController {
                         turmsRequestWrapper.getUserId(),
                         request.getToId(),
                         request.getChatType(),
+                        false,
                         request.hasText() ? request.getText().getValue() : null,
                         records,
                         burnAfter,
@@ -142,18 +148,19 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryPendingMessagesWithTotalRequest() {
         return turmsRequestWrapper -> {
             QueryPendingMessagesWithTotalRequest request = turmsRequestWrapper.getTurmsRequest().getQueryPendingMessagesWithTotalRequest();
-            // chat type, group id or sender id -> message
-            Multimap<Pair<ChatType, Long>, Message> multimap = LinkedListMultimap.create();
+            // chat type, is system message, group id or sender id -> message
+            Multimap<Triple<ChatType, Boolean, Long>, Message> multimap = LinkedListMultimap.create();
             Integer size = request.hasSize() ? request.getSize().getValue() : null;
             if (size == null) {
                 size = turmsClusterManager.getTurmsProperties().getMessage().getDefaultMessagesNumberWithTotal();
             }
             size = pageUtil.getSize(size);
             return messageService.queryCompleteMessages(
-                    false, null, null,
+                    false, null, null, null,
                     turmsRequestWrapper.getUserId(), null, null,
                     MessageDeliveryStatus.READY, size)
-                    .doOnNext(message -> multimap.put(Pair.of(message.getChatType(),
+                    .doOnNext(message -> multimap.put(Triple.of(message.getChatType(),
+                            message.getIsSystemMessage(),
                             message.getChatType() == ChatType.GROUP ? message.getTargetId() : message.getSenderId()), message))
                     .collectList()
                     .flatMap(messages -> {
@@ -162,16 +169,17 @@ public class WsMessageController {
                         }
                         MessagesWithTotalList.Builder listBuilder = MessagesWithTotalList.newBuilder();
                         List<Mono<Long>> countMonos = new ArrayList<>(multimap.size());
-                        for (Pair<ChatType, Long> key : multimap.keys()) {
+                        for (Triple<ChatType, Boolean, Long> key : multimap.keys()) {
                             countMonos.add(messageStatusService.countPendingMessages(key.getLeft(),
+                                    key.getMiddle(),
                                     key.getRight(),
                                     turmsRequestWrapper.getUserId()));
                         }
                         return Mono.zip(countMonos, objects -> objects)
                                 .map(numberObjects -> {
-                                    Iterator<Pair<ChatType, Long>> keyIterator = multimap.keys().iterator();
+                                    Iterator<Triple<ChatType, Boolean, Long>> keyIterator = multimap.keys().iterator();
                                     for (int i = 0; i < multimap.keys().size(); i++) {
-                                        Pair<ChatType, Long> key = keyIterator.next();
+                                        Triple<ChatType, Boolean, Long> key = keyIterator.next();
                                         int number = ((Long) numberObjects[i]).intValue();
                                         MessagesWithTotal.Builder messagesWithTotalBuilder = MessagesWithTotal.newBuilder()
                                                 .setTotal(number)
@@ -193,6 +201,8 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryMessagesRequest() {
         return turmsRequestWrapper -> {
             QueryMessagesRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessagesRequest();
+            ChatType chatType = request.getChatType();
+            Boolean areSystemMessages = request.hasAreSystemMessages() ? request.getAreSystemMessages().getValue() : null;
             Long fromId = request.hasFromId() ? request.getFromId().getValue() : null;
             Date deliveryDateAfter = request.hasDeliveryDateAfter() ? new Date(request.getDeliveryDateAfter().getValue()) : null;
             Date deliveryDateBefore = request.hasDeliveryDateBefore() && deliveryDateAfter == null ?
@@ -206,7 +216,8 @@ public class WsMessageController {
             Integer size = request.hasSize() ? pageUtil.getSize(request.getSize().getValue()) : null;
             return messageService.authAndQueryCompleteMessages(
                     true,
-                    request.getChatType(),
+                    chatType,
+                    areSystemMessages,
                     fromId,
                     turmsRequestWrapper.getUserId(),
                     deliveryDateAfter,
@@ -241,6 +252,9 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateMessageRequest() {
         return turmsRequestWrapper -> {
             UpdateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateMessageRequest();
+            if (request.hasIsSystemMessage() && request.getIsSystemMessage().getValue()) {
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+            }
             long messageId = request.getMessageId();
             if (request.hasReadDate()) {
                 long readDateValue = request.getReadDate().getValue();

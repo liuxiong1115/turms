@@ -11,9 +11,11 @@ import "constant/chat_type.proto";
 message CreateMessageRequest {
     google.protobuf.Int64Value message_id = 1;
     ChatType chat_type = 2;
-    int64 to_id = 3;
-    int64 delivery_date = 4;
-    google.protobuf.StringValue text = 5;
-    repeated bytes records = 6;
-    google.protobuf.Int32Value burn_after = 7;
+    // Client can never set this to true
+    google.protobuf.BoolValue is_system_message = 3;
+    int64 to_id = 4;
+    int64 delivery_date = 5;
+    google.protobuf.StringValue text = 6;
+    repeated bytes records = 7;
+    google.protobuf.Int32Value burn_after = 8;
 }

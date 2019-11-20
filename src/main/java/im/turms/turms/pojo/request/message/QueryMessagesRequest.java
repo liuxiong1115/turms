@@ -70,6 +70,19 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 26: {
+            com.google.protobuf.BoolValue.Builder subBuilder = null;
+            if (areSystemMessages_ != null) {
+              subBuilder = areSystemMessages_.toBuilder();
+            }
+            areSystemMessages_ = input.readMessage(com.google.protobuf.BoolValue.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(areSystemMessages_);
+              areSystemMessages_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
+          case 34: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (fromId_ != null) {
               subBuilder = fromId_.toBuilder();
@@ -82,7 +95,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 34: {
+          case 42: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (deliveryDateAfter_ != null) {
               subBuilder = deliveryDateAfter_.toBuilder();
@@ -95,7 +108,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 42: {
+          case 50: {
             com.google.protobuf.Int64Value.Builder subBuilder = null;
             if (deliveryDateBefore_ != null) {
               subBuilder = deliveryDateBefore_.toBuilder();
@@ -108,7 +121,7 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
-          case 48: {
+          case 56: {
             int rawValue = input.readEnum();
 
             deliveryStatus_ = rawValue;
@@ -127,26 +140,29 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
   }
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+    return im.turms.turms.pojo.request.message.QueryMessagesRequestOuterClass.internal_static_im_turms_proto_QueryMessagesRequest_descriptor;
+  }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.QueryMessagesRequest)
-  private static final im.turms.turms.pojo.request.message.QueryMessagesRequest DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.message.QueryMessagesRequest();
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.request.message.QueryMessagesRequestOuterClass.internal_static_im_turms_proto_QueryMessagesRequest_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.request.message.QueryMessagesRequest.class, im.turms.turms.pojo.request.message.QueryMessagesRequest.Builder.class);
   }
 
   public static final int SIZE_FIELD_NUMBER = 1;
   private com.google.protobuf.Int32Value size_;
-
   /**
    * <code>.google.protobuf.Int32Value size = 1;</code>
-   *
    * @return Whether the size field is set.
    */
   public boolean hasSize() {
@@ -185,86 +201,109 @@ private static final long serialVersionUID = 0L;
     return result == null ? im.turms.turms.constant.ChatType.UNRECOGNIZED : result;
   }
 
-  public static final int FROM_ID_FIELD_NUMBER = 3;
+  public static final int ARE_SYSTEM_MESSAGES_FIELD_NUMBER = 3;
+  private com.google.protobuf.BoolValue areSystemMessages_;
+  /**
+   * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+   * @return Whether the areSystemMessages field is set.
+   */
+  public boolean hasAreSystemMessages() {
+    return areSystemMessages_ != null;
+  }
+  /**
+   * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+   * @return The areSystemMessages.
+   */
+  public com.google.protobuf.BoolValue getAreSystemMessages() {
+    return areSystemMessages_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : areSystemMessages_;
+  }
+  /**
+   * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+   */
+  public com.google.protobuf.BoolValueOrBuilder getAreSystemMessagesOrBuilder() {
+    return getAreSystemMessages();
+  }
+
+  public static final int FROM_ID_FIELD_NUMBER = 4;
   private com.google.protobuf.Int64Value fromId_;
   /**
-   * <code>.google.protobuf.Int64Value from_id = 3;</code>
+   * <code>.google.protobuf.Int64Value from_id = 4;</code>
    * @return Whether the fromId field is set.
    */
   public boolean hasFromId() {
     return fromId_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value from_id = 3;</code>
+   * <code>.google.protobuf.Int64Value from_id = 4;</code>
    * @return The fromId.
    */
   public com.google.protobuf.Int64Value getFromId() {
     return fromId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : fromId_;
   }
   /**
-   * <code>.google.protobuf.Int64Value from_id = 3;</code>
+   * <code>.google.protobuf.Int64Value from_id = 4;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getFromIdOrBuilder() {
     return getFromId();
   }
 
-  public static final int DELIVERY_DATE_AFTER_FIELD_NUMBER = 4;
+  public static final int DELIVERY_DATE_AFTER_FIELD_NUMBER = 5;
   private com.google.protobuf.Int64Value deliveryDateAfter_;
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
    * @return Whether the deliveryDateAfter field is set.
    */
   public boolean hasDeliveryDateAfter() {
     return deliveryDateAfter_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
    * @return The deliveryDateAfter.
    */
   public com.google.protobuf.Int64Value getDeliveryDateAfter() {
     return deliveryDateAfter_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : deliveryDateAfter_;
   }
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getDeliveryDateAfterOrBuilder() {
     return getDeliveryDateAfter();
   }
 
-  public static final int DELIVERY_DATE_BEFORE_FIELD_NUMBER = 5;
+  public static final int DELIVERY_DATE_BEFORE_FIELD_NUMBER = 6;
   private com.google.protobuf.Int64Value deliveryDateBefore_;
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
    * @return Whether the deliveryDateBefore field is set.
    */
   public boolean hasDeliveryDateBefore() {
     return deliveryDateBefore_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
    * @return The deliveryDateBefore.
    */
   public com.google.protobuf.Int64Value getDeliveryDateBefore() {
     return deliveryDateBefore_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : deliveryDateBefore_;
   }
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getDeliveryDateBeforeOrBuilder() {
     return getDeliveryDateBefore();
   }
 
-  public static final int DELIVERY_STATUS_FIELD_NUMBER = 6;
+  public static final int DELIVERY_STATUS_FIELD_NUMBER = 7;
   private int deliveryStatus_;
   /**
-   * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 6;</code>
+   * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
    * @return The enum numeric value on the wire for deliveryStatus.
    */
   public int getDeliveryStatusValue() {
     return deliveryStatus_;
   }
   /**
-   * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 6;</code>
+   * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
    * @return The deliveryStatus.
    */
   public im.turms.turms.constant.MessageDeliveryStatus getDeliveryStatus() {
@@ -293,17 +332,20 @@ private static final long serialVersionUID = 0L;
     if (chatType_ != im.turms.turms.constant.ChatType.PRIVATE.getNumber()) {
       output.writeEnum(2, chatType_);
     }
+    if (areSystemMessages_ != null) {
+      output.writeMessage(3, getAreSystemMessages());
+    }
     if (fromId_ != null) {
-      output.writeMessage(3, getFromId());
+      output.writeMessage(4, getFromId());
     }
     if (deliveryDateAfter_ != null) {
-      output.writeMessage(4, getDeliveryDateAfter());
+      output.writeMessage(5, getDeliveryDateAfter());
     }
     if (deliveryDateBefore_ != null) {
-      output.writeMessage(5, getDeliveryDateBefore());
+      output.writeMessage(6, getDeliveryDateBefore());
     }
     if (deliveryStatus_ != im.turms.turms.constant.MessageDeliveryStatus.READY.getNumber()) {
-      output.writeEnum(6, deliveryStatus_);
+      output.writeEnum(7, deliveryStatus_);
     }
     unknownFields.writeTo(output);
   }
@@ -322,30 +364,70 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(2, chatType_);
     }
+    if (areSystemMessages_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, getAreSystemMessages());
+    }
     if (fromId_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, getFromId());
+        .computeMessageSize(4, getFromId());
     }
     if (deliveryDateAfter_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, getDeliveryDateAfter());
+        .computeMessageSize(5, getDeliveryDateAfter());
     }
     if (deliveryDateBefore_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getDeliveryDateBefore());
+        .computeMessageSize(6, getDeliveryDateBefore());
     }
     if (deliveryStatus_ != im.turms.turms.constant.MessageDeliveryStatus.READY.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-              .computeEnumSize(6, deliveryStatus_);
+        .computeEnumSize(7, deliveryStatus_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
-    return im.turms.turms.pojo.request.message.QueryMessagesRequestOuterClass.internal_static_im_turms_proto_QueryMessagesRequest_descriptor;
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.request.message.QueryMessagesRequest)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.request.message.QueryMessagesRequest other = (im.turms.turms.pojo.request.message.QueryMessagesRequest) obj;
+
+    if (hasSize() != other.hasSize()) return false;
+    if (hasSize()) {
+      if (!getSize()
+          .equals(other.getSize())) return false;
+    }
+    if (chatType_ != other.chatType_) return false;
+    if (hasAreSystemMessages() != other.hasAreSystemMessages()) return false;
+    if (hasAreSystemMessages()) {
+      if (!getAreSystemMessages()
+          .equals(other.getAreSystemMessages())) return false;
+    }
+    if (hasFromId() != other.hasFromId()) return false;
+    if (hasFromId()) {
+      if (!getFromId()
+          .equals(other.getFromId())) return false;
+    }
+    if (hasDeliveryDateAfter() != other.hasDeliveryDateAfter()) return false;
+    if (hasDeliveryDateAfter()) {
+      if (!getDeliveryDateAfter()
+          .equals(other.getDeliveryDateAfter())) return false;
+    }
+    if (hasDeliveryDateBefore() != other.hasDeliveryDateBefore()) return false;
+    if (hasDeliveryDateBefore()) {
+      if (!getDeliveryDateBefore()
+          .equals(other.getDeliveryDateBefore())) return false;
+    }
+    if (deliveryStatus_ != other.deliveryStatus_) return false;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -361,6 +443,10 @@ private static final long serialVersionUID = 0L;
     }
     hash = (37 * hash) + CHAT_TYPE_FIELD_NUMBER;
     hash = (53 * hash) + chatType_;
+    if (hasAreSystemMessages()) {
+      hash = (37 * hash) + ARE_SYSTEM_MESSAGES_FIELD_NUMBER;
+      hash = (53 * hash) + getAreSystemMessages().hashCode();
+    }
     if (hasFromId()) {
       hash = (37 * hash) + FROM_ID_FIELD_NUMBER;
       hash = (53 * hash) + getFromId().hashCode();
@@ -381,206 +467,118 @@ private static final long serialVersionUID = 0L;
   }
 
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.message.QueryMessagesRequest parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
   public static Builder newBuilder(im.turms.turms.pojo.request.message.QueryMessagesRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  public static im.turms.turms.pojo.request.message.QueryMessagesRequest getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.request.message.QueryMessagesRequestOuterClass.internal_static_im_turms_proto_QueryMessagesRequest_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.request.message.QueryMessagesRequest.class, im.turms.turms.pojo.request.message.QueryMessagesRequest.Builder.class);
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.request.message.QueryMessagesRequest)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.request.message.QueryMessagesRequest other = (im.turms.turms.pojo.request.message.QueryMessagesRequest) obj;
-
-    if (hasSize() != other.hasSize()) return false;
-    if (hasSize()) {
-      if (!getSize()
-              .equals(other.getSize())) return false;
-    }
-    if (chatType_ != other.chatType_) return false;
-    if (hasFromId() != other.hasFromId()) return false;
-    if (hasFromId()) {
-      if (!getFromId()
-              .equals(other.getFromId())) return false;
-    }
-    if (hasDeliveryDateAfter() != other.hasDeliveryDateAfter()) return false;
-    if (hasDeliveryDateAfter()) {
-      if (!getDeliveryDateAfter()
-              .equals(other.getDeliveryDateAfter())) return false;
-    }
-    if (hasDeliveryDateBefore() != other.hasDeliveryDateBefore()) return false;
-    if (hasDeliveryDateBefore()) {
-      if (!getDeliveryDateBefore()
-              .equals(other.getDeliveryDateBefore())) return false;
-    }
-    if (deliveryStatus_ != other.deliveryStatus_) return false;
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.request.message.QueryMessagesRequest getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<QueryMessagesRequest>
-          PARSER = new com.google.protobuf.AbstractParser<QueryMessagesRequest>() {
-    @java.lang.Override
-    public QueryMessagesRequest parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new QueryMessagesRequest(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<QueryMessagesRequest> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<QueryMessagesRequest> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.QueryMessagesRequest}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.QueryMessagesRequest)
-          im.turms.turms.pojo.request.message.QueryMessagesRequestOrBuilder {
-    // Construct using im.turms.turms.pojo.request.message.QueryMessagesRequest.newBuilder()
-    private Builder() {
-      maybeForceBuilderInitialization();
-    }
-
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.QueryMessagesRequest)
+      im.turms.turms.pojo.request.message.QueryMessagesRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
+        getDescriptor() {
       return im.turms.turms.pojo.request.message.QueryMessagesRequestOuterClass.internal_static_im_turms_proto_QueryMessagesRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
+        internalGetFieldAccessorTable() {
       return im.turms.turms.pojo.request.message.QueryMessagesRequestOuterClass.internal_static_im_turms_proto_QueryMessagesRequest_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.request.message.QueryMessagesRequest.class, im.turms.turms.pojo.request.message.QueryMessagesRequest.Builder.class);
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.request.message.QueryMessagesRequest.class, im.turms.turms.pojo.request.message.QueryMessagesRequest.Builder.class);
+    }
+
+    // Construct using im.turms.turms.pojo.request.message.QueryMessagesRequest.newBuilder()
+    private Builder() {
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
@@ -604,6 +602,12 @@ private static final long serialVersionUID = 0L;
       }
       chatType_ = 0;
 
+      if (areSystemMessagesBuilder_ == null) {
+        areSystemMessages_ = null;
+      } else {
+        areSystemMessages_ = null;
+        areSystemMessagesBuilder_ = null;
+      }
       if (fromIdBuilder_ == null) {
         fromId_ = null;
       } else {
@@ -656,6 +660,11 @@ private static final long serialVersionUID = 0L;
         result.size_ = sizeBuilder_.build();
       }
       result.chatType_ = chatType_;
+      if (areSystemMessagesBuilder_ == null) {
+        result.areSystemMessages_ = areSystemMessages_;
+      } else {
+        result.areSystemMessages_ = areSystemMessagesBuilder_.build();
+      }
       if (fromIdBuilder_ == null) {
         result.fromId_ = fromId_;
       } else {
@@ -708,11 +717,10 @@ private static final long serialVersionUID = 0L;
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
-
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.request.message.QueryMessagesRequest) {
-        return mergeFrom((im.turms.turms.pojo.request.message.QueryMessagesRequest) other);
+        return mergeFrom((im.turms.turms.pojo.request.message.QueryMessagesRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -726,6 +734,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.chatType_ != 0) {
         setChatTypeValue(other.getChatTypeValue());
+      }
+      if (other.hasAreSystemMessages()) {
+        mergeAreSystemMessages(other.getAreSystemMessages());
       }
       if (other.hasFromId()) {
         mergeFromId(other.getFromId());
@@ -855,7 +866,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value size = 1;</code>
      */
     public com.google.protobuf.Int32Value.Builder getSizeBuilder() {
-
+      
       onChanged();
       return getSizeFieldBuilder().getBuilder();
     }
@@ -874,7 +885,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value size = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getSizeFieldBuilder() {
       if (sizeBuilder_ == null) {
         sizeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -923,7 +934,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       chatType_ = value.getNumber();
       onChanged();
       return this;
@@ -933,24 +944,143 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearChatType() {
-
+      
       chatType_ = 0;
       onChanged();
       return this;
+    }
+
+    private com.google.protobuf.BoolValue areSystemMessages_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> areSystemMessagesBuilder_;
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     * @return Whether the areSystemMessages field is set.
+     */
+    public boolean hasAreSystemMessages() {
+      return areSystemMessagesBuilder_ != null || areSystemMessages_ != null;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     * @return The areSystemMessages.
+     */
+    public com.google.protobuf.BoolValue getAreSystemMessages() {
+      if (areSystemMessagesBuilder_ == null) {
+        return areSystemMessages_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : areSystemMessages_;
+      } else {
+        return areSystemMessagesBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     */
+    public Builder setAreSystemMessages(com.google.protobuf.BoolValue value) {
+      if (areSystemMessagesBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        areSystemMessages_ = value;
+        onChanged();
+      } else {
+        areSystemMessagesBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     */
+    public Builder setAreSystemMessages(
+        com.google.protobuf.BoolValue.Builder builderForValue) {
+      if (areSystemMessagesBuilder_ == null) {
+        areSystemMessages_ = builderForValue.build();
+        onChanged();
+      } else {
+        areSystemMessagesBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     */
+    public Builder mergeAreSystemMessages(com.google.protobuf.BoolValue value) {
+      if (areSystemMessagesBuilder_ == null) {
+        if (areSystemMessages_ != null) {
+          areSystemMessages_ =
+            com.google.protobuf.BoolValue.newBuilder(areSystemMessages_).mergeFrom(value).buildPartial();
+        } else {
+          areSystemMessages_ = value;
+        }
+        onChanged();
+      } else {
+        areSystemMessagesBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     */
+    public Builder clearAreSystemMessages() {
+      if (areSystemMessagesBuilder_ == null) {
+        areSystemMessages_ = null;
+        onChanged();
+      } else {
+        areSystemMessages_ = null;
+        areSystemMessagesBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     */
+    public com.google.protobuf.BoolValue.Builder getAreSystemMessagesBuilder() {
+      
+      onChanged();
+      return getAreSystemMessagesFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     */
+    public com.google.protobuf.BoolValueOrBuilder getAreSystemMessagesOrBuilder() {
+      if (areSystemMessagesBuilder_ != null) {
+        return areSystemMessagesBuilder_.getMessageOrBuilder();
+      } else {
+        return areSystemMessages_ == null ?
+            com.google.protobuf.BoolValue.getDefaultInstance() : areSystemMessages_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
+        getAreSystemMessagesFieldBuilder() {
+      if (areSystemMessagesBuilder_ == null) {
+        areSystemMessagesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>(
+                getAreSystemMessages(),
+                getParentForChildren(),
+                isClean());
+        areSystemMessages_ = null;
+      }
+      return areSystemMessagesBuilder_;
     }
 
     private com.google.protobuf.Int64Value fromId_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> fromIdBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      * @return Whether the fromId field is set.
      */
     public boolean hasFromId() {
       return fromIdBuilder_ != null || fromId_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      * @return The fromId.
      */
     public com.google.protobuf.Int64Value getFromId() {
@@ -961,7 +1091,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      */
     public Builder setFromId(com.google.protobuf.Int64Value value) {
       if (fromIdBuilder_ == null) {
@@ -977,7 +1107,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      */
     public Builder setFromId(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -991,7 +1121,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      */
     public Builder mergeFromId(com.google.protobuf.Int64Value value) {
       if (fromIdBuilder_ == null) {
@@ -1009,7 +1139,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      */
     public Builder clearFromId() {
       if (fromIdBuilder_ == null) {
@@ -1023,15 +1153,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      */
     public com.google.protobuf.Int64Value.Builder getFromIdBuilder() {
-
+      
       onChanged();
       return getFromIdFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getFromIdOrBuilder() {
       if (fromIdBuilder_ != null) {
@@ -1042,10 +1172,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value from_id = 3;</code>
+     * <code>.google.protobuf.Int64Value from_id = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getFromIdFieldBuilder() {
       if (fromIdBuilder_ == null) {
         fromIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1062,14 +1192,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> deliveryDateAfterBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      * @return Whether the deliveryDateAfter field is set.
      */
     public boolean hasDeliveryDateAfter() {
       return deliveryDateAfterBuilder_ != null || deliveryDateAfter_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      * @return The deliveryDateAfter.
      */
     public com.google.protobuf.Int64Value getDeliveryDateAfter() {
@@ -1080,7 +1210,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      */
     public Builder setDeliveryDateAfter(com.google.protobuf.Int64Value value) {
       if (deliveryDateAfterBuilder_ == null) {
@@ -1096,7 +1226,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      */
     public Builder setDeliveryDateAfter(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1110,7 +1240,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      */
     public Builder mergeDeliveryDateAfter(com.google.protobuf.Int64Value value) {
       if (deliveryDateAfterBuilder_ == null) {
@@ -1128,7 +1258,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      */
     public Builder clearDeliveryDateAfter() {
       if (deliveryDateAfterBuilder_ == null) {
@@ -1142,15 +1272,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      */
     public com.google.protobuf.Int64Value.Builder getDeliveryDateAfterBuilder() {
-
+      
       onChanged();
       return getDeliveryDateAfterFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getDeliveryDateAfterOrBuilder() {
       if (deliveryDateAfterBuilder_ != null) {
@@ -1161,10 +1291,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_after = 4;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getDeliveryDateAfterFieldBuilder() {
       if (deliveryDateAfterBuilder_ == null) {
         deliveryDateAfterBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1181,14 +1311,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> deliveryDateBeforeBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      * @return Whether the deliveryDateBefore field is set.
      */
     public boolean hasDeliveryDateBefore() {
       return deliveryDateBeforeBuilder_ != null || deliveryDateBefore_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      * @return The deliveryDateBefore.
      */
     public com.google.protobuf.Int64Value getDeliveryDateBefore() {
@@ -1199,7 +1329,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      */
     public Builder setDeliveryDateBefore(com.google.protobuf.Int64Value value) {
       if (deliveryDateBeforeBuilder_ == null) {
@@ -1215,7 +1345,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      */
     public Builder setDeliveryDateBefore(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1229,7 +1359,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      */
     public Builder mergeDeliveryDateBefore(com.google.protobuf.Int64Value value) {
       if (deliveryDateBeforeBuilder_ == null) {
@@ -1247,7 +1377,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      */
     public Builder clearDeliveryDateBefore() {
       if (deliveryDateBeforeBuilder_ == null) {
@@ -1261,15 +1391,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      */
     public com.google.protobuf.Int64Value.Builder getDeliveryDateBeforeBuilder() {
-
+      
       onChanged();
       return getDeliveryDateBeforeFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getDeliveryDateBeforeOrBuilder() {
       if (deliveryDateBeforeBuilder_ != null) {
@@ -1280,10 +1410,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value delivery_date_before = 5;</code>
+     * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getDeliveryDateBeforeFieldBuilder() {
       if (deliveryDateBeforeBuilder_ == null) {
         deliveryDateBeforeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1298,14 +1428,14 @@ private static final long serialVersionUID = 0L;
 
     private int deliveryStatus_ = 0;
     /**
-     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 6;</code>
+     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
      * @return The enum numeric value on the wire for deliveryStatus.
      */
     public int getDeliveryStatusValue() {
       return deliveryStatus_;
     }
     /**
-     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 6;</code>
+     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
      * @param value The enum numeric value on the wire for deliveryStatus to set.
      * @return This builder for chaining.
      */
@@ -1315,7 +1445,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 6;</code>
+     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
      * @return The deliveryStatus.
      */
     public im.turms.turms.constant.MessageDeliveryStatus getDeliveryStatus() {
@@ -1324,7 +1454,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? im.turms.turms.constant.MessageDeliveryStatus.UNRECOGNIZED : result;
     }
     /**
-     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 6;</code>
+     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
      * @param value The deliveryStatus to set.
      * @return This builder for chaining.
      */
@@ -1332,17 +1462,17 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       deliveryStatus_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 6;</code>
+     * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
      * @return This builder for chaining.
      */
     public Builder clearDeliveryStatus() {
-
+      
       deliveryStatus_ = 0;
       onChanged();
       return this;
@@ -1361,6 +1491,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.QueryMessagesRequest)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.QueryMessagesRequest)
+  private static final im.turms.turms.pojo.request.message.QueryMessagesRequest DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.message.QueryMessagesRequest();
+  }
+
+  public static im.turms.turms.pojo.request.message.QueryMessagesRequest getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<QueryMessagesRequest>
+      PARSER = new com.google.protobuf.AbstractParser<QueryMessagesRequest>() {
+    @java.lang.Override
+    public QueryMessagesRequest parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new QueryMessagesRequest(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<QueryMessagesRequest> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<QueryMessagesRequest> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.request.message.QueryMessagesRequest getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

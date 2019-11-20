@@ -185,7 +185,8 @@ public class UserController {
                 counts.add(messageService.countUsersWhoSentMessage(
                         sentMessageStartDate,
                         sentMessageEndDate,
-                        null)
+                        null,
+                        false)
                         .map(total -> Pair.of(USERS_WHO_SENT_MESSAGES, total)));
             }
             if (loggedInStartDate != null || loggedInEndDate != null) {
@@ -224,7 +225,8 @@ public class UserController {
                         sentMessageEndDate,
                         divideBy,
                         messageService::countUsersWhoSentMessage,
-                        null));
+                        null,
+                        false));
             }
             if (loggedInStartDate != null && loggedInEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(

@@ -105,8 +105,12 @@ public class UserService {
 
     public Mono<Boolean> isAllowedToSendMessageToTarget(
             @NotNull ChatType chatType,
+            @NotNull Boolean isSystemMessage,
             @NotNull Long requesterId,
             @NotNull Long targetId) {
+        if (isSystemMessage != null && isSystemMessage) {
+            return Mono.just(true);
+        }
         switch (chatType) {
             case PRIVATE:
                 if (requesterId.equals(targetId)) {
@@ -133,8 +137,6 @@ public class UserService {
                         });
             case GROUP:
                 return groupMemberService.isAllowedToSendMessage(targetId, requesterId);
-            case SYSTEM:
-                return Mono.just(requesterId.equals(ADMIN_REQUESTER_ID));
             case UNRECOGNIZED:
             default:
                 return Mono.just(false);

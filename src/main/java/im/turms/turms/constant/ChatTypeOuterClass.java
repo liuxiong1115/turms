@@ -24,9 +24,8 @@ public final class ChatTypeOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\030constant/chat_type.proto\022\016im.turms.pro" +
-      "to*.\n\010ChatType\022\013\n\007PRIVATE\020\000\022\t\n\005GROUP\020\001\022\n" +
-      "\n\006SYSTEM\020\002B\033\n\027im.turms.turms.constantP\001b" +
-      "\006proto3"
+      "to*\"\n\010ChatType\022\013\n\007PRIVATE\020\000\022\t\n\005GROUP\020\001B\033" +
+      "\n\027im.turms.turms.constantP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

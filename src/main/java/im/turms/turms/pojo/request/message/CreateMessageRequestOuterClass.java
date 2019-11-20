@@ -16,7 +16,7 @@ public final class CreateMessageRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_CreateMessageRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_CreateMessageRequest_fieldAccessorTable;
 
@@ -28,17 +28,19 @@ public final class CreateMessageRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n,request/message/create_message_request" +
-                    ".proto\022\016im.turms.proto\032\036google/protobuf/" +
-                    "wrappers.proto\032\030constant/chat_type.proto" +
-                    "\"\210\002\n\024CreateMessageRequest\022/\n\nmessage_id\030" +
-                    "\001 \001(\0132\033.google.protobuf.Int64Value\022+\n\tch" +
-                    "at_type\030\002 \001(\0162\030.im.turms.proto.ChatType\022" +
-                    "\r\n\005to_id\030\003 \001(\003\022\025\n\rdelivery_date\030\004 \001(\003\022*\n" +
-                    "\004text\030\005 \001(\0132\034.google.protobuf.StringValu" +
-                    "e\022\017\n\007records\030\006 \003(\014\022/\n\nburn_after\030\007 \001(\0132\033" +
-                    ".google.protobuf.Int32ValueB'\n#im.turms." +
-                    "turms.pojo.request.messageP\001b\006proto3"
+      "\n,request/message/create_message_request" +
+      ".proto\022\016im.turms.proto\032\036google/protobuf/" +
+      "wrappers.proto\032\030constant/chat_type.proto" +
+      "\"\277\002\n\024CreateMessageRequest\022/\n\nmessage_id\030" +
+      "\001 \001(\0132\033.google.protobuf.Int64Value\022+\n\tch" +
+      "at_type\030\002 \001(\0162\030.im.turms.proto.ChatType\022" +
+      "5\n\021is_system_message\030\003 \001(\0132\032.google.prot" +
+      "obuf.BoolValue\022\r\n\005to_id\030\004 \001(\003\022\025\n\rdeliver" +
+      "y_date\030\005 \001(\003\022*\n\004text\030\006 \001(\0132\034.google.prot" +
+      "obuf.StringValue\022\017\n\007records\030\007 \003(\014\022/\n\nbur" +
+      "n_after\030\010 \001(\0132\033.google.protobuf.Int32Val" +
+      "ueB\'\n#im.turms.turms.pojo.request.messag" +
+      "eP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -51,7 +53,7 @@ public final class CreateMessageRequestOuterClass {
     internal_static_im_turms_proto_CreateMessageRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_im_turms_proto_CreateMessageRequest_descriptor,
-        new java.lang.String[] { "MessageId", "ChatType", "ToId", "DeliveryDate", "Text", "Records", "BurnAfter", });
+        new java.lang.String[] { "MessageId", "ChatType", "IsSystemMessage", "ToId", "DeliveryDate", "Text", "Records", "BurnAfter", });
     com.google.protobuf.WrappersProto.getDescriptor();
     im.turms.turms.constant.ChatTypeOuterClass.getDescriptor();
   }

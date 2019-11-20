@@ -44,6 +44,9 @@ public class Message {
     private ChatType chatType;
 
     @Indexed
+    private Boolean isSystemMessage;
+
+    @Indexed
     private Date deliveryDate;
 
     @Indexed
@@ -73,6 +76,7 @@ public class Message {
     public Message(
             @NotNull Long id,
             @NotNull ChatType chatType,
+            @Nullable Boolean isSystemMessage,
             @NotNull Date deliveryDate,
             @NotNull String text,
             @NotNull Long senderId,
@@ -83,6 +87,7 @@ public class Message {
         this.id = id;
         this.text = text;
         this.chatType = chatType;
+        this.isSystemMessage = isSystemMessage;
         this.senderId = senderId;
         this.targetId = targetId;
         this.deliveryDate = deliveryDate;

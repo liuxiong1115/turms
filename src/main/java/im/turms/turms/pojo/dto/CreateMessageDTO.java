@@ -30,6 +30,8 @@ import java.util.List;
 public class CreateMessageDTO {
     private ChatType chatType;
 
+    private Boolean isSystemMessage;
+
     private String text;
 
     private Long senderId;
