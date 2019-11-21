@@ -162,7 +162,7 @@ public class GroupBlacklistService {
                                 .collect(Collectors.toSet())
                                 .map(ids -> {
                                     if (ids.isEmpty()) {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                     return Int64ValuesWithVersion
                                             .newBuilder()
@@ -188,7 +188,7 @@ public class GroupBlacklistService {
                                 .collect(Collectors.toSet())
                                 .map(ids -> {
                                     if (ids.isEmpty()) {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                     return ids;
                                 })
@@ -196,7 +196,7 @@ public class GroupBlacklistService {
                                 .collect(Collectors.toSet())
                                 .map(users -> {
                                     if (users.isEmpty()) {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                     UsersInfosWithVersion.Builder builder = UsersInfosWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());

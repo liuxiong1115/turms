@@ -339,7 +339,7 @@ public class WsGroupController {
                                     .collect(Collectors.toSet())
                                     .map(recipientsIds -> {
                                         if (recipientsIds.isEmpty()) {
-                                            return RequestResult.status(TurmsStatusCode.NOT_FOUND);
+                                            return RequestResult.status(TurmsStatusCode.NO_CONTENT);
                                         } else {
                                             return RequestResult.responseIdAndRecipientData(
                                                     joinRequest.getId(),
@@ -416,7 +416,7 @@ public class WsGroupController {
                                             .collect(Collectors.toSet())
                                             .map(ids -> {
                                                 if (ids.isEmpty()) {
-                                                    return RequestResult.status(TurmsStatusCode.NOT_FOUND);
+                                                    return RequestResult.status(TurmsStatusCode.NO_CONTENT);
                                                 } else {
                                                     return RequestResult.recipientData(
                                                             ids,

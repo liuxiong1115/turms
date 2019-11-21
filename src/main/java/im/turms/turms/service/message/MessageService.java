@@ -171,7 +171,7 @@ public class MessageService {
                     .collect(Collectors.toSet())
                     .flatMapMany(ids -> {
                         if (ids.isEmpty()) {
-                            throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                            throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                         }
                         Query query = builder.add(Criteria.where(ID).in(ids))
                                 .paginateIfNotNull(0, size, finalDirection);

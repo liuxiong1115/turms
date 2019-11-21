@@ -252,7 +252,7 @@ public class GroupInvitationService {
                                             .collect(Collectors.toSet())
                                             .map(groupInvitations -> {
                                                 if (groupInvitations.isEmpty()) {
-                                                    throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                                    throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                                 }
                                                 GroupInvitationsWithVersion.Builder builder = GroupInvitationsWithVersion.newBuilder();
                                                 builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());

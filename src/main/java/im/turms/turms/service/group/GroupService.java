@@ -139,7 +139,7 @@ public class GroupService {
                     if (existed != null && existed) {
                         return countUserOwnedGroupNumber(creatorId);
                     } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT));
                     }
                 })
                 .flatMap(ownedGroupNumber -> {
@@ -392,7 +392,7 @@ public class GroupService {
                 .collectList()
                 .flatMapMany(groupsIds -> {
                     if (groupsIds.isEmpty()) {
-                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                     }
                     Query query = new Query().addCriteria(Criteria.where(ID).in(groupsIds));
                     return mongoTemplate.find(query, Group.class);
@@ -452,7 +452,7 @@ public class GroupService {
                                 .collectList()
                                 .map(ids -> {
                                     if (ids.isEmpty()) {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                     return Int64ValuesWithVersion
                                             .newBuilder()
@@ -478,7 +478,7 @@ public class GroupService {
                                 .collectList()
                                 .map(groups -> {
                                     if (groups.isEmpty()) {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                     GroupsWithVersion.Builder builder = GroupsWithVersion.newBuilder();
                                     for (Group group : groups) {

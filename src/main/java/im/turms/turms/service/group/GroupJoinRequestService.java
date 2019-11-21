@@ -216,7 +216,7 @@ public class GroupJoinRequestService {
                                 .collect(Collectors.toSet())
                                 .map(groupJoinRequests -> {
                                     if (groupJoinRequests.isEmpty()) {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                     GroupJoinRequestsWithVersion.Builder builder = GroupJoinRequestsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());

@@ -452,7 +452,7 @@ public class GroupMemberService {
                 })
                 .flatMap(members -> {
                     if (members.isEmpty()) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT));
                     }
                     GroupMembersWithVersion.Builder builder = GroupMembersWithVersion.newBuilder();
                     if (withStatus) {
@@ -488,7 +488,7 @@ public class GroupMemberService {
                                 .collectList()
                                 .flatMap(members -> {
                                     if (members.isEmpty()) {
-                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND));
+                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT));
                                     }
                                     GroupMembersWithVersion.Builder builder = GroupMembersWithVersion.newBuilder();
                                     if (withStatus) {

@@ -241,7 +241,7 @@ public class GroupJoinQuestionService {
                                 .collect(Collectors.toSet())
                                 .map(groupJoinQuestions -> {
                                     if (groupJoinQuestions.isEmpty()) {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                     GroupJoinQuestionsWithVersion.Builder builder = GroupJoinQuestionsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());

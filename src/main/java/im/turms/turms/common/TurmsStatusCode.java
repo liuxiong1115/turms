@@ -29,7 +29,7 @@ public enum TurmsStatusCode {
     FAILED(4000, "failed", 400),
     SERVER_INTERNAL_ERROR(5000, "Internal server error", 500),
 
-    NOT_FOUND(2001, "Not Found", 404),
+    NO_CONTENT(2001, "No Content", 204),
     ALREADY_UP_TO_DATE(2002, "Already up-to-date", 204),
     RECIPIENTS_OFFLINE(2003, "The recipients are offline", 200),
 

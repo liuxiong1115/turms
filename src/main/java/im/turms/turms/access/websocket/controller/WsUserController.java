@@ -143,7 +143,7 @@ public class WsUserController {
                     .collectList()
                     .map(users -> {
                         if (users.isEmpty()) {
-                            return RequestResult.status(TurmsStatusCode.NOT_FOUND);
+                            return RequestResult.status(TurmsStatusCode.NO_CONTENT);
                         }
                         UsersInfosWithVersion.Builder builder = UsersInfosWithVersion.newBuilder();
                         for (User user : users) {

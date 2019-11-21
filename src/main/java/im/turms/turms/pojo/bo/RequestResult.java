@@ -38,7 +38,7 @@ public class RequestResult {
             null,
             null,
             null,
-            TurmsStatusCode.NOT_FOUND);
+            TurmsStatusCode.NO_CONTENT);
 
     private TurmsNotification.Data dataForRequester;
     private Set<Long> recipients;

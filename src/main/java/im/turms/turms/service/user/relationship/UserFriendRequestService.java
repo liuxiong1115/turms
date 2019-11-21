@@ -273,7 +273,7 @@ public class UserFriendRequestService {
                                         }
                                         return builder.build();
                                     } else {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND);
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                 });
                     } else {

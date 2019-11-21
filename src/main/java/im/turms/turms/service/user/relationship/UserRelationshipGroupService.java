@@ -128,7 +128,7 @@ public class UserRelationshipGroupService {
                 .defaultIfEmpty(EMPTY_RELATIONSHIP_GROUP)
                 .flatMap(group -> {
                     if (EMPTY_RELATIONSHIP_GROUP == group) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT));
                     } else {
                         return userVersionService.updateRelationshipGroupsVersion(ownerId)
                                 .thenReturn(true);

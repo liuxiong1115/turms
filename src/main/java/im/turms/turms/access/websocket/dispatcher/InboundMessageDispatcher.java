@@ -181,7 +181,7 @@ public class InboundMessageDispatcher {
                         if (requestId != null) {
                             TurmsNotification response = TurmsNotification.newBuilder()
                                     .setCode(Int32Value.newBuilder()
-                                            .setValue(TurmsStatusCode.NOT_FOUND.getBusinessCode()).build())
+                                            .setValue(TurmsStatusCode.NO_CONTENT.getBusinessCode()).build())
                                     .setRequestId(Int64Value.newBuilder().setValue(requestId).build())
                                     .build();
                             return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory

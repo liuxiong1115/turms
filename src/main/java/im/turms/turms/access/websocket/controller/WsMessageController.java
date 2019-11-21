@@ -165,7 +165,7 @@ public class WsMessageController {
                     .collectList()
                     .flatMap(messages -> {
                         if (messages.isEmpty()) {
-                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_FOUND));
+                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT));
                         }
                         MessagesWithTotalList.Builder listBuilder = MessagesWithTotalList.newBuilder();
                         List<Mono<Long>> countMonos = new ArrayList<>(multimap.size());
