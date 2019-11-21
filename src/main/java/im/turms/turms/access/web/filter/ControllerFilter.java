@@ -26,6 +26,7 @@ import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.service.admin.AdminActionLogService;
 import im.turms.turms.service.admin.AdminService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -70,9 +71,9 @@ public class ControllerFilter implements WebFilter {
                 .peek();
         if (handlerMethodObject instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handlerMethodObject;
-            ServerHttpRequest request = exchange.getRequest();
-            String account = request.getHeaders().getFirst(ACCOUNT);
-            String password = request.getHeaders().getFirst(PASSWORD);
+            Pair<String, String> pair = parseAccountAndPassword(exchange);
+            String account = pair.getLeft();
+            String password = pair.getRight();
             if (Constants.DEV_MODE) {
                 if (account != null && password != null) {
                     return tryPersistingAndPass(account, exchange, chain, handlerMethod);
@@ -107,20 +108,37 @@ public class ControllerFilter implements WebFilter {
                             });
                 } else {
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                    return Mono.empty();
                 }
             }
         } else {
-            String upgrade = exchange.getRequest().getHeaders().getFirst("Upgrade");
-            if (upgrade != null && upgrade.equals("websocket")) {
-                return chain.filter(exchange);
-            } else if (isCorsPreflightRequest(exchange)) {
+            if (isHandshakeRequest(exchange) || isCorsPreflightRequest(exchange)) {
                 return chain.filter(exchange);
             } else {
-                exchange.getResponse().setStatusCode(HttpStatus.METHOD_NOT_ALLOWED);
-                return Mono.empty();
+                Pair<String, String> pair = parseAccountAndPassword(exchange);
+                String account = pair.getLeft();
+                String password = pair.getRight();
+                if (account != null && password != null) {
+                    return adminService.authenticate(account, password)
+                            .flatMap(authenticated -> {
+                                if (authenticated) {
+                                    return chain.filter(exchange);
+                                } else {
+                                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                                    return Mono.empty();
+                                }
+                            });
+                } else {
+                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                }
             }
         }
+        return Mono.empty();
+    }
+
+    private Pair<String, String> parseAccountAndPassword(@NotNull ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
+        return Pair.of(request.getHeaders().getFirst(ACCOUNT),
+                request.getHeaders().getFirst(PASSWORD));
     }
 
     /**
@@ -187,6 +205,15 @@ public class ControllerFilter implements WebFilter {
             }
         }
         return chain.filter(exchange);
+    }
+
+    private boolean isHandshakeRequest(@NotNull ServerWebExchange exchange) {
+        String upgrade = exchange.getRequest().getHeaders().getFirst("Upgrade");
+        if (upgrade != null && upgrade.equals("websocket")) {
+            String path = exchange.getRequest().getURI().getPath();
+            return path.equals("") || path.equals("/");
+        }
+        return false;
     }
 
     private boolean isCorsPreflightRequest(@NotNull ServerWebExchange exchange) {
