@@ -115,7 +115,7 @@ public class GroupJoinRequestService {
                         return groupService.isGroupActive(groupId)
                                 .flatMap(isActive -> {
                                     if (isActive == null || !isActive) {
-                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_ACTIVE));
                                     }
                                     Date expirationDate = null;
                                     int hours = turmsClusterManager.getTurmsProperties().getGroup()

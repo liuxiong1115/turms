@@ -29,7 +29,7 @@ public enum TurmsStatusCode {
     FAILED(4000, "failed", 400),
     SERVER_INTERNAL_ERROR(5000, "Internal server error", 500),
 
-    NO_CONTENT(2001, "No Content", 204),
+    NO_CONTENT(2001, "No content", 204),
     ALREADY_UP_TO_DATE(2002, "Already up-to-date", 204),
     RECIPIENTS_OFFLINE(2003, "The recipients are offline", 200),
 
@@ -39,16 +39,17 @@ public enum TurmsStatusCode {
     ID_DUPLICATED(4004, "ID must be unique", 400),
     ILLEGAL_ARGUMENTS(4005, "Illegal arguments", 400),
     ILLEGAL_DATE_FORMAT(4006, "Illegal date format", 400),
-    OWNED_RESOURCE_LIMIT_REACHED(4007, "The resource limit is reached", 400),
-    REQUESTED_RECORDS_TOO_MANY(4008, "Too many records are requested", 400),
-    RESOURCES_HAVE_BEEN_HANDLED(4009, "The resources have been handled", 400),
-    RESOURCES_HAVE_CHANGED(4010, "The resources have been changed", 400),
-    SESSION_SIMULTANEOUS_CONFLICTS_DECLINE(4011, "A different device has logged into your account", 409),
-    SESSION_SIMULTANEOUS_CONFLICTS_NOTIFY(4012, "Someone attempted to log into your account", 409),
-    SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE(4013, "A different device has logged into your account", 409),
-    SUCCESSOR_NOT_GROUP_MEMBER(4014, "The successor is not the group member", 400),
-    TARGET_USERS_UNAUTHORIZED(4015, "The target users are unauthorized", 400),
-    UNAUTHORIZED(4016, "Unauthorized", 401),
+    NOT_ACTIVE(4007, "Not active", 400),
+    OWNED_RESOURCE_LIMIT_REACHED(4008, "The resource limit is reached", 400),
+    REQUESTED_RECORDS_TOO_MANY(4009, "Too many records are requested", 400),
+    RESOURCES_HAVE_BEEN_HANDLED(4010, "The resources have been handled", 400),
+    RESOURCES_HAVE_CHANGED(4011, "The resources have been changed", 400),
+    SESSION_SIMULTANEOUS_CONFLICTS_DECLINE(4012, "A different device has logged into your account", 409),
+    SESSION_SIMULTANEOUS_CONFLICTS_NOTIFY(4013, "Someone attempted to log into your account", 409),
+    SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE(4014, "A different device has logged into your account", 409),
+    SUCCESSOR_NOT_GROUP_MEMBER(4015, "The successor is not the group member", 400),
+    TARGET_USERS_UNAUTHORIZED(4016, "The target users are unauthorized", 400),
+    UNAUTHORIZED(4017, "Unauthorized", 401),
 
     LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500);
 

@@ -124,7 +124,7 @@ public class GroupJoinQuestionService {
                             if (isActive != null && isActive) {
                                 return checkGroupQuestionAnswersAndCountScore(questionIdAndAnswerMap, groupId);
                             } else {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION));
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_ACTIVE));
                             }
                         })
                         .flatMap(idsAndScore -> groupService.queryGroupMinimumScore(groupId)

@@ -108,19 +108,23 @@ public class UserService {
             @NotNull Boolean isSystemMessage,
             @NotNull Long requesterId,
             @NotNull Long targetId) {
-        if (isSystemMessage != null && isSystemMessage) {
+        if (isSystemMessage) {
             return Mono.just(true);
         }
         switch (chatType) {
             case PRIVATE:
                 if (requesterId.equals(targetId)) {
-                    return Mono.just(turmsClusterManager.getTurmsProperties()
-                            .getMessage().isAllowSendingMessagesToOneself());
+                    if (turmsClusterManager.getTurmsProperties()
+                            .getMessage().isAllowSendingMessagesToOneself()) {
+                        return Mono.just(true);
+                    } else {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION));
+                    }
                 }
                 return isActive(requesterId)
                         .flatMap(isActive -> {
                             if (isActive == null || !isActive) {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_ACTIVE));
                             } else {
                                 if (turmsClusterManager.getTurmsProperties().getMessage().isAllowSendingMessagesToStranger()) {
                                     if (turmsClusterManager.getTurmsProperties().getMessage().isCheckIfTargetExists()) {

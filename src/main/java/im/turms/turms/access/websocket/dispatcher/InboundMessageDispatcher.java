@@ -155,7 +155,7 @@ public class InboundMessageDispatcher {
     /**
      * Transfers RequestResult to WebSocketMessage.
      * Scenario 1: Mono<RequestResult> return a RequestResult object -> TurmsStatusCode.getCode()
-     * Scenario 2: Mono<RequestResult> is Mono.empty() -> TurmsStatusCode.NOT_FOUND
+     * Scenario 2: Mono<RequestResult> is Mono.empty() -> TurmsStatusCode.NO_CONTENT
      * Scenario 3: Mono<RequestResult> throw a TurmsBusinessException -> TurmsStatusCode.getCode()
      * Scenario 3: Mono<RequestResult> throw an exception of other types -> TurmsStatusCode.SERVER_INTERNAL_ERROR
      */
