@@ -346,7 +346,7 @@ public class TurmsClusterManager {
         return getClusterMemberBySlotIndex(index);
     }
 
-    private int getSlotIndexByUserId(@NotNull Long userId) {
+    public int getSlotIndexByUserId(@NotNull Long userId) {
         return (int) (userId % HASH_SLOTS_NUMBER);
     }
 

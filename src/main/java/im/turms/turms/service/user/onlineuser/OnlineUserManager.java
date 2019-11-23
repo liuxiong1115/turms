@@ -131,6 +131,10 @@ public class OnlineUserManager {
         return userOnlineInfo.getSessionMap().get(deviceType);
     }
 
+    public int getSessionsNumber() {
+        return userOnlineInfo.getSessionMap().size();
+    }
+
     public Set<DeviceType> getUsingDeviceTypes() {
         return userOnlineInfo.getUsingDeviceTypes();
     }

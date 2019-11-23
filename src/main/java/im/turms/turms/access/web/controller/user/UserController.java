@@ -267,7 +267,7 @@ public class UserController {
      */
     @GetMapping("/online-statuses")
     @RequiredPermission(AdminPermission.USER_QUERY)
-    public Mono<ResponseEntity> getOnlineUsersStatus(
+    public Mono<ResponseEntity> queryOnlineUsersStatus(
             @RequestParam(required = false) Set<Long> userIds,
             @RequestParam(defaultValue = "20") Integer number) {
         if (userIds != null && !userIds.isEmpty()) {

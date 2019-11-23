@@ -168,6 +168,9 @@ public class OnlineUserService {
                 }
             }
             manager.setSpecificDevicesOffline(deviceTypes, closeStatus);
+            if (manager.getSessionsNumber() == 0) {
+                clearOnlineUserManager(userId);
+            }
             if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
                 List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
                 if (!handlerList.isEmpty()) {
@@ -199,6 +202,9 @@ public class OnlineUserService {
                             closeStatus.getCode());
                 }
                 manager.setAllDevicesOffline(closeStatus);
+                if (manager.getSessionsNumber() == 0) {
+                    clearOnlineUserManager(userId);
+                }
                 if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
                     List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
                     if (!handlerList.isEmpty()) {
@@ -209,6 +215,11 @@ public class OnlineUserService {
                 }
             }
         }
+    }
+
+    public void clearOnlineUserManager(Long userId) {
+        int slotIndex = turmsClusterManager.getSlotIndexByUserId(userId);
+        onlineUsersManagerAtSlots.get(slotIndex).remove(userId);
     }
 
     public boolean setLocalUserOffline(
