@@ -224,6 +224,26 @@ public class OnlineUserService {
         return setLocalUserDevicesOffline(userId, Collections.singleton(deviceType), closeStatus);
     }
 
+    public Mono<Boolean> setUserOffline(
+            @NotNull Long userId,
+            @NotNull CloseStatus closeStatus) {
+        boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(userId);
+        if (responsible) {
+            setLocalUserOffline(userId, closeStatus);
+            return Mono.just(true);
+        } else {
+            Member member = turmsClusterManager.getMemberByUserId(userId);
+            if (member != null) {
+                Future<Boolean> future = turmsClusterManager
+                        .getExecutor()
+                        .submitToMember(new SetUserOfflineTask(userId, null, closeStatus.getCode()), member);
+                return ReactorUtil.future2Mono(future);
+            } else {
+                return Mono.just(false);
+            }
+        }
+    }
+
     public Mono<Boolean> setUserDevicesOffline(
             @NotNull Long userId,
             @NotEmpty Set<DeviceType> deviceTypes,
