@@ -20,6 +20,7 @@ package im.turms.turms.access.web.util;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.PageResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -103,6 +104,10 @@ public class ResponseFactory {
         return ResponseEntity
                 .status(turmsStatusCode.getHttpStatusCode())
                 .body(new Response(turmsStatusCode, null));
+    }
+
+    public static Mono<ResponseEntity> page(Mono<Long> total, Flux data) {
+        return okWhenTruthy(PageResult.getResult(total, data));
     }
 
     public static ResponseEntity fail() {

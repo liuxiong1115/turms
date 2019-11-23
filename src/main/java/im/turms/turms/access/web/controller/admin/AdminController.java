@@ -20,7 +20,6 @@ package im.turms.turms.access.web.controller.admin;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.pojo.bo.PageResult;
 import im.turms.turms.pojo.domain.Admin;
 import im.turms.turms.pojo.dto.AddAdminDTO;
 import im.turms.turms.pojo.dto.UpdateAdminDTO;
@@ -127,7 +126,7 @@ public class AdminController {
             size = pageUtil.getSize(size);
             Flux<Admin> admins = adminService.queryAdmins(accounts, roleId, withPassword, page, size);
             Mono<Long> total = adminService.countAdmins(accounts, roleId);
-            return ResponseFactory.okWhenTruthy(PageResult.getResult(total, admins));
+            return ResponseFactory.page(total, admins);
         }
     }
 }

@@ -64,6 +64,13 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder addIsIfNotNull(@NotNull String key, @Nullable Object obj) {
+        if (obj != null) {
+            criteriaList.add(Criteria.where(key).is(obj));
+        }
+        return this;
+    }
+
     public QueryBuilder addIfNotNull(Criteria criteria, Object data) {
         if (data != null) {
             if (data instanceof Collection) {

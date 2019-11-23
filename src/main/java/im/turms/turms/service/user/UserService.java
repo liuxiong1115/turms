@@ -414,6 +414,31 @@ public class UserService {
         return mongoTemplate.count(new Query(), User.class);
     }
 
+    public Mono<Long> countUsers(
+            @Nullable Set<Long> userIds,
+            @Nullable Date registrationDateStart,
+            @Nullable Date registrationDateEnd,
+            @Nullable Date deletionDateStart,
+            @Nullable Date deletionDateEnd,
+            @Nullable Boolean active) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addBetweenIfNotNull(
+                        User.Fields.registrationDate,
+                        registrationDateStart,
+                        registrationDateEnd)
+                .addBetweenIfNotNull(
+                        User.Fields.deletionDate,
+                        deletionDateStart,
+                        deletionDateEnd)
+                .addIsIfNotNull(User.Fields.active, active)
+                .buildQuery();
+        if (userIds != null) {
+            query.addCriteria(Criteria.where(ID).in(userIds));
+        }
+        return mongoTemplate.count(query, User.class);
+    }
+
     public Mono<Long> countMaxOnlineUsers(@Nullable Date startDate, @Nullable Date endDate) {
         Query query = QueryBuilder
                 .newBuilder()

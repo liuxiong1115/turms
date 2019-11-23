@@ -77,7 +77,7 @@ public class UserController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.USER_QUERY)
-    public Mono<ResponseEntity> getUsers(
+    public Mono<ResponseEntity> queryUsers(
             @RequestParam(required = false) Set<Long> userIds,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Date registrationDateStart,
@@ -100,7 +100,14 @@ public class UserController {
                     active,
                     page,
                     size);
-            return ResponseFactory.okWhenTruthy(users);
+            Mono<Long> count = userService.countUsers(
+                    userIds,
+                    registrationDateStart,
+                    registrationDateEnd,
+                    deletionDateStart,
+                    deletionDateEnd,
+                    active);
+            return ResponseFactory.page(count, users);
         }
     }
 
