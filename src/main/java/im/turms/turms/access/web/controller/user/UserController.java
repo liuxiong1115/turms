@@ -304,17 +304,15 @@ public class UserController {
             @RequestParam(required = false) Set<DeviceType> deviceTypes,
             @RequestBody UpdateOnlineStatusDTO updateOnlineStatusDTO) {
         Mono<Boolean> updated;
-        if (updateOnlineStatusDTO.getOnlineStatus() == UserStatus.OFFLINE) {
+        UserStatus onlineStatus = updateOnlineStatusDTO.getOnlineStatus();
+        if (onlineStatus == UserStatus.OFFLINE) {
             if (deviceTypes != null) {
                 updated = onlineUserService.setUserDevicesOffline(userId, deviceTypes, CloseStatus.NORMAL);
             } else {
                 updated = onlineUserService.setUserOffline(userId, CloseStatus.NORMAL);
             }
         } else {
-            updated = onlineUserService.updateOnlineUserStatus(
-                    userId,
-                    deviceTypes,
-                    updateOnlineStatusDTO.getOnlineStatus());
+            updated = onlineUserService.updateOnlineUserStatus(userId, onlineStatus);
         }
         return ResponseFactory.okWhenTruthy(updated);
     }

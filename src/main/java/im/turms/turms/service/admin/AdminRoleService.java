@@ -74,7 +74,7 @@ public class AdminRoleService {
 
     public void loadAllRoles() {
         mongoTemplate.find(new Query(), AdminRole.class)
-                .doOnNext(role -> roles.put(role.getRoleId(), role))
+                .doOnNext(role -> roles.put(role.getId(), role))
                 .subscribe();
     }
 
@@ -89,7 +89,7 @@ public class AdminRoleService {
 
     public Mono<AdminRole> addAdminRole(@NotNull AdminRole adminRole) {
         return mongoTemplate.insert(adminRole).map(role -> {
-            roles.put(adminRole.getRoleId(), role);
+            roles.put(adminRole.getId(), role);
             return role;
         });
     }

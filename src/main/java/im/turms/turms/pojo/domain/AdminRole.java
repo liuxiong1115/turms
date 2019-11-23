@@ -72,10 +72,6 @@ public class AdminRole implements IdentifiedDataSerializable {
         return IdentifiedDataFactory.Type.DOMAIN_ADMIN_ROLE.getValue();
     }
 
-    public Long getRoleId() {
-        return this.id;
-    }
-
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeLong(id);
