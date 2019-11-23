@@ -266,11 +266,9 @@ public class AdminService {
             int page,
             int size) {
         Query query = QueryBuilder.newBuilder()
-                .addIfNotNull(Criteria.where(Admin.Fields.roleId).is(roleId), roleId)
+                .addInIfNotNull(ID, accounts)
+                .addIsIfNotNull(Admin.Fields.roleId, roleId)
                 .paginateIfNotNull(page, size);
-        if (accounts != null && !accounts.isEmpty()) {
-            query.addCriteria(Criteria.where(ID).in(accounts));
-        }
         if (!withPassword) {
             query.fields().exclude(Admin.Fields.password);
         }
@@ -367,11 +365,9 @@ public class AdminService {
 
     public Mono<Long> countAdmins(@Nullable Set<String> accounts, @Nullable Long roleId) {
         Query query = QueryBuilder.newBuilder()
-                .addIfNotNull(Criteria.where(Admin.Fields.roleId).is(roleId), roleId)
+                .addInIfNotNull(ID, accounts)
+                .addIsIfNotNull(Admin.Fields.roleId, roleId)
                 .buildQuery();
-        if (accounts != null && !accounts.isEmpty()) {
-            query.addCriteria(Criteria.where(ID).in(accounts));
-        }
         return mongoTemplate.count(query, Admin.class);
     }
 }

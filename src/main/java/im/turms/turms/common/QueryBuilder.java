@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class QueryBuilder {
-    public static Criteria EMPTY_CRITERIA = new Criteria();
+    private static Criteria EMPTY_CRITERIA = new Criteria();
     private List<Criteria> criteriaList;
     private Criteria finalCriteria;
     private Query outputQuery;
@@ -71,15 +71,9 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder addIfNotNull(Criteria criteria, Object data) {
-        if (data != null) {
-            if (data instanceof Collection) {
-                if (!((Collection) data).isEmpty()) {
-                    criteriaList.add(criteria);
-                }
-            } else {
-                criteriaList.add(criteria);
-            }
+    public QueryBuilder addInIfNotNull(@NotNull String key, @Nullable Collection collection) {
+        if (collection != null && !collection.isEmpty()) {
+            criteriaList.add(Criteria.where(key).in(collection));
         }
         return this;
     }

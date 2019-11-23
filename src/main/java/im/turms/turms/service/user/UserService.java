@@ -378,7 +378,7 @@ public class UserService {
         Query query = builder
                 .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateStart, registrationDateEnd)
                 .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateStart, deletionDateEnd)
-                .addIfNotNull(Criteria.where(User.Fields.active).is(active), active)
+                .addIsIfNotNull(User.Fields.active, active)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, User.class);
     }

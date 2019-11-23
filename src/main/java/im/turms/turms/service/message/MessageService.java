@@ -156,10 +156,10 @@ public class MessageService {
             @Nullable MessageDeliveryStatus deliveryStatus,
             @Nullable Integer size) {
         QueryBuilder builder = QueryBuilder.newBuilder()
-                .addIfNotNull(Criteria.where(Message.Fields.chatType).is(chatType), chatType)
-                .addIfNotNull(Criteria.where(Message.Fields.isSystemMessage).is(areSystemMessages), areSystemMessages)
-                .addIfNotNull(Criteria.where(Message.Fields.senderId).is(senderId), senderId)
-                .addIfNotNull(Criteria.where(Message.Fields.targetId).is(targetId), targetId)
+                .addIsIfNotNull(Message.Fields.chatType, chatType)
+                .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
+                .addIsIfNotNull(Message.Fields.senderId, senderId)
+                .addIsIfNotNull(Message.Fields.targetId, targetId)
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate);
         Sort.Direction direction = null;
         if (closeToDate) {
@@ -455,8 +455,8 @@ public class MessageService {
             @Nullable Boolean areSystemMessages) {
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
-                .addIfNotNull(Criteria.where(Message.Fields.chatType).is(chatType), chatType)
-                .addIfNotNull(Criteria.where(Message.Fields.isSystemMessage).is(areSystemMessages), areSystemMessages)
+                .addIsIfNotNull(Message.Fields.chatType, chatType)
+                .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
@@ -507,8 +507,8 @@ public class MessageService {
             @Nullable Boolean areSystemMessages) {
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
-                .addIfNotNull(Criteria.where(Message.Fields.chatType).is(chatType), chatType)
-                .addIfNotNull(Criteria.where(Message.Fields.isSystemMessage).is(areSystemMessages), areSystemMessages)
+                .addIsIfNotNull(Message.Fields.chatType, chatType)
+                .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .buildQuery();
         return mongoTemplate.count(query, Message.class);
     }
@@ -542,7 +542,7 @@ public class MessageService {
             @Nullable Boolean areSystemMessages) {
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, startDate, endDate)
-                .addIfNotNull(Criteria.where(MessageStatus.Fields.isSystemMessage).is(areSystemMessages), areSystemMessages)
+                .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, areSystemMessages)
                 .buildQuery();
         if (chatType != null) {
             if (chatType == ChatType.GROUP) {

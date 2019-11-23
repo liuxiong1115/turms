@@ -213,7 +213,7 @@ public class UserRelationshipService {
             @Nullable Boolean isBlocked) {
         Query query = QueryBuilder.newBuilder()
                 .add(Criteria.where(ID_OWNER_ID).is(ownerId))
-                .addIfNotNull(Criteria.where(UserRelationship.Fields.isBlocked).is(isBlocked), isBlocked)
+                .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
                 .buildQuery();
         query.fields().include(ID_RELATED_USER_ID);
         return mongoTemplate.find(query, UserRelationship.class)
@@ -245,10 +245,8 @@ public class UserRelationshipService {
             @Nullable Boolean isBlocked) {
         QueryBuilder builder = QueryBuilder.newBuilder()
                 .add(Criteria.where(ID_OWNER_ID).is(ownerId))
-                .addIfNotNull(Criteria.where(UserRelationship.Fields.isBlocked).is(isBlocked), isBlocked);
-        if (relatedUsersIds != null && !relatedUsersIds.isEmpty()) {
-            builder.add(Criteria.where(ID_RELATED_USER_ID).in(relatedUsersIds));
-        }
+                .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
+                .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked);
         return mongoTemplate.find(builder.buildQuery(), UserRelationship.class);
     }
 
@@ -432,8 +430,8 @@ public class UserRelationshipService {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         Query query = QueryBuilder.newBuilder()
-                .addIfNotNull(Criteria.where(ID_OWNER_ID).is(ownerId), ownerId)
-                .addIfNotNull(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId), relatedUserId)
+                .addIsIfNotNull(ID_OWNER_ID, ownerId)
+                .addIsIfNotNull(ID_RELATED_USER_ID, relatedUserId)
                 .buildQuery();
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
@@ -452,16 +450,15 @@ public class UserRelationshipService {
         if (relatedUsersIds == null && isBlocked == null && establishmentDate == null) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
-        QueryBuilder builder = QueryBuilder.newBuilder()
-                .add(Criteria.where(ID_OWNER_ID).is(ownerId));
-        if (relatedUsersIds != null && !relatedUsersIds.isEmpty()) {
-            builder.add(Criteria.where(ID_RELATED_USER_ID).in(relatedUsersIds));
-        }
+        Query query = QueryBuilder.newBuilder()
+                .add(Criteria.where(ID_OWNER_ID).is(ownerId))
+                .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
+                .buildQuery();
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
                 .setIfNotNull(UserRelationship.Fields.establishmentDate, establishmentDate)
                 .build();
-        return mongoTemplate.updateMulti(builder.buildQuery(), update, UserRelationship.class)
+        return mongoTemplate.updateMulti(query, update, UserRelationship.class)
                 .zipWith(userVersionService.updateRelationshipsVersion(ownerId))
                 .map(result -> result.getT1().wasAcknowledged());
     }

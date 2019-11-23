@@ -49,7 +49,7 @@ public class MessageStatusService {
             @Nullable Long recipientId) {
         Query query = QueryBuilder.newBuilder()
                 .add(Criteria.where(MessageStatus.Fields.deliveryStatus).is(deliveryStatus))
-                .addIfNotNull(Criteria.where(ID_RECIPIENT_ID).is(recipientId), recipientId)
+                .addIsIfNotNull(ID_RECIPIENT_ID, recipientId)
                 .buildQuery();
         query.fields().include(ID_MESSAGE_ID);
         return mongoTemplate
