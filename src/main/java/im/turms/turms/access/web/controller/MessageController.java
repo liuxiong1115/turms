@@ -29,10 +29,11 @@ import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.dto.CreateMessageDTO;
 import im.turms.turms.service.message.MessageService;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -57,23 +58,30 @@ public class MessageController {
     @RequiredPermission(AdminPermission.MESSAGE_QUERY)
     public Mono<ResponseEntity> getCompleteMessages(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) String chatType,
+            @RequestParam(required = false) ChatType chatType,
             @RequestParam(required = false) Boolean areSystemMessages,
-            @RequestParam(required = false) Long fromId,
-            @RequestParam(required = false) Long toId,
-            @RequestParam(required = false) Date startDate,
-            @RequestParam(required = false) Date endDate,
+            @RequestParam(required = false) Long senderId,
+            @RequestParam(required = false) Long targetId,
+            @RequestParam(required = false) Date deliveryStartDate,
+            @RequestParam(required = false) Date deliveryEndDate,
+            @RequestParam(required = false) Date deletionStartDate,
+            @RequestParam(required = false) Date deletionEndDate,
             @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
             @RequestParam(defaultValue = "0") Integer size) {
+        if (chatType == ChatType.UNRECOGNIZED) {
+            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST));
+        }
         Flux<Message> completeMessages = messageService.queryCompleteMessages(
                 false,
                 ids,
-                EnumUtils.getEnum(ChatType.class, chatType),
+                chatType,
                 areSystemMessages,
-                fromId,
-                toId,
-                startDate,
-                endDate,
+                senderId,
+                targetId,
+                deliveryStartDate,
+                deliveryEndDate,
+                deletionStartDate,
+                deletionEndDate,
                 deliveryStatus,
                 pageUtil.getSize(size));
         return ResponseFactory.okWhenTruthy(completeMessages);
