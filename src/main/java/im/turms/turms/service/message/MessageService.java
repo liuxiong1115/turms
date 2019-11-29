@@ -134,10 +134,11 @@ public class MessageService {
             @Nullable Date deletionDateStart,
             @Nullable Date deletionDateEnd,
             @Nullable MessageDeliveryStatus deliveryStatus,
+            @Nullable Integer page,
             @Nullable Integer size) {
         if (deliveryStatus == MessageDeliveryStatus.READY
                 || deliveryStatus == MessageDeliveryStatus.RECEIVED) {
-            return queryCompleteMessages(closeToDate, messageIds, chatType, areSystemMessages, senderId, targetId, deliveryDateStart, deliveryDateEnd, deletionDateStart, deletionDateEnd, deliveryStatus, size);
+            return queryCompleteMessages(closeToDate, messageIds, chatType, areSystemMessages, senderId, targetId, deliveryDateStart, deliveryDateEnd, deletionDateStart, deletionDateEnd, deliveryStatus, page, size);
         } else {
             throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
@@ -160,9 +161,9 @@ public class MessageService {
             @Nullable Date deletionDateStart,
             @Nullable Date deletionDateEnd,
             @Nullable MessageDeliveryStatus deliveryStatus,
+            @Nullable Integer page,
             @Nullable Integer size) {
         QueryBuilder builder = QueryBuilder.newBuilder()
-                .addInIfNotNull(ID, messageIds)
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .addIsIfNotNull(Message.Fields.senderId, senderId)
@@ -175,18 +176,22 @@ public class MessageService {
         }
         if (deliveryStatus != null) {
             Sort.Direction finalDirection = direction;
-            return messageStatusService.getMessagesIdsByDeliveryStatusAndRecipientId(deliveryStatus, targetId)
+            return messageStatusService.queryMessagesIdsByDeliveryStatusAndTargetId(deliveryStatus, chatType, targetId)
                     .collect(Collectors.toSet())
                     .flatMapMany(ids -> {
                         if (ids.isEmpty()) {
-                            throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
+                            return Flux.empty();
+                        }
+                        if (messageIds != null) {
+                            ids.retainAll(messageIds);
                         }
                         Query query = builder.add(Criteria.where(ID).in(ids))
-                                .paginateIfNotNull(0, size, finalDirection);
+                                .paginateIfNotNull(page, size, finalDirection);
                         return mongoTemplate.find(query, Message.class);
                     });
         } else {
-            Query query = builder.paginateIfNotNull(0, size, direction);
+            builder.addInIfNotNull(ID, messageIds);
+            Query query = builder.paginateIfNotNull(page, size, direction);
             return mongoTemplate.find(query, Message.class);
         }
     }
@@ -454,6 +459,43 @@ public class MessageService {
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.updateFirst(query, update, Message.class)
                 .map(UpdateResult::wasAcknowledged);
+    }
+
+    public Mono<Long> countMessages(
+            @Nullable Set<Long> messageIds,
+            @Nullable ChatType chatType,
+            @Nullable Boolean areSystemMessages,
+            @Nullable Long senderId,
+            @Nullable Long targetId,
+            @Nullable Date deliveryDateStart,
+            @Nullable Date deliveryDateEnd,
+            @Nullable Date deletionDateStart,
+            @Nullable Date deletionDateEnd,
+            @Nullable MessageDeliveryStatus deliveryStatus) {
+        QueryBuilder builder = QueryBuilder.newBuilder()
+                .addIsIfNotNull(Message.Fields.chatType, chatType)
+                .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
+                .addIsIfNotNull(Message.Fields.senderId, senderId)
+                .addIsIfNotNull(Message.Fields.targetId, targetId)
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateStart, deliveryDateEnd)
+                .addBetweenIfNotNull(Message.Fields.deletionDate, deletionDateStart, deletionDateEnd);
+        if (deliveryStatus != null) {
+            return messageStatusService.queryMessagesIdsByDeliveryStatusAndTargetId(deliveryStatus, chatType, targetId)
+                    .collect(Collectors.toSet())
+                    .flatMap(ids -> {
+                        if (ids.isEmpty()) {
+                            return Mono.just(0L);
+                        }
+                        if (messageIds != null) {
+                            ids.retainAll(messageIds);
+                        }
+                        Query query = builder.add(Criteria.where(ID).in(ids)).buildQuery();
+                        return mongoTemplate.count(query, Message.class);
+                    });
+        } else {
+            Query query = builder.addInIfNotNull(ID, messageIds).buildQuery();
+            return mongoTemplate.count(query, Message.class);
+        }
     }
 
     public Mono<Long> countUsersWhoSentMessage(

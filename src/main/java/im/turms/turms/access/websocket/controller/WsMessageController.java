@@ -158,7 +158,7 @@ public class WsMessageController {
             return messageService.queryCompleteMessages(
                     false, null, null, null, null,
                     turmsRequestWrapper.getUserId(), null, null,
-                    null, null, MessageDeliveryStatus.READY, size)
+                    null, null, MessageDeliveryStatus.READY, 0, size)
                     .doOnNext(message -> multimap.put(Triple.of(message.getChatType(),
                             message.getIsSystemMessage(),
                             message.getChatType() == ChatType.GROUP ? message.getTargetId() : message.getSenderId()), message))
@@ -227,6 +227,7 @@ public class WsMessageController {
                     null,
                     null,
                     deliveryStatus,
+                    0,
                     size)
                     .collectList()
                     .flatMap(messages -> {
