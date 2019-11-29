@@ -129,13 +129,15 @@ public class MessageService {
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Long targetId,
-            @Nullable Date startDate,
-            @Nullable Date endDate,
+            @Nullable Date deliveryDateStart,
+            @Nullable Date deliveryDateEnd,
+            @Nullable Date deletionDateStart,
+            @Nullable Date deletionDateEnd,
             @Nullable MessageDeliveryStatus deliveryStatus,
             @Nullable Integer size) {
         if (deliveryStatus == MessageDeliveryStatus.READY
                 || deliveryStatus == MessageDeliveryStatus.RECEIVED) {
-            return queryCompleteMessages(closeToDate, messageIds, chatType, areSystemMessages, senderId, targetId, startDate, endDate, deliveryStatus, size);
+            return queryCompleteMessages(closeToDate, messageIds, chatType, areSystemMessages, senderId, targetId, deliveryDateStart, deliveryDateEnd, deletionDateStart, deletionDateEnd, deliveryStatus, size);
         } else {
             throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
@@ -153,8 +155,10 @@ public class MessageService {
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Long targetId,
-            @Nullable Date startDate,
-            @Nullable Date endDate,
+            @Nullable Date deliveryDateStart,
+            @Nullable Date deliveryDateEnd,
+            @Nullable Date deletionDateStart,
+            @Nullable Date deletionDateEnd,
             @Nullable MessageDeliveryStatus deliveryStatus,
             @Nullable Integer size) {
         QueryBuilder builder = QueryBuilder.newBuilder()
@@ -163,10 +167,11 @@ public class MessageService {
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .addIsIfNotNull(Message.Fields.senderId, senderId)
                 .addIsIfNotNull(Message.Fields.targetId, targetId)
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate);
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateStart, deliveryDateEnd)
+                .addBetweenIfNotNull(Message.Fields.deletionDate, deletionDateStart, deletionDateEnd);
         Sort.Direction direction = null;
         if (closeToDate) {
-            direction = startDate != null ? Sort.Direction.ASC : Sort.Direction.DESC;
+            direction = deliveryDateStart != null ? Sort.Direction.ASC : Sort.Direction.DESC;
         }
         if (deliveryStatus != null) {
             Sort.Direction finalDirection = direction;
