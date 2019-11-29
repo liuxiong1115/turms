@@ -156,7 +156,7 @@ public class WsMessageController {
             }
             size = pageUtil.getSize(size);
             return messageService.queryCompleteMessages(
-                    false, null, null, null,
+                    false, null, null, null, null,
                     turmsRequestWrapper.getUserId(), null, null,
                     MessageDeliveryStatus.READY, size)
                     .doOnNext(message -> multimap.put(Triple.of(message.getChatType(),
@@ -201,6 +201,7 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryMessagesRequest() {
         return turmsRequestWrapper -> {
             QueryMessagesRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessagesRequest();
+            List<Long> idsList = request.getIdsCount() != 0 ? request.getIdsList() : null;
             ChatType chatType = request.getChatType();
             Boolean areSystemMessages = request.hasAreSystemMessages() ? request.getAreSystemMessages().getValue() : null;
             Long fromId = request.hasFromId() ? request.getFromId().getValue() : null;
@@ -216,6 +217,7 @@ public class WsMessageController {
             Integer size = request.hasSize() ? pageUtil.getSize(request.getSize().getValue()) : null;
             return messageService.authAndQueryCompleteMessages(
                     true,
+                    idsList,
                     chatType,
                     areSystemMessages,
                     fromId,

@@ -124,6 +124,7 @@ public class MessageService {
 
     public Flux<Message> authAndQueryCompleteMessages(
             @NotNull boolean closeToDate,
+            @Nullable Collection<Long> messageIds,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
@@ -134,7 +135,7 @@ public class MessageService {
             @Nullable Integer size) {
         if (deliveryStatus == MessageDeliveryStatus.READY
                 || deliveryStatus == MessageDeliveryStatus.RECEIVED) {
-            return queryCompleteMessages(closeToDate, chatType, areSystemMessages, senderId, targetId, startDate, endDate, deliveryStatus, size);
+            return queryCompleteMessages(closeToDate, messageIds, chatType, areSystemMessages, senderId, targetId, startDate, endDate, deliveryStatus, size);
         } else {
             throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
@@ -147,6 +148,7 @@ public class MessageService {
 
     public Flux<Message> queryCompleteMessages(
             @NotNull boolean closeToDate,
+            @Nullable Collection<Long> messageIds,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
@@ -156,6 +158,7 @@ public class MessageService {
             @Nullable MessageDeliveryStatus deliveryStatus,
             @Nullable Integer size) {
         QueryBuilder builder = QueryBuilder.newBuilder()
+                .addInIfNotNull(ID, messageIds)
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .addIsIfNotNull(Message.Fields.senderId, senderId)

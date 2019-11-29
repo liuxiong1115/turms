@@ -8,98 +8,115 @@ public interface QueryMessagesRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.google.protobuf.Int32Value size = 1;</code>
+   * <code>repeated int64 ids = 1;</code>
+   * @return A list containing the ids.
+   */
+  java.util.List<java.lang.Long> getIdsList();
+  /**
+   * <code>repeated int64 ids = 1;</code>
+   * @return The count of ids.
+   */
+  int getIdsCount();
+  /**
+   * <code>repeated int64 ids = 1;</code>
+   * @param index The index of the element to return.
+   * @return The ids at the given index.
+   */
+  long getIds(int index);
+
+  /**
+   * <code>.google.protobuf.Int32Value size = 2;</code>
    * @return Whether the size field is set.
    */
   boolean hasSize();
   /**
-   * <code>.google.protobuf.Int32Value size = 1;</code>
+   * <code>.google.protobuf.Int32Value size = 2;</code>
    * @return The size.
    */
   com.google.protobuf.Int32Value getSize();
   /**
-   * <code>.google.protobuf.Int32Value size = 1;</code>
+   * <code>.google.protobuf.Int32Value size = 2;</code>
    */
   com.google.protobuf.Int32ValueOrBuilder getSizeOrBuilder();
 
   /**
-   * <code>.im.turms.proto.ChatType chat_type = 2;</code>
+   * <code>.im.turms.proto.ChatType chat_type = 3;</code>
    * @return The enum numeric value on the wire for chatType.
    */
   int getChatTypeValue();
   /**
-   * <code>.im.turms.proto.ChatType chat_type = 2;</code>
+   * <code>.im.turms.proto.ChatType chat_type = 3;</code>
    * @return The chatType.
    */
   im.turms.turms.constant.ChatType getChatType();
 
   /**
-   * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+   * <code>.google.protobuf.BoolValue are_system_messages = 4;</code>
    * @return Whether the areSystemMessages field is set.
    */
   boolean hasAreSystemMessages();
   /**
-   * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+   * <code>.google.protobuf.BoolValue are_system_messages = 4;</code>
    * @return The areSystemMessages.
    */
   com.google.protobuf.BoolValue getAreSystemMessages();
   /**
-   * <code>.google.protobuf.BoolValue are_system_messages = 3;</code>
+   * <code>.google.protobuf.BoolValue are_system_messages = 4;</code>
    */
   com.google.protobuf.BoolValueOrBuilder getAreSystemMessagesOrBuilder();
 
   /**
-   * <code>.google.protobuf.Int64Value from_id = 4;</code>
+   * <code>.google.protobuf.Int64Value from_id = 5;</code>
    * @return Whether the fromId field is set.
    */
   boolean hasFromId();
   /**
-   * <code>.google.protobuf.Int64Value from_id = 4;</code>
+   * <code>.google.protobuf.Int64Value from_id = 5;</code>
    * @return The fromId.
    */
   com.google.protobuf.Int64Value getFromId();
   /**
-   * <code>.google.protobuf.Int64Value from_id = 4;</code>
+   * <code>.google.protobuf.Int64Value from_id = 5;</code>
    */
   com.google.protobuf.Int64ValueOrBuilder getFromIdOrBuilder();
 
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_after = 6;</code>
    * @return Whether the deliveryDateAfter field is set.
    */
   boolean hasDeliveryDateAfter();
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_after = 6;</code>
    * @return The deliveryDateAfter.
    */
   com.google.protobuf.Int64Value getDeliveryDateAfter();
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_after = 5;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_after = 6;</code>
    */
   com.google.protobuf.Int64ValueOrBuilder getDeliveryDateAfterOrBuilder();
 
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_before = 7;</code>
    * @return Whether the deliveryDateBefore field is set.
    */
   boolean hasDeliveryDateBefore();
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_before = 7;</code>
    * @return The deliveryDateBefore.
    */
   com.google.protobuf.Int64Value getDeliveryDateBefore();
   /**
-   * <code>.google.protobuf.Int64Value delivery_date_before = 6;</code>
+   * <code>.google.protobuf.Int64Value delivery_date_before = 7;</code>
    */
   com.google.protobuf.Int64ValueOrBuilder getDeliveryDateBeforeOrBuilder();
 
   /**
-   * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
+   * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 8;</code>
    * @return The enum numeric value on the wire for deliveryStatus.
    */
   int getDeliveryStatusValue();
   /**
-   * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 7;</code>
+   * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 8;</code>
    * @return The deliveryStatus.
    */
   im.turms.turms.constant.MessageDeliveryStatus getDeliveryStatus();

@@ -56,6 +56,7 @@ public class MessageController {
     @GetMapping
     @RequiredPermission(AdminPermission.MESSAGE_QUERY)
     public Mono<ResponseEntity> getCompleteMessages(
+            @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) String chatType,
             @RequestParam(required = false) Boolean areSystemMessages,
             @RequestParam(required = false) Long fromId,
@@ -66,6 +67,7 @@ public class MessageController {
             @RequestParam(defaultValue = "0") Integer size) {
         Flux<Message> completeMessages = messageService.queryCompleteMessages(
                 false,
+                ids,
                 EnumUtils.getEnum(ChatType.class, chatType),
                 areSystemMessages,
                 fromId,

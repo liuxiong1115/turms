@@ -10,11 +10,12 @@ import "constant/chat_type.proto";
 import "constant/message_delivery_status.proto";
 
 message QueryMessagesRequest {
-    google.protobuf.Int32Value size = 1;
-    ChatType chat_type = 2;
-    google.protobuf.BoolValue are_system_messages = 3;
-    google.protobuf.Int64Value from_id = 4;
-    google.protobuf.Int64Value delivery_date_after = 5;
-    google.protobuf.Int64Value delivery_date_before = 6;
-    MessageDeliveryStatus delivery_status = 7;
+    repeated int64 ids = 1;
+    google.protobuf.Int32Value size = 2;
+    ChatType chat_type = 3;
+    google.protobuf.BoolValue are_system_messages = 4;
+    google.protobuf.Int64Value from_id = 5;
+    google.protobuf.Int64Value delivery_date_after = 6;
+    google.protobuf.Int64Value delivery_date_before = 7;
+    MessageDeliveryStatus delivery_status = 8;
 }
