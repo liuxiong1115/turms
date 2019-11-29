@@ -2,7 +2,6 @@ package im.turms.turms.service.message;
 
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
@@ -44,13 +43,22 @@ public class MessageStatusService {
         return mongoTemplate.exists(query, MessageStatus.class);
     }
 
-    public Flux<Long> getMessagesIdsByDeliveryStatusAndRecipientId(
+    public Flux<Long> queryMessagesIdsByDeliveryStatusAndTargetId(
             @NotNull MessageDeliveryStatus deliveryStatus,
-            @Nullable Long recipientId) {
-        Query query = QueryBuilder.newBuilder()
-                .add(Criteria.where(MessageStatus.Fields.deliveryStatus).is(deliveryStatus))
-                .addIsIfNotNull(ID_RECIPIENT_ID, recipientId)
-                .buildQuery();
+            @Nullable ChatType chatType,
+            @Nullable Long targetId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(MessageStatus.Fields.deliveryStatus).is(deliveryStatus));
+        if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP) {
+            if (targetId == null) {
+                return Flux.empty();
+            }
+            if (chatType == ChatType.PRIVATE) {
+                query.addCriteria(Criteria.where(ID_RECIPIENT_ID).is(targetId));
+            } else {
+                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(targetId));
+            }
+        }
         query.fields().include(ID_MESSAGE_ID);
         return mongoTemplate
                 .find(query, MessageStatus.class)

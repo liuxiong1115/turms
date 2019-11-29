@@ -62,15 +62,27 @@ public class MessageController {
             @RequestParam(required = false) Boolean areSystemMessages,
             @RequestParam(required = false) Long senderId,
             @RequestParam(required = false) Long targetId,
-            @RequestParam(required = false) Date deliveryStartDate,
-            @RequestParam(required = false) Date deliveryEndDate,
-            @RequestParam(required = false) Date deletionStartDate,
-            @RequestParam(required = false) Date deletionEndDate,
+            @RequestParam(required = false) Date deliveryDateStart,
+            @RequestParam(required = false) Date deliveryDateEnd,
+            @RequestParam(required = false) Date deletionDateStart,
+            @RequestParam(required = false) Date deletionDateEnd,
             @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
+            @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "0") Integer size) {
         if (chatType == ChatType.UNRECOGNIZED) {
             return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST));
         }
+        Mono<Long> count = messageService.countMessages(
+                ids,
+                chatType,
+                areSystemMessages,
+                senderId,
+                targetId,
+                deliveryDateStart,
+                deliveryDateEnd,
+                deletionDateStart,
+                deletionDateEnd,
+                deliveryStatus);
         Flux<Message> completeMessages = messageService.queryCompleteMessages(
                 false,
                 ids,
@@ -78,13 +90,15 @@ public class MessageController {
                 areSystemMessages,
                 senderId,
                 targetId,
-                deliveryStartDate,
-                deliveryEndDate,
-                deletionStartDate,
-                deletionEndDate,
+                deliveryDateStart,
+                deliveryDateEnd,
+                deletionDateStart,
+                deletionDateEnd,
                 deliveryStatus,
+                page,
                 pageUtil.getSize(size));
-        return ResponseFactory.okWhenTruthy(completeMessages);
+
+        return ResponseFactory.page(count, completeMessages);
     }
 
     @PostMapping
