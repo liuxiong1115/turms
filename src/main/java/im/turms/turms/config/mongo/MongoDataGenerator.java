@@ -106,6 +106,13 @@ public class MongoDataGenerator {
             final int USER_COUNT = 100;
             final Date now = new Date();
             List<Object> objects = new LinkedList<>();
+            Admin defaultAdmin = new Admin(
+                    "turms",
+                    passwordUtil.encodeAdminPassword("turms"),
+                    "turms",
+                    0L,
+                    EPOCH);
+            objects.add(defaultAdmin);
             for (int i = 1; i <= ADMIN_COUNT; i++) {
                 Admin admin = new Admin(
                         "account" + i,
