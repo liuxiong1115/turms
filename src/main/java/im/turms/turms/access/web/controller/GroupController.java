@@ -39,10 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -65,18 +62,17 @@ public class GroupController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.GROUP_QUERY)
-    public Mono<ResponseEntity> getGroupsInformation(
-            @RequestParam(required = false) Long id,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "0") Integer size
-    ) {
-        if (id != null) {
-            Mono<Group> group = groupService.queryGroupById(id);
-            return ResponseFactory.okWhenTruthy(group);
+    public Mono<ResponseEntity> queryGroupsInformation(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<Group> groupsFlux = groupService.queryGroups(ids, page, size);
+        if (page != null) {
+            Mono<Long> count = groupService.countGroups(ids);
+            return ResponseFactory.page(count, groupsFlux);
         } else {
-            size = pageUtil.getSize(size);
-            Flux<Group> groups = groupService.queryGroups(page, size);
-            return ResponseFactory.okWhenTruthy(groups);
+            return ResponseFactory.okIfTruthy(groupsFlux);
         }
     }
 
@@ -95,7 +91,7 @@ public class GroupController {
                 addGroupDTO.getTypeId(),
                 addGroupDTO.getMuteEndDate(),
                 addGroupDTO.getActive());
-        return ResponseFactory.okWhenTruthy(createdGroup);
+        return ResponseFactory.okIfTruthy(createdGroup);
     }
 
     @PutMapping
@@ -128,9 +124,17 @@ public class GroupController {
 
     @GetMapping("/types")
     @RequiredPermission(AdminPermission.GROUP_TYPE_QUERY)
-    public Mono<ResponseEntity> getGroupTypes() {
-        Flux<GroupType> groupTypes = groupTypeService.getGroupTypes();
-        return ResponseFactory.okWhenTruthy(groupTypes);
+    public Mono<ResponseEntity> queryGroupTypes(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<GroupType> groupTypesFlux = groupTypeService.queryGroupTypes(page, size);
+        if (page != null) {
+            Mono<Long> count = groupTypeService.countGroupTypes();
+            return ResponseFactory.page(count, groupTypesFlux);
+        } else {
+            return ResponseFactory.okIfTruthy(groupTypesFlux);
+        }
     }
 
     @PostMapping("/types")
@@ -146,7 +150,7 @@ public class GroupController {
                 addGroupTypeDTO.getSelfInfoUpdatable(),
                 addGroupTypeDTO.getEnableReadReceipt(),
                 addGroupTypeDTO.getMessageEditable());
-        return ResponseFactory.okWhenTruthy(addedGroupType);
+        return ResponseFactory.okIfTruthy(addedGroupType);
     }
 
     @PutMapping("/types")

@@ -21,6 +21,7 @@ import com.hazelcast.replicatedmap.ReplicatedMap;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.Constants;
+import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.AdminRole;
@@ -203,22 +204,34 @@ public class AdminRoleService {
             @Nullable Set<Long> ids,
             @Nullable Set<String> names,
             @Nullable Set<AdminPermission> includedPermissions,
-            @Nullable Set<Integer> ranks) {
-        Query query = new Query();
-        if (ids != null && !ids.isEmpty()) {
-            query.addCriteria(Criteria.where(ID).in(ids));
-        }
-        if (names != null && !names.isEmpty()) {
-            query.addCriteria(Criteria.where(AdminRole.Fields.name).in(names));
-        }
-        if (includedPermissions != null && !includedPermissions.isEmpty()) {
-            query.addCriteria(Criteria.where(AdminRole.Fields.permissions).in(includedPermissions));
-        }
-        if (ranks != null && !ranks.isEmpty()) {
-            query.addCriteria(Criteria.where(AdminRole.Fields.rank).in(ranks));
-        }
+            @Nullable Set<Integer> ranks,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addInIfNotNull(AdminRole.Fields.name, names)
+                .addInIfNotNull(AdminRole.Fields.permissions, includedPermissions)
+                .addInIfNotNull(AdminRole.Fields.rank, ranks)
+                .paginateIfNotNull(page, size);
         return Flux.from(mongoTemplate.find(query, AdminRole.class)
                 .concatWithValues(getRootRole()));
+    }
+
+    public Mono<Long> countAdminRoles(
+            @Nullable Set<Long> ids,
+            @Nullable Set<String> names,
+            @Nullable Set<AdminPermission> includedPermissions,
+            @Nullable Set<Integer> ranks) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addInIfNotNull(AdminRole.Fields.name, names)
+                .addInIfNotNull(AdminRole.Fields.permissions, includedPermissions)
+                .addInIfNotNull(AdminRole.Fields.rank, ranks)
+                .buildQuery();
+        return mongoTemplate.count(query, AdminRole.class)
+                .map(number -> number + 1);
     }
 
     public Flux<Integer> queryRanksByAccounts(@NotNull Set<String> accounts) {

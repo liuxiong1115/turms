@@ -67,22 +67,11 @@ public class MessageController {
             @RequestParam(required = false) Date deletionDateStart,
             @RequestParam(required = false) Date deletionDateEnd,
             @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "0") Integer size) {
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
         if (chatType == ChatType.UNRECOGNIZED) {
             return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST));
         }
-        Mono<Long> count = messageService.countMessages(
-                ids,
-                chatType,
-                areSystemMessages,
-                senderId,
-                targetId,
-                deliveryDateStart,
-                deliveryDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
-                deliveryStatus);
         Flux<Message> completeMessages = messageService.queryCompleteMessages(
                 false,
                 ids,
@@ -97,8 +86,22 @@ public class MessageController {
                 deliveryStatus,
                 page,
                 pageUtil.getSize(size));
-
-        return ResponseFactory.page(count, completeMessages);
+        if (page != null) {
+            Mono<Long> count = messageService.countMessages(
+                    ids,
+                    chatType,
+                    areSystemMessages,
+                    senderId,
+                    targetId,
+                    deliveryDateStart,
+                    deliveryDateEnd,
+                    deletionDateStart,
+                    deletionDateEnd,
+                    deliveryStatus);
+            return ResponseFactory.page(count, completeMessages);
+        } else {
+            return ResponseFactory.okIfTruthy(completeMessages);
+        }
     }
 
     @PostMapping

@@ -64,7 +64,7 @@ public class ResponseFactory {
     }
 
     public static Mono<ResponseEntity> withKey(String key, Mono data) {
-        return okWhenTruthy(
+        return okIfTruthy(
                 data.map(value -> Collections.singletonMap(key, value)),
                 true);
     }
@@ -107,23 +107,23 @@ public class ResponseFactory {
     }
 
     public static Mono<ResponseEntity> page(Mono<Long> total, Flux data) {
-        return okWhenTruthy(PageResult.getResult(total, data));
+        return okIfTruthy(PageResult.getResult(total, data));
     }
 
     public static ResponseEntity fail() {
         return entity(TurmsStatusCode.FAILED);
     }
 
-    public static Mono<ResponseEntity> okWhenTruthy(Flux data) {
-        return okWhenTruthy(data, true);
+    public static Mono<ResponseEntity> okIfTruthy(Flux data) {
+        return okIfTruthy(data, true);
     }
 
-    public static Mono<ResponseEntity> okWhenTruthy(Flux data, boolean passData) {
+    public static Mono<ResponseEntity> okIfTruthy(Flux data, boolean passData) {
         return data
                 .collectList()
                 .map(list -> {
                     if (((Collection) list).size() != 0) {
-                        return okWhenTruthy(list, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
+                        return okIfTruthy(list, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
                     } else {
                         return entity(TurmsStatusCode.NO_CONTENT);
                     }
@@ -131,12 +131,12 @@ public class ResponseFactory {
                 .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
     }
 
-    public static Mono<ResponseEntity> okWhenTruthy(Flux data, TurmsStatusCode failed) {
+    public static Mono<ResponseEntity> okIfTruthy(Flux data, TurmsStatusCode failed) {
         return data
                 .collectList()
                 .map(list -> {
                     if (((Collection) list).size() != 0) {
-                        return okWhenTruthy(list, true, TurmsStatusCode.OK, failed);
+                        return okIfTruthy(list, true, TurmsStatusCode.OK, failed);
                     } else {
                         return entity(TurmsStatusCode.NO_CONTENT);
                     }
@@ -144,40 +144,40 @@ public class ResponseFactory {
                 .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
     }
 
-    public static Mono<ResponseEntity> okWhenTruthy(Mono data) {
-        return okWhenTruthy(data, true);
+    public static Mono<ResponseEntity> okIfTruthy(Mono data) {
+        return okIfTruthy(data, true);
     }
 
-    public static Mono<ResponseEntity> okWhenTruthy(Mono data, boolean passData) {
+    public static Mono<ResponseEntity> okIfTruthy(Mono data, boolean passData) {
         return data
-                .map(item -> okWhenTruthy(item, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED))
+                .map(item -> okIfTruthy(item, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED))
                 .switchIfEmpty(code(TurmsStatusCode.NO_CONTENT))
                 .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
     }
 
-    public static Mono<ResponseEntity> okWhenTruthy(Mono data, boolean passData, TurmsStatusCode failed) {
+    public static Mono<ResponseEntity> okIfTruthy(Mono data, boolean passData, TurmsStatusCode failed) {
         return data
-                .map(item -> okWhenTruthy(item, passData, TurmsStatusCode.OK, failed))
+                .map(item -> okIfTruthy(item, passData, TurmsStatusCode.OK, failed))
                 .switchIfEmpty(code(TurmsStatusCode.NO_CONTENT))
                 .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
     }
 
-    public static Mono<ResponseEntity> okWhenTruthy(Mono data, TurmsStatusCode failed) {
+    public static Mono<ResponseEntity> okIfTruthy(Mono data, TurmsStatusCode failed) {
         return data
-                .map(item -> okWhenTruthy(item, true, TurmsStatusCode.OK, failed))
+                .map(item -> okIfTruthy(item, true, TurmsStatusCode.OK, failed))
                 .switchIfEmpty(code(TurmsStatusCode.NO_CONTENT))
                 .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
     }
 
-    public static ResponseEntity okWhenTruthy(Object data) {
-        return okWhenTruthy(data, true, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
+    public static ResponseEntity okIfTruthy(Object data) {
+        return okIfTruthy(data, true, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
     }
 
-    public static ResponseEntity okWhenTruthy(Object data, boolean passData) {
-        return okWhenTruthy(data, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
+    public static ResponseEntity okIfTruthy(Object data, boolean passData) {
+        return okIfTruthy(data, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
     }
 
-    public static ResponseEntity okWhenTruthy(Object data, boolean returnData, TurmsStatusCode ok, TurmsStatusCode failed) {
+    public static ResponseEntity okIfTruthy(Object data, boolean returnData, TurmsStatusCode ok, TurmsStatusCode failed) {
         if (data != null) {
             if (data instanceof Boolean) {
                 if ((boolean) data) {
@@ -224,13 +224,13 @@ public class ResponseFactory {
     }
 
     public static Mono<ResponseEntity> acknowledged(Mono<Boolean> data) {
-        return okWhenTruthy(
+        return okIfTruthy(
                 data.map(acknowledged -> Collections.singletonMap(ACKNOWLEDGED, acknowledged)),
                 true);
     }
 
     public static ResponseEntity acknowledged(Boolean data) {
-        return okWhenTruthy(Collections.singletonMap(ACKNOWLEDGED, data), true);
+        return okIfTruthy(Collections.singletonMap(ACKNOWLEDGED, data), true);
     }
 
     public static Mono<ResponseEntity> authenticated(Mono<Boolean> data) {
@@ -244,7 +244,7 @@ public class ResponseFactory {
     }
 
     public static ResponseEntity authenticated(Boolean data) {
-        return okWhenTruthy(Collections.singletonMap(AUTHENTICATED, data), true);
+        return okIfTruthy(Collections.singletonMap(AUTHENTICATED, data), true);
     }
 
     public static <T> Mono<ResponseEntity> collectCountResults(List<Mono<Pair<String, T>>> counts) {
@@ -252,6 +252,6 @@ public class ResponseFactory {
                 .collectMap(
                         (Function<? super Pair<String, T>, String>) Pair::getLeft,
                         (Function<? super Pair<String, T>, T>) Pair::getRight);
-        return okWhenTruthy(resultMono);
+        return okIfTruthy(resultMono);
     }
 }

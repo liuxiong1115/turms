@@ -20,6 +20,8 @@ package im.turms.turms.common;
 import im.turms.turms.cluster.TurmsClusterManager;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
+
 @Component
 public class PageUtil {
     private final TurmsClusterManager turmsClusterManager;
@@ -29,12 +31,14 @@ public class PageUtil {
     }
 
     // TODO: more options
-    public int getSize(int size) {
-        int maxReturnedRecordsPerRequest = turmsClusterManager.getTurmsProperties().getSecurity().getMaxReturnedRecordsPerRequest();
-        if (size <= 0) {
-            size = turmsClusterManager.getTurmsProperties().getSecurity().getDefaultReturnedRecordsPerRequest();
-        } else if (size > maxReturnedRecordsPerRequest) {
-            size = maxReturnedRecordsPerRequest;
+    public int getSize(@Nullable Integer size) {
+        if (size == null || size <= 0) {
+            return turmsClusterManager.getTurmsProperties().getSecurity().getDefaultReturnedRecordsPerRequest();
+        } else {
+            int maxLimit = turmsClusterManager.getTurmsProperties().getSecurity().getMaxReturnedRecordsPerRequest();
+            if (size > maxLimit) {
+                size = maxLimit;
+            }
         }
         return size;
     }

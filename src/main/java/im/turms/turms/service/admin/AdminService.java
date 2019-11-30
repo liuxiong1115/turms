@@ -263,8 +263,8 @@ public class AdminService {
             @Nullable Set<String> accounts,
             @Nullable Long roleId,
             boolean withPassword,
-            int page,
-            int size) {
+            @Nullable Integer page,
+            @Nullable Integer size) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, accounts)
                 .addIsIfNotNull(Admin.Fields.roleId, roleId)

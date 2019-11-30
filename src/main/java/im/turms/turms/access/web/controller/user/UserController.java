@@ -34,6 +34,7 @@ import im.turms.turms.pojo.domain.UserLocation;
 import im.turms.turms.pojo.dto.AddUserDTO;
 import im.turms.turms.pojo.dto.UpdateOnlineStatusDTO;
 import im.turms.turms.pojo.dto.UpdateUserDTO;
+import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.group.GroupService;
 import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.user.UserService;
@@ -59,12 +60,13 @@ public class UserController {
     private final OnlineUserService onlineUserService;
     private final UsersNearbyService usersNearbyService;
     private final GroupService groupService;
+    private final GroupMemberService groupMemberService;
     private final MessageService messageService;
     private final TurmsClusterManager turmsClusterManager;
     private final PageUtil pageUtil;
     private final DateTimeUtil dateTimeUtil;
 
-    public UserController(UserService userService, OnlineUserService onlineUserService, GroupService groupService, PageUtil pageUtil, UsersNearbyService usersNearbyService, MessageService messageService, DateTimeUtil dateTimeUtil, TurmsClusterManager turmsClusterManager) {
+    public UserController(UserService userService, OnlineUserService onlineUserService, GroupService groupService, PageUtil pageUtil, UsersNearbyService usersNearbyService, MessageService messageService, DateTimeUtil dateTimeUtil, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService) {
         this.userService = userService;
         this.onlineUserService = onlineUserService;
         this.groupService = groupService;
@@ -73,33 +75,31 @@ public class UserController {
         this.messageService = messageService;
         this.dateTimeUtil = dateTimeUtil;
         this.turmsClusterManager = turmsClusterManager;
+        this.groupMemberService = groupMemberService;
     }
 
     @GetMapping
     @RequiredPermission(AdminPermission.USER_QUERY)
     public Mono<ResponseEntity> queryUsers(
             @RequestParam(required = false) Set<Long> userIds,
-            @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Date registrationDateStart,
             @RequestParam(required = false) Date registrationDateEnd,
             @RequestParam(required = false) Date deletionDateStart,
             @RequestParam(required = false) Date deletionDateEnd,
             @RequestParam(required = false) Boolean active,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "0") int size) {
-        if (userId != null) {
-            return ResponseFactory.okWhenTruthy(userService.queryUser(userId));
-        } else {
-            size = pageUtil.getSize(size);
-            Flux<User> users = userService.queryUsers(
-                    userIds,
-                    registrationDateStart,
-                    registrationDateEnd,
-                    deletionDateStart,
-                    deletionDateEnd,
-                    active,
-                    page,
-                    size);
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<User> usersFlux = userService.queryUsers(
+                userIds,
+                registrationDateStart,
+                registrationDateEnd,
+                deletionDateStart,
+                deletionDateEnd,
+                active,
+                page,
+                size);
+        if (page != null) {
             Mono<Long> count = userService.countUsers(
                     userIds,
                     registrationDateStart,
@@ -107,7 +107,9 @@ public class UserController {
                     deletionDateStart,
                     deletionDateEnd,
                     active);
-            return ResponseFactory.page(count, users);
+            return ResponseFactory.page(count, usersFlux);
+        } else {
+            return ResponseFactory.okIfTruthy(usersFlux);
         }
     }
 
@@ -123,7 +125,7 @@ public class UserController {
                 addUserDTO.getProfileAccess(),
                 addUserDTO.getRegistrationDate(),
                 addUserDTO.getActive());
-        return ResponseFactory.okWhenTruthy(addUser);
+        return ResponseFactory.okIfTruthy(addUser);
     }
 
     @DeleteMapping
@@ -293,14 +295,14 @@ public class UserController {
                 });
                 queryUsers.add(queryInfo);
             }
-            return ResponseFactory.okWhenTruthy(Flux.merge(queryUsers));
+            return ResponseFactory.okIfTruthy(Flux.merge(queryUsers));
         } else {
             if (number > turmsClusterManager.getTurmsProperties().getSecurity()
                     .getMaxQueryOnlineUsersStatusPerRequest()) {
                 throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
             }
             Flux<UserOnlineInfo> userOnlineInfoFlux = onlineUserService.queryUserOnlineInfos(number);
-            return ResponseFactory.okWhenTruthy(userOnlineInfoFlux);
+            return ResponseFactory.okIfTruthy(userOnlineInfoFlux);
         }
     }
 
@@ -321,31 +323,40 @@ public class UserController {
         } else {
             updated = onlineUserService.updateOnlineUserStatus(userId, onlineStatus);
         }
-        return ResponseFactory.okWhenTruthy(updated);
+        return ResponseFactory.okIfTruthy(updated);
     }
 
     @GetMapping("/users-nearby")
     @RequiredPermission(AdminPermission.USER_QUERY)
-    public Mono<ResponseEntity> getUsersNearby(
+    public Mono<ResponseEntity> queryUsersNearby(
             @RequestParam Long userId,
             @RequestParam(required = false) DeviceType deviceType,
             @RequestParam(required = false) Integer maxPeopleNumber,
             @RequestParam(required = false) Double maxDistance) {
         Flux<User> usersNearby = usersNearbyService.queryUsersProfilesNearby(userId, deviceType, maxPeopleNumber, maxDistance);
-        return ResponseFactory.okWhenTruthy(usersNearby);
+        return ResponseFactory.okIfTruthy(usersNearby);
     }
 
     @GetMapping("/locations")
     @RequiredPermission(AdminPermission.USER_QUERY)
-    public ResponseEntity getUserLocations(@RequestParam Long userId) {
+    public ResponseEntity queryUserLocations(@RequestParam Long userId) {
         SortedSet<UserLocation> userLocations = onlineUserService.getUserLocations(userId);
-        return ResponseFactory.okWhenTruthy(userLocations);
+        return ResponseFactory.okIfTruthy(userLocations);
     }
 
     @GetMapping("/groups")
     @RequiredPermission(AdminPermission.USER_QUERY)
-    public Mono<ResponseEntity> getUserJoinedGroup(@RequestParam Long userId) {
-        Flux<Group> groups = groupService.queryUserJoinedGroup(userId);
-        return ResponseFactory.okWhenTruthy(groups);
+    public Mono<ResponseEntity> queryUserJoinedGroups(
+            @RequestParam Long userId,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<Group> groupsFlux = groupService.queryUserJoinedGroups(userId, page, size);
+        if (page != null) {
+            Mono<Long> count = groupMemberService.countUserJoinedGroupsIds(userId);
+            return ResponseFactory.page(count, groupsFlux);
+        } else {
+            return ResponseFactory.okIfTruthy(groupsFlux);
+        }
     }
 }

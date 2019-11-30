@@ -83,7 +83,7 @@ public class AdminController {
                 addAdminDTO.getName(),
                 new Date(),
                 false);
-        return ResponseFactory.okWhenTruthy(generatedAdmin);
+        return ResponseFactory.okIfTruthy(generatedAdmin);
     }
 
     @DeleteMapping
@@ -114,19 +114,17 @@ public class AdminController {
     @RequiredPermission(ADMIN_QUERY)
     public Mono<ResponseEntity> queryAdmins(
             @RequestParam(required = false) Set<String> accounts,
-            @RequestParam(required = false) String account,
             @RequestParam(required = false) Long roleId,
             @RequestParam(defaultValue = "false") boolean withPassword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "0") int size) {
-        if (StringUtils.hasText(account)) {
-            Mono<Admin> getAdmin = adminService.queryAdmin(account, withPassword);
-            return ResponseFactory.okWhenTruthy(getAdmin);
-        } else {
-            size = pageUtil.getSize(size);
-            Flux<Admin> admins = adminService.queryAdmins(accounts, roleId, withPassword, page, size);
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<Admin> admins = adminService.queryAdmins(accounts, roleId, withPassword, page, size);
+        if (page != null) {
             Mono<Long> total = adminService.countAdmins(accounts, roleId);
             return ResponseFactory.page(total, admins);
+        } else {
+            return ResponseFactory.okIfTruthy(admins);
         }
     }
 }

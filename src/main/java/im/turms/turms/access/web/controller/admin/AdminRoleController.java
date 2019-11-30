@@ -19,6 +19,7 @@ package im.turms.turms.access.web.controller.admin;
 
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
+import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.AdminRole;
@@ -38,9 +39,11 @@ import java.util.Set;
 @RequestMapping("/admins/roles")
 public class AdminRoleController {
     private final AdminRoleService adminRoleService;
+    private final PageUtil pageUtil;
 
-    public AdminRoleController(AdminRoleService adminRoleService) {
+    public AdminRoleController(AdminRoleService adminRoleService, PageUtil pageUtil) {
         this.adminRoleService = adminRoleService;
+        this.pageUtil = pageUtil;
     }
 
     @PostMapping
@@ -50,7 +53,7 @@ public class AdminRoleController {
                 && !CollectionUtils.isEmpty(addAdminRoleDTO.getPermissions())
                 && StringUtils.hasText(addAdminRoleDTO.getName())
                 && addAdminRoleDTO.getRank() != null) {
-            return ResponseFactory.okWhenTruthy(adminRoleService.addAdminRole(
+            return ResponseFactory.okIfTruthy(adminRoleService.addAdminRole(
                     addAdminRoleDTO.getId(),
                     addAdminRoleDTO.getName(),
                     addAdminRoleDTO.getPermissions(),
@@ -92,12 +95,26 @@ public class AdminRoleController {
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> names,
             @RequestParam(required = false) Set<AdminPermission> includedPermissions,
-            @RequestParam(required = false) Set<Integer> ranks) {
-        Flux<AdminRole> queryAdminRoles = adminRoleService.queryAdminRoles(
+            @RequestParam(required = false) Set<Integer> ranks,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<AdminRole> adminRolesFlux = adminRoleService.queryAdminRoles(
                 ids,
                 names,
                 includedPermissions,
-                ranks);
-        return ResponseFactory.okWhenTruthy(queryAdminRoles);
+                ranks,
+                page,
+                size);
+        if (page != null) {
+            Mono<Long> count = adminRoleService.countAdminRoles(
+                    ids,
+                    names,
+                    includedPermissions,
+                    ranks);
+            return ResponseFactory.page(count, adminRolesFlux);
+        } else {
+            return ResponseFactory.okIfTruthy(adminRolesFlux);
+        }
     }
 }
