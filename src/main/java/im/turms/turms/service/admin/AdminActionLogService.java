@@ -90,22 +90,18 @@ public class AdminActionLogService {
                 .map(DeleteResult::wasAcknowledged);
     }
 
-    public Flux<AdminActionLog> getAdminActionLogs(
+    public Flux<AdminActionLog> queryAdminActionLogs(
             @Nullable Set<Long> ids,
             @Nullable Set<String> accounts,
-            @Nullable Date actionDateStart,
-            @Nullable Date actionDateEnd,
-            int page,
-            int size) {
+            @Nullable Date logDateStart,
+            @Nullable Date logDateEnd,
+            @Nullable Integer page,
+            @Nullable Integer size) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, actionDateStart, actionDateEnd)
+                .addInIfNotNull(ID, ids)
+                .addInIfNotNull(AdminActionLog.Fields.account, accounts)
+                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateStart, logDateEnd)
                 .paginateIfNotNull(page, size);
-        if (ids != null && !ids.isEmpty()) {
-            query.addCriteria(Criteria.where(ID).in(ids));
-        }
-        if (accounts != null && !accounts.isEmpty()) {
-            query.addCriteria(Criteria.where(AdminActionLog.Fields.account).in(accounts));
-        }
         return mongoTemplate.find(query, AdminActionLog.class);
     }
 
@@ -138,5 +134,18 @@ public class AdminActionLogService {
         for (LogHandler logHandler : turmsPluginManager.getLogHandlerList()) {
             logHandler.handleAdminActionLog(exchange, log);
         }
+    }
+
+    public Mono<Long> countAdminActionLogs(
+            @Nullable Set<Long> ids,
+            @Nullable Set<String> accounts,
+            @Nullable Date logDateStart,
+            @Nullable Date logDateEnd) {
+        Query query = QueryBuilder.newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addInIfNotNull(AdminActionLog.Fields.account, accounts)
+                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateStart, logDateEnd)
+                .buildQuery();
+        return mongoTemplate.count(query, AdminActionLog.class);
     }
 }

@@ -21,6 +21,7 @@ import com.hazelcast.replicatedmap.ReplicatedMap;
 import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.GroupInvitationStrategy;
 import im.turms.turms.constant.GroupJoinStrategy;
@@ -76,8 +77,18 @@ public class GroupTypeService {
         };
     }
 
-    public Flux<GroupType> getGroupTypes() {
-        return mongoTemplate.findAll(GroupType.class);
+    public GroupType getDefaultGroupType() {
+        return groupTypeMap.get(DEFAULT_GROUP_TYPE_ID);
+    }
+
+    public Flux<GroupType> queryGroupTypes(
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .paginateIfNotNull(page, size);
+        return mongoTemplate.find(query, GroupType.class)
+                .concatWithValues(getDefaultGroupType());
     }
 
     public Mono<GroupType> addGroupType(
@@ -180,8 +191,8 @@ public class GroupTypeService {
                 .map(Group::getTypeId);
     }
 
-    public Mono<GroupType> queryGroupTypeByGroupId(@NotNull Long groupId) {
-        return queryGroupTypeIdByGroupId(groupId)
-                .flatMap(this::queryGroupType);
+    public Mono<Long> countGroupTypes() {
+        return mongoTemplate.count(new Query(), GroupType.class)
+                .map(number -> number + 1);
     }
 }

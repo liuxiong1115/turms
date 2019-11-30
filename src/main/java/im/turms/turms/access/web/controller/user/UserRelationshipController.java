@@ -19,6 +19,7 @@ package im.turms.turms.access.web.controller.user;
 
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
+import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.UserRelationship;
@@ -38,9 +39,11 @@ import static im.turms.turms.common.Constants.DEFAULT_RELATIONSHIP_GROUP_INDEX;
 @RequestMapping("/users/relationships")
 public class UserRelationshipController {
     private final UserRelationshipService userRelationshipService;
+    private final PageUtil pageUtil;
 
-    public UserRelationshipController(UserRelationshipService userRelationshipService) {
+    public UserRelationshipController(UserRelationshipService userRelationshipService, PageUtil pageUtil) {
         this.userRelationshipService = userRelationshipService;
+        this.pageUtil = pageUtil;
     }
 
     @PostMapping
@@ -85,19 +88,24 @@ public class UserRelationshipController {
         }
     }
 
-    //TODO: pagify
     @GetMapping
     @RequiredPermission(AdminPermission.USER_RELATIONSHIP_QUERY)
     public Mono<ResponseEntity> getRelationships(
             @RequestParam Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
             @RequestParam(required = false) Integer groupIndex,
-            @RequestParam(required = false) Boolean blocked
-//            @RequestParam(defaultValue = "0") Integer page,
-//            @RequestParam(defaultValue = "0") Integer size
-    ) {
-        Flux<UserRelationship> relationships = userRelationshipService.queryRelationships(
-                ownerId, relatedUsersIds, groupIndex, blocked);
-        return ResponseFactory.okWhenTruthy(relationships, true);
+            @RequestParam(required = false) Boolean isBlocked,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
+                ownerId, relatedUsersIds, groupIndex, isBlocked, page, size);
+        if (page != null) {
+            Mono<Long> count = userRelationshipService.countRelationships(
+                    ownerId, relatedUsersIds, groupIndex, isBlocked);
+            return ResponseFactory.page(count, relationshipsFlux);
+        } else {
+            return ResponseFactory.okIfTruthy(relationshipsFlux);
+        }
     }
 }

@@ -34,7 +34,6 @@ import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.pojo.domain.GroupType;
 import im.turms.turms.service.user.UserVersionService;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -50,6 +49,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -215,8 +215,14 @@ public class GroupService {
                 });
     }
 
-    public Flux<Group> queryGroups(@NotNull Integer page, @NotNull Integer size) {
-        Query query = new Query().with(PageRequest.of(page, size));
+    public Flux<Group> queryGroups(
+            @Nullable Set<Long> ids,
+            @NotNull Integer page,
+            @NotNull Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, Group.class);
     }
 
@@ -386,9 +392,12 @@ public class GroupService {
         return mongoTemplate.count(query, Group.class);
     }
 
-    public Flux<Group> queryUserJoinedGroup(@NotNull Long userId) {
+    public Flux<Group> queryUserJoinedGroups(
+            @NotNull Long userId,
+            @NotNull Integer page,
+            @NotNull Integer size) {
         return groupMemberService
-                .queryUserJoinedGroupsIds(userId)
+                .queryUserJoinedGroupsIds(userId, page, size)
                 .collectList()
                 .flatMapMany(groupsIds -> {
                     if (groupsIds.isEmpty()) {
@@ -619,8 +628,12 @@ public class GroupService {
         return mongoTemplate.count(query, Group.class);
     }
 
-    public Mono<Long> countGroups() {
-        return mongoTemplate.count(new Query(), Group.class);
+    public Mono<Long> countGroups(@Nullable Set<Long> ids) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .buildQuery();
+        return mongoTemplate.count(query, Group.class);
     }
 
     public Mono<Long> countDeletedGroups(
@@ -653,6 +666,7 @@ public class GroupService {
 
     public Mono<Boolean> isGroupActive(@NotNull Long groupId) {
         Query query = new Query()
+                .addCriteria(Criteria.where(ID).is(groupId))
                 .addCriteria(Criteria.where(Group.Fields.active).is(true));
         return mongoTemplate.exists(query, Group.class);
     }

@@ -45,14 +45,14 @@ public class ClusterController {
     @RequiredPermission(AdminPermission.CLUSTER_CONFIG_QUERY)
     public ResponseEntity getClusterInfo(@RequestParam(defaultValue = "false") boolean withConfigs) {
         Map<String, Object> clusterInfo = turmsClusterManager.getClusterInfo(withConfigs);
-        return ResponseFactory.okWhenTruthy(clusterInfo);
+        return ResponseFactory.okIfTruthy(clusterInfo);
     }
 
     @GetMapping("/server")
     @RequiredPermission(AdminPermission.NONE)
     public ResponseEntity getServerHost(@RequestParam Long userId) {
         String host = turmsClusterManager.getMemberByUserId(userId).getAddress().getHost();
-        return ResponseFactory.okWhenTruthy(host);
+        return ResponseFactory.okIfTruthy(host);
     }
 
     @GetMapping("/config")
@@ -61,12 +61,12 @@ public class ClusterController {
         TurmsProperties properties = turmsClusterManager.getTurmsProperties();
         if (mutable) {
             try {
-                return ResponseFactory.okWhenTruthy(TurmsProperties.getMutableProperties(turmsClusterManager.getTurmsProperties()));
+                return ResponseFactory.okIfTruthy(TurmsProperties.getMutableProperties(turmsClusterManager.getTurmsProperties()));
             } catch (IOException e) {
                 return ResponseFactory.entity(TurmsStatusCode.SERVER_INTERNAL_ERROR);
             }
         } else {
-            return ResponseFactory.okWhenTruthy(properties);
+            return ResponseFactory.okIfTruthy(properties);
         }
     }
 
@@ -82,6 +82,6 @@ public class ClusterController {
         turmsClusterManager.updateProperties(mergedProperties);
         userSimultaneousLoginService.applyStrategy(
                 mergedProperties.getUser().getSimultaneousLogin().getStrategy());
-        return ResponseFactory.okWhenTruthy(mergedProperties);
+        return ResponseFactory.okIfTruthy(mergedProperties);
     }
 }

@@ -144,17 +144,16 @@ public class UserRelationshipService {
                 .single();
     }
 
-    private Flux<UserRelationship> queryRelationships(@NotEmpty Set<Long> ownersIds) {
-        Query query = new Query().addCriteria(Criteria.where(ID_OWNER_ID).in(ownersIds));
-        return mongoTemplate.find(query, UserRelationship.class);
-    }
-
-    private Flux<Long> queryRelatedUsersIds(
+    private Flux<Long> queryMembersRelatedUsersIds(
             @NotNull Long ownerId,
-            @NotNull Integer groupIndex) {
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
-                .addCriteria(Criteria.where(ID_GROUP_INDEX).is(groupIndex));
+            @NotNull Integer groupIndex,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addIsIfNotNull(ID_OWNER_ID, ownerId)
+                .addIsIfNotNull(ID_GROUP_INDEX, groupIndex)
+                .paginateIfNotNull(page, size);
         query.fields().include(ID_RELATED_USER_ID);
         return mongoTemplate.find(query, UserRelationshipGroupMember.class)
                 .map(member -> member.getKey().getRelatedUserId());
@@ -169,7 +168,7 @@ public class UserRelationshipService {
                 .defaultIfEmpty(MAX_DATE)
                 .flatMap(date -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
-                        return queryRelatedUsersIds(ownerId, groupIndex, isBlocked)
+                        return queryMembersRelatedUsersIds(ownerId, groupIndex, isBlocked)
                                 .collect(Collectors.toSet())
                                 .map(ids -> Int64ValuesWithVersion.newBuilder()
                                         .setLastUpdatedDate(Int64Value.newBuilder().setValue(date.getTime()).build())
@@ -191,7 +190,7 @@ public class UserRelationshipService {
                 .defaultIfEmpty(MAX_DATE)
                 .flatMap(date -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
-                        return queryRelationships(ownerId, relatedUsersIds, groupIndex, isBlocked)
+                        return queryRelationships(ownerId, relatedUsersIds, groupIndex, isBlocked, null, null)
                                 .collect(Collectors.toSet())
                                 .map(relationships -> {
                                     UserRelationshipsWithVersion.Builder builder = UserRelationshipsWithVersion.newBuilder();
@@ -220,34 +219,37 @@ public class UserRelationshipService {
                 .map(userRelationship -> userRelationship.getKey().getRelatedUserId());
     }
 
-    public Flux<Long> queryRelatedUsersIds(
+    public Flux<Long> queryMembersRelatedUsersIds(
             @NotNull Long ownerId,
             @Nullable Integer groupIndex,
             @Nullable Boolean isBlocked) {
         if (groupIndex != null && isBlocked != null) {
             return Mono.zip(
-                    queryRelatedUsersIds(ownerId, groupIndex).collect(Collectors.toSet()),
+                    queryMembersRelatedUsersIds(ownerId, groupIndex, null, null).collect(Collectors.toSet()),
                     queryRelatedUsersIds(ownerId, isBlocked).collect(Collectors.toSet()))
                     .flatMapIterable(tuple -> {
                         tuple.getT1().retainAll(tuple.getT2());
                         return tuple.getT1();
                     });
         } else if (groupIndex != null) {
-            return queryRelatedUsersIds(ownerId, groupIndex);
+            return queryMembersRelatedUsersIds(ownerId, groupIndex, null, null);
         } else {
             return queryRelatedUsersIds(ownerId, isBlocked);
         }
     }
 
-    private Flux<UserRelationship> queryRelationshipsWithoutGroupIndex(
+    private Flux<UserRelationship> queryRelationships(
             @NotNull Long ownerId,
             @Nullable Set<Long> relatedUsersIds,
-            @Nullable Boolean isBlocked) {
-        QueryBuilder builder = QueryBuilder.newBuilder()
+            @Nullable Boolean isBlocked,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder.newBuilder()
                 .add(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
-                .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked);
-        return mongoTemplate.find(builder.buildQuery(), UserRelationship.class);
+                .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
+                .paginateIfNotNull(page, size);
+        return mongoTemplate.find(query, UserRelationship.class);
     }
 
     public Mono<UserRelationship> queryRelationship(
@@ -263,20 +265,96 @@ public class UserRelationshipService {
             @NotNull Long ownerId,
             @Nullable Set<Long> relatedUsersIds,
             @Nullable Integer groupIndex,
-            @Nullable Boolean isBlocked) {
-        if (groupIndex != null && (relatedUsersIds != null || isBlocked != null)) {
-            return Mono.zip(
-                    queryRelatedUsersIds(ownerId, groupIndex).collect(Collectors.toSet()),
-                    queryRelationshipsWithoutGroupIndex(ownerId, relatedUsersIds, isBlocked).collect(Collectors.toSet()))
-                    .flatMapIterable(results -> results.getT2().stream()
-                            .filter(userRelationship -> results.getT1().contains(userRelationship.getKey().getRelatedUserId()))
-                            .collect(Collectors.toSet()));
-        } else if (groupIndex != null) {
-            return queryRelatedUsersIds(ownerId, groupIndex).collect(Collectors.toSet())
-                    .flatMapMany(this::queryRelationships);
+            @Nullable Boolean isBlocked,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        boolean queryByGroup = groupIndex != null;
+        boolean queryByRelationshipInfo = relatedUsersIds != null || isBlocked != null;
+        if (queryByGroup && queryByRelationshipInfo) {
+            if (relatedUsersIds != null && relatedUsersIds.isEmpty()) {
+                return Flux.empty();
+            }
+            return queryMembersRelatedUsersIds(ownerId, groupIndex, null, null)
+                    .collect(Collectors.toSet())
+                    .flatMapMany(usersIds -> {
+                        if (relatedUsersIds != null) {
+                            usersIds.retainAll(relatedUsersIds);
+                        }
+                        return queryRelationships(ownerId, usersIds, isBlocked, page, size);
+                    });
+        } else if (queryByGroup) {
+            return queryMembersRelationships(ownerId, groupIndex, page, size);
         } else {
-            return queryRelationshipsWithoutGroupIndex(ownerId, relatedUsersIds, isBlocked);
+            return queryRelationships(ownerId, relatedUsersIds, isBlocked, page, size);
         }
+    }
+
+    public Flux<UserRelationship> queryMembersRelationships(
+            @NotNull Long ownerId,
+            @NotNull Integer groupIndex,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        return queryMembersRelatedUsersIds(ownerId, groupIndex, null)
+                .collect(Collectors.toSet())
+                .flatMapMany(relatedUsersIds -> {
+                    if (relatedUsersIds.isEmpty()) {
+                        return Flux.empty();
+                    }
+                    Query query = QueryBuilder
+                            .newBuilder()
+                            .addIsIfNotNull(ID_OWNER_ID, ownerId)
+                            .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
+                            .paginateIfNotNull(page, size);
+                    return mongoTemplate.find(query, UserRelationship.class);
+                });
+    }
+
+    public Mono<Long> countRelationships(
+            @NotNull Long ownerId,
+            @Nullable Set<Long> relatedUsersIds,
+            @Nullable Integer groupIndex,
+            @Nullable Boolean isBlocked) {
+        boolean queryByGroup = groupIndex != null;
+        boolean queryByRelationshipInfo = relatedUsersIds != null || isBlocked != null;
+        if (queryByGroup && queryByRelationshipInfo) {
+            if (relatedUsersIds != null && relatedUsersIds.isEmpty()) {
+                return Mono.just(0L);
+            }
+            return queryMembersRelatedUsersIds(ownerId, groupIndex, null, null)
+                    .collect(Collectors.toSet())
+                    .flatMap(usersIds -> {
+                        if (relatedUsersIds != null) {
+                            usersIds.retainAll(relatedUsersIds);
+                        }
+                        return countRelationships(ownerId, usersIds, isBlocked);
+                    });
+        } else if (queryByGroup) {
+            return countMembersRelationships(ownerId, groupIndex);
+        } else {
+            return countRelationships(ownerId, relatedUsersIds, isBlocked);
+        }
+    }
+
+    private Mono<Long> countMembersRelationships(
+            @NotNull Long ownerId,
+            @NotNull Integer groupIndex) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
+                .addCriteria(Criteria.where(ID_GROUP_INDEX).is(groupIndex));
+        return mongoTemplate.count(query, UserRelationshipGroupMember.class);
+    }
+
+    public Mono<Long> countRelationships(
+            @NotNull Long ownerId,
+            @NotNull Set<Long> relatedUsersIds,
+            @NotNull Boolean isBlocked) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addIsIfNotNull(ID_OWNER_ID, ownerId)
+                .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
+                .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
+                .buildQuery();
+        return mongoTemplate.count(query, UserRelationship.class);
     }
 
     public Mono<Boolean> friendTwoUsers(

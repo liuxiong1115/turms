@@ -97,8 +97,8 @@ public class QueryBuilder {
         return this;
     }
 
-    public Query paginateIfNotNull(Integer page, Integer size) {
-        if (page != null && size != null) {
+    public Query paginateIfNotNull(@Nullable Integer page, @Nullable Integer size) {
+        if (size != null) {
             buildReadyCriteria();
             Query query;
             if (finalCriteria != null) {
@@ -106,23 +106,29 @@ public class QueryBuilder {
             } else {
                 query = new Query();
             }
+            if (page == null) {
+                page = 0;
+            }
             return query.with(PageRequest.of(page, size));
         } else {
             return buildQuery();
         }
     }
 
-    public Query paginateIfNotNull(Integer page, Integer size, @Nullable Sort.Direction direction) {
+    public Query paginateIfNotNull(@Nullable Integer page, @Nullable Integer size, @Nullable Sort.Direction direction) {
         if (direction == null) {
             return paginateIfNotNull(page, size);
         } else {
-            if (page != null && size != null) {
+            if (size != null) {
                 buildReadyCriteria();
                 Query query;
                 if (finalCriteria != null) {
                     query = new Query(finalCriteria);
                 } else {
                     query = new Query();
+                }
+                if (page == null) {
+                    page = 0;
                 }
                 return query.with(PageRequest.of(page, size, direction));
             } else {

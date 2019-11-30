@@ -369,13 +369,11 @@ public class UserService {
             @Nullable Date deletionDateStart,
             @Nullable Date deletionDateEnd,
             @Nullable Boolean active,
-            int page,
-            int size) {
-        QueryBuilder builder = QueryBuilder.newBuilder();
-        if (userIds != null && !userIds.isEmpty()) {
-            builder.add(Criteria.where(ID).in(userIds));
-        }
-        Query query = builder
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, userIds)
                 .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateStart, registrationDateEnd)
                 .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateStart, deletionDateEnd)
                 .addIsIfNotNull(User.Fields.active, active)
@@ -423,19 +421,11 @@ public class UserService {
             @Nullable Boolean active) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addBetweenIfNotNull(
-                        User.Fields.registrationDate,
-                        registrationDateStart,
-                        registrationDateEnd)
-                .addBetweenIfNotNull(
-                        User.Fields.deletionDate,
-                        deletionDateStart,
-                        deletionDateEnd)
+                .addInIfNotNull(ID, userIds)
+                .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateStart, registrationDateEnd)
+                .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateStart, deletionDateEnd)
                 .addIsIfNotNull(User.Fields.active, active)
                 .buildQuery();
-        if (userIds != null) {
-            query.addCriteria(Criteria.where(ID).in(userIds));
-        }
         return mongoTemplate.count(query, User.class);
     }
 

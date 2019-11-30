@@ -20,6 +20,7 @@ package im.turms.turms.service.group;
 import com.google.protobuf.Int64Value;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.GroupInvitationStrategy;
@@ -366,20 +367,24 @@ public class GroupMemberService {
                 .defaultIfEmpty(false);
     }
 
-    public Flux<Long> queryUserJoinedGroupsIds(@NotNull Long userId) {
-        Query query = new Query().addCriteria(Criteria.where(ID_USER_ID).is(userId));
+    public Flux<Long> queryUserJoinedGroupsIds(
+            @NotNull Long userId,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addIsIfNotNull(ID_USER_ID, userId)
+                .paginateIfNotNull(page, size);
         query.fields().include(ID_GROUP_ID);
         return mongoTemplate.find(query, GroupMember.class)
                 .map(groupMember -> groupMember.getKey().getGroupId());
     }
 
     public Mono<Set<Long>> queryUserJoinedGroupsMembersIds(@NotNull Long userId) {
-        return queryUserJoinedGroupsIds(userId)
+        return queryUserJoinedGroupsIds(userId, null, null)
                 .collect(Collectors.toSet())
-                .flatMap(groupsIds -> {
-                    return queryGroupMembersIds(groupsIds)
-                            .collect(Collectors.toSet());
-                });
+                .flatMap(groupsIds -> queryGroupMembersIds(groupsIds)
+                        .collect(Collectors.toSet()));
     }
 
     //TODO: Creatable group types for admins
@@ -589,5 +594,10 @@ public class GroupMemberService {
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).is(userId));
         return mongoTemplate.exists(query, GroupMember.class);
+    }
+
+    public Mono<Long> countUserJoinedGroupsIds(@NotNull Long userId) {
+        Query query = new Query().addCriteria(Criteria.where(ID_USER_ID).is(userId));
+        return mongoTemplate.count(query, GroupMember.class);
     }
 }

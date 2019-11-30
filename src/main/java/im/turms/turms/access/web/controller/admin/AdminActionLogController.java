@@ -61,16 +61,22 @@ public class AdminActionLogController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.ADMIN_ACTION_LOG_QUERY)
-    public Mono<ResponseEntity> getAdminActionLogs(
+    public Mono<ResponseEntity> queryAdminActionLogs(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> accounts,
-            @RequestParam(required = false) Date startDate,
-            @RequestParam(required = false) Date endDate,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "0") int size) {
+            @RequestParam(required = false) Date logDateStart,
+            @RequestParam(required = false) Date logDateEnd,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Flux<AdminActionLog> adminActionLogs = adminActionLogService
-                .getAdminActionLogs(ids, accounts, startDate, endDate, page, size);
-        return ResponseFactory.okWhenTruthy(adminActionLogs);
+        Flux<AdminActionLog> adminActionLogsFlux = adminActionLogService
+                .queryAdminActionLogs(ids, accounts, logDateStart, logDateEnd, page, size);
+        if (page != null) {
+            Mono<Long> count = adminActionLogService
+                    .countAdminActionLogs(ids, accounts, logDateStart, logDateEnd);
+            return ResponseFactory.page(count, adminActionLogsFlux);
+        } else {
+            return ResponseFactory.okIfTruthy(adminActionLogsFlux);
+        }
     }
 }
