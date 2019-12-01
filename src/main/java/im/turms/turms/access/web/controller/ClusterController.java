@@ -22,10 +22,14 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.dto.ResponseDTO;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserSimultaneousLoginService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -41,33 +45,33 @@ public class ClusterController {
         this.userSimultaneousLoginService = userSimultaneousLoginService;
     }
 
-    @GetMapping
+    @GetMapping("/hazelcast-info")
     @RequiredPermission(AdminPermission.CLUSTER_CONFIG_QUERY)
-    public ResponseEntity getClusterInfo(@RequestParam(defaultValue = "false") boolean withConfigs) {
-        Map<String, Object> clusterInfo = turmsClusterManager.getClusterInfo(withConfigs);
-        return ResponseFactory.okIfTruthy(clusterInfo);
-    }
-
-    @GetMapping("/server")
-    @RequiredPermission(AdminPermission.NONE)
-    public ResponseEntity getServerHost(@RequestParam Long userId) {
-        String host = turmsClusterManager.getMemberByUserId(userId).getAddress().getHost();
-        return ResponseFactory.okIfTruthy(host);
+    public ResponseEntity<ResponseDTO<Map>> queryHazelcastInfo(@RequestParam(defaultValue = "false") boolean withConfigs) {
+        Map<String, ?> hazelcastInfo = turmsClusterManager.getHazelcastInfo(withConfigs);
+        return ResponseFactory.okIfTruthy(hazelcastInfo);
     }
 
     @GetMapping("/config")
     @RequiredPermission(AdminPermission.CLUSTER_CONFIG_QUERY)
-    public ResponseEntity getClusterConfig(@RequestParam(defaultValue = "false") boolean mutable) {
+    public ResponseEntity<ResponseDTO<TurmsProperties>> queryClusterConfig(@RequestParam(defaultValue = "false") boolean mutable) {
         TurmsProperties properties = turmsClusterManager.getTurmsProperties();
         if (mutable) {
             try {
                 return ResponseFactory.okIfTruthy(TurmsProperties.getMutableProperties(turmsClusterManager.getTurmsProperties()));
             } catch (IOException e) {
-                return ResponseFactory.entity(TurmsStatusCode.SERVER_INTERNAL_ERROR);
+                throw TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR);
             }
         } else {
             return ResponseFactory.okIfTruthy(properties);
         }
+    }
+
+    @GetMapping("/server")
+    @RequiredPermission(AdminPermission.NONE)
+    public ResponseEntity<String> queryServerHost(@RequestParam Long userId) {
+        String host = turmsClusterManager.getMemberByUserId(userId).getAddress().getHost();
+        return ResponseFactory.raw(host);
     }
 
     /**
@@ -75,7 +79,7 @@ public class ClusterController {
      */
     @PutMapping("/config")
     @RequiredPermission(AdminPermission.CLUSTER_CONFIG_UPDATE)
-    public ResponseEntity updateClusterConfig(@RequestBody TurmsProperties turmsProperties) throws IOException {
+    public ResponseEntity<ResponseDTO<TurmsProperties>> updateClusterConfig(@RequestBody TurmsProperties turmsProperties) throws IOException {
         TurmsProperties mergedProperties = TurmsProperties.merge(
                 turmsClusterManager.getTurmsProperties(),
                 turmsProperties);

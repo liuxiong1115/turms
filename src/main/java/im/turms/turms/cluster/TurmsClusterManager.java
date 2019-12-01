@@ -250,7 +250,7 @@ public class TurmsClusterManager {
         }
     }
 
-    public Map<String, Object> getClusterInfo(boolean withConfigs) {
+    public Map<String, Object> getHazelcastInfo(boolean withConfigs) {
         Map<String, Object> map = new HashMap<>(4);
         map.put(CLUSTER_STATE, hazelcastInstance.getCluster().getClusterState());
         map.put(CLUSTER_TIME, hazelcastInstance.getCluster().getClusterTime());

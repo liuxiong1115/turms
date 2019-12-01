@@ -20,6 +20,7 @@ package im.turms.turms.common;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.DivideBy;
+import im.turms.turms.pojo.dto.StatisticsRecordDTO;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -153,8 +154,7 @@ public class DateTimeUtil {
     }
 
     //TODO: moves to somewhere more suitable
-    public Mono<Pair<String, List<Map<String, ?>>>> queryBetweenDate(
-            @NotNull String title,
+    public Mono<List<StatisticsRecordDTO>> queryBetweenDate(
             @NotNull Date startDate,
             @NotNull Date endDate,
             @NotNull DivideBy divideBy,
@@ -162,41 +162,41 @@ public class DateTimeUtil {
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
         List<Pair<Date, Date>> dates = divide(startDate, endDate, divideBy);
-        List<Mono<Map<String, ?>>> monos = new ArrayList<>(dates.size());
+        List<Mono<StatisticsRecordDTO>> monos = new ArrayList<>(dates.size());
         for (Pair<Date, Date> datePair : dates) {
             Mono<Long> result = function.apply(
                     datePair.getLeft(),
                     datePair.getRight(),
                     chatType,
                     areSystemMessages);
-            monos.add(result.map(total -> Map.of("startDate", datePair.getLeft(),
-                    "endDate", datePair.getRight(),
-                    "total", total)));
+            monos.add(result.map(total -> new StatisticsRecordDTO(
+                    datePair.getLeft(),
+                    datePair.getRight(),
+                    total)));
         }
-        return merge(title, monos);
+        return merge(monos);
     }
 
-    public Mono<Pair<String, List<Map<String, ?>>>> queryBetweenDate(
-            @NotNull String title,
+    public Mono<List<StatisticsRecordDTO>> queryBetweenDate(
             @NotNull Date startDate,
             @NotNull Date endDate,
             @NotNull DivideBy divideBy,
             @NotNull BiFunction<Date, Date, Mono<Long>> function) {
         List<Pair<Date, Date>> dates = divide(startDate, endDate, divideBy);
-        List<Mono<Map<String, ?>>> monos = new ArrayList<>(dates.size());
+        List<Mono<StatisticsRecordDTO>> monos = new ArrayList<>(dates.size());
         for (Pair<Date, Date> datePair : dates) {
             Mono<Long> result = function.apply(
                     datePair.getLeft(),
                     datePair.getRight());
-            monos.add(result.map(total -> Map.of("startDate", datePair.getLeft(),
-                    "endDate", datePair.getRight(),
-                    "total", total)));
+            monos.add(result.map(total -> new StatisticsRecordDTO(
+                    datePair.getLeft(),
+                    datePair.getRight(),
+                    total)));
         }
-        return merge(title, monos);
+        return merge(monos);
     }
 
-    public Mono<Pair<String, List<Map<String, ?>>>> checkAndQueryBetweenDate(
-            @NotNull String title,
+    public Mono<List<StatisticsRecordDTO>> checkAndQueryBetweenDate(
             @NotNull Date startDate,
             @NotNull Date endDate,
             @NotNull DivideBy divideBy,
@@ -212,14 +212,13 @@ public class DateTimeUtil {
         boolean checked = checkRangesNumber(startDate, endDate, divideBy,
                 maxHourRanges, maxDayRanges, maxMonthRanges);
         if (checked) {
-            return queryBetweenDate(title, startDate, endDate, divideBy, function, chatType, areSystemMessages);
+            return queryBetweenDate(startDate, endDate, divideBy, function, chatType, areSystemMessages);
         } else {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         }
     }
 
-    public Mono<Pair<String, List<Map<String, ?>>>> checkAndQueryBetweenDate(
-            @NotNull String title,
+    public Mono<List<StatisticsRecordDTO>> checkAndQueryBetweenDate(
             @NotNull Date startDate,
             @NotNull Date endDate,
             @NotNull DivideBy divideBy,
@@ -233,16 +232,16 @@ public class DateTimeUtil {
         boolean checked = checkRangesNumber(startDate, endDate, divideBy,
                 maxHourRanges, maxDayRanges, maxMonthRanges);
         if (checked) {
-            return queryBetweenDate(title, startDate, endDate, divideBy, function);
+            return queryBetweenDate(startDate, endDate, divideBy, function);
         } else {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         }
     }
 
-    private Mono<Pair<String, List<Map<String, ?>>>> merge(@NotNull String title, List<Mono<Map<String, ?>>> monos) {
-        Flux<Map<String, ?>> resultFlux = Flux.mergeOrdered((o1, o2) -> {
-            Date startDate1 = (Date) o1.get("startDate");
-            Date startDate2 = (Date) o2.get("startDate");
+    private Mono<List<StatisticsRecordDTO>> merge(List<Mono<StatisticsRecordDTO>> monos) {
+        Flux<StatisticsRecordDTO> resultFlux = Flux.mergeOrdered((o1, o2) -> {
+            Date startDate1 = o1.getStartDate();
+            Date startDate2 = o2.getStartDate();
             if (startDate1.before(startDate2)) {
                 return -1;
             } else if (startDate1.after(startDate2)) {
@@ -250,8 +249,6 @@ public class DateTimeUtil {
             }
             return 0;
         }, Flux.merge(monos));
-        return resultFlux
-                .collectList()
-                .map(results -> Pair.of(title, results));
+        return resultFlux.collectList();
     }
 }

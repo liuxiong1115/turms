@@ -26,10 +26,10 @@ import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.constant.MessageDeliveryStatus;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.Message;
-import im.turms.turms.pojo.dto.CreateMessageDTO;
+import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.message.MessageService;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +38,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-
-import static im.turms.turms.common.Constants.*;
 
 @RestController
 @RequestMapping("/messages")
@@ -56,7 +54,7 @@ public class MessageController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.MESSAGE_QUERY)
-    public Mono<ResponseEntity> getCompleteMessages(
+    public Mono<ResponseEntity<ResponseDTO<Collection<Message>>>> queryCompleteMessages(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) ChatType chatType,
             @RequestParam(required = false) Boolean areSystemMessages,
@@ -67,11 +65,56 @@ public class MessageController {
             @RequestParam(required = false) Date deletionDateStart,
             @RequestParam(required = false) Date deletionDateEnd,
             @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
-            @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         if (chatType == ChatType.UNRECOGNIZED) {
-            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST));
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
+        Flux<Message> completeMessages = messageService.queryCompleteMessages(
+                false,
+                ids,
+                chatType,
+                areSystemMessages,
+                senderId,
+                targetId,
+                deliveryDateStart,
+                deliveryDateEnd,
+                deletionDateStart,
+                deletionDateEnd,
+                deliveryStatus,
+                0,
+                pageUtil.getSize(size));
+        return ResponseFactory.okIfTruthy(completeMessages);
+    }
+
+    @GetMapping("/page")
+    @RequiredPermission(AdminPermission.MESSAGE_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Message>>>> queryCompleteMessages(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) ChatType chatType,
+            @RequestParam(required = false) Boolean areSystemMessages,
+            @RequestParam(required = false) Long senderId,
+            @RequestParam(required = false) Long targetId,
+            @RequestParam(required = false) Date deliveryDateStart,
+            @RequestParam(required = false) Date deliveryDateEnd,
+            @RequestParam(required = false) Date deletionDateStart,
+            @RequestParam(required = false) Date deletionDateEnd,
+            @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(required = false) Integer size) {
+        if (chatType == ChatType.UNRECOGNIZED) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
+        Mono<Long> count = messageService.countMessages(
+                ids,
+                chatType,
+                areSystemMessages,
+                senderId,
+                targetId,
+                deliveryDateStart,
+                deliveryDateEnd,
+                deletionDateStart,
+                deletionDateEnd,
+                deliveryStatus);
         Flux<Message> completeMessages = messageService.queryCompleteMessages(
                 false,
                 ids,
@@ -86,27 +129,12 @@ public class MessageController {
                 deliveryStatus,
                 page,
                 pageUtil.getSize(size));
-        if (page != null) {
-            Mono<Long> count = messageService.countMessages(
-                    ids,
-                    chatType,
-                    areSystemMessages,
-                    senderId,
-                    targetId,
-                    deliveryDateStart,
-                    deliveryDateEnd,
-                    deletionDateStart,
-                    deletionDateEnd,
-                    deliveryStatus);
-            return ResponseFactory.page(count, completeMessages);
-        } else {
-            return ResponseFactory.okIfTruthy(completeMessages);
-        }
+        return ResponseFactory.page(count, completeMessages);
     }
 
     @PostMapping
     @RequiredPermission(AdminPermission.MESSAGE_CREATE)
-    public Mono<ResponseEntity> createMessages(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> createMessages(
             @RequestParam(defaultValue = "true") Boolean deliver,
             @RequestBody CreateMessageDTO createMessageDTO) {
         if (createMessageDTO.getTargetId() == null
@@ -122,7 +150,7 @@ public class MessageController {
 
     @DeleteMapping
     @RequiredPermission(AdminPermission.MESSAGE_DELETE)
-    public Mono<ResponseEntity> deleteMessages(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteMessages(
             @RequestParam Set<Long> messagesIds,
             @RequestParam(defaultValue = "false") Boolean deleteMessagesStatuses,
             @RequestParam(required = false) Boolean logicalDelete) {
@@ -133,7 +161,7 @@ public class MessageController {
 
     @GetMapping("/count")
     @RequiredPermission(AdminPermission.MESSAGE_QUERY)
-    public Mono<ResponseEntity> countMessages(
+    public Mono<ResponseEntity<ResponseDTO<MessageStatisticsDTO>>> countMessages(
             @RequestParam(required = false) ChatType chatType,
             @RequestParam(required = false) Boolean areSystemMessages,
             @RequestParam(required = false) Date sentStartDate,
@@ -145,18 +173,19 @@ public class MessageController {
             @RequestParam(required = false) Date acknowledgedOnAverageStartDate,
             @RequestParam(required = false) Date acknowledgedOnAverageEndDate,
             @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
+        List<Mono<?>> counts = new LinkedList<>();
+        MessageStatisticsDTO statistics = new MessageStatisticsDTO();
         if (chatType == ChatType.UNRECOGNIZED) {
-            return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         if (divideBy == null || divideBy == DivideBy.NOOP) {
-            List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
             if (sentOnAverageStartDate != null || sentOnAverageEndDate != null) {
-                counts.add(messageService.countDeliveredMessagesOnAverage(
+                counts.add(messageService.countSentMessagesOnAverage(
                         sentOnAverageStartDate,
                         sentOnAverageEndDate,
                         chatType,
                         areSystemMessages)
-                        .map(total -> Pair.of(SENT_MESSAGES_ON_AVERAGE, total)));
+                        .doOnSuccess(statistics::setSentMessagesOnAverage));
             }
             if (acknowledgedStartDate != null || acknowledgedEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessages(
@@ -164,7 +193,7 @@ public class MessageController {
                         acknowledgedEndDate,
                         chatType,
                         areSystemMessages)
-                        .map(total -> Pair.of(ACKNOWLEDGED_MESSAGES, total)));
+                        .doOnSuccess(statistics::setAcknowledgedMessages));
             }
             if (acknowledgedOnAverageStartDate != null || acknowledgedOnAverageEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessagesOnAverage(
@@ -172,7 +201,7 @@ public class MessageController {
                         acknowledgedOnAverageEndDate,
                         chatType,
                         areSystemMessages)
-                        .map(total -> Pair.of(ACKNOWLEDGED_MESSAGES_ON_AVERAGE, total)));
+                        .doOnSuccess(statistics::setAcknowledgedMessagesOnAverage));
             }
             if (counts.isEmpty() || sentStartDate != null || sentEndDate != null) {
                 counts.add(messageService.countSentMessages(
@@ -180,55 +209,53 @@ public class MessageController {
                         sentEndDate,
                         chatType,
                         areSystemMessages)
-                        .map(total -> Pair.of(SENT_MESSAGES, total)));
+                        .doOnSuccess(statistics::setSentMessages));
             }
-            return ResponseFactory.collectCountResults(counts);
         } else {
-            List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
             if (sentOnAverageStartDate != null && sentOnAverageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        SENT_MESSAGES_ON_AVERAGE,
                         sentOnAverageStartDate,
                         sentOnAverageEndDate,
                         divideBy,
-                        messageService::countDeliveredMessagesOnAverage,
+                        messageService::countSentMessagesOnAverage,
                         chatType,
-                        areSystemMessages));
+                        areSystemMessages)
+                        .doOnSuccess(statistics::setSentMessagesOnAverageRecords));
             }
             if (acknowledgedStartDate != null && acknowledgedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        ACKNOWLEDGED_MESSAGES,
                         acknowledgedStartDate,
                         acknowledgedEndDate,
                         divideBy,
                         messageService::countAcknowledgedMessages,
                         chatType,
-                        areSystemMessages));
+                        areSystemMessages)
+                        .doOnSuccess(statistics::setAcknowledgedMessagesRecords));
             }
             if (acknowledgedOnAverageStartDate != null && acknowledgedOnAverageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        ACKNOWLEDGED_MESSAGES_ON_AVERAGE,
                         acknowledgedOnAverageStartDate,
                         acknowledgedOnAverageEndDate,
                         divideBy,
                         messageService::countAcknowledgedMessagesOnAverage,
                         chatType,
-                        areSystemMessages));
+                        areSystemMessages)
+                        .doOnSuccess(statistics::setAcknowledgedMessagesOnAverageRecords));
             }
             if (sentStartDate != null && sentEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        SENT_MESSAGES,
                         sentStartDate,
                         sentEndDate,
                         divideBy,
                         messageService::countSentMessages,
                         chatType,
-                        areSystemMessages));
+                        areSystemMessages)
+                        .doOnSuccess(statistics::setSentMessagesRecords));
             }
             if (counts.isEmpty()) {
-                return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
             }
-            return ResponseFactory.collectCountResults(counts);
         }
+        return ResponseFactory.okIfTruthy(Flux.merge(counts).then(Mono.just(statistics)));
     }
 }

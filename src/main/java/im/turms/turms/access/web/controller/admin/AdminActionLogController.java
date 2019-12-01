@@ -22,13 +22,18 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.AdminActionLog;
+import im.turms.turms.pojo.dto.AcknowledgedDTO;
+import im.turms.turms.pojo.dto.PaginationDTO;
+import im.turms.turms.pojo.dto.ResponseDTO;
 import im.turms.turms.service.admin.AdminActionLogService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -45,38 +50,48 @@ public class AdminActionLogController {
 
     @DeleteMapping
     @RequiredPermission(AdminPermission.ADMIN_ACTION_LOG_DELETE)
-    public Mono<ResponseEntity> deleteAdminActionLog(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminActionLog(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> accounts,
-            @RequestParam(required = false) Date startDate,
-            @RequestParam(required = false) Date endDate) {
-        if (ids != null || startDate != null || endDate != null) {
+            @RequestParam(required = false) Date logDateStart,
+            @RequestParam(required = false) Date logDateEnd) {
+        if (ids != null || accounts != null || logDateStart != null || logDateEnd != null) {
             Mono<Boolean> deleted = adminActionLogService
-                    .deleteAdminActionLogs(ids, accounts, startDate, endDate);
+                    .deleteAdminActionLogs(ids, accounts, logDateStart, logDateEnd);
             return ResponseFactory.acknowledged(deleted);
         } else {
-            return Mono.just(ResponseFactory.entity(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
     }
 
     @GetMapping
     @RequiredPermission(AdminPermission.ADMIN_ACTION_LOG_QUERY)
-    public Mono<ResponseEntity> queryAdminActionLogs(
+    public Mono<ResponseEntity<ResponseDTO<Collection<AdminActionLog>>>> queryAdminActionLogs(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> accounts,
             @RequestParam(required = false) Date logDateStart,
             @RequestParam(required = false) Date logDateEnd,
-            @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Flux<AdminActionLog> adminActionLogsFlux = adminActionLogService
+                .queryAdminActionLogs(ids, accounts, logDateStart, logDateEnd, 0, size);
+        return ResponseFactory.okIfTruthy(adminActionLogsFlux);
+    }
+
+    @GetMapping("/page")
+    @RequiredPermission(AdminPermission.ADMIN_ACTION_LOG_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<AdminActionLog>>>> queryAdminActionLogs(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Set<String> accounts,
+            @RequestParam(required = false) Date logDateStart,
+            @RequestParam(required = false) Date logDateEnd,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Mono<Long> count = adminActionLogService
+                .countAdminActionLogs(ids, accounts, logDateStart, logDateEnd);
+        Flux<AdminActionLog> adminActionLogsFlux = adminActionLogService
                 .queryAdminActionLogs(ids, accounts, logDateStart, logDateEnd, page, size);
-        if (page != null) {
-            Mono<Long> count = adminActionLogService
-                    .countAdminActionLogs(ids, accounts, logDateStart, logDateEnd);
-            return ResponseFactory.page(count, adminActionLogsFlux);
-        } else {
-            return ResponseFactory.okIfTruthy(adminActionLogsFlux);
-        }
+        return ResponseFactory.page(count, adminActionLogsFlux);
     }
 }

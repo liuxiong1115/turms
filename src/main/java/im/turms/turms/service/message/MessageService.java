@@ -516,8 +516,8 @@ public class MessageService {
     }
 
     public Mono<Long> countGroupsThatSentMessages(
-            @NotNull Date startDate,
-            @NotNull Date endDate) {
+            @Nullable Date startDate,
+            @Nullable Date endDate) {
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
                 .add(Criteria.where(Message.Fields.chatType).is(ChatType.GROUP))
@@ -563,7 +563,7 @@ public class MessageService {
         return mongoTemplate.count(query, Message.class);
     }
 
-    public Mono<Long> countDeliveredMessagesOnAverage(
+    public Mono<Long> countSentMessagesOnAverage(
             @Nullable Date startDate,
             @Nullable Date endDate,
             @Nullable ChatType chatType,

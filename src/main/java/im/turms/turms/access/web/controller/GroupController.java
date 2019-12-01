@@ -24,24 +24,19 @@ import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.constant.DivideBy;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.GroupType;
-import im.turms.turms.pojo.dto.AddGroupDTO;
-import im.turms.turms.pojo.dto.AddGroupTypeDTO;
-import im.turms.turms.pojo.dto.UpdateGroupDTO;
-import im.turms.turms.pojo.dto.UpdateGroupTypeDTO;
+import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.group.GroupService;
 import im.turms.turms.service.group.GroupTypeService;
 import im.turms.turms.service.message.MessageService;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-
-import static im.turms.turms.common.Constants.*;
 
 @RestController
 @RequestMapping("/groups")
@@ -62,23 +57,29 @@ public class GroupController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.GROUP_QUERY)
-    public Mono<ResponseEntity> queryGroupsInformation(
+    public Mono<ResponseEntity<ResponseDTO<Collection<Group>>>> queryGroupsInformation(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
+        Flux<Group> groupsFlux = groupService.queryGroups(ids, 0, size);
+        return ResponseFactory.okIfTruthy(groupsFlux);
+    }
+
+    @GetMapping("/page")
+    @RequiredPermission(AdminPermission.GROUP_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Group>>>> queryGroupsInformation(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Mono<Long> count = groupService.countGroups(ids);
         Flux<Group> groupsFlux = groupService.queryGroups(ids, page, size);
-        if (page != null) {
-            Mono<Long> count = groupService.countGroups(ids);
-            return ResponseFactory.page(count, groupsFlux);
-        } else {
-            return ResponseFactory.okIfTruthy(groupsFlux);
-        }
+        return ResponseFactory.page(count, groupsFlux);
     }
 
     @PostMapping
     @RequiredPermission(AdminPermission.GROUP_CREATE)
-    public Mono<ResponseEntity> addGroup(@RequestBody AddGroupDTO addGroupDTO) {
+    public Mono<ResponseEntity<ResponseDTO<Group>>> addGroup(@RequestBody AddGroupDTO addGroupDTO) {
         Long ownerId = addGroupDTO.getOwnerId();
         Mono<Group> createdGroup = groupService.authAndCreateGroup(
                 addGroupDTO.getCreatorId(),
@@ -96,7 +97,7 @@ public class GroupController {
 
     @PutMapping
     @RequiredPermission(AdminPermission.GROUP_UPDATE)
-    public Mono<ResponseEntity> updateGroup(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroup(
             @RequestParam Long groupId,
             @RequestBody UpdateGroupDTO updateGroupDTO) {
         Mono<Boolean> updated = groupService.updateGroup(
@@ -115,7 +116,7 @@ public class GroupController {
 
     @DeleteMapping
     @RequiredPermission(AdminPermission.GROUP_DELETE)
-    public Mono<ResponseEntity> deleteGroup(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroup(
             @RequestParam Long groupId,
             @RequestParam(required = false) Boolean logicalDelete) {
         Mono<Boolean> deleted = groupService.deleteGroupAndGroupMembers(groupId, logicalDelete);
@@ -124,22 +125,27 @@ public class GroupController {
 
     @GetMapping("/types")
     @RequiredPermission(AdminPermission.GROUP_TYPE_QUERY)
-    public Mono<ResponseEntity> queryGroupTypes(
-            @RequestParam(required = false) Integer page,
+    public Mono<ResponseEntity<ResponseDTO<Collection<GroupType>>>> queryGroupTypes(
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
+        Flux<GroupType> groupTypesFlux = groupTypeService.queryGroupTypes(0, size);
+        return ResponseFactory.okIfTruthy(groupTypesFlux);
+    }
+
+    @GetMapping("/types/page")
+    @RequiredPermission(AdminPermission.GROUP_TYPE_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupType>>>> queryGroupTypes(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Mono<Long> count = groupTypeService.countGroupTypes();
         Flux<GroupType> groupTypesFlux = groupTypeService.queryGroupTypes(page, size);
-        if (page != null) {
-            Mono<Long> count = groupTypeService.countGroupTypes();
-            return ResponseFactory.page(count, groupTypesFlux);
-        } else {
-            return ResponseFactory.okIfTruthy(groupTypesFlux);
-        }
+        return ResponseFactory.page(count, groupTypesFlux);
     }
 
     @PostMapping("/types")
     @RequiredPermission(AdminPermission.GROUP_TYPE_CREATE)
-    public Mono<ResponseEntity> addGroupType(@RequestBody AddGroupTypeDTO addGroupTypeDTO) {
+    public Mono<ResponseEntity<ResponseDTO<GroupType>>> addGroupType(@RequestBody AddGroupTypeDTO addGroupTypeDTO) {
         Mono<GroupType> addedGroupType = groupTypeService.addGroupType(addGroupTypeDTO.getName(),
                 addGroupTypeDTO.getGroupSizeLimit(),
                 addGroupTypeDTO.getInvitationStrategy(),
@@ -155,7 +161,7 @@ public class GroupController {
 
     @PutMapping("/types")
     @RequiredPermission(AdminPermission.GROUP_TYPE_QUERY)
-    public Mono<ResponseEntity> updateGroupType(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupType(
             @RequestParam Long typeId,
             @RequestBody UpdateGroupTypeDTO updateGroupTypeDTO) {
         Mono<Boolean> updated = groupTypeService.updateGroupType(
@@ -174,13 +180,13 @@ public class GroupController {
     }
 
     @DeleteMapping("/types")
-    public Mono<ResponseEntity> deleteGroupType(@RequestParam Long groupTypeId) {
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupType(@RequestParam Long groupTypeId) {
         Mono<Boolean> deleted = groupTypeService.deleteGroupType(groupTypeId);
         return ResponseFactory.acknowledged(deleted);
     }
 
     @GetMapping("/count")
-    public Mono<ResponseEntity> countGroups(
+    public Mono<ResponseEntity<ResponseDTO<GroupStatisticsDTO>>> countGroups(
             @RequestParam(required = false) Date createdStartDate,
             @RequestParam(required = false) Date createdEndDate,
             @RequestParam(required = false) Date deletedStartDate,
@@ -188,57 +194,56 @@ public class GroupController {
             @RequestParam(required = false) Date sentMessageStartDate,
             @RequestParam(required = false) Date sentMessageEndDate,
             @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
+        List<Mono<?>> counts = new LinkedList<>();
+        GroupStatisticsDTO statistics = new GroupStatisticsDTO();
         if (divideBy == null || divideBy == DivideBy.NOOP) {
-            List<Mono<Pair<String, Long>>> counts = new LinkedList<>();
             if (deletedStartDate != null || deletedEndDate != null) {
                 counts.add(groupService.countDeletedGroups(
                         deletedStartDate,
                         deletedEndDate)
-                        .map(total -> Pair.of(DELETED_GROUPS, total)));
+                        .doOnSuccess(statistics::setDeletedGroups));
             }
             if (sentMessageStartDate != null || sentMessageEndDate != null) {
                 counts.add(messageService.countGroupsThatSentMessages(
                         sentMessageStartDate,
                         sentMessageEndDate)
-                        .map(total -> Pair.of(GROUPS_THAT_SENT_MESSAGES, total)));
+                        .doOnSuccess(statistics::setGroupsThatSentMessages));
             }
             if (counts.isEmpty() || createdStartDate != null || createdEndDate != null) {
                 counts.add(groupService.countCreatedGroups(
                         createdStartDate,
                         createdEndDate)
-                        .map(total -> Pair.of(CREATED_GROUPS, total)));
+                        .doOnSuccess(statistics::setCreatedGroups));
             }
-            return ResponseFactory.collectCountResults(counts);
         } else {
-            List<Mono<Pair<String, List<Map<String, ?>>>>> counts = new LinkedList<>();
             if (deletedStartDate != null && deletedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        DELETED_GROUPS,
                         deletedStartDate,
                         deletedEndDate,
                         divideBy,
-                        groupService::countDeletedGroups));
+                        groupService::countDeletedGroups)
+                        .doOnSuccess(statistics::setDeletedGroupsRecords));
             }
             if (sentMessageStartDate != null && sentMessageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        GROUPS_THAT_SENT_MESSAGES,
                         sentMessageStartDate,
                         sentMessageEndDate,
                         divideBy,
-                        messageService::countGroupsThatSentMessages));
+                        messageService::countGroupsThatSentMessages)
+                        .doOnSuccess(statistics::setGroupsThatSentMessagesRecords));
             }
             if (createdStartDate != null && createdEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        CREATED_GROUPS,
                         createdStartDate,
                         createdEndDate,
                         divideBy,
-                        groupService::countCreatedGroups));
+                        groupService::countCreatedGroups)
+                        .doOnSuccess(statistics::setCreatedGroupsRecords));
             }
             if (counts.isEmpty()) {
-                return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
             }
-            return ResponseFactory.collectCountResults(counts);
         }
+        return ResponseFactory.okIfTruthy(Flux.merge(counts).then(Mono.just(statistics)));
     }
 }

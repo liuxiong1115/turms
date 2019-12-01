@@ -21,6 +21,7 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.pojo.dto.AddressDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,9 +49,8 @@ public class RouteController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.NONE)
-    public Mono<ResponseEntity> getResponsibleServerAddress(@RequestParam Long userId) {
+    public Mono<ResponseEntity<AddressDTO>> queryResponsibleServerAddress(@RequestParam Long userId) {
         Mono<String> address = turmsClusterManager.getResponsibleTurmsServerAddress(userId);
-        return ResponseFactory.okIfTruthy(address
-                .map(addr -> Collections.singletonMap("address", addr)));
+        return ResponseFactory.raw(address.map(AddressDTO::new));
     }
 }

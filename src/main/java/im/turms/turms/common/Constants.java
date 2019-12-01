@@ -60,23 +60,8 @@ public class Constants {
 
     public static final String ACCOUNT = "account";
     public static final String PASSWORD = "password";
-    public static final String ACKNOWLEDGED = "acknowledged";
-    public static final String AUTHENTICATED = "authenticated";
     public static final String STATUS = "status";
     public static final String TOTAL = "total";
-
-    public static final String DELETED_USERS = "deletedUsers";
-    public static final String USERS_WHO_SENT_MESSAGES = "usersWhoSentMessages";
-    public static final String LOGGED_IN_USERS = "loggedInUsers";
-    public static final String MAX_ONLINE_USERS = "maxOnlineUsers";
-    public static final String REGISTERED_USERS = "registeredUsers";
-    public static final String DELETED_GROUPS = "deletedGroups";
-    public static final String GROUPS_THAT_SENT_MESSAGES = "groupsThatSentMessages";
-    public static final String CREATED_GROUPS = "createdGroups";
-    public static final String SENT_MESSAGES_ON_AVERAGE = "sentMessagesOnAverage";
-    public static final String ACKNOWLEDGED_MESSAGES = "acknowledgedMessages";
-    public static final String ACKNOWLEDGED_MESSAGES_ON_AVERAGE = "acknowledgedMessagesOnAverage";
-    public static final String SENT_MESSAGES = "sentMessages";
 
     public static final long RESERVED_ID = 0L;
     public static final long ADMIN_ROLE_ROOT_ID = RESERVED_ID;
