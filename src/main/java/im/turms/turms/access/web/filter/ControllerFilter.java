@@ -226,7 +226,8 @@ public class ControllerFilter implements WebFilter {
         if (DEV_MODE) {
             String path = exchange.getRequest().getURI().getPath();
             return path.startsWith("/swagger-ui.html")
-                    || path.startsWith("/webjars/springfox-swagger-ui");
+                    || path.startsWith("/webjars/springfox-swagger-ui")
+                    || path.startsWith("/v2/api-docs");
         } else {
             return false;
         }
