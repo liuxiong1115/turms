@@ -17,241 +17,95 @@
 
 package im.turms.turms.access.web.util;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.pojo.bo.PageResult;
-import lombok.AllArgsConstructor;
+import im.turms.turms.pojo.dto.AcknowledgedDTO;
+import im.turms.turms.pojo.dto.PaginationDTO;
+import im.turms.turms.pojo.dto.ResponseDTO;
+import im.turms.turms.pojo.dto.TotalDTO;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.NotNull;
-import java.util.*;
-import java.util.function.Function;
+import java.util.Collection;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.common.Constants.EMPTY_OBJECT;
 
 @Data
 public class ResponseFactory {
     private static final Object ERROR_OBJECT = EMPTY_OBJECT;
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Response {
-        private Integer code;
-        private String reason;
-        private Date timestamp;
-        private Object data;
-
-        @JsonIgnore
-        private Integer httpCode;
-
-        /**
-         * Note: To keep consistent, the data field should be always a map structure object.
-         */
-        public Response(TurmsStatusCode turmsStatusCode, Object data) {
-            this.code = turmsStatusCode.getBusinessCode();
-            this.reason = turmsStatusCode.getReason();
-            this.timestamp = new Date();
-            this.data = data;
-            this.httpCode = turmsStatusCode.getHttpStatusCode();
-        }
+    private ResponseFactory() {
     }
 
-    public static Mono<ResponseEntity> withKey(String key, Mono data) {
-        return okIfTruthy(
-                data.map(value -> Collections.singletonMap(key, value)),
-                true);
+    public static Mono<ResponseEntity<ResponseDTO<TotalDTO>>> total(Mono<Integer> data) {
+        return okIfTruthy(data.map(TotalDTO::new));
     }
 
-    public static Mono<ResponseEntity> dataWithCodeAnyway(
-            @NotNull TurmsStatusCode turmsStatusCode,
-            @NotNull Mono data,
-            @NotNull Object dataWhenNull) {
-        return data
-                .switchIfEmpty(Mono.just(
-                        ResponseEntity
-                                .status(turmsStatusCode.getHttpStatusCode())
-                                .body(new Response(turmsStatusCode, dataWhenNull)))
-                        .map(a -> ResponseEntity
-                                .status(turmsStatusCode.getHttpStatusCode())
-                                .body(new Response(turmsStatusCode, a))))
-                .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
+    public static <T> Mono<ResponseEntity<ResponseDTO<PaginationDTO<T>>>> page(Mono<Long> totalMono, Flux<T> data) {
+        Mono<PaginationDTO<T>> mono = Mono
+                .zip(totalMono, data.collectList())
+                .map(tuple -> {
+                    Long total = tuple.getT1();
+                    if (total.equals(0L)) {
+                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
+                    }
+                    return new PaginationDTO<>(total, tuple.getT2());
+                });
+        return okIfTruthy(mono);
     }
 
-    public static Mono<ResponseEntity> dataWithCodeAnyway(TurmsStatusCode turmsStatusCode, Flux data, Object dataWhenNull) {
-        return dataWithCodeAnyway(turmsStatusCode, data.collectList(), dataWhenNull);
-    }
-
-    public static Mono<ResponseEntity> code(TurmsStatusCode turmsStatusCode) {
-        return Mono.just(ResponseEntity
-                .status(turmsStatusCode.getHttpStatusCode())
-                .body(new Response(turmsStatusCode, null)));
-    }
-
-    public static Mono<ResponseEntity> codeInMono(TurmsStatusCode turmsStatusCode) {
-        return Mono.just(ResponseEntity
-                .status(turmsStatusCode.getHttpStatusCode())
-                .body(new Response(turmsStatusCode, null)));
-    }
-
-    public static ResponseEntity entity(TurmsStatusCode turmsStatusCode) {
-        return ResponseEntity
-                .status(turmsStatusCode.getHttpStatusCode())
-                .body(new Response(turmsStatusCode, null));
-    }
-
-    public static Mono<ResponseEntity> page(Mono<Long> total, Flux data) {
-        return okIfTruthy(PageResult.getResult(total, data));
-    }
-
-    public static ResponseEntity fail() {
-        return entity(TurmsStatusCode.FAILED);
-    }
-
-    public static Mono<ResponseEntity> okIfTruthy(Flux data) {
-        return okIfTruthy(data, true);
-    }
-
-    public static Mono<ResponseEntity> okIfTruthy(Flux data, boolean passData) {
+    public static <T> Mono<ResponseEntity<ResponseDTO<Collection<T>>>> okIfTruthy(Flux<T> data) {
         return data
                 .collectList()
-                .map(list -> {
-                    if (((Collection) list).size() != 0) {
-                        return okIfTruthy(list, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
-                    } else {
-                        return entity(TurmsStatusCode.NO_CONTENT);
-                    }
-                })
-                .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
+                .map(ResponseFactory::okIfTruthy);
     }
 
-    public static Mono<ResponseEntity> okIfTruthy(Flux data, TurmsStatusCode failed) {
-        return data
-                .collectList()
-                .map(list -> {
-                    if (((Collection) list).size() != 0) {
-                        return okIfTruthy(list, true, TurmsStatusCode.OK, failed);
-                    } else {
-                        return entity(TurmsStatusCode.NO_CONTENT);
-                    }
-                })
-                .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
+    public static <T> Mono<ResponseEntity<ResponseDTO<T>>> okIfTruthy(Mono<T> dataMono) {
+        return dataMono
+                .map(data -> ResponseEntity.ok(new ResponseDTO<>(TurmsStatusCode.OK, data)))
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT)));
     }
 
-    public static Mono<ResponseEntity> okIfTruthy(Mono data) {
-        return okIfTruthy(data, true);
+    public static <T> Mono<ResponseEntity<T>> raw(Mono<T> dataMono) {
+        return dataMono
+                .map(ResponseEntity::ok)
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT)));
     }
 
-    public static Mono<ResponseEntity> okIfTruthy(Mono data, boolean passData) {
-        return data
-                .map(item -> okIfTruthy(item, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED))
-                .switchIfEmpty(code(TurmsStatusCode.NO_CONTENT))
-                .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
+    public static <T> ResponseEntity<ResponseDTO<T>> okIfTruthy(T data) {
+        return ResponseEntity.ok(new ResponseDTO<>(TurmsStatusCode.OK, data));
     }
 
-    public static Mono<ResponseEntity> okIfTruthy(Mono data, boolean passData, TurmsStatusCode failed) {
-        return data
-                .map(item -> okIfTruthy(item, passData, TurmsStatusCode.OK, failed))
-                .switchIfEmpty(code(TurmsStatusCode.NO_CONTENT))
-                .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
+    public static <T> ResponseEntity<T> raw(T data) {
+        return ResponseEntity.ok(data);
     }
 
-    public static Mono<ResponseEntity> okIfTruthy(Mono data, TurmsStatusCode failed) {
-        return data
-                .map(item -> okIfTruthy(item, true, TurmsStatusCode.OK, failed))
-                .switchIfEmpty(code(TurmsStatusCode.NO_CONTENT))
-                .onErrorResume(TurmsBusinessException.class, e -> handleException((TurmsBusinessException) e));
-    }
-
-    public static ResponseEntity okIfTruthy(Object data) {
-        return okIfTruthy(data, true, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
-    }
-
-    public static ResponseEntity okIfTruthy(Object data, boolean passData) {
-        return okIfTruthy(data, passData, TurmsStatusCode.OK, TurmsStatusCode.FAILED);
-    }
-
-    public static ResponseEntity okIfTruthy(Object data, boolean returnData, TurmsStatusCode ok, TurmsStatusCode failed) {
+    public static <T> ResponseEntity<ResponseDTO<Collection<T>>> okIfTruthy(Collection<T> data) {
         if (data != null) {
-            if (data instanceof Boolean) {
-                if ((boolean) data) {
-                    return ResponseEntity.ok(new Response(ok, returnData ? true : null));
-                } else {
-                    return ResponseEntity.status(failed.getHttpStatusCode())
-                            .body(new Response(failed, null));
-                }
-            } else if (data instanceof Map) {
-                Map map = (Map) data;
-                if (!map.isEmpty()) {
-                    Object total = map.get("total");
-                    if (total instanceof Long && total.equals(0L)) {
-                        return ResponseEntity.status(TurmsStatusCode.NO_CONTENT.getHttpStatusCode())
-                                .body(new Response(failed, null));
-                    }
-                    return ResponseEntity.ok(new Response(ok, returnData ? data : null));
-                } else {
-                    return ResponseEntity.status(TurmsStatusCode.NO_CONTENT.getHttpStatusCode())
-                            .body(new Response(failed, null));
-                }
-            } else if (data instanceof Collection) {
-                Collection<?> collection = (Collection<?>) data;
-                if (!collection.isEmpty()) {
-                    return ResponseEntity.ok(new Response(ok, returnData ? data : null));
-                } else {
-                    return ResponseEntity.status(TurmsStatusCode.NO_CONTENT.getHttpStatusCode())
-                            .body(new Response(failed, null));
-                }
+            if (data.isEmpty()) {
+                return ResponseEntity.status(TurmsStatusCode.NO_CONTENT.getHttpStatusCode())
+                        .body(new ResponseDTO<>(TurmsStatusCode.NO_CONTENT, null));
             } else {
-                return ResponseEntity.ok(new Response(ok, returnData ? data : null));
+                return ResponseEntity.ok(new ResponseDTO<>(TurmsStatusCode.OK, data));
             }
         } else {
-            return ResponseEntity.status(failed.getHttpStatusCode())
-                    .body(new Response(failed, null));
+            return ResponseEntity.status(TurmsStatusCode.FAILED.getHttpStatusCode())
+                    .body(new ResponseDTO<>(TurmsStatusCode.FAILED, null));
         }
     }
 
-    private static Mono<ResponseEntity<Response>> handleException(TurmsBusinessException exception) {
-        TurmsStatusCode code = exception.getCode();
-        return Mono.just(ResponseEntity
-                .status(code.getHttpStatusCode())
-                .body(new Response(code, null)));
+    public static Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> acknowledged(Mono<Boolean> data) {
+        return okIfTruthy(data.map(AcknowledgedDTO::new));
     }
 
-    public static Mono<ResponseEntity> acknowledged(Mono<Boolean> data) {
-        return okIfTruthy(
-                data.map(acknowledged -> Collections.singletonMap(ACKNOWLEDGED, acknowledged)),
-                true);
-    }
-
-    public static ResponseEntity acknowledged(Boolean data) {
-        return okIfTruthy(Collections.singletonMap(ACKNOWLEDGED, data), true);
-    }
-
-    public static Mono<ResponseEntity> authenticated(Mono<Boolean> data) {
-        return data.map(authenticated -> {
-            if (authenticated) {
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        });
-    }
-
-    public static ResponseEntity authenticated(Boolean data) {
-        return okIfTruthy(Collections.singletonMap(AUTHENTICATED, data), true);
-    }
-
-    public static <T> Mono<ResponseEntity> collectCountResults(List<Mono<Pair<String, T>>> counts) {
-        Mono<Map<String, T>> resultMono = Flux.merge(counts)
-                .collectMap(
-                        (Function<? super Pair<String, T>, String>) Pair::getLeft,
-                        (Function<? super Pair<String, T>, T>) Pair::getRight);
-        return okIfTruthy(resultMono);
+    public static ResponseEntity<ResponseDTO<AcknowledgedDTO>> acknowledged(Boolean data) {
+        if (data != null) {
+            return ResponseEntity.ok(new ResponseDTO<>(TurmsStatusCode.OK, new AcknowledgedDTO(data)));
+        } else {
+            return ResponseEntity.status(TurmsStatusCode.FAILED.getHttpStatusCode())
+                    .body(new ResponseDTO<>(TurmsStatusCode.FAILED, null));
+        }
     }
 }

@@ -45,8 +45,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 
-import static im.turms.turms.common.Constants.ACCOUNT;
-import static im.turms.turms.common.Constants.PASSWORD;
+import static im.turms.turms.common.Constants.*;
 
 @Component
 public class ControllerFilter implements WebFilter {
@@ -111,7 +110,7 @@ public class ControllerFilter implements WebFilter {
                 }
             }
         } else {
-            if (isHandshakeRequest(exchange) || isCorsPreflightRequest(exchange)) {
+            if (isHandshakeRequest(exchange) || isCorsPreflightRequest(exchange) || isDevAndSwaggerRequest(exchange)) {
                 return chain.filter(exchange);
             } else {
                 Pair<String, String> pair = parseAccountAndPassword(exchange);
@@ -221,5 +220,15 @@ public class ControllerFilter implements WebFilter {
         return request.getMethodValue().equals(HttpMethod.OPTIONS.name())
                 && request.getHeaders().containsKey(HttpHeaders.ORIGIN)
                 && request.getHeaders().containsKey(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD);
+    }
+
+    private boolean isDevAndSwaggerRequest(@NotNull ServerWebExchange exchange) {
+        if (DEV_MODE) {
+            String path = exchange.getRequest().getURI().getPath();
+            return path.startsWith("/swagger-ui.html")
+                    || path.startsWith("/webjars/springfox-swagger-ui");
+        } else {
+            return false;
+        }
     }
 }

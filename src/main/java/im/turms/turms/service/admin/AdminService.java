@@ -284,10 +284,10 @@ public class AdminService {
                     if (triple.getLeft()) {
                         return deleteAdmins(accounts);
                     } else {
-                        return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
                 })
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
     }
 
     public Mono<Boolean> deleteAdmins(@NotEmpty Set<String> accounts) {

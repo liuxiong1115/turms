@@ -21,17 +21,16 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.pojo.domain.Admin;
-import im.turms.turms.pojo.dto.AddAdminDTO;
-import im.turms.turms.pojo.dto.UpdateAdminDTO;
+import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.admin.AdminService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -69,17 +68,18 @@ public class AdminController {
 
     @PostMapping
     @RequiredPermission(ADMIN_CREATE)
-    public Mono<ResponseEntity> addAdmin(
+    public Mono<ResponseEntity<ResponseDTO<Admin>>> addAdmin(
             @RequestHeader String account,
             @RequestBody AddAdminDTO addAdminDTO) {
-        if (addAdminDTO.getRoleId() == null) {
+        Long roleId = addAdminDTO.getRoleId();
+        if (roleId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         Mono<Admin> generatedAdmin = adminService.authAndAddAdmin(
                 account,
                 addAdminDTO.getAccount(),
                 addAdminDTO.getPassword(),
-                addAdminDTO.getRoleId(),
+                roleId,
                 addAdminDTO.getName(),
                 new Date(),
                 false);
@@ -88,7 +88,7 @@ public class AdminController {
 
     @DeleteMapping
     @RequiredPermission(ADMIN_DELETE)
-    public Mono<ResponseEntity> deleteAdmins(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdmins(
             @RequestHeader String account,
             @RequestParam Set<String> accounts) {
         Mono<Boolean> deleted = adminService.authAndDeleteAdmins(account, accounts);
@@ -97,7 +97,7 @@ public class AdminController {
 
     @PutMapping
     @RequiredPermission(ADMIN_UPDATE)
-    public Mono<ResponseEntity> updateAdmins(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdmins(
             @RequestHeader String account,
             @RequestParam Set<String> accounts,
             @RequestBody UpdateAdminDTO updateAdminDTO) {
@@ -112,19 +112,27 @@ public class AdminController {
 
     @GetMapping
     @RequiredPermission(ADMIN_QUERY)
-    public Mono<ResponseEntity> queryAdmins(
+    public Mono<ResponseEntity<ResponseDTO<Collection<Admin>>>> queryAdmins(
             @RequestParam(required = false) Set<String> accounts,
             @RequestParam(required = false) Long roleId,
             @RequestParam(defaultValue = "false") boolean withPassword,
-            @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
+        Flux<Admin> admins = adminService.queryAdmins(accounts, roleId, withPassword, 0, size);
+        return ResponseFactory.okIfTruthy(admins);
+    }
+
+    @GetMapping("/page")
+    @RequiredPermission(ADMIN_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Admin>>>> queryAdmins(
+            @RequestParam(required = false) Set<String> accounts,
+            @RequestParam(required = false) Long roleId,
+            @RequestParam(defaultValue = "false") boolean withPassword,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Mono<Long> count = adminService.countAdmins(accounts, roleId);
         Flux<Admin> admins = adminService.queryAdmins(accounts, roleId, withPassword, page, size);
-        if (page != null) {
-            Mono<Long> total = adminService.countAdmins(accounts, roleId);
-            return ResponseFactory.page(total, admins);
-        } else {
-            return ResponseFactory.okIfTruthy(admins);
-        }
+        return ResponseFactory.page(count, admins);
     }
 }

@@ -22,9 +22,9 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.AdminRole;
-import im.turms.turms.pojo.dto.AddAdminRoleDTO;
-import im.turms.turms.pojo.dto.UpdateAdminRoleDTO;
+import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.admin.AdminRoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.Set;
 
 @RestController
@@ -48,7 +49,7 @@ public class AdminRoleController {
 
     @PostMapping
     @RequiredPermission(AdminPermission.ADMIN_ROLE_CREATE)
-    public Mono<ResponseEntity> addAdminRole(@RequestBody AddAdminRoleDTO addAdminRoleDTO) {
+    public Mono<ResponseEntity<ResponseDTO<AdminRole>>> addAdminRole(@RequestBody AddAdminRoleDTO addAdminRoleDTO) {
         if (addAdminRoleDTO.getId() != null
                 && !CollectionUtils.isEmpty(addAdminRoleDTO.getPermissions())
                 && StringUtils.hasText(addAdminRoleDTO.getName())
@@ -59,20 +60,20 @@ public class AdminRoleController {
                     addAdminRoleDTO.getPermissions(),
                     addAdminRoleDTO.getRank()));
         } else {
-            return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
     }
 
     @DeleteMapping
     @RequiredPermission(AdminPermission.ADMIN_ROLE_DELETE)
-    public Mono<ResponseEntity> deleteAdminRoles(@RequestParam Set<Long> ids) {
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminRoles(@RequestParam Set<Long> ids) {
         Mono<Boolean> deleted = adminRoleService.deleteAdminRoles(ids);
         return ResponseFactory.acknowledged(deleted);
     }
 
     @PutMapping
     @RequiredPermission(AdminPermission.ADMIN_ROLE_UPDATE)
-    public Mono<ResponseEntity> updateAdminRole(
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdminRole(
             @RequestParam Long id,
             @RequestBody UpdateAdminRoleDTO updateAdminRoleDTO) {
         if (StringUtils.hasText(updateAdminRoleDTO.getName())
@@ -85,18 +86,17 @@ public class AdminRoleController {
                     updateAdminRoleDTO.getRank());
             return ResponseFactory.acknowledged(updated);
         } else {
-            return ResponseFactory.code(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
     }
 
     @GetMapping
     @RequiredPermission(AdminPermission.ADMIN_ROLE_QUERY)
-    public Mono<ResponseEntity> queryAdminRoles(
+    public Mono<ResponseEntity<ResponseDTO<Collection<AdminRole>>>> queryAdminRoles(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> names,
             @RequestParam(required = false) Set<AdminPermission> includedPermissions,
             @RequestParam(required = false) Set<Integer> ranks,
-            @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Flux<AdminRole> adminRolesFlux = adminRoleService.queryAdminRoles(
@@ -104,17 +104,33 @@ public class AdminRoleController {
                 names,
                 includedPermissions,
                 ranks,
+                0,
+                size);
+        return ResponseFactory.okIfTruthy(adminRolesFlux);
+    }
+
+    @GetMapping("/page")
+    @RequiredPermission(AdminPermission.ADMIN_ROLE_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<AdminRole>>>> queryAdminRoles(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Set<String> names,
+            @RequestParam(required = false) Set<AdminPermission> includedPermissions,
+            @RequestParam(required = false) Set<Integer> ranks,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Mono<Long> count = adminRoleService.countAdminRoles(
+                ids,
+                names,
+                includedPermissions,
+                ranks);
+        Flux<AdminRole> adminRolesFlux = adminRoleService.queryAdminRoles(
+                ids,
+                names,
+                includedPermissions,
+                ranks,
                 page,
                 size);
-        if (page != null) {
-            Mono<Long> count = adminRoleService.countAdminRoles(
-                    ids,
-                    names,
-                    includedPermissions,
-                    ranks);
-            return ResponseFactory.page(count, adminRolesFlux);
-        } else {
-            return ResponseFactory.okIfTruthy(adminRolesFlux);
-        }
+        return ResponseFactory.page(count, adminRolesFlux);
     }
 }

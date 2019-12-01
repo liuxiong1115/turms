@@ -26,7 +26,6 @@ import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.AdminActionLog;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
@@ -75,17 +74,13 @@ public class AdminActionLogService {
     public Mono<Boolean> deleteAdminActionLogs(
             @Nullable Set<Long> ids,
             @Nullable Set<String> accounts,
-            @Nullable Date startDate,
-            @Nullable Date endDate) {
+            @Nullable Date logDateStart,
+            @Nullable Date logDateEnd) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, startDate, endDate)
+                .addInIfNotNull(ID, ids)
+                .addInIfNotNull(AdminActionLog.Fields.account, accounts)
+                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateStart, logDateEnd)
                 .buildQuery();
-        if (ids != null && !ids.isEmpty()) {
-            query.addCriteria(Criteria.where(ID).in(ids));
-        }
-        if (accounts != null && !accounts.isEmpty()) {
-            query.addCriteria(Criteria.where(AdminActionLog.Fields.account).in(accounts));
-        }
         return mongoTemplate.remove(query, AdminActionLog.class)
                 .map(DeleteResult::wasAcknowledged);
     }
