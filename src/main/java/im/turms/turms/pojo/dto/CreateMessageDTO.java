@@ -34,11 +34,11 @@ public class CreateMessageDTO {
 
     private String text;
 
+    private List<byte[]> records;
+
     private Long senderId;
 
     private Long targetId;
-
-    private List<byte[]> records;
 
     private Integer burnAfter;
 

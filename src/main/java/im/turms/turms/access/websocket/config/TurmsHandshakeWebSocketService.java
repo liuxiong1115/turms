@@ -21,6 +21,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
+import im.turms.turms.common.Validator;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.plugin.UserAuthenticator;
@@ -151,6 +152,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
     }
 
     public Object getFailedReason(@NotNull Long userId, @NotNull Long requestId) {
+        Validator.throwIfAnyNull(userId, requestId);
         if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryingLoginFailedReason()) {
             return loginFailedReasonCache.getIfPresent(Pair.of(userId, requestId));
         } else {

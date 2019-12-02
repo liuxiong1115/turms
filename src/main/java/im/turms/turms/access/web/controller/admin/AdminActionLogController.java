@@ -20,9 +20,7 @@ package im.turms.turms.access.web.controller.admin;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
-import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.AdminActionLog;
 import im.turms.turms.pojo.dto.AcknowledgedDTO;
 import im.turms.turms.pojo.dto.PaginationDTO;
@@ -55,13 +53,9 @@ public class AdminActionLogController {
             @RequestParam(required = false) Set<String> accounts,
             @RequestParam(required = false) Date logDateStart,
             @RequestParam(required = false) Date logDateEnd) {
-        if (ids != null || accounts != null || logDateStart != null || logDateEnd != null) {
-            Mono<Boolean> deleted = adminActionLogService
-                    .deleteAdminActionLogs(ids, accounts, logDateStart, logDateEnd);
-            return ResponseFactory.acknowledged(deleted);
-        } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
+        Mono<Boolean> deleted = adminActionLogService
+                .deleteAdminActionLogs(ids, accounts, logDateStart, logDateEnd);
+        return ResponseFactory.acknowledged(deleted);
     }
 
     @GetMapping

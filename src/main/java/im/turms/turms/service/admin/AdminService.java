@@ -20,6 +20,7 @@ package im.turms.turms.service.admin;
 import com.hazelcast.replicatedmap.ReplicatedMap;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.common.Validator;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
@@ -111,6 +112,7 @@ public class AdminService {
             @Nullable String name,
             @Nullable Date registrationDate,
             boolean upsert) {
+        Validator.throwIfAllNull(requester, roleId);
         return adminRoleService.isAdminHigherThanRole(requester, roleId)
                 .flatMap(isHigher -> {
                     if (isHigher) {

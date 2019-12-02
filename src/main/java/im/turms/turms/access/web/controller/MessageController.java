@@ -30,10 +30,8 @@ import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.message.MessageService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -66,9 +64,6 @@ public class MessageController {
             @RequestParam(required = false) Date deletionDateEnd,
             @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
             @RequestParam(required = false) Integer size) {
-        if (chatType == ChatType.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
         Flux<Message> completeMessages = messageService.queryCompleteMessages(
                 false,
                 ids,
@@ -101,9 +96,6 @@ public class MessageController {
             @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
-        if (chatType == ChatType.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
         Mono<Long> count = messageService.countMessages(
                 ids,
                 chatType,
@@ -137,14 +129,16 @@ public class MessageController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> createMessages(
             @RequestParam(defaultValue = "true") Boolean deliver,
             @RequestBody CreateMessageDTO createMessageDTO) {
-        if (createMessageDTO.getTargetId() == null
-                || createMessageDTO.getChatType() == null
-                || createMessageDTO.getChatType() == ChatType.UNRECOGNIZED
-                || createMessageDTO.getIsSystemMessage() == null
-                || (createMessageDTO.getText() == null && createMessageDTO.getRecords() == null)) {
-            throw new IllegalArgumentException();
-        }
-        Mono<Boolean> acknowledged = messageService.sendAdminMessage(deliver, createMessageDTO);
+        Mono<Boolean> acknowledged = messageService.sendMessage(
+                deliver,
+                createMessageDTO.getChatType(),
+                createMessageDTO.getIsSystemMessage(),
+                createMessageDTO.getText(),
+                createMessageDTO.getRecords(),
+                createMessageDTO.getSenderId(),
+                createMessageDTO.getTargetId(),
+                createMessageDTO.getBurnAfter(),
+                createMessageDTO.getReferenceId());
         return ResponseFactory.acknowledged(acknowledged);
     }
 
