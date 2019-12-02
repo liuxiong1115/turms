@@ -203,6 +203,7 @@ public class DateTimeUtil {
             @NotNull Function4<Date, Date, ChatType, Boolean, Mono<Long>> function,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         int maxHourRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxHourRangesPerCountRequest();
         int maxDayRanges = turmsClusterManager.getTurmsProperties()
@@ -223,6 +224,7 @@ public class DateTimeUtil {
             @NotNull Date endDate,
             @NotNull DivideBy divideBy,
             @NotNull BiFunction<Date, Date, Mono<Long>> function) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         int maxHourRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxHourRangesPerCountRequest();
         int maxDayRanges = turmsClusterManager.getTurmsProperties()

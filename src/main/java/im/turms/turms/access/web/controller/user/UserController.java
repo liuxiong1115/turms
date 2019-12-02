@@ -160,26 +160,16 @@ public class UserController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUser(
             @RequestParam Set<Long> userIds,
             @RequestBody UpdateUserDTO updateUserDTO) {
-        boolean validated = updateUserDTO.getPassword() != null
-                && updateUserDTO.getName() != null
-                && updateUserDTO.getIntro() != null
-                && updateUserDTO.getProfilePictureUrl() != null
-                && updateUserDTO.getRegistrationDate() != null
-                && updateUserDTO.getActive() != null;
-        if (validated) {
-            Mono<Boolean> updated = userService.updateUsers(
-                    userIds,
-                    updateUserDTO.getPassword(),
-                    updateUserDTO.getName(),
-                    updateUserDTO.getIntro(),
-                    updateUserDTO.getProfilePictureUrl(),
-                    updateUserDTO.getProfileAccess(),
-                    updateUserDTO.getRegistrationDate(),
-                    updateUserDTO.getActive());
-            return ResponseFactory.acknowledged(updated);
-        } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
+        Mono<Boolean> updated = userService.updateUsers(
+                userIds,
+                updateUserDTO.getPassword(),
+                updateUserDTO.getName(),
+                updateUserDTO.getIntro(),
+                updateUserDTO.getProfilePictureUrl(),
+                updateUserDTO.getProfileAccess(),
+                updateUserDTO.getRegistrationDate(),
+                updateUserDTO.getActive());
+        return ResponseFactory.acknowledged(updated);
     }
 
     @GetMapping("/count")

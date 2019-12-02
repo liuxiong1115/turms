@@ -21,10 +21,7 @@ import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.constant.GroupUpdateStrategy;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -130,6 +127,7 @@ public class GroupService {
             @Nullable Long groupTypeId,
             @Nullable Date muteEndDate,
             @Nullable Boolean active) {
+        Validator.throwIfAnyNull(creatorId, ownerId);
         if (groupTypeId == null) {
             groupTypeId = DEFAULT_GROUP_TYPE_ID;
         }
@@ -170,6 +168,7 @@ public class GroupService {
     public Mono<Boolean> deleteGroupAndGroupMembers(
             @NotNull Long groupId,
             @Nullable Boolean useLogicalDeletion) {
+        Validator.throwIfAnyNull(groupId);
         if (useLogicalDeletion == null) {
             useLogicalDeletion = turmsClusterManager.getTurmsProperties()
                     .getGroup().isLogicallyDeleteGroupByDefault();
@@ -514,6 +513,16 @@ public class GroupService {
             @Nullable Long groupTypeId,
             @Nullable Long successorId,
             boolean quitAfterTransfer) {
+        Validator.throwIfAnyNull(groupId);
+        Validator.throwIfAllNull(
+                muteEndDate,
+                groupName,
+                url,
+                intro,
+                announcement,
+                minimumScore,
+                groupTypeId,
+                successorId);
         return mongoTemplate
                 .inTransaction()
                 .execute(operations -> {
@@ -619,10 +628,11 @@ public class GroupService {
     }
 
     public Mono<Long> countCreatedGroups(
-            @Nullable Date createdStartDate,
-            @Nullable Date createdEndDate) {
+            @Nullable Date startDate,
+            @Nullable Date endDate) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Group.Fields.creationDate, createdStartDate, createdEndDate)
+                .addBetweenIfNotNull(Group.Fields.creationDate, startDate, endDate)
                 .add(Criteria.where(Group.Fields.deletionDate).is(null))
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
@@ -637,10 +647,11 @@ public class GroupService {
     }
 
     public Mono<Long> countDeletedGroups(
-            @Nullable Date deletedStartDate,
-            @Nullable Date deletedEndDate) {
+            @Nullable Date startDate,
+            @Nullable Date endDate) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Group.Fields.deletionDate, deletedStartDate, deletedEndDate)
+                .addBetweenIfNotNull(Group.Fields.deletionDate, startDate, endDate)
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
     }

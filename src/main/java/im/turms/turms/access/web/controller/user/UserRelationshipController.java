@@ -20,9 +20,7 @@ package im.turms.turms.access.web.controller.user;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
-import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.UserRelationship;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
@@ -77,16 +75,12 @@ public class UserRelationshipController {
             @RequestParam Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
             @RequestBody UpdateRelationshipDTO updateRelationshipDTO) {
-        if (updateRelationshipDTO.getIsBlocked() != null && updateRelationshipDTO.getEstablishmentDate() != null) {
-            Mono<Boolean> updated = userRelationshipService.updateUserOneSidedRelationships(
-                    ownerId,
-                    relatedUsersIds,
-                    updateRelationshipDTO.getIsBlocked(),
-                    updateRelationshipDTO.getEstablishmentDate());
-            return ResponseFactory.acknowledged(updated);
-        } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
+        Mono<Boolean> updated = userRelationshipService.updateUserOneSidedRelationships(
+                ownerId,
+                relatedUsersIds,
+                updateRelationshipDTO.getIsBlocked(),
+                updateRelationshipDTO.getEstablishmentDate());
+        return ResponseFactory.acknowledged(updated);
     }
 
     @GetMapping

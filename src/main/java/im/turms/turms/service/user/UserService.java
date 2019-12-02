@@ -20,6 +20,7 @@ package im.turms.turms.service.user;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.common.Validator;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
@@ -371,6 +372,8 @@ public class UserService {
             @Nullable Boolean active,
             @Nullable Integer page,
             @Nullable Integer size) {
+        Validator.throwIfAfterWhenNotNull(registrationDateStart, registrationDateEnd);
+        Validator.throwIfAfterWhenNotNull(deletionDateStart, deletionDateEnd);
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, userIds)
@@ -384,6 +387,7 @@ public class UserService {
     public Mono<Long> countRegisteredUsers(
             @Nullable Date startDate,
             @Nullable Date endDate) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(User.Fields.registrationDate, startDate, endDate)
                 .buildQuery();
@@ -391,6 +395,7 @@ public class UserService {
     }
 
     public Mono<Long> countDeletedUsers(@Nullable Date startDate, @Nullable Date endDate) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(User.Fields.deletionDate, startDate, endDate)
                 .buildQuery();
@@ -398,6 +403,7 @@ public class UserService {
     }
 
     public Mono<Long> countLoggedInUsers(@Nullable Date startDate, @Nullable Date endDate) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, startDate, endDate)
                 .buildCriteria();
@@ -419,6 +425,8 @@ public class UserService {
             @Nullable Date deletionDateStart,
             @Nullable Date deletionDateEnd,
             @Nullable Boolean active) {
+        Validator.throwIfAfterWhenNotNull(registrationDateStart, registrationDateEnd);
+        Validator.throwIfAfterWhenNotNull(deletionDateStart, deletionDateEnd);
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, userIds)
@@ -430,6 +438,7 @@ public class UserService {
     }
 
     public Mono<Long> countMaxOnlineUsers(@Nullable Date startDate, @Nullable Date endDate) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder
                 .newBuilder()
                 .addBetweenIfNotNull(UserOnlineUserNumber.Fields.timestamp, startDate, endDate)
@@ -449,6 +458,14 @@ public class UserService {
             @Nullable ProfileAccessStrategy profileAccessStrategy,
             @Nullable Date registrationDate,
             @Nullable Boolean active) {
+        Validator.throwIfAllFalsy(
+                password,
+                name,
+                intro,
+                profilePictureUrl,
+                profileAccessStrategy,
+                registrationDate,
+                active);
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(User.Fields.password, password)

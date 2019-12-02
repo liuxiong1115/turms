@@ -29,7 +29,6 @@ import im.turms.turms.plugin.ExpiryMessageAutoDeletionNotificationHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
-import im.turms.turms.pojo.dto.CreateMessageDTO;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.service.group.GroupMemberService;
@@ -163,6 +162,11 @@ public class MessageService {
             @Nullable MessageDeliveryStatus deliveryStatus,
             @Nullable Integer page,
             @Nullable Integer size) {
+        if (chatType == ChatType.UNRECOGNIZED) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
+        Validator.throwIfAfterWhenNotNull(deliveryDateStart, deliveryDateEnd);
+        Validator.throwIfAfterWhenNotNull(deletionDateStart, deletionDateEnd);
         QueryBuilder builder = QueryBuilder.newBuilder()
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
@@ -472,6 +476,11 @@ public class MessageService {
             @Nullable Date deletionDateStart,
             @Nullable Date deletionDateEnd,
             @Nullable MessageDeliveryStatus deliveryStatus) {
+        if (chatType == ChatType.UNRECOGNIZED) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
+        Validator.throwIfAfterWhenNotNull(deliveryDateStart, deliveryDateEnd);
+        Validator.throwIfAfterWhenNotNull(deletionDateStart, deletionDateEnd);
         QueryBuilder builder = QueryBuilder.newBuilder()
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
@@ -503,6 +512,7 @@ public class MessageService {
             @Nullable Date endDate,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
@@ -518,6 +528,7 @@ public class MessageService {
     public Mono<Long> countGroupsThatSentMessages(
             @Nullable Date startDate,
             @Nullable Date endDate) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
                 .add(Criteria.where(Message.Fields.chatType).is(ChatType.GROUP))
@@ -533,6 +544,7 @@ public class MessageService {
             @Nullable Date startDate,
             @Nullable Date endDate,
             @Nullable ChatType chatType) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, startDate, endDate)
                 .buildCriteria();
@@ -555,6 +567,7 @@ public class MessageService {
             @Nullable Date endDate,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
@@ -568,6 +581,7 @@ public class MessageService {
             @Nullable Date endDate,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         return countSentMessages(startDate, endDate, chatType, areSystemMessages)
                 .flatMap(totalDeliveredMessages -> {
                     if (totalDeliveredMessages == 0) {
@@ -590,6 +604,7 @@ public class MessageService {
             @Nullable Date endDate,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, startDate, endDate)
                 .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, areSystemMessages)
@@ -609,6 +624,7 @@ public class MessageService {
             @Nullable Date endDate,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
+        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         return countAcknowledgedMessages(startDate, endDate, chatType, areSystemMessages)
                 .flatMap(totalAcknowledgedMessages -> {
                     if (totalAcknowledgedMessages == 0) {
@@ -791,32 +807,51 @@ public class MessageService {
                         messageId));
     }
 
-    public Mono<Boolean> sendAdminMessage(
+    public Mono<Boolean> sendMessage(
             boolean deliver,
-            @NotNull CreateMessageDTO createMessageDTO) {
+            @NotNull ChatType chatType,
+            @NotNull Boolean isSystemMessage,
+            @Nullable String text,
+            @Nullable List<byte[]> records,
+            @Nullable Long senderId,
+            @NotNull Long targetId,
+            @Nullable Integer burnAfter,
+            @Nullable Long referenceId) {
+        Validator.throwIfAnyNull(chatType, isSystemMessage, targetId);
+        Validator.throwIfAllFalsy(text, records);
+        if (chatType == ChatType.UNRECOGNIZED) {
+            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
+        }
+        if (senderId == null) {
+            if (isSystemMessage) {
+                senderId = ADMIN_REQUESTER_ID;
+            } else {
+                throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
+            }
+        }
         Message message = new Message();
-        message.setChatType(createMessageDTO.getChatType());
-        Boolean areSystemMessages = createMessageDTO.getIsSystemMessage();
-        areSystemMessages = areSystemMessages != null ? areSystemMessages : true;
-        message.setIsSystemMessage(areSystemMessages);
-        message.setText(createMessageDTO.getText());
-        message.setSenderId(createMessageDTO.getSenderId());
-        message.setTargetId(createMessageDTO.getTargetId());
-        message.setRecords(createMessageDTO.getRecords());
-        message.setBurnAfter(createMessageDTO.getBurnAfter());
-        message.setReferenceId(createMessageDTO.getReferenceId());
-        return sendAdminMessage(deliver, message);
+        message.setChatType(chatType);
+        message.setIsSystemMessage(isSystemMessage);
+        message.setText(text);
+        message.setRecords(records);
+        message.setSenderId(senderId);
+        message.setTargetId(targetId);
+        message.setBurnAfter(burnAfter);
+        message.setReferenceId(referenceId);
+        return sendMessage(deliver, message);
     }
 
-    public Mono<Boolean> sendAdminMessage(
+    public Mono<Boolean> sendMessage(
             boolean deliver,
             @NotNull Message message) {
-        if (message.getTargetId() == null
-                || message.getChatType() == null
-                || message.getChatType() == ChatType.UNRECOGNIZED
-                || message.getIsSystemMessage() == null
-                || (message.getText() == null && message.getRecords() == null)) {
-            throw new IllegalArgumentException();
+        Validator.throwIfAnyNull(
+                message.getTargetId(),
+                message.getChatType(),
+                message.getChatType(),
+                message.getIsSystemMessage());
+        Validator.throwIfAllFalsy(message.getText(), message.getRecords());
+        if (message.getChatType() == ChatType.UNRECOGNIZED) {
+            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
         if (deliver) {
             return authAndSendMessage(
