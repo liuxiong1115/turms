@@ -35,6 +35,7 @@ import com.hazelcast.replicatedmap.ReplicatedMap;
 import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import im.turms.turms.annotation.cluster.HazelcastConfig;
 import im.turms.turms.common.TurmsLogger;
+import im.turms.turms.common.Validator;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.task.QueryResponsibleTurmsServerAddressTask;
 import im.turms.turms.task.TurmsTaskExecutor;
@@ -364,6 +365,7 @@ public class TurmsClusterManager {
     }
 
     public Mono<String> getResponsibleTurmsServerAddress(@NotNull Long userId) {
+        Validator.throwIfAnyNull(userId);
         Member member = getMemberByUserId(userId);
         if (member == null) {
             return Mono.empty();

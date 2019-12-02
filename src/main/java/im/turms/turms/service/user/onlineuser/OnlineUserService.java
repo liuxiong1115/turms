@@ -24,6 +24,7 @@ import com.hazelcast.cluster.Member;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
 import im.turms.turms.common.TurmsStatusCode;
+import im.turms.turms.common.Validator;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -577,6 +578,7 @@ public class OnlineUserService {
     }
 
     public Integer getDisconnectionReason(@NotNull Long userId, @NotNull String sessionId) {
+        Validator.throwIfAnyNull(userId, sessionId);
         if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryingLoginFailedReason()) {
             return disconnectionReasonCache.getIfPresent(Pair.of(userId, sessionId));
         } else {

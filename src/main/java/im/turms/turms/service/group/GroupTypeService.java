@@ -23,6 +23,7 @@ import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.Validator;
 import im.turms.turms.constant.GroupInvitationStrategy;
 import im.turms.turms.constant.GroupJoinStrategy;
 import im.turms.turms.constant.GroupUpdateStrategy;
@@ -102,6 +103,16 @@ public class GroupTypeService {
             @NotNull Boolean selfInfoUpdatable,
             @NotNull Boolean enableReadReceipt,
             @NotNull Boolean messageEditable) {
+        Validator.throwIfAnyNull(name,
+                groupSizeLimit,
+                groupInvitationStrategy,
+                groupJoinStrategy,
+                groupInfoUpdateStrategy,
+                memberInfoUpdateStrategy,
+                guestSpeakable,
+                selfInfoUpdatable,
+                enableReadReceipt,
+                messageEditable);
         Long id = turmsClusterManager.generateRandomId();
         GroupType groupType = new GroupType(
                 id,
@@ -131,6 +142,18 @@ public class GroupTypeService {
             @Nullable Boolean selfInfoUpdatable,
             @Nullable Boolean enableReadReceipt,
             @Nullable Boolean messageEditable) {
+        Validator.throwIfAnyNull(id);
+        Validator.throwIfAllNull(
+                name,
+                groupSizeLimit,
+                groupInvitationStrategy,
+                groupJoinStrategy,
+                groupInfoUpdateStrategy,
+                memberInfoUpdateStrategy,
+                guestSpeakable,
+                selfInfoUpdatable,
+                enableReadReceipt,
+                messageEditable);
         Query query = new Query().addCriteria(Criteria.where(ID).is(id));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(GroupType.Fields.name, name)
@@ -150,12 +173,14 @@ public class GroupTypeService {
     }
 
     public Mono<Boolean> deleteGroupType(@NotNull Long groupTypeId) {
+        Validator.throwIfAnyNull(groupTypeId);
         Query query = new Query().addCriteria(Criteria.where(ID).is(groupTypeId));
         groupTypeMap.remove(groupTypeId);
         return mongoTemplate.remove(query, GroupType.class).map(DeleteResult::wasAcknowledged);
     }
 
     public Mono<GroupType> queryGroupType(@NotNull Long groupTypeId) {
+        Validator.throwIfAnyNull(groupTypeId);
         GroupType groupType = groupTypeMap.get(groupTypeId);
         if (groupType != null) {
             return Mono.just(groupType);

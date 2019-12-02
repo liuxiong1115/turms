@@ -19,10 +19,7 @@ package im.turms.turms.service.user.relationship;
 
 import com.google.protobuf.Int64Value;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.*;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
 import im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion;
@@ -525,9 +522,7 @@ public class UserRelationshipService {
             @Nullable Set<Long> relatedUsersIds,
             @Nullable Boolean isBlocked,
             @Nullable Date establishmentDate) {
-        if (relatedUsersIds == null && isBlocked == null && establishmentDate == null) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
+        Validator.throwIfAllNull(relatedUsersIds, isBlocked, establishmentDate);
         Query query = QueryBuilder.newBuilder()
                 .add(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)

@@ -23,6 +23,7 @@ import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.Constants;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.Validator;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.AdminRole;
 import org.apache.commons.lang3.tuple.Triple;
@@ -84,6 +85,7 @@ public class AdminRoleService {
             @NotNull String name,
             @NotEmpty Set<AdminPermission> permissions,
             @NotNull Integer rank) {
+        Validator.throwIfAnyFalsy(id, name, permissions, rank);
         AdminRole adminRole = new AdminRole(id, name, permissions, rank);
         return addAdminRole(adminRole);
     }
@@ -116,6 +118,7 @@ public class AdminRoleService {
             @Nullable String newName,
             @Nullable Set<AdminPermission> permissions,
             @Nullable Integer rank) {
+        Validator.throwIfAllFalsy(newName, permissions, rank);
         Query query = new Query().addCriteria(Criteria.where(Constants.ID).is(roleId));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(AdminRole.Fields.name, newName)

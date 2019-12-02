@@ -71,15 +71,11 @@ public class AdminController {
     public Mono<ResponseEntity<ResponseDTO<Admin>>> addAdmin(
             @RequestHeader String account,
             @RequestBody AddAdminDTO addAdminDTO) {
-        Long roleId = addAdminDTO.getRoleId();
-        if (roleId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
         Mono<Admin> generatedAdmin = adminService.authAndAddAdmin(
                 account,
                 addAdminDTO.getAccount(),
                 addAdminDTO.getPassword(),
-                roleId,
+                addAdminDTO.getRoleId(),
                 addAdminDTO.getName(),
                 new Date(),
                 false);

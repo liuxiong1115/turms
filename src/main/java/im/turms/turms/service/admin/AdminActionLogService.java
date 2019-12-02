@@ -22,6 +22,7 @@ import com.mongodb.DBObject;
 import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.Validator;
 import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.AdminActionLog;
@@ -76,6 +77,7 @@ public class AdminActionLogService {
             @Nullable Set<String> accounts,
             @Nullable Date logDateStart,
             @Nullable Date logDateEnd) {
+        Validator.throwIfAfterWhenNotNull(logDateStart, logDateEnd);
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)
@@ -92,6 +94,7 @@ public class AdminActionLogService {
             @Nullable Date logDateEnd,
             @Nullable Integer page,
             @Nullable Integer size) {
+        Validator.throwIfAfterWhenNotNull(logDateStart, logDateEnd);
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)
@@ -136,6 +139,7 @@ public class AdminActionLogService {
             @Nullable Set<String> accounts,
             @Nullable Date logDateStart,
             @Nullable Date logDateEnd) {
+        Validator.throwIfAfterWhenNotNull(logDateStart, logDateEnd);
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)

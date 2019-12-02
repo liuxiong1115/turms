@@ -20,15 +20,11 @@ package im.turms.turms.access.web.controller.admin;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
-import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.AdminRole;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.admin.AdminRoleService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,18 +46,12 @@ public class AdminRoleController {
     @PostMapping
     @RequiredPermission(AdminPermission.ADMIN_ROLE_CREATE)
     public Mono<ResponseEntity<ResponseDTO<AdminRole>>> addAdminRole(@RequestBody AddAdminRoleDTO addAdminRoleDTO) {
-        if (addAdminRoleDTO.getId() != null
-                && !CollectionUtils.isEmpty(addAdminRoleDTO.getPermissions())
-                && StringUtils.hasText(addAdminRoleDTO.getName())
-                && addAdminRoleDTO.getRank() != null) {
-            return ResponseFactory.okIfTruthy(adminRoleService.addAdminRole(
-                    addAdminRoleDTO.getId(),
-                    addAdminRoleDTO.getName(),
-                    addAdminRoleDTO.getPermissions(),
-                    addAdminRoleDTO.getRank()));
-        } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
+        Mono<AdminRole> adminRoleMono = adminRoleService.addAdminRole(
+                addAdminRoleDTO.getId(),
+                addAdminRoleDTO.getName(),
+                addAdminRoleDTO.getPermissions(),
+                addAdminRoleDTO.getRank());
+        return ResponseFactory.okIfTruthy(adminRoleMono);
     }
 
     @DeleteMapping
@@ -76,18 +66,12 @@ public class AdminRoleController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdminRole(
             @RequestParam Long id,
             @RequestBody UpdateAdminRoleDTO updateAdminRoleDTO) {
-        if (StringUtils.hasText(updateAdminRoleDTO.getName())
-                || !CollectionUtils.isEmpty(updateAdminRoleDTO.getPermissions())
-                || updateAdminRoleDTO.getRank() != null) {
-            Mono<Boolean> updated = adminRoleService.updateAdminRole(
-                    id,
-                    updateAdminRoleDTO.getName(),
-                    updateAdminRoleDTO.getPermissions(),
-                    updateAdminRoleDTO.getRank());
-            return ResponseFactory.acknowledged(updated);
-        } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
+        Mono<Boolean> updated = adminRoleService.updateAdminRole(
+                id,
+                updateAdminRoleDTO.getName(),
+                updateAdminRoleDTO.getPermissions(),
+                updateAdminRoleDTO.getRank());
+        return ResponseFactory.acknowledged(updated);
     }
 
     @GetMapping
