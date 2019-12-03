@@ -572,8 +572,7 @@ public class GroupMemberService {
         List<Mono<UserOnlineInfo>> monoList = new ArrayList<>(members.size());
         for (GroupMember member : members) {
             Long userId = member.getKey().getUserId();
-            monoList.add(onlineUserService.queryUserOnlineInfo(userId)
-                    .defaultIfEmpty(OFFLINE_USER_ONLINE_INFO));
+            monoList.add(onlineUserService.queryUserOnlineInfo(userId));
         }
         return Mono.zip(monoList, objects -> objects)
                 .map(results -> {

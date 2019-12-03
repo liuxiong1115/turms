@@ -49,8 +49,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-import static im.turms.turms.common.Constants.OFFLINE_USER_ONLINE_INFO;
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -278,19 +276,24 @@ public class UserController {
     @RequiredPermission(AdminPermission.USER_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<UserOnlineInfo>>>> queryOnlineUsersStatus(
             @RequestParam(required = false) Set<Long> userIds,
-            @RequestParam(defaultValue = "20") Integer number) {
+            @RequestParam(defaultValue = "20") Integer number,
+            @RequestParam(defaultValue = "true") Boolean checkIfExists) {
         if (userIds != null && !userIds.isEmpty()) {
             List<Mono<UserOnlineInfo>> userOnlineInfoMonos = new ArrayList<>(userIds.size());
             for (Long userId : userIds) {
                 Mono<UserOnlineInfo> userOnlineInfoMno = onlineUserService.queryUserOnlineInfo(userId);
-                userOnlineInfoMno = userOnlineInfoMno.map(info -> {
-                    if (info == OFFLINE_USER_ONLINE_INFO) {
-                        return UserOnlineInfo.builder()
-                                .userId(userId)
-                                .userStatus(UserStatus.OFFLINE)
-                                .build();
+                userOnlineInfoMno = userOnlineInfoMno.flatMap(info -> {
+                    if (info.getUserStatus() == UserStatus.OFFLINE && checkIfExists) {
+                        return userService.userExists(userId)
+                                .flatMap(exists -> {
+                                    if (exists) {
+                                        return Mono.just(info);
+                                    } else {
+                                        return Mono.empty();
+                                    }
+                                });
                     } else {
-                        return info;
+                        return Mono.just(info);
                     }
                 });
                 userOnlineInfoMonos.add(userOnlineInfoMno);
