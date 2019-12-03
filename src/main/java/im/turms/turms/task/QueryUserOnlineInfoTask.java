@@ -18,6 +18,7 @@
 package im.turms.turms.task;
 
 import com.hazelcast.spring.context.SpringAware;
+import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -29,8 +30,6 @@ import org.springframework.context.ApplicationContextAware;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
-
-import static im.turms.turms.common.Constants.OFFLINE_USER_ONLINE_INFO;
 
 @SpringAware
 public class QueryUserOnlineInfoTask implements Callable<UserOnlineInfo>, Serializable, ApplicationContextAware {
@@ -49,7 +48,10 @@ public class QueryUserOnlineInfoTask implements Callable<UserOnlineInfo>, Serial
         if (userManager != null) {
             return userManager.getOnlineUserInfo();
         } else {
-            return OFFLINE_USER_ONLINE_INFO;
+            return UserOnlineInfo.builder()
+                    .userId(userId)
+                    .userStatus(UserStatus.OFFLINE)
+                    .build();
         }
     }
 

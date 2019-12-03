@@ -45,8 +45,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.common.Constants.OFFLINE_USER_ONLINE_INFO;
-
 @Controller
 public class WsUserController {
     private final UserService userService;
@@ -170,8 +168,7 @@ public class WsUserController {
             UsersOnlineStatuses.Builder statusesBuilder = UsersOnlineStatuses.newBuilder();
             List<Mono<UserOnlineInfo>> monos = new ArrayList<>(usersIds.size());
             for (Long userId : usersIds) {
-                monos.add(onlineUserService.queryUserOnlineInfo(userId)
-                        .defaultIfEmpty(OFFLINE_USER_ONLINE_INFO));
+                monos.add(onlineUserService.queryUserOnlineInfo(userId));
             }
             return Mono.zip(monos, objects -> objects)
                     .map(infos -> {

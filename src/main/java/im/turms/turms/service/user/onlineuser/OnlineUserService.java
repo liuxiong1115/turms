@@ -62,7 +62,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.common.Constants.ALL_DEVICE_TYPES;
+import static im.turms.turms.common.Constants.ONLINE_USERS_NUMBER_PERSISTER_CRON;
 
 @Service
 public class OnlineUserService {
@@ -490,7 +491,10 @@ public class OnlineUserService {
             if (localOnlineUserManager != null) {
                 return Mono.just(localOnlineUserManager.getOnlineUserInfo());
             } else {
-                return Mono.just(OFFLINE_USER_ONLINE_INFO);
+                return Mono.just(UserOnlineInfo.builder()
+                        .userId(userId)
+                        .userStatus(UserStatus.OFFLINE)
+                        .build());
             }
         } else {
             Member member = turmsClusterManager.getMemberByUserId(userId);
