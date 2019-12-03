@@ -100,7 +100,7 @@ public class UserRelationshipController {
     @GetMapping("/page")
     @RequiredPermission(AdminPermission.USER_RELATIONSHIP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<UserRelationship>>>> queryRelationships(
-            @RequestParam Long ownerId,
+            @RequestParam(required = false) Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
             @RequestParam(required = false) Integer groupIndex,
             @RequestParam(required = false) Boolean isBlocked,
