@@ -86,12 +86,6 @@ public class Constants {
     public static final TaskScheduler TASK_SCHEDULER = new DefaultManagedTaskScheduler();
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-    /**
-     * Note: This is a precompile directive that java compiler can use it to optimize
-     * the source code in at compile time.
-     * So, DO NOT remove "static final"
-     */
-    public static final boolean DEV_MODE = true;
 
     public static <T, R> Pair<T, R> emptyPair() {
         return EMPTY_PAIR;

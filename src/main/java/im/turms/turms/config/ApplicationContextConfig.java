@@ -17,8 +17,8 @@
 
 package im.turms.turms.config;
 
-import im.turms.turms.common.Constants;
 import im.turms.turms.common.TurmsLogger;
+import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -36,8 +36,8 @@ public class ApplicationContextConfig {
 
     @EventListener(classes = ContextRefreshedEvent.class)
     public void handleContextRefreshedEvent() {
-        if (Constants.DEV_MODE) {
-            TurmsLogger.getLogger().warn("Turms is running in dev mode. Turn it off in im/turms/turms/common/Constants.java");
+        if (CompilerOptions.env == CompilerOptions.Value.DEV_ENV) {
+            TurmsLogger.getLogger().warn("Turms is running in dev mode. Turn it off in pom.xml");
         }
     }
 
