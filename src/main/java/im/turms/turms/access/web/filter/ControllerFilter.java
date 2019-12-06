@@ -21,7 +21,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.Constants;
+import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.service.admin.AdminActionLogService;
@@ -45,7 +45,8 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.common.Constants.ACCOUNT;
+import static im.turms.turms.common.Constants.PASSWORD;
 
 @Component
 public class ControllerFilter implements WebFilter {
@@ -73,7 +74,7 @@ public class ControllerFilter implements WebFilter {
             Pair<String, String> pair = parseAccountAndPassword(exchange);
             String account = pair.getLeft();
             String password = pair.getRight();
-            if (Constants.DEV_MODE) {
+            if (CompilerOptions.env == CompilerOptions.Value.DEV_ENV) {
                 if (account != null && password != null) {
                     return tryPersistingAndPass(account, exchange, chain, handlerMethod);
                 }
@@ -223,7 +224,7 @@ public class ControllerFilter implements WebFilter {
     }
 
     private boolean isDevAndSwaggerRequest(@NotNull ServerWebExchange exchange) {
-        if (DEV_MODE) {
+        if (CompilerOptions.env == CompilerOptions.Value.DEV_ENV) {
             String path = exchange.getRequest().getURI().getPath();
             return path.startsWith("/swagger-ui.html")
                     || path.startsWith("/webjars/springfox-swagger-ui")
