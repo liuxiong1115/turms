@@ -4,6 +4,7 @@ import com.google.common.net.InetAddresses;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.common.TurmsPasswordUtil;
+import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.*;
 import im.turms.turms.pojo.domain.*;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -94,7 +95,7 @@ public class MongoDataGenerator {
     }
 
     private boolean isDevEnv() {
-        return DEV_MODE && mongoTemplate.getMongoDatabase().getName().contains("-dev");
+        return CompilerOptions.env == CompilerOptions.Value.DEV_ENV && mongoTemplate.getMongoDatabase().getName().contains("-dev");
     }
 
     // Note: Better not to remove all mock data after turms closed
