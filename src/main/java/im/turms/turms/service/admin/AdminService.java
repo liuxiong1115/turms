@@ -18,23 +18,20 @@
 package im.turms.turms.service.admin;
 
 import com.hazelcast.replicatedmap.ReplicatedMap;
-import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.UpdateResult;
-import im.turms.turms.common.Validator;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.admin.AdminInfo;
 import im.turms.turms.pojo.domain.Admin;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -42,7 +39,10 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,17 +51,13 @@ import static im.turms.turms.common.Constants.*;
 @Service
 public class AdminService {
     public static String ROOT_ADMIN_ACCOUNT;
-    private static final String DESC_ACCOUNT = "Account";
-    private static final String DESC_RAW_PASSWORD = "Raw Password";
-    //Account -> Admin
-    private static ReplicatedMap<String, Admin> admins;
-    private final TurmsClusterManager turmsClusterManager;
+    //Account -> AdminInfo
+    private static ReplicatedMap<String, AdminInfo> adminMap;
     private final TurmsPasswordUtil turmsPasswordUtil;
     private final ReactiveMongoTemplate mongoTemplate;
     private final AdminRoleService adminRoleService;
 
-    public AdminService(TurmsClusterManager turmsClusterManager, TurmsPasswordUtil turmsPasswordUtil, ReactiveMongoTemplate mongoTemplate, AdminRoleService adminRoleService) {
-        this.turmsClusterManager = turmsClusterManager;
+    public AdminService(TurmsPasswordUtil turmsPasswordUtil, ReactiveMongoTemplate mongoTemplate, AdminRoleService adminRoleService) {
         this.turmsPasswordUtil = turmsPasswordUtil;
         this.mongoTemplate = mongoTemplate;
         this.adminRoleService = adminRoleService;
@@ -70,17 +66,14 @@ public class AdminService {
     @PostHazelcastInitialized
     public Function<TurmsClusterManager, Void> initAdminsCache() {
         return clusterManager -> {
-            admins = clusterManager.getHazelcastInstance().getReplicatedMap(HAZELCAST_ADMINS_MAP);
-            if (admins.size() == 0) {
+            adminMap = clusterManager.getHazelcastInstance().getReplicatedMap(HAZELCAST_ADMINS_MAP);
+            if (adminMap.size() == 0) {
                 loadAllAdmins();
             }
             countRootAdmins().subscribe(number -> {
                 if (number == 0) {
                     String account = RandomStringUtils.randomAlphabetic(16);
                     String rawPassword = RandomStringUtils.randomAlphanumeric(32);
-                    Map<String, String> map = new HashMap<>(2);
-                    map.put(DESC_ACCOUNT, account);
-                    map.put(DESC_RAW_PASSWORD, rawPassword);
                     addAdmin(account,
                             rawPassword,
                             ADMIN_ROLE_ROOT_ID,
@@ -89,7 +82,9 @@ public class AdminService {
                             false)
                             .doOnSuccess(admin -> {
                                 ROOT_ADMIN_ACCOUNT = account;
-                                TurmsLogger.logJson("Root admin", map);
+                                TurmsLogger.logJson("Root admin", Map.of(
+                                        "Account", account,
+                                        "Raw Password", rawPassword));
                             })
                             .subscribe();
                 }
@@ -118,10 +113,10 @@ public class AdminService {
                     if (isHigher) {
                         return addAdmin(account, rawPassword, roleId, name, registrationDate, upsert);
                     } else {
-                        return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
                 })
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
     }
 
     public Mono<Admin> addAdmin(
@@ -131,58 +126,39 @@ public class AdminService {
             @Nullable String name,
             @Nullable Date registrationDate,
             boolean upsert) {
-        Admin admin = new Admin();
-        admin.setAccount(account != null ? account : RandomStringUtils.randomAlphabetic(16));
-        admin.setName(name != null && !name.isBlank() ? name : RandomStringUtils.randomAlphabetic(8));
-        String password = rawPassword != null && !rawPassword.isBlank() ?
+        account = account != null ? account : RandomStringUtils.randomAlphabetic(16);
+        String password = StringUtils.hasText(rawPassword) ?
                 turmsPasswordUtil.encodeAdminPassword(rawPassword) :
                 turmsPasswordUtil.encodeAdminPassword(RandomStringUtils.randomAlphabetic(10));
-        admin.setPassword(password);
-        admin.setRegistrationDate(registrationDate != null ? registrationDate : new Date());
-        admin.setRoleId(roleId);
+        name = StringUtils.hasText(name) ? name : RandomStringUtils.randomAlphabetic(8);
+        registrationDate = registrationDate != null ? registrationDate : new Date();
+        Admin admin = new Admin(account, password, name, roleId, registrationDate);
+        AdminInfo adminInfo = new AdminInfo(admin, rawPassword);
+        String finalAccount = account;
         if (upsert) {
-            return mongoTemplate.save(admin).doOnSuccess(result -> admins.put(account, admin));
+            return mongoTemplate.save(admin).doOnSuccess(result -> adminMap.put(finalAccount, adminInfo));
         } else {
-            return mongoTemplate.insert(admin).doOnSuccess(result -> admins.put(account, admin));
+            return mongoTemplate.insert(admin).doOnSuccess(result -> adminMap.put(finalAccount, adminInfo));
         }
     }
 
     public Mono<Long> queryRoleId(@NotNull String account) {
-        Admin admin = admins.get(account);
-        if (admin != null) {
-            return Mono.just(admin.getRoleId());
-        } else {
-            Query query = new Query().addCriteria(Criteria.where(ID).is(account));
-            query.fields().include(Admin.Fields.roleId);
-            return mongoTemplate.findOne(query, Admin.class)
-                    .map(administrator -> {
-                        admins.put(account, administrator);
-                        return administrator.getRoleId();
-                    });
-        }
+        return queryAdmin(account).map(Admin::getRoleId);
     }
 
     public Flux<Long> queryRolesIds(@NotEmpty Set<String> accounts) {
-        List<Admin> cacheAdmins = new ArrayList<>(accounts.size());
+        Set<Long> rolesIds = new HashSet<>(accounts.size());
         for (String account : accounts) {
-            Admin admin = admins.get(account);
-            cacheAdmins.add(admin);
+            AdminInfo adminInfo = adminMap.get(account);
+            if (adminInfo != null) {
+                rolesIds.add(adminInfo.getAdmin().getRoleId());
+            }
         }
-        if (cacheAdmins.size() == accounts.size()) {
-            Set<Long> rolesIds = cacheAdmins.stream()
-                    .map(Admin::getRoleId)
-                    .mapToLong(value -> value)
-                    .boxed()
-                    .collect(Collectors.toSet());
+        if (rolesIds.size() == accounts.size()) {
             return Flux.fromIterable(rolesIds);
         } else {
-            Query query = new Query().addCriteria(Criteria.where(ID).in(accounts));
-            query.fields().include(Admin.Fields.roleId);
-            return mongoTemplate.find(query, Admin.class)
-                    .map(administrator -> {
-                        admins.put(administrator.getAccount(), administrator);
-                        return administrator.getRoleId();
-                    });
+            return queryAdmins(accounts, null, true, null, null)
+                    .map(Admin::getRoleId);
         }
     }
 
@@ -219,45 +195,45 @@ public class AdminService {
     }
 
     public Mono<Boolean> authenticate(@NotNull String account, @NotNull String rawPassword) {
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID).is(account));
-        query.fields().include(Admin.Fields.password);
-        return mongoTemplate.findOne(query, Admin.class)
-                .map(admin -> turmsPasswordUtil.matchesAdminPassword(rawPassword, admin.getPassword()))
-                .defaultIfEmpty(false);
+        AdminInfo adminInfo = adminMap.get(account);
+        if (adminInfo != null && adminInfo.getRawPassword() != null) {
+            return Mono.just(adminInfo.getRawPassword().equals(rawPassword));
+        } else {
+            return queryAdmin(account)
+                    .map(admin -> {
+                        boolean valid = turmsPasswordUtil.matchesAdminPassword(rawPassword, admin.getPassword());
+                        if (valid) {
+                            adminMap.get(admin.getAccount()).setRawPassword(rawPassword);
+                        }
+                        return valid;
+                    })
+                    .defaultIfEmpty(false);
+        }
     }
 
     public Mono<Boolean> deleteAdmin(@NotNull String account) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(account));
         return mongoTemplate.remove(query, Admin.class).map(result -> {
-            admins.remove(account);
+            if (result.wasAcknowledged()) {
+                adminMap.remove(account);
+            }
             return result.wasAcknowledged();
         });
     }
 
-    public Mono<Boolean> authAndDeleteAdmin(@NotNull String requesterAccount, @NotNull String deleteAccount) {
-        return isAdminAuthorized(requesterAccount, AdminPermission.ADMIN_DELETE)
-                .flatMap(authorized -> {
-                    if (authorized != null && authorized) {
-                        Query query = new Query().addCriteria(Criteria.where(ID).is(deleteAccount));
-                        return mongoTemplate.remove(query, Admin.class).map(DeleteResult::wasAcknowledged);
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                    }
-                });
-    }
-
-    public Mono<Admin> queryAdmin(@NotNull String account, boolean withPassword) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(account));
-        if (!withPassword) {
-            query.fields().exclude(Admin.Fields.password);
+    public Mono<Admin> queryAdmin(@NotNull String account) {
+        AdminInfo adminInfo = adminMap.get(account);
+        if (adminInfo != null) {
+            return Mono.just(adminInfo.getAdmin());
+        } else {
+            return mongoTemplate.findById(account, Admin.class)
+                    .doOnSuccess(admin -> adminMap.put(account, new AdminInfo(admin, null)));
         }
-        return mongoTemplate.findById(account, Admin.class);
     }
 
     public void loadAllAdmins() {
         mongoTemplate.find(new Query(), Admin.class)
-                .doOnNext(admin -> admins.put(admin.getAccount(), admin))
+                .doOnNext(admin -> adminMap.put(admin.getAccount(), new AdminInfo(admin, null)))
                 .subscribe();
     }
 
@@ -271,10 +247,15 @@ public class AdminService {
                 .addInIfNotNull(ID, accounts)
                 .addIsIfNotNull(Admin.Fields.roleId, roleId)
                 .paginateIfNotNull(page, size);
-        if (!withPassword) {
-            query.fields().exclude(Admin.Fields.password);
-        }
-        return mongoTemplate.find(query, Admin.class);
+        return mongoTemplate.find(query, Admin.class).map(admin -> {
+            if (withPassword) {
+                return admin;
+            } else {
+                Admin clone = admin.clone();
+                clone.setPassword(null);
+                return clone;
+            }
+        });
     }
 
 
@@ -296,12 +277,18 @@ public class AdminService {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).in(accounts));
         Set<String> rootAdminsAccounts = getRootAdminsAccounts();
-        rootAdminsAccounts.removeAll(accounts);
+        for (String account : accounts) {
+            if (rootAdminsAccounts.contains(account)) {
+                throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+            }
+        }
         if (!rootAdminsAccounts.isEmpty()) {
             return mongoTemplate.remove(query, Admin.class)
                     .map(result -> {
-                        for (String account : accounts) {
-                            admins.remove(account);
+                        if (result.wasAcknowledged()) {
+                            for (String account : accounts) {
+                                adminMap.remove(account);
+                            }
                         }
                         return result.wasAcknowledged();
                     });
@@ -311,23 +298,23 @@ public class AdminService {
     }
 
     public Set<String> getRootAdminsAccounts() {
-        return admins.values()
+        return adminMap.values()
                 .stream()
-                .map(Admin::getAccount)
+                .map(adminInfo -> adminInfo.getAdmin().getAccount())
                 .collect(Collectors.toSet());
     }
 
     public Mono<Boolean> authAndUpdateAdmins(
             @NotNull String requester,
             @NotEmpty Set<String> targetAccounts,
-            @Nullable String password,
+            @Nullable String rawPassword,
             @Nullable String name,
             @Nullable Long roleId) {
         if (targetAccounts.size() == 1 && targetAccounts.iterator().next().equals(requester)) {
             if (roleId == null) {
-                return updateAdmins(targetAccounts, password, name, null);
+                return updateAdmins(targetAccounts, rawPassword, name, null);
             } else {
-                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
             }
         } else {
             return adminRoleService.isAdminHigherThanAdmins(requester, targetAccounts)
@@ -336,33 +323,57 @@ public class AdminService {
                             return adminRoleService.queryRankByRole(roleId)
                                     .flatMap(rank -> {
                                         if (triple.getMiddle() > rank) {
-                                            return updateAdmins(targetAccounts, password, name, roleId);
+                                            return updateAdmins(targetAccounts, rawPassword, name, roleId);
                                         } else {
-                                            return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                                         }
                                     });
                         } else {
-                            return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                         }
                     })
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+                    .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
         }
     }
 
     public Mono<Boolean> updateAdmins(
             @NotEmpty Set<String> targetAccounts,
-            @Nullable String password,
+            @Nullable String rawPassword,
             @Nullable String name,
             @Nullable Long roleId) {
+        Validator.throwIfAnyFalsy(targetAccounts);
+        Validator.throwIfAllNull(rawPassword, name, roleId);
         Query query = new Query();
         query.addCriteria(Criteria.where(ID).in(targetAccounts));
+        String password = turmsPasswordUtil.encodeAdminPassword(rawPassword);
         Update update = UpdateBuilder
                 .newBuilder()
                 .setIfNotNull(Admin.Fields.password, password)
                 .setIfNotNull(Admin.Fields.name, name)
                 .setIfNotNull(Admin.Fields.roleId, roleId)
                 .build();
-        return mongoTemplate.updateMulti(query, update, Admin.class).map(UpdateResult::wasAcknowledged);
+        return mongoTemplate.updateMulti(query, update, Admin.class)
+                .map(result -> {
+                    if (result.wasAcknowledged()) {
+                        for (String account : targetAccounts) {
+                            AdminInfo adminInfo = adminMap.get(account);
+                            if (adminInfo != null) {
+                                Admin admin = adminInfo.getAdmin();
+                                if (rawPassword != null) {
+                                    admin.setPassword(password);
+                                    adminInfo.setRawPassword(rawPassword);
+                                }
+                                if (name != null) {
+                                    admin.setName(name);
+                                }
+                                if (roleId != null) {
+                                    admin.setRoleId(roleId);
+                                }
+                            }
+                        }
+                    }
+                    return result.wasAcknowledged();
+                });
     }
 
     public Mono<Long> countAdmins(@Nullable Set<String> accounts, @Nullable Long roleId) {

@@ -20,8 +20,6 @@ package im.turms.turms.common;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.UserStatus;
-import im.turms.turms.pojo.bo.UserOnlineInfo;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
@@ -76,9 +74,6 @@ public class Constants {
     public static final Date EPOCH = new Date(0);
     public static final Date MAX_DATE = new Date(Long.MAX_VALUE);
     public static final Set<DeviceType> ALL_DEVICE_TYPES = Arrays.stream(DeviceType.values()).collect(Collectors.toSet());
-    public static final UserOnlineInfo OFFLINE_USER_ONLINE_INFO = UserOnlineInfo.builder()
-            .userStatus(UserStatus.OFFLINE)
-            .build();
 
     public static final int MONGO_TRANSACTION_RETRIES_NUMBER = 3;
     public static final Duration MONGO_TRANSACTION_BACKOFF = Duration.ofSeconds(3);
