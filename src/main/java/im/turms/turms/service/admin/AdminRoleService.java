@@ -20,11 +20,9 @@ package im.turms.turms.service.admin;
 import com.hazelcast.replicatedmap.ReplicatedMap;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.Constants;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
-import im.turms.turms.common.Validator;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.AdminRole;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.context.annotation.Lazy;
@@ -91,6 +89,9 @@ public class AdminRoleService {
     }
 
     public Mono<AdminRole> addAdminRole(@NotNull AdminRole adminRole) {
+        if (adminRole.getId().equals(ADMIN_ROLE_ROOT_ID)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+        }
         return mongoTemplate.insert(adminRole).map(role -> {
             roles.put(adminRole.getId(), role);
             return role;
@@ -98,7 +99,9 @@ public class AdminRoleService {
     }
 
     public Mono<Boolean> deleteAdminRoles(@NotEmpty Set<Long> rolesIds) {
-        rolesIds.remove(ADMIN_ROLE_ROOT_ID);
+        if (rolesIds.contains(ADMIN_ROLE_ROOT_ID)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+        }
         Query query = new Query().addCriteria(Criteria.where(Constants.ID).in(rolesIds));
         return mongoTemplate.remove(query, AdminRole.class)
                 .map(result -> {
@@ -119,6 +122,9 @@ public class AdminRoleService {
             @Nullable Set<AdminPermission> permissions,
             @Nullable Integer rank) {
         Validator.throwIfAllFalsy(newName, permissions, rank);
+        if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+        }
         Query query = new Query().addCriteria(Criteria.where(Constants.ID).is(roleId));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(AdminRole.Fields.name, newName)
@@ -134,7 +140,7 @@ public class AdminRoleService {
                             adminRole.setPermissions(permissions);
                             adminRole.setRank(rank);
                         } else {
-                            queryAndUpdateRole(roleId);
+                            queryAndCacheRole(roleId);
                         }
                         return true;
                     } else {
@@ -146,6 +152,9 @@ public class AdminRoleService {
     public Mono<Boolean> addPermissions(
             @NotNull Long roleId,
             @NotEmpty Set<AdminPermission> permissions) {
+        if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+        }
         Query query = new Query().addCriteria(Criteria.where(Constants.ID).is(roleId));
         Update update = new Update().addToSet(AdminRole.Fields.permissions).each(permissions);
         return mongoTemplate.updateFirst(query, update, AdminRole.class)
@@ -156,7 +165,7 @@ public class AdminRoleService {
                             adminRole.getPermissions().addAll(permissions);
                             return Mono.just(true);
                         } else {
-                            return queryAndUpdateRole(roleId)
+                            return queryAndCacheRole(roleId)
                                     .map(role -> {
                                         role.getPermissions().addAll(permissions);
                                         return true;
@@ -171,6 +180,9 @@ public class AdminRoleService {
     public Mono<Boolean> deletePermissions(
             @NotNull Long roleId,
             @NotEmpty Set<AdminPermission> permissions) {
+        if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(Constants.ID).is(roleId));
         Update update = new Update().pullAll(AdminRole.Fields.permissions, permissions.toArray());
@@ -182,7 +194,7 @@ public class AdminRoleService {
                             adminRole.getPermissions().removeAll(permissions);
                             return Mono.just(true);
                         } else {
-                            return queryAndUpdateRole(roleId)
+                            return queryAndCacheRole(roleId)
                                     .map(role -> {
                                         role.getPermissions().removeAll(permissions);
                                         return true;
@@ -249,7 +261,7 @@ public class AdminRoleService {
     }
 
     public Mono<Integer> queryRankByRole(@NotNull Long roleId) {
-        if (roleId == ADMIN_ROLE_ROOT_ID) {
+        if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
             return Mono.just(getRootRole().getRank());
         } else {
             Query query = new Query();
@@ -300,8 +312,8 @@ public class AdminRoleService {
                         }));
     }
 
-    public Mono<AdminRole> queryAndUpdateRole(@NotNull Long roleId) {
-        if (roleId == ADMIN_ROLE_ROOT_ID) {
+    public Mono<AdminRole> queryAndCacheRole(@NotNull Long roleId) {
+        if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
             return Mono.just(getRootRole());
         } else {
             return mongoTemplate.findById(roleId, AdminRole.class)
@@ -317,7 +329,7 @@ public class AdminRoleService {
         if (role != null) {
             return Mono.just(role.getPermissions());
         } else {
-            return queryAndUpdateRole(roleId)
+            return queryAndCacheRole(roleId)
                     .map(AdminRole::getPermissions);
         }
     }

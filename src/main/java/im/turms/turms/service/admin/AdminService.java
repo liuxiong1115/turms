@@ -44,13 +44,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
 
 @Service
 public class AdminService {
-    public static String ROOT_ADMIN_ACCOUNT;
+    /**
+     * Use hard-coded account because modifying the account of admins is not allowed.
+     */
+    public static String ROOT_ADMIN_ACCOUNT = "turms";
     //Account -> AdminInfo
     private static ReplicatedMap<String, AdminInfo> adminMap;
     private final TurmsPasswordUtil turmsPasswordUtil;
@@ -70,22 +72,18 @@ public class AdminService {
             if (adminMap.size() == 0) {
                 loadAllAdmins();
             }
-            countRootAdmins().subscribe(number -> {
-                if (number == 0) {
-                    String account = RandomStringUtils.randomAlphabetic(16);
+            rootAdminExists().subscribe(exists -> {
+                if (!exists) {
                     String rawPassword = RandomStringUtils.randomAlphanumeric(32);
-                    addAdmin(account,
+                    addAdmin(ROOT_ADMIN_ACCOUNT,
                             rawPassword,
                             ADMIN_ROLE_ROOT_ID,
                             RandomStringUtils.randomAlphabetic(8),
                             new Date(),
                             false)
-                            .doOnSuccess(admin -> {
-                                ROOT_ADMIN_ACCOUNT = account;
-                                TurmsLogger.logJson("Root admin", Map.of(
-                                        "Account", account,
-                                        "Raw Password", rawPassword));
-                            })
+                            .doOnSuccess(admin -> TurmsLogger.logJson("Root admin", Map.of(
+                                    "Account", ROOT_ADMIN_ACCOUNT,
+                                    "Raw Password", rawPassword)))
                             .subscribe();
                 }
             });
@@ -93,10 +91,10 @@ public class AdminService {
         };
     }
 
-    public Mono<Long> countRootAdmins() {
+    public Mono<Boolean> rootAdminExists() {
         Query query = new Query()
                 .addCriteria(Criteria.where(Admin.Fields.roleId).is(ADMIN_ROLE_ROOT_ID));
-        return mongoTemplate.count(query, Admin.class);
+        return mongoTemplate.exists(query, Admin.class);
     }
 
     public Mono<Admin> authAndAddAdmin(
@@ -108,6 +106,9 @@ public class AdminService {
             @Nullable Date registrationDate,
             boolean upsert) {
         Validator.throwIfAllNull(requester, roleId);
+        if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+        }
         return adminRoleService.isAdminHigherThanRole(requester, roleId)
                 .flatMap(isHigher -> {
                     if (isHigher) {
@@ -262,6 +263,9 @@ public class AdminService {
     public Mono<Boolean> authAndDeleteAdmins(
             @NotNull String requester,
             @NotEmpty Set<String> accounts) {
+        if (accounts.contains(ROOT_ADMIN_ACCOUNT)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+        }
         return adminRoleService.isAdminHigherThanAdmins(requester, accounts)
                 .flatMap(triple -> {
                     if (triple.getLeft()) {
@@ -276,32 +280,15 @@ public class AdminService {
     public Mono<Boolean> deleteAdmins(@NotEmpty Set<String> accounts) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).in(accounts));
-        Set<String> rootAdminsAccounts = getRootAdminsAccounts();
-        for (String account : accounts) {
-            if (rootAdminsAccounts.contains(account)) {
-                throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
-            }
-        }
-        if (!rootAdminsAccounts.isEmpty()) {
-            return mongoTemplate.remove(query, Admin.class)
-                    .map(result -> {
-                        if (result.wasAcknowledged()) {
-                            for (String account : accounts) {
-                                adminMap.remove(account);
-                            }
+        return mongoTemplate.remove(query, Admin.class)
+                .map(result -> {
+                    if (result.wasAcknowledged()) {
+                        for (String account : accounts) {
+                            adminMap.remove(account);
                         }
-                        return result.wasAcknowledged();
-                    });
-        } else {
-            return Mono.just(false);
-        }
-    }
-
-    public Set<String> getRootAdminsAccounts() {
-        return adminMap.values()
-                .stream()
-                .map(adminInfo -> adminInfo.getAdmin().getAccount())
-                .collect(Collectors.toSet());
+                    }
+                    return result.wasAcknowledged();
+                });
     }
 
     public Mono<Boolean> authAndUpdateAdmins(
@@ -314,7 +301,7 @@ public class AdminService {
             if (roleId == null) {
                 return updateAdmins(targetAccounts, rawPassword, name, null);
             } else {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
             }
         } else {
             return adminRoleService.isAdminHigherThanAdmins(requester, targetAccounts)
