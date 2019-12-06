@@ -39,7 +39,7 @@ import java.util.Date;
 @FieldNameConstants
 @AllArgsConstructor
 @NoArgsConstructor
-public class Admin implements IdentifiedDataSerializable {
+public class Admin implements IdentifiedDataSerializable, Cloneable {
     @Id
     @Length(min = 1, max = 32)
     private String account;
@@ -74,6 +74,16 @@ public class Admin implements IdentifiedDataSerializable {
         out.writeUTF(name);
         out.writeLong(roleId);
         out.writeLong(registrationDate.getTime());
+    }
+
+    @Override
+    public Admin clone() {
+        try {
+            return (Admin) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

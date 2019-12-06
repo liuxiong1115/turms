@@ -19,6 +19,7 @@ package im.turms.turms.config.hazelcast;
 
 import com.hazelcast.nio.serialization.DataSerializableFactory;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import im.turms.turms.pojo.bo.admin.AdminInfo;
 import im.turms.turms.pojo.domain.Admin;
 import im.turms.turms.pojo.domain.AdminRole;
 import im.turms.turms.pojo.domain.GroupType;
@@ -36,6 +37,8 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
     public IdentifiedDataSerializable create(int typeId) {
         Type type = Type.values()[typeId - 1];
         switch (type) {
+            case BO_ADMIN_INFO:
+                return new AdminInfo();
             case DOMAIN_ADMIN:
                 return new Admin();
             case DOMAIN_ADMIN_ROLE:
@@ -82,6 +85,7 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
     }
 
     public enum Type {
+        BO_ADMIN_INFO,
         DOMAIN_ADMIN,
         DOMAIN_ADMIN_ROLE,
         DOMAIN_GROUP_TYPE,
