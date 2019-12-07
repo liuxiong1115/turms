@@ -112,7 +112,7 @@ public class GroupJoinRequestService {
                     if (isBlacklisted != null && isBlacklisted) {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     } else {
-                        return groupService.isGroupActive(groupId)
+                        return groupService.isGroupActiveAndNotDeleted(groupId)
                                 .flatMap(isActive -> {
                                     if (isActive == null || !isActive) {
                                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_ACTIVE));

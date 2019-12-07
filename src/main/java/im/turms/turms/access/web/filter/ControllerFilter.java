@@ -74,12 +74,6 @@ public class ControllerFilter implements WebFilter {
             Pair<String, String> pair = parseAccountAndPassword(exchange);
             String account = pair.getLeft();
             String password = pair.getRight();
-            if (CompilerOptions.env == CompilerOptions.Value.DEV_ENV) {
-                if (account != null && password != null) {
-                    return tryPersistingAndPass(account, exchange, chain, handlerMethod);
-                }
-                return chain.filter(exchange);
-            }
             RequiredPermission requiredPermission = handlerMethod.getMethodAnnotation(RequiredPermission.class);
             if (requiredPermission != null && requiredPermission.value().equals(AdminPermission.NONE)) {
                 return chain.filter(exchange);

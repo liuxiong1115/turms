@@ -116,8 +116,8 @@ public class GroupController {
     @RequiredPermission(GROUP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroup(
             @RequestParam Long groupId,
-            @RequestParam(required = false) Boolean logicalDelete) {
-        Mono<Boolean> deleted = groupService.deleteGroupAndGroupMembers(groupId, logicalDelete);
+            @RequestParam(required = false) Boolean logicallyDelete) {
+        Mono<Boolean> deleted = groupService.deleteGroupAndGroupMembers(groupId, logicallyDelete);
         return ResponseFactory.acknowledged(deleted);
     }
 
