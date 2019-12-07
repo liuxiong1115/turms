@@ -3,7 +3,6 @@ package im.turms.turms.access.web.controller.user;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.dto.PaginationDTO;
 import im.turms.turms.pojo.dto.ResponseDTO;
@@ -19,6 +18,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 
+import static im.turms.turms.constant.AdminPermission.USER_JOINED_GROUP_QUERY;
+
 @RestController
 @RequestMapping("/users/groups")
 public class UserGroupController {
@@ -33,7 +34,7 @@ public class UserGroupController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(USER_JOINED_GROUP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<Group>>>> queryUserJoinedGroups(
             @RequestParam Long userId,
             @RequestParam(required = false) Integer size) {
@@ -43,7 +44,7 @@ public class UserGroupController {
     }
 
     @GetMapping("/page")
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(USER_JOINED_GROUP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Group>>>> queryUserJoinedGroups(
             @RequestParam Long userId,
             @RequestParam(defaultValue = "0") Integer page,

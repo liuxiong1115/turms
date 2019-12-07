@@ -3,7 +3,6 @@ package im.turms.turms.access.web.controller.user;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
@@ -26,6 +25,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
+import static im.turms.turms.constant.AdminPermission.*;
+
 @RestController
 @RequestMapping("/users/online-infos")
 public class UserOnlineInfoController {
@@ -42,7 +43,7 @@ public class UserOnlineInfoController {
     }
 
     @GetMapping("/count")
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(STATISTICS_USER_QUERY)
     public Mono<ResponseEntity<ResponseDTO<TotalDTO>>> countOnlineUsers() {
         return ResponseFactory.total(onlineUserService.countOnlineUsers());
     }
@@ -51,7 +52,7 @@ public class UserOnlineInfoController {
      * @param number only works when userIds is null or empty
      */
     @GetMapping("/statuses")
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(USER_ONLINE_INFO_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<UserOnlineInfo>>>> queryOnlineUsersStatus(
             @RequestParam(required = false) Set<Long> userIds,
             @RequestParam(defaultValue = "20") Integer number,
@@ -88,7 +89,7 @@ public class UserOnlineInfoController {
     }
 
     @PutMapping("/statuses")
-    @RequiredPermission(AdminPermission.USER_UPDATE)
+    @RequiredPermission(USER_ONLINE_INFO_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUserOnlineStatus(
             @RequestParam Long userId,
             @RequestParam(required = false) Set<DeviceType> deviceTypes,
@@ -108,7 +109,7 @@ public class UserOnlineInfoController {
     }
 
     @GetMapping("/users-nearby")
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(USER_ONLINE_INFO_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<User>>>> queryUsersNearby(
             @RequestParam Long userId,
             @RequestParam(required = false) DeviceType deviceType,
@@ -119,7 +120,7 @@ public class UserOnlineInfoController {
     }
 
     @GetMapping("/locations")
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(USER_ONLINE_INFO_QUERY)
     public ResponseEntity<ResponseDTO<Collection<UserLocation>>> queryUserLocations(@RequestParam Long userId) {
         SortedSet<UserLocation> userLocations = onlineUserService.getUserLocations(userId);
         return ResponseFactory.okIfTruthy(userLocations);

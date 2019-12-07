@@ -32,6 +32,8 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.Set;
 
+import static im.turms.turms.constant.AdminPermission.*;
+
 @RestController
 @RequestMapping("/admins/roles")
 public class AdminRoleController {
@@ -44,7 +46,7 @@ public class AdminRoleController {
     }
 
     @PostMapping
-    @RequiredPermission(AdminPermission.ADMIN_ROLE_CREATE)
+    @RequiredPermission(ADMIN_ROLE_CREATE)
     public Mono<ResponseEntity<ResponseDTO<AdminRole>>> addAdminRole(@RequestBody AddAdminRoleDTO addAdminRoleDTO) {
         Mono<AdminRole> adminRoleMono = adminRoleService.addAdminRole(
                 addAdminRoleDTO.getId(),
@@ -55,14 +57,14 @@ public class AdminRoleController {
     }
 
     @DeleteMapping
-    @RequiredPermission(AdminPermission.ADMIN_ROLE_DELETE)
+    @RequiredPermission(ADMIN_ROLE_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminRoles(@RequestParam Set<Long> ids) {
         Mono<Boolean> deleted = adminRoleService.deleteAdminRoles(ids);
         return ResponseFactory.acknowledged(deleted);
     }
 
     @PutMapping
-    @RequiredPermission(AdminPermission.ADMIN_ROLE_UPDATE)
+    @RequiredPermission(ADMIN_ROLE_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdminRole(
             @RequestParam Long id,
             @RequestBody UpdateAdminRoleDTO updateAdminRoleDTO) {
@@ -75,7 +77,7 @@ public class AdminRoleController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.ADMIN_ROLE_QUERY)
+    @RequiredPermission(ADMIN_ROLE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<AdminRole>>>> queryAdminRoles(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> names,
@@ -94,7 +96,7 @@ public class AdminRoleController {
     }
 
     @GetMapping("/page")
-    @RequiredPermission(AdminPermission.ADMIN_ROLE_QUERY)
+    @RequiredPermission(ADMIN_ROLE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<AdminRole>>>> queryAdminRoles(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> names,

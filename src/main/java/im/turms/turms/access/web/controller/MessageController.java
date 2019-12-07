@@ -22,7 +22,6 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.DateTimeUtil;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.constant.MessageDeliveryStatus;
@@ -36,6 +35,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
+
+import static im.turms.turms.constant.AdminPermission.*;
 
 @RestController
 @RequestMapping("/messages")
@@ -51,7 +52,7 @@ public class MessageController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.MESSAGE_QUERY)
+    @RequiredPermission(MESSAGE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<Message>>>> queryCompleteMessages(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) ChatType chatType,
@@ -82,7 +83,7 @@ public class MessageController {
     }
 
     @GetMapping("/page")
-    @RequiredPermission(AdminPermission.MESSAGE_QUERY)
+    @RequiredPermission(MESSAGE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Message>>>> queryCompleteMessages(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) ChatType chatType,
@@ -125,7 +126,7 @@ public class MessageController {
     }
 
     @PostMapping
-    @RequiredPermission(AdminPermission.MESSAGE_CREATE)
+    @RequiredPermission(MESSAGE_CREATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> createMessages(
             @RequestParam(defaultValue = "true") Boolean deliver,
             @RequestBody CreateMessageDTO createMessageDTO) {
@@ -143,7 +144,7 @@ public class MessageController {
     }
 
     @DeleteMapping
-    @RequiredPermission(AdminPermission.MESSAGE_DELETE)
+    @RequiredPermission(MESSAGE_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteMessages(
             @RequestParam Set<Long> messagesIds,
             @RequestParam(defaultValue = "false") Boolean deleteMessagesStatuses,
@@ -154,7 +155,7 @@ public class MessageController {
     }
 
     @GetMapping("/count")
-    @RequiredPermission(AdminPermission.MESSAGE_QUERY)
+    @RequiredPermission(MESSAGE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<MessageStatisticsDTO>>> countMessages(
             @RequestParam(required = false) ChatType chatType,
             @RequestParam(required = false) Boolean areSystemMessages,

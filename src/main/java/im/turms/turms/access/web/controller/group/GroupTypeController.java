@@ -20,7 +20,6 @@ package im.turms.turms.access.web.controller.group;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.GroupType;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.group.GroupTypeService;
@@ -30,6 +29,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+
+import static im.turms.turms.constant.AdminPermission.*;
 
 @RestController
 @RequestMapping("/groups/types")
@@ -43,7 +44,7 @@ public class GroupTypeController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.GROUP_TYPE_QUERY)
+    @RequiredPermission(GROUP_TYPE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupType>>>> queryGroupTypes(
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
@@ -52,7 +53,7 @@ public class GroupTypeController {
     }
 
     @GetMapping("/page")
-    @RequiredPermission(AdminPermission.GROUP_TYPE_QUERY)
+    @RequiredPermission(GROUP_TYPE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupType>>>> queryGroupTypes(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
@@ -63,7 +64,7 @@ public class GroupTypeController {
     }
 
     @PostMapping
-    @RequiredPermission(AdminPermission.GROUP_TYPE_CREATE)
+    @RequiredPermission(GROUP_TYPE_CREATE)
     public Mono<ResponseEntity<ResponseDTO<GroupType>>> addGroupType(@RequestBody AddGroupTypeDTO addGroupTypeDTO) {
         Mono<GroupType> addedGroupType = groupTypeService.addGroupType(addGroupTypeDTO.getName(),
                 addGroupTypeDTO.getGroupSizeLimit(),
@@ -79,7 +80,7 @@ public class GroupTypeController {
     }
 
     @PutMapping
-    @RequiredPermission(AdminPermission.GROUP_TYPE_QUERY)
+    @RequiredPermission(GROUP_TYPE_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupType(
             @RequestParam Long typeId,
             @RequestBody UpdateGroupTypeDTO updateGroupTypeDTO) {
@@ -99,6 +100,7 @@ public class GroupTypeController {
     }
 
     @DeleteMapping
+    @RequiredPermission(GROUP_TYPE_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupType(@RequestParam Long groupTypeId) {
         Mono<Boolean> deleted = groupTypeService.deleteGroupType(groupTypeId);
         return ResponseFactory.acknowledged(deleted);

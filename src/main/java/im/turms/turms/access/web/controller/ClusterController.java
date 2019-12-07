@@ -21,18 +21,17 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.dto.ResponseDTO;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserSimultaneousLoginService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static im.turms.turms.constant.AdminPermission.*;
 
 @RestController
 @RequestMapping("/cluster")
@@ -46,14 +45,14 @@ public class ClusterController {
     }
 
     @GetMapping("/hazelcast-info")
-    @RequiredPermission(AdminPermission.CLUSTER_CONFIG_QUERY)
+    @RequiredPermission(CLUSTER_CONFIG_QUERY)
     public ResponseEntity<ResponseDTO<Map>> queryHazelcastInfo(@RequestParam(defaultValue = "false") boolean withConfigs) {
         Map<String, ?> hazelcastInfo = turmsClusterManager.getHazelcastInfo(withConfigs);
         return ResponseFactory.okIfTruthy(hazelcastInfo);
     }
 
     @GetMapping("/config")
-    @RequiredPermission(AdminPermission.CLUSTER_CONFIG_QUERY)
+    @RequiredPermission(CLUSTER_CONFIG_QUERY)
     public ResponseEntity<ResponseDTO<TurmsProperties>> queryClusterConfig(@RequestParam(defaultValue = "false") boolean mutable) {
         TurmsProperties properties = turmsClusterManager.getTurmsProperties();
         if (mutable) {
@@ -68,7 +67,7 @@ public class ClusterController {
     }
 
     @GetMapping("/server")
-    @RequiredPermission(AdminPermission.NONE)
+    @RequiredPermission(NONE)
     public ResponseEntity<String> queryServerHost(@RequestParam Long userId) {
         String host = turmsClusterManager.getMemberByUserId(userId).getAddress().getHost();
         return ResponseFactory.raw(host);
@@ -78,7 +77,7 @@ public class ClusterController {
      * Do not call this method frequently because it will cost a lot of resources
      */
     @PutMapping("/config")
-    @RequiredPermission(AdminPermission.CLUSTER_CONFIG_UPDATE)
+    @RequiredPermission(CLUSTER_CONFIG_UPDATE)
     public ResponseEntity<ResponseDTO<TurmsProperties>> updateClusterConfig(@RequestBody TurmsProperties turmsProperties) throws IOException {
         TurmsProperties mergedProperties = TurmsProperties.merge(
                 turmsClusterManager.getTurmsProperties(),

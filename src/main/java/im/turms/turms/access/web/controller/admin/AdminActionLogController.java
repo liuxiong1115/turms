@@ -20,7 +20,6 @@ package im.turms.turms.access.web.controller.admin;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.AdminActionLog;
 import im.turms.turms.pojo.dto.AcknowledgedDTO;
 import im.turms.turms.pojo.dto.PaginationDTO;
@@ -35,6 +34,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
+import static im.turms.turms.constant.AdminPermission.ADMIN_ACTION_LOG_DELETE;
+import static im.turms.turms.constant.AdminPermission.ADMIN_ACTION_LOG_QUERY;
+
 @RestController
 @RequestMapping("/admins/action-logs")
 public class AdminActionLogController {
@@ -47,7 +49,7 @@ public class AdminActionLogController {
     }
 
     @DeleteMapping
-    @RequiredPermission(AdminPermission.ADMIN_ACTION_LOG_DELETE)
+    @RequiredPermission(ADMIN_ACTION_LOG_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminActionLog(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> accounts,
@@ -59,7 +61,7 @@ public class AdminActionLogController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.ADMIN_ACTION_LOG_QUERY)
+    @RequiredPermission(ADMIN_ACTION_LOG_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<AdminActionLog>>>> queryAdminActionLogs(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> accounts,
@@ -73,7 +75,7 @@ public class AdminActionLogController {
     }
 
     @GetMapping("/page")
-    @RequiredPermission(AdminPermission.ADMIN_ACTION_LOG_QUERY)
+    @RequiredPermission(ADMIN_ACTION_LOG_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<AdminActionLog>>>> queryAdminActionLogs(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> accounts,

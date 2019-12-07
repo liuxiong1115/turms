@@ -19,7 +19,6 @@ package im.turms.turms.access.web.controller;
 
 import im.turms.turms.access.websocket.config.TurmsHandshakeWebSocketService;
 import im.turms.turms.annotation.web.RequiredPermission;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +26,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static im.turms.turms.constant.AdminPermission.NONE;
 
 @RestController
 @RequestMapping("/reasons")
@@ -40,7 +41,7 @@ public class ReasonController {
     }
 
     @GetMapping("/login-failed")
-    @RequiredPermission(AdminPermission.NONE)
+    @RequiredPermission(NONE)
     public Object getLoginFailedReason(
             @RequestParam Long userId,
             @RequestParam Long requestId) {
@@ -55,7 +56,7 @@ public class ReasonController {
     }
 
     @GetMapping("/disconnection")
-    @RequiredPermission(AdminPermission.NONE)
+    @RequiredPermission(NONE)
     public Integer getDisconnectionReason(
             @RequestParam Long userId,
             @RequestParam String sessionId) {
