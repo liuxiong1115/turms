@@ -195,7 +195,7 @@ public class ControllerFilter implements WebFilter {
                                 action,
                                 params,
                                 null)
-                                .doOnSuccess(log -> {
+                                .doOnNext(log -> {
                                     if (callHandlers) {
                                         adminActionLogService.triggeringLogHandlers(exchange, log);
                                     }
