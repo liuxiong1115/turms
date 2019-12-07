@@ -20,7 +20,6 @@ package im.turms.turms.service.user;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.turms.common.Validator;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
@@ -33,6 +32,7 @@ import im.turms.turms.pojo.domain.UserLoginLog;
 import im.turms.turms.pojo.domain.UserOnlineUserNumber;
 import im.turms.turms.service.group.GroupInvitationService;
 import im.turms.turms.service.group.GroupMemberService;
+import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -41,6 +41,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -54,21 +55,16 @@ import static im.turms.turms.common.Constants.*;
 
 @Component
 public class UserService {
-    private static final String REGISTERED_USERS = "registeredUsers";
-    private static final String DELETED_USERS = "deletedUsers";
-    private static final String USERS_WHO_SENT_MESSAGES = "usersWhoSentMessages";
-    private static final String LOGGED_IN_USERS = "loggedInUsers";
-    private static final String MAX_ONLINE_USERS = "maxOnlineUsers";
-    private static final String USERS = "users";
     private final GroupMemberService groupMemberService;
     private final GroupInvitationService groupInvitationService;
     private final UserRelationshipService userRelationshipService;
     private final UserVersionService userVersionService;
+    private final OnlineUserService onlineUserService;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPasswordUtil turmsPasswordUtil;
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, GroupInvitationService groupInvitationService) {
+    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, GroupInvitationService groupInvitationService, OnlineUserService onlineUserService) {
         this.userRelationshipService = userRelationshipService;
         this.groupMemberService = groupMemberService;
         this.turmsPasswordUtil = turmsPasswordUtil;
@@ -76,6 +72,7 @@ public class UserService {
         this.userVersionService = userVersionService;
         this.mongoTemplate = mongoTemplate;
         this.groupInvitationService = groupInvitationService;
+        this.onlineUserService = onlineUserService;
     }
 
     /**
@@ -97,10 +94,11 @@ public class UserService {
                 .defaultIfEmpty(false);
     }
 
-    public Mono<Boolean> isActive(@NotNull Long userId) {
+    public Mono<Boolean> isActiveAndNotDeleted(@NotNull Long userId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(userId))
-                .addCriteria(Criteria.where(User.Fields.active).is(true));
+                .addCriteria(Criteria.where(User.Fields.active).is(true))
+                .addCriteria(Criteria.where(User.Fields.deletionDate).is(null));
         return mongoTemplate.exists(query, User.class);
     }
 
@@ -121,25 +119,19 @@ public class UserService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION));
                     }
+                } else {
+                    if (turmsClusterManager.getTurmsProperties().getMessage().isAllowSendingMessagesToStranger()) {
+                        if (turmsClusterManager.getTurmsProperties().getMessage().isCheckIfTargetActiveAndNotDeleted()) {
+                            return isActiveAndNotDeleted(targetId)
+                                    .zipWith(userRelationshipService.isNotBlocked(targetId, requesterId))
+                                    .map(results -> results.getT1() && results.getT2());
+                        } else {
+                            return userRelationshipService.isNotBlocked(targetId, requesterId);
+                        }
+                    } else {
+                        return userRelationshipService.isRelatedAndAllowed(targetId, requesterId);
+                    }
                 }
-                return isActive(requesterId)
-                        .flatMap(isActive -> {
-                            if (isActive == null || !isActive) {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_ACTIVE));
-                            } else {
-                                if (turmsClusterManager.getTurmsProperties().getMessage().isAllowSendingMessagesToStranger()) {
-                                    if (turmsClusterManager.getTurmsProperties().getMessage().isCheckIfTargetExists()) {
-                                        return userExists(targetId)
-                                                .zipWith(userRelationshipService.isNotBlocked(targetId, requesterId))
-                                                .map(results -> results.getT1() && results.getT2());
-                                    } else {
-                                        return userRelationshipService.isNotBlocked(targetId, requesterId);
-                                    }
-                                } else {
-                                    return userRelationshipService.isRelatedAndAllowed(targetId, requesterId);
-                                }
-                            }
-                        });
             case GROUP:
                 return groupMemberService.isAllowedToSendMessage(targetId, requesterId);
             case UNRECOGNIZED:
@@ -288,14 +280,15 @@ public class UserService {
     public Mono<Boolean> deleteUsers(
             @NotEmpty Set<Long> userIds,
             boolean deleteRelationships,
-            @Nullable Boolean logicalDelete) {
+            @Nullable Boolean logicallyDelete) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
-        if (logicalDelete == null) {
-            logicalDelete = turmsClusterManager.getTurmsProperties().getUser().isLogicallyDeleteUser();
+        if (logicallyDelete == null) {
+            logicallyDelete = turmsClusterManager.getTurmsProperties().getUser().isLogicallyDeleteUser();
         }
+        Mono<Boolean> deleteMono;
         if (deleteRelationships) {
-            boolean finalLogicallyDeleteUser = logicalDelete;
-            return mongoTemplate.inTransaction()
+            boolean finalLogicallyDeleteUser = logicallyDelete;
+            deleteMono = mongoTemplate.inTransaction()
                     .execute(operations -> {
                         Mono<Boolean> updateOrRemove;
                         Update update = new Update().set(User.Fields.deletionDate, new Date());
@@ -318,12 +311,12 @@ public class UserService {
                     .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
         } else {
-            if (logicalDelete) {
+            if (logicallyDelete) {
                 Update update = new Update().set(User.Fields.deletionDate, new Date());
-                return mongoTemplate.updateFirst(query, update, User.class)
+                deleteMono = mongoTemplate.updateFirst(query, update, User.class)
                         .map(UpdateResult::wasAcknowledged);
             } else {
-                return mongoTemplate.inTransaction()
+                deleteMono = mongoTemplate.inTransaction()
                         .execute(operations -> operations.remove(query, User.class)
                                 .flatMap(result -> {
                                     if (result.wasAcknowledged()) {
@@ -337,6 +330,13 @@ public class UserService {
                         .single();
             }
         }
+        return deleteMono.flatMap(success -> {
+            if (success) {
+                return onlineUserService.setUsersOffline(userIds, CloseStatus.NOT_ACCEPTABLE).then(Mono.just(true));
+            } else {
+                return Mono.just(false);
+            }
+        });
     }
 
     public Mono<Boolean> userExists(@NotNull Long userId) {
@@ -457,7 +457,7 @@ public class UserService {
             @Nullable String profilePictureUrl,
             @Nullable ProfileAccessStrategy profileAccessStrategy,
             @Nullable Date registrationDate,
-            @Nullable Boolean active) {
+            @Nullable Boolean isActive) {
         Validator.throwIfAllFalsy(
                 password,
                 name,
@@ -465,7 +465,7 @@ public class UserService {
                 profilePictureUrl,
                 profileAccessStrategy,
                 registrationDate,
-                active);
+                isActive);
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(User.Fields.password, password)
@@ -474,7 +474,7 @@ public class UserService {
                 .setIfNotNull(User.Fields.profilePictureUrl, profilePictureUrl)
                 .setIfNotNull(User.Fields.profileAccess, profileAccessStrategy)
                 .setIfNotNull(User.Fields.registrationDate, registrationDate)
-                .setIfNotNull(User.Fields.active, active)
+                .setIfNotNull(User.Fields.active, isActive)
                 .build();
         return mongoTemplate.updateMulti(query, update, User.class)
                 .flatMap(result -> {
@@ -483,8 +483,14 @@ public class UserService {
                         for (Long userId : userIds) {
                             monos.add(userVersionService.updateInformationVersion(userId));
                         }
-                        return Mono.zip(monos, objects -> objects)
-                                .thenReturn(true);
+                        if (isActive != null && !isActive) {
+                            return Mono.zip(monos, objects -> objects)
+                                    .then(onlineUserService.setUsersOffline(userIds, CloseStatus.NOT_ACCEPTABLE).then())
+                                    .thenReturn(true);
+                        } else {
+                            return Mono.zip(monos, objects -> objects)
+                                    .thenReturn(true);
+                        }
                     } else {
                         return Mono.just(false);
                     }

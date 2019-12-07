@@ -117,7 +117,7 @@ public class GroupJoinQuestionService {
                             if (exists != null && exists) {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RESOURCES_HAVE_BEEN_HANDLED));
                             } else {
-                                return groupService.isGroupActive(groupId);
+                                return groupService.isGroupActiveAndNotDeleted(groupId);
                             }
                         })
                         .flatMap(isActive -> {

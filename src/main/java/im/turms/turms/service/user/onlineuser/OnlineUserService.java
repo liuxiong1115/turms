@@ -237,6 +237,15 @@ public class OnlineUserService {
         return setLocalUserDevicesOffline(userId, Collections.singleton(deviceType), closeStatus);
     }
 
+    public Flux<Boolean> setUsersOffline(
+            @NotEmpty Set<Long> userIds,
+            @NotNull CloseStatus closeStatus) {
+        List<Mono<Boolean>> list = userIds.stream()
+                .map(userId -> setUserOffline(userId, closeStatus))
+                .collect(Collectors.toList());
+        return Flux.merge(list);
+    }
+
     public Mono<Boolean> setUserOffline(
             @NotNull Long userId,
             @NotNull CloseStatus closeStatus) {

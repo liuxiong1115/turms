@@ -667,18 +667,18 @@ public class GroupService {
                 .map(member -> member.getKey().getUserId());
     }
 
-    public Mono<Boolean> isGroupMutedOrInactive(@NotNull Long groupId) {
+    public Mono<Boolean> isGroupMuted(@NotNull Long groupId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
-                .addCriteria(Criteria.where(Group.Fields.muteEndDate).gt(new Date()))
-                .addCriteria(Criteria.where(Group.Fields.active).ne(true));
+                .addCriteria(Criteria.where(Group.Fields.muteEndDate).gt(new Date()));
         return mongoTemplate.exists(query, Group.class);
     }
 
-    public Mono<Boolean> isGroupActive(@NotNull Long groupId) {
+    public Mono<Boolean> isGroupActiveAndNotDeleted(@NotNull Long groupId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(groupId))
-                .addCriteria(Criteria.where(Group.Fields.active).is(true));
+                .addCriteria(Criteria.where(Group.Fields.active).is(true))
+                .addCriteria(Criteria.where(Group.Fields.deletionDate).is(null));
         return mongoTemplate.exists(query, Group.class);
     }
 }
