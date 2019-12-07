@@ -90,48 +90,54 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         } else if (!turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
             return cacheAndReturnError(HttpStatus.TEMPORARY_REDIRECT, userId, requestId);
         } else {
-            Pair<String, DeviceType> loggingDeviceType = SessionUtil.parseDeviceTypeFromRequest(
-                    request,
-                    turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
-            if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, loggingDeviceType.getRight())) {
-                return cacheAndReturnError(HttpStatus.CONFLICT, userId, requestId);
-            } else {
-                String password = SessionUtil.getPasswordFromRequest(request);
-                Mono<Boolean> finalMono = Mono.empty();
-                if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
-                    List<UserAuthenticator> authenticatorList = turmsPluginManager.getUserAuthenticatorList();
-                    if (!authenticatorList.isEmpty()) {
-                        UserLoginInfo userLoginInfo = new UserLoginInfo(
-                                userId,
-                                password,
-                                loggingDeviceType.getRight(),
-                                loggingDeviceType.getLeft());
-                        for (UserAuthenticator authenticator : authenticatorList) {
-                            Mono<Boolean> authenticateMono = authenticator.authenticate(userLoginInfo);
-                            finalMono = finalMono.switchIfEmpty(authenticateMono);
+            return userService.isActiveAndNotDeleted(userId)
+                    .flatMap(isActiveAndNotDeleted -> {
+                        if (isActiveAndNotDeleted == null || !isActiveAndNotDeleted) {
+                            return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
                         }
-                    }
-                }
-                return finalMono.switchIfEmpty(userService.authenticate(userId, password))
-                        .flatMap(authenticated -> {
-                            if (authenticated != null && authenticated) {
-                                return userSimultaneousLoginService.setConflictedDevicesOffline(userId, loggingDeviceType.getRight())
-                                        .flatMap(success -> {
-                                            if (success) {
-                                                if (password != null && !password.isBlank()) {
-                                                    return super.handleRequest(exchange, handler);
-                                                } else {
-                                                    return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
-                                                }
-                                            } else {
-                                                return cacheAndReturnError(HttpStatus.INTERNAL_SERVER_ERROR, userId, requestId);
-                                            }
-                                        });
-                            } else {
-                                return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
+                        Pair<String, DeviceType> loggingInDeviceType = SessionUtil.parseDeviceTypeFromRequest(
+                                request,
+                                turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
+                        if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, loggingInDeviceType.getRight())) {
+                            return cacheAndReturnError(HttpStatus.CONFLICT, userId, requestId);
+                        } else {
+                            String password = SessionUtil.getPasswordFromRequest(request);
+                            Mono<Boolean> authenticate = Mono.empty();
+                            if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                                List<UserAuthenticator> authenticatorList = turmsPluginManager.getUserAuthenticatorList();
+                                if (!authenticatorList.isEmpty()) {
+                                    UserLoginInfo userLoginInfo = new UserLoginInfo(
+                                            userId,
+                                            password,
+                                            loggingInDeviceType.getRight(),
+                                            loggingInDeviceType.getLeft());
+                                    for (UserAuthenticator authenticator : authenticatorList) {
+                                        Mono<Boolean> authenticateMono = authenticator.authenticate(userLoginInfo);
+                                        authenticate = authenticate.switchIfEmpty(authenticateMono);
+                                    }
+                                }
                             }
-                        });
-            }
+                            return authenticate.switchIfEmpty(userService.authenticate(userId, password))
+                                    .flatMap(authenticated -> {
+                                        if (authenticated != null && authenticated) {
+                                            return userSimultaneousLoginService.setConflictedDevicesOffline(userId, loggingInDeviceType.getRight())
+                                                    .flatMap(success -> {
+                                                        if (success) {
+                                                            if (password != null && !password.isBlank()) {
+                                                                return super.handleRequest(exchange, handler);
+                                                            } else {
+                                                                return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
+                                                            }
+                                                        } else {
+                                                            return cacheAndReturnError(HttpStatus.INTERNAL_SERVER_ERROR, userId, requestId);
+                                                        }
+                                                    });
+                                        } else {
+                                            return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
+                                        }
+                                    });
+                        }
+                    });
         }
     }
 

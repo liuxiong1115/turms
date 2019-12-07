@@ -105,7 +105,7 @@ public class GroupMemberService {
                 .flatMap(allowed -> {
                     if (allowed.isInvitable()) {
                         return Mono.zip(isBlacklisted(groupId, userId),
-                                groupService.isGroupActive(groupId))
+                                groupService.isGroupActiveAndNotDeleted(groupId))
                                 .flatMap(results -> {
                                     if (!results.getT1() && results.getT2()) {
                                         return addGroupMember(groupId, userId, groupMemberRole, name, muteEndDate, operations);
@@ -292,18 +292,31 @@ public class GroupMemberService {
                 });
     }
 
-    // Note: a blacklisted user is never a group member
+    // Note that a blacklisted user is never a group member
     public Mono<Boolean> isAllowedToSendMessage(@NotNull Long groupId, @NotNull Long senderId) {
         return isGroupMember(groupId, senderId)
-                .flatMap(authenticated -> {
-                    if (authenticated != null && authenticated) {
-                        return groupService.isGroupMutedOrInactive(groupId)
-                                .flatMap(groupMutedOrInactive -> {
-                                    if (groupMutedOrInactive) {
+                .flatMap(isGroupMember -> {
+                    if (isGroupMember != null && isGroupMember) {
+                        return groupService.isGroupMuted(groupId)
+                                .flatMap(isGroupMuted -> {
+                                    if (isGroupMuted) {
                                         return Mono.just(false);
                                     } else {
-                                        return isMemberMuted(groupId, senderId)
-                                                .map(muted -> !muted);
+                                        if (turmsClusterManager.getTurmsProperties().getMessage()
+                                                .isCheckIfTargetActiveAndNotDeleted()) {
+                                            return groupService.isGroupActiveAndNotDeleted(groupId)
+                                                    .flatMap(isGroupActiveAndNotDeleted -> {
+                                                        if (isGroupActiveAndNotDeleted) {
+                                                            return isMemberMuted(groupId, senderId)
+                                                                    .map(muted -> !muted);
+                                                        } else {
+                                                            return Mono.just(false);
+                                                        }
+                                                    });
+                                        } else {
+                                            return isMemberMuted(groupId, senderId)
+                                                    .map(muted -> !muted);
+                                        }
                                     }
                                 });
                     } else {
@@ -311,13 +324,20 @@ public class GroupMemberService {
                                 .flatMap(type -> {
                                     Boolean speakable = type.getGuestSpeakable();
                                     if (speakable != null && speakable) {
-                                        return groupService.isGroupMutedOrInactive(groupId)
-                                                .flatMap(groupMutedOrInactive -> {
-                                                    if (groupMutedOrInactive) {
+                                        return groupService.isGroupMuted(groupId)
+                                                .flatMap(isGroupMuted -> {
+                                                    if (isGroupMuted) {
                                                         return Mono.just(false);
                                                     } else {
-                                                        return isBlacklisted(groupId, senderId)
-                                                                .map(isBlacklisted -> !isBlacklisted);
+                                                        return groupService.isGroupActiveAndNotDeleted(groupId)
+                                                                .flatMap(isGroupActiveAndNoteDeleted -> {
+                                                                    if (isGroupActiveAndNoteDeleted) {
+                                                                        return isBlacklisted(groupId, senderId)
+                                                                                .map(isBlacklisted -> !isBlacklisted);
+                                                                    } else {
+                                                                        return Mono.just(false);
+                                                                    }
+                                                                });
                                                     }
                                                 });
                                     } else {

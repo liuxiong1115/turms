@@ -33,7 +33,7 @@ public class Message implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private TimeType timeType = TimeType.LOCAL_SERVER_TIME;
     @JsonView(MutablePropertiesView.class)
-    private boolean checkIfTargetExists = false;
+    private boolean checkIfTargetActiveAndNotDeleted = true;
 
     /**
      * The maximum length of a message allowed to send.
@@ -100,7 +100,7 @@ public class Message implements IdentifiedDataSerializable {
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeInt(timeType.ordinal());
-        out.writeBoolean(checkIfTargetExists);
+        out.writeBoolean(checkIfTargetActiveAndNotDeleted);
         out.writeInt(maxTextLimit);
         out.writeInt(maxRecordsSizeBytes);
         out.writeBoolean(messagePersistent);
@@ -123,7 +123,7 @@ public class Message implements IdentifiedDataSerializable {
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         timeType = TimeType.values()[in.readInt()];
-        checkIfTargetExists = in.readBoolean();
+        checkIfTargetActiveAndNotDeleted = in.readBoolean();
         maxTextLimit = in.readInt();
         maxRecordsSizeBytes = in.readInt();
         messagePersistent = in.readBoolean();
