@@ -169,7 +169,7 @@ public class UserController {
                 counts.add(userService.countDeletedUsers(
                         deletedStartDate,
                         deletedEndDate)
-                        .doOnSuccess(statistics::setDeletedUsers));
+                        .doOnNext(statistics::setDeletedUsers));
             }
             if (sentMessageStartDate != null || sentMessageEndDate != null) {
                 counts.add(messageService.countUsersWhoSentMessage(
@@ -177,25 +177,25 @@ public class UserController {
                         sentMessageEndDate,
                         null,
                         false)
-                        .doOnSuccess(statistics::setUsersWhoSentMessages));
+                        .doOnNext(statistics::setUsersWhoSentMessages));
             }
             if (loggedInStartDate != null || loggedInEndDate != null) {
                 counts.add(userService.countLoggedInUsers(
                         loggedInStartDate,
                         loggedInEndDate)
-                        .doOnSuccess(statistics::setLoggedInUsers));
+                        .doOnNext(statistics::setLoggedInUsers));
             }
             if (maxOnlineUsersStartDate != null || maxOnlineUsersEndDate != null) {
                 counts.add(userService.countMaxOnlineUsers(
                         maxOnlineUsersStartDate,
                         maxOnlineUsersEndDate)
-                        .doOnSuccess(statistics::setMaxOnlineUsers));
+                        .doOnNext(statistics::setMaxOnlineUsers));
             }
             if (counts.isEmpty() || registeredStartDate != null || registeredEndDate != null) {
                 counts.add(userService.countRegisteredUsers(
                         registeredStartDate,
                         registeredEndDate)
-                        .doOnSuccess(statistics::setRegisteredUsers));
+                        .doOnNext(statistics::setRegisteredUsers));
             }
         } else {
             if (deletedStartDate != null && deletedEndDate != null) {
@@ -204,7 +204,7 @@ public class UserController {
                         deletedEndDate,
                         divideBy,
                         userService::countDeletedUsers)
-                        .doOnSuccess(statistics::setDeletedUsersRecords));
+                        .doOnNext(statistics::setDeletedUsersRecords));
             }
             if (sentMessageStartDate != null && sentMessageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -214,7 +214,7 @@ public class UserController {
                         messageService::countUsersWhoSentMessage,
                         null,
                         false)
-                        .doOnSuccess(statistics::setUsersWhoSentMessagesRecords));
+                        .doOnNext(statistics::setUsersWhoSentMessagesRecords));
             }
             if (loggedInStartDate != null && loggedInEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -222,7 +222,7 @@ public class UserController {
                         loggedInEndDate,
                         divideBy,
                         userService::countLoggedInUsers)
-                        .doOnSuccess(statistics::setLoggedInUsersRecords));
+                        .doOnNext(statistics::setLoggedInUsersRecords));
             }
             if (maxOnlineUsersStartDate != null && maxOnlineUsersEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -230,7 +230,7 @@ public class UserController {
                         maxOnlineUsersEndDate,
                         divideBy,
                         userService::countMaxOnlineUsers)
-                        .doOnSuccess(statistics::setMaxOnlineUsersRecords));
+                        .doOnNext(statistics::setMaxOnlineUsersRecords));
             }
             if (registeredStartDate != null && registeredEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -238,7 +238,7 @@ public class UserController {
                         registeredEndDate,
                         divideBy,
                         userService::countRegisteredUsers)
-                        .doOnSuccess(statistics::setRegisteredUsersRecords));
+                        .doOnNext(statistics::setRegisteredUsersRecords));
             }
             if (counts.isEmpty()) {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);

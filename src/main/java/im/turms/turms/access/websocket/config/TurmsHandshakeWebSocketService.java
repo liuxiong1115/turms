@@ -144,7 +144,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                 loginFailedReasonCache.put(Pair.of(userId, requestId), httpStatus.value());
             } else {
                 return turmsClusterManager.getResponsibleTurmsServerAddress(userId)
-                        .doOnSuccess(address -> loginFailedReasonCache.put(Pair.of(userId, requestId), address))
+                        .doOnNext(address -> loginFailedReasonCache.put(Pair.of(userId, requestId), address))
                         .then(Mono.error(new ResponseStatusException(httpStatus)));
             }
         }

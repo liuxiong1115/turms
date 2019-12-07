@@ -180,7 +180,7 @@ public class MessageController {
                         sentOnAverageEndDate,
                         chatType,
                         areSystemMessages)
-                        .doOnSuccess(statistics::setSentMessagesOnAverage));
+                        .doOnNext(statistics::setSentMessagesOnAverage));
             }
             if (acknowledgedStartDate != null || acknowledgedEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessages(
@@ -188,7 +188,7 @@ public class MessageController {
                         acknowledgedEndDate,
                         chatType,
                         areSystemMessages)
-                        .doOnSuccess(statistics::setAcknowledgedMessages));
+                        .doOnNext(statistics::setAcknowledgedMessages));
             }
             if (acknowledgedOnAverageStartDate != null || acknowledgedOnAverageEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessagesOnAverage(
@@ -196,7 +196,7 @@ public class MessageController {
                         acknowledgedOnAverageEndDate,
                         chatType,
                         areSystemMessages)
-                        .doOnSuccess(statistics::setAcknowledgedMessagesOnAverage));
+                        .doOnNext(statistics::setAcknowledgedMessagesOnAverage));
             }
             if (counts.isEmpty() || sentStartDate != null || sentEndDate != null) {
                 counts.add(messageService.countSentMessages(
@@ -204,7 +204,7 @@ public class MessageController {
                         sentEndDate,
                         chatType,
                         areSystemMessages)
-                        .doOnSuccess(statistics::setSentMessages));
+                        .doOnNext(statistics::setSentMessages));
             }
         } else {
             if (sentOnAverageStartDate != null && sentOnAverageEndDate != null) {
@@ -215,7 +215,7 @@ public class MessageController {
                         messageService::countSentMessagesOnAverage,
                         chatType,
                         areSystemMessages)
-                        .doOnSuccess(statistics::setSentMessagesOnAverageRecords));
+                        .doOnNext(statistics::setSentMessagesOnAverageRecords));
             }
             if (acknowledgedStartDate != null && acknowledgedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -225,7 +225,7 @@ public class MessageController {
                         messageService::countAcknowledgedMessages,
                         chatType,
                         areSystemMessages)
-                        .doOnSuccess(statistics::setAcknowledgedMessagesRecords));
+                        .doOnNext(statistics::setAcknowledgedMessagesRecords));
             }
             if (acknowledgedOnAverageStartDate != null && acknowledgedOnAverageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -235,7 +235,7 @@ public class MessageController {
                         messageService::countAcknowledgedMessagesOnAverage,
                         chatType,
                         areSystemMessages)
-                        .doOnSuccess(statistics::setAcknowledgedMessagesOnAverageRecords));
+                        .doOnNext(statistics::setAcknowledgedMessagesOnAverageRecords));
             }
             if (sentStartDate != null && sentEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -245,7 +245,7 @@ public class MessageController {
                         messageService::countSentMessages,
                         chatType,
                         areSystemMessages)
-                        .doOnSuccess(statistics::setSentMessagesRecords));
+                        .doOnNext(statistics::setSentMessagesRecords));
             }
             if (counts.isEmpty()) {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
