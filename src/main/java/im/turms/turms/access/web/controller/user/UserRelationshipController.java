@@ -20,9 +20,12 @@ package im.turms.turms.access.web.controller.user;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
+import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.UserRelationship;
 import im.turms.turms.pojo.dto.*;
+import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +34,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.DEFAULT_RELATIONSHIP_GROUP_INDEX;
 
@@ -38,11 +42,13 @@ import static im.turms.turms.common.Constants.DEFAULT_RELATIONSHIP_GROUP_INDEX;
 @RequestMapping("/users/relationships")
 public class UserRelationshipController {
     private final UserRelationshipService userRelationshipService;
+    private final UserRelationshipGroupService userRelationshipGroupService;
     private final PageUtil pageUtil;
 
-    public UserRelationshipController(UserRelationshipService userRelationshipService, PageUtil pageUtil) {
+    public UserRelationshipController(UserRelationshipService userRelationshipService, PageUtil pageUtil, UserRelationshipGroupService userRelationshipGroupService) {
         this.userRelationshipService = userRelationshipService;
         this.pageUtil = pageUtil;
+        this.userRelationshipGroupService = userRelationshipGroupService;
     }
 
     @PostMapping
@@ -85,32 +91,54 @@ public class UserRelationshipController {
 
     @GetMapping
     @RequiredPermission(AdminPermission.USER_RELATIONSHIP_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<Collection<UserRelationship>>>> queryRelationships(
+    public Mono<ResponseEntity<ResponseDTO<Collection<UserRelationshipDTO>>>> queryRelationships(
             @RequestParam Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
             @RequestParam(required = false) Integer groupIndex,
             @RequestParam(required = false) Boolean isBlocked,
-            @RequestParam(required = false) Integer size) {
+            @RequestParam(required = false) Integer size,
+            @RequestParam(defaultValue = "false") Boolean withGroupIndexes) {
         size = pageUtil.getSize(size);
         Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
                 ownerId, relatedUsersIds, groupIndex, isBlocked, 0, size);
-        return ResponseFactory.okIfTruthy(relationshipsFlux);
+        Flux<UserRelationshipDTO> dtoFlux = relationship2dto(ownerId, withGroupIndexes, relationshipsFlux);
+        return ResponseFactory.okIfTruthy(dtoFlux);
     }
 
     @GetMapping("/page")
     @RequiredPermission(AdminPermission.USER_RELATIONSHIP_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<UserRelationship>>>> queryRelationships(
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<UserRelationshipDTO>>>> queryRelationships(
             @RequestParam(required = false) Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
             @RequestParam(required = false) Integer groupIndex,
             @RequestParam(required = false) Boolean isBlocked,
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(required = false) Integer size) {
+            @RequestParam(required = false) Integer size,
+            @RequestParam(defaultValue = "false") Boolean withGroupIndexes) {
         size = pageUtil.getSize(size);
         Mono<Long> count = userRelationshipService.countRelationships(
                 ownerId, relatedUsersIds, groupIndex, isBlocked);
         Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
                 ownerId, relatedUsersIds, groupIndex, isBlocked, page, size);
-        return ResponseFactory.page(count, relationshipsFlux);
+        Flux<UserRelationshipDTO> dtoFlux = relationship2dto(ownerId, withGroupIndexes, relationshipsFlux);
+        return ResponseFactory.page(count, dtoFlux);
+    }
+
+    private Flux<UserRelationshipDTO> relationship2dto(Long ownerId, Boolean withGroupIndexes, Flux<UserRelationship> relationshipsFlux) {
+        return relationshipsFlux
+                .flatMap(relationship -> {
+                    if (withGroupIndexes) {
+                        if (ownerId != null) {
+                            return userRelationshipGroupService.queryGroupIndexes(
+                                    ownerId, relationship.getKey().getRelatedUserId())
+                                    .collect(Collectors.toSet())
+                                    .map(indexes -> UserRelationshipDTO.fromDomain(relationship, indexes));
+                        } else {
+                            return Flux.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                        }
+                    } else {
+                        return Mono.just(UserRelationshipDTO.fromDomain(relationship));
+                    }
+                });
     }
 }
