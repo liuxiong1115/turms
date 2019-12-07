@@ -168,7 +168,7 @@ public class GroupTypeService {
                 .setIfNotNull(GroupType.Fields.messageEditable, messageEditable)
                 .build();
         return mongoTemplate.findAndModify(query, update, GroupType.class)
-                .doOnSuccess(groupType -> groupTypeMap.put(id, groupType))
+                .doOnNext(groupType -> groupTypeMap.put(id, groupType))
                 .thenReturn(true);
     }
 
@@ -186,7 +186,7 @@ public class GroupTypeService {
             return Mono.just(groupType);
         } else {
             return mongoTemplate.findById(groupTypeId, GroupType.class)
-                    .doOnSuccess(type -> groupTypeMap.put(groupTypeId, type));
+                    .doOnNext(type -> groupTypeMap.put(groupTypeId, type));
         }
     }
 

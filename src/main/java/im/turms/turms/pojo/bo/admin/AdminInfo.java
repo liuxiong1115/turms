@@ -36,7 +36,10 @@ public class AdminInfo implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        admin.readData(in);
+        if (admin == null) {
+            admin = new Admin();
+            admin.readData(in);
+        }
         rawPassword = in.readUTF();
     }
 }

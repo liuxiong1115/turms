@@ -81,7 +81,7 @@ public class AdminService {
                             RandomStringUtils.randomAlphabetic(8),
                             new Date(),
                             false)
-                            .doOnSuccess(admin -> TurmsLogger.logJson("Root admin", Map.of(
+                            .doOnNext(admin -> TurmsLogger.logJson("Root admin", Map.of(
                                     "Account", ROOT_ADMIN_ACCOUNT,
                                     "Raw Password", rawPassword)))
                             .subscribe();
@@ -137,9 +137,9 @@ public class AdminService {
         AdminInfo adminInfo = new AdminInfo(admin, rawPassword);
         String finalAccount = account;
         if (upsert) {
-            return mongoTemplate.save(admin).doOnSuccess(result -> adminMap.put(finalAccount, adminInfo));
+            return mongoTemplate.save(admin).doOnNext(result -> adminMap.put(finalAccount, adminInfo));
         } else {
-            return mongoTemplate.insert(admin).doOnSuccess(result -> adminMap.put(finalAccount, adminInfo));
+            return mongoTemplate.insert(admin).doOnNext(result -> adminMap.put(finalAccount, adminInfo));
         }
     }
 
@@ -228,7 +228,7 @@ public class AdminService {
             return Mono.just(adminInfo.getAdmin());
         } else {
             return mongoTemplate.findById(account, Admin.class)
-                    .doOnSuccess(admin -> adminMap.put(account, new AdminInfo(admin, null)));
+                    .doOnNext(admin -> adminMap.put(account, new AdminInfo(admin, null)));
         }
     }
 

@@ -379,7 +379,7 @@ public class TurmsClusterManager {
             } else {
                 return turmsTaskExecutor.call(member,
                             new QueryResponsibleTurmsServerAddressTask())
-                            .doOnSuccess(addr -> memberAddressCache.put(
+                            .doOnNext(addr -> memberAddressCache.put(
                                     member.getUuid(), addr));
                 }
             }

@@ -137,19 +137,19 @@ public class GroupController {
                 counts.add(groupService.countDeletedGroups(
                         deletedStartDate,
                         deletedEndDate)
-                        .doOnSuccess(statistics::setDeletedGroups));
+                        .doOnNext(statistics::setDeletedGroups));
             }
             if (sentMessageStartDate != null || sentMessageEndDate != null) {
                 counts.add(messageService.countGroupsThatSentMessages(
                         sentMessageStartDate,
                         sentMessageEndDate)
-                        .doOnSuccess(statistics::setGroupsThatSentMessages));
+                        .doOnNext(statistics::setGroupsThatSentMessages));
             }
             if (counts.isEmpty() || createdStartDate != null || createdEndDate != null) {
                 counts.add(groupService.countCreatedGroups(
                         createdStartDate,
                         createdEndDate)
-                        .doOnSuccess(statistics::setCreatedGroups));
+                        .doOnNext(statistics::setCreatedGroups));
             }
         } else {
             if (deletedStartDate != null && deletedEndDate != null) {
@@ -158,7 +158,7 @@ public class GroupController {
                         deletedEndDate,
                         divideBy,
                         groupService::countDeletedGroups)
-                        .doOnSuccess(statistics::setDeletedGroupsRecords));
+                        .doOnNext(statistics::setDeletedGroupsRecords));
             }
             if (sentMessageStartDate != null && sentMessageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -166,7 +166,7 @@ public class GroupController {
                         sentMessageEndDate,
                         divideBy,
                         messageService::countGroupsThatSentMessages)
-                        .doOnSuccess(statistics::setGroupsThatSentMessagesRecords));
+                        .doOnNext(statistics::setGroupsThatSentMessagesRecords));
             }
             if (createdStartDate != null && createdEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
@@ -174,7 +174,7 @@ public class GroupController {
                         createdEndDate,
                         divideBy,
                         groupService::countCreatedGroups)
-                        .doOnSuccess(statistics::setCreatedGroupsRecords));
+                        .doOnNext(statistics::setCreatedGroupsRecords));
             }
             if (counts.isEmpty()) {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
