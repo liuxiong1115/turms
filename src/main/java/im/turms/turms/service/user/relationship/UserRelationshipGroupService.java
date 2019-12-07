@@ -105,6 +105,17 @@ public class UserRelationshipGroupService {
                 });
     }
 
+    public Flux<Integer> queryGroupIndexes(
+            @NotNull Long ownerId,
+            @NotNull Long relatedUserId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
+                .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId));
+        query.fields().include(ID_GROUP_INDEX);
+        return mongoTemplate.find(query, UserRelationshipGroupMember.class)
+                .map(member -> member.getKey().getGroupIndex());
+    }
+
     public Flux<Long> queryRelatedUsersIdsInRelationshipGroup(
             @NotNull Long ownerId,
             @NotNull Integer groupIndex) {

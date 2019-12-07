@@ -38,10 +38,10 @@ import java.io.IOException;
 @AllArgsConstructor
 @NoArgsConstructor
 /**
- * Note: There is an group type {
+ * Note that a built-in group type {
  *     id: 0,
  *     name: "DEFAULT"
- * } hardcoded in Turms
+ * } always exists in Turms
  */
 public class GroupType implements IdentifiedDataSerializable {
     @Id
