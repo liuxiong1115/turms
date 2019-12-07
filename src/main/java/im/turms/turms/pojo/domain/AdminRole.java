@@ -40,12 +40,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 /**
- * Note: There is an admin role {
+ * Note that a built-in admin role {
  *     id: 0,
  *     name: "ROOT",
  *     permissions: all permissions
  *     rank: Integer.MAX_VALUE
- * } hardcoded in Turms
+ * } always exists in Turms
  */
 public class AdminRole implements IdentifiedDataSerializable {
     @Id
