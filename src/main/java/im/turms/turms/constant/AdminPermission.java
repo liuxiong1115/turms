@@ -38,6 +38,11 @@ public enum AdminPermission {
     USER_RELATIONSHIP_UPDATE,
     USER_RELATIONSHIP_QUERY,
 
+    USER_JOINED_GROUP_QUERY,
+
+    USER_ONLINE_INFO_UPDATE,
+    USER_ONLINE_INFO_QUERY,
+
     GROUP_CREATE,
     GROUP_DELETE,
     GROUP_UPDATE,
@@ -91,6 +96,9 @@ public enum AdminPermission {
         permissions.add(USER_RELATIONSHIP_DELETE);
         permissions.add(USER_RELATIONSHIP_UPDATE);
         permissions.add(USER_RELATIONSHIP_QUERY);
+        permissions.add(USER_JOINED_GROUP_QUERY);
+        permissions.add(USER_ONLINE_INFO_UPDATE);
+        permissions.add(USER_ONLINE_INFO_QUERY);
         return permissions;
     }
 

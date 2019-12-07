@@ -36,6 +36,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
+import static im.turms.turms.constant.AdminPermission.*;
+
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
@@ -52,7 +54,7 @@ public class GroupController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.GROUP_QUERY)
+    @RequiredPermission(GROUP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<Group>>>> queryGroupsInformation(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Integer size) {
@@ -62,7 +64,7 @@ public class GroupController {
     }
 
     @GetMapping("/page")
-    @RequiredPermission(AdminPermission.GROUP_QUERY)
+    @RequiredPermission(GROUP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Group>>>> queryGroupsInformation(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(defaultValue = "0") Integer page,
@@ -74,7 +76,7 @@ public class GroupController {
     }
 
     @PostMapping
-    @RequiredPermission(AdminPermission.GROUP_CREATE)
+    @RequiredPermission(GROUP_CREATE)
     public Mono<ResponseEntity<ResponseDTO<Group>>> addGroup(@RequestBody AddGroupDTO addGroupDTO) {
         Long ownerId = addGroupDTO.getOwnerId();
         Mono<Group> createdGroup = groupService.authAndCreateGroup(
@@ -92,7 +94,7 @@ public class GroupController {
     }
 
     @PutMapping
-    @RequiredPermission(AdminPermission.GROUP_UPDATE)
+    @RequiredPermission(GROUP_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroup(
             @RequestParam Long groupId,
             @RequestBody UpdateGroupDTO updateGroupDTO) {
@@ -111,7 +113,7 @@ public class GroupController {
     }
 
     @DeleteMapping
-    @RequiredPermission(AdminPermission.GROUP_DELETE)
+    @RequiredPermission(GROUP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroup(
             @RequestParam Long groupId,
             @RequestParam(required = false) Boolean logicalDelete) {

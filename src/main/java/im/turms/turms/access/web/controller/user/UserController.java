@@ -22,7 +22,6 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.DateTimeUtil;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.User;
@@ -35,6 +34,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
+
+import static im.turms.turms.constant.AdminPermission.*;
 
 @RestController
 @RequestMapping("/users")
@@ -52,7 +53,7 @@ public class UserController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(USER_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<User>>>> queryUsers(
             @RequestParam(required = false) Set<Long> userIds,
             @RequestParam(required = false) Date registrationDateStart,
@@ -75,7 +76,7 @@ public class UserController {
     }
 
     @GetMapping("/page")
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(USER_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<User>>>> queryUsers(
             @RequestParam(required = false) Set<Long> userIds,
             @RequestParam(required = false) Date registrationDateStart,
@@ -106,7 +107,7 @@ public class UserController {
     }
 
     @PostMapping
-    @RequiredPermission(AdminPermission.USER_CREATE)
+    @RequiredPermission(USER_CREATE)
     public Mono<ResponseEntity<ResponseDTO<User>>> addUser(@RequestBody AddUserDTO addUserDTO) {
         Mono<User> addUser = userService.addUser(
                 addUserDTO.getId(),
@@ -121,7 +122,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    @RequiredPermission(AdminPermission.USER_DELETE)
+    @RequiredPermission(USER_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteUsers(
             @RequestParam Set<Long> userIds,
             @RequestParam(defaultValue = "false") boolean deleteRelationships,
@@ -131,7 +132,7 @@ public class UserController {
     }
 
     @PutMapping
-    @RequiredPermission(AdminPermission.USER_UPDATE)
+    @RequiredPermission(USER_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUser(
             @RequestParam Set<Long> userIds,
             @RequestBody UpdateUserDTO updateUserDTO) {
@@ -148,7 +149,7 @@ public class UserController {
     }
 
     @GetMapping("/count")
-    @RequiredPermission(AdminPermission.USER_QUERY)
+    @RequiredPermission(USER_QUERY)
     public Mono<ResponseEntity<ResponseDTO<UserStatisticsDTO>>> countUsers(
             @RequestParam(required = false) Date registeredStartDate,
             @RequestParam(required = false) Date registeredEndDate,
