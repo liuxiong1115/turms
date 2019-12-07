@@ -40,10 +40,10 @@ import java.util.Collections;
  */
 @RestController
 @RequestMapping("/router")
-public class RouteController {
+public class RouterController {
     private final TurmsClusterManager turmsClusterManager;
 
-    public RouteController(TurmsClusterManager turmsClusterManager) {
+    public RouterController(TurmsClusterManager turmsClusterManager) {
         this.turmsClusterManager = turmsClusterManager;
     }
 
