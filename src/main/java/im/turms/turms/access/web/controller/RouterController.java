@@ -20,7 +20,6 @@ package im.turms.turms.access.web.controller;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.dto.AddressDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
+import static im.turms.turms.constant.AdminPermission.NONE;
 
 /**
  * Used to inform clients of which servers they should connect.
@@ -48,7 +47,7 @@ public class RouterController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.NONE)
+    @RequiredPermission(NONE)
     public Mono<ResponseEntity<AddressDTO>> queryResponsibleServerAddress(@RequestParam Long userId) {
         Mono<String> address = turmsClusterManager.getResponsibleTurmsServerAddress(userId);
         return ResponseFactory.raw(address.map(AddressDTO::new));

@@ -21,7 +21,6 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.UserRelationship;
 import im.turms.turms.pojo.dto.*;
@@ -37,6 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.DEFAULT_RELATIONSHIP_GROUP_INDEX;
+import static im.turms.turms.constant.AdminPermission.*;
 
 @RestController
 @RequestMapping("/users/relationships")
@@ -52,7 +52,7 @@ public class UserRelationshipController {
     }
 
     @PostMapping
-    @RequiredPermission(AdminPermission.USER_RELATIONSHIP_CREATE)
+    @RequiredPermission(USER_RELATIONSHIP_CREATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> addRelationship(@RequestBody AddRelationshipDTO addRelationshipDTO) {
         Mono<Boolean> upsert = userRelationshipService.upsertOneSidedRelationship(
                 addRelationshipDTO.getOwnerId(),
@@ -67,7 +67,7 @@ public class UserRelationshipController {
     }
 
     @DeleteMapping
-    @RequiredPermission(AdminPermission.USER_RELATIONSHIP_DELETE)
+    @RequiredPermission(USER_RELATIONSHIP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteRelationships(
             @RequestParam Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds) {
@@ -76,7 +76,7 @@ public class UserRelationshipController {
     }
 
     @PutMapping
-    @RequiredPermission(AdminPermission.USER_RELATIONSHIP_UPDATE)
+    @RequiredPermission(USER_RELATIONSHIP_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateRelationships(
             @RequestParam Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
@@ -90,7 +90,7 @@ public class UserRelationshipController {
     }
 
     @GetMapping
-    @RequiredPermission(AdminPermission.USER_RELATIONSHIP_QUERY)
+    @RequiredPermission(USER_RELATIONSHIP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<UserRelationshipDTO>>>> queryRelationships(
             @RequestParam Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
@@ -106,7 +106,7 @@ public class UserRelationshipController {
     }
 
     @GetMapping("/page")
-    @RequiredPermission(AdminPermission.USER_RELATIONSHIP_QUERY)
+    @RequiredPermission(USER_RELATIONSHIP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<UserRelationshipDTO>>>> queryRelationships(
             @RequestParam(required = false) Long ownerId,
             @RequestParam(required = false) Set<Long> relatedUsersIds,
