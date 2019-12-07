@@ -36,6 +36,7 @@ import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -64,7 +65,7 @@ public class UserService {
     private final TurmsPasswordUtil turmsPasswordUtil;
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, GroupInvitationService groupInvitationService, OnlineUserService onlineUserService) {
+    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, GroupInvitationService groupInvitationService, @Lazy OnlineUserService onlineUserService) {
         this.userRelationshipService = userRelationshipService;
         this.groupMemberService = groupMemberService;
         this.turmsPasswordUtil = turmsPasswordUtil;
