@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static im.turms.turms.constant.AdminPermission.*;
@@ -53,16 +54,30 @@ public class ClusterController {
 
     @GetMapping("/config")
     @RequiredPermission(CLUSTER_CONFIG_QUERY)
-    public ResponseEntity<ResponseDTO<TurmsProperties>> queryClusterConfig(@RequestParam(defaultValue = "false") boolean mutable) {
-        TurmsProperties properties = turmsClusterManager.getTurmsProperties();
-        if (mutable) {
+    public ResponseEntity<ResponseDTO<Map<String, Object>>> queryClusterConfig(@RequestParam(defaultValue = "false") Boolean mutable) {
+        try {
+            return ResponseFactory.okIfTruthy(TurmsProperties.getPropertiesMap(turmsClusterManager.getTurmsProperties(), mutable));
+        } catch (IOException e) {
+            throw TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR);
+        }
+    }
+
+    @GetMapping("/config/metadata")
+    @RequiredPermission(CLUSTER_CONFIG_QUERY)
+    public ResponseEntity<ResponseDTO<Map<String, Object>>> queryClusterConfigMetadata(
+            @RequestParam(defaultValue = "false") Boolean mutable,
+            @RequestParam(defaultValue = "false") Boolean withValue) {
+        Map<String, Object> metadata = TurmsProperties.getMetadata(new HashMap<>(), TurmsProperties.class, mutable);
+        if (withValue) {
             try {
-                return ResponseFactory.okIfTruthy(TurmsProperties.getMutableProperties(turmsClusterManager.getTurmsProperties()));
+                Map<String, Object> propertiesMap = TurmsProperties.getPropertiesMap(turmsClusterManager.getTurmsProperties(), mutable);
+                Map<String, Object> propertiesWithMetadata = TurmsProperties.mergePropertiesWithMetadata(propertiesMap, metadata);
+                return ResponseFactory.okIfTruthy(propertiesWithMetadata);
             } catch (IOException e) {
                 throw TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR);
             }
         } else {
-            return ResponseFactory.okIfTruthy(properties);
+            return ResponseFactory.okIfTruthy(metadata);
         }
     }
 

@@ -19,13 +19,13 @@ package im.turms.turms.property;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.*;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import im.turms.turms.common.Constants;
+import im.turms.turms.common.MapUtil;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.business.Group;
 import im.turms.turms.property.business.Message;
@@ -34,10 +34,16 @@ import im.turms.turms.property.business.User;
 import im.turms.turms.property.env.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ConfigurationProperties(prefix = "turms")
 @Data
@@ -45,22 +51,30 @@ import java.io.IOException;
 public class TurmsProperties implements IdentifiedDataSerializable {
     public static final ObjectWriter MUTABLE_PROPERTIES_WRITER = new ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+            .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
             .writerWithView(MutablePropertiesView.class);
-    public static final ObjectReader MUTABLE_PROPERTIES_READER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .readerWithView(MutablePropertiesView.class)
-            .forType(TurmsProperties.class);
+    @JsonView(MutablePropertiesView.class)
     private Cache cache = new Cache();
+    @JsonView(MutablePropertiesView.class)
     private Cluster cluster = new Cluster();
+    @JsonView(MutablePropertiesView.class)
     private Database database = new Database();
+    @JsonView(MutablePropertiesView.class)
     private Log log = new Log();
+    @JsonView(MutablePropertiesView.class)
     private Session session = new Session();
+    @JsonView(MutablePropertiesView.class)
     private Security security = new Security();
+    @JsonView(MutablePropertiesView.class)
     private Plugin plugin = new Plugin();
 
+    @JsonView(MutablePropertiesView.class)
     private Message message = new Message();
+    @JsonView(MutablePropertiesView.class)
     private Group group = new Group();
+    @JsonView(MutablePropertiesView.class)
     private User user = new User();
+    @JsonView(MutablePropertiesView.class)
     private Notification notification = new Notification();
 
     @JsonIgnore
@@ -73,21 +87,6 @@ public class TurmsProperties implements IdentifiedDataSerializable {
     @Override
     public int getClassId() {
         return IdentifiedDataFactory.Type.PROPERTIES.getValue();
-    }
-
-    public static TurmsProperties merge(
-            @NotNull TurmsProperties propertiesToUpdate,
-            @NotNull TurmsProperties propertiesForUpdating) throws IOException {
-        ObjectReader objectReader = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
-                .readerForUpdating(propertiesToUpdate)
-                .forType(TurmsProperties.class);
-        return objectReader.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(propertiesForUpdating));
-    }
-
-    public static TurmsProperties getMutableProperties(TurmsProperties turmsProperties) throws IOException {
-        return MUTABLE_PROPERTIES_READER.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(turmsProperties));
     }
 
     @Override
@@ -120,5 +119,59 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         group.readData(in);
         user.readData(in);
         notification.readData(in);
+    }
+
+    public static TurmsProperties merge(
+            @NotNull TurmsProperties propertiesToUpdate,
+            @NotNull TurmsProperties propertiesForUpdating) throws IOException {
+        ObjectReader objectReader = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+                .readerForUpdating(propertiesToUpdate)
+                .forType(TurmsProperties.class);
+        return objectReader.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(propertiesForUpdating));
+    }
+
+    public static Map<String, Object> mergePropertiesWithMetadata(
+            @NotNull Map<String, Object> properties,
+            @NotNull Map<String, Object> metadata) {
+        properties = MapUtil.addValueKeyToAllLeaves(properties);
+        return MapUtil.deepMerge(properties, metadata);
+    }
+
+    public static Map<String, Object> getPropertiesMap(TurmsProperties turmsProperties, boolean mutable) throws IOException {
+        if (mutable) {
+            return Constants.MAPPER.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(turmsProperties), Constants.TYPE_REF_MAP);
+        } else {
+            return Constants.MAPPER.readValue(Constants.MAPPER.writeValueAsBytes(turmsProperties), Constants.TYPE_REF_MAP);
+        }
+    }
+
+    public static Map<String, Object> getMetadata(Map<String, Object> map, Class<?> clazz, boolean mutable) {
+        String packageName = TurmsProperties.class.getPackageName();
+        List<Field> fieldList;
+        if (mutable) {
+            fieldList = FieldUtils.getFieldsListWithAnnotation(clazz, JsonView.class);
+        } else {
+            fieldList = FieldUtils.getAllFieldsList(clazz);
+        }
+        for (Field field : fieldList) {
+            if (field.getType().getTypeName().startsWith(packageName)) {
+                if (field.getType().isEnum()) {
+                    map.put(field.getName(), Map.of("type", "enum",
+                            "options", field.getType().getEnumConstants()));
+                } else {
+                    Object any = getMetadata(new HashMap<>(), field.getType(), mutable);
+                    map.put(field.getName(), any);
+                }
+            } else if (!Modifier.isStatic(field.getModifiers())) {
+                String typeName = field.getType().getTypeName();
+                if (typeName.equals(String.class.getTypeName())) {
+                    typeName = "string";
+                }
+                map.put(field.getName(), Map.of("type", typeName));
+            }
+        }
+        return map;
     }
 }

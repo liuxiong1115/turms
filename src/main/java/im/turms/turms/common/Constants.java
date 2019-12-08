@@ -18,6 +18,7 @@
 package im.turms.turms.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import im.turms.turms.constant.DeviceType;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,6 +28,7 @@ import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,6 +83,7 @@ public class Constants {
     public static final TaskScheduler TASK_SCHEDULER = new DefaultManagedTaskScheduler();
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    public static final TypeReference<HashMap<String, Object>> TYPE_REF_MAP = new TypeReference<>() {};
 
     public static <T, R> Pair<T, R> emptyPair() {
         return EMPTY_PAIR;
