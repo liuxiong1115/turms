@@ -45,8 +45,9 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 @Configuration
 @EnableSwagger2WebFlux
 @Profile("dev")
-public class SwaggerConfig {@Autowired
-private TypeResolver typeResolver;
+public class SwaggerConfig {
+    @Autowired
+    private TypeResolver typeResolver;
 
     @Bean
     public Docket docket() {

@@ -147,10 +147,10 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         }
     }
 
-    public static Map<String, Object> getMetadata(Map<String, Object> map, Class<?> clazz, boolean mutable) {
+    public static Map<String, Object> getMetadata(Map<String, Object> map, Class<?> clazz, boolean onlyMutable, boolean withMutableFlag) {
         String packageName = TurmsProperties.class.getPackageName();
         List<Field> fieldList;
-        if (mutable) {
+        if (onlyMutable) {
             fieldList = FieldUtils.getFieldsListWithAnnotation(clazz, JsonView.class);
         } else {
             fieldList = FieldUtils.getAllFieldsList(clazz);
@@ -158,10 +158,16 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         for (Field field : fieldList) {
             if (field.getType().getTypeName().startsWith(packageName)) {
                 if (field.getType().isEnum()) {
-                    map.put(field.getName(), Map.of("type", "enum",
-                            "options", field.getType().getEnumConstants()));
+                    if (withMutableFlag) {
+                        map.put(field.getName(), Map.of("type", "enum",
+                                "options", field.getType().getEnumConstants(),
+                                "mutable", field.isAnnotationPresent(JsonView.class)));
+                    } else {
+                        map.put(field.getName(), Map.of("type", "enum",
+                                "options", field.getType().getEnumConstants()));
+                    }
                 } else {
-                    Object any = getMetadata(new HashMap<>(), field.getType(), mutable);
+                    Object any = getMetadata(new HashMap<>(), field.getType(), onlyMutable, withMutableFlag);
                     map.put(field.getName(), any);
                 }
             } else if (!Modifier.isStatic(field.getModifiers())) {
@@ -169,7 +175,12 @@ public class TurmsProperties implements IdentifiedDataSerializable {
                 if (typeName.equals(String.class.getTypeName())) {
                     typeName = "string";
                 }
-                map.put(field.getName(), Map.of("type", typeName));
+                if (withMutableFlag) {
+                    map.put(field.getName(), Map.of("type", typeName,
+                            "mutable", field.isAnnotationPresent(JsonView.class)));
+                } else {
+                    map.put(field.getName(), Map.of("type", typeName));
+                }
             }
         }
         return map;
