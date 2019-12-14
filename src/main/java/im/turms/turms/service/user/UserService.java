@@ -158,7 +158,7 @@ public class UserService {
         profilePictureUrl = profilePictureUrl != null ? profilePictureUrl : "";
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
         registrationDate = registrationDate != null ? registrationDate : new Date();
-        active = active != null ? active : true;
+        active = active != null ? active : false;
         user.setId(id);
         user.setPassword(turmsPasswordUtil.encodeUserPassword(rawPassword));
         user.setName(name);
@@ -294,7 +294,7 @@ public class UserService {
                         Mono<Boolean> updateOrRemove;
                         Update update = new Update().set(User.Fields.deletionDate, new Date());
                         if (finalLogicallyDeleteUser) {
-                            updateOrRemove = operations.updateFirst(query, update, User.class)
+                            updateOrRemove = operations.updateMulti(query, update, User.class)
                                     .map(UpdateResult::wasAcknowledged);
                         } else {
                             updateOrRemove = operations.remove(query, User.class)
@@ -314,7 +314,7 @@ public class UserService {
         } else {
             if (logicallyDelete) {
                 Update update = new Update().set(User.Fields.deletionDate, new Date());
-                deleteMono = mongoTemplate.updateFirst(query, update, User.class)
+                deleteMono = mongoTemplate.updateMulti(query, update, User.class)
                         .map(UpdateResult::wasAcknowledged);
             } else {
                 deleteMono = mongoTemplate.inTransaction()
