@@ -196,7 +196,7 @@ public class GroupMemberService {
             }
         }
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        return mongoOperations.updateFirst(query, update, GroupMember.class)
+        return mongoOperations.updateMulti(query, update, GroupMember.class)
                 .flatMap(result -> {
                     if (result.wasAcknowledged()) {
                         return groupVersionService.updateMembersVersion(groupId)
