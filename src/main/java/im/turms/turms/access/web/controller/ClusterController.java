@@ -54,9 +54,9 @@ public class ClusterController {
 
     @GetMapping("/config")
     @RequiredPermission(CLUSTER_CONFIG_QUERY)
-    public ResponseEntity<ResponseDTO<Map<String, Object>>> queryClusterConfig(@RequestParam(defaultValue = "false") Boolean mutable) {
+    public ResponseEntity<ResponseDTO<Map<String, Object>>> queryClusterConfig(@RequestParam(defaultValue = "false") Boolean onlyMutable) {
         try {
-            return ResponseFactory.okIfTruthy(TurmsProperties.getPropertiesMap(turmsClusterManager.getTurmsProperties(), mutable));
+            return ResponseFactory.okIfTruthy(TurmsProperties.getPropertiesMap(turmsClusterManager.getTurmsProperties(), onlyMutable));
         } catch (IOException e) {
             throw TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR);
         }
@@ -65,12 +65,13 @@ public class ClusterController {
     @GetMapping("/config/metadata")
     @RequiredPermission(CLUSTER_CONFIG_QUERY)
     public ResponseEntity<ResponseDTO<Map<String, Object>>> queryClusterConfigMetadata(
-            @RequestParam(defaultValue = "false") Boolean mutable,
-            @RequestParam(defaultValue = "false") Boolean withValue) {
-        Map<String, Object> metadata = TurmsProperties.getMetadata(new HashMap<>(), TurmsProperties.class, mutable);
+            @RequestParam(defaultValue = "false") Boolean onlyMutable,
+            @RequestParam(defaultValue = "false") Boolean withValue,
+            @RequestParam(defaultValue = "false") Boolean withMutableFlag) {
+        Map<String, Object> metadata = TurmsProperties.getMetadata(new HashMap<>(), TurmsProperties.class, onlyMutable, withMutableFlag);
         if (withValue) {
             try {
-                Map<String, Object> propertiesMap = TurmsProperties.getPropertiesMap(turmsClusterManager.getTurmsProperties(), mutable);
+                Map<String, Object> propertiesMap = TurmsProperties.getPropertiesMap(turmsClusterManager.getTurmsProperties(), onlyMutable);
                 Map<String, Object> propertiesWithMetadata = TurmsProperties.mergePropertiesWithMetadata(propertiesMap, metadata);
                 return ResponseFactory.okIfTruthy(propertiesWithMetadata);
             } catch (IOException e) {
