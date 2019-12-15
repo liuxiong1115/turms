@@ -17,6 +17,7 @@
 
 package im.turms.turms.service.user.relationship;
 
+import com.google.common.collect.HashMultimap;
 import com.google.protobuf.Int64Value;
 import im.turms.turms.common.*;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -57,6 +58,7 @@ public class UserRelationshipService {
     public Mono<Boolean> deleteOneSidedRelationships(
             @NotNull Long ownerId,
             @NotEmpty Set<Long> relatedUsersIds) {
+        Validator.throwIfAnyFalsy(ownerId, relatedUsersIds);
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).in(relatedUsersIds));
@@ -69,6 +71,20 @@ public class UserRelationshipService {
                         return Mono.just(false);
                     }
                 });
+    }
+
+    public Mono<Boolean> deleteOneSidedRelationships(@NotEmpty Set<UserRelationship.Key> keys) {
+        Validator.throwIfAnyFalsy(keys);
+        HashMultimap<Long, Long> multimap = HashMultimap.create();
+        for (UserRelationship.Key key : keys) {
+            multimap.put(key.getOwnerId(), key.getRelatedUserId());
+        }
+        ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
+        for (Long ownerId : multimap.keySet()) {
+            Set<Long> relatedUserIds = multimap.get(ownerId);
+            monos.add(deleteOneSidedRelationships(ownerId, relatedUserIds));
+        }
+        return Flux.merge(monos).all(value -> value);
     }
 
     public Mono<Boolean> deleteAllRelatedRelationships(

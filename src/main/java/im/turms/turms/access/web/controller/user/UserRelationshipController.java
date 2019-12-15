@@ -32,6 +32,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -69,9 +70,15 @@ public class UserRelationshipController {
     @DeleteMapping
     @RequiredPermission(USER_RELATIONSHIP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteRelationships(
-            @RequestParam Long ownerId,
-            @RequestParam(required = false) Set<Long> relatedUsersIds) {
-        Mono<Boolean> deleted = userRelationshipService.deleteOneSidedRelationships(ownerId, relatedUsersIds);
+            @RequestParam(required = false) Long ownerId,
+            @RequestParam(required = false) Set<Long> relatedUsersIds,
+            UserRelationship.KeyList keys) {
+        Mono<Boolean> deleted;
+        if (keys != null && !keys.getKeys().isEmpty()) {
+            deleted = userRelationshipService.deleteOneSidedRelationships(new HashSet<>(keys.getKeys()));
+        } else {
+            deleted = userRelationshipService.deleteOneSidedRelationships(ownerId, relatedUsersIds);
+        }
         return ResponseFactory.acknowledged(deleted);
     }
 
