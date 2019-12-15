@@ -18,7 +18,6 @@
 package im.turms.turms.config;
 
 import com.fasterxml.classmate.TypeResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -46,8 +45,11 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 @EnableSwagger2WebFlux
 @Profile("dev")
 public class SwaggerConfig {
-    @Autowired
-    private TypeResolver typeResolver;
+    private final TypeResolver typeResolver;
+
+    public SwaggerConfig(TypeResolver typeResolver) {
+        this.typeResolver = typeResolver;
+    }
 
     @Bean
     public Docket docket() {
