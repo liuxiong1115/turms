@@ -262,7 +262,7 @@ public class MongoDataGenerator {
                         true);
                 UserVersion userVersion = new UserVersion(
                         (long) i, now, now, now, now, now, now);
-                UserRelationshipGroup relationshipGroup = new UserRelationshipGroup(0L, 0, "");
+                UserRelationshipGroup relationshipGroup = new UserRelationshipGroup((long) i, 0, "");
                 objects.add(user);
                 objects.add(userVersion);
                 objects.add(relationshipGroup);
