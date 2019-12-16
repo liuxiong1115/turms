@@ -19,6 +19,7 @@ package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -30,6 +31,8 @@ import java.util.Date;
 @Data
 @Document
 @FieldNameConstants
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserRelationshipGroupMember {
     @Id
     private Key key;
@@ -48,6 +51,7 @@ public class UserRelationshipGroupMember {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Key {
         @Indexed
         private Long ownerId;
