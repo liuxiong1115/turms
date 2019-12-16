@@ -65,7 +65,7 @@ public class UserRelationship {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class KeySet {
+    public static class KeyList {
         List<Key> keys;
     }
 }
