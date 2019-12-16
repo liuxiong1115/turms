@@ -125,9 +125,9 @@ public class UserController {
     @RequiredPermission(USER_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteUsers(
             @RequestParam Set<Long> userIds,
-            @RequestParam(defaultValue = "false") boolean deleteRelationships,
+            @RequestParam(defaultValue = "true") boolean deleteRelationshipsAndGroups,
             @RequestParam(required = false) Boolean logicallyDelete) {
-        Mono<Boolean> deleted = userService.deleteUsers(userIds, deleteRelationships, logicallyDelete);
+        Mono<Boolean> deleted = userService.deleteUsers(userIds, deleteRelationshipsAndGroups, logicallyDelete);
         return ResponseFactory.acknowledged(deleted);
     }
 

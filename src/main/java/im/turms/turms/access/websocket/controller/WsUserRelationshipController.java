@@ -81,7 +81,9 @@ public class WsUserRelationshipController {
             CreateRelationshipGroupRequest request = turmsRequestWrapper.getTurmsRequest().getCreateRelationshipGroupRequest();
             return userRelationshipGroupService.createRelationshipGroup(
                     turmsRequestWrapper.getUserId(),
-                    request.getName())
+                    null,
+                    request.getName(),
+                    null)
                     .map(group -> RequestResult.responseId(group.getKey().getIndex().longValue()));
         };
     }
