@@ -129,17 +129,32 @@ public class MessageController {
     @RequiredPermission(MESSAGE_CREATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> createMessages(
             @RequestParam(defaultValue = "true") Boolean deliver,
-            @RequestBody CreateMessageDTO createMessageDTO) {
+            @RequestBody CreateMessageDTO dto) {
         Mono<Boolean> acknowledged = messageService.sendMessage(
                 deliver,
-                createMessageDTO.getChatType(),
-                createMessageDTO.getIsSystemMessage(),
-                createMessageDTO.getText(),
-                createMessageDTO.getRecords(),
-                createMessageDTO.getSenderId(),
-                createMessageDTO.getTargetId(),
-                createMessageDTO.getBurnAfter(),
-                createMessageDTO.getReferenceId());
+                dto.getChatType(),
+                dto.getIsSystemMessage(),
+                dto.getText(),
+                dto.getRecords(),
+                dto.getSenderId(),
+                dto.getTargetId(),
+                dto.getBurnAfter(),
+                dto.getReferenceId());
+        return ResponseFactory.acknowledged(acknowledged);
+    }
+
+    @PutMapping
+    @RequiredPermission(MESSAGE_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateMessages(
+            @RequestParam Set<Long> ids,
+            @RequestBody UpdateMessageDTO dto) {
+        Mono<Boolean> acknowledged = messageService.updateMessage(
+                ids,
+                dto.getIsSystemMessage(),
+                dto.getText(),
+                dto.getRecords(),
+                dto.getBurnAfter(),
+                null);
         return ResponseFactory.acknowledged(acknowledged);
     }
 

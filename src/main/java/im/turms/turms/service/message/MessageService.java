@@ -48,6 +48,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -448,14 +449,14 @@ public class MessageService {
     }
 
     public Mono<Boolean> updateMessage(
-            @NotNull Long messageId,
+            @NotEmpty Set<Long> messageIds,
+            @Nullable Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
+            @Nullable Integer burnAfter,
             @Nullable ReactiveMongoOperations operations) {
-        if (text == null && records == null) {
-            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
-        }
-        Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
+        Validator.throwIfAllNull(isSystemMessage, text, records, burnAfter);
+        Query query = new Query().addCriteria(Criteria.where(ID).in(messageIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(Message.Fields.text, text)
                 .setIfNotNull(Message.Fields.records, records)
@@ -463,6 +464,18 @@ public class MessageService {
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.updateFirst(query, update, Message.class)
                 .map(UpdateResult::wasAcknowledged);
+    }
+
+    public Mono<Boolean> updateMessage(
+            @NotNull Long messageId,
+            @Nullable Boolean isSystemMessage,
+            @Nullable String text,
+            @Nullable List<byte[]> records,
+            @Nullable Integer burnAfter,
+            @Nullable ReactiveMongoOperations operations) {
+        Validator.throwIfAllNull(messageId);
+        return updateMessage(Collections.singleton(messageId), isSystemMessage, text,
+                records, burnAfter, operations);
     }
 
     public Mono<Long> countMessages(
@@ -695,7 +708,7 @@ public class MessageService {
                     .execute(operations -> {
                         List<Mono<Boolean>> updateMonos = new ArrayList<>(2);
                         if (readyUpdateMessage) {
-                            updateMonos.add(updateMessage(messageId, text, records, operations));
+                            updateMonos.add(updateMessage(messageId, null, text, records, null, operations));
                         }
                         if (readyUpdateMessageStatus) {
                             updateMonos.add(messageStatusService.updateMessageStatus(messageId, recipientId, recallDate, readDate, null, operations));
@@ -850,12 +863,19 @@ public class MessageService {
                 message.getChatType(),
                 message.getIsSystemMessage());
         Validator.throwIfAllFalsy(message.getText(), message.getRecords());
+        if (message.getSenderId() == null) {
+            if (message.getIsSystemMessage()) {
+                message.setSenderId(ADMIN_REQUESTER_ID);
+            } else {
+                throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
+            }
+        }
         if (message.getChatType() == ChatType.UNRECOGNIZED) {
             throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
         if (deliver) {
             return authAndSendMessage(
-                    ADMIN_REQUESTER_ID,
+                    message.getSenderId(),
                     message.getTargetId(),
                     message.getChatType(),
                     message.getIsSystemMessage(),
