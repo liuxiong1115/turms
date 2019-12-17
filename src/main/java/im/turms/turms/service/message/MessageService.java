@@ -698,7 +698,7 @@ public class MessageService {
                             updateMonos.add(updateMessage(messageId, text, records, operations));
                         }
                         if (readyUpdateMessageStatus) {
-                            updateMonos.add(messageStatusService.updateMessageStatus(messageId, recipientId, recallDate, readDate, operations));
+                            updateMonos.add(messageStatusService.updateMessageStatus(messageId, recipientId, recallDate, readDate, null, operations));
                         }
                         return Mono.zip(updateMonos, objects -> objects)
                                 .thenReturn(true);

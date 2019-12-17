@@ -35,7 +35,6 @@ import im.turms.turms.pojo.bo.message.Messages;
 import im.turms.turms.pojo.bo.message.MessagesWithTotal;
 import im.turms.turms.pojo.bo.message.MessagesWithTotalList;
 import im.turms.turms.pojo.domain.Message;
-import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.pojo.request.message.*;
@@ -125,16 +124,10 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryMessageStatusRequest() {
         return turmsRequestWrapper -> {
             QueryMessageStatusesRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessageStatusesRequest();
-            return messageStatusService.queryMessageStatuses(request.getMessageId())
-                    .collectList()
-                    .map(messageStatuses -> {
-                        if (messageStatuses == null || messageStatuses.isEmpty()) {
-                            return RequestResult.NOT_FOUND;
-                        }
+            return messageStatusService.queryMessageStatus(request.getMessageId())
+                    .map(messageStatus -> {
                         MessageStatuses.Builder builder = MessageStatuses.newBuilder();
-                        for (MessageStatus messageStatus : messageStatuses) {
-                            builder.addMessageStatuses(ProtoUtil.messageStatus2proto(messageStatus));
-                        }
+                        builder.addMessageStatuses(ProtoUtil.messageStatus2proto(messageStatus));
                         TurmsNotification.Data data = TurmsNotification.Data
                                 .newBuilder()
                                 .setMessageStatuses(builder)
