@@ -1,6 +1,7 @@
 package im.turms.turms.service.user.relationship;
 
 import com.google.protobuf.Int64Value;
+import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
@@ -23,10 +24,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -47,12 +45,18 @@ public class UserRelationshipGroupService {
 
     public Mono<UserRelationshipGroup> createRelationshipGroup(
             @NotNull Long ownerId,
-            @NotNull String groupName) {
+            @Nullable Integer groupIndex,
+            @NotNull String groupName,
+            @Nullable ReactiveMongoOperations operations) {
+        if (groupIndex == null) {
+            groupIndex = turmsClusterManager.generateRandomId().intValue();
+        }
         UserRelationshipGroup group = new UserRelationshipGroup(
                 ownerId,
-                turmsClusterManager.generateRandomId().intValue(),
+                groupIndex,
                 groupName);
-        return mongoTemplate.insert(group);
+        ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
+        return mongoOperations.insert(group);
     }
 
     public Flux<Integer> queryRelationshipGroupsIndexes(@NotNull Long ownerId) {
@@ -175,7 +179,12 @@ public class UserRelationshipGroupService {
             @NotNull Long ownerId,
             @NotNull Integer deleteGroupIndex,
             @NotNull Integer existingUsersToTargetGroupIndex) {
-        if (!deleteGroupIndex.equals(existingUsersToTargetGroupIndex)) {
+        if (deleteGroupIndex == DEFAULT_RELATIONSHIP_GROUP_INDEX) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
+        if (deleteGroupIndex.equals(existingUsersToTargetGroupIndex)) {
+            return Mono.just(true);
+        } else {
             return mongoTemplate.inTransaction()
                     .execute(operations -> {
                         Query query = new Query()
@@ -189,22 +198,63 @@ public class UserRelationshipGroupService {
                     })
                     .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
+        }
+    }
+
+    public Mono<Boolean> deleteAllRelationshipGroups(
+            @NotEmpty Set<Long> ownerIds,
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateVersion) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(ID_OWNER_ID).in(ownerIds));
+        ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
+        if (updateVersion) {
+            return mongoOperations.remove(query, UserRelationshipGroup.class)
+                    .flatMap(result -> {
+                        if (result.wasAcknowledged()) {
+                            return userVersionService.updateRelationshipGroupsVersion(ownerIds)
+                                    .thenReturn(true);
+                        } else {
+                            return Mono.just(false);
+                        }
+                    });
         } else {
-            return Mono.just(true);
+            return mongoOperations.remove(query, UserRelationshipGroup.class)
+                    .map(DeleteResult::wasAcknowledged);
         }
     }
 
     public Mono<Boolean> deleteRelatedUserFromAllRelationshipGroups(
             @NotNull Long ownerId,
             @NotNull Long relatedUserId,
-            @Nullable ReactiveMongoOperations operations) {
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateVersion) {
+        return deleteRelatedUsersFromAllRelationshipGroups(ownerId, Collections.singleton(relatedUserId), operations, updateVersion);
+    }
+
+    public Mono<Boolean> deleteRelatedUsersFromAllRelationshipGroups(
+            @NotNull Long ownerId,
+            @NotEmpty Set<Long> relatedUserIds,
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateVersion) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
-                .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId));
+                .addCriteria(Criteria.where(ID_RELATED_USER_ID).in(relatedUserIds));
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        return mongoOperations.remove(query, UserRelationshipGroupMember.class)
-                .zipWith(userVersionService.updateRelationshipGroupsVersion(ownerId))
-                .map(results -> results.getT1().wasAcknowledged());
+        if (updateVersion) {
+            return mongoOperations.remove(query, UserRelationshipGroupMember.class)
+                    .flatMap(result -> {
+                        if (result.wasAcknowledged()) {
+                            return userVersionService.updateRelationshipGroupsVersion(ownerId)
+                                    .thenReturn(true);
+                        } else {
+                            return Mono.just(false);
+                        }
+                    });
+        } else {
+            return mongoOperations.remove(query, UserRelationshipGroupMember.class)
+                    .map(DeleteResult::wasAcknowledged);
+        }
     }
 
     public Mono<Boolean> removeRelatedUserFromRelationshipGroup(
