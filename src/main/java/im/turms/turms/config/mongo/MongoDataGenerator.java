@@ -24,7 +24,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.common.Constants.ADMIN_ROLE_ROOT_ID;
+import static im.turms.turms.common.Constants.DEFAULT_GROUP_TYPE_ID;
 
 @Component
 public class MongoDataGenerator {
@@ -261,8 +262,10 @@ public class MongoDataGenerator {
                         true);
                 UserVersion userVersion = new UserVersion(
                         (long) i, now, now, now, now, now, now);
+                UserRelationshipGroup relationshipGroup = new UserRelationshipGroup((long) i, 0, "");
                 objects.add(user);
                 objects.add(userVersion);
+                objects.add(relationshipGroup);
             }
             for (int i = 1 + USER_COUNT / 10; i <= USER_COUNT / 10 * 2; i++) {
                 UserFriendRequest userFriendRequest = new UserFriendRequest(
@@ -276,18 +279,23 @@ public class MongoDataGenerator {
                         (long) i);
                 objects.add(userFriendRequest);
             }
-            // P.S. Do not need to put them into the default relationship group
             for (int i = 2; i <= USER_COUNT / 10; i++) {
-                UserRelationship userRelationship = new UserRelationship(
+                UserRelationship userRelationship1 = new UserRelationship(
                         new UserRelationship.Key(1L, (long) i),
                         false,
                         now);
-                UserRelationship userRelationship1 = new UserRelationship(
+                UserRelationship userRelationship2 = new UserRelationship(
                         new UserRelationship.Key((long) i, 1L),
                         false,
                         now);
-                objects.add(userRelationship);
+                UserRelationshipGroupMember relationshipGroupMember1 = new UserRelationshipGroupMember(
+                        1L, 0, (long) i, now);
+                UserRelationshipGroupMember relationshipGroupMember2 = new UserRelationshipGroupMember(
+                        (long) i, 0, 1L, now);
                 objects.add(userRelationship1);
+                objects.add(userRelationship2);
+                objects.add(relationshipGroupMember1);
+                objects.add(relationshipGroupMember2);
             }
             // Execute
             mongoTemplate.insertAll(objects)
