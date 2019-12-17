@@ -31,6 +31,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -96,33 +97,46 @@ public class UserVersionService {
     }
 
     public Mono<Boolean> updateInformationVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.info);
+        return updateSpecificVersion(userId, UserVersion.Fields.info, null);
     }
 
-    public Mono<Boolean> updateRelationshipsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.relationships);
+    public Mono<Boolean> updateRelationshipsVersion(@NotNull Long userId, @Nullable ReactiveMongoOperations operations) {
+        return updateSpecificVersion(userId, UserVersion.Fields.relationships, operations);
+    }
+
+    public Mono<Boolean> updateRelationshipsVersion(@NotNull Set<Long> userIds, @Nullable ReactiveMongoOperations operations) {
+        return updateSpecificVersion(userIds, UserVersion.Fields.relationships, operations);
     }
 
     public Mono<Boolean> updateFriendRequestsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.friendRequests);
+        return updateSpecificVersion(userId, UserVersion.Fields.friendRequests, null);
     }
 
     public Mono<Boolean> updateRelationshipGroupsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.relationshipGroups);
+        return updateSpecificVersion(userId, UserVersion.Fields.relationshipGroups, null);
+    }
+
+    public Mono<Boolean> updateRelationshipGroupsVersion(@NotNull Set<Long> userIds) {
+        return updateSpecificVersion(userIds, UserVersion.Fields.relationshipGroups, null);
     }
 
     public Mono<Boolean> updateGroupInvitationsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.groupInvitations);
+        return updateSpecificVersion(userId, UserVersion.Fields.groupInvitations, null);
     }
 
     public Mono<Boolean> updateJoinedGroupsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.joinedGroups);
+        return updateSpecificVersion(userId, UserVersion.Fields.joinedGroups, null);
     }
 
-    public Mono<Boolean> updateSpecificVersion(@NotNull Long userId, @NotNull String field) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
+    public Mono<Boolean> updateSpecificVersion(@NotNull Long userId, @NotNull String field, @Nullable ReactiveMongoOperations operations) {
+        return updateSpecificVersion(Collections.singleton(userId), field, operations);
+    }
+
+    public Mono<Boolean> updateSpecificVersion(@NotEmpty Set<Long> userIds, @NotNull String field, @Nullable ReactiveMongoOperations operations) {
+        Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         Update update = new Update().set(field, new Date());
-        return mongoTemplate.updateFirst(query, update, UserVersion.class)
+        ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
+        return mongoOperations.updateFirst(query, update, UserVersion.class)
                 .map(UpdateResult::wasAcknowledged);
     }
 

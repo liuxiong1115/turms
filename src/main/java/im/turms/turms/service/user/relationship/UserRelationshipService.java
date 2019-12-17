@@ -19,6 +19,7 @@ package im.turms.turms.service.user.relationship;
 
 import com.google.common.collect.HashMultimap;
 import com.google.protobuf.Int64Value;
+import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.common.*;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
@@ -59,18 +60,61 @@ public class UserRelationshipService {
             @NotNull Long ownerId,
             @NotEmpty Set<Long> relatedUsersIds) {
         Validator.throwIfAnyFalsy(ownerId, relatedUsersIds);
+        return mongoTemplate.inTransaction()
+                .execute(operations -> {
+                    Query query = new Query()
+                            .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
+                            .addCriteria(Criteria.where(ID_RELATED_USER_ID).in(relatedUsersIds));
+                    return operations.remove(query, UserRelationship.class)
+                            .flatMap(result -> {
+                                if (result.wasAcknowledged()) {
+                                    return userRelationshipGroupService.deleteRelatedUsersFromAllRelationshipGroups(ownerId, relatedUsersIds, operations, true)
+                                            .then(userVersionService.updateRelationshipsVersion(ownerId, null))
+                                            .thenReturn(true);
+                                } else {
+                                    return Mono.just(false);
+                                }
+                            });
+                })
+                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                .single();
+    }
+
+    public Mono<Boolean> deleteAllRelationships(
+            @NotEmpty Set<Long> usersIds,
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateVersion) {
         Query query = new Query()
-                .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
-                .addCriteria(Criteria.where(ID_RELATED_USER_ID).in(relatedUsersIds));
-        return mongoTemplate.remove(query, UserRelationship.class)
-                .flatMap(result -> {
-                    if (result.wasAcknowledged()) {
-                        return userVersionService.updateRelationshipsVersion(ownerId)
-                                .thenReturn(true);
-                    } else {
-                        return Mono.just(false);
-                    }
-                });
+                .addCriteria(new Criteria().orOperator(
+                        Criteria.where(ID_OWNER_ID).in(usersIds),
+                        Criteria.where(ID_RELATED_USER_ID).in(usersIds)));
+        if (updateVersion) {
+            if (operations != null) {
+                return operations.remove(query, UserRelationship.class)
+                        .flatMap(result -> {
+                            if (result.wasAcknowledged()) {
+                                return userVersionService.updateRelationshipsVersion(usersIds, operations);
+                            } else {
+                                return Mono.just(false);
+                            }
+                        });
+            } else {
+                return mongoTemplate.inTransaction()
+                        .execute(newOperations -> newOperations.remove(query, UserRelationship.class)
+                                .flatMap(result -> {
+                                    if (result.wasAcknowledged()) {
+                                        return userVersionService.updateRelationshipsVersion(usersIds, newOperations);
+                                    } else {
+                                        return Mono.just(false);
+                                    }
+                                }))
+                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                        .single();
+            }
+        } else {
+            ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
+            return mongoOperations.remove(query, UserRelationship.class).map(DeleteResult::wasAcknowledged);
+        }
     }
 
     public Mono<Boolean> deleteOneSidedRelationships(@NotEmpty Set<UserRelationship.Key> keys) {
@@ -87,37 +131,6 @@ public class UserRelationshipService {
         return Flux.merge(monos).all(value -> value);
     }
 
-    public Mono<Boolean> deleteAllRelatedRelationships(
-            @NotEmpty Set<Long> usersIds,
-            @Nullable ReactiveMongoOperations operations) {
-        Query query = new Query()
-                .addCriteria(new Criteria().orOperator(
-                        Criteria.where(ID_OWNER_ID).in(usersIds),
-                        Criteria.where(ID_RELATED_USER_ID).in(usersIds)));
-        if (operations != null) {
-            return operations.remove(query, UserRelationship.class)
-                    .flatMap(result -> {
-                        if (result.wasAcknowledged()) {
-                            return userVersionService.delete(usersIds, operations);
-                        } else {
-                            return Mono.just(false);
-                        }
-                    });
-        } else {
-            return mongoTemplate.inTransaction()
-                    .execute(newOperations -> newOperations.remove(query, UserRelationship.class)
-                            .flatMap(result -> {
-                                if (result.wasAcknowledged()) {
-                                    return userVersionService.delete(usersIds, newOperations);
-                                } else {
-                                    return Mono.just(false);
-                                }
-                            }))
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
-                    .single();
-        }
-    }
-
     public Mono<Boolean> deleteOneSidedRelationship(
             @NotNull Long ownerId,
             @NotNull Long relatedUserId,
@@ -128,15 +141,15 @@ public class UserRelationshipService {
         if (operations != null) {
             return operations.remove(query, UserRelationship.class)
                     .zipWith(userRelationshipGroupService.deleteRelatedUserFromAllRelationshipGroups(
-                            ownerId, relatedUserId, operations))
-                    .zipWith(userVersionService.updateRelationshipsVersion(ownerId))
+                            ownerId, relatedUserId, operations, true))
+                    .zipWith(userVersionService.updateRelationshipsVersion(ownerId, operations))
                     .thenReturn(true);
         } else {
             return mongoTemplate.inTransaction()
                     .execute(newOperations -> newOperations.remove(query, UserRelationship.class)
                             .zipWith(userRelationshipGroupService.deleteRelatedUserFromAllRelationshipGroups(
-                                    ownerId, relatedUserId, operations))
-                            .zipWith(userVersionService.updateRelationshipsVersion(ownerId))
+                                    ownerId, relatedUserId, newOperations, true))
+                            .zipWith(userVersionService.updateRelationshipsVersion(ownerId, newOperations))
                             .thenReturn(true))
                     .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
@@ -457,7 +470,7 @@ public class UserRelationshipService {
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId));
         Update update = new Update().set(UserRelationship.Fields.isBlocked, false);
         return mongoTemplate.updateFirst(query, update, UserRelationship.class)
-                .zipWith(userVersionService.updateRelationshipsVersion(ownerId))
+                .zipWith(userVersionService.updateRelationshipsVersion(ownerId, null))
                 .map(result -> result.getT1().wasAcknowledged());
     }
 
@@ -500,7 +513,7 @@ public class UserRelationshipService {
                 .setIfNotNull(UserRelationship.Fields.establishmentDate, establishmentDate)
                 .build();
         return mongoTemplate.updateMulti(query, update, UserRelationship.class)
-                .zipWith(userVersionService.updateRelationshipsVersion(ownerId))
+                .zipWith(userVersionService.updateRelationshipsVersion(ownerId, null))
                 .map(result -> result.getT1().wasAcknowledged());
     }
 

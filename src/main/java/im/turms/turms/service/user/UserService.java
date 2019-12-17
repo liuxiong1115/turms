@@ -33,6 +33,7 @@ import im.turms.turms.pojo.domain.UserOnlineUserNumber;
 import im.turms.turms.service.group.GroupInvitationService;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -59,13 +60,14 @@ public class UserService {
     private final GroupMemberService groupMemberService;
     private final GroupInvitationService groupInvitationService;
     private final UserRelationshipService userRelationshipService;
+    private final UserRelationshipGroupService userRelationshipGroupService;
     private final UserVersionService userVersionService;
     private final OnlineUserService onlineUserService;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPasswordUtil turmsPasswordUtil;
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, GroupInvitationService groupInvitationService, @Lazy OnlineUserService onlineUserService) {
+    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, GroupInvitationService groupInvitationService, @Lazy OnlineUserService onlineUserService, UserRelationshipGroupService userRelationshipGroupService) {
         this.userRelationshipService = userRelationshipService;
         this.groupMemberService = groupMemberService;
         this.turmsPasswordUtil = turmsPasswordUtil;
@@ -74,6 +76,7 @@ public class UserService {
         this.mongoTemplate = mongoTemplate;
         this.groupInvitationService = groupInvitationService;
         this.onlineUserService = onlineUserService;
+        this.userRelationshipGroupService = userRelationshipGroupService;
     }
 
     /**
@@ -167,8 +170,10 @@ public class UserService {
         user.setProfileAccess(profileAccess);
         user.setRegistrationDate(registrationDate);
         user.setActive(active);
+        Long finalId = id;
         return mongoTemplate.inTransaction()
                 .execute(operations -> operations.insert(user)
+                        .then(userRelationshipGroupService.createRelationshipGroup(finalId, 0, "", operations))
                         .then(userVersionService.upsertEmptyUserVersion(user.getId(), operations))
                         .thenReturn(user))
                 .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
@@ -280,20 +285,20 @@ public class UserService {
 
     public Mono<Boolean> deleteUsers(
             @NotEmpty Set<Long> userIds,
-            boolean deleteRelationships,
+            boolean deleteRelationshipsAndGroups,
             @Nullable Boolean logicallyDelete) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         if (logicallyDelete == null) {
             logicallyDelete = turmsClusterManager.getTurmsProperties().getUser().isLogicallyDeleteUser();
         }
         Mono<Boolean> deleteMono;
-        if (deleteRelationships) {
+        if (deleteRelationshipsAndGroups) {
             boolean finalLogicallyDeleteUser = logicallyDelete;
             deleteMono = mongoTemplate.inTransaction()
                     .execute(operations -> {
                         Mono<Boolean> updateOrRemove;
-                        Update update = new Update().set(User.Fields.deletionDate, new Date());
                         if (finalLogicallyDeleteUser) {
+                            Update update = new Update().set(User.Fields.deletionDate, new Date());
                             updateOrRemove = operations.updateMulti(query, update, User.class)
                                     .map(UpdateResult::wasAcknowledged);
                         } else {
@@ -303,7 +308,16 @@ public class UserService {
                         return updateOrRemove
                                 .flatMap(acknowledged -> {
                                     if (acknowledged != null && acknowledged) {
-                                        return userRelationshipService.deleteAllRelatedRelationships(userIds, operations);
+                                        if (finalLogicallyDeleteUser) {
+                                            return userRelationshipService.deleteAllRelationships(userIds, operations, true)
+                                                    .then(userRelationshipGroupService.deleteAllRelationshipGroups(userIds, operations, true))
+                                                    .thenReturn(true);
+                                        } else {
+                                            return userRelationshipService.deleteAllRelationships(userIds, operations, false)
+                                                    .then(userRelationshipGroupService.deleteAllRelationshipGroups(userIds, operations, false))
+                                                    .then(userVersionService.delete(userIds, operations))
+                                                    .thenReturn(true);
+                                        }
                                     } else {
                                         return Mono.just(false);
                                     }
