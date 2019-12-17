@@ -2,9 +2,12 @@ package im.turms.turms.service.message;
 
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.MessageStatus;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -19,6 +22,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -65,29 +69,46 @@ public class MessageStatusService {
                 .map(status -> status.getKey().getMessageId());
     }
 
+    public Mono<Boolean> updateMessageStatuses(
+            @Nullable Set<Long> messageIds,
+            @Nullable Set<Long> recipientIds,
+            @Nullable Date recallDate,
+            @Nullable Date readDate,
+            @Nullable Date receptionDate,
+            @Nullable ReactiveMongoOperations operations) {
+        boolean isIllegalRecall = recallDate != null
+                && !turmsClusterManager.getTurmsProperties().getMessage().isAllowRecallingMessage();
+        boolean isIllegalRead = readDate != null
+                && !turmsClusterManager.getTurmsProperties().getMessage().getReadReceipt().isEnabled();
+        if (isIllegalRecall || isIllegalRead) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION);
+        }
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID_MESSAGE_ID, messageIds)
+                .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
+                .buildQuery();
+        Update update = UpdateBuilder.newBuilder()
+                .setIfNotNull(MessageStatus.Fields.recallDate, recallDate)
+                .setIfNotNull(MessageStatus.Fields.readDate, readDate)
+                .setIfNotNull(MessageStatus.Fields.receptionDate, receptionDate)
+                .build();
+        ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
+        return mongoOperations.updateFirst(query, update, MessageStatus.class)
+                .map(UpdateResult::wasAcknowledged);
+    }
+
     public Mono<Boolean> updateMessageStatus(
             @NotNull Long messageId,
             @NotNull Long recipientId,
             @Nullable Date recallDate,
             @Nullable Date readDate,
+            @Nullable Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
-        boolean unrecallable = recallDate != null
-                && !turmsClusterManager.getTurmsProperties().getMessage().isAllowRecallingMessage();
-        boolean unreadable = readDate != null
-                && !turmsClusterManager.getTurmsProperties().getMessage().getReadReceipt().isEnabled();
-        if (unrecallable || unreadable) {
-            return Mono.just(false);
-        }
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
-                .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId));
-        Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(MessageStatus.Fields.recallDate, recallDate)
-                .setIfNotNull(MessageStatus.Fields.readDate, readDate)
-                .build();
-        ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        return mongoOperations.updateFirst(query, update, MessageStatus.class)
-                .map(UpdateResult::wasAcknowledged);
+        return updateMessageStatuses(
+                Collections.singleton(messageId),
+                Collections.singleton(recipientId),
+                recallDate, readDate, receptionDate, operations);
     }
 
     public Mono<Boolean> authAndUpdateMessagesDeliveryStatus(
@@ -119,8 +140,21 @@ public class MessageStatusService {
                 .map(status -> EMPTY_MESSAGE_STATUS != status);
     }
 
-    public Flux<MessageStatus> queryMessageStatuses(@NotNull Long messageId) {
+    public Mono<MessageStatus> queryMessageStatus(@NotNull Long messageId) {
         Query query = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId));
+        return mongoTemplate.findOne(query, MessageStatus.class);
+    }
+
+    public Flux<MessageStatus> queryMessageStatuses(@NotEmpty Set<Long> messageIds) {
+        Query query = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).in(messageIds));
+        return mongoTemplate.find(query, MessageStatus.class);
+    }
+
+    public Flux<MessageStatus> queryMessageStatuses(@NotEmpty Set<Long> ids, @Nullable Integer page, @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID_MESSAGE_ID, ids)
+                .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, MessageStatus.class);
     }
 

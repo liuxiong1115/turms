@@ -58,6 +58,9 @@ public enum AdminPermission {
     MESSAGE_UPDATE,
     MESSAGE_QUERY,
 
+    MESSAGE_STATUS_QUERY,
+    MESSAGE_STATUS_UPDATE,
+
     ADMIN_CREATE,
     ADMIN_DELETE,
     ADMIN_UPDATE,
@@ -121,6 +124,8 @@ public enum AdminPermission {
         permissions.add(MESSAGE_DELETE);
         permissions.add(MESSAGE_UPDATE);
         permissions.add(MESSAGE_QUERY);
+        permissions.add(MESSAGE_STATUS_QUERY);
+        permissions.add(MESSAGE_STATUS_UPDATE);
         return permissions;
     }
 
