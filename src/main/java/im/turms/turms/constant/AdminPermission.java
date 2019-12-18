@@ -53,6 +53,11 @@ public enum AdminPermission {
     GROUP_UPDATE,
     GROUP_QUERY,
 
+    GROUP_BLACKLIST_CREATE,
+    GROUP_BLACKLIST_DELETE,
+    GROUP_BLACKLIST_UPDATE,
+    GROUP_BLACKLIST_QUERY,
+
     GROUP_TYPE_CREATE,
     GROUP_TYPE_DELETE,
     GROUP_TYPE_UPDATE,
@@ -116,6 +121,10 @@ public enum AdminPermission {
         permissions.add(GROUP_DELETE);
         permissions.add(GROUP_UPDATE);
         permissions.add(GROUP_QUERY);
+        permissions.add(GROUP_BLACKLIST_CREATE);
+        permissions.add(GROUP_BLACKLIST_DELETE);
+        permissions.add(GROUP_BLACKLIST_UPDATE);
+        permissions.add(GROUP_BLACKLIST_QUERY);
         permissions.add(GROUP_TYPE_CREATE);
         permissions.add(GROUP_TYPE_DELETE);
         permissions.add(GROUP_TYPE_UPDATE);
