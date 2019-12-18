@@ -4,8 +4,7 @@ import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.TurmsStatusCode;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.constant.ResponseAction;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -21,13 +20,16 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -97,20 +99,31 @@ public class UserFriendRequestService {
             @NotNull Long requesterId,
             @NotNull Long recipientId,
             @NotNull String content,
-            @NotNull Date creationDate) {
+            @Nullable Date creationDate,
+            @Nullable Date expirationDate,
+            @Nullable String reason) {
+        Validator.throwIfAnyNull(requesterId, recipientId, content);
         UserFriendRequest userFriendRequest = new UserFriendRequest();
         userFriendRequest.setId(turmsClusterManager.generateRandomId());
         userFriendRequest.setContent(content);
         Date now = new Date();
-        userFriendRequest.setCreationDate(creationDate.before(now) ? creationDate : now);
-        int friendRequestExpiryHours = turmsClusterManager.getTurmsProperties()
-                .getUser().getFriendRequestExpiryHours();
-        if (friendRequestExpiryHours != 0) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.HOUR, turmsClusterManager.getTurmsProperties()
-                    .getUser().getFriendRequestExpiryHours());
-            userFriendRequest.setExpirationDate(calendar.getTime());
+        if (creationDate == null) {
+            creationDate = now;
         }
+        userFriendRequest.setCreationDate(creationDate.before(now) ? creationDate : now);
+        if (expirationDate != null) {
+            userFriendRequest.setExpirationDate(expirationDate);
+        } else {
+            int friendRequestExpiryHours = turmsClusterManager.getTurmsProperties()
+                    .getUser().getFriendRequestExpiryHours();
+            if (friendRequestExpiryHours != 0) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.HOUR, turmsClusterManager.getTurmsProperties()
+                        .getUser().getFriendRequestExpiryHours());
+                userFriendRequest.setExpirationDate(calendar.getTime());
+            }
+        }
+        userFriendRequest.setReason(reason);
         userFriendRequest.setRequesterId(requesterId);
         userFriendRequest.setRecipientId(recipientId);
         userFriendRequest.setStatus(RequestStatus.PENDING);
@@ -144,7 +157,7 @@ public class UserFriendRequestService {
                         }
                         return requestExistsMono.flatMap(requestExists -> {
                             if (requestExists != null && !requestExists) {
-                                return createFriendRequest(requesterId, recipientId, content, creationDate);
+                                return createFriendRequest(requesterId, recipientId, content, creationDate, null, null);
                             } else {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED));
                             }
@@ -189,9 +202,33 @@ public class UserFriendRequestService {
                 .thenReturn(true)
                 .defaultIfEmpty(false)
                 .zipWith(
-                queryRecipientId(requestId)
-                        .map(userVersionService::updateFriendRequestsVersion))
+                        queryRecipientId(requestId)
+                                .map(userVersionService::updateFriendRequestsVersion))
                 .map(Tuple2::getT1);
+    }
+
+    public Mono<Boolean> updateFriendRequests(
+            @NotEmpty Set<Long> ids,
+            @Nullable Long requesterId,
+            @Nullable Long recipientId,
+            @Nullable String content,
+            @Nullable String reason,
+            @Nullable Date creationDate,
+            @Nullable Date expirationDate) {
+        Validator.throwIfAllFalsy(ids);
+        Validator.throwIfAllNull(requesterId, recipientId, content, reason, creationDate, expirationDate);
+        Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
+        Update update = UpdateBuilder
+                .newBuilder()
+                .setIfNotNull(UserFriendRequest.Fields.requesterId, requesterId)
+                .setIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
+                .setIfNotNull(UserFriendRequest.Fields.content, content)
+                .setIfNotNull(UserFriendRequest.Fields.reason, reason)
+                .setIfNotNull(UserFriendRequest.Fields.creationDate, creationDate)
+                .setIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDate)
+                .build();
+        return mongoTemplate.updateMulti(query, update, UserFriendRequest.class)
+                .map(UpdateResult::wasAcknowledged);
     }
 
     public Mono<Long> queryRecipientId(@NotNull Long requestId) {
@@ -280,5 +317,71 @@ public class UserFriendRequestService {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
                 });
+    }
+
+    public Mono<Boolean> deleteFriendRequests(
+            @Nullable Set<Long> ids,
+            @Nullable Long requesterId,
+            @Nullable Long recipientId,
+            @Nullable RequestStatus status,
+            @Nullable Date creationDateStart,
+            @Nullable Date creationDateEnd,
+            @Nullable Date expirationDateStart,
+            @Nullable Date expirationDateEnd) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(UserFriendRequest.Fields.requesterId, requesterId)
+                .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
+                .addIsIfNotNull(UserFriendRequest.Fields.status, status)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .buildQuery();
+        return mongoTemplate.remove(query, UserFriendRequest.class)
+                .map(DeleteResult::wasAcknowledged);
+    }
+
+    public Flux<UserFriendRequest> queryFriendRequests(
+            @Nullable Set<Long> ids,
+            @Nullable Long requesterId,
+            @Nullable Long recipientId,
+            @Nullable RequestStatus status,
+            @Nullable Date creationDateStart,
+            @Nullable Date creationDateEnd,
+            @Nullable Date expirationDateStart,
+            @Nullable Date expirationDateEnd,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(UserFriendRequest.Fields.requesterId, requesterId)
+                .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
+                .addIsIfNotNull(UserFriendRequest.Fields.status, status)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .paginateIfNotNull(page, size);
+        return mongoTemplate.find(query, UserFriendRequest.class);
+    }
+
+    public Mono<Long> countFriendRequests(
+            @Nullable Set<Long> ids,
+            @Nullable Long requesterId,
+            @Nullable Long recipientId,
+            @Nullable RequestStatus status,
+            @Nullable Date creationDateStart,
+            @Nullable Date creationDateEnd,
+            @Nullable Date expirationDateStart,
+            @Nullable Date expirationDateEnd) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(UserFriendRequest.Fields.requesterId, requesterId)
+                .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
+                .addIsIfNotNull(UserFriendRequest.Fields.status, status)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .buildQuery();
+        return mongoTemplate.count(query, UserFriendRequest.class);
     }
 }
