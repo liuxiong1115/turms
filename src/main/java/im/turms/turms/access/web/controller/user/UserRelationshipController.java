@@ -32,6 +32,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -103,11 +104,13 @@ public class UserRelationshipController {
             @RequestParam(required = false) Set<Long> relatedUsersIds,
             @RequestParam(required = false) Integer groupIndex,
             @RequestParam(required = false) Boolean isBlocked,
+            @RequestParam(required = false) Date establishmentDateStart,
+            @RequestParam(required = false) Date establishmentDateEnd,
             @RequestParam(required = false) Integer size,
             @RequestParam(defaultValue = "false") Boolean withGroupIndexes) {
         size = pageUtil.getSize(size);
         Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
-                ownerId, relatedUsersIds, groupIndex, isBlocked, 0, size);
+                ownerId, relatedUsersIds, groupIndex, isBlocked, establishmentDateStart, establishmentDateEnd, 0, size);
         Flux<UserRelationshipDTO> dtoFlux = relationship2dto(ownerId, withGroupIndexes, relationshipsFlux);
         return ResponseFactory.okIfTruthy(dtoFlux);
     }
@@ -119,6 +122,8 @@ public class UserRelationshipController {
             @RequestParam(required = false) Set<Long> relatedUsersIds,
             @RequestParam(required = false) Integer groupIndex,
             @RequestParam(required = false) Boolean isBlocked,
+            @RequestParam(required = false) Date establishmentDateStart,
+            @RequestParam(required = false) Date establishmentDateEnd,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size,
             @RequestParam(defaultValue = "false") Boolean withGroupIndexes) {
@@ -126,7 +131,7 @@ public class UserRelationshipController {
         Mono<Long> count = userRelationshipService.countRelationships(
                 ownerId, relatedUsersIds, groupIndex, isBlocked);
         Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
-                ownerId, relatedUsersIds, groupIndex, isBlocked, page, size);
+                ownerId, relatedUsersIds, groupIndex, isBlocked, establishmentDateStart, establishmentDateEnd, page, size);
         Flux<UserRelationshipDTO> dtoFlux = relationship2dto(ownerId, withGroupIndexes, relationshipsFlux);
         return ResponseFactory.page(count, dtoFlux);
     }
