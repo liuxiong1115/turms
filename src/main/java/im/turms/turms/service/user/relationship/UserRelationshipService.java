@@ -213,7 +213,7 @@ public class UserRelationshipService {
                 .defaultIfEmpty(MAX_DATE)
                 .flatMap(date -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
-                        return queryRelationships(ownerId, relatedUsersIds, groupIndex, isBlocked, null, null)
+                        return queryRelationships(ownerId, relatedUsersIds, groupIndex, isBlocked, null, null, null, null)
                                 .collect(Collectors.toSet())
                                 .map(relationships -> {
                                     UserRelationshipsWithVersion.Builder builder = UserRelationshipsWithVersion.newBuilder();
@@ -265,11 +265,14 @@ public class UserRelationshipService {
             @Nullable Long ownerId,
             @Nullable Set<Long> relatedUsersIds,
             @Nullable Boolean isBlocked,
+            @Nullable Date establishmentDateStart,
+            @Nullable Date establishmentDateEnd,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder.newBuilder()
                 .addIsIfNotNull(ID_OWNER_ID, ownerId)
                 .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
+                .addBetweenIfNotNull(UserRelationship.Fields.establishmentDate, establishmentDateStart, establishmentDateEnd)
                 .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, UserRelationship.class);
@@ -280,10 +283,12 @@ public class UserRelationshipService {
             @Nullable Set<Long> relatedUsersIds,
             @Nullable Integer groupIndex,
             @Nullable Boolean isBlocked,
+            @Nullable Date establishmentDateStart,
+            @Nullable Date establishmentDateEnd,
             @Nullable Integer page,
             @Nullable Integer size) {
         boolean queryByGroup = groupIndex != null;
-        boolean queryByRelationshipInfo = relatedUsersIds != null || isBlocked != null;
+        boolean queryByRelationshipInfo = relatedUsersIds != null || isBlocked != null || establishmentDateStart != null || establishmentDateEnd != null;
         if (queryByGroup && queryByRelationshipInfo) {
             if (relatedUsersIds != null && relatedUsersIds.isEmpty()) {
                 return Flux.empty();
@@ -294,12 +299,12 @@ public class UserRelationshipService {
                         if (relatedUsersIds != null) {
                             usersIds.retainAll(relatedUsersIds);
                         }
-                        return queryRelationships(ownerId, usersIds, isBlocked, page, size);
+                        return queryRelationships(ownerId, usersIds, isBlocked, establishmentDateStart, establishmentDateEnd, page, size);
                     });
         } else if (queryByGroup) {
             return queryMembersRelationships(ownerId, groupIndex, page, size);
         } else {
-            return queryRelationships(ownerId, relatedUsersIds, isBlocked, page, size);
+            return queryRelationships(ownerId, relatedUsersIds, isBlocked, establishmentDateStart, establishmentDateEnd, page, size);
         }
     }
 
