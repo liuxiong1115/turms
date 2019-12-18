@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.access.web.controller.user;
+package im.turms.turms.access.web.controller.user.relationship;
 
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
