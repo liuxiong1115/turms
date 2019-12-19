@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static im.turms.turms.common.Constants.ADMIN_ROLE_ROOT_ID;
 import static im.turms.turms.common.Constants.DEFAULT_GROUP_TYPE_ID;
@@ -163,20 +164,20 @@ public class MongoDataGenerator {
             for (int i = 1 + USER_COUNT / 10 * 8; i <= USER_COUNT / 10 * 9; i++) {
                 GroupInvitation groupInvitation = new GroupInvitation(
                         turmsClusterManager.generateRandomId(),
-                        now,
+                        1L,
+                        1L,
+                        (long) i,
                         "test-content",
                         RequestStatus.PENDING,
-                        null,
-                        1L,
-                        1L,
-                        (long) i);
+                        now,
+                        null);
                 objects.add(groupInvitation);
             }
             GroupJoinQuestion groupJoinQuestion = new GroupJoinQuestion(
                     turmsClusterManager.generateRandomId(),
                     1L,
                     "test-question",
-                    List.of("a", "b", "c"),
+                    Set.of("a", "b", "c"),
                     20);
             objects.add(groupJoinQuestion);
             for (int i = 1 + USER_COUNT / 10 * 7; i <= USER_COUNT / 10 * 8; i++) {
@@ -299,7 +300,8 @@ public class MongoDataGenerator {
             }
             // Execute
             mongoTemplate.insertAll(objects)
-                    .doOnTerminate(() -> TurmsLogger.log("Mocking is done"))
+                    .doOnError(error -> TurmsLogger.logObject("Mocking failed", error))
+                    .doOnComplete(() -> TurmsLogger.log("Mocking succeeded"))
                     .subscribe();
         }
     }
