@@ -68,6 +68,11 @@ public enum AdminPermission {
     GROUP_JOIN_QUESTION_UPDATE,
     GROUP_JOIN_QUESTION_QUERY,
 
+    GROUP_JOIN_REQUEST_CREATE,
+    GROUP_JOIN_REQUEST_DELETE,
+    GROUP_JOIN_REQUEST_UPDATE,
+    GROUP_JOIN_REQUEST_QUERY,
+
     GROUP_TYPE_CREATE,
     GROUP_TYPE_DELETE,
     GROUP_TYPE_UPDATE,
@@ -143,6 +148,10 @@ public enum AdminPermission {
         permissions.add(GROUP_JOIN_QUESTION_DELETE);
         permissions.add(GROUP_JOIN_QUESTION_UPDATE);
         permissions.add(GROUP_JOIN_QUESTION_QUERY);
+        permissions.add(GROUP_JOIN_REQUEST_CREATE);
+        permissions.add(GROUP_JOIN_REQUEST_DELETE);
+        permissions.add(GROUP_JOIN_REQUEST_UPDATE);
+        permissions.add(GROUP_JOIN_REQUEST_QUERY);
         permissions.add(GROUP_TYPE_CREATE);
         permissions.add(GROUP_TYPE_DELETE);
         permissions.add(GROUP_TYPE_UPDATE);
