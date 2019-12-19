@@ -22,7 +22,9 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.TurmsStatusCode;
+import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion;
@@ -39,10 +41,12 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
@@ -55,13 +59,15 @@ public class GroupJoinRequestService {
     private final GroupService groupService;
     private final GroupVersionService groupVersionService;
     private final GroupMemberService groupMemberService;
+    private final GroupVersionService userVersionService;
 
-    public GroupJoinRequestService(ReactiveMongoTemplate mongoTemplate, @Lazy TurmsClusterManager turmsClusterManager, GroupVersionService groupVersionService, GroupMemberService groupMemberService, @Lazy GroupService groupService) {
+    public GroupJoinRequestService(ReactiveMongoTemplate mongoTemplate, @Lazy TurmsClusterManager turmsClusterManager, GroupVersionService groupVersionService, GroupMemberService groupMemberService, @Lazy GroupService groupService, GroupVersionService userVersionService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.groupVersionService = groupVersionService;
         this.groupMemberService = groupMemberService;
         this.groupService = groupService;
+        this.userVersionService = userVersionService;
     }
 
     @Scheduled(cron = EXPIRY_GROUP_JOIN_REQUESTS_CLEANER_CRON)
@@ -237,5 +243,130 @@ public class GroupJoinRequestService {
         query.fields().include(GroupJoinRequest.Fields.groupId);
         return mongoTemplate.findOne(query, GroupJoinRequest.class)
                 .map(GroupJoinRequest::getGroupId);
+    }
+
+
+    public Flux<GroupJoinRequest> queryJoinRequests(
+            @Nullable Set<Long> ids,
+            @Nullable Long groupId,
+            @Nullable Long requesterId,
+            @Nullable Long responderId,
+            @Nullable RequestStatus status,
+            @Nullable Date creationDateStart,
+            @Nullable Date creationDateEnd,
+            @Nullable Date expirationDateStart,
+            @Nullable Date expirationDateEnd,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(GroupJoinRequest.Fields.groupId, groupId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .paginateIfNotNull(page, size);
+        return mongoTemplate.find(query, GroupJoinRequest.class);
+    }
+
+    public Mono<Long> countJoinRequests(
+            @Nullable Set<Long> ids,
+            @Nullable Long groupId,
+            @Nullable Long requesterId,
+            @Nullable Long responderId,
+            @Nullable RequestStatus status,
+            @Nullable Date creationDateStart,
+            @Nullable Date creationDateEnd,
+            @Nullable Date expirationDateStart,
+            @Nullable Date expirationDateEnd) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(GroupJoinRequest.Fields.groupId, groupId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .buildQuery();
+        return mongoTemplate.count(query, GroupJoinRequest.class);
+    }
+
+    public Mono<Boolean> deleteJoinRequests(
+            @Nullable Set<Long> ids,
+            @Nullable Long groupId,
+            @Nullable Long requesterId,
+            @Nullable Long responderId,
+            @Nullable RequestStatus status,
+            @Nullable Date creationDateStart,
+            @Nullable Date creationDateEnd,
+            @Nullable Date expirationDateStart,
+            @Nullable Date expirationDateEnd) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(GroupJoinRequest.Fields.groupId, groupId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .buildQuery();
+        return mongoTemplate.remove(query, GroupJoinRequest.class)
+                .map(DeleteResult::wasAcknowledged);
+    }
+
+    public Mono<Boolean> updateJoinRequests(
+            @NotEmpty Set<Long> ids,
+            @Nullable Long requesterId,
+            @Nullable String content,
+            @Nullable Date creationDate,
+            @Nullable Date expirationDate) {
+        Query query = new Query().addCriteria(where(ID).in(ids));
+        Update update = UpdateBuilder
+                .newBuilder()
+                .setIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
+                .setIfNotNull(GroupJoinRequest.Fields.content, content)
+                .setIfNotNull(GroupJoinRequest.Fields.creationDate, creationDate)
+                .setIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDate)
+                .build();
+        return mongoTemplate.updateMulti(query, update, GroupJoinRequest.class)
+                .map(UpdateResult::wasAcknowledged);
+    }
+
+    public Mono<GroupJoinRequest> createGroupJoinRequest(
+            @NotNull Long groupId,
+            @NotNull Long requesterId,
+            @NotNull Long responderId,
+            @NotNull String content,
+            @Nullable Date creationDate,
+            @Nullable Date expirationDate) {
+        Date now = new Date();
+        GroupJoinRequest groupJoinRequest = new GroupJoinRequest();
+        groupJoinRequest.setId(turmsClusterManager.generateRandomId());
+        groupJoinRequest.setContent(content);
+        if (creationDate == null) {
+            creationDate = now;
+        }
+        if (expirationDate == null) {
+            int timeToLiveHours = turmsClusterManager.getTurmsProperties().getGroup()
+                    .getGroupJoinRequestTimeToLiveHours();
+            if (timeToLiveHours == 0) {
+                expirationDate = Date.from(Instant.now()
+                        .plus(timeToLiveHours, ChronoUnit.HOURS));
+                groupJoinRequest.setExpirationDate(expirationDate);
+            }
+        }
+        groupJoinRequest.setGroupId(groupId);
+        groupJoinRequest.setRequesterId(requesterId);
+        groupJoinRequest.setResponderId(responderId);
+        groupJoinRequest.setCreationDate(creationDate);
+        groupJoinRequest.setStatus(RequestStatus.PENDING);
+        return Mono.zip(mongoTemplate.insert(groupJoinRequest),
+                groupVersionService.updateJoinRequestsVersion(groupId),
+                userVersionService.updateJoinRequestsVersion(responderId))
+                .map(Tuple2::getT1);
     }
 }
