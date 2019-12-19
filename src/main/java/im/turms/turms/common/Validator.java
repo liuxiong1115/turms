@@ -10,13 +10,10 @@ import java.util.Date;
 public class Validator {
     private Validator() {}
 
-    public static void throwIfAllNull(@NotEmpty Object... array) {
-        for (Object o : array) {
-            if (o != null) {
-                return;
-            }
+    public static void throwIfAllNull(Object... array) {
+        if (areAllNull(array)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
-        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
     }
 
     public static void throwIfAfterWhenNotNull(@Nullable Date startDate, @Nullable Date endDate) {
@@ -71,5 +68,24 @@ public class Validator {
             }
         }
         throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+    }
+
+    public static boolean areAllNull(Object ...array) {
+        if (array == null) {
+            return true;
+        } else {
+            for (Object o : array) {
+                if (o != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void throwIfFalseAndAllNull(boolean bool, Object ...array) {
+        if (!bool && areAllNull(array)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
     }
 }
