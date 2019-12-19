@@ -59,15 +59,13 @@ public class GroupMemberService {
     private static final UserPermissionGroup EMPTY_USER_GROUP_TYPE_PERMISSION = new UserPermissionGroup();
     private final ReactiveMongoTemplate mongoTemplate;
     private final GroupService groupService;
-    private final GroupTypeService groupTypeService;
     private final GroupVersionService groupVersionService;
     private final OnlineUserService onlineUserService;
     private final TurmsClusterManager turmsClusterManager;
 
-    public GroupMemberService(ReactiveMongoTemplate mongoTemplate, @Lazy GroupService groupService, @Lazy GroupTypeService groupTypeService, GroupVersionService groupVersionService, @Lazy OnlineUserService onlineUserService, @Lazy TurmsClusterManager turmsClusterManager) {
+    public GroupMemberService(ReactiveMongoTemplate mongoTemplate, @Lazy GroupService groupService, GroupVersionService groupVersionService, @Lazy OnlineUserService onlineUserService, @Lazy TurmsClusterManager turmsClusterManager) {
         this.mongoTemplate = mongoTemplate;
         this.groupService = groupService;
-        this.groupTypeService = groupTypeService;
         this.groupVersionService = groupVersionService;
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;

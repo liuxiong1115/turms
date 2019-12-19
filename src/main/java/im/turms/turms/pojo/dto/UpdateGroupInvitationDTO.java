@@ -15,45 +15,21 @@
  * limitations under the License.
  */
 
-package im.turms.turms.pojo.domain;
+package im.turms.turms.pojo.dto;
 
-import im.turms.turms.constant.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
 @Data
-@Document
-@FieldNameConstants
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupInvitation {
-    @Id
-    private Long id;
-
-    @Indexed
-    private Long groupId;
-
-    @Indexed
-    private Long inviterId;
-
-    @Indexed
-    private Long inviteeId;
-
-    private String content;
-
-    @Indexed
-    private RequestStatus status;
-
-    @Indexed
+public class UpdateGroupInvitationDTO {
     private Date creationDate;
-
-    @Indexed
+    private String content;
     private Date expirationDate;
+    private Long groupId;
+    private Long inviterId;
 }
