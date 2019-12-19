@@ -18,10 +18,10 @@
 package im.turms.turms.service.group;
 
 import com.google.protobuf.Int64Value;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult;
@@ -150,11 +150,11 @@ public class GroupJoinQuestionService {
                                         .build())));
     }
 
-    public Mono<GroupJoinQuestion> createGroupJoinQuestion(
+    public Mono<GroupJoinQuestion> authAndCreateGroupJoinQuestion(
             @NotNull Long requesterId,
             @NotNull Long groupId,
             @NotNull String question,
-            @NotEmpty List<String> answers,
+            @NotEmpty Set<String> answers,
             @NotNull Integer score) {
         if (score < 0) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
@@ -162,19 +162,27 @@ public class GroupJoinQuestionService {
         return groupMemberService.isAllowedToCreateJoinQuestion(requesterId, groupId)
                 .flatMap(allowed -> {
                     if (allowed != null && allowed) {
-                        GroupJoinQuestion groupJoinQuestion = new GroupJoinQuestion(
-                                turmsClusterManager.generateRandomId(),
-                                groupId,
-                                question,
-                                answers,
-                                score);
-                        return mongoTemplate.insert(groupJoinQuestion)
-                                .zipWith(groupVersionService.updateJoinQuestionsVersion(groupId))
-                                .map(Tuple2::getT1);
+                        return createGroupJoinQuestion(groupId, question, answers, score);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
                 });
+    }
+
+    public Mono<GroupJoinQuestion> createGroupJoinQuestion(
+            @NotNull Long groupId,
+            @NotNull String question,
+            @NotEmpty Set<String> answers,
+            @NotNull Integer score) {
+        GroupJoinQuestion groupJoinQuestion = new GroupJoinQuestion(
+                turmsClusterManager.generateRandomId(),
+                groupId,
+                question,
+                answers,
+                score);
+        return mongoTemplate.insert(groupJoinQuestion)
+                .zipWith(groupVersionService.updateJoinQuestionsVersion(groupId))
+                .map(Tuple2::getT1);
     }
 
     public Mono<Long> queryGroupId(@NotNull Long questionId) {
@@ -184,7 +192,7 @@ public class GroupJoinQuestionService {
                 .map(GroupJoinQuestion::getGroupId);
     }
 
-    public Mono<Boolean> deleteGroupJoinQuestion(
+    public Mono<Boolean> authAndDeleteGroupJoinQuestion(
             @NotNull Long requesterId,
             @NotNull Long questionId) {
         return queryGroupId(questionId)
@@ -207,12 +215,40 @@ public class GroupJoinQuestionService {
                         }));
     }
 
-    public Flux<GroupJoinQuestion> queryGroupJoinQuestions(@NotNull Long groupId, boolean withAnswers) {
-        Query query = new Query().addCriteria(Criteria.where(GroupJoinQuestion.Fields.groupId).is(groupId));
+    public Flux<GroupJoinQuestion> queryGroupJoinQuestions(
+            @Nullable Set<Long> ids,
+            @Nullable Long groupId,
+            @Nullable Integer page,
+            @Nullable Integer size,
+            boolean withAnswers) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
+                .paginateIfNotNull(page, size);
         if (!withAnswers) {
             query.fields().exclude(GroupJoinQuestion.Fields.answers);
         }
         return mongoTemplate.find(query, GroupJoinQuestion.class);
+    }
+
+    public Mono<Long> countGroupJoinQuestions(@Nullable Set<Long> ids, @Nullable Long groupId) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
+                .buildQuery();
+        return mongoTemplate.count(query, GroupJoinQuestion.class);
+    }
+
+    public Mono<Boolean> deleteGroupJoinQuestion(@Nullable Set<Long> ids, @Nullable Long groupId) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
+                .buildQuery();
+        return mongoTemplate.remove(query, GroupJoinQuestion.class)
+                .map(DeleteResult::wasAcknowledged);
     }
 
     public Mono<GroupJoinQuestionsWithVersion> queryGroupJoinQuestionsWithVersion(
@@ -237,7 +273,7 @@ public class GroupJoinQuestionService {
                 })
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return queryGroupJoinQuestions(groupId, false)
+                        return queryGroupJoinQuestions(null, groupId, null, null, false)
                                 .collect(Collectors.toSet())
                                 .map(groupJoinQuestions -> {
                                     if (groupJoinQuestions.isEmpty()) {
@@ -257,13 +293,14 @@ public class GroupJoinQuestionService {
                 });
     }
 
-    public Mono<Boolean> updateGroupJoinQuestion(
+    public Mono<Boolean> authAndUpdateGroupJoinQuestion(
             @NotNull Long requesterId,
             @NotNull Long questionId,
             @Nullable String question,
             @Nullable Set<String> answers,
             @Nullable Integer score) {
-        if ((question == null && answers == null && score == null) || (score != null && score < 0)) {
+        Validator.throwIfAllNull(question, answers, score);
+        if (score != null && score < 0) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         return queryGroupId(questionId)
@@ -289,5 +326,23 @@ public class GroupJoinQuestionService {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                             }
                         }));
+    }
+
+    public Mono<Boolean> updateGroupJoinQuestions(
+            @NotEmpty Set<Long> ids,
+            @Nullable Long groupId,
+            @Nullable String question,
+            @Nullable Set<String> answers,
+            @Nullable Integer score) {
+        Validator.throwIfAllFalsy(ids);
+        Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
+        Update update = UpdateBuilder.newBuilder()
+                .setIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
+                .setIfNotNull(GroupJoinQuestion.Fields.question, question)
+                .setIfNotNull(GroupJoinQuestion.Fields.answers, answers)
+                .setIfNotNull(GroupJoinQuestion.Fields.score, score)
+                .build();
+        return mongoTemplate.updateMulti(query, update, GroupJoinQuestion.class)
+                .map(UpdateResult::wasAcknowledged);
     }
 }

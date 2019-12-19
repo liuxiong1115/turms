@@ -22,7 +22,6 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.pojo.domain.UserFriendRequest;
-import im.turms.turms.pojo.domain.UserRelationship;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.user.relationship.UserFriendRequestService;
 import org.springframework.http.ResponseEntity;

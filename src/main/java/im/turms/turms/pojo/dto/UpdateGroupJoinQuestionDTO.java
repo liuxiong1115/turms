@@ -15,33 +15,20 @@
  * limitations under the License.
  */
 
-package im.turms.turms.pojo.domain;
+package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
-@FieldNameConstants
-public class GroupJoinQuestion {
-    @Id
-    private Long id;
-
-    @Indexed
+public class UpdateGroupJoinQuestionDTO {
     private Long groupId;
-
     private String question;
-
     private Set<String> answers;
-
     private Integer score;
 }

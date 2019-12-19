@@ -39,7 +39,9 @@ import im.turms.turms.service.group.*;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -361,10 +363,10 @@ public class WsGroupController {
             if (request.getAnswersCount() == 0) {
                 return Mono.just(RequestResult.fail());
             } else {
-                List<String> answers = new ArrayList<>(request.getAnswersList());
+                Set<String> answers = new HashSet<>(request.getAnswersList());
                 int score = request.getScore();
                 if (score >= 0) {
-                    return groupJoinQuestionService.createGroupJoinQuestion(
+                    return groupJoinQuestionService.authAndCreateGroupJoinQuestion(
                             turmsRequestWrapper.getUserId(),
                             request.getGroupId(),
                             request.getQuestion(),
@@ -434,7 +436,7 @@ public class WsGroupController {
         return turmsRequestWrapper -> {
             DeleteGroupJoinQuestionRequest request = turmsRequestWrapper.getTurmsRequest()
                     .getDeleteGroupJoinQuestionRequest();
-            return groupJoinQuestionService.deleteGroupJoinQuestion(
+            return groupJoinQuestionService.authAndDeleteGroupJoinQuestion(
                     turmsRequestWrapper.getUserId(),
                     request.getQuestionId())
                     .map(RequestResult::okIfTrue);
@@ -504,7 +506,7 @@ public class WsGroupController {
                     null : new HashSet<>(request.getAnswersList());
             String question = request.hasQuestion() ? request.getQuestion().getValue() : null;
             Integer score = request.hasScore() ? request.getScore().getValue() : null;
-            return groupJoinQuestionService.updateGroupJoinQuestion(
+            return groupJoinQuestionService.authAndUpdateGroupJoinQuestion(
                     turmsRequestWrapper.getUserId(),
                     request.getQuestionId(),
                     question,

@@ -257,10 +257,8 @@ public class TurmsClusterManager {
         map.put(CLUSTER_TIME, hazelcastInstance.getCluster().getClusterTime());
         map.put(CLUSTER_VERSION, hazelcastInstance.getCluster().getClusterVersion());
         map.put(MEMBERS, hazelcastInstance.getCluster().getMembers());
-        // Do not just pass hazelcastInstance.getConfig() which will cause JsonMappingException: Infinite recursion
-        // TODO: optimize structure
         if (withConfigs) {
-            map.put("configs", hazelcastInstance.getConfig().toString());
+            map.put("configs", hazelcastInstance.getConfig());
         }
         return map;
     }
