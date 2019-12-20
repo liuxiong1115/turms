@@ -135,6 +135,7 @@ public class GroupJoinQuestionService {
                                                 requesterId,
                                                 GroupMemberRole.MEMBER,
                                                 null,
+                                                null,
                                                 null, //TODO: GroupType: allow add a mute end date for new members
                                                 null)
                                                 .thenReturn(true);

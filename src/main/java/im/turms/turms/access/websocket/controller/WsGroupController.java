@@ -536,14 +536,13 @@ public class WsGroupController {
                     name,
                     muteEndDate,
                     null)
-                    .map(added -> {
-                        if (added != null && added
-                                && turmsClusterManager.getTurmsProperties().getNotification().isNotifyUserAfterAddedToGroupByOthers()) {
+                    .map(member -> {
+                        if (member != null && turmsClusterManager.getTurmsProperties().getNotification().isNotifyUserAfterAddedToGroupByOthers()) {
                             return RequestResult.recipientData(
                                     request.getUserId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
-                        return RequestResult.okIfTrue(added);
+                        return RequestResult.okIfTrue(true);
                     });
         };
     }
