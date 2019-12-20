@@ -108,6 +108,7 @@ public class GroupService {
                                 creatorId,
                                 GroupMemberRole.OWNER,
                                 null,
+                                new Date(),
                                 null,
                                 operations))
                         .flatMap(results -> groupVersionService.upsert(groupId)
@@ -298,6 +299,7 @@ public class GroupService {
                                                 null,
                                                 GroupMemberRole.MEMBER,
                                                 null,
+                                                null,
                                                 operations);
                                     }
                                     Mono<Boolean> update = groupMemberService.updateGroupMember(
@@ -305,6 +307,7 @@ public class GroupService {
                                             successorId,
                                             null,
                                             GroupMemberRole.OWNER,
+                                            null,
                                             null,
                                             operations);
                                     return Mono.zip(deleteOrUpdateOwnerMono, update)

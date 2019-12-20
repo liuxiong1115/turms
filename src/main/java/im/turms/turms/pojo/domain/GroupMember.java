@@ -20,6 +20,7 @@ package im.turms.turms.pojo.domain;
 import im.turms.turms.constant.GroupMemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
@@ -29,6 +30,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Document
@@ -67,11 +69,19 @@ public class GroupMember {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @EqualsAndHashCode
     public static class Key {
         @Indexed
         private Long groupId;
 
         @Indexed
         private Long userId;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class KeyList {
+        private List<Key> keys;
     }
 }

@@ -17,12 +17,11 @@
 
 package im.turms.turms.service.group;
 
+import com.google.common.collect.HashMultimap;
 import com.google.protobuf.Int64Value;
+import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.GroupInvitationStrategy;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -42,6 +41,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
@@ -71,27 +71,31 @@ public class GroupMemberService {
         this.turmsClusterManager = turmsClusterManager;
     }
 
-    public Mono<Boolean> addGroupMember(
+    public Mono<GroupMember> addGroupMember(
             @NotNull Long groupId,
             @NotNull Long userId,
             @NotNull GroupMemberRole groupMemberRole,
             @Nullable String name,
+            @Nullable Date joinDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
+        if (joinDate == null) {
+            joinDate = new Date();
+        }
         GroupMember groupMember = new GroupMember(
                 groupId,
                 userId,
                 name,
                 groupMemberRole,
-                new Date(),
+                joinDate,
                 muteEndDate);
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.insert(groupMember)
                 .zipWith(groupVersionService.updateMembersVersion(groupId))
-                .thenReturn(true);
+                .map(Tuple2::getT1);
     }
 
-    public Mono<Boolean> authAndAddGroupMember(
+    public Mono<GroupMember> authAndAddGroupMember(
             @NotNull Long requesterId,
             @NotNull Long groupId,
             @NotNull Long userId,
@@ -106,7 +110,7 @@ public class GroupMemberService {
                                 groupService.isGroupActiveAndNotDeleted(groupId))
                                 .flatMap(results -> {
                                     if (!results.getT1() && results.getT2()) {
-                                        return addGroupMember(groupId, userId, groupMemberRole, name, muteEndDate, operations);
+                                        return addGroupMember(groupId, userId, groupMemberRole, name, new Date(), muteEndDate, operations);
                                     } else {
                                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.TARGET_USERS_UNAUTHORIZED));
                                     }
@@ -174,17 +178,29 @@ public class GroupMemberService {
             @NotNull Long memberId,
             @Nullable String name,
             @Nullable GroupMemberRole role,
+            @Nullable Date joinDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        if (name == null && role == null && muteEndDate == null) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
+        return updateGroupMembers(groupId, Set.of(memberId), name, role, joinDate, muteEndDate, operations);
+    }
+
+    public Mono<Boolean> updateGroupMembers(
+            @NotNull Long groupId,
+            @NotEmpty Set<Long> memberIds,
+            @Nullable String name,
+            @Nullable GroupMemberRole role,
+            @Nullable Date joinDate,
+            @Nullable Date muteEndDate,
+            @Nullable ReactiveMongoOperations operations) {
+        Validator.throwIfAnyFalsy(groupId, memberIds);
+        Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
-                .addCriteria(Criteria.where(ID_USER_ID).is(memberId));
+                .addCriteria(Criteria.where(ID_USER_ID).in(memberIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(GroupMember.Fields.name, name)
                 .setIfNotNull(GroupMember.Fields.role, role)
+                .setIfNotNull(GroupMember.Fields.joinDate, joinDate)
                 .build();
         if (muteEndDate != null) {
             if (muteEndDate.before(new Date())) {
@@ -203,6 +219,27 @@ public class GroupMemberService {
                         return Mono.just(false);
                     }
                 });
+    }
+
+    public Mono<Boolean> updateGroupMembers(
+            @NotEmpty Set<GroupMember.Key> keys,
+            @Nullable String name,
+            @Nullable GroupMemberRole role,
+            @Nullable Date joinDate,
+            @Nullable Date muteEndDate,
+            @Nullable ReactiveMongoOperations operations) {
+        Validator.throwIfAnyFalsy(keys);
+        Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
+        HashMultimap<Long, Long> multimap = HashMultimap.create();
+        for (GroupMember.Key key : keys) {
+            multimap.put(key.getGroupId(), key.getUserId());
+        }
+        ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
+        for (Long groupId : multimap.keySet()) {
+            Set<Long> memberIds = multimap.get(groupId);
+            monos.add(updateGroupMembers(groupId, memberIds, name, role, joinDate, muteEndDate, operations));
+        }
+        return Flux.merge(monos).all(value -> value);
     }
 
     public Flux<Long> getMembersIdsByGroupId(@NotNull Long groupId) {
@@ -448,9 +485,64 @@ public class GroupMemberService {
                 .map(member -> member.getKey().getUserId());
     }
 
-    public Flux<GroupMember> queryGroupMembers(@NotNull Long groupId) {
-        Query query = new Query().addCriteria(Criteria.where(ID_GROUP_ID).is(groupId));
+    public Flux<GroupMember> queryGroupMembers(
+            @Nullable Long groupId,
+            @Nullable Long userId,
+            @Nullable GroupMemberRole role,
+            @Nullable Date joinDateStart,
+            @Nullable Date joinDateEnd,
+            @Nullable Date muteEndDateStart,
+            @Nullable Date muteEndDateEnd,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addIsIfNotNull(ID_GROUP_ID, groupId)
+                .addIsIfNotNull(ID_USER_ID, userId)
+                .addIsIfNotNull(GroupMember.Fields.role, role)
+                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateStart, joinDateEnd)
+                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
+                .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupMember.class);
+    }
+
+    public Mono<Long> countMembers(
+            @Nullable Long groupId,
+            @Nullable Long userId,
+            @Nullable GroupMemberRole role,
+            @Nullable Date joinDateStart,
+            @Nullable Date joinDateEnd,
+            @Nullable Date muteEndDateStart,
+            @Nullable Date muteEndDateEnd) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addIsIfNotNull(ID_GROUP_ID, groupId)
+                .addIsIfNotNull(ID_USER_ID, userId)
+                .addIsIfNotNull(GroupMember.Fields.role, role)
+                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateStart, joinDateEnd)
+                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
+                .buildQuery();
+        return mongoTemplate.count(query, GroupMember.class);
+    }
+
+    public Mono<Boolean> deleteMembers(
+            @Nullable Long groupId,
+            @Nullable Long userId,
+            @Nullable GroupMemberRole role,
+            @Nullable Date joinDateStart,
+            @Nullable Date joinDateEnd,
+            @Nullable Date muteEndDateStart,
+            @Nullable Date muteEndDateEnd) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addIsIfNotNull(ID_GROUP_ID, groupId)
+                .addIsIfNotNull(ID_USER_ID, userId)
+                .addIsIfNotNull(GroupMember.Fields.role, role)
+                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateStart, joinDateEnd)
+                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
+                .buildQuery();
+        return mongoTemplate.remove(query, GroupMember.class)
+                .map(DeleteResult::wasAcknowledged);
     }
 
     public Flux<GroupMember> queryGroupMembers(@NotNull Long groupId, @NotEmpty Set<Long> membersIds) {
@@ -507,7 +599,7 @@ public class GroupMemberService {
                 })
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return queryGroupMembers(groupId)
+                        return queryGroupMembers(groupId, null, null, null, null, null, null, null, null)
                                 .collectList()
                                 .flatMap(members -> {
                                     if (members.isEmpty()) {
@@ -551,7 +643,7 @@ public class GroupMemberService {
         return authorized
                 .flatMap(isAuthorized -> {
                     if (isAuthorized != null && isAuthorized) {
-                        return updateGroupMember(groupId, memberId, name, role, muteEndDate, null);
+                        return updateGroupMember(groupId, memberId, name, role, new Date(), muteEndDate, null);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
