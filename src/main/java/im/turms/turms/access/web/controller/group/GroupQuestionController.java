@@ -22,7 +22,7 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.pojo.domain.GroupJoinQuestion;
 import im.turms.turms.pojo.dto.*;
-import im.turms.turms.service.group.GroupJoinQuestionService;
+import im.turms.turms.service.group.GroupQuestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -34,46 +34,46 @@ import java.util.Set;
 import static im.turms.turms.constant.AdminPermission.*;
 
 @RestController
-@RequestMapping("/groups/join-questions")
-public class GroupJoinQuestionController {
-    private final GroupJoinQuestionService groupJoinQuestionService;
+@RequestMapping("/groups/questions")
+public class GroupQuestionController {
+    private final GroupQuestionService groupQuestionService;
     private final PageUtil pageUtil;
 
-    public GroupJoinQuestionController(PageUtil pageUtil, GroupJoinQuestionService groupJoinQuestionService) {
+    public GroupQuestionController(PageUtil pageUtil, GroupQuestionService groupQuestionService) {
         this.pageUtil = pageUtil;
-        this.groupJoinQuestionService = groupJoinQuestionService;
+        this.groupQuestionService = groupQuestionService;
     }
 
     @GetMapping
-    @RequiredPermission(GROUP_JOIN_QUESTION_QUERY)
+    @RequiredPermission(GROUP_QUESTION_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupJoinQuestion>>>> queryGroupJoinQuestions(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Long groupId,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Flux<GroupJoinQuestion> groupJoinQuestionFlux = groupJoinQuestionService
+        Flux<GroupJoinQuestion> groupJoinQuestionFlux = groupQuestionService
                 .queryGroupJoinQuestions(ids, groupId, 0, size, true);
         return ResponseFactory.okIfTruthy(groupJoinQuestionFlux);
     }
 
     @GetMapping("/page")
-    @RequiredPermission(GROUP_JOIN_QUESTION_QUERY)
+    @RequiredPermission(GROUP_QUESTION_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupJoinQuestion>>>> queryGroupsInformation(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Long groupId,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Mono<Long> count = groupJoinQuestionService.countGroupJoinQuestions(ids, groupId);
-        Flux<GroupJoinQuestion> groupJoinQuestionFlux = groupJoinQuestionService
+        Mono<Long> count = groupQuestionService.countGroupJoinQuestions(ids, groupId);
+        Flux<GroupJoinQuestion> groupJoinQuestionFlux = groupQuestionService
                 .queryGroupJoinQuestions(ids, groupId, page, size, true);
         return ResponseFactory.page(count, groupJoinQuestionFlux);
     }
 
     @PostMapping
-    @RequiredPermission(GROUP_JOIN_QUESTION_CREATE)
+    @RequiredPermission(GROUP_QUESTION_CREATE)
     public Mono<ResponseEntity<ResponseDTO<GroupJoinQuestion>>> addGroupJoinQuestion(@RequestBody AddGroupJoinQuestionDTO dto) {
-        Mono<GroupJoinQuestion> createMono = groupJoinQuestionService
+        Mono<GroupJoinQuestion> createMono = groupQuestionService
                 .createGroupJoinQuestion(
                         dto.getGroupId(),
                         dto.getQuestion(),
@@ -83,11 +83,11 @@ public class GroupJoinQuestionController {
     }
 
     @PutMapping
-    @RequiredPermission(GROUP_JOIN_QUESTION_UPDATE)
+    @RequiredPermission(GROUP_QUESTION_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupJoinQuestions(
             @RequestParam Set<Long> ids,
             @RequestBody UpdateGroupJoinQuestionDTO dto) {
-        Mono<Boolean> updateMono = groupJoinQuestionService.updateGroupJoinQuestions(
+        Mono<Boolean> updateMono = groupQuestionService.updateGroupJoinQuestions(
                 ids,
                 dto.getGroupId(),
                 dto.getQuestion(),
@@ -97,11 +97,11 @@ public class GroupJoinQuestionController {
     }
 
     @DeleteMapping
-    @RequiredPermission(GROUP_JOIN_QUESTION_DELETE)
+    @RequiredPermission(GROUP_QUESTION_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupJoinQuestions(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Long groupId) {
-        Mono<Boolean> deleteMono = groupJoinQuestionService.deleteGroupJoinQuestion(ids, groupId);
+        Mono<Boolean> deleteMono = groupQuestionService.deleteGroupJoinQuestion(ids, groupId);
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

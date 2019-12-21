@@ -47,14 +47,14 @@ import static im.turms.turms.common.Constants.ID;
 import static im.turms.turms.common.Constants.MAX_DATE;
 
 @Service
-public class GroupJoinQuestionService {
+public class GroupQuestionService {
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
     private final GroupMemberService groupMemberService;
     private final GroupService groupService;
     private final GroupVersionService groupVersionService;
 
-    public GroupJoinQuestionService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService, GroupVersionService groupVersionService, GroupService groupService) {
+    public GroupQuestionService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService, GroupVersionService groupVersionService, GroupService groupService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.groupMemberService = groupMemberService;

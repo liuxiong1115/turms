@@ -20,6 +20,7 @@ package im.turms.turms.access.web.controller.message;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
+import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.pojo.dto.AcknowledgedDTO;
 import im.turms.turms.pojo.dto.PaginationDTO;
@@ -32,6 +33,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import static im.turms.turms.constant.AdminPermission.MESSAGE_STATUS_QUERY;
@@ -51,30 +54,92 @@ public class MessageStatusController {
     @GetMapping
     @RequiredPermission(MESSAGE_STATUS_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<MessageStatus>>>> queryMessageStatuses(
-            @RequestParam(required = false) Set<Long> ids) {
-        Flux<MessageStatus> messageStatuses = messageStatusService.queryMessageStatuses(ids);
+            @RequestParam(required = false) Set<Long> messageIds,
+            @RequestParam(required = false) Set<Long> recipientIds,
+            @RequestParam(required = false) Boolean areSystemMessages,
+            @RequestParam(required = false) Long senderId,
+            @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
+            @RequestParam(required = false) Date receptionDateStart,
+            @RequestParam(required = false) Date receptionDateEnd,
+            @RequestParam(required = false) Date readDateStart,
+            @RequestParam(required = false) Date readDateEnd,
+            @RequestParam(required = false) Date recallDateStart,
+            @RequestParam(required = false) Date recallDateEnd,
+            @RequestParam(required = false) Integer size) {
+        Flux<MessageStatus> messageStatuses = messageStatusService.queryMessageStatuses(
+                messageIds,
+                recipientIds,
+                areSystemMessages,
+                senderId,
+                deliveryStatus,
+                receptionDateStart,
+                receptionDateEnd,
+                readDateStart,
+                readDateEnd,
+                recallDateStart,
+                recallDateEnd,
+                0,
+                size);
         return ResponseFactory.okIfTruthy(messageStatuses);
     }
 
     @GetMapping("/page")
     @RequiredPermission(MESSAGE_STATUS_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<MessageStatus>>>> queryMessageStatuses(
-            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Set<Long> messageIds,
+            @RequestParam(required = false) Set<Long> recipientIds,
+            @RequestParam(required = false) Boolean areSystemMessages,
+            @RequestParam(required = false) Long senderId,
+            @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
+            @RequestParam(required = false) Date receptionDateStart,
+            @RequestParam(required = false) Date receptionDateEnd,
+            @RequestParam(required = false) Date readDateStart,
+            @RequestParam(required = false) Date readDateEnd,
+            @RequestParam(required = false) Date recallDateStart,
+            @RequestParam(required = false) Date recallDateEnd,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Flux<MessageStatus> messageStatuses = messageStatusService.queryMessageStatuses(ids, page, size);
-        return ResponseFactory.page(messageStatuses.count(), messageStatuses);
+        Mono<Long> count = messageStatusService.countMessageStatuses(
+                messageIds,
+                recipientIds,
+                areSystemMessages,
+                senderId,
+                deliveryStatus,
+                receptionDateStart,
+                receptionDateEnd,
+                readDateStart,
+                readDateEnd,
+                recallDateStart,
+                recallDateEnd);
+        Flux<MessageStatus> messageStatuses = messageStatusService.queryMessageStatuses(
+                messageIds,
+                recipientIds,
+                areSystemMessages,
+                senderId,
+                deliveryStatus,
+                receptionDateStart,
+                receptionDateEnd,
+                readDateStart,
+                readDateEnd,
+                recallDateStart,
+                recallDateEnd,
+                page,
+                size);
+        return ResponseFactory.page(count, messageStatuses);
     }
 
     @PutMapping
     @RequiredPermission(MESSAGE_STATUS_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateMessageStatuses(
-            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam MessageStatus.KeyList keys,
             @RequestBody UpdateMessageStatusDTO dto) {
         Mono<Boolean> updateMono = messageStatusService.updateMessageStatuses(
-                ids, null,
-                dto.getRecallDate(), dto.getReadDate(), dto.getReceptionDate(), null);
+                new HashSet<>(keys.getKeys()),
+                dto.getRecallDate(),
+                dto.getReadDate(),
+                dto.getReceptionDate(),
+                null);
         return ResponseFactory.acknowledged(updateMono);
     }
 }
