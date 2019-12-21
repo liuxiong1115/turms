@@ -1,10 +1,12 @@
 package im.turms.turms.service.message;
 
+import com.google.common.collect.HashMultimap;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.Validator;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -21,10 +23,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -70,12 +69,13 @@ public class MessageStatusService {
     }
 
     public Mono<Boolean> updateMessageStatuses(
-            @Nullable Set<Long> messageIds,
-            @Nullable Set<Long> recipientIds,
+            @NotEmpty Set<MessageStatus.Key> keys,
             @Nullable Date recallDate,
             @Nullable Date readDate,
             @Nullable Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
+        Validator.throwIfAnyFalsy(keys);
+        Validator.throwIfAllNull(recallDate, readDate, receptionDate);
         boolean isIllegalRecall = recallDate != null
                 && !turmsClusterManager.getTurmsProperties().getMessage().isAllowRecallingMessage();
         boolean isIllegalRead = readDate != null
@@ -83,9 +83,28 @@ public class MessageStatusService {
         if (isIllegalRecall || isIllegalRead) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION);
         }
+        HashMultimap<Long, Long> multimap = HashMultimap.create();
+        for (MessageStatus.Key key : keys) {
+            multimap.put(key.getMessageId(), key.getRecipientId());
+        }
+        ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
+        for (Long messageId : multimap.keySet()) {
+            Set<Long> recipientIds = multimap.get(messageId);
+            monos.add(updateMessageStatuses(messageId, recipientIds, recallDate, readDate, receptionDate, operations));
+        }
+        return Flux.merge(monos).all(value -> value);
+    }
+
+    public Mono<Boolean> updateMessageStatuses(
+            @NotNull Long messageId,
+            @NotEmpty Set<Long> recipientIds,
+            @Nullable Date recallDate,
+            @Nullable Date readDate,
+            @Nullable Date receptionDate,
+            @Nullable ReactiveMongoOperations operations) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addInIfNotNull(ID_MESSAGE_ID, messageIds)
+                .addIsIfNotNull(ID_MESSAGE_ID, messageId)
                 .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
                 .buildQuery();
         Update update = UpdateBuilder.newBuilder()
@@ -105,9 +124,7 @@ public class MessageStatusService {
             @Nullable Date readDate,
             @Nullable Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
-        return updateMessageStatuses(
-                Collections.singleton(messageId),
-                Collections.singleton(recipientId),
+        return updateMessageStatuses(messageId, Collections.singleton(recipientId),
                 recallDate, readDate, receptionDate, operations);
     }
 
@@ -145,17 +162,58 @@ public class MessageStatusService {
         return mongoTemplate.findOne(query, MessageStatus.class);
     }
 
-    public Flux<MessageStatus> queryMessageStatuses(@NotEmpty Set<Long> messageIds) {
-        Query query = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).in(messageIds));
+    public Flux<MessageStatus> queryMessageStatuses(
+            @Nullable Set<Long> messageIds,
+            @Nullable Set<Long> recipientIds,
+            @Nullable Boolean isSystemMessage,
+            @Nullable Long senderId,
+            @Nullable MessageDeliveryStatus deliveryStatus,
+            @Nullable Date receptionDateStart,
+            @Nullable Date receptionDateEnd,
+            @Nullable Date readDateStart,
+            @Nullable Date readDateEnd,
+            @Nullable Date recallDateStart,
+            @Nullable Date recallDateEnd,
+            @Nullable Integer page,
+            @Nullable Integer size) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID_MESSAGE_ID, messageIds)
+                .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
+                .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, isSystemMessage)
+                .addIsIfNotNull(MessageStatus.Fields.senderId, senderId)
+                .addIsIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatus)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateStart, receptionDateEnd)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, readDateStart, readDateEnd)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, recallDateStart, recallDateEnd)
+                .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, MessageStatus.class);
     }
 
-    public Flux<MessageStatus> queryMessageStatuses(@NotEmpty Set<Long> ids, @Nullable Integer page, @Nullable Integer size) {
+    public Mono<Long> countMessageStatuses(
+            @Nullable Set<Long> messageIds,
+            @Nullable Set<Long> recipientIds,
+            @Nullable Boolean isSystemMessage,
+            @Nullable Long senderId,
+            @Nullable MessageDeliveryStatus deliveryStatus,
+            @Nullable Date receptionDateStart,
+            @Nullable Date receptionDateEnd,
+            @Nullable Date readDateStart,
+            @Nullable Date readDateEnd,
+            @Nullable Date recallDateStart,
+            @Nullable Date recallDateEnd) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addInIfNotNull(ID_MESSAGE_ID, ids)
-                .paginateIfNotNull(page, size);
-        return mongoTemplate.find(query, MessageStatus.class);
+                .addInIfNotNull(ID_MESSAGE_ID, messageIds)
+                .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
+                .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, isSystemMessage)
+                .addIsIfNotNull(MessageStatus.Fields.senderId, senderId)
+                .addIsIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatus)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateStart, receptionDateEnd)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, readDateStart, readDateEnd)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, recallDateStart, recallDateEnd)
+                .buildQuery();
+        return mongoTemplate.count(query, MessageStatus.class);
     }
 
     public Mono<Long> countPendingMessages(

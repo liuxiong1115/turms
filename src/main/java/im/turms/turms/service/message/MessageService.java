@@ -275,6 +275,7 @@ public class MessageService {
                 MessageStatus messageStatus = new MessageStatus(
                         message.getId(),
                         null,
+                        message.getIsSystemMessage(),
                         message.getSenderId(),
                         message.getTargetId(),
                         MessageDeliveryStatus.READY);
@@ -293,6 +294,7 @@ public class MessageService {
                                 messageStatuses.add(new MessageStatus(
                                         message.getId(),
                                         message.getTargetId(),
+                                        message.getIsSystemMessage(),
                                         message.getSenderId(),
                                         memberId,
                                         MessageDeliveryStatus.READY));
