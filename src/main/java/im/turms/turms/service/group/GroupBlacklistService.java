@@ -154,8 +154,8 @@ public class GroupBlacklistService {
     public Flux<GroupBlacklistedUser> queryBlacklistedUsers(
             @Nullable Long groupId,
             @Nullable Long userId,
-            @Nullable Date blockTimeStart,
-            @Nullable Date blockTimeEnd,
+            @Nullable Date blockDateStart,
+            @Nullable Date blockDateEnd,
             @Nullable Long requesterId,
             @Nullable Integer page,
             @Nullable Integer size) {
@@ -163,7 +163,7 @@ public class GroupBlacklistService {
                 .newBuilder()
                 .addIsIfNotNull(ID_GROUP_ID, groupId)
                 .addIsIfNotNull(ID_USER_ID, userId)
-                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.blockTime, blockTimeStart, blockTimeEnd)
+                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.blockDate, blockDateStart, blockDateEnd)
                 .addIsIfNotNull(GroupBlacklistedUser.Fields.requesterId, requesterId)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupBlacklistedUser.class);
@@ -172,14 +172,14 @@ public class GroupBlacklistService {
     public Mono<Long> countBlacklistedUsers(
             @Nullable Long groupId,
             @Nullable Long userId,
-            @Nullable Date blockTimeStart,
-            @Nullable Date blockTimeEnd,
+            @Nullable Date blockDateStart,
+            @Nullable Date blockDateEnd,
             @Nullable Long requesterId) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addIsIfNotNull(ID_GROUP_ID, groupId)
                 .addIsIfNotNull(ID_USER_ID, userId)
-                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.blockTime, blockTimeStart, blockTimeEnd)
+                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.blockDate, blockDateStart, blockDateEnd)
                 .addIsIfNotNull(GroupBlacklistedUser.Fields.requesterId, requesterId)
                 .buildQuery();
         return mongoTemplate.count(query, GroupBlacklistedUser.class);
@@ -251,28 +251,28 @@ public class GroupBlacklistService {
             @NotNull Long groupId,
             @NotNull Long userId,
             @NotNull Long requesterId,
-            @Nullable Date blockTime) {
+            @Nullable Date blockDate) {
         Validator.throwIfAnyNull(groupId, userId, requesterId);
-        if (blockTime == null) {
-            blockTime = new Date();
+        if (blockDate == null) {
+            blockDate = new Date();
         }
-        GroupBlacklistedUser user = new GroupBlacklistedUser(groupId, userId, blockTime, requesterId);
+        GroupBlacklistedUser user = new GroupBlacklistedUser(groupId, userId, blockDate, requesterId);
         return mongoTemplate.insert(user);
     }
 
     public Mono<Boolean> updateBlacklistedUsers(
             @NotNull Long groupId,
             @NotEmpty Set<Long> userIds,
-            @Nullable Date blockTime,
+            @Nullable Date blockDate,
             @Nullable Long requesterId) {
         Validator.throwIfAnyFalsy(groupId, userIds);
-        Validator.throwIfAllNull(blockTime, requesterId);
+        Validator.throwIfAllNull(blockDate, requesterId);
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).in(userIds));
         Update update = UpdateBuilder
                 .newBuilder()
-                .setIfNotNull(GroupBlacklistedUser.Fields.blockTime, blockTime)
+                .setIfNotNull(GroupBlacklistedUser.Fields.blockDate, blockDate)
                 .setIfNotNull(GroupBlacklistedUser.Fields.requesterId, requesterId)
                 .build();
         return mongoTemplate.updateMulti(query, update, GroupBlacklistedUser.class)
@@ -281,10 +281,10 @@ public class GroupBlacklistService {
 
     public Mono<Boolean> updateBlacklistedUsers(
             @NotEmpty Set<GroupBlacklistedUser.Key> keys,
-            @Nullable Date blockTime,
+            @Nullable Date blockDate,
             @Nullable Long requesterId) {
         Validator.throwIfAnyFalsy(keys);
-        Validator.throwIfAllNull(blockTime, requesterId);
+        Validator.throwIfAllNull(blockDate, requesterId);
         HashMultimap<Long, Long> multimap = HashMultimap.create();
         for (GroupBlacklistedUser.Key key : keys) {
             multimap.put(key.getGroupId(), key.getUserId());
@@ -292,7 +292,7 @@ public class GroupBlacklistService {
         ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
         for (Long groupId : multimap.keySet()) {
             Set<Long> relatedUserIds = multimap.get(groupId);
-            monos.add(updateBlacklistedUsers(groupId, relatedUserIds, blockTime, requesterId));
+            monos.add(updateBlacklistedUsers(groupId, relatedUserIds, blockDate, requesterId));
         }
         return Flux.merge(monos).all(value -> value);
     }
@@ -300,14 +300,14 @@ public class GroupBlacklistService {
     public Mono<Boolean> deleteBlacklistedUsers(
             @Nullable Long groupId,
             @Nullable Long userId,
-            @Nullable Date blockTimeStart,
-            @Nullable Date blockTimeEnd,
+            @Nullable Date blockDateStart,
+            @Nullable Date blockDateEnd,
             @Nullable Long requesterId) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addIsIfNotNull(ID_GROUP_ID, groupId)
                 .addIsIfNotNull(ID_USER_ID, userId)
-                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.blockTime, blockTimeStart, blockTimeEnd)
+                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.blockDate, blockDateStart, blockDateEnd)
                 .addIsIfNotNull(GroupBlacklistedUser.Fields.requesterId, requesterId)
                 .buildQuery();
         return mongoTemplate.remove(query, GroupBlacklistedUser.class)
