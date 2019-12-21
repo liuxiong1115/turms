@@ -20,13 +20,17 @@ package im.turms.turms.pojo.domain;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -59,13 +63,18 @@ public class MessageStatus {
     private Date recallDate;
 
     public MessageStatus(
-            Long id,
-            Long groupId,
-            Long senderId,
-            Long recipientId,
-            MessageDeliveryStatus status) {
+            long id,
+            @Nullable Long groupId,
+            boolean isSystemMessage,
+            long senderId,
+            long recipientId,
+            @NotNull MessageDeliveryStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException();
+        }
         this.key = new Key(id, recipientId);
         this.groupId = groupId;
+        this.isSystemMessage = isSystemMessage;
         this.senderId = senderId;
         this.deliveryStatus = status;
     }
@@ -73,11 +82,19 @@ public class MessageStatus {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @EqualsAndHashCode
     public static class Key {
         @Indexed
         private Long messageId;
 
         @Indexed
         private Long recipientId;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class KeyList {
+        private List<Key> keys;
     }
 }

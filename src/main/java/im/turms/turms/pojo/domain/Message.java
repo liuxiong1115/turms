@@ -76,7 +76,7 @@ public class Message {
     public Message(
             @NotNull Long id,
             @NotNull ChatType chatType,
-            @Nullable Boolean isSystemMessage,
+            @NotNull Boolean isSystemMessage,
             @NotNull Date deliveryDate,
             @NotNull String text,
             @NotNull Long senderId,

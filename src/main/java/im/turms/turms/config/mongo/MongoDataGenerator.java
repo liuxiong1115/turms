@@ -220,6 +220,7 @@ public class MongoDataGenerator {
                 MessageStatus privateMessageStatus = new MessageStatus(
                         id,
                         null,
+                        false,
                         1L,
                         (long) 2 + (i % 9),
                         MessageDeliveryStatus.READY);
@@ -240,6 +241,7 @@ public class MongoDataGenerator {
                     MessageStatus groupMessageStatus = new MessageStatus(
                             id,
                             1L,
+                            false,
                             1L,
                             (long) j,
                             MessageDeliveryStatus.READY);

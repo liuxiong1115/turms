@@ -49,16 +49,16 @@ import java.util.stream.Collectors;
 public class WsGroupController {
     private final GroupService groupService;
     private final GroupBlacklistService groupBlacklistService;
-    private final GroupJoinQuestionService groupJoinQuestionService;
+    private final GroupQuestionService groupQuestionService;
     private final GroupInvitationService groupInvitationService;
     private final GroupJoinRequestService groupJoinRequestService;
     private final GroupMemberService groupMemberService;
     private final TurmsClusterManager turmsClusterManager;
 
-    public WsGroupController(GroupService groupService, GroupBlacklistService groupBlacklistService, GroupJoinQuestionService groupJoinQuestionService, GroupInvitationService groupInvitationService, GroupJoinRequestService groupJoinRequestService, GroupMemberService groupMemberService, TurmsClusterManager turmsClusterManager) {
+    public WsGroupController(GroupService groupService, GroupBlacklistService groupBlacklistService, GroupQuestionService groupQuestionService, GroupInvitationService groupInvitationService, GroupJoinRequestService groupJoinRequestService, GroupMemberService groupMemberService, TurmsClusterManager turmsClusterManager) {
         this.groupService = groupService;
         this.groupBlacklistService = groupBlacklistService;
-        this.groupJoinQuestionService = groupJoinQuestionService;
+        this.groupQuestionService = groupQuestionService;
         this.groupInvitationService = groupInvitationService;
         this.groupJoinRequestService = groupJoinRequestService;
         this.groupMemberService = groupMemberService;
@@ -301,7 +301,7 @@ public class WsGroupController {
         return turmsRequestWrapper -> {
             CheckGroupJoinQuestionsAnswersRequest request = turmsRequestWrapper.getTurmsRequest()
                     .getCheckGroupJoinQuestionsAnswersRequest();
-            return groupJoinQuestionService.checkGroupQuestionAnswerAndJoin(
+            return groupQuestionService.checkGroupQuestionAnswerAndJoin(
                     turmsRequestWrapper.getUserId(),
                     request.getQuestionIdAndAnswerMap())
                     .map(answerResult -> RequestResult.responseData(TurmsNotification.Data.newBuilder()
@@ -371,7 +371,7 @@ public class WsGroupController {
                 Set<String> answers = new HashSet<>(request.getAnswersList());
                 int score = request.getScore();
                 if (score >= 0) {
-                    return groupJoinQuestionService.authAndCreateGroupJoinQuestion(
+                    return groupQuestionService.authAndCreateGroupJoinQuestion(
                             turmsRequestWrapper.getUserId(),
                             request.getGroupId(),
                             request.getQuestion(),
@@ -441,7 +441,7 @@ public class WsGroupController {
         return turmsRequestWrapper -> {
             DeleteGroupJoinQuestionRequest request = turmsRequestWrapper.getTurmsRequest()
                     .getDeleteGroupJoinQuestionRequest();
-            return groupJoinQuestionService.authAndDeleteGroupJoinQuestion(
+            return groupQuestionService.authAndDeleteGroupJoinQuestion(
                     turmsRequestWrapper.getUserId(),
                     request.getQuestionId())
                     .map(RequestResult::okIfTrue);
@@ -491,7 +491,7 @@ public class WsGroupController {
             QueryGroupJoinQuestionsRequest request = turmsRequestWrapper.getTurmsRequest()
                     .getQueryGroupJoinQuestionsRequest();
             Date lastUpdatedDate = request.hasLastUpdatedDate() ? new Date(request.getLastUpdatedDate().getValue()) : null;
-            return groupJoinQuestionService.queryGroupJoinQuestionsWithVersion(
+            return groupQuestionService.queryGroupJoinQuestionsWithVersion(
                     turmsRequestWrapper.getUserId(),
                     request.getGroupId(),
                     request.getWithAnswers(),
@@ -511,7 +511,7 @@ public class WsGroupController {
                     null : new HashSet<>(request.getAnswersList());
             String question = request.hasQuestion() ? request.getQuestion().getValue() : null;
             Integer score = request.hasScore() ? request.getScore().getValue() : null;
-            return groupJoinQuestionService.authAndUpdateGroupJoinQuestion(
+            return groupQuestionService.authAndUpdateGroupJoinQuestion(
                     turmsRequestWrapper.getUserId(),
                     request.getQuestionId(),
                     question,
