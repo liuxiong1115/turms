@@ -43,10 +43,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -217,11 +214,28 @@ public class GroupService {
 
     public Flux<Group> queryGroups(
             @Nullable Set<Long> ids,
-            @NotNull Integer page,
-            @NotNull Integer size) {
+            @Nullable Long typeId,
+            @Nullable Long creatorId,
+            @Nullable Long ownerId,
+            @Nullable Boolean isActive,
+            @Nullable Date creationDateStart,
+            @Nullable Date creationDateEnd,
+            @Nullable Date deletionDateStart,
+            @Nullable Date deletionDateEnd,
+            @Nullable Date muteEndDateStart,
+            @Nullable Date muteEndDateEnd,
+            @Nullable Integer page,
+            @Nullable Integer size) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(Group.Fields.typeId, typeId)
+                .addIsIfNotNull(Group.Fields.creatorId, creatorId)
+                .addIsIfNotNull(Group.Fields.ownerId, ownerId)
+                .addIsIfNotNull(Group.Fields.active, isActive)
+                .addBetweenIfNotNull(Group.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateStart, deletionDateEnd)
+                .addBetweenIfNotNull(Group.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, Group.class);
     }
@@ -263,14 +277,14 @@ public class GroupService {
     }
 
     private Mono<Boolean> checkAndTransferGroupOwnership(
-            @Nullable Long currentOwnerId,
+            @Nullable Long helperCurrentOwnerId,
             @NotNull Long groupId,
             @NotNull Long successorId,
             boolean quitAfterTransfer,
             @Nullable ReactiveMongoOperations operations) {
         Mono<Long> queryOwnerIdMono;
-        if (currentOwnerId != null) {
-            queryOwnerIdMono = Mono.just(currentOwnerId);
+        if (helperCurrentOwnerId != null) {
+            queryOwnerIdMono = Mono.just(helperCurrentOwnerId);
         } else {
             queryOwnerIdMono = queryGroupOwnerId(groupId);
         }
@@ -291,11 +305,11 @@ public class GroupService {
                                     }
                                     Mono<Boolean> deleteOrUpdateOwnerMono;
                                     if (quitAfterTransfer) {
-                                        deleteOrUpdateOwnerMono = groupMemberService.deleteGroupMember(groupId, currentOwnerId, operations);
+                                        deleteOrUpdateOwnerMono = groupMemberService.deleteGroupMember(groupId, helperCurrentOwnerId, operations);
                                     } else {
                                         deleteOrUpdateOwnerMono = groupMemberService.updateGroupMember(
                                                 groupId,
-                                                currentOwnerId,
+                                                helperCurrentOwnerId,
                                                 null,
                                                 GroupMemberRole.MEMBER,
                                                 null,
@@ -322,30 +336,48 @@ public class GroupService {
                 .flatMap(group -> groupTypeService.queryGroupType(group.getTypeId()));
     }
 
-    public Mono<Boolean> updateGroupInformation(
-            @NotNull Long groupId,
+    public Mono<Boolean> updateGroupsInformation(
+            @NotEmpty Set<Long> groupIds,
+            @Nullable Long typeId,
+            @Nullable Long creatorId,
+            @Nullable Long ownerId,
             @Nullable String name,
-            @Nullable String profileUrl,
             @Nullable String intro,
             @Nullable String announcement,
+            @Nullable String profilePictureUrl,
             @Nullable Integer minimumScore,
-            @Nullable Long typeId,
+            @Nullable Boolean isActive,
+            @Nullable Date creationDate,
+            @Nullable Date deletionDate,
+            @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
+        Validator.throwIfAnyFalsy(groupIds);
+        Validator.throwIfAllNull(typeId, creatorId, ownerId, name, intro, announcement,
+                profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate);
+        Query query = new Query().addCriteria(Criteria.where(ID).in(groupIds));
         Update update = UpdateBuilder.newBuilder()
+                .setIfNotNull(Group.Fields.typeId, typeId)
+                .setIfNotNull(Group.Fields.creatorId, creatorId)
+                .setIfNotNull(Group.Fields.ownerId, ownerId)
                 .setIfNotNull(Group.Fields.name, name)
                 .setIfNotNull(Group.Fields.intro, intro)
                 .setIfNotNull(Group.Fields.announcement, announcement)
+                .setIfNotNull(Group.Fields.profilePictureUrl, profilePictureUrl)
                 .setIfNotNull(Group.Fields.minimumScore, minimumScore)
-                .setIfNotNull(Group.Fields.profilePictureUrl, profileUrl)
-                .setIfNotNull(Group.Fields.typeId, typeId)
+                .setIfNotNull(Group.Fields.active, isActive)
+                .setIfNotNull(Group.Fields.creationDate, creationDate)
+                .setIfNotNull(Group.Fields.deletionDate, deletionDate)
+                .setIfNotNull(Group.Fields.muteEndDate, muteEndDate)
                 .build();
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        return mongoOperations.updateFirst(query, update, Group.class)
+        return mongoOperations.updateMulti(query, update, Group.class)
                 .flatMap(result -> {
                     if (result.wasAcknowledged()) {
-                        return groupVersionService.updateInformation(groupId)
-                                .thenReturn(true);
+                        ArrayList<Mono<Boolean>> list = new ArrayList<>(groupIds.size());
+                        for (Long groupId : groupIds) {
+                            list.add(groupVersionService.updateInformation(groupId));
+                        }
+                        return Flux.merge(list).then(Mono.just(true));
                     } else {
                         return Mono.just(false);
                     }
@@ -355,13 +387,22 @@ public class GroupService {
     public Mono<Boolean> authAndUpdateGroupInformation(
             @Nullable Long requesterId,
             @NotNull Long groupId,
+            @Nullable Long typeId,
+            @Nullable Long creatorId,
+            @Nullable Long ownerId,
             @Nullable String name,
-            @Nullable String profileUrl,
             @Nullable String intro,
             @Nullable String announcement,
+            @Nullable String profilePictureUrl,
             @Nullable Integer minimumScore,
-            @Nullable Long typeId,
+            @Nullable Boolean isActive,
+            @Nullable Date creationDate,
+            @Nullable Date deletionDate,
+            @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
+        Validator.throwIfAnyNull(groupId);
+        Validator.throwIfAllNull(typeId, creatorId, ownerId, name, intro, announcement,
+                profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate);
         return queryGroupType(groupId)
                 .flatMap(groupType -> {
                     GroupUpdateStrategy groupUpdateStrategy = groupType.getGroupInfoUpdateStrategy();
@@ -382,7 +423,8 @@ public class GroupService {
                 })
                 .flatMap(authenticated -> {
                     if (authenticated != null && authenticated) {
-                        return updateGroupInformation(groupId, name, profileUrl, intro, announcement, minimumScore, typeId, operations);
+                        return updateGroupsInformation(Set.of(groupId), typeId, creatorId, ownerId, name, intro,
+                                announcement, profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -505,46 +547,53 @@ public class GroupService {
                 });
     }
 
-    public Mono<Boolean> updateGroup(
-            @NotNull Long groupId,
-            @Nullable Date muteEndDate,
-            @Nullable String groupName,
-            @Nullable String url,
+    public Mono<Boolean> updateGroups(
+            @NotEmpty Set<Long> groupIds,
+            @Nullable Long typeId,
+            @Nullable Long creatorId,
+            @Nullable Long ownerId,
+            @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
+            @Nullable String profilePictureUrl,
             @Nullable Integer minimumScore,
-            @Nullable Long groupTypeId,
+            @Nullable Boolean isActive,
+            @Nullable Date creationDate,
+            @Nullable Date deletionDate,
+            @Nullable Date muteEndDate,
             @Nullable Long successorId,
             boolean quitAfterTransfer) {
-        Validator.throwIfAnyNull(groupId);
+        Validator.throwIfAnyFalsy(groupIds);
         Validator.throwIfAllNull(
-                muteEndDate,
-                groupName,
-                url,
+                typeId,
+                creatorId,
+                ownerId,
+                name,
                 intro,
                 announcement,
+                profilePictureUrl,
                 minimumScore,
-                groupTypeId,
+                isActive,
+                creationDate,
+                deletionDate,
+                muteEndDate,
                 successorId);
         return mongoTemplate
                 .inTransaction()
                 .execute(operations -> {
                     List<Mono<Boolean>> monos = new LinkedList<>();
                     if (successorId != null) {
-                        Mono<Boolean> transferMono = checkAndTransferGroupOwnership(
-                                null, groupId, successorId, quitAfterTransfer, operations);
-                        monos.add(transferMono);
+                        for (Long groupId : groupIds) {
+                            Mono<Boolean> transferMono = checkAndTransferGroupOwnership(
+                                    null, groupId, successorId, quitAfterTransfer, operations);
+                            monos.add(transferMono);
+                        }
                     }
-                    if (muteEndDate != null || groupName != null || url != null
-                            || intro != null || announcement != null || groupTypeId != null) {
-                        monos.add(updateGroupInformation(
-                                groupId,
-                                groupName,
-                                url,
-                                intro,
-                                announcement,
-                                minimumScore,
-                                groupTypeId,
+                    if (!Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
+                            profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
+                        monos.add(updateGroupsInformation(
+                                groupIds, typeId, creatorId, ownerId, name, intro, announcement, profilePictureUrl,
+                                minimumScore, isActive, creationDate, deletionDate, muteEndDate,
                                 operations));
                     }
                     if (monos.isEmpty()) {
@@ -560,23 +609,28 @@ public class GroupService {
     public Mono<Boolean> authAndUpdateGroup(
             @NotNull Long requesterId,
             @NotNull Long groupId,
-            @Nullable Date muteEndDate,
-            @Nullable String groupName,
-            @Nullable String url,
+            @Nullable Long typeId,
+            @Nullable Long creatorId,
+            @Nullable Long ownerId,
+            @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
+            @Nullable String profilePictureUrl,
             @Nullable Integer minimumScore,
-            @Nullable Long groupTypeId,
+            @Nullable Boolean isActive,
+            @Nullable Date creationDate,
+            @Nullable Date deletionDate,
+            @Nullable Date muteEndDate,
             @Nullable Long successorId,
             boolean quitAfterTransfer) {
         Mono<Boolean> authorizeMono = Mono.just(true);
-        if (successorId != null || groupTypeId != null) {
+        if (successorId != null || typeId != null) {
             authorizeMono = groupMemberService.isOwner(requesterId, groupId);
-            if (groupTypeId != null) {
+            if (typeId != null) {
                 authorizeMono = authorizeMono.flatMap(
                         authorized -> {
                             if (authorized != null && authorized) {
-                                return groupMemberService.isAllowedToHaveGroupType(requesterId, groupTypeId);
+                                return groupMemberService.isAllowedToHaveGroupType(requesterId, typeId);
                             } else {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                             }
@@ -593,18 +647,11 @@ public class GroupService {
                                         requesterId, groupId, successorId, quitAfterTransfer, operations);
                                 monos.add(transferMono);
                             }
-                            if (muteEndDate != null || groupName != null || url != null
-                                    || intro != null || announcement != null || groupTypeId != null) {
+                            if (!Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
+                                    profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
                                 Mono<Boolean> updateMono = authAndUpdateGroupInformation(
-                                        requesterId,
-                                        groupId,
-                                        groupName,
-                                        url,
-                                        intro,
-                                        announcement,
-                                        minimumScore,
-                                        groupTypeId,
-                                        operations);
+                                        requesterId, groupId, typeId, creatorId, ownerId, name, intro, announcement,
+                                        profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations);
                                 monos.add(updateMono);
                             }
                             if (monos.isEmpty()) {
@@ -641,10 +688,28 @@ public class GroupService {
         return mongoTemplate.count(query, Group.class);
     }
 
-    public Mono<Long> countGroups(@Nullable Set<Long> ids) {
+    public Mono<Long> countGroups(
+            @Nullable Set<Long> ids,
+            @Nullable Long typeId,
+            @Nullable Long creatorId,
+            @Nullable Long ownerId,
+            @Nullable Boolean isActive,
+            @Nullable Date creationDateStart,
+            @Nullable Date creationDateEnd,
+            @Nullable Date deletionDateStart,
+            @Nullable Date deletionDateEnd,
+            @Nullable Date muteEndDateStart,
+            @Nullable Date muteEndDateEnd) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
+                .addIsIfNotNull(Group.Fields.typeId, typeId)
+                .addIsIfNotNull(Group.Fields.creatorId, creatorId)
+                .addIsIfNotNull(Group.Fields.ownerId, ownerId)
+                .addIsIfNotNull(Group.Fields.active, isActive)
+                .addBetweenIfNotNull(Group.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateStart, deletionDateEnd)
+                .addBetweenIfNotNull(Group.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
     }
