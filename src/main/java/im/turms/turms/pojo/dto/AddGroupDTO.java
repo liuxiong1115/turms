@@ -38,5 +38,5 @@ public class AddGroupDTO {
     private Date creationDate;
     private Date deletionDate;
     private Date muteEndDate;
-    private Boolean active;
+    private Boolean isActive;
 }

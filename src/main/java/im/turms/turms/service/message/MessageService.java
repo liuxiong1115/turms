@@ -123,7 +123,7 @@ public class MessageService {
     }
 
     public Flux<Message> authAndQueryCompleteMessages(
-            @NotNull boolean closeToDate,
+            boolean closeToDate,
             @Nullable Collection<Long> messageIds,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages,
@@ -150,7 +150,7 @@ public class MessageService {
     }
 
     public Flux<Message> queryCompleteMessages(
-            @NotNull boolean closeToDate,
+            boolean closeToDate,
             @Nullable Collection<Long> messageIds,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages,

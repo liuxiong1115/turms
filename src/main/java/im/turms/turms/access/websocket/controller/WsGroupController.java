@@ -187,13 +187,18 @@ public class WsGroupController {
             return groupService.authAndUpdateGroup(
                     turmsRequestWrapper.getUserId(),
                     request.getGroupId(),
-                    muteEndDate,
+                    groupTypeId,
+                    null,
+                    null,
                     groupName,
-                    profilePictureUrl,
                     intro,
                     announcement,
+                    profilePictureUrl,
                     minimumScore,
-                    groupTypeId,
+                    null,
+                    null,
+                    null,
+                    muteEndDate,
                     successorId,
                     quitAfterTransfer)
                     .flatMap(updated -> {
