@@ -273,9 +273,10 @@ public class MongoDataGenerator {
             for (int i = 1 + USER_COUNT / 10; i <= USER_COUNT / 10 * 2; i++) {
                 UserFriendRequest userFriendRequest = new UserFriendRequest(
                         turmsClusterManager.generateRandomId(),
-                        now,
                         "test-request",
                         RequestStatus.PENDING,
+                        null,
+                        now,
                         null,
                         null,
                         1L,

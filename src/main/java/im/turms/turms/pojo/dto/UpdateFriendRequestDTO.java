@@ -17,6 +17,7 @@
 
 package im.turms.turms.pojo.dto;
 
+import im.turms.turms.constant.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,7 +31,9 @@ public class UpdateFriendRequestDTO {
     private Long requesterId;
     private Long recipientId;
     private String content;
+    private RequestStatus status;
     private String reason;
     private Date creationDate;
+    private Date responseDate;
     private Date expirationDate;
 }

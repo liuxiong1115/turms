@@ -50,16 +50,16 @@ public class GroupBlacklistController {
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupBlacklistedUser>>>> queryGroupBlacklistedUsers(
             @RequestParam(required = false) Long groupId,
             @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Date blockTimeStart,
-            @RequestParam(required = false) Date blockTimeEnd,
+            @RequestParam(required = false) Date blockDateStart,
+            @RequestParam(required = false) Date blockDateEnd,
             @RequestParam(required = false) Long requesterId,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Flux<GroupBlacklistedUser> userFlux = groupBlacklistService.queryBlacklistedUsers(
                 groupId,
                 userId,
-                blockTimeStart,
-                blockTimeEnd,
+                blockDateStart,
+                blockDateEnd,
                 requesterId,
                 0,
                 size);
@@ -71,22 +71,22 @@ public class GroupBlacklistController {
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupBlacklistedUser>>>> queryGroupBlacklistedUsers(
             @RequestParam(required = false) Long groupId,
             @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Date blockTimeStart,
-            @RequestParam(required = false) Date blockTimeEnd,
+            @RequestParam(required = false) Date blockDateStart,
+            @RequestParam(required = false) Date blockDateEnd,
             @RequestParam(required = false) Long requesterId,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Mono<Long> count = groupBlacklistService.countBlacklistedUsers(groupId,
                 userId,
-                blockTimeStart,
-                blockTimeEnd,
+                blockDateStart,
+                blockDateEnd,
                 requesterId);
         Flux<GroupBlacklistedUser> userFlux = groupBlacklistService.queryBlacklistedUsers(
                 groupId,
                 userId,
-                blockTimeStart,
-                blockTimeEnd,
+                blockDateStart,
+                blockDateEnd,
                 requesterId,
                 page,
                 size);
@@ -100,7 +100,7 @@ public class GroupBlacklistController {
                 dto.getGroupId(),
                 dto.getUserId(),
                 dto.getRequesterId(),
-                dto.getBlockTime());
+                dto.getBlockDate());
         return ResponseFactory.okIfTruthy(createMono);
     }
 
@@ -111,7 +111,7 @@ public class GroupBlacklistController {
             @RequestBody UpdateGroupBlacklistedUserDTO dto) {
         Mono<Boolean> updateMono = groupBlacklistService.updateBlacklistedUsers(
                 new HashSet<>(keys.getKeys()),
-                dto.getBlockTime(),
+                dto.getBlockDate(),
                 dto.getRequesterId());
         return ResponseFactory.acknowledged(updateMono);
     }
@@ -121,14 +121,14 @@ public class GroupBlacklistController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupBlacklistedUsers(
             @RequestParam(required = false) Long groupId,
             @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Date blockTimeStart,
-            @RequestParam(required = false) Date blockTimeEnd,
+            @RequestParam(required = false) Date blockDateStart,
+            @RequestParam(required = false) Date blockDateEnd,
             @RequestParam(required = false) Long requesterId) {
         Mono<Boolean> deleteMono = groupBlacklistService.deleteBlacklistedUsers(
                 groupId,
                 userId,
-                blockTimeStart,
-                blockTimeEnd,
+                blockDateStart,
+                blockDateEnd,
                 requesterId);
         return ResponseFactory.acknowledged(deleteMono);
     }

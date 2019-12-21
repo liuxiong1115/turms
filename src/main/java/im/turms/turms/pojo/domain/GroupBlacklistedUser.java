@@ -32,19 +32,21 @@ import java.util.List;
 @Data
 @Document
 @FieldNameConstants
+@AllArgsConstructor
+@NoArgsConstructor
 public class GroupBlacklistedUser {
     @Id
     private Key key;
 
     @Indexed
-    private Date blockTime;
+    private Date blockDate;
 
     @Indexed
     private Long requesterId;
 
-    public GroupBlacklistedUser(Long groupId, Long userId, Date blockTime, Long requesterId) {
+    public GroupBlacklistedUser(Long groupId, Long userId, Date blockDate, Long requesterId) {
         this.key = new Key(groupId, userId);
-        this.blockTime = blockTime;
+        this.blockDate = blockDate;
         this.requesterId = requesterId;
     }
 

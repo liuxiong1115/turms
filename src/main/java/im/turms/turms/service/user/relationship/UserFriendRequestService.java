@@ -39,7 +39,6 @@ public class UserFriendRequestService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final UserVersionService userVersionService;
     private final UserRelationshipService userRelationshipService;
-    private static final UserFriendRequest EMPTY_FRIEND_REQUEST = new UserFriendRequest();
 
     public UserFriendRequestService(@Lazy TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, UserVersionService userVersionService, @Lazy UserRelationshipService userRelationshipService, TaskScheduler taskScheduler) {
         this.turmsClusterManager = turmsClusterManager;
@@ -99,10 +98,15 @@ public class UserFriendRequestService {
             @NotNull Long requesterId,
             @NotNull Long recipientId,
             @NotNull String content,
+            @Nullable RequestStatus status,
             @Nullable Date creationDate,
+            @Nullable Date responseDate,
             @Nullable Date expirationDate,
             @Nullable String reason) {
         Validator.throwIfAnyNull(requesterId, recipientId, content);
+        if (status == RequestStatus.UNRECOGNIZED) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         UserFriendRequest userFriendRequest = new UserFriendRequest();
         userFriendRequest.setId(turmsClusterManager.generateRandomId());
         userFriendRequest.setContent(content);
@@ -111,6 +115,12 @@ public class UserFriendRequestService {
             creationDate = now;
         }
         userFriendRequest.setCreationDate(creationDate.before(now) ? creationDate : now);
+        if (RequestStatusUtil.isProcessedByResponder(status)) {
+            if (responseDate == null) {
+                responseDate = now;
+            }
+            userFriendRequest.setResponseDate(responseDate);
+        }
         if (expirationDate != null) {
             userFriendRequest.setExpirationDate(expirationDate);
         } else {
@@ -126,7 +136,10 @@ public class UserFriendRequestService {
         userFriendRequest.setReason(reason);
         userFriendRequest.setRequesterId(requesterId);
         userFriendRequest.setRecipientId(recipientId);
-        userFriendRequest.setStatus(RequestStatus.PENDING);
+        if (status == null) {
+            status = RequestStatus.PENDING;
+        }
+        userFriendRequest.setStatus(status);
         return mongoTemplate.insert(userFriendRequest)
                 .zipWith(userVersionService.updateFriendRequestsVersion(recipientId))
                 .map(Tuple2::getT1);
@@ -157,7 +170,7 @@ public class UserFriendRequestService {
                         }
                         return requestExistsMono.flatMap(requestExists -> {
                             if (requestExists != null && !requestExists) {
-                                return createFriendRequest(requesterId, recipientId, content, creationDate, null, null);
+                                return createFriendRequest(requesterId, recipientId, content, RequestStatus.PENDING, creationDate, null, null, null);
                             } else {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED));
                             }
@@ -212,11 +225,13 @@ public class UserFriendRequestService {
             @Nullable Long requesterId,
             @Nullable Long recipientId,
             @Nullable String content,
+            @Nullable RequestStatus status,
             @Nullable String reason,
             @Nullable Date creationDate,
+            @Nullable Date responseDate,
             @Nullable Date expirationDate) {
         Validator.throwIfAllFalsy(ids);
-        Validator.throwIfAllNull(requesterId, recipientId, content, reason, creationDate, expirationDate);
+        Validator.throwIfAllNull(requesterId, recipientId, content, status, reason, creationDate, responseDate, expirationDate);
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()
@@ -227,6 +242,13 @@ public class UserFriendRequestService {
                 .setIfNotNull(UserFriendRequest.Fields.creationDate, creationDate)
                 .setIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDate)
                 .build();
+        if (status != null) {
+            if (status == RequestStatus.PENDING) {
+                update.unset(UserFriendRequest.Fields.responseDate);
+            } else if (status == RequestStatus.ACCEPTED || status == RequestStatus.DECLINED || status == RequestStatus.IGNORED) {
+                update.set(UserFriendRequest.Fields.responseDate, new Date());
+            }
+        }
         return mongoTemplate.updateMulti(query, update, UserFriendRequest.class)
                 .map(UpdateResult::wasAcknowledged);
     }
@@ -326,6 +348,8 @@ public class UserFriendRequestService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd) {
         Query query = QueryBuilder
@@ -335,6 +359,7 @@ public class UserFriendRequestService {
                 .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
                 .addIsIfNotNull(UserFriendRequest.Fields.status, status)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.responseDate, responseDateStart, responseDateEnd)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .buildQuery();
         return mongoTemplate.remove(query, UserFriendRequest.class)
@@ -348,6 +373,8 @@ public class UserFriendRequestService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd,
             @Nullable Integer page,
@@ -359,6 +386,7 @@ public class UserFriendRequestService {
                 .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
                 .addIsIfNotNull(UserFriendRequest.Fields.status, status)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.responseDate, responseDateStart, responseDateEnd)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, UserFriendRequest.class);
@@ -371,6 +399,8 @@ public class UserFriendRequestService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd) {
         Query query = QueryBuilder
@@ -380,6 +410,7 @@ public class UserFriendRequestService {
                 .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
                 .addIsIfNotNull(UserFriendRequest.Fields.status, status)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateStart, creationDateEnd)
+                .addBetweenIfNotNull(UserFriendRequest.Fields.responseDate, responseDateStart, responseDateEnd)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .buildQuery();
         return mongoTemplate.count(query, UserFriendRequest.class);
