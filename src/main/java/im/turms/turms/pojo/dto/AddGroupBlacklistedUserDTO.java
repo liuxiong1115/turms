@@ -29,6 +29,6 @@ import java.util.Date;
 public class AddGroupBlacklistedUserDTO {
     private Long groupId;
     private Long userId;
-    private Date blockTime;
+    private Date blockDate;
     private Long requesterId;
 }

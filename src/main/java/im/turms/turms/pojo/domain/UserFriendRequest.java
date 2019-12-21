@@ -37,9 +37,6 @@ public class UserFriendRequest {
     @Id
     private Long id;
 
-    @Indexed
-    private Date creationDate;
-
     private String content;
 
     @Indexed
@@ -48,7 +45,13 @@ public class UserFriendRequest {
     private String reason;
 
     @Indexed
+    private Date creationDate;
+
+    @Indexed
     private Date expirationDate;
+
+    @Indexed
+    private Date responseDate;
 
     @Indexed
     private Long requesterId;

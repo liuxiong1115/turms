@@ -17,6 +17,7 @@
 
 package im.turms.turms.pojo.dto;
 
+import im.turms.turms.constant.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,10 +28,12 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddFriendRequestDTO {
-    private Date creationDate;
-    private String content;
-    private String reason;
-    private Date expirationDate;
     private Long requesterId;
     private Long recipientId;
+    private String content;
+    private RequestStatus status;
+    private String reason;
+    private Date creationDate;
+    private Date responseDate;
+    private Date expirationDate;
 }

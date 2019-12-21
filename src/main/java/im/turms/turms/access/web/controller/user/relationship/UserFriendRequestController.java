@@ -53,7 +53,9 @@ public class UserFriendRequestController {
                 dto.getRequesterId(),
                 dto.getRecipientId(),
                 dto.getContent(),
+                dto.getStatus(),
                 dto.getCreationDate(),
+                dto.getResponseDate(),
                 dto.getExpirationDate(),
                 dto.getReason());
         return ResponseFactory.okIfTruthy(createMono);
@@ -68,6 +70,8 @@ public class UserFriendRequestController {
             @RequestParam(required = false) RequestStatus status,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
+            @RequestParam(required = false) Date responseDateStart,
+            @RequestParam(required = false) Date responseDateEnd,
             @RequestParam(required = false) Date expirationDateStart,
             @RequestParam(required = false) Date expirationDateEnd) {
         Mono<Boolean> deleteMono = userFriendRequestService.deleteFriendRequests(
@@ -77,6 +81,8 @@ public class UserFriendRequestController {
                 status,
                 creationDateStart,
                 creationDateEnd,
+                responseDateStart,
+                responseDateEnd,
                 expirationDateStart,
                 expirationDateEnd);
         return ResponseFactory.acknowledged(deleteMono);
@@ -92,8 +98,10 @@ public class UserFriendRequestController {
                 dto.getRequesterId(),
                 dto.getRecipientId(),
                 dto.getContent(),
+                dto.getStatus(),
                 dto.getReason(),
                 dto.getCreationDate(),
+                dto.getResponseDate(),
                 dto.getExpirationDate());
         return ResponseFactory.acknowledged(updateMono);
     }
@@ -107,6 +115,8 @@ public class UserFriendRequestController {
             @RequestParam(required = false) RequestStatus status,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
+            @RequestParam(required = false) Date responseDateStart,
+            @RequestParam(required = false) Date responseDateEnd,
             @RequestParam(required = false) Date expirationDateStart,
             @RequestParam(required = false) Date expirationDateEnd,
             @RequestParam(required = false) Integer size) {
@@ -118,6 +128,8 @@ public class UserFriendRequestController {
                 status,
                 creationDateStart,
                 creationDateEnd,
+                responseDateStart,
+                responseDateEnd,
                 expirationDateStart,
                 expirationDateEnd,
                 0,
@@ -134,6 +146,8 @@ public class UserFriendRequestController {
             @RequestParam(required = false) RequestStatus status,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
+            @RequestParam(required = false) Date responseDateStart,
+            @RequestParam(required = false) Date responseDateEnd,
             @RequestParam(required = false) Date expirationDateStart,
             @RequestParam(required = false) Date expirationDateEnd,
             @RequestParam(defaultValue = "0") Integer page,
@@ -146,6 +160,8 @@ public class UserFriendRequestController {
                 status,
                 creationDateStart,
                 creationDateEnd,
+                responseDateStart,
+                responseDateEnd,
                 expirationDateStart,
                 expirationDateEnd);
         Flux<UserFriendRequest> userFriendRequestFlux = userFriendRequestService.queryFriendRequests(
@@ -155,9 +171,11 @@ public class UserFriendRequestController {
                 status,
                 creationDateStart,
                 creationDateEnd,
+                responseDateStart,
+                responseDateEnd,
                 expirationDateStart,
                 expirationDateEnd,
-                0,
+                page,
                 size);
         return ResponseFactory.page(count, userFriendRequestFlux);
     }
