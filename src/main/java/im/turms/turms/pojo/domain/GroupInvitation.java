@@ -55,5 +55,8 @@ public class GroupInvitation {
     private Date creationDate;
 
     @Indexed
+    private Date responseDate;
+
+    @Indexed
     private Date expirationDate;
 }

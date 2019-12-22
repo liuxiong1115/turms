@@ -21,10 +21,7 @@ import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
@@ -128,7 +125,8 @@ public class GroupInvitationService {
                                     return Mono.error(TurmsBusinessException.get(TurmsStatusCode.TARGET_USERS_UNAUTHORIZED));
                                 }
                                 if (strategy.getGroupInvitationStrategy().requireAcceptance()) {
-                                    return createGroupInvitation(groupId, inviterId, inviteeId, content, null, null);
+                                    return createGroupInvitation(groupId, inviterId, inviteeId, content,
+                                            RequestStatus.PENDING, null, null, null);
                                 } else {
                                     return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
                                 }
@@ -141,8 +139,13 @@ public class GroupInvitationService {
             @NotNull Long inviterId,
             @NotNull Long inviteeId,
             @NotNull String content,
+            @Nullable RequestStatus status,
             @Nullable Date creationDate,
+            @Nullable Date responseDate,
             @Nullable Date expirationDate) {
+        if (status == RequestStatus.UNRECOGNIZED) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         Date now = new Date();
         GroupInvitation groupInvitation = new GroupInvitation();
         groupInvitation.setId(turmsClusterManager.generateRandomId());
@@ -163,7 +166,11 @@ public class GroupInvitationService {
         groupInvitation.setInviterId(inviterId);
         groupInvitation.setInviteeId(inviteeId);
         groupInvitation.setCreationDate(creationDate);
-        groupInvitation.setStatus(RequestStatus.PENDING);
+        groupInvitation.setResponseDate(responseDate);
+        if (status == null) {
+            status = RequestStatus.PENDING;
+        }
+        groupInvitation.setStatus(status);
         return Mono.zip(mongoTemplate.insert(groupInvitation),
                 groupVersionService.updateGroupInvitationsVersion(groupId),
                 userVersionService.updateGroupInvitationsVersion(inviteeId))
@@ -294,6 +301,8 @@ public class GroupInvitationService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd,
             @Nullable Integer page,
@@ -306,7 +315,8 @@ public class GroupInvitationService {
                 .addIsIfNotNull(GroupInvitation.Fields.inviteeId, inviteeId)
                 .addIsIfNotNull(GroupInvitation.Fields.status, status)
                 .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateStart, responseDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupInvitation.class);
     }
@@ -319,6 +329,8 @@ public class GroupInvitationService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd) {
         Query query = QueryBuilder
@@ -329,7 +341,8 @@ public class GroupInvitationService {
                 .addIsIfNotNull(GroupInvitation.Fields.inviteeId, inviteeId)
                 .addIsIfNotNull(GroupInvitation.Fields.status, status)
                 .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateStart, responseDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .buildQuery();
         return mongoTemplate.count(query, GroupInvitation.class);
     }
@@ -342,6 +355,8 @@ public class GroupInvitationService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd) {
         Query query = QueryBuilder
@@ -352,7 +367,8 @@ public class GroupInvitationService {
                 .addIsIfNotNull(GroupInvitation.Fields.inviteeId, inviteeId)
                 .addIsIfNotNull(GroupInvitation.Fields.status, status)
                 .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateStart, responseDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .buildQuery();
         return mongoTemplate.remove(query, GroupInvitation.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -361,17 +377,23 @@ public class GroupInvitationService {
     public Mono<Boolean> updateInvitations(
             @NotEmpty Set<Long> ids,
             @Nullable Long inviterId,
+            @Nullable Long inviteeId,
             @Nullable String content,
+            @Nullable RequestStatus status,
             @Nullable Date creationDate,
+            @Nullable Date responseDate,
             @Nullable Date expirationDate) {
         Query query = new Query().addCriteria(where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()
                 .setIfNotNull(GroupInvitation.Fields.inviterId, inviterId)
+                .setIfNotNull(GroupInvitation.Fields.inviteeId, inviteeId)
                 .setIfNotNull(GroupInvitation.Fields.content, content)
+                .setIfNotNull(GroupInvitation.Fields.status, status)
                 .setIfNotNull(GroupInvitation.Fields.creationDate, creationDate)
                 .setIfNotNull(GroupInvitation.Fields.expirationDate, expirationDate)
                 .build();
+        RequestStatusUtil.updateResponseDateBasedOnStatus(update, status, responseDate);
         return mongoTemplate.updateMulti(query, update, GroupInvitation.class)
                 .map(UpdateResult::wasAcknowledged);
     }

@@ -170,6 +170,7 @@ public class MongoDataGenerator {
                         "test-content",
                         RequestStatus.PENDING,
                         now,
+                        null,
                         null);
                 objects.add(groupInvitation);
             }
