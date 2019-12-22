@@ -17,6 +17,7 @@
 
 package im.turms.turms.pojo.dto;
 
+import im.turms.turms.constant.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,8 +28,10 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddGroupJoinRequestDTO {
-    private Date creationDate;
     private String content;
+    private RequestStatus status;
+    private Date creationDate;
+    private Date responseDate;
     private Date expirationDate;
     private Long groupId;
     private Long requesterId;
