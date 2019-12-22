@@ -184,9 +184,10 @@ public class MongoDataGenerator {
             for (int i = 1 + USER_COUNT / 10 * 7; i <= USER_COUNT / 10 * 8; i++) {
                 GroupJoinRequest groupJoinRequest = new GroupJoinRequest(
                         turmsClusterManager.generateRandomId(),
-                        now,
                         "test-content",
                         RequestStatus.PENDING,
+                        now,
+                        null,
                         null,
                         1L,
                         (long) i,

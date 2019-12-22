@@ -37,13 +37,16 @@ public class GroupJoinRequest {
     @Id
     private Long id;
 
-    @Indexed
-    private Date creationDate;
-
     private String content;
 
     @Indexed
     private RequestStatus status;
+
+    @Indexed
+    private Date creationDate;
+
+    @Indexed
+    private Date responseDate;
 
     @Indexed
     private Date expirationDate;

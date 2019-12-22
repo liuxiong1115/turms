@@ -21,10 +21,7 @@ import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion;
@@ -132,9 +129,10 @@ public class GroupJoinRequestService {
                                     long id = turmsClusterManager.generateRandomId();
                                     GroupJoinRequest groupJoinRequest = new GroupJoinRequest(
                                             id,
-                                            new Date(),
                                             content,
                                             RequestStatus.PENDING,
+                                            new Date(),
+                                            null,
                                             expirationDate,
                                             groupId,
                                             requesterId,
@@ -254,6 +252,8 @@ public class GroupJoinRequestService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd,
             @Nullable Integer page,
@@ -266,7 +266,8 @@ public class GroupJoinRequestService {
                 .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
                 .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateStart, responseDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupJoinRequest.class);
     }
@@ -279,6 +280,8 @@ public class GroupJoinRequestService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd) {
         Query query = QueryBuilder
@@ -289,7 +292,8 @@ public class GroupJoinRequestService {
                 .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
                 .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateStart, responseDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .buildQuery();
         return mongoTemplate.count(query, GroupJoinRequest.class);
     }
@@ -302,6 +306,8 @@ public class GroupJoinRequestService {
             @Nullable RequestStatus status,
             @Nullable Date creationDateStart,
             @Nullable Date creationDateEnd,
+            @Nullable Date responseDateStart,
+            @Nullable Date responseDateEnd,
             @Nullable Date expirationDateStart,
             @Nullable Date expirationDateEnd) {
         Query query = QueryBuilder
@@ -312,7 +318,8 @@ public class GroupJoinRequestService {
                 .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
                 .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateStart, responseDateEnd)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
                 .buildQuery();
         return mongoTemplate.remove(query, GroupJoinRequest.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -321,17 +328,26 @@ public class GroupJoinRequestService {
     public Mono<Boolean> updateJoinRequests(
             @NotEmpty Set<Long> ids,
             @Nullable Long requesterId,
+            @Nullable Long responderId,
             @Nullable String content,
+            @Nullable RequestStatus status,
             @Nullable Date creationDate,
+            @Nullable Date responseDate,
             @Nullable Date expirationDate) {
+        if (status == RequestStatus.UNRECOGNIZED) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         Query query = new Query().addCriteria(where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()
                 .setIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
+                .setIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
                 .setIfNotNull(GroupJoinRequest.Fields.content, content)
+                .setIfNotNull(GroupJoinRequest.Fields.status, status)
                 .setIfNotNull(GroupJoinRequest.Fields.creationDate, creationDate)
                 .setIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDate)
                 .build();
+        RequestStatusUtil.updateResponseDateBasedOnStatus(update, status, responseDate);
         return mongoTemplate.updateMulti(query, update, GroupJoinRequest.class)
                 .map(UpdateResult::wasAcknowledged);
     }
@@ -341,7 +357,9 @@ public class GroupJoinRequestService {
             @NotNull Long requesterId,
             @NotNull Long responderId,
             @NotNull String content,
+            @Nullable RequestStatus status,
             @Nullable Date creationDate,
+            @Nullable Date responseDate,
             @Nullable Date expirationDate) {
         Date now = new Date();
         GroupJoinRequest groupJoinRequest = new GroupJoinRequest();
@@ -363,7 +381,12 @@ public class GroupJoinRequestService {
         groupJoinRequest.setRequesterId(requesterId);
         groupJoinRequest.setResponderId(responderId);
         groupJoinRequest.setCreationDate(creationDate);
-        groupJoinRequest.setStatus(RequestStatus.PENDING);
+        if (status == null) {
+            status = RequestStatus.PENDING;
+        }
+        responseDate = RequestStatusUtil.getResponseDateBasedOnStatus(status, responseDate, now);
+        groupJoinRequest.setResponseDate(responseDate);
+        groupJoinRequest.setStatus(status);
         return Mono.zip(mongoTemplate.insert(groupJoinRequest),
                 groupVersionService.updateJoinRequestsVersion(groupId),
                 userVersionService.updateJoinRequestsVersion(responderId))
