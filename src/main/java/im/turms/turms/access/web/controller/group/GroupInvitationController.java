@@ -56,6 +56,8 @@ public class GroupInvitationController {
             @RequestParam(required = false) RequestStatus status,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
+            @RequestParam(required = false) Date responseDateStart,
+            @RequestParam(required = false) Date responseDateEnd,
             @RequestParam(required = false) Date expirationDateStart,
             @RequestParam(required = false) Date expirationDateEnd,
             @RequestParam(required = false) Integer size) {
@@ -68,6 +70,8 @@ public class GroupInvitationController {
                 status,
                 creationDateStart,
                 creationDateEnd,
+                responseDateStart,
+                responseDateEnd,
                 expirationDateStart,
                 expirationDateEnd,
                 0,
@@ -85,6 +89,8 @@ public class GroupInvitationController {
             @RequestParam(required = false) RequestStatus status,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
+            @RequestParam(required = false) Date responseDateStart,
+            @RequestParam(required = false) Date responseDateEnd,
             @RequestParam(required = false) Date expirationDateStart,
             @RequestParam(required = false) Date expirationDateEnd,
             @RequestParam(defaultValue = "0") Integer page,
@@ -98,6 +104,8 @@ public class GroupInvitationController {
                 status,
                 creationDateStart,
                 creationDateEnd,
+                responseDateStart,
+                responseDateEnd,
                 expirationDateStart,
                 expirationDateEnd);
         Flux<GroupInvitation> invitationFlux = groupInvitationService.queryInvitations(
@@ -108,6 +116,8 @@ public class GroupInvitationController {
                 status,
                 creationDateStart,
                 creationDateEnd,
+                responseDateStart,
+                responseDateEnd,
                 expirationDateStart,
                 expirationDateEnd,
                 page,
@@ -123,7 +133,9 @@ public class GroupInvitationController {
                 dto.getInviterId(),
                 dto.getInviteeId(),
                 dto.getContent(),
+                dto.getStatus(),
                 dto.getCreationDate(),
+                dto.getResponseDate(),
                 dto.getExpirationDate());
         return ResponseFactory.okIfTruthy(createMono);
     }
@@ -136,8 +148,11 @@ public class GroupInvitationController {
         Mono<Boolean> updateMono = groupInvitationService.updateInvitations(
                 ids,
                 dto.getInviterId(),
+                dto.getInviteeId(),
                 dto.getContent(),
+                dto.getStatus(),
                 dto.getCreationDate(),
+                dto.getResponseDate(),
                 dto.getExpirationDate());
         return ResponseFactory.acknowledged(updateMono);
     }
@@ -152,6 +167,8 @@ public class GroupInvitationController {
             @RequestParam(required = false) RequestStatus status,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
+            @RequestParam(required = false) Date responseDateStart,
+            @RequestParam(required = false) Date responseDateEnd,
             @RequestParam(required = false) Date expirationDateStart,
             @RequestParam(required = false) Date expirationDateEnd) {
         Mono<Boolean> deleteMono = groupInvitationService.deleteInvitations(
@@ -162,6 +179,8 @@ public class GroupInvitationController {
                 status,
                 creationDateStart,
                 creationDateEnd,
+                responseDateStart,
+                responseDateEnd,
                 expirationDateStart,
                 expirationDateEnd);
         return ResponseFactory.acknowledged(deleteMono);

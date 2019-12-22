@@ -28,8 +28,10 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddGroupInvitationDTO {
-    private Date creationDate;
     private String content;
+    private RequestStatus status;
+    private Date creationDate;
+    private Date responseDate;
     private Date expirationDate;
     private Long groupId;
     private Long inviterId;

@@ -115,12 +115,7 @@ public class UserFriendRequestService {
             creationDate = now;
         }
         userFriendRequest.setCreationDate(creationDate.before(now) ? creationDate : now);
-        if (RequestStatusUtil.isProcessedByResponder(status)) {
-            if (responseDate == null) {
-                responseDate = now;
-            }
-            userFriendRequest.setResponseDate(responseDate);
-        }
+        userFriendRequest.setResponseDate(RequestStatusUtil.getResponseDateBasedOnStatus(status, responseDate, now));
         if (expirationDate != null) {
             userFriendRequest.setExpirationDate(expirationDate);
         } else {
@@ -242,13 +237,7 @@ public class UserFriendRequestService {
                 .setIfNotNull(UserFriendRequest.Fields.creationDate, creationDate)
                 .setIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDate)
                 .build();
-        if (status != null) {
-            if (status == RequestStatus.PENDING) {
-                update.unset(UserFriendRequest.Fields.responseDate);
-            } else if (status == RequestStatus.ACCEPTED || status == RequestStatus.DECLINED || status == RequestStatus.IGNORED) {
-                update.set(UserFriendRequest.Fields.responseDate, new Date());
-            }
-        }
+        RequestStatusUtil.updateResponseDateBasedOnStatus(update, status, new Date());
         return mongoTemplate.updateMulti(query, update, UserFriendRequest.class)
                 .map(UpdateResult::wasAcknowledged);
     }
