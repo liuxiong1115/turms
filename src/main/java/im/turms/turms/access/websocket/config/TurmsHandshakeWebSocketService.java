@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.server.support.HandshakeWebSocketService;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,6 +46,7 @@ import java.time.Duration;
 import java.util.List;
 
 @Component
+@Validated
 public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
     private final TurmsClusterManager turmsClusterManager;
     private final UserService userService;
@@ -158,7 +160,6 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
     }
 
     public Object getFailedReason(@NotNull Long userId, @NotNull Long requestId) {
-        Validator.throwIfAnyNull(userId, requestId);
         if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryingLoginFailedReason()) {
             return loginFailedReasonCache.getIfPresent(Pair.of(userId, requestId));
         } else {

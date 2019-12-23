@@ -23,6 +23,7 @@ import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.pojo.bo.group.GroupQuestionIdAndAnswer;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.pojo.request.group.*;
@@ -41,6 +42,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -301,9 +303,11 @@ public class WsGroupController {
         return turmsRequestWrapper -> {
             CheckGroupJoinQuestionsAnswersRequest request = turmsRequestWrapper.getTurmsRequest()
                     .getCheckGroupJoinQuestionsAnswersRequest();
-            return groupQuestionService.checkGroupQuestionAnswerAndJoin(
-                    turmsRequestWrapper.getUserId(),
-                    request.getQuestionIdAndAnswerMap())
+            HashSet<GroupQuestionIdAndAnswer> set = new HashSet<>(request.getQuestionIdAndAnswerCount());
+            for (Map.Entry<Long, String> entry : request.getQuestionIdAndAnswerMap().entrySet()) {
+                set.add(new GroupQuestionIdAndAnswer(entry.getKey(), entry.getValue()));
+            }
+            return groupQuestionService.checkGroupQuestionAnswerAndJoin(turmsRequestWrapper.getUserId(), set)
                     .map(answerResult -> RequestResult.responseData(TurmsNotification.Data.newBuilder()
                             .setGroupJoinQuestionAnswerResult(answerResult).build()));
         };

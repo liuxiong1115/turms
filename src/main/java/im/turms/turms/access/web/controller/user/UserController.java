@@ -24,6 +24,7 @@ import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.message.MessageService;
@@ -60,16 +61,14 @@ public class UserController {
             @RequestParam(required = false) Date registrationDateEnd,
             @RequestParam(required = false) Date deletionDateStart,
             @RequestParam(required = false) Date deletionDateEnd,
-            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) Boolean isActive,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Flux<User> usersFlux = userService.queryUsers(
                 userIds,
-                registrationDateStart,
-                registrationDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
-                active,
+                DateRange.of(registrationDateStart, registrationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                isActive,
                 0,
                 size);
         return ResponseFactory.okIfTruthy(usersFlux);
@@ -83,24 +82,20 @@ public class UserController {
             @RequestParam(required = false) Date registrationDateEnd,
             @RequestParam(required = false) Date deletionDateStart,
             @RequestParam(required = false) Date deletionDateEnd,
-            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) Boolean isActive,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Mono<Long> count = userService.countUsers(
                 userIds,
-                registrationDateStart,
-                registrationDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
-                active);
+                DateRange.of(registrationDateStart, registrationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                isActive);
         Flux<User> usersFlux = userService.queryUsers(
                 userIds,
-                registrationDateStart,
-                registrationDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
-                active,
+                DateRange.of(registrationDateStart, registrationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                isActive,
                 page,
                 size);
         return ResponseFactory.page(count, usersFlux);
@@ -117,7 +112,7 @@ public class UserController {
                 addUserDTO.getProfilePictureUrl(),
                 addUserDTO.getProfileAccess(),
                 addUserDTO.getRegistrationDate(),
-                addUserDTO.getActive());
+                addUserDTO.getIsActive());
         return ResponseFactory.okIfTruthy(addUser);
     }
 
@@ -126,8 +121,8 @@ public class UserController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteUsers(
             @RequestParam Set<Long> userIds,
             @RequestParam(defaultValue = "true") boolean deleteRelationshipsAndGroups,
-            @RequestParam(required = false) Boolean logicallyDelete) {
-        Mono<Boolean> deleted = userService.deleteUsers(userIds, deleteRelationshipsAndGroups, logicallyDelete);
+            @RequestParam(required = false) Boolean shouldDeleteLogically) {
+        Mono<Boolean> deleted = userService.deleteUsers(userIds, deleteRelationshipsAndGroups, shouldDeleteLogically);
         return ResponseFactory.acknowledged(deleted);
     }
 
@@ -144,7 +139,7 @@ public class UserController {
                 updateUserDTO.getProfilePictureUrl(),
                 updateUserDTO.getProfileAccess(),
                 updateUserDTO.getRegistrationDate(),
-                updateUserDTO.getActive());
+                updateUserDTO.getIsActive());
         return ResponseFactory.acknowledged(updated);
     }
 
@@ -167,49 +162,42 @@ public class UserController {
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             if (deletedStartDate != null || deletedEndDate != null) {
                 counts.add(userService.countDeletedUsers(
-                        deletedStartDate,
-                        deletedEndDate)
+                        DateRange.of(deletedStartDate, deletedEndDate))
                         .doOnNext(statistics::setDeletedUsers));
             }
             if (sentMessageStartDate != null || sentMessageEndDate != null) {
                 counts.add(messageService.countUsersWhoSentMessage(
-                        sentMessageStartDate,
-                        sentMessageEndDate,
+                        DateRange.of(sentMessageStartDate, sentMessageEndDate),
                         null,
                         false)
                         .doOnNext(statistics::setUsersWhoSentMessages));
             }
             if (loggedInStartDate != null || loggedInEndDate != null) {
                 counts.add(userService.countLoggedInUsers(
-                        loggedInStartDate,
-                        loggedInEndDate)
+                        DateRange.of(loggedInStartDate, loggedInEndDate))
                         .doOnNext(statistics::setLoggedInUsers));
             }
             if (maxOnlineUsersStartDate != null || maxOnlineUsersEndDate != null) {
                 counts.add(userService.countMaxOnlineUsers(
-                        maxOnlineUsersStartDate,
-                        maxOnlineUsersEndDate)
+                        DateRange.of(maxOnlineUsersStartDate, maxOnlineUsersEndDate))
                         .doOnNext(statistics::setMaxOnlineUsers));
             }
             if (counts.isEmpty() || registeredStartDate != null || registeredEndDate != null) {
                 counts.add(userService.countRegisteredUsers(
-                        registeredStartDate,
-                        registeredEndDate)
+                        DateRange.of(registeredStartDate, registeredEndDate))
                         .doOnNext(statistics::setRegisteredUsers));
             }
         } else {
             if (deletedStartDate != null && deletedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        deletedStartDate,
-                        deletedEndDate,
+                        DateRange.of(deletedStartDate, deletedEndDate),
                         divideBy,
                         userService::countDeletedUsers)
                         .doOnNext(statistics::setDeletedUsersRecords));
             }
             if (sentMessageStartDate != null && sentMessageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        sentMessageStartDate,
-                        sentMessageEndDate,
+                        DateRange.of(sentMessageStartDate, sentMessageEndDate),
                         divideBy,
                         messageService::countUsersWhoSentMessage,
                         null,
@@ -218,24 +206,21 @@ public class UserController {
             }
             if (loggedInStartDate != null && loggedInEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        loggedInStartDate,
-                        loggedInEndDate,
+                        DateRange.of(loggedInStartDate, loggedInEndDate),
                         divideBy,
                         userService::countLoggedInUsers)
                         .doOnNext(statistics::setLoggedInUsersRecords));
             }
             if (maxOnlineUsersStartDate != null && maxOnlineUsersEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        maxOnlineUsersStartDate,
-                        maxOnlineUsersEndDate,
+                        DateRange.of(maxOnlineUsersStartDate, maxOnlineUsersEndDate),
                         divideBy,
                         userService::countMaxOnlineUsers)
                         .doOnNext(statistics::setMaxOnlineUsersRecords));
             }
             if (registeredStartDate != null && registeredEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        registeredStartDate,
-                        registeredEndDate,
+                        DateRange.of(registeredStartDate, registeredEndDate),
                         divideBy,
                         userService::countRegisteredUsers)
                         .doOnNext(statistics::setRegisteredUsersRecords));

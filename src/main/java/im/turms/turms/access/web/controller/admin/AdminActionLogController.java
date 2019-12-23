@@ -20,6 +20,7 @@ package im.turms.turms.access.web.controller.admin;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.AdminActionLog;
 import im.turms.turms.pojo.dto.AcknowledgedDTO;
 import im.turms.turms.pojo.dto.PaginationDTO;
@@ -56,7 +57,7 @@ public class AdminActionLogController {
             @RequestParam(required = false) Date logDateStart,
             @RequestParam(required = false) Date logDateEnd) {
         Mono<Boolean> deleted = adminActionLogService
-                .deleteAdminActionLogs(ids, accounts, logDateStart, logDateEnd);
+                .deleteAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd));
         return ResponseFactory.acknowledged(deleted);
     }
 
@@ -70,7 +71,7 @@ public class AdminActionLogController {
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Flux<AdminActionLog> adminActionLogsFlux = adminActionLogService
-                .queryAdminActionLogs(ids, accounts, logDateStart, logDateEnd, 0, size);
+                .queryAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd), 0, size);
         return ResponseFactory.okIfTruthy(adminActionLogsFlux);
     }
 
@@ -85,9 +86,9 @@ public class AdminActionLogController {
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Mono<Long> count = adminActionLogService
-                .countAdminActionLogs(ids, accounts, logDateStart, logDateEnd);
+                .countAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd));
         Flux<AdminActionLog> adminActionLogsFlux = adminActionLogService
-                .queryAdminActionLogs(ids, accounts, logDateStart, logDateEnd, page, size);
+                .queryAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd), page, size);
         return ResponseFactory.page(count, adminActionLogsFlux);
     }
 }

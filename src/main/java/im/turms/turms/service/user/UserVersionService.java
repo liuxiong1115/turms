@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
@@ -38,6 +39,7 @@ import java.util.Set;
 import static im.turms.turms.common.Constants.ID;
 
 @Service
+@Validated
 public class UserVersionService {
     private final ReactiveMongoTemplate mongoTemplate;
 
@@ -104,7 +106,7 @@ public class UserVersionService {
         return updateSpecificVersion(userId, UserVersion.Fields.relationships, operations);
     }
 
-    public Mono<Boolean> updateRelationshipsVersion(@NotNull Set<Long> userIds, @Nullable ReactiveMongoOperations operations) {
+    public Mono<Boolean> updateRelationshipsVersion(@NotEmpty Set<Long> userIds, @Nullable ReactiveMongoOperations operations) {
         return updateSpecificVersion(userIds, UserVersion.Fields.relationships, operations);
     }
 
@@ -116,7 +118,7 @@ public class UserVersionService {
         return updateSpecificVersion(userId, UserVersion.Fields.relationshipGroups, null);
     }
 
-    public Mono<Boolean> updateRelationshipGroupsVersion(@NotNull Set<Long> userIds) {
+    public Mono<Boolean> updateRelationshipGroupsVersion(@NotEmpty Set<Long> userIds) {
         return updateSpecificVersion(userIds, UserVersion.Fields.relationshipGroups, null);
     }
 

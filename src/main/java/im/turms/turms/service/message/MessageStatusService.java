@@ -2,6 +2,8 @@ package im.turms.turms.service.message;
 
 import com.google.common.collect.HashMultimap;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.annotation.constraint.MessageDeliveryStatusConstraint;
+import im.turms.turms.annotation.constraint.MessageStatusKeyConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.TurmsStatusCode;
@@ -10,6 +12,7 @@ import im.turms.turms.common.Validator;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.MessageStatus;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -17,17 +20,20 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 
 import static im.turms.turms.common.Constants.*;
 
 @Service
+@Validated
 public class MessageStatusService {
     private static final MessageStatus EMPTY_MESSAGE_STATUS = new MessageStatus();
     private final ReactiveMongoTemplate mongoTemplate;
@@ -69,12 +75,11 @@ public class MessageStatusService {
     }
 
     public Mono<Boolean> updateMessageStatuses(
-            @NotEmpty Set<MessageStatus.Key> keys,
-            @Nullable Date recallDate,
-            @Nullable Date readDate,
-            @Nullable Date receptionDate,
+            @NotEmpty Set<MessageStatus.@MessageStatusKeyConstraint Key> keys,
+            @Nullable @PastOrPresent Date recallDate,
+            @Nullable @PastOrPresent Date readDate,
+            @Nullable @PastOrPresent Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAnyFalsy(keys);
         Validator.throwIfAllNull(recallDate, readDate, receptionDate);
         boolean isIllegalRecall = recallDate != null
                 && !turmsClusterManager.getTurmsProperties().getMessage().isAllowRecallingMessage();
@@ -98,10 +103,11 @@ public class MessageStatusService {
     public Mono<Boolean> updateMessageStatuses(
             @NotNull Long messageId,
             @NotEmpty Set<Long> recipientIds,
-            @Nullable Date recallDate,
-            @Nullable Date readDate,
-            @Nullable Date receptionDate,
+            @Nullable @PastOrPresent Date recallDate,
+            @Nullable @PastOrPresent Date readDate,
+            @Nullable @PastOrPresent Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
+        Validator.throwIfAllNull(recallDate, readDate, receptionDate);
         Query query = QueryBuilder
                 .newBuilder()
                 .addIsIfNotNull(ID_MESSAGE_ID, messageId)
@@ -120,9 +126,9 @@ public class MessageStatusService {
     public Mono<Boolean> updateMessageStatus(
             @NotNull Long messageId,
             @NotNull Long recipientId,
-            @Nullable Date recallDate,
-            @Nullable Date readDate,
-            @Nullable Date receptionDate,
+            @Nullable @PastOrPresent Date recallDate,
+            @Nullable @PastOrPresent Date readDate,
+            @Nullable @PastOrPresent Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
         return updateMessageStatuses(messageId, Collections.singleton(recipientId),
                 recallDate, readDate, receptionDate, operations);
@@ -131,7 +137,7 @@ public class MessageStatusService {
     public Mono<Boolean> authAndUpdateMessagesDeliveryStatus(
             @NotNull Long recipientId,
             @NotEmpty Collection<Long> messagesIds,
-            @NotNull MessageDeliveryStatus deliveryStatus) {
+            @NotNull @MessageDeliveryStatusConstraint MessageDeliveryStatus deliveryStatus) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds))
                 .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId));
@@ -142,7 +148,7 @@ public class MessageStatusService {
 
     public Mono<Boolean> updateMessagesReadDate(
             @NotNull Long messageId,
-            @Nullable Date readDate) {
+            @Nullable @PastOrPresent Date readDate) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
                 .addCriteria(Criteria.where(MessageStatus.Fields.readDate).is(null));
@@ -168,12 +174,9 @@ public class MessageStatusService {
             @Nullable Boolean isSystemMessage,
             @Nullable Long senderId,
             @Nullable MessageDeliveryStatus deliveryStatus,
-            @Nullable Date receptionDateStart,
-            @Nullable Date receptionDateEnd,
-            @Nullable Date readDateStart,
-            @Nullable Date readDateEnd,
-            @Nullable Date recallDateStart,
-            @Nullable Date recallDateEnd,
+            @Nullable DateRange receptionDateRange,
+            @Nullable DateRange readDateRange,
+            @Nullable DateRange recallDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder
@@ -183,9 +186,9 @@ public class MessageStatusService {
                 .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, isSystemMessage)
                 .addIsIfNotNull(MessageStatus.Fields.senderId, senderId)
                 .addIsIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatus)
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateStart, receptionDateEnd)
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, readDateStart, readDateEnd)
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, recallDateStart, recallDateEnd)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.readDate, readDateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.recallDate, recallDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, MessageStatus.class);
     }
@@ -196,12 +199,9 @@ public class MessageStatusService {
             @Nullable Boolean isSystemMessage,
             @Nullable Long senderId,
             @Nullable MessageDeliveryStatus deliveryStatus,
-            @Nullable Date receptionDateStart,
-            @Nullable Date receptionDateEnd,
-            @Nullable Date readDateStart,
-            @Nullable Date readDateEnd,
-            @Nullable Date recallDateStart,
-            @Nullable Date recallDateEnd) {
+            @Nullable DateRange receptionDateRange,
+            @Nullable DateRange readDateRange,
+            @Nullable DateRange recallDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID_MESSAGE_ID, messageIds)
@@ -209,9 +209,9 @@ public class MessageStatusService {
                 .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, isSystemMessage)
                 .addIsIfNotNull(MessageStatus.Fields.senderId, senderId)
                 .addIsIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatus)
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateStart, receptionDateEnd)
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, readDateStart, readDateEnd)
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, recallDateStart, recallDateEnd)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.readDate, readDateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.recallDate, recallDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, MessageStatus.class);
     }

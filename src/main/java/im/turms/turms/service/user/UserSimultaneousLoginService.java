@@ -19,6 +19,7 @@ package im.turms.turms.service.user;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
@@ -27,6 +28,7 @@ import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Mono;
 
@@ -36,6 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@Validated
 public class UserSimultaneousLoginService {
     private final TurmsClusterManager turmsClusterManager;
     private final OnlineUserService onlineUserService;
@@ -58,7 +61,7 @@ public class UserSimultaneousLoginService {
 
     public Mono<Boolean> setConflictedDevicesOffline(
             @NotNull Long userId,
-            @NotNull DeviceType deviceType) {
+            @NotNull @DeviceTypeConstraint DeviceType deviceType) {
         return onlineUserService.setUserDevicesOffline(
                 userId,
                 getConflictedDeviceTypes(deviceType),
@@ -118,26 +121,26 @@ public class UserSimultaneousLoginService {
         }
     }
 
-    private void addDeviceTypeConflictedWithAllTypes(@NotNull DeviceType deviceType) {
+    private void addDeviceTypeConflictedWithAllTypes(@NotNull @DeviceTypeConstraint DeviceType deviceType) {
         for (DeviceType type : DeviceType.values()) {
             addConflictedDeviceTypes(deviceType, type);
         }
     }
 
     private void addConflictedDeviceTypes(
-            @NotNull DeviceType deviceTypeOne,
-            @NotNull DeviceType deviceTypeTwo) {
+            @NotNull @DeviceTypeConstraint DeviceType deviceTypeOne,
+            @NotNull @DeviceTypeConstraint DeviceType deviceTypeTwo) {
         exclusiveDeviceTypes.put(deviceTypeOne, deviceTypeTwo);
         exclusiveDeviceTypes.put(deviceTypeTwo, deviceTypeOne);
     }
 
-    private Set<DeviceType> getConflictedDeviceTypes(@NotNull DeviceType deviceType) {
+    private Set<DeviceType> getConflictedDeviceTypes(@NotNull @DeviceTypeConstraint DeviceType deviceType) {
         return exclusiveDeviceTypes.get(deviceType);
     }
 
     private boolean isConflicted(
-            @NotEmpty Set<DeviceType> loggedDeviceTypes,
-            @NotNull DeviceType loggingDeviceType) {
+            @NotEmpty Set<@DeviceTypeConstraint DeviceType> loggedDeviceTypes,
+            @NotNull @DeviceTypeConstraint DeviceType loggingDeviceType) {
         Set<DeviceType> conflictedDeviceTypes = getConflictedDeviceTypes(loggingDeviceType);
         for (DeviceType loggedDeviceType : loggedDeviceTypes) {
             if (conflictedDeviceTypes.contains(loggedDeviceType)) {
@@ -147,11 +150,13 @@ public class UserSimultaneousLoginService {
         return false;
     }
 
-    public boolean isDeviceTypeAllowedToLogin(@NotNull Long userId, @NotNull DeviceType loggingDeviceType) {
+    public boolean isDeviceTypeAllowedToLogin(
+            @NotNull Long userId,
+            @NotNull @DeviceTypeConstraint DeviceType loggingInDeviceType) {
         OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(userId);
         if (onlineUserManager == null) {
             return true;
-        } else if (forbiddenDeviceTypes.contains(loggingDeviceType)) {
+        } else if (forbiddenDeviceTypes.contains(loggingInDeviceType)) {
             return false;
         }
         UserOnlineInfo onlineUserInfo = onlineUserManager.getOnlineUserInfo();
@@ -161,7 +166,7 @@ public class UserSimultaneousLoginService {
                 .getUser()
                 .getSimultaneousLogin()
                 .getConflictStrategy();
-        return !isConflicted(usingDeviceTypes, loggingDeviceType) ||
+        return !isConflicted(usingDeviceTypes, loggingInDeviceType) ||
                 strategy != User.SimultaneousLogin.ConflictStrategy.LOGGING_DEVICE_OFFLINE;
     }
 }

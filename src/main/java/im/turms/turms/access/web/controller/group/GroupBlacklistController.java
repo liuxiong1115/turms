@@ -20,6 +20,7 @@ package im.turms.turms.access.web.controller.group;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.GroupBlacklistedUser;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.group.GroupBlacklistService;
@@ -58,8 +59,7 @@ public class GroupBlacklistController {
         Flux<GroupBlacklistedUser> userFlux = groupBlacklistService.queryBlacklistedUsers(
                 groupId,
                 userId,
-                blockDateStart,
-                blockDateEnd,
+                DateRange.of(blockDateStart, blockDateEnd),
                 requesterId,
                 0,
                 size);
@@ -79,14 +79,12 @@ public class GroupBlacklistController {
         size = pageUtil.getSize(size);
         Mono<Long> count = groupBlacklistService.countBlacklistedUsers(groupId,
                 userId,
-                blockDateStart,
-                blockDateEnd,
+                DateRange.of(blockDateStart, blockDateEnd),
                 requesterId);
         Flux<GroupBlacklistedUser> userFlux = groupBlacklistService.queryBlacklistedUsers(
                 groupId,
                 userId,
-                blockDateStart,
-                blockDateEnd,
+                DateRange.of(blockDateStart, blockDateEnd),
                 requesterId,
                 page,
                 size);
@@ -127,8 +125,7 @@ public class GroupBlacklistController {
         Mono<Boolean> deleteMono = groupBlacklistService.deleteBlacklistedUsers(
                 groupId,
                 userId,
-                blockDateStart,
-                blockDateEnd,
+                DateRange.of(blockDateStart, blockDateEnd),
                 requesterId);
         return ResponseFactory.acknowledged(deleteMono);
     }

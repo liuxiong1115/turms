@@ -30,6 +30,7 @@ import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.message.MessageStatuses;
 import im.turms.turms.pojo.bo.message.Messages;
 import im.turms.turms.pojo.bo.message.MessagesWithTotal;
@@ -150,8 +151,7 @@ public class WsMessageController {
             size = pageUtil.getSize(size);
             return messageService.queryCompleteMessages(
                     false, null, null, null, null,
-                    turmsRequestWrapper.getUserId(), null, null,
-                    null, null, MessageDeliveryStatus.READY, 0, size)
+                    turmsRequestWrapper.getUserId(), null, null, MessageDeliveryStatus.READY, 0, size)
                     .doOnNext(message -> multimap.put(Triple.of(message.getChatType(),
                             message.getIsSystemMessage(),
                             message.getChatType() == ChatType.GROUP ? message.getTargetId() : message.getSenderId()), message))
@@ -215,9 +215,7 @@ public class WsMessageController {
                     areSystemMessages,
                     fromId,
                     turmsRequestWrapper.getUserId(),
-                    deliveryDateAfter,
-                    deliveryDateBefore,
-                    null,
+                    DateRange.of(deliveryDateAfter, deliveryDateBefore),
                     null,
                     deliveryStatus,
                     0,

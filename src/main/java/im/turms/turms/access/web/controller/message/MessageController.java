@@ -26,6 +26,7 @@ import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.message.MessageService;
@@ -72,10 +73,8 @@ public class MessageController {
                 areSystemMessages,
                 senderId,
                 targetId,
-                deliveryDateStart,
-                deliveryDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
+                DateRange.of(deliveryDateStart, deliveryDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
                 deliveryStatus,
                 0,
                 pageUtil.getSize(size));
@@ -103,10 +102,8 @@ public class MessageController {
                 areSystemMessages,
                 senderId,
                 targetId,
-                deliveryDateStart,
-                deliveryDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
+                DateRange.of(deliveryDateStart, deliveryDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
                 deliveryStatus);
         Flux<Message> completeMessages = messageService.queryCompleteMessages(
                 false,
@@ -115,10 +112,8 @@ public class MessageController {
                 areSystemMessages,
                 senderId,
                 targetId,
-                deliveryDateStart,
-                deliveryDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
+                DateRange.of(deliveryDateStart, deliveryDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
                 deliveryStatus,
                 page,
                 pageUtil.getSize(size));
@@ -191,32 +186,28 @@ public class MessageController {
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             if (sentOnAverageStartDate != null || sentOnAverageEndDate != null) {
                 counts.add(messageService.countSentMessagesOnAverage(
-                        sentOnAverageStartDate,
-                        sentOnAverageEndDate,
+                        DateRange.of(sentOnAverageStartDate, sentOnAverageEndDate),
                         chatType,
                         areSystemMessages)
                         .doOnNext(statistics::setSentMessagesOnAverage));
             }
             if (acknowledgedStartDate != null || acknowledgedEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessages(
-                        acknowledgedStartDate,
-                        acknowledgedEndDate,
+                        DateRange.of(acknowledgedStartDate, acknowledgedEndDate),
                         chatType,
                         areSystemMessages)
                         .doOnNext(statistics::setAcknowledgedMessages));
             }
             if (acknowledgedOnAverageStartDate != null || acknowledgedOnAverageEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessagesOnAverage(
-                        acknowledgedOnAverageStartDate,
-                        acknowledgedOnAverageEndDate,
+                        DateRange.of(acknowledgedOnAverageStartDate, acknowledgedOnAverageEndDate),
                         chatType,
                         areSystemMessages)
                         .doOnNext(statistics::setAcknowledgedMessagesOnAverage));
             }
             if (counts.isEmpty() || sentStartDate != null || sentEndDate != null) {
                 counts.add(messageService.countSentMessages(
-                        sentStartDate,
-                        sentEndDate,
+                        DateRange.of(sentStartDate, sentEndDate),
                         chatType,
                         areSystemMessages)
                         .doOnNext(statistics::setSentMessages));
@@ -224,8 +215,7 @@ public class MessageController {
         } else {
             if (sentOnAverageStartDate != null && sentOnAverageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        sentOnAverageStartDate,
-                        sentOnAverageEndDate,
+                        DateRange.of(sentOnAverageStartDate, sentOnAverageEndDate),
                         divideBy,
                         messageService::countSentMessagesOnAverage,
                         chatType,
@@ -234,8 +224,7 @@ public class MessageController {
             }
             if (acknowledgedStartDate != null && acknowledgedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        acknowledgedStartDate,
-                        acknowledgedEndDate,
+                        DateRange.of(acknowledgedStartDate, acknowledgedEndDate),
                         divideBy,
                         messageService::countAcknowledgedMessages,
                         chatType,
@@ -244,8 +233,7 @@ public class MessageController {
             }
             if (acknowledgedOnAverageStartDate != null && acknowledgedOnAverageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        acknowledgedOnAverageStartDate,
-                        acknowledgedOnAverageEndDate,
+                        DateRange.of(acknowledgedOnAverageStartDate, acknowledgedOnAverageEndDate),
                         divideBy,
                         messageService::countAcknowledgedMessagesOnAverage,
                         chatType,
@@ -254,8 +242,7 @@ public class MessageController {
             }
             if (sentStartDate != null && sentEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        sentStartDate,
-                        sentEndDate,
+                        DateRange.of(sentStartDate, sentEndDate),
                         divideBy,
                         messageService::countSentMessages,
                         chatType,

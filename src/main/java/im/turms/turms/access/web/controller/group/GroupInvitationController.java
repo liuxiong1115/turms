@@ -21,6 +21,7 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.constant.RequestStatus;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.GroupInvitation;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.group.GroupInvitationService;
@@ -68,12 +69,9 @@ public class GroupInvitationController {
                 inviterId,
                 inviteeId,
                 status,
-                creationDateStart,
-                creationDateEnd,
-                responseDateStart,
-                responseDateEnd,
-                expirationDateStart,
-                expirationDateEnd,
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(responseDateStart, responseDateEnd),
+                DateRange.of(expirationDateStart, expirationDateEnd),
                 0,
                 size);
         return ResponseFactory.okIfTruthy(invitationFlux);
@@ -102,24 +100,18 @@ public class GroupInvitationController {
                 inviterId,
                 inviteeId,
                 status,
-                creationDateStart,
-                creationDateEnd,
-                responseDateStart,
-                responseDateEnd,
-                expirationDateStart,
-                expirationDateEnd);
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(responseDateStart, responseDateEnd),
+                DateRange.of(expirationDateStart, expirationDateEnd));
         Flux<GroupInvitation> invitationFlux = groupInvitationService.queryInvitations(
                 ids,
                 groupId,
                 inviterId,
                 inviteeId,
                 status,
-                creationDateStart,
-                creationDateEnd,
-                responseDateStart,
-                responseDateEnd,
-                expirationDateStart,
-                expirationDateEnd,
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(responseDateStart, responseDateEnd),
+                DateRange.of(expirationDateStart, expirationDateEnd),
                 page,
                 size);
         return ResponseFactory.page(count, invitationFlux);
@@ -177,12 +169,9 @@ public class GroupInvitationController {
                 inviterId,
                 inviteeId,
                 status,
-                creationDateStart,
-                creationDateEnd,
-                responseDateStart,
-                responseDateEnd,
-                expirationDateStart,
-                expirationDateEnd);
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(responseDateStart, responseDateEnd),
+                DateRange.of(expirationDateStart, expirationDateEnd));
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

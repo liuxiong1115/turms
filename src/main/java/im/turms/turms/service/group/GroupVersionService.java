@@ -26,8 +26,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -35,6 +37,7 @@ import static im.turms.turms.common.Constants.ID;
 import static im.turms.turms.common.Constants.ID_GROUP_ID;
 
 @Service
+@Validated
 public class GroupVersionService {
     private final ReactiveMongoTemplate mongoTemplate;
 
@@ -133,7 +136,7 @@ public class GroupVersionService {
         return mongoTemplate.insert(version).thenReturn(true);
     }
 
-    public Mono<Boolean> delete(@NotNull Long groupId, ReactiveMongoOperations operations) {
+    public Mono<Boolean> delete(@NotNull Long groupId, @Nullable ReactiveMongoOperations operations) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.remove(query, GroupVersion.class)

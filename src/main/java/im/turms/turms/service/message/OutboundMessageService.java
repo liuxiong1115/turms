@@ -20,12 +20,11 @@ package im.turms.turms.service.message;
 import com.hazelcast.cluster.Member;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.task.DeliveryUserMessageTask;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.FluxSink;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 @Component
+@Validated
 public class OutboundMessageService {
     private final OnlineUserService onlineUserService;
     private final TurmsClusterManager turmsClusterManager;
@@ -85,39 +85,5 @@ public class OutboundMessageService {
             }
         }
         return Mono.just(false);
-    }
-
-    public void relayClientMessageToClient(
-            @NotNull WebSocketSession session,
-            @NotNull FluxSink<WebSocketMessage> outputSink,
-            @NotNull TurmsRequest clientMessage) {
-        WebSocketMessage message = session.binaryMessage(dataBufferFactory ->
-                dataBufferFactory.wrap(clientMessage.toByteArray()));
-        outputSink.next(message);
-    }
-
-    // Server message -> client
-    public boolean sendServerMessageToClient(TurmsNotification serverMessage, Long receiverId) {
-        //Check whether the recipient connects to the local note.
-        OnlineUserManager manager = onlineUserService.getLocalOnlineUserManager(receiverId);
-        if (manager != null) {
-            List<WebSocketSession> recipientSessions = manager.getWebSocketSessions();
-            if (recipientSessions != null && !recipientSessions.isEmpty()) {
-                for (WebSocketSession recipientSession : recipientSessions) {
-                    sendServerMessageToClient(recipientSession, serverMessage);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void sendServerMessageToClient(WebSocketSession session, TurmsNotification serverMessage) {
-        if (session != null && serverMessage != null) {
-            WebSocketMessage binaryMessage = session.binaryMessage(dataBufferFactory ->
-                    dataBufferFactory.wrap(serverMessage.toByteArray())
-            );
-            session.send(Mono.just(binaryMessage)).subscribe();
-        }
     }
 }

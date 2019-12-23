@@ -20,12 +20,14 @@ package im.turms.turms.service.group;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.annotation.constraint.GroupQuestionIdAndAnswerConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult;
 import im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion;
+import im.turms.turms.pojo.bo.group.GroupQuestionIdAndAnswer;
 import im.turms.turms.pojo.domain.GroupJoinQuestion;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -33,6 +35,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -40,13 +43,17 @@ import reactor.util.function.Tuple2;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.ID;
 import static im.turms.turms.common.Constants.MAX_DATE;
 
 @Service
+@Validated
 public class GroupQuestionService {
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
@@ -80,12 +87,12 @@ public class GroupQuestionService {
      * group join questions ids -> score
      */
     public Mono<Pair<List<Long>, Integer>> checkGroupQuestionAnswersAndCountScore(
-            @NotEmpty Map<Long, String> questionIdAndAnswerMap,
+            @NotEmpty Set<@GroupQuestionIdAndAnswerConstraint GroupQuestionIdAndAnswer> questionIdAndAnswers,
             @Nullable Long groupId) {
-        List<Mono<Pair<Long, Integer>>> checks = new ArrayList<>(questionIdAndAnswerMap.entrySet().size());
-        for (Map.Entry<Long, String> entry : questionIdAndAnswerMap.entrySet()) {
-            checks.add(checkGroupQuestionAnswerAndCountScore(entry.getKey(), entry.getValue(), groupId)
-                    .map(score -> Pair.of(entry.getKey(), score)));
+        List<Mono<Pair<Long, Integer>>> checks = new ArrayList<>(questionIdAndAnswers.size());
+        for (GroupQuestionIdAndAnswer entry : questionIdAndAnswers) {
+            checks.add(checkGroupQuestionAnswerAndCountScore(entry.getId(), entry.getAnswer(), groupId)
+                    .map(score -> Pair.of(entry.getId(), score)));
         }
         return Flux.merge(checks)
                 .collectList()
@@ -102,8 +109,8 @@ public class GroupQuestionService {
 
     public Mono<GroupJoinQuestionsAnswerResult> checkGroupQuestionAnswerAndJoin(
             @NotNull Long requesterId,
-            @NotEmpty Map<Long, String> questionIdAndAnswerMap) {
-        Long firstQuestionId = questionIdAndAnswerMap.keySet().toArray(new Long[0])[0];
+            @NotEmpty Set<@GroupQuestionIdAndAnswerConstraint GroupQuestionIdAndAnswer> questionIdAndAnswers) {
+        Long firstQuestionId = questionIdAndAnswers.iterator().next().getId();
         return queryGroupId(firstQuestionId)
                 .flatMap(groupId -> groupMemberService.isBlacklisted(groupId, requesterId)
                         .flatMap(isBlacklisted -> {
@@ -122,7 +129,7 @@ public class GroupQuestionService {
                         })
                         .flatMap(isActive -> {
                             if (isActive != null && isActive) {
-                                return checkGroupQuestionAnswersAndCountScore(questionIdAndAnswerMap, groupId);
+                                return checkGroupQuestionAnswersAndCountScore(questionIdAndAnswers, groupId);
                             } else {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_ACTIVE));
                             }
@@ -136,7 +143,7 @@ public class GroupQuestionService {
                                                 GroupMemberRole.MEMBER,
                                                 null,
                                                 null,
-                                                null, //TODO: GroupType: allow add a mute end date for new members
+                                                null, //TODO: GroupType: allow adding a mute end date for new members
                                                 null)
                                                 .thenReturn(true);
                                     } else {
@@ -335,7 +342,7 @@ public class GroupQuestionService {
             @Nullable String question,
             @Nullable Set<String> answers,
             @Nullable Integer score) {
-        Validator.throwIfAllFalsy(ids);
+        Validator.throwIfAllFalsy(groupId, question, answers, score);
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)

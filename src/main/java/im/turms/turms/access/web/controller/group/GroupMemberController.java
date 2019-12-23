@@ -21,6 +21,7 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.constant.GroupMemberRole;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.group.GroupMemberService;
@@ -62,10 +63,8 @@ public class GroupMemberController {
                 groupId,
                 userId,
                 role,
-                joinDateStart,
-                joinDateEnd,
-                muteEndDateStart,
-                muteEndDateEnd,
+                DateRange.of(joinDateStart, joinDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd),
                 0,
                 size);
         return ResponseFactory.okIfTruthy(groupMemberFlux);
@@ -88,18 +87,14 @@ public class GroupMemberController {
                 groupId,
                 userId,
                 role,
-                joinDateStart,
-                joinDateEnd,
-                muteEndDateStart,
-                muteEndDateEnd);
+                DateRange.of(joinDateStart, joinDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd));
         Flux<GroupMember> userFlux = groupMemberService.queryGroupMembers(
                 groupId,
                 userId,
                 role,
-                joinDateStart,
-                joinDateEnd,
-                muteEndDateStart,
-                muteEndDateEnd,
+                DateRange.of(joinDateStart, joinDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd),
                 page,
                 size);
         return ResponseFactory.page(count, userFlux);
@@ -148,10 +143,8 @@ public class GroupMemberController {
                 groupId,
                 userId,
                 role,
-                joinDateStart,
-                joinDateEnd,
-                muteEndDateStart,
-                muteEndDateEnd);
+                DateRange.of(joinDateStart, joinDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd));
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

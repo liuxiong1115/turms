@@ -17,6 +17,7 @@
 
 package im.turms.turms.common;
 
+import im.turms.turms.pojo.bo.common.DateRange;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -25,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,14 +49,17 @@ public class QueryBuilder {
      */
     public QueryBuilder addBetweenIfNotNull(
             @NotNull String key,
-            @Nullable Object start,
-            @Nullable Object end) {
-        if (start != null && end == null) {
-            criteriaList.add(Criteria.where(key).gte(start));
-        } else if (start == null && end != null) {
-            criteriaList.add(Criteria.where(key).lt(end));
-        } else if (start != null) {
-            criteriaList.add(Criteria.where(key).gte(start).lt(end));
+            @Nullable DateRange dateRange) {
+        if (dateRange != null) {
+            Date start = dateRange.getStart();
+            Date end = dateRange.getEnd();
+            if (start != null && end == null) {
+                criteriaList.add(Criteria.where(key).gte(start));
+            } else if (start == null && end != null) {
+                criteriaList.add(Criteria.where(key).lt(end));
+            } else if (start != null) {
+                criteriaList.add(Criteria.where(key).gte(start).lt(end));
+            }
         }
         return this;
     }

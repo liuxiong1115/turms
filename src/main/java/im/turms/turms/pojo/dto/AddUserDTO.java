@@ -42,5 +42,5 @@ public class AddUserDTO {
 
     private Date registrationDate;
 
-    private Boolean active;
+    private Boolean isActive;
 }
