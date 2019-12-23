@@ -40,5 +40,5 @@ public class UpdateUserDTO {
 
     private Date registrationDate;
 
-    private Boolean active;
+    private Boolean isActive;
 }

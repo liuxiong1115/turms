@@ -20,6 +20,8 @@ package im.turms.turms.service.group;
 import com.google.common.collect.HashMultimap;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
+import im.turms.turms.annotation.constraint.GroupMemberKeyConstraint;
+import im.turms.turms.annotation.constraint.GroupMemberRoleConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.GroupInvitationStrategy;
@@ -27,6 +29,7 @@ import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.InvitableAndInvitationStrategy;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.group.GroupMembersWithVersion;
 import im.turms.turms.pojo.domain.GroupBlacklistedUser;
 import im.turms.turms.pojo.domain.GroupMember;
@@ -39,6 +42,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -46,6 +50,7 @@ import reactor.util.function.Tuple2;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +60,7 @@ import java.util.stream.Collectors;
 import static im.turms.turms.common.Constants.*;
 
 @Service
+@Validated
 public class GroupMemberService {
     private static final UserPermissionGroup EMPTY_USER_GROUP_TYPE_PERMISSION = new UserPermissionGroup();
     private final ReactiveMongoTemplate mongoTemplate;
@@ -74,9 +80,9 @@ public class GroupMemberService {
     public Mono<GroupMember> addGroupMember(
             @NotNull Long groupId,
             @NotNull Long userId,
-            @NotNull GroupMemberRole groupMemberRole,
+            @NotNull @GroupMemberRoleConstraint GroupMemberRole groupMemberRole,
             @Nullable String name,
-            @Nullable Date joinDate,
+            @Nullable @PastOrPresent Date joinDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
         if (joinDate == null) {
@@ -99,7 +105,7 @@ public class GroupMemberService {
             @NotNull Long requesterId,
             @NotNull Long groupId,
             @NotNull Long userId,
-            @NotNull GroupMemberRole groupMemberRole,
+            @NotNull @GroupMemberRoleConstraint GroupMemberRole groupMemberRole,
             @Nullable String name,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
@@ -177,8 +183,8 @@ public class GroupMemberService {
             @NotNull Long groupId,
             @NotNull Long memberId,
             @Nullable String name,
-            @Nullable GroupMemberRole role,
-            @Nullable Date joinDate,
+            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
+            @Nullable @PastOrPresent Date joinDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
         return updateGroupMembers(groupId, Set.of(memberId), name, role, joinDate, muteEndDate, operations);
@@ -188,11 +194,10 @@ public class GroupMemberService {
             @NotNull Long groupId,
             @NotEmpty Set<Long> memberIds,
             @Nullable String name,
-            @Nullable GroupMemberRole role,
-            @Nullable Date joinDate,
+            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
+            @Nullable @PastOrPresent Date joinDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAnyFalsy(groupId, memberIds);
         Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
@@ -222,13 +227,12 @@ public class GroupMemberService {
     }
 
     public Mono<Boolean> updateGroupMembers(
-            @NotEmpty Set<GroupMember.Key> keys,
+            @NotEmpty Set<GroupMember.@GroupMemberKeyConstraint Key> keys,
             @Nullable String name,
-            @Nullable GroupMemberRole role,
-            @Nullable Date joinDate,
+            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
+            @Nullable @PastOrPresent Date joinDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAnyFalsy(keys);
         Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
         HashMultimap<Long, Long> multimap = HashMultimap.create();
         for (GroupMember.Key key : keys) {
@@ -267,7 +271,7 @@ public class GroupMemberService {
     public Mono<InvitableAndInvitationStrategy> isAllowedToInviteOrAdd(
             @NotNull Long groupId,
             @NotNull Long inviterId,
-            @Nullable GroupMemberRole targetRole) {
+            @Nullable @GroupMemberRoleConstraint GroupMemberRole targetRole) {
         return groupService.queryGroupType(groupId)
                 .flatMap(groupType -> {
                     GroupInvitationStrategy groupInvitationStrategy = groupType.getInvitationStrategy();
@@ -478,8 +482,8 @@ public class GroupMemberService {
                 .map(member -> member.getKey().getUserId());
     }
 
-    public Flux<Long> queryGroupMembersIds(@NotEmpty Set<Long> groupsIds) {
-        Query query = new Query().addCriteria(Criteria.where(ID_GROUP_ID).in(groupsIds));
+    public Flux<Long> queryGroupMembersIds(@NotEmpty Set<Long> groupIds) {
+        Query query = new Query().addCriteria(Criteria.where(ID_GROUP_ID).in(groupIds));
         query.fields().include(ID_USER_ID);
         return mongoTemplate.find(query, GroupMember.class)
                 .map(member -> member.getKey().getUserId());
@@ -488,11 +492,9 @@ public class GroupMemberService {
     public Flux<GroupMember> queryGroupMembers(
             @Nullable Long groupId,
             @Nullable Long userId,
-            @Nullable GroupMemberRole role,
-            @Nullable Date joinDateStart,
-            @Nullable Date joinDateEnd,
-            @Nullable Date muteEndDateStart,
-            @Nullable Date muteEndDateEnd,
+            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
+            @Nullable DateRange joinDateRange,
+            @Nullable DateRange muteEndDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder
@@ -500,8 +502,8 @@ public class GroupMemberService {
                 .addIsIfNotNull(ID_GROUP_ID, groupId)
                 .addIsIfNotNull(ID_USER_ID, userId)
                 .addIsIfNotNull(GroupMember.Fields.role, role)
-                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateStart, joinDateEnd)
-                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
+                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateRange)
+                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupMember.class);
     }
@@ -509,18 +511,16 @@ public class GroupMemberService {
     public Mono<Long> countMembers(
             @Nullable Long groupId,
             @Nullable Long userId,
-            @Nullable GroupMemberRole role,
-            @Nullable Date joinDateStart,
-            @Nullable Date joinDateEnd,
-            @Nullable Date muteEndDateStart,
-            @Nullable Date muteEndDateEnd) {
+            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
+            @Nullable DateRange joinDateRange,
+            @Nullable DateRange muteEndDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addIsIfNotNull(ID_GROUP_ID, groupId)
                 .addIsIfNotNull(ID_USER_ID, userId)
                 .addIsIfNotNull(GroupMember.Fields.role, role)
-                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateStart, joinDateEnd)
-                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
+                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateRange)
+                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, GroupMember.class);
     }
@@ -528,18 +528,16 @@ public class GroupMemberService {
     public Mono<Boolean> deleteMembers(
             @Nullable Long groupId,
             @Nullable Long userId,
-            @Nullable GroupMemberRole role,
-            @Nullable Date joinDateStart,
-            @Nullable Date joinDateEnd,
-            @Nullable Date muteEndDateStart,
-            @Nullable Date muteEndDateEnd) {
+            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
+            @Nullable DateRange joinDateRange,
+            @Nullable DateRange muteEndDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addIsIfNotNull(ID_GROUP_ID, groupId)
                 .addIsIfNotNull(ID_USER_ID, userId)
                 .addIsIfNotNull(GroupMember.Fields.role, role)
-                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateStart, joinDateEnd)
-                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
+                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateRange)
+                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateRange)
                 .buildQuery();
         return mongoTemplate.remove(query, GroupMember.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -599,7 +597,7 @@ public class GroupMemberService {
                 })
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return queryGroupMembers(groupId, null, null, null, null, null, null, null, null)
+                        return queryGroupMembers(groupId, null, null, null, null, null, null)
                                 .collectList()
                                 .flatMap(members -> {
                                     if (members.isEmpty()) {
@@ -630,7 +628,7 @@ public class GroupMemberService {
             @NotNull Long groupId,
             @NotNull Long memberId,
             @Nullable String name,
-            @Nullable GroupMemberRole role,
+            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
             @Nullable Date muteEndDate) {
         Mono<Boolean> authorized;
         if (role != null) {
@@ -677,8 +675,8 @@ public class GroupMemberService {
     }
 
     private Mono<GroupMembersWithVersion> fillMembersBuilderWithStatus(
-            List<GroupMember> members,
-            GroupMembersWithVersion.Builder builder) {
+            @NotNull List<GroupMember> members,
+            @NotNull GroupMembersWithVersion.Builder builder) {
         List<Mono<UserOnlineInfo>> monoList = new ArrayList<>(members.size());
         for (GroupMember member : members) {
             Long userId = member.getKey().getUserId();

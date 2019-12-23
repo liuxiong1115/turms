@@ -20,6 +20,7 @@ package im.turms.turms.service.group;
 import com.hazelcast.replicatedmap.ReplicatedMap;
 import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
+import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.UpdateBuilder;
@@ -35,16 +36,19 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.function.Function;
 
 import static im.turms.turms.common.Constants.*;
 
 @Service
+@Validated
 public class GroupTypeService {
     private static final GroupType EMPTY_GROUP_TYPE = new GroupType();
     private static ReplicatedMap<Long, GroupType> groupTypeMap;
@@ -93,8 +97,8 @@ public class GroupTypeService {
     }
 
     public Mono<GroupType> addGroupType(
-            @NotNull String name,
-            @NotNull Integer groupSizeLimit,
+            @NotNull @NoWhitespaceConstraint String name,
+            @NotNull @Min(1) Integer groupSizeLimit,
             @NotNull GroupInvitationStrategy groupInvitationStrategy,
             @NotNull GroupJoinStrategy groupJoinStrategy,
             @NotNull GroupUpdateStrategy groupInfoUpdateStrategy,
@@ -103,16 +107,6 @@ public class GroupTypeService {
             @NotNull Boolean selfInfoUpdatable,
             @NotNull Boolean enableReadReceipt,
             @NotNull Boolean messageEditable) {
-        Validator.throwIfAnyNull(name,
-                groupSizeLimit,
-                groupInvitationStrategy,
-                groupJoinStrategy,
-                groupInfoUpdateStrategy,
-                memberInfoUpdateStrategy,
-                guestSpeakable,
-                selfInfoUpdatable,
-                enableReadReceipt,
-                messageEditable);
         Long id = turmsClusterManager.generateRandomId();
         GroupType groupType = new GroupType(
                 id,
@@ -132,8 +126,8 @@ public class GroupTypeService {
 
     public Mono<Boolean> updateGroupType(
             @NotNull Long id,
-            @Nullable String name,
-            @Nullable Integer groupSizeLimit,
+            @Nullable @NoWhitespaceConstraint String name,
+            @Nullable @Min(1) Integer groupSizeLimit,
             @Nullable GroupInvitationStrategy groupInvitationStrategy,
             @Nullable GroupJoinStrategy groupJoinStrategy,
             @Nullable GroupUpdateStrategy groupInfoUpdateStrategy,
@@ -142,7 +136,6 @@ public class GroupTypeService {
             @Nullable Boolean selfInfoUpdatable,
             @Nullable Boolean enableReadReceipt,
             @Nullable Boolean messageEditable) {
-        Validator.throwIfAnyNull(id);
         Validator.throwIfAllNull(
                 name,
                 groupSizeLimit,

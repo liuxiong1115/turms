@@ -20,10 +20,12 @@ package im.turms.turms.service.group;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.annotation.constraint.RequestStatusConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
 import im.turms.turms.pojo.domain.GroupInvitation;
 import im.turms.turms.property.TurmsProperties;
@@ -35,6 +37,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -42,6 +45,7 @@ import reactor.util.function.Tuple2;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -52,6 +56,7 @@ import static im.turms.turms.common.Constants.*;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
+@Validated
 public class GroupInvitationService {
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsProperties turmsProperties;
@@ -139,13 +144,10 @@ public class GroupInvitationService {
             @NotNull Long inviterId,
             @NotNull Long inviteeId,
             @NotNull String content,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDate,
-            @Nullable Date responseDate,
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
-        if (status == RequestStatus.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
         Date now = new Date();
         GroupInvitation groupInvitation = new GroupInvitation();
         groupInvitation.setId(turmsClusterManager.generateRandomId());
@@ -298,13 +300,10 @@ public class GroupInvitationService {
             @Nullable Long groupId,
             @Nullable Long inviterId,
             @Nullable Long inviteeId,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd,
-            @Nullable Date responseDateStart,
-            @Nullable Date responseDateEnd,
-            @Nullable Date expirationDateStart,
-            @Nullable Date expirationDateEnd,
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable DateRange creationDateRange,
+            @Nullable DateRange responseDateRange,
+            @Nullable DateRange expirationDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder
@@ -314,9 +313,9 @@ public class GroupInvitationService {
                 .addIsIfNotNull(GroupInvitation.Fields.inviterId, inviterId)
                 .addIsIfNotNull(GroupInvitation.Fields.inviteeId, inviteeId)
                 .addIsIfNotNull(GroupInvitation.Fields.status, status)
-                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateStart, responseDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupInvitation.class);
     }
@@ -326,13 +325,10 @@ public class GroupInvitationService {
             @Nullable Long groupId,
             @Nullable Long inviterId,
             @Nullable Long inviteeId,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd,
-            @Nullable Date responseDateStart,
-            @Nullable Date responseDateEnd,
-            @Nullable Date expirationDateStart,
-            @Nullable Date expirationDateEnd) {
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable DateRange creationDateRange,
+            @Nullable DateRange responseDateRange,
+            @Nullable DateRange expirationDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
@@ -340,9 +336,9 @@ public class GroupInvitationService {
                 .addIsIfNotNull(GroupInvitation.Fields.inviterId, inviterId)
                 .addIsIfNotNull(GroupInvitation.Fields.inviteeId, inviteeId)
                 .addIsIfNotNull(GroupInvitation.Fields.status, status)
-                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateStart, responseDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, GroupInvitation.class);
     }
@@ -352,13 +348,10 @@ public class GroupInvitationService {
             @Nullable Long groupId,
             @Nullable Long inviterId,
             @Nullable Long inviteeId,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd,
-            @Nullable Date responseDateStart,
-            @Nullable Date responseDateEnd,
-            @Nullable Date expirationDateStart,
-            @Nullable Date expirationDateEnd) {
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable DateRange creationDateRange,
+            @Nullable DateRange responseDateRange,
+            @Nullable DateRange expirationDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
@@ -366,9 +359,9 @@ public class GroupInvitationService {
                 .addIsIfNotNull(GroupInvitation.Fields.inviterId, inviterId)
                 .addIsIfNotNull(GroupInvitation.Fields.inviteeId, inviteeId)
                 .addIsIfNotNull(GroupInvitation.Fields.status, status)
-                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateStart, responseDateEnd)
-                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateRange)
                 .buildQuery();
         return mongoTemplate.remove(query, GroupInvitation.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -379,10 +372,11 @@ public class GroupInvitationService {
             @Nullable Long inviterId,
             @Nullable Long inviteeId,
             @Nullable String content,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDate,
-            @Nullable Date responseDate,
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
+        Validator.throwIfAllNull(inviterId, inviteeId, content, status, creationDate, expirationDate);
         Query query = new Query().addCriteria(where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()

@@ -20,21 +20,25 @@ package im.turms.turms.service.admin;
 import com.google.common.net.InetAddresses;
 import com.mongodb.DBObject;
 import com.mongodb.client.result.DeleteResult;
+import im.turms.turms.annotation.constraint.IpAddressConstraint;
+import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.Validator;
 import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.AdminActionLog;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.Set;
@@ -42,6 +46,7 @@ import java.util.Set;
 import static im.turms.turms.common.Constants.ID;
 
 @Service
+@Validated
 public class AdminActionLogService {
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
@@ -54,10 +59,10 @@ public class AdminActionLogService {
     }
 
     public Mono<AdminActionLog> saveAdminActionLog(
-            @NotNull String account,
-            @NotNull Date timestamp,
-            @NotNull String ip,
-            @NotNull String action,
+            @NotNull @NoWhitespaceConstraint String account,
+            @NotNull @PastOrPresent Date timestamp,
+            @NotNull @IpAddressConstraint String ip,
+            @NotNull @NoWhitespaceConstraint String action,
             @Nullable DBObject params,
             @Nullable DBObject body) {
         InetAddress inetAddress = InetAddresses.forString(ip);
@@ -75,13 +80,11 @@ public class AdminActionLogService {
     public Mono<Boolean> deleteAdminActionLogs(
             @Nullable Set<Long> ids,
             @Nullable Set<String> accounts,
-            @Nullable Date logDateStart,
-            @Nullable Date logDateEnd) {
-        Validator.throwIfAfterWhenNotNull(logDateStart, logDateEnd);
+            @Nullable DateRange logDateRange) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateStart, logDateEnd)
+                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateRange)
                 .buildQuery();
         return mongoTemplate.remove(query, AdminActionLog.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -90,15 +93,13 @@ public class AdminActionLogService {
     public Flux<AdminActionLog> queryAdminActionLogs(
             @Nullable Set<Long> ids,
             @Nullable Set<String> accounts,
-            @Nullable Date logDateStart,
-            @Nullable Date logDateEnd,
+            @Nullable DateRange logDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
-        Validator.throwIfAfterWhenNotNull(logDateStart, logDateEnd);
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateStart, logDateEnd)
+                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, AdminActionLog.class);
     }
@@ -137,13 +138,11 @@ public class AdminActionLogService {
     public Mono<Long> countAdminActionLogs(
             @Nullable Set<Long> ids,
             @Nullable Set<String> accounts,
-            @Nullable Date logDateStart,
-            @Nullable Date logDateEnd) {
-        Validator.throwIfAfterWhenNotNull(logDateStart, logDateEnd);
+            @Nullable DateRange logDateRange) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateStart, logDateEnd)
+                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, AdminActionLog.class);
     }

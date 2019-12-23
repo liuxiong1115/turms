@@ -22,6 +22,7 @@ import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.UserRelationship;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
@@ -110,7 +111,7 @@ public class UserRelationshipController {
             @RequestParam(defaultValue = "false") Boolean withGroupIndexes) {
         size = pageUtil.getSize(size);
         Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
-                ownerId, relatedUsersIds, groupIndex, isBlocked, establishmentDateStart, establishmentDateEnd, 0, size);
+                ownerId, relatedUsersIds, groupIndex, isBlocked, DateRange.of(establishmentDateStart, establishmentDateEnd), 0, size);
         Flux<UserRelationshipDTO> dtoFlux = relationship2dto(ownerId, withGroupIndexes, relationshipsFlux);
         return ResponseFactory.okIfTruthy(dtoFlux);
     }
@@ -131,7 +132,7 @@ public class UserRelationshipController {
         Mono<Long> count = userRelationshipService.countRelationships(
                 ownerId, relatedUsersIds, groupIndex, isBlocked);
         Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
-                ownerId, relatedUsersIds, groupIndex, isBlocked, establishmentDateStart, establishmentDateEnd, page, size);
+                ownerId, relatedUsersIds, groupIndex, isBlocked, DateRange.of(establishmentDateStart, establishmentDateEnd), page, size);
         Flux<UserRelationshipDTO> dtoFlux = relationship2dto(ownerId, withGroupIndexes, relationshipsFlux);
         return ResponseFactory.page(count, dtoFlux);
     }

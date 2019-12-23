@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -41,12 +40,10 @@ import java.util.Date;
 @NoArgsConstructor
 public class Admin implements IdentifiedDataSerializable, Cloneable {
     @Id
-    @Length(min = 1, max = 32)
     private String account;
 
     private String password;
 
-    @Length(min = 1, max = 50)
     private String name;
 
     @Indexed

@@ -33,8 +33,8 @@ import im.turms.turms.task.QueryNearestUsersTask;
 import im.turms.turms.task.TurmsTaskExecutor;
 import jdk.jfr.Experimental;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.Nullable;
@@ -50,10 +50,11 @@ import java.util.stream.Collectors;
 /**
  * The accuracy is within 1.7m
  */
-// TODO: benchmark
+// TODO: compared with plokhotnyuk/rtree2d
 // Main Check point: Pay attention to the memory usage
 @Experimental
 @Service
+@Validated
 public class UsersNearbyService {
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsTaskExecutor turmsTaskExecutor;
@@ -93,9 +94,9 @@ public class UsersNearbyService {
      * Usually used when a user is just online.
      */
     public void upsertUserLocation(
-            @NonNull Long userId,
-            @NonNull Float longitude,
-            @NonNull Float latitude,
+            @NotNull Long userId,
+            @NotNull Float longitude,
+            @NotNull Float latitude,
             @NotNull Date date) {
         PointFloat point = PointFloat.create(longitude, latitude);
         SortedSet<UserLocation> locations = this.userLocations.get(userId);
@@ -152,7 +153,7 @@ public class UsersNearbyService {
     }
 
     public Flux<User> queryUsersProfilesNearby(
-            @NonNull Long userId,
+            @NotNull Long userId,
             @Nullable DeviceType deviceType,
             @Nullable Integer maxPeopleNumber,
             @Nullable Double maxDistance) {

@@ -20,6 +20,7 @@ package im.turms.turms.service.message;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.annotation.constraint.ChatTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
@@ -27,6 +28,7 @@ import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.plugin.ExpiryMessageAutoDeletionNotificationHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.pojo.notification.TurmsNotification;
@@ -43,13 +45,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -59,6 +64,7 @@ import static im.turms.turms.common.Constants.*;
 import static im.turms.turms.common.TurmsStatusCode.*;
 
 @Service
+@Validated
 public class MessageService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
@@ -129,16 +135,14 @@ public class MessageService {
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Long targetId,
-            @Nullable Date deliveryDateStart,
-            @Nullable Date deliveryDateEnd,
-            @Nullable Date deletionDateStart,
-            @Nullable Date deletionDateEnd,
+            @Nullable DateRange deliveryDateRange,
+            @Nullable DateRange deletionDateRange,
             @Nullable MessageDeliveryStatus deliveryStatus,
             @Nullable Integer page,
             @Nullable Integer size) {
         if (deliveryStatus == MessageDeliveryStatus.READY
                 || deliveryStatus == MessageDeliveryStatus.RECEIVED) {
-            return queryCompleteMessages(closeToDate, messageIds, chatType, areSystemMessages, senderId, targetId, deliveryDateStart, deliveryDateEnd, deletionDateStart, deletionDateEnd, deliveryStatus, page, size);
+            return queryCompleteMessages(closeToDate, messageIds, chatType, areSystemMessages, senderId, targetId, deliveryDateRange, deletionDateRange, deliveryStatus, page, size);
         } else {
             throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
         }
@@ -156,28 +160,21 @@ public class MessageService {
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Long targetId,
-            @Nullable Date deliveryDateStart,
-            @Nullable Date deliveryDateEnd,
-            @Nullable Date deletionDateStart,
-            @Nullable Date deletionDateEnd,
+            @Nullable DateRange deliveryDateRange,
+            @Nullable DateRange deletionDateRange,
             @Nullable MessageDeliveryStatus deliveryStatus,
             @Nullable Integer page,
             @Nullable Integer size) {
-        if (chatType == ChatType.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
-        Validator.throwIfAfterWhenNotNull(deliveryDateStart, deliveryDateEnd);
-        Validator.throwIfAfterWhenNotNull(deletionDateStart, deletionDateEnd);
         QueryBuilder builder = QueryBuilder.newBuilder()
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .addIsIfNotNull(Message.Fields.senderId, senderId)
                 .addIsIfNotNull(Message.Fields.targetId, targetId)
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateStart, deliveryDateEnd)
-                .addBetweenIfNotNull(Message.Fields.deletionDate, deletionDateStart, deletionDateEnd);
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateRange)
+                .addBetweenIfNotNull(Message.Fields.deletionDate, deletionDateRange);
         Sort.Direction direction = null;
         if (closeToDate) {
-            direction = deliveryDateStart != null ? Sort.Direction.ASC : Sort.Direction.DESC;
+            direction = deliveryDateRange.getStart() != null ? Sort.Direction.ASC : Sort.Direction.DESC;
         }
         if (deliveryStatus != null) {
             Sort.Direction finalDirection = direction;
@@ -202,31 +199,15 @@ public class MessageService {
     }
 
     public Mono<Message> saveMessage(
-            @NotNull Message message,
-            @Nullable Long referenceId,
-            @Nullable ReactiveMongoOperations operations) {
-        return saveMessage(
-                message.getSenderId(),
-                message.getTargetId(),
-                message.getChatType(),
-                message.getIsSystemMessage(),
-                message.getText(),
-                message.getRecords(),
-                message.getBurnAfter(),
-                message.getDeliveryDate(),
-                referenceId,
-                operations);
-    }
-
-    public Mono<Message> saveMessage(
+            @Nullable Long messageId,
             @NotNull Long senderId,
             @NotNull Long targetId,
-            @NotNull ChatType chatType,
+            @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
-            @Nullable Integer burnAfter,
-            @Nullable Date deliveryDate,
+            @Nullable @Min(0) Integer burnAfter,
+            @Nullable @PastOrPresent Date deliveryDate,
             @Nullable Long referenceId,
             @Nullable ReactiveMongoOperations operations) {
         if (text != null && text.length() > turmsClusterManager.getTurmsProperties().getMessage().getMaxTextLimit()) {
@@ -251,8 +232,11 @@ public class MessageService {
         if (!turmsClusterManager.getTurmsProperties().getMessage().isRecordsPersistent()) {
             records = null;
         }
+        if (messageId == null) {
+            messageId = turmsClusterManager.generateRandomId();
+        }
         Message message = new Message(
-                turmsClusterManager.generateRandomId(),
+                messageId,
                 chatType,
                 isSystemMessage,
                 deliveryDate,
@@ -267,22 +251,26 @@ public class MessageService {
     }
 
     public Mono<Boolean> saveMessageStatuses(
-            @NotNull Message message,
+            @NotNull Long messageId,
+            @NotNull Boolean isSystemMessage,
+            @NotNull @ChatTypeConstraint ChatType chatType,
+            @NotNull Long senderId,
+            @NotNull Long targetId,
             @Nullable ReactiveMongoOperations operations) {
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        switch (message.getChatType()) {
+        switch (chatType) {
             case PRIVATE:
                 MessageStatus messageStatus = new MessageStatus(
-                        message.getId(),
+                        messageId,
                         null,
-                        message.getIsSystemMessage(),
-                        message.getSenderId(),
-                        message.getTargetId(),
+                        isSystemMessage,
+                        senderId,
+                        targetId,
                         MessageDeliveryStatus.READY);
                 return mongoOperations.save(messageStatus).thenReturn(true);
             case GROUP:
                 return groupMemberService
-                        .queryGroupMembersIds(message.getTargetId())
+                        .queryGroupMembersIds(targetId)
                         .collect(Collectors.toSet())
                         .flatMap(membersIds -> {
                             //TODO: duplicated query for membersIds
@@ -292,10 +280,10 @@ public class MessageService {
                             List<MessageStatus> messageStatuses = new ArrayList<>(membersIds.size());
                             for (Long memberId : membersIds) {
                                 messageStatuses.add(new MessageStatus(
-                                        message.getId(),
-                                        message.getTargetId(),
-                                        message.getIsSystemMessage(),
-                                        message.getSenderId(),
+                                        messageId,
+                                        targetId,
+                                        isSystemMessage,
+                                        senderId,
                                         memberId,
                                         MessageDeliveryStatus.READY));
                             }
@@ -309,37 +297,43 @@ public class MessageService {
     public Mono<Message> saveMessageAndMessagesStatus(
             @NotNull Long senderId,
             @NotNull Long targetId,
-            @NotNull ChatType chatType,
+            @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Boolean isSystemMessage,
             @NotNull String text,
             @Nullable List<byte[]> records,
-            @Nullable Integer burnAfter,
-            @Nullable Date deliveryDate,
+            @Nullable @Min(0) Integer burnAfter,
+            @Nullable @PastOrPresent Date deliveryDate,
             @Nullable Long referenceId) {
         if (turmsClusterManager.getTurmsProperties().getMessage().getTimeType()
                 != im.turms.turms.property.business.Message.TimeType.CLIENT_TIME
                 || deliveryDate == null) {
             deliveryDate = new Date();
         }
-        Message message = new Message(
-                turmsClusterManager.generateRandomId(),
-                chatType,
-                isSystemMessage,
-                deliveryDate,
-                text,
-                senderId,
-                targetId,
-                records,
-                burnAfter,
-                referenceId);
-        return saveMessageAndMessagesStatus(message, referenceId);
-    }
-
-    public Mono<Message> saveMessageAndMessagesStatus(@NotNull Message message, @Nullable Long referenceId) {
+        Date finalDeliveryDate = deliveryDate;
         return mongoTemplate.inTransaction()
-                .execute(operations -> saveMessage(message, referenceId, operations)
-                        .zipWith(saveMessageStatuses(message, operations))
-                        .map(Tuple2::getT1))
+                .execute(operations -> {
+                    Long messageId = turmsClusterManager.generateRandomId();
+                    return saveMessage(
+                            messageId,
+                            senderId,
+                            targetId,
+                            chatType,
+                            isSystemMessage,
+                            text,
+                            records,
+                            burnAfter,
+                            finalDeliveryDate,
+                            referenceId,
+                            operations)
+                            .zipWith(saveMessageStatuses(
+                                    messageId,
+                                    isSystemMessage,
+                                    chatType,
+                                    senderId,
+                                    targetId,
+                                    operations))
+                            .map(Tuple2::getT1);
+                })
                 .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                 .single();
     }
@@ -401,20 +395,22 @@ public class MessageService {
     }
 
     public Mono<Boolean> deleteMessages(
-            @Nullable Set<Long> messagesIds,
+            @Nullable Set<Long> messageIds,
             boolean deleteMessageStatus,
-            @Nullable Boolean logicalDelete) {
-        Query queryMessage = new Query();
-        Query queryMessageStatus = new Query();
-        if (messagesIds != null && !messagesIds.isEmpty()) {
-            queryMessage.addCriteria(Criteria.where(ID).in(messagesIds));
-            queryMessageStatus.addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds));
-        }
-        if (logicalDelete == null) {
-            logicalDelete = turmsClusterManager.getTurmsProperties()
+            @Nullable Boolean shouldDeleteLogically) {
+        Query queryMessage = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, messageIds)
+                .buildQuery();
+        Query queryMessageStatus = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID_MESSAGE_ID, messageIds)
+                .buildQuery();
+        if (shouldDeleteLogically == null) {
+            shouldDeleteLogically = turmsClusterManager.getTurmsProperties()
                     .getMessage().isLogicallyDeleteMessageByDefault();
         }
-        if (logicalDelete) {
+        if (shouldDeleteLogically) {
             Update update = new Update().set(Message.Fields.deletionDate, new Date());
             if (deleteMessageStatus) {
                 return mongoTemplate.inTransaction()
@@ -446,8 +442,8 @@ public class MessageService {
     public Mono<Boolean> deleteMessage(
             @NotNull Long messageId,
             boolean deleteMessageStatus,
-            @Nullable Boolean logicalDelete) {
-        return deleteMessages(Set.of(messageId), deleteMessageStatus, logicalDelete);
+            @Nullable Boolean shouldDeleteLogically) {
+        return deleteMessages(Set.of(messageId), deleteMessageStatus, shouldDeleteLogically);
     }
 
     public Mono<Boolean> updateMessage(
@@ -455,7 +451,7 @@ public class MessageService {
             @Nullable Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
-            @Nullable Integer burnAfter,
+            @Nullable @Min(0) Integer burnAfter,
             @Nullable ReactiveMongoOperations operations) {
         Validator.throwIfAllNull(isSystemMessage, text, records, burnAfter);
         Query query = new Query().addCriteria(Criteria.where(ID).in(messageIds));
@@ -473,7 +469,7 @@ public class MessageService {
             @Nullable Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
-            @Nullable Integer burnAfter,
+            @Nullable @Min(0) Integer burnAfter,
             @Nullable ReactiveMongoOperations operations) {
         Validator.throwIfAllNull(messageId);
         return updateMessage(Collections.singleton(messageId), isSystemMessage, text,
@@ -486,23 +482,16 @@ public class MessageService {
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Long targetId,
-            @Nullable Date deliveryDateStart,
-            @Nullable Date deliveryDateEnd,
-            @Nullable Date deletionDateStart,
-            @Nullable Date deletionDateEnd,
+            @Nullable DateRange deliveryDateRange,
+            @Nullable DateRange deletionDateRange,
             @Nullable MessageDeliveryStatus deliveryStatus) {
-        if (chatType == ChatType.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
-        Validator.throwIfAfterWhenNotNull(deliveryDateStart, deliveryDateEnd);
-        Validator.throwIfAfterWhenNotNull(deletionDateStart, deletionDateEnd);
         QueryBuilder builder = QueryBuilder.newBuilder()
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .addIsIfNotNull(Message.Fields.senderId, senderId)
                 .addIsIfNotNull(Message.Fields.targetId, targetId)
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateStart, deliveryDateEnd)
-                .addBetweenIfNotNull(Message.Fields.deletionDate, deletionDateStart, deletionDateEnd);
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateRange)
+                .addBetweenIfNotNull(Message.Fields.deletionDate, deletionDateRange);
         if (deliveryStatus != null) {
             return messageStatusService.queryMessagesIdsByDeliveryStatusAndTargetId(deliveryStatus, chatType, targetId)
                     .collect(Collectors.toSet())
@@ -523,13 +512,11 @@ public class MessageService {
     }
 
     public Mono<Long> countUsersWhoSentMessage(
-            @Nullable Date startDate,
-            @Nullable Date endDate,
+            @Nullable DateRange dateRange,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Criteria criteria = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, dateRange)
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .buildCriteria();
@@ -541,11 +528,9 @@ public class MessageService {
     }
 
     public Mono<Long> countGroupsThatSentMessages(
-            @Nullable Date startDate,
-            @Nullable Date endDate) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
+            @Nullable DateRange dateRange) {
         Criteria criteria = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, dateRange)
                 .add(Criteria.where(Message.Fields.chatType).is(ChatType.GROUP))
                 .buildCriteria();
         return AggregationUtil.countDistinct(
@@ -556,12 +541,10 @@ public class MessageService {
     }
 
     public Mono<Long> countUsersWhoAcknowledgedMessage(
-            @Nullable Date startDate,
-            @Nullable Date endDate,
+            @Nullable DateRange dateRange,
             @Nullable ChatType chatType) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Criteria criteria = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, startDate, endDate)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, dateRange)
                 .buildCriteria();
         if (chatType != null) {
             if (chatType == ChatType.GROUP) {
@@ -578,13 +561,11 @@ public class MessageService {
     }
 
     public Mono<Long> countSentMessages(
-            @Nullable Date startDate,
-            @Nullable Date endDate,
+            @Nullable DateRange dateRange,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, startDate, endDate)
+                .addBetweenIfNotNull(Message.Fields.deliveryDate, dateRange)
                 .addIsIfNotNull(Message.Fields.chatType, chatType)
                 .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
                 .buildQuery();
@@ -592,17 +573,15 @@ public class MessageService {
     }
 
     public Mono<Long> countSentMessagesOnAverage(
-            @Nullable Date startDate,
-            @Nullable Date endDate,
+            @Nullable DateRange dateRange,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
-        return countSentMessages(startDate, endDate, chatType, areSystemMessages)
+        return countSentMessages(dateRange, chatType, areSystemMessages)
                 .flatMap(totalDeliveredMessages -> {
                     if (totalDeliveredMessages == 0) {
                         return Mono.just(0L);
                     } else {
-                        return countUsersWhoSentMessage(startDate, endDate, chatType, areSystemMessages)
+                        return countUsersWhoSentMessage(dateRange, chatType, areSystemMessages)
                                 .map(totalUsers -> {
                                     if (totalUsers == 0) {
                                         return Long.MAX_VALUE;
@@ -615,13 +594,11 @@ public class MessageService {
     }
 
     public Mono<Long> countAcknowledgedMessages(
-            @Nullable Date startDate,
-            @Nullable Date endDate,
+            @Nullable DateRange dateRange,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, startDate, endDate)
+                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, dateRange)
                 .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, areSystemMessages)
                 .buildQuery();
         if (chatType != null) {
@@ -635,17 +612,15 @@ public class MessageService {
     }
 
     public Mono<Long> countAcknowledgedMessagesOnAverage(
-            @Nullable Date startDate,
-            @Nullable Date endDate,
+            @Nullable DateRange dateRange,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
-        return countAcknowledgedMessages(startDate, endDate, chatType, areSystemMessages)
+        return countAcknowledgedMessages(dateRange, chatType, areSystemMessages)
                 .flatMap(totalAcknowledgedMessages -> {
                     if (totalAcknowledgedMessages == 0) {
                         return Mono.just(0L);
                     } else {
-                        return countUsersWhoAcknowledgedMessage(startDate, endDate, chatType)
+                        return countUsersWhoAcknowledgedMessage(dateRange, chatType)
                                 .map(totalUsers -> {
                                     if (totalUsers == 0) {
                                         return Long.MAX_VALUE;
@@ -663,8 +638,8 @@ public class MessageService {
             @NotNull Long recipientId,
             @Nullable String text,
             @Nullable List<byte[]> records,
-            @Nullable Date recallDate,
-            @Nullable Date readDate) {
+            @Nullable @PastOrPresent Date recallDate,
+            @Nullable @PastOrPresent Date readDate) {
         boolean updateMessageContent = text != null || (records != null && !records.isEmpty());
         if (updateMessageContent || recallDate != null) {
             if (recallDate != null && !turmsClusterManager.getTurmsProperties()
@@ -701,8 +676,8 @@ public class MessageService {
             @NotNull Long recipientId,
             @Nullable String text,
             @Nullable List<byte[]> records,
-            @Nullable Date recallDate,
-            @Nullable Date readDate) {
+            @Nullable @PastOrPresent Date recallDate,
+            @Nullable @PastOrPresent Date readDate) {
         boolean readyUpdateMessage = text != null || (records != null && !records.isEmpty());
         boolean readyUpdateMessageStatus = recallDate != null || readDate != null;
         if (readyUpdateMessage || readyUpdateMessageStatus) {
@@ -732,15 +707,6 @@ public class MessageService {
                 .map(status -> status.getKey().getRecipientId());
     }
 
-    public Mono<Long> queryPrivateMessageRecipient(@NotNull Long messageId) {
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
-                .addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null));
-        query.fields().include(ID_RECIPIENT_ID);
-        return mongoTemplate.findOne(query, MessageStatus.class)
-                .map(status -> status.getKey().getRecipientId());
-    }
-
     public Mono<Long> queryMessageSenderId(@NotNull Long messageId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
         query.fields().include(Message.Fields.senderId);
@@ -752,12 +718,12 @@ public class MessageService {
     public Mono<Pair<Long, Set<Long>>> authAndSendMessage(
             @NotNull Long senderId,
             @NotNull Long targetId,
-            @NotNull ChatType chatType,
+            @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
-            @Nullable Integer burnAfter,
-            @Nullable Date deliveryDate,
+            @Nullable @Min(0) Integer burnAfter,
+            @Nullable @PastOrPresent Date deliveryDate,
             @Nullable Long referenceId) {
         boolean messagePersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent();
         boolean messageStatusPersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent();
@@ -784,13 +750,12 @@ public class MessageService {
                             }
                             Mono<Message> saveMono;
                             if (messageStatusPersistent) {
-                                saveMono = saveMessageAndMessagesStatus(
-                                        senderId, targetId, chatType, isSystemMessage, text,
-                                        records, burnAfter, deliveryDate, referenceId);
+                                saveMono = saveMessageAndMessagesStatus(senderId, targetId, chatType,
+                                        isSystemMessage, text, records, burnAfter, deliveryDate, referenceId);
                             } else {
-                                saveMono = saveMessage(
-                                        senderId, targetId, chatType, isSystemMessage, text,
-                                        records, burnAfter, deliveryDate, referenceId, null);
+                                saveMono = saveMessage(null, senderId, targetId, chatType,
+                                        isSystemMessage, text, records, burnAfter, deliveryDate,
+                                        referenceId, null);
                             }
                             return saveMono.map(message -> Pair.of(message.getId(), recipientsIds));
                         });
@@ -806,7 +771,7 @@ public class MessageService {
     public Mono<Pair<Long, Set<Long>>> authAndCloneAndSendMessage(
             @NotNull Long requesterId,
             @NotNull Long messageId,
-            @NotNull ChatType chatType,
+            @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Boolean isSystemMessage,
             @NotNull Long targetId) {
         return queryMessage(messageId)
@@ -824,19 +789,15 @@ public class MessageService {
 
     public Mono<Boolean> sendMessage(
             boolean deliver,
-            @NotNull ChatType chatType,
+            @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
             @Nullable Long senderId,
             @NotNull Long targetId,
-            @Nullable Integer burnAfter,
+            @Nullable @Min(0) Integer burnAfter,
             @Nullable Long referenceId) {
-        Validator.throwIfAnyNull(chatType, isSystemMessage, targetId);
         Validator.throwIfAllFalsy(text, records);
-        if (chatType == ChatType.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
-        }
         if (senderId == null) {
             if (isSystemMessage) {
                 senderId = ADMIN_REQUESTER_ID;
@@ -844,8 +805,10 @@ public class MessageService {
                 throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
             }
         }
+        Date deliveryDate = new Date();
         Message message = new Message();
         message.setChatType(chatType);
+        message.setDeliveryDate(deliveryDate);
         message.setIsSystemMessage(isSystemMessage);
         message.setText(text);
         message.setRecords(records);
@@ -853,38 +816,16 @@ public class MessageService {
         message.setTargetId(targetId);
         message.setBurnAfter(burnAfter);
         message.setReferenceId(referenceId);
-        return sendMessage(deliver, message);
-    }
-
-    public Mono<Boolean> sendMessage(
-            boolean deliver,
-            @NotNull Message message) {
-        Validator.throwIfAnyNull(
-                message.getTargetId(),
-                message.getChatType(),
-                message.getChatType(),
-                message.getIsSystemMessage());
-        Validator.throwIfAllFalsy(message.getText(), message.getRecords());
-        if (message.getSenderId() == null) {
-            if (message.getIsSystemMessage()) {
-                message.setSenderId(ADMIN_REQUESTER_ID);
-            } else {
-                throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
-            }
-        }
-        if (message.getChatType() == ChatType.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
-        }
         if (deliver) {
             return authAndSendMessage(
-                    message.getSenderId(),
-                    message.getTargetId(),
-                    message.getChatType(),
-                    message.getIsSystemMessage(),
-                    message.getText(),
-                    message.getRecords(),
-                    message.getBurnAfter(),
-                    new Date(),
+                    senderId,
+                    targetId,
+                    chatType,
+                    isSystemMessage,
+                    text,
+                    records,
+                    burnAfter,
+                    deliveryDate,
                     null)
                     .flatMap(pair -> {
                         TurmsRequest request = TurmsRequest
@@ -905,10 +846,12 @@ public class MessageService {
                     });
         } else {
             if (turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent()) {
-                return saveMessageAndMessagesStatus(message, null)
+                return saveMessageAndMessagesStatus(senderId, targetId, chatType,
+                        isSystemMessage, text, records, burnAfter, deliveryDate, null)
                         .thenReturn(true);
             } else {
-                return saveMessage(message, message.getReferenceId(), null)
+                return saveMessage(null, senderId, targetId, chatType,
+                        isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, null)
                         .thenReturn(true);
             }
         }

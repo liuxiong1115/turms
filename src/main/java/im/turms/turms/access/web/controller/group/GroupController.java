@@ -24,6 +24,7 @@ import im.turms.turms.common.PageUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.group.GroupService;
@@ -74,12 +75,9 @@ public class GroupController {
                 creatorId,
                 ownerId,
                 isActive,
-                creationDateStart,
-                creationDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
-                muteEndDateStart,
-                muteEndDateEnd,
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd),
                 0,
                 size);
         return ResponseFactory.okIfTruthy(groupsFlux);
@@ -108,24 +106,18 @@ public class GroupController {
                 creatorId,
                 ownerId,
                 isActive,
-                creationDateStart,
-                creationDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
-                muteEndDateStart,
-                muteEndDateEnd);
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd));
         Flux<Group> groupsFlux = groupService.queryGroups(
                 ids,
                 typeId,
                 creatorId,
                 ownerId,
                 isActive,
-                creationDateStart,
-                creationDateEnd,
-                deletionDateStart,
-                deletionDateEnd,
-                muteEndDateStart,
-                muteEndDateEnd,
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd),
                 page,
                 size);
         return ResponseFactory.page(count, groupsFlux);
@@ -196,43 +188,37 @@ public class GroupController {
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             if (deletedStartDate != null || deletedEndDate != null) {
                 counts.add(groupService.countDeletedGroups(
-                        deletedStartDate,
-                        deletedEndDate)
+                        DateRange.of(deletedStartDate, deletedEndDate))
                         .doOnNext(statistics::setDeletedGroups));
             }
             if (sentMessageStartDate != null || sentMessageEndDate != null) {
                 counts.add(messageService.countGroupsThatSentMessages(
-                        sentMessageStartDate,
-                        sentMessageEndDate)
+                        DateRange.of(sentMessageStartDate, sentMessageEndDate))
                         .doOnNext(statistics::setGroupsThatSentMessages));
             }
             if (counts.isEmpty() || createdStartDate != null || createdEndDate != null) {
                 counts.add(groupService.countCreatedGroups(
-                        createdStartDate,
-                        createdEndDate)
+                        DateRange.of(createdStartDate, createdEndDate))
                         .doOnNext(statistics::setCreatedGroups));
             }
         } else {
             if (deletedStartDate != null && deletedEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        deletedStartDate,
-                        deletedEndDate,
+                        DateRange.of(deletedStartDate, deletedEndDate),
                         divideBy,
                         groupService::countDeletedGroups)
                         .doOnNext(statistics::setDeletedGroupsRecords));
             }
             if (sentMessageStartDate != null && sentMessageEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        sentMessageStartDate,
-                        sentMessageEndDate,
+                        DateRange.of(sentMessageStartDate, sentMessageEndDate),
                         divideBy,
                         messageService::countGroupsThatSentMessages)
                         .doOnNext(statistics::setGroupsThatSentMessagesRecords));
             }
             if (createdStartDate != null && createdEndDate != null) {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
-                        createdStartDate,
-                        createdEndDate,
+                        DateRange.of(createdStartDate, createdEndDate),
                         divideBy,
                         groupService::countCreatedGroups)
                         .doOnNext(statistics::setCreatedGroupsRecords));
