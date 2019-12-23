@@ -20,11 +20,13 @@ package im.turms.turms.service.user;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.annotation.constraint.ProfileAccessConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.ProfileAccessStrategy;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
 import im.turms.turms.pojo.domain.GroupInvitation;
 import im.turms.turms.pojo.domain.User;
@@ -37,12 +39,14 @@ import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,12 +54,14 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
 
 @Component
+@Validated
 public class UserService {
     private final GroupMemberService groupMemberService;
     private final GroupInvitationService groupInvitationService;
@@ -86,7 +92,9 @@ public class UserService {
      * @return return the userId If the user information is matched.
      * return null If the userId and the token are unmatched.
      */
-    public Mono<Boolean> authenticate(@NotNull Long userId, @NotNull String rawPassword) {
+    public Mono<Boolean> authenticate(
+            @NotNull Long userId,
+            @NotNull String rawPassword) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(userId));
         query.fields().include(User.Fields.password);
@@ -149,10 +157,10 @@ public class UserService {
             @Nullable String rawPassword,
             @Nullable String name,
             @Nullable String intro,
-            @Nullable String profilePictureUrl,
-            @Nullable ProfileAccessStrategy profileAccess,
-            @Nullable Date registrationDate,
-            @Nullable Boolean active) {
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccess,
+            @Nullable @PastOrPresent Date registrationDate,
+            @Nullable Boolean isActive) {
         User user = new User();
         id = id != null ? id : turmsClusterManager.generateRandomId();
         rawPassword = rawPassword != null ? rawPassword : RandomStringUtils.randomAlphanumeric(16);
@@ -161,7 +169,7 @@ public class UserService {
         profilePictureUrl = profilePictureUrl != null ? profilePictureUrl : "";
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
         registrationDate = registrationDate != null ? registrationDate : new Date();
-        active = active != null ? active : false;
+        isActive = isActive != null ? isActive : false;
         user.setId(id);
         user.setPassword(turmsPasswordUtil.encodeUserPassword(rawPassword));
         user.setName(name);
@@ -169,7 +177,7 @@ public class UserService {
         user.setProfilePictureUrl(profilePictureUrl);
         user.setProfileAccess(profileAccess);
         user.setRegistrationDate(registrationDate);
-        user.setActive(active);
+        user.setActive(isActive);
         Long finalId = id;
         return mongoTemplate.inTransaction()
                 .execute(operations -> operations.insert(user)
@@ -218,10 +226,6 @@ public class UserService {
                 });
     }
 
-    public Mono<User> queryUser(@NotNull Long userId) {
-        return mongoTemplate.findById(userId, User.class);
-    }
-
     public Mono<Boolean> isAllowToQueryUserProfile(
             @NotNull Long requesterId,
             @NotNull Long targetUserId) {
@@ -247,11 +251,6 @@ public class UserService {
             @NotNull Long requesterId,
             @NotNull Long userId) {
         return authAndQueryUsersProfiles(requesterId, Collections.singleton(userId)).single();
-    }
-
-    public Mono<User> queryUserProfile(@NotNull Long userId) {
-        return queryUsersProfiles(Collections.singleton(userId))
-                .single();
     }
 
     public Flux<User> authAndQueryUsersProfiles(
@@ -286,14 +285,14 @@ public class UserService {
     public Mono<Boolean> deleteUsers(
             @NotEmpty Set<Long> userIds,
             boolean deleteRelationshipsAndGroups,
-            @Nullable Boolean logicallyDelete) {
+            @Nullable Boolean shouldDeleteLogically) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
-        if (logicallyDelete == null) {
-            logicallyDelete = turmsClusterManager.getTurmsProperties().getUser().isLogicallyDeleteUser();
+        if (shouldDeleteLogically == null) {
+            shouldDeleteLogically = turmsClusterManager.getTurmsProperties().getUser().isLogicallyDeleteUser();
         }
         Mono<Boolean> deleteMono;
         if (deleteRelationshipsAndGroups) {
-            boolean finalLogicallyDeleteUser = logicallyDelete;
+            boolean finalLogicallyDeleteUser = shouldDeleteLogically;
             deleteMono = mongoTemplate.inTransaction()
                     .execute(operations -> {
                         Mono<Boolean> updateOrRemove;
@@ -326,7 +325,7 @@ public class UserService {
                     .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
                     .single();
         } else {
-            if (logicallyDelete) {
+            if (shouldDeleteLogically) {
                 Update update = new Update().set(User.Fields.deletionDate, new Date());
                 deleteMono = mongoTemplate.updateMulti(query, update, User.class)
                         .map(UpdateResult::wasAcknowledged);
@@ -364,10 +363,10 @@ public class UserService {
             @Nullable String rawPassword,
             @Nullable String name,
             @Nullable String intro,
-            @Nullable String profilePictureUrl,
-            @Nullable ProfileAccessStrategy profileAccessStrategy,
-            @Nullable Boolean active,
-            @Nullable Date registrationDate) {
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccessStrategy,
+            @Nullable Boolean isActive,
+            @Nullable @PastOrPresent Date registrationDate) {
         return updateUsers(Collections.singleton(userId),
                 rawPassword,
                 name,
@@ -375,52 +374,43 @@ public class UserService {
                 profilePictureUrl,
                 profileAccessStrategy,
                 registrationDate,
-                active);
+                isActive);
     }
 
     public Flux<User> queryUsers(
             @Nullable Collection<Long> userIds,
-            @Nullable Date registrationDateStart,
-            @Nullable Date registrationDateEnd,
-            @Nullable Date deletionDateStart,
-            @Nullable Date deletionDateEnd,
-            @Nullable Boolean active,
+            @Nullable DateRange registrationDateRange,
+            @Nullable DateRange deletionDateRange,
+            @Nullable Boolean isActive,
             @Nullable Integer page,
             @Nullable Integer size) {
-        Validator.throwIfAfterWhenNotNull(registrationDateStart, registrationDateEnd);
-        Validator.throwIfAfterWhenNotNull(deletionDateStart, deletionDateEnd);
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, userIds)
-                .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateStart, registrationDateEnd)
-                .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateStart, deletionDateEnd)
-                .addIsIfNotNull(User.Fields.active, active)
+                .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateRange)
+                .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateRange)
+                .addIsIfNotNull(User.Fields.active, isActive)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, User.class);
     }
 
-    public Mono<Long> countRegisteredUsers(
-            @Nullable Date startDate,
-            @Nullable Date endDate) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
+    public Mono<Long> countRegisteredUsers(@Nullable DateRange dateRange) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(User.Fields.registrationDate, startDate, endDate)
+                .addBetweenIfNotNull(User.Fields.registrationDate, dateRange)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
 
-    public Mono<Long> countDeletedUsers(@Nullable Date startDate, @Nullable Date endDate) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
+    public Mono<Long> countDeletedUsers(@Nullable DateRange dateRange) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(User.Fields.deletionDate, startDate, endDate)
+                .addBetweenIfNotNull(User.Fields.deletionDate, dateRange)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
 
-    public Mono<Long> countLoggedInUsers(@Nullable Date startDate, @Nullable Date endDate) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
+    public Mono<Long> countLoggedInUsers(@Nullable DateRange dateRange) {
         Criteria criteria = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, startDate, endDate)
+                .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, dateRange)
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
@@ -435,28 +425,23 @@ public class UserService {
 
     public Mono<Long> countUsers(
             @Nullable Set<Long> userIds,
-            @Nullable Date registrationDateStart,
-            @Nullable Date registrationDateEnd,
-            @Nullable Date deletionDateStart,
-            @Nullable Date deletionDateEnd,
-            @Nullable Boolean active) {
-        Validator.throwIfAfterWhenNotNull(registrationDateStart, registrationDateEnd);
-        Validator.throwIfAfterWhenNotNull(deletionDateStart, deletionDateEnd);
+            @Nullable DateRange registrationDateRange,
+            @Nullable DateRange deletionDateRange,
+            @Nullable Boolean isActive) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, userIds)
-                .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateStart, registrationDateEnd)
-                .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateStart, deletionDateEnd)
-                .addIsIfNotNull(User.Fields.active, active)
+                .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateRange)
+                .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateRange)
+                .addIsIfNotNull(User.Fields.active, isActive)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
 
-    public Mono<Long> countMaxOnlineUsers(@Nullable Date startDate, @Nullable Date endDate) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
+    public Mono<Long> countMaxOnlineUsers(@Nullable DateRange dateRange) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addBetweenIfNotNull(UserOnlineUserNumber.Fields.timestamp, startDate, endDate)
+                .addBetweenIfNotNull(UserOnlineUserNumber.Fields.timestamp, dateRange)
                 .max(UserOnlineUserNumber.Fields.number)
                 .buildQuery();
         return mongoTemplate.findOne(query, UserOnlineUserNumber.class)
@@ -469,9 +454,9 @@ public class UserService {
             @Nullable String password,
             @Nullable String name,
             @Nullable String intro,
-            @Nullable String profilePictureUrl,
-            @Nullable ProfileAccessStrategy profileAccessStrategy,
-            @Nullable Date registrationDate,
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccessStrategy,
+            @Nullable @PastOrPresent Date registrationDate,
             @Nullable Boolean isActive) {
         Validator.throwIfAllFalsy(
                 password,

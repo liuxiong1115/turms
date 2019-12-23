@@ -21,10 +21,10 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.hazelcast.cluster.Member;
+import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
 import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.Validator;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -43,6 +43,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -66,6 +67,7 @@ import static im.turms.turms.common.Constants.ALL_DEVICE_TYPES;
 import static im.turms.turms.common.Constants.ONLINE_USERS_NUMBER_PERSISTER_CRON;
 
 @Service
+@Validated
 public class OnlineUserService {
     private static final int DEFAULT_ONLINE_USERS_MANAGER_CAPACITY = 1024;
     private static final UserLocation EMPTY_USER_LOCATION = new UserLocation();
@@ -151,7 +153,7 @@ public class OnlineUserService {
 
     public boolean setLocalUserDevicesOffline(
             @NotNull Long userId,
-            @NotEmpty Set<DeviceType> deviceTypes,
+            @NotEmpty Set<@DeviceTypeConstraint DeviceType> deviceTypes,
             @NotNull CloseStatus closeStatus) {
         OnlineUserManager manager = getLocalOnlineUserManager(userId);
         if (manager != null) {
@@ -219,7 +221,7 @@ public class OnlineUserService {
         }
     }
 
-    public void clearOnlineUserManager(Long userId) {
+    public void clearOnlineUserManager(@NotNull Long userId) {
         int slotIndex = turmsClusterManager.getSlotIndexByUserId(userId);
         onlineUsersManagerAtSlots.get(slotIndex).remove(userId);
     }
@@ -232,7 +234,7 @@ public class OnlineUserService {
 
     public boolean setLocalUserDeviceOffline(
             @NotNull Long userId,
-            @NotNull DeviceType deviceType,
+            @NotNull @DeviceTypeConstraint DeviceType deviceType,
             @NotNull CloseStatus closeStatus) {
         return setLocalUserDevicesOffline(userId, Collections.singleton(deviceType), closeStatus);
     }
@@ -268,7 +270,7 @@ public class OnlineUserService {
 
     public Mono<Boolean> setUserDevicesOffline(
             @NotNull Long userId,
-            @NotEmpty Set<DeviceType> deviceTypes,
+            @NotEmpty Set<@DeviceTypeConstraint DeviceType> deviceTypes,
             @NotNull CloseStatus closeStatus) {
         boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(userId);
         if (responsible) {
@@ -308,7 +310,7 @@ public class OnlineUserService {
 
     public void resetHeartbeatTimeout(
             @NotNull Long userId,
-            @NotNull DeviceType deviceType) {
+            @NotNull @DeviceTypeConstraint DeviceType deviceType) {
         OnlineUserManager onlineUserManager = getLocalOnlineUserManager(userId);
         if (onlineUserManager != null) {
             OnlineUserManager.Session session = onlineUserManager.getSession(deviceType);
@@ -328,7 +330,7 @@ public class OnlineUserService {
         }
     }
 
-    private Timeout newHeartbeatTimeout(@NotNull Long userId, @NotNull DeviceType deviceType) {
+    private Timeout newHeartbeatTimeout(@NotNull Long userId, @NotNull @DeviceTypeConstraint DeviceType deviceType) {
         return timer.newTimeout(
                 timeout -> setLocalUserDeviceOffline(userId, deviceType, CloseStatus.GOING_AWAY),
                 turmsClusterManager.getTurmsProperties().getSession().getRequestHeartbeatTimeoutSeconds(),
@@ -345,7 +347,7 @@ public class OnlineUserService {
     private Mono<UserLoginLog> logUserOnline(
             @NotNull Long userId,
             @NotNull Integer ip,
-            @NotNull DeviceType usingDeviceType,
+            @NotNull @DeviceTypeConstraint DeviceType usingDeviceType,
             @Nullable Map<String, String> deviceDetails,
             @Nullable Long locationId) {
         return userLoginLogService.save(userId, ip, usingDeviceType, deviceDetails, locationId);
@@ -552,15 +554,6 @@ public class OnlineUserService {
         return usersNearbyService.getUserLocations().get(userId);
     }
 
-    public Set<DeviceType> getUsingDeviceTypes(@NotNull Long userId) {
-        OnlineUserManager onlineUserManager = getLocalOnlineUserManager(userId);
-        if (onlineUserManager != null) {
-            return onlineUserManager.getUsingDeviceTypes();
-        } else {
-            return Collections.emptySet();
-        }
-    }
-
     public boolean updateUserLocation(
             @NotNull Long userId,
             @NotNull DeviceType deviceType,
@@ -591,7 +584,6 @@ public class OnlineUserService {
     }
 
     public Integer getDisconnectionReason(@NotNull Long userId, @NotNull String sessionId) {
-        Validator.throwIfAnyNull(userId, sessionId);
         if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryingLoginFailedReason()) {
             return disconnectionReasonCache.getIfPresent(Pair.of(userId, sessionId));
         } else {

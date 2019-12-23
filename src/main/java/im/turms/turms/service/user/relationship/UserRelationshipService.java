@@ -20,8 +20,10 @@ package im.turms.turms.service.user.relationship;
 import com.google.common.collect.HashMultimap;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
+import im.turms.turms.annotation.constraint.UserRelationshipKeyConstraint;
 import im.turms.turms.common.*;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
 import im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion;
 import im.turms.turms.pojo.domain.UserRelationship;
@@ -33,18 +35,21 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
 
 @Service
+@Validated
 public class UserRelationshipService {
     private final UserVersionService userVersionService;
     private final UserRelationshipGroupService userRelationshipGroupService;
@@ -59,7 +64,6 @@ public class UserRelationshipService {
     public Mono<Boolean> deleteOneSidedRelationships(
             @NotNull Long ownerId,
             @NotEmpty Set<Long> relatedUsersIds) {
-        Validator.throwIfAnyFalsy(ownerId, relatedUsersIds);
         return mongoTemplate.inTransaction()
                 .execute(operations -> {
                     Query query = new Query()
@@ -117,8 +121,7 @@ public class UserRelationshipService {
         }
     }
 
-    public Mono<Boolean> deleteOneSidedRelationships(@NotEmpty Set<UserRelationship.Key> keys) {
-        Validator.throwIfAnyFalsy(keys);
+    public Mono<Boolean> deleteOneSidedRelationships(@NotEmpty Set<UserRelationship.@UserRelationshipKeyConstraint Key> keys) {
         HashMultimap<Long, Long> multimap = HashMultimap.create();
         for (UserRelationship.Key key : keys) {
             multimap.put(key.getOwnerId(), key.getRelatedUserId());
@@ -213,7 +216,7 @@ public class UserRelationshipService {
                 .defaultIfEmpty(MAX_DATE)
                 .flatMap(date -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
-                        return queryRelationships(ownerId, relatedUsersIds, groupIndex, isBlocked, null, null, null, null)
+                        return queryRelationships(ownerId, relatedUsersIds, groupIndex, isBlocked, null, null, null)
                                 .collect(Collectors.toSet())
                                 .map(relationships -> {
                                     UserRelationshipsWithVersion.Builder builder = UserRelationshipsWithVersion.newBuilder();
@@ -265,14 +268,13 @@ public class UserRelationshipService {
             @Nullable Long ownerId,
             @Nullable Set<Long> relatedUsersIds,
             @Nullable Boolean isBlocked,
-            @Nullable Date establishmentDateStart,
-            @Nullable Date establishmentDateEnd,
+            @Nullable DateRange establishmentDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder.newBuilder()
                 .addIsIfNotNull(ID_OWNER_ID, ownerId)
                 .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
-                .addBetweenIfNotNull(UserRelationship.Fields.establishmentDate, establishmentDateStart, establishmentDateEnd)
+                .addBetweenIfNotNull(UserRelationship.Fields.establishmentDate, establishmentDateRange)
                 .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, UserRelationship.class);
@@ -283,12 +285,11 @@ public class UserRelationshipService {
             @Nullable Set<Long> relatedUsersIds,
             @Nullable Integer groupIndex,
             @Nullable Boolean isBlocked,
-            @Nullable Date establishmentDateStart,
-            @Nullable Date establishmentDateEnd,
+            @Nullable DateRange establishmentDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         boolean queryByGroup = groupIndex != null;
-        boolean queryByRelationshipInfo = relatedUsersIds != null || isBlocked != null || establishmentDateStart != null || establishmentDateEnd != null;
+        boolean queryByRelationshipInfo = relatedUsersIds != null || isBlocked != null || establishmentDateRange != null;
         if (queryByGroup && queryByRelationshipInfo) {
             if (relatedUsersIds != null && relatedUsersIds.isEmpty()) {
                 return Flux.empty();
@@ -299,12 +300,12 @@ public class UserRelationshipService {
                         if (relatedUsersIds != null) {
                             usersIds.retainAll(relatedUsersIds);
                         }
-                        return queryRelationships(ownerId, usersIds, isBlocked, establishmentDateStart, establishmentDateEnd, page, size);
+                        return queryRelationships(ownerId, usersIds, isBlocked, establishmentDateRange, page, size);
                     });
         } else if (queryByGroup) {
             return queryMembersRelationships(ownerId, groupIndex, page, size);
         } else {
-            return queryRelationships(ownerId, relatedUsersIds, isBlocked, establishmentDateStart, establishmentDateEnd, page, size);
+            return queryRelationships(ownerId, relatedUsersIds, isBlocked, establishmentDateRange, page, size);
         }
     }
 
@@ -421,7 +422,7 @@ public class UserRelationshipService {
             @Nullable Boolean isBlocked,
             @Nullable Integer newGroupIndex,
             @Nullable Integer deleteGroupIndex,
-            @Nullable Date establishmentDate,
+            @Nullable @PastOrPresent Date establishmentDate,
             boolean upsert,
             @Nullable ReactiveMongoOperations operations) {
         UserRelationship userRelationship = new UserRelationship();
@@ -507,7 +508,7 @@ public class UserRelationshipService {
             @NotNull Long ownerId,
             @Nullable Set<Long> relatedUsersIds,
             @Nullable Boolean isBlocked,
-            @Nullable Date establishmentDate) {
+            @Nullable @PastOrPresent Date establishmentDate) {
         Validator.throwIfAllNull(relatedUsersIds, isBlocked, establishmentDate);
         Query query = QueryBuilder.newBuilder()
                 .add(Criteria.where(ID_OWNER_ID).is(ownerId))

@@ -18,6 +18,7 @@
 package im.turms.turms.service.user;
 
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.plugin.LogHandler;
@@ -28,16 +29,19 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.util.Date;
 import java.util.Map;
 
 import static im.turms.turms.common.Constants.ID;
 
 @Service
+@Validated
 public class UserLoginLogService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
@@ -52,7 +56,7 @@ public class UserLoginLogService {
     public Mono<UserLoginLog> save(
             @NotNull Long userId,
             @Nullable Integer ip,
-            @NotNull DeviceType deviceType,
+            @NotNull @DeviceTypeConstraint DeviceType deviceType,
             @Nullable Map<String, String> deviceDetails,
             @Nullable Long locationId) {
         Long id = turmsClusterManager.generateRandomId();
@@ -69,7 +73,7 @@ public class UserLoginLogService {
 
     public Mono<Boolean> updateLogoutDate(
             @NotNull Long id,
-            @NotNull Date logoutDate) {
+            @NotNull @PastOrPresent Date logoutDate) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(id));
         Update update = new Update().set(UserLoginLog.Fields.logoutDate, logoutDate);
         return mongoTemplate.updateFirst(query, update, UserLoginLog.class)
@@ -85,7 +89,7 @@ public class UserLoginLogService {
     public void triggerLogHandlers(
             @Nullable Long userId,
             @Nullable Integer ip,
-            @Nullable DeviceType loggingInDeviceType,
+            @Nullable @DeviceTypeConstraint DeviceType loggingInDeviceType,
             @Nullable Map<String, String> deviceDetails,
             @Nullable Long locationId) {
         if (!turmsPluginManager.getLogHandlerList().isEmpty()) {

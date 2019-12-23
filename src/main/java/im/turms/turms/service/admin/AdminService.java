@@ -19,6 +19,7 @@ package im.turms.turms.service.admin;
 
 import com.hazelcast.replicatedmap.ReplicatedMap;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
+import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.AdminPermission;
@@ -32,6 +33,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,6 +41,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,6 +51,7 @@ import java.util.function.Function;
 import static im.turms.turms.common.Constants.*;
 
 @Service
+@Validated
 public class AdminService {
     /**
      * Use hard-coded account because modifying the account of admins is not allowed.
@@ -98,18 +102,17 @@ public class AdminService {
     }
 
     public Mono<Admin> authAndAddAdmin(
-            @NotNull String requester,
-            @Nullable String account,
-            @Nullable String rawPassword,
+            @NotNull String requesterAccount,
+            @Nullable @NoWhitespaceConstraint String account,
+            @Nullable @NoWhitespaceConstraint String rawPassword,
             @NotNull Long roleId,
-            @Nullable String name,
-            @Nullable Date registrationDate,
+            @Nullable @NoWhitespaceConstraint String name,
+            @Nullable @PastOrPresent Date registrationDate,
             boolean upsert) {
-        Validator.throwIfAllNull(requester, roleId);
         if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
             throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
         }
-        return adminRoleService.isAdminHigherThanRole(requester, roleId)
+        return adminRoleService.isAdminHigherThanRole(requesterAccount, roleId)
                 .flatMap(isHigher -> {
                     if (isHigher) {
                         return addAdmin(account, rawPassword, roleId, name, registrationDate, upsert);
@@ -121,11 +124,11 @@ public class AdminService {
     }
 
     public Mono<Admin> addAdmin(
-            @Nullable String account,
-            @Nullable String rawPassword,
+            @Nullable @NoWhitespaceConstraint String account,
+            @Nullable @NoWhitespaceConstraint String rawPassword,
             @NotNull Long roleId,
-            @Nullable String name,
-            @Nullable Date registrationDate,
+            @Nullable @NoWhitespaceConstraint String name,
+            @Nullable @PastOrPresent Date registrationDate,
             boolean upsert) {
         account = account != null ? account : RandomStringUtils.randomAlphabetic(16);
         String password = StringUtils.hasText(rawPassword) ?
@@ -195,7 +198,9 @@ public class AdminService {
         }
     }
 
-    public Mono<Boolean> authenticate(@NotNull String account, @NotNull String rawPassword) {
+    public Mono<Boolean> authenticate(
+            @NotNull @NoWhitespaceConstraint String account,
+            @NotNull @NoWhitespaceConstraint String rawPassword) {
         AdminInfo adminInfo = adminMap.get(account);
         if (adminInfo != null && adminInfo.getRawPassword() != null) {
             return Mono.just(adminInfo.getRawPassword().equals(rawPassword));
@@ -210,16 +215,6 @@ public class AdminService {
                     })
                     .defaultIfEmpty(false);
         }
-    }
-
-    public Mono<Boolean> deleteAdmin(@NotNull String account) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(account));
-        return mongoTemplate.remove(query, Admin.class).map(result -> {
-            if (result.wasAcknowledged()) {
-                adminMap.remove(account);
-            }
-            return result.wasAcknowledged();
-        });
     }
 
     public Mono<Admin> queryAdmin(@NotNull String account) {
@@ -261,12 +256,12 @@ public class AdminService {
 
 
     public Mono<Boolean> authAndDeleteAdmins(
-            @NotNull String requester,
+            @NotNull String requesterAccount,
             @NotEmpty Set<String> accounts) {
         if (accounts.contains(ROOT_ADMIN_ACCOUNT)) {
             throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
         }
-        return adminRoleService.isAdminHigherThanAdmins(requester, accounts)
+        return adminRoleService.isAdminHigherThanAdmins(requesterAccount, accounts)
                 .flatMap(triple -> {
                     if (triple.getLeft()) {
                         return deleteAdmins(accounts);
@@ -292,19 +287,19 @@ public class AdminService {
     }
 
     public Mono<Boolean> authAndUpdateAdmins(
-            @NotNull String requester,
+            @NotNull String requesterAccount,
             @NotEmpty Set<String> targetAccounts,
-            @Nullable String rawPassword,
-            @Nullable String name,
+            @Nullable @NoWhitespaceConstraint String rawPassword,
+            @Nullable @NoWhitespaceConstraint String name,
             @Nullable Long roleId) {
-        if (targetAccounts.size() == 1 && targetAccounts.iterator().next().equals(requester)) {
+        if (targetAccounts.size() == 1 && targetAccounts.iterator().next().equals(requesterAccount)) {
             if (roleId == null) {
                 return updateAdmins(targetAccounts, rawPassword, name, null);
             } else {
                 throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
             }
         } else {
-            return adminRoleService.isAdminHigherThanAdmins(requester, targetAccounts)
+            return adminRoleService.isAdminHigherThanAdmins(requesterAccount, targetAccounts)
                     .flatMap(triple -> {
                         if (triple.getLeft()) {
                             return adminRoleService.queryRankByRole(roleId)
@@ -325,10 +320,9 @@ public class AdminService {
 
     public Mono<Boolean> updateAdmins(
             @NotEmpty Set<String> targetAccounts,
-            @Nullable String rawPassword,
-            @Nullable String name,
+            @Nullable @NoWhitespaceConstraint String rawPassword,
+            @Nullable @NoWhitespaceConstraint String name,
             @Nullable Long roleId) {
-        Validator.throwIfAnyFalsy(targetAccounts);
         Validator.throwIfAllNull(rawPassword, name, roleId);
         Query query = new Query();
         query.addCriteria(Criteria.where(ID).in(targetAccounts));

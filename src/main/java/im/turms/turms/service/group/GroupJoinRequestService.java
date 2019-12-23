@@ -20,11 +20,14 @@ package im.turms.turms.service.group;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.annotation.constraint.RequestStatusConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.*;
 import im.turms.turms.constant.RequestStatus;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion;
+import im.turms.turms.pojo.domain.GroupInvitation;
 import im.turms.turms.pojo.domain.GroupJoinRequest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -33,6 +36,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -40,6 +44,7 @@ import reactor.util.function.Tuple2;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -50,6 +55,7 @@ import static im.turms.turms.common.Constants.*;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
+@Validated
 public class GroupJoinRequestService {
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
@@ -249,13 +255,10 @@ public class GroupJoinRequestService {
             @Nullable Long groupId,
             @Nullable Long requesterId,
             @Nullable Long responderId,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd,
-            @Nullable Date responseDateStart,
-            @Nullable Date responseDateEnd,
-            @Nullable Date expirationDateStart,
-            @Nullable Date expirationDateEnd,
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable DateRange creationDateRange,
+            @Nullable DateRange responseDateRange,
+            @Nullable DateRange expirationDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder
@@ -265,9 +268,9 @@ public class GroupJoinRequestService {
                 .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateStart, responseDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupJoinRequest.class);
     }
@@ -277,13 +280,10 @@ public class GroupJoinRequestService {
             @Nullable Long groupId,
             @Nullable Long requesterId,
             @Nullable Long responderId,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd,
-            @Nullable Date responseDateStart,
-            @Nullable Date responseDateEnd,
-            @Nullable Date expirationDateStart,
-            @Nullable Date expirationDateEnd) {
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable DateRange creationDateRange,
+            @Nullable DateRange responseDateRange,
+            @Nullable DateRange expirationDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
@@ -291,9 +291,9 @@ public class GroupJoinRequestService {
                 .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateStart, responseDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, GroupJoinRequest.class);
     }
@@ -303,13 +303,10 @@ public class GroupJoinRequestService {
             @Nullable Long groupId,
             @Nullable Long requesterId,
             @Nullable Long responderId,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd,
-            @Nullable Date responseDateStart,
-            @Nullable Date responseDateEnd,
-            @Nullable Date expirationDateStart,
-            @Nullable Date expirationDateEnd) {
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable DateRange creationDateRange,
+            @Nullable DateRange responseDateRange,
+            @Nullable DateRange expirationDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
@@ -317,9 +314,9 @@ public class GroupJoinRequestService {
                 .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
                 .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateStart, responseDateEnd)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateStart, expirationDateEnd)
+                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateRange)
                 .buildQuery();
         return mongoTemplate.remove(query, GroupJoinRequest.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -330,13 +327,11 @@ public class GroupJoinRequestService {
             @Nullable Long requesterId,
             @Nullable Long responderId,
             @Nullable String content,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDate,
-            @Nullable Date responseDate,
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
-        if (status == RequestStatus.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
+        Validator.throwIfAllNull(requesterId, responderId, content, status, creationDate, expirationDate);
         Query query = new Query().addCriteria(where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()
@@ -357,9 +352,9 @@ public class GroupJoinRequestService {
             @NotNull Long requesterId,
             @NotNull Long responderId,
             @NotNull String content,
-            @Nullable RequestStatus status,
-            @Nullable Date creationDate,
-            @Nullable Date responseDate,
+            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
         Date now = new Date();
         GroupJoinRequest groupJoinRequest = new GroupJoinRequest();

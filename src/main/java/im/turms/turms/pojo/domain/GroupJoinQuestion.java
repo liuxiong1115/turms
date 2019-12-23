@@ -43,5 +43,6 @@ public class GroupJoinQuestion {
 
     private Set<String> answers;
 
+    // Note that score can be a negative number
     private Integer score;
 }

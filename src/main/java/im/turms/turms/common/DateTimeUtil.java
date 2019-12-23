@@ -20,6 +20,7 @@ package im.turms.turms.common;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.DivideBy;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.dto.StatisticsRecordDTO;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,12 +29,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.function.Function4;
+import reactor.function.Function3;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.*;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 @Component
 public class DateTimeUtil {
@@ -44,12 +45,13 @@ public class DateTimeUtil {
     }
 
     public boolean checkRangesNumber(
-            @NotNull Date startDate,
-            @NotNull Date endDate,
+            @NotNull DateRange dateRange,
             @NotNull DivideBy divideBy,
             @Nullable Integer maxHourRanges,
             @Nullable Integer maxDayRanges,
             @Nullable Integer maxMonthRanges) {
+        Date startDate = dateRange.getStart();
+        Date endDate = dateRange.getStart();
         switch (divideBy) {
             case HOUR:
                 if (maxHourRanges == null) {
@@ -155,18 +157,16 @@ public class DateTimeUtil {
 
     //TODO: moves to somewhere more suitable
     public Mono<List<StatisticsRecordDTO>> queryBetweenDate(
-            @NotNull Date startDate,
-            @NotNull Date endDate,
+            @NotNull DateRange dateRange,
             @NotNull DivideBy divideBy,
-            @NotNull Function4<Date, Date, ChatType, Boolean, Mono<Long>> function,
+            @NotNull Function3<DateRange, ChatType, Boolean, Mono<Long>> function,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
-        List<Pair<Date, Date>> dates = divide(startDate, endDate, divideBy);
+        List<Pair<Date, Date>> dates = divide(dateRange.getStart(), dateRange.getEnd(), divideBy);
         List<Mono<StatisticsRecordDTO>> monos = new ArrayList<>(dates.size());
         for (Pair<Date, Date> datePair : dates) {
             Mono<Long> result = function.apply(
-                    datePair.getLeft(),
-                    datePair.getRight(),
+                    DateRange.of(datePair.getLeft(), datePair.getRight()),
                     chatType,
                     areSystemMessages);
             monos.add(result.map(total -> new StatisticsRecordDTO(
@@ -178,16 +178,13 @@ public class DateTimeUtil {
     }
 
     public Mono<List<StatisticsRecordDTO>> queryBetweenDate(
-            @NotNull Date startDate,
-            @NotNull Date endDate,
+            @NotNull DateRange dateRange,
             @NotNull DivideBy divideBy,
-            @NotNull BiFunction<Date, Date, Mono<Long>> function) {
-        List<Pair<Date, Date>> dates = divide(startDate, endDate, divideBy);
+            @NotNull Function<DateRange, Mono<Long>> function) {
+        List<Pair<Date, Date>> dates = divide(dateRange.getStart(), dateRange.getEnd(), divideBy);
         List<Mono<StatisticsRecordDTO>> monos = new ArrayList<>(dates.size());
         for (Pair<Date, Date> datePair : dates) {
-            Mono<Long> result = function.apply(
-                    datePair.getLeft(),
-                    datePair.getRight());
+            Mono<Long> result = function.apply(DateRange.of(datePair.getLeft(), datePair.getRight()));
             monos.add(result.map(total -> new StatisticsRecordDTO(
                     datePair.getLeft(),
                     datePair.getRight(),
@@ -197,44 +194,40 @@ public class DateTimeUtil {
     }
 
     public Mono<List<StatisticsRecordDTO>> checkAndQueryBetweenDate(
-            @NotNull Date startDate,
-            @NotNull Date endDate,
+            @NotNull DateRange dateRange,
             @NotNull DivideBy divideBy,
-            @NotNull Function4<Date, Date, ChatType, Boolean, Mono<Long>> function,
+            @NotNull Function3<DateRange, ChatType, Boolean, Mono<Long>> function,
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
         int maxHourRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxHourRangesPerCountRequest();
         int maxDayRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxDayRangesPerCountRequest();
         int maxMonthRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxMonthRangesPerCountRequest();
-        boolean checked = checkRangesNumber(startDate, endDate, divideBy,
+        boolean checked = checkRangesNumber(dateRange, divideBy,
                 maxHourRanges, maxDayRanges, maxMonthRanges);
         if (checked) {
-            return queryBetweenDate(startDate, endDate, divideBy, function, chatType, areSystemMessages);
+            return queryBetweenDate(dateRange, divideBy, function, chatType, areSystemMessages);
         } else {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         }
     }
 
     public Mono<List<StatisticsRecordDTO>> checkAndQueryBetweenDate(
-            @NotNull Date startDate,
-            @NotNull Date endDate,
+            @NotNull DateRange dateRange,
             @NotNull DivideBy divideBy,
-            @NotNull BiFunction<Date, Date, Mono<Long>> function) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
+            @NotNull Function<DateRange, Mono<Long>> function) {
         int maxHourRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxHourRangesPerCountRequest();
         int maxDayRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxDayRangesPerCountRequest();
         int maxMonthRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxMonthRangesPerCountRequest();
-        boolean checked = checkRangesNumber(startDate, endDate, divideBy,
+        boolean checked = checkRangesNumber(dateRange, divideBy,
                 maxHourRanges, maxDayRanges, maxMonthRanges);
         if (checked) {
-            return queryBetweenDate(startDate, endDate, divideBy, function);
+            return queryBetweenDate(dateRange, divideBy, function);
         } else {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         }

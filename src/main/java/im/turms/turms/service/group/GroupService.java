@@ -25,30 +25,36 @@ import im.turms.turms.common.*;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.constant.GroupUpdateStrategy;
 import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
 import im.turms.turms.pojo.bo.group.GroupsWithVersion;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.pojo.domain.GroupType;
 import im.turms.turms.service.user.UserVersionService;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 
 import static im.turms.turms.common.Constants.*;
 
 // TODO: Allow group owners to change the type of their groups
 @Service
+@Validated
 public class GroupService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final GroupTypeService groupTypeService;
@@ -78,11 +84,11 @@ public class GroupService {
             @Nullable String groupName,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable String profilePictureUrl,
-            @Nullable Integer minimumScore,
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @Min(value = 0) Integer minimumScore,
             @Nullable Long groupTypeId,
             @Nullable Date muteEndDate,
-            @Nullable Boolean active) {
+            @Nullable Boolean isActive) {
         Long groupId = turmsClusterManager.generateRandomId();
         Group group = new Group();
         group.setId(groupId);
@@ -96,7 +102,7 @@ public class GroupService {
         group.setMinimumScore(minimumScore);
         group.setTypeId(groupTypeId);
         group.setMuteEndDate(muteEndDate);
-        group.setActive(active);
+        group.setActive(isActive);
         return mongoTemplate
                 .inTransaction()
                 .execute(operations -> operations.insert(group)
@@ -120,12 +126,11 @@ public class GroupService {
             @Nullable String groupName,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable String profilePictureUrl,
-            @Nullable Integer minimumScore,
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @Min(value = 0) Integer minimumScore,
             @Nullable Long groupTypeId,
             @Nullable Date muteEndDate,
-            @Nullable Boolean active) {
-        Validator.throwIfAnyNull(creatorId, ownerId);
+            @Nullable Boolean isActive) {
         if (groupTypeId == null) {
             groupTypeId = DEFAULT_GROUP_TYPE_ID;
         }
@@ -156,7 +161,7 @@ public class GroupService {
                                 minimumScore,
                                 finalGroupTypeId,
                                 muteEndDate,
-                                active);
+                                isActive);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED));
                     }
@@ -165,13 +170,12 @@ public class GroupService {
 
     public Mono<Boolean> deleteGroupAndGroupMembers(
             @NotNull Long groupId,
-            @Nullable Boolean useLogicalDeletion) {
-        Validator.throwIfAnyNull(groupId);
-        if (useLogicalDeletion == null) {
-            useLogicalDeletion = turmsClusterManager.getTurmsProperties()
+            @Nullable Boolean shouldDeleteLogically) {
+        if (shouldDeleteLogically == null) {
+            shouldDeleteLogically = turmsClusterManager.getTurmsProperties()
                     .getGroup().isLogicallyDeleteGroupByDefault();
         }
-        boolean finalUseLogicalDeletion = useLogicalDeletion;
+        boolean finalUseLogicalDeletion = shouldDeleteLogically;
         return mongoTemplate.inTransaction()
                 .execute(operations -> {
                     Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
@@ -200,12 +204,12 @@ public class GroupService {
     public Mono<Boolean> authAndDeleteGroupAndGroupMembers(
             @NotNull Long requesterId,
             @NotNull Long groupId,
-            @Nullable Boolean useLogicalDeletion) {
+            @Nullable Boolean shouldDeleteLogically) {
         return groupMemberService
                 .isOwner(requesterId, groupId)
                 .flatMap(authenticated -> {
                     if (authenticated != null && authenticated) {
-                        return deleteGroupAndGroupMembers(groupId, useLogicalDeletion);
+                        return deleteGroupAndGroupMembers(groupId, shouldDeleteLogically);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -218,12 +222,9 @@ public class GroupService {
             @Nullable Long creatorId,
             @Nullable Long ownerId,
             @Nullable Boolean isActive,
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd,
-            @Nullable Date deletionDateStart,
-            @Nullable Date deletionDateEnd,
-            @Nullable Date muteEndDateStart,
-            @Nullable Date muteEndDateEnd,
+            @Nullable DateRange creationDateRange,
+            @Nullable DateRange deletionDateRange,
+            @Nullable DateRange muteEndDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder
@@ -233,9 +234,9 @@ public class GroupService {
                 .addIsIfNotNull(Group.Fields.creatorId, creatorId)
                 .addIsIfNotNull(Group.Fields.ownerId, ownerId)
                 .addIsIfNotNull(Group.Fields.active, isActive)
-                .addBetweenIfNotNull(Group.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateStart, deletionDateEnd)
-                .addBetweenIfNotNull(Group.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
+                .addBetweenIfNotNull(Group.Fields.creationDate, creationDateRange)
+                .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateRange)
+                .addBetweenIfNotNull(Group.Fields.muteEndDate, muteEndDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, Group.class);
     }
@@ -257,7 +258,7 @@ public class GroupService {
             @NotNull Long groupId,
             @NotNull Long successorId,
             boolean quitAfterTransfer,
-            ReactiveMongoOperations operations) {
+            @Nullable ReactiveMongoOperations operations) {
         return groupMemberService
                 .isOwner(requesterId, groupId)
                 .flatMap(isOwner -> {
@@ -344,14 +345,13 @@ public class GroupService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable String profilePictureUrl,
-            @Nullable Integer minimumScore,
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @Min(0) Integer minimumScore,
             @Nullable Boolean isActive,
-            @Nullable Date creationDate,
-            @Nullable Date deletionDate,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAnyFalsy(groupIds);
         Validator.throwIfAllNull(typeId, creatorId, ownerId, name, intro, announcement,
                 profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate);
         Query query = new Query().addCriteria(Criteria.where(ID).in(groupIds));
@@ -393,14 +393,13 @@ public class GroupService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable String profilePictureUrl,
-            @Nullable Integer minimumScore,
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @Min(0) Integer minimumScore,
             @Nullable Boolean isActive,
-            @Nullable Date creationDate,
-            @Nullable Date deletionDate,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAnyNull(groupId);
         Validator.throwIfAllNull(typeId, creatorId, ownerId, name, intro, announcement,
                 profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate);
         return queryGroupType(groupId)
@@ -450,10 +449,6 @@ public class GroupService {
                     Query query = new Query().addCriteria(Criteria.where(ID).in(groupsIds));
                     return mongoTemplate.find(query, Group.class);
                 });
-    }
-
-    public Mono<Group> queryGroupById(@NotNull Long groupId) {
-        return mongoTemplate.findById(groupId, Group.class);
     }
 
     public Mono<GroupsWithVersion> queryGroupWithVersion(
@@ -555,15 +550,14 @@ public class GroupService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable String profilePictureUrl,
-            @Nullable Integer minimumScore,
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @Min(0) Integer minimumScore,
             @Nullable Boolean isActive,
-            @Nullable Date creationDate,
-            @Nullable Date deletionDate,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable Long successorId,
             boolean quitAfterTransfer) {
-        Validator.throwIfAnyFalsy(groupIds);
         Validator.throwIfAllNull(
                 typeId,
                 creatorId,
@@ -615,11 +609,11 @@ public class GroupService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable String profilePictureUrl,
-            @Nullable Integer minimumScore,
+            @Nullable @URL String profilePictureUrl,
+            @Nullable @Min(0) Integer minimumScore,
             @Nullable Boolean isActive,
-            @Nullable Date creationDate,
-            @Nullable Date deletionDate,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable Long successorId,
             boolean quitAfterTransfer) {
@@ -677,12 +671,9 @@ public class GroupService {
         return mongoTemplate.count(query, Group.class);
     }
 
-    public Mono<Long> countCreatedGroups(
-            @Nullable Date startDate,
-            @Nullable Date endDate) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
+    public Mono<Long> countCreatedGroups(@Nullable DateRange dateRange) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Group.Fields.creationDate, startDate, endDate)
+                .addBetweenIfNotNull(Group.Fields.creationDate, dateRange)
                 .add(Criteria.where(Group.Fields.deletionDate).is(null))
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
@@ -694,12 +685,9 @@ public class GroupService {
             @Nullable Long creatorId,
             @Nullable Long ownerId,
             @Nullable Boolean isActive,
-            @Nullable Date creationDateStart,
-            @Nullable Date creationDateEnd,
-            @Nullable Date deletionDateStart,
-            @Nullable Date deletionDateEnd,
-            @Nullable Date muteEndDateStart,
-            @Nullable Date muteEndDateEnd) {
+            @Nullable DateRange creationDateRange,
+            @Nullable DateRange deletionDateRange,
+            @Nullable DateRange muteEndDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
@@ -707,19 +695,16 @@ public class GroupService {
                 .addIsIfNotNull(Group.Fields.creatorId, creatorId)
                 .addIsIfNotNull(Group.Fields.ownerId, ownerId)
                 .addIsIfNotNull(Group.Fields.active, isActive)
-                .addBetweenIfNotNull(Group.Fields.creationDate, creationDateStart, creationDateEnd)
-                .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateStart, deletionDateEnd)
-                .addBetweenIfNotNull(Group.Fields.muteEndDate, muteEndDateStart, muteEndDateEnd)
+                .addBetweenIfNotNull(Group.Fields.creationDate, creationDateRange)
+                .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateRange)
+                .addBetweenIfNotNull(Group.Fields.muteEndDate, muteEndDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
     }
 
-    public Mono<Long> countDeletedGroups(
-            @Nullable Date startDate,
-            @Nullable Date endDate) {
-        Validator.throwIfAfterWhenNotNull(startDate, endDate);
+    public Mono<Long> countDeletedGroups(@Nullable DateRange dateRange) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Group.Fields.deletionDate, startDate, endDate)
+                .addBetweenIfNotNull(Group.Fields.deletionDate, dateRange)
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
     }
