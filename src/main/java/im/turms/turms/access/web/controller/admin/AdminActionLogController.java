@@ -21,8 +21,8 @@ import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
 import im.turms.turms.pojo.bo.common.DateRange;
-import im.turms.turms.pojo.domain.AdminActionLog;
 import im.turms.turms.pojo.dto.AcknowledgedDTO;
+import im.turms.turms.pojo.dto.AdminActionLogDTO;
 import im.turms.turms.pojo.dto.PaginationDTO;
 import im.turms.turms.pojo.dto.ResponseDTO;
 import im.turms.turms.service.admin.AdminActionLogService;
@@ -63,21 +63,22 @@ public class AdminActionLogController {
 
     @GetMapping
     @RequiredPermission(ADMIN_ACTION_LOG_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<Collection<AdminActionLog>>>> queryAdminActionLogs(
+    public Mono<ResponseEntity<ResponseDTO<Collection<AdminActionLogDTO>>>> queryAdminActionLogs(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> accounts,
             @RequestParam(required = false) Date logDateStart,
             @RequestParam(required = false) Date logDateEnd,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Flux<AdminActionLog> adminActionLogsFlux = adminActionLogService
-                .queryAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd), 0, size);
+        Flux<AdminActionLogDTO> adminActionLogsFlux = adminActionLogService
+                .queryAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd), 0, size)
+                .map(AdminActionLogDTO::from);
         return ResponseFactory.okIfTruthy(adminActionLogsFlux);
     }
 
     @GetMapping("/page")
     @RequiredPermission(ADMIN_ACTION_LOG_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<AdminActionLog>>>> queryAdminActionLogs(
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<AdminActionLogDTO>>>> queryAdminActionLogs(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Set<String> accounts,
             @RequestParam(required = false) Date logDateStart,
@@ -87,8 +88,9 @@ public class AdminActionLogController {
         size = pageUtil.getSize(size);
         Mono<Long> count = adminActionLogService
                 .countAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd));
-        Flux<AdminActionLog> adminActionLogsFlux = adminActionLogService
-                .queryAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd), page, size);
+        Flux<AdminActionLogDTO> adminActionLogsFlux = adminActionLogService
+                .queryAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd), page, size)
+                .map(AdminActionLogDTO::from);
         return ResponseFactory.page(count, adminActionLogsFlux);
     }
 }
