@@ -161,6 +161,7 @@ public class UserService {
             @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccess,
             @Nullable @PastOrPresent Date registrationDate,
             @Nullable Boolean isActive) {
+        Date now = new Date();
         User user = new User();
         id = id != null ? id : turmsClusterManager.generateRandomId();
         rawPassword = rawPassword != null ? rawPassword : RandomStringUtils.randomAlphanumeric(16);
@@ -168,7 +169,7 @@ public class UserService {
         intro = intro != null ? intro : "";
         profilePictureUrl = profilePictureUrl != null ? profilePictureUrl : "";
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
-        registrationDate = registrationDate != null ? registrationDate : new Date();
+        registrationDate = registrationDate != null ? registrationDate : now;
         isActive = isActive != null ? isActive : false;
         user.setId(id);
         user.setPassword(turmsPasswordUtil.encodeUserPassword(rawPassword));
@@ -181,7 +182,7 @@ public class UserService {
         Long finalId = id;
         return mongoTemplate.inTransaction()
                 .execute(operations -> operations.insert(user)
-                        .then(userRelationshipGroupService.createRelationshipGroup(finalId, 0, "", operations))
+                        .then(userRelationshipGroupService.createRelationshipGroup(finalId, 0, "", now, operations))
                         .then(userVersionService.upsertEmptyUserVersion(user.getId(), operations))
                         .thenReturn(user))
                 .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)

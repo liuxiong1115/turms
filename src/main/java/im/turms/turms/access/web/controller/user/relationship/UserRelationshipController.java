@@ -73,13 +73,13 @@ public class UserRelationshipController {
     @RequiredPermission(USER_RELATIONSHIP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteRelationships(
             @RequestParam(required = false) Long ownerId,
-            @RequestParam(required = false) Set<Long> relatedUsersIds,
+            @RequestParam(required = false) Set<Long> relatedUserIds,
             UserRelationship.KeyList keys) {
         Mono<Boolean> deleted;
         if (keys != null && !keys.getKeys().isEmpty()) {
             deleted = userRelationshipService.deleteOneSidedRelationships(new HashSet<>(keys.getKeys()));
         } else {
-            deleted = userRelationshipService.deleteOneSidedRelationships(ownerId, relatedUsersIds);
+            deleted = userRelationshipService.deleteOneSidedRelationships(ownerId, relatedUserIds);
         }
         return ResponseFactory.acknowledged(deleted);
     }
@@ -88,11 +88,11 @@ public class UserRelationshipController {
     @RequiredPermission(USER_RELATIONSHIP_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateRelationships(
             @RequestParam Long ownerId,
-            @RequestParam(required = false) Set<Long> relatedUsersIds,
+            @RequestParam(required = false) Set<Long> relatedUserIds,
             @RequestBody UpdateRelationshipDTO updateRelationshipDTO) {
         Mono<Boolean> updated = userRelationshipService.updateUserOneSidedRelationships(
                 ownerId,
-                relatedUsersIds,
+                relatedUserIds,
                 updateRelationshipDTO.getIsBlocked(),
                 updateRelationshipDTO.getEstablishmentDate());
         return ResponseFactory.acknowledged(updated);
@@ -102,7 +102,7 @@ public class UserRelationshipController {
     @RequiredPermission(USER_RELATIONSHIP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<UserRelationshipDTO>>>> queryRelationships(
             @RequestParam Long ownerId,
-            @RequestParam(required = false) Set<Long> relatedUsersIds,
+            @RequestParam(required = false) Set<Long> relatedUserIds,
             @RequestParam(required = false) Integer groupIndex,
             @RequestParam(required = false) Boolean isBlocked,
             @RequestParam(required = false) Date establishmentDateStart,
@@ -111,7 +111,7 @@ public class UserRelationshipController {
             @RequestParam(defaultValue = "false") Boolean withGroupIndexes) {
         size = pageUtil.getSize(size);
         Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
-                ownerId, relatedUsersIds, groupIndex, isBlocked, DateRange.of(establishmentDateStart, establishmentDateEnd), 0, size);
+                ownerId, relatedUserIds, groupIndex, isBlocked, DateRange.of(establishmentDateStart, establishmentDateEnd), 0, size);
         Flux<UserRelationshipDTO> dtoFlux = relationship2dto(ownerId, withGroupIndexes, relationshipsFlux);
         return ResponseFactory.okIfTruthy(dtoFlux);
     }
@@ -120,7 +120,7 @@ public class UserRelationshipController {
     @RequiredPermission(USER_RELATIONSHIP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<UserRelationshipDTO>>>> queryRelationships(
             @RequestParam(required = false) Long ownerId,
-            @RequestParam(required = false) Set<Long> relatedUsersIds,
+            @RequestParam(required = false) Set<Long> relatedUserIds,
             @RequestParam(required = false) Integer groupIndex,
             @RequestParam(required = false) Boolean isBlocked,
             @RequestParam(required = false) Date establishmentDateStart,
@@ -130,9 +130,9 @@ public class UserRelationshipController {
             @RequestParam(defaultValue = "false") Boolean withGroupIndexes) {
         size = pageUtil.getSize(size);
         Mono<Long> count = userRelationshipService.countRelationships(
-                ownerId, relatedUsersIds, groupIndex, isBlocked);
+                ownerId, relatedUserIds, groupIndex, isBlocked);
         Flux<UserRelationship> relationshipsFlux = userRelationshipService.queryRelationships(
-                ownerId, relatedUsersIds, groupIndex, isBlocked, DateRange.of(establishmentDateStart, establishmentDateEnd), page, size);
+                ownerId, relatedUserIds, groupIndex, isBlocked, DateRange.of(establishmentDateStart, establishmentDateEnd), page, size);
         Flux<UserRelationshipDTO> dtoFlux = relationship2dto(ownerId, withGroupIndexes, relationshipsFlux);
         return ResponseFactory.page(count, dtoFlux);
     }
