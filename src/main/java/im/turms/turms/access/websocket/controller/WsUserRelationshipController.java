@@ -83,6 +83,7 @@ public class WsUserRelationshipController {
                     turmsRequestWrapper.getUserId(),
                     null,
                     request.getName(),
+                    new Date(),
                     null)
                     .map(group -> RequestResult.responseId(group.getKey().getIndex().longValue()));
         };

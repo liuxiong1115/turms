@@ -50,7 +50,7 @@ public class GroupMember {
     private Date joinDate;
 
     @Indexed
-    private Date muteEndDate                                                                                                                                                                                                                      ;
+    private Date muteEndDate;
 
     public GroupMember(
             @NotNull Long groupId,

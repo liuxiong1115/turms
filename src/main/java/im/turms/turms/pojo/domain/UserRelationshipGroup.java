@@ -19,6 +19,7 @@ package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
@@ -26,6 +27,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.List;
 
 @Data
 @Document
@@ -35,10 +38,16 @@ public class UserRelationshipGroup {
     @Id
     private Key key;
     private String name;
+    private Date creationDate;
 
-    public UserRelationshipGroup(@NotNull Long ownerId, @NotNull Integer index, @NotNull String name) {
+    public UserRelationshipGroup(
+            @NotNull Long ownerId,
+            @NotNull Integer index,
+            @NotNull String name,
+            @NotNull Date creationDate) {
         this.key = new Key(ownerId, index);
         this.name = name;
+        this.creationDate = creationDate;
     }
 
     /**
@@ -48,11 +57,19 @@ public class UserRelationshipGroup {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @EqualsAndHashCode
     public static class Key {
         @Indexed
         private Long ownerId;
 
         @Indexed
         private Integer index;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class KeyList {
+        private List<Key> keys;
     }
 }
