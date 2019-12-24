@@ -44,7 +44,7 @@ public class AdminActionLog {
     private String account;
 
     @Indexed(expireAfter = "90d")
-    private Date timestamp;
+    private Date logDate;
 
     @Indexed
     private Integer ip;

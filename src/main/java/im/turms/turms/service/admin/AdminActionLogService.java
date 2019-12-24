@@ -84,7 +84,7 @@ public class AdminActionLogService {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateRange)
+                .addBetweenIfNotNull(AdminActionLog.Fields.logDate, logDateRange)
                 .buildQuery();
         return mongoTemplate.remove(query, AdminActionLog.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -99,7 +99,7 @@ public class AdminActionLogService {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateRange)
+                .addBetweenIfNotNull(AdminActionLog.Fields.logDate, logDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, AdminActionLog.class);
     }
@@ -142,7 +142,7 @@ public class AdminActionLogService {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
                 .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.timestamp, logDateRange)
+                .addBetweenIfNotNull(AdminActionLog.Fields.logDate, logDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, AdminActionLog.class);
     }
