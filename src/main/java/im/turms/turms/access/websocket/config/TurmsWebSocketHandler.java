@@ -65,7 +65,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
     }
 
     @Override
-    public Mono<Void> handle(@NotNull WebSocketSession session) {
+    public Mono<Void> handle(WebSocketSession session) {
         Map<String, String> cookies = SessionUtil.getCookiesFromSession(session);
         if (cookies == null || cookies.isEmpty()) {
             return session.close();
