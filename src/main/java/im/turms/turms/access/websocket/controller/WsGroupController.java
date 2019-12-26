@@ -103,14 +103,14 @@ public class WsGroupController {
                             return Mono.just(RequestResult.status(TurmsStatusCode.UNAUTHORIZED));
                         }
                         if (!turmsClusterManager.getTurmsProperties().getNotification().isNotifyMembersAfterGroupDeleted()) {
-                            return groupService.deleteGroupAndGroupMembers(
-                                    request.getGroupId(),
+                            return groupService.deleteGroupsAndGroupMembers(
+                                    Set.of(request.getGroupId()),
                                     null)
                                     .map(RequestResult::okIfTrue);
                         }
                         return groupService.queryGroupMembersIds(request.getGroupId())
                                 .collect(Collectors.toSet())
-                                .flatMap(membersIds -> groupService.deleteGroupAndGroupMembers(request.getGroupId(), null)
+                                .flatMap(membersIds -> groupService.deleteGroupsAndGroupMembers(Set.of(request.getGroupId()), null)
                                         .map(deleted -> {
                                             if (deleted != null && deleted) {
                                                 if (membersIds.isEmpty()) {

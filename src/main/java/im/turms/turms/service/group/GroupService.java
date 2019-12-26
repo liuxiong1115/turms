@@ -168,21 +168,24 @@ public class GroupService {
                 });
     }
 
-    public Mono<Boolean> deleteGroupAndGroupMembers(
-            @NotNull Long groupId,
+    public Mono<Boolean> deleteGroupsAndGroupMembers(
+            @Nullable Set<Long> groupIds,
             @Nullable Boolean shouldDeleteLogically) {
         if (shouldDeleteLogically == null) {
             shouldDeleteLogically = turmsClusterManager.getTurmsProperties()
-                    .getGroup().isLogicallyDeleteGroupByDefault();
+                    .getGroup().isShouldDeleteLogicallyGroupByDefault();
         }
-        boolean finalUseLogicalDeletion = shouldDeleteLogically;
+        boolean finalShouldDeleteLogically = shouldDeleteLogically;
         return mongoTemplate.inTransaction()
                 .execute(operations -> {
-                    Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
+                    Query query = QueryBuilder
+                            .newBuilder()
+                            .addInIfNotNull(ID, groupIds)
+                            .buildQuery();
                     Mono<Boolean> updateOrRemoveMono;
-                    if (finalUseLogicalDeletion) {
+                    if (finalShouldDeleteLogically) {
                         Update update = new Update().set(Group.Fields.deletionDate, new Date());
-                        updateOrRemoveMono = operations.updateFirst(query, update, Group.class)
+                        updateOrRemoveMono = operations.updateMulti(query, update, Group.class)
                                 .map(UpdateResult::wasAcknowledged);
                     } else {
                         updateOrRemoveMono = operations.remove(query, Group.class)
@@ -190,8 +193,8 @@ public class GroupService {
                     }
                     return updateOrRemoveMono.flatMap(acknowledged -> {
                         if (acknowledged != null && acknowledged) {
-                            return groupMemberService.deleteAllGroupMembers(groupId, operations)
-                                    .then(groupVersionService.delete(groupId, operations));
+                            return groupMemberService.deleteAllGroupMembers(groupIds, operations)
+                                    .then(groupVersionService.delete(groupIds, operations));
                         } else {
                             return Mono.just(false);
                         }
@@ -201,26 +204,11 @@ public class GroupService {
                 .single();
     }
 
-    public Mono<Boolean> authAndDeleteGroupAndGroupMembers(
-            @NotNull Long requesterId,
-            @NotNull Long groupId,
-            @Nullable Boolean shouldDeleteLogically) {
-        return groupMemberService
-                .isOwner(requesterId, groupId)
-                .flatMap(authenticated -> {
-                    if (authenticated != null && authenticated) {
-                        return deleteGroupAndGroupMembers(groupId, shouldDeleteLogically);
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                    }
-                });
-    }
-
     public Flux<Group> queryGroups(
             @Nullable Set<Long> ids,
-            @Nullable Long typeId,
-            @Nullable Long creatorId,
-            @Nullable Long ownerId,
+            @Nullable Set<Long> typeIds,
+            @Nullable Set<Long> creatorIds,
+            @Nullable Set<Long> ownerIds,
             @Nullable Boolean isActive,
             @Nullable DateRange creationDateRange,
             @Nullable DateRange deletionDateRange,
@@ -230,9 +218,9 @@ public class GroupService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(Group.Fields.typeId, typeId)
-                .addIsIfNotNull(Group.Fields.creatorId, creatorId)
-                .addIsIfNotNull(Group.Fields.ownerId, ownerId)
+                .addInIfNotNull(Group.Fields.typeId, typeIds)
+                .addInIfNotNull(Group.Fields.creatorId, creatorIds)
+                .addInIfNotNull(Group.Fields.ownerId, ownerIds)
                 .addIsIfNotNull(Group.Fields.active, isActive)
                 .addBetweenIfNotNull(Group.Fields.creationDate, creationDateRange)
                 .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateRange)
@@ -681,9 +669,9 @@ public class GroupService {
 
     public Mono<Long> countGroups(
             @Nullable Set<Long> ids,
-            @Nullable Long typeId,
-            @Nullable Long creatorId,
-            @Nullable Long ownerId,
+            @Nullable Set<Long> typeIds,
+            @Nullable Set<Long> creatorIds,
+            @Nullable Set<Long> ownerIds,
             @Nullable Boolean isActive,
             @Nullable DateRange creationDateRange,
             @Nullable DateRange deletionDateRange,
@@ -691,9 +679,9 @@ public class GroupService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(Group.Fields.typeId, typeId)
-                .addIsIfNotNull(Group.Fields.creatorId, creatorId)
-                .addIsIfNotNull(Group.Fields.ownerId, ownerId)
+                .addInIfNotNull(Group.Fields.typeId, typeIds)
+                .addInIfNotNull(Group.Fields.creatorId, creatorIds)
+                .addInIfNotNull(Group.Fields.ownerId, ownerIds)
                 .addIsIfNotNull(Group.Fields.active, isActive)
                 .addBetweenIfNotNull(Group.Fields.creationDate, creationDateRange)
                 .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateRange)

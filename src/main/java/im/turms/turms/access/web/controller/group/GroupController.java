@@ -53,76 +53,6 @@ public class GroupController {
         this.dateTimeUtil = dateTimeUtil;
     }
 
-    @GetMapping
-    @RequiredPermission(GROUP_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<Collection<Group>>>> queryGroupsInformation(
-            @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long typeId,
-            @RequestParam(required = false) Long creatorId,
-            @RequestParam(required = false) Long ownerId,
-            @RequestParam(required = false) Boolean isActive,
-            @RequestParam(required = false) Date creationDateStart,
-            @RequestParam(required = false) Date creationDateEnd,
-            @RequestParam(required = false) Date deletionDateStart,
-            @RequestParam(required = false) Date deletionDateEnd,
-            @RequestParam(required = false) Date muteEndDateStart,
-            @RequestParam(required = false) Date muteEndDateEnd,
-            @RequestParam(required = false) Integer size) {
-        size = pageUtil.getSize(size);
-        Flux<Group> groupsFlux = groupService.queryGroups(
-                ids,
-                typeId,
-                creatorId,
-                ownerId,
-                isActive,
-                DateRange.of(creationDateStart, creationDateEnd),
-                DateRange.of(deletionDateStart, deletionDateEnd),
-                DateRange.of(muteEndDateStart, muteEndDateEnd),
-                0,
-                size);
-        return ResponseFactory.okIfTruthy(groupsFlux);
-    }
-
-    @GetMapping("/page")
-    @RequiredPermission(GROUP_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Group>>>> queryGroupsInformation(
-            @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long typeId,
-            @RequestParam(required = false) Long creatorId,
-            @RequestParam(required = false) Long ownerId,
-            @RequestParam(required = false) Boolean isActive,
-            @RequestParam(required = false) Date creationDateStart,
-            @RequestParam(required = false) Date creationDateEnd,
-            @RequestParam(required = false) Date deletionDateStart,
-            @RequestParam(required = false) Date deletionDateEnd,
-            @RequestParam(required = false) Date muteEndDateStart,
-            @RequestParam(required = false) Date muteEndDateEnd,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(required = false) Integer size) {
-        size = pageUtil.getSize(size);
-        Mono<Long> count = groupService.countGroups(
-                ids,
-                typeId,
-                creatorId,
-                ownerId,
-                isActive,
-                DateRange.of(creationDateStart, creationDateEnd),
-                DateRange.of(deletionDateStart, deletionDateEnd),
-                DateRange.of(muteEndDateStart, muteEndDateEnd));
-        Flux<Group> groupsFlux = groupService.queryGroups(
-                ids,
-                typeId,
-                creatorId,
-                ownerId,
-                isActive,
-                DateRange.of(creationDateStart, creationDateEnd),
-                DateRange.of(deletionDateStart, deletionDateEnd),
-                DateRange.of(muteEndDateStart, muteEndDateEnd),
-                page,
-                size);
-        return ResponseFactory.page(count, groupsFlux);
-    }
-
     @PostMapping
     @RequiredPermission(GROUP_CREATE)
     public Mono<ResponseEntity<ResponseDTO<Group>>> addGroup(@RequestBody AddGroupDTO addGroupDTO) {
@@ -144,10 +74,10 @@ public class GroupController {
     @PutMapping
     @RequiredPermission(GROUP_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroups(
-            @RequestParam Set<Long> groupIds,
+            @RequestParam Set<Long> ids,
             @RequestBody UpdateGroupDTO updateGroupDTO) {
         Mono<Boolean> updated = groupService.updateGroups(
-                groupIds,
+                ids,
                 updateGroupDTO.getTypeId(),
                 updateGroupDTO.getCreatorId(),
                 updateGroupDTO.getOwnerId(),
@@ -165,13 +95,74 @@ public class GroupController {
         return ResponseFactory.acknowledged(updated);
     }
 
-    @DeleteMapping
-    @RequiredPermission(GROUP_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroup(
-            @RequestParam Long groupId,
-            @RequestParam(required = false) Boolean logicallyDelete) {
-        Mono<Boolean> deleted = groupService.deleteGroupAndGroupMembers(groupId, logicallyDelete);
-        return ResponseFactory.acknowledged(deleted);
+    @GetMapping
+    @RequiredPermission(GROUP_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<Collection<Group>>>> queryGroupsInformation(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Set<Long> typeIds,
+            @RequestParam(required = false) Set<Long> creatorIds,
+            @RequestParam(required = false) Set<Long> ownerIds,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) Date creationDateStart,
+            @RequestParam(required = false) Date creationDateEnd,
+            @RequestParam(required = false) Date deletionDateStart,
+            @RequestParam(required = false) Date deletionDateEnd,
+            @RequestParam(required = false) Date muteEndDateStart,
+            @RequestParam(required = false) Date muteEndDateEnd,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<Group> groupsFlux = groupService.queryGroups(
+                ids,
+                typeIds,
+                creatorIds,
+                ownerIds,
+                isActive,
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd),
+                0,
+                size);
+        return ResponseFactory.okIfTruthy(groupsFlux);
+    }
+
+    @GetMapping("/page")
+    @RequiredPermission(GROUP_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Group>>>> queryGroupsInformation(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Set<Long> typeIds,
+            @RequestParam(required = false) Set<Long> creatorIds,
+            @RequestParam(required = false) Set<Long> ownerIds,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) Date creationDateStart,
+            @RequestParam(required = false) Date creationDateEnd,
+            @RequestParam(required = false) Date deletionDateStart,
+            @RequestParam(required = false) Date deletionDateEnd,
+            @RequestParam(required = false) Date muteEndDateStart,
+            @RequestParam(required = false) Date muteEndDateEnd,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Mono<Long> count = groupService.countGroups(
+                ids,
+                typeIds,
+                creatorIds,
+                ownerIds,
+                isActive,
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd));
+        Flux<Group> groupsFlux = groupService.queryGroups(
+                ids,
+                typeIds,
+                creatorIds,
+                ownerIds,
+                isActive,
+                DateRange.of(creationDateStart, creationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                DateRange.of(muteEndDateStart, muteEndDateEnd),
+                page,
+                size);
+        return ResponseFactory.page(count, groupsFlux);
     }
 
     @GetMapping("/count")
@@ -228,5 +219,16 @@ public class GroupController {
             }
         }
         return ResponseFactory.okIfTruthy(Flux.merge(counts).then(Mono.just(statistics)));
+    }
+
+    @DeleteMapping
+    @RequiredPermission(GROUP_DELETE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroups(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Boolean shouldDeleteLogically) {
+        Mono<Boolean> deleted = groupService.deleteGroupsAndGroupMembers(
+                ids,
+                shouldDeleteLogically);
+        return ResponseFactory.acknowledged(deleted);
     }
 }

@@ -19,6 +19,7 @@ package im.turms.turms.service.group;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.pojo.domain.GroupVersion;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -30,8 +31,10 @@ import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Set;
 
 import static im.turms.turms.common.Constants.ID;
 import static im.turms.turms.common.Constants.ID_GROUP_ID;
@@ -104,8 +107,12 @@ public class GroupVersionService {
         return updateSpecificVersion(groupId, GroupVersion.Fields.info);
     }
 
-    public Mono<Boolean> updateMembersVersion(@NotNull Long groupId) {
+    public Mono<Boolean> updateMembersVersion(@NotEmpty Long groupId) {
         return updateSpecificVersion(groupId, GroupVersion.Fields.members);
+    }
+
+    public Mono<Boolean> updateMembersVersion(@Nullable Set<Long> groupIds) {
+        return updateSpecificVersion(groupIds, GroupVersion.Fields.members);
     }
 
     public Mono<Boolean> updateBlacklistVersion(@NotNull Long groupId) {
@@ -131,13 +138,23 @@ public class GroupVersionService {
                 .map(UpdateResult::wasAcknowledged);
     }
 
+    public Mono<Boolean> updateSpecificVersion(@Nullable Set<Long> groupIds, @NotNull String field) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, groupIds)
+                .buildQuery();
+        Update update = new Update().set(field, new Date());
+        return mongoTemplate.updateFirst(query, update, GroupVersion.class)
+                .map(UpdateResult::wasAcknowledged);
+    }
+
     public Mono<Boolean> upsert(@NotNull Long groupId) {
         GroupVersion version = GroupVersion.builder().groupId(groupId).build();
         return mongoTemplate.insert(version).thenReturn(true);
     }
 
-    public Mono<Boolean> delete(@NotNull Long groupId, @Nullable ReactiveMongoOperations operations) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
+    public Mono<Boolean> delete(@NotEmpty Set<Long> groupIds, @Nullable ReactiveMongoOperations operations) {
+        Query query = new Query().addCriteria(Criteria.where(ID).in(groupIds));
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.remove(query, GroupVersion.class)
                 .map(DeleteResult::wasAcknowledged);

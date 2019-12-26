@@ -53,7 +53,7 @@ public class User implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private boolean deleteTwoSidedRelationships = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean logicallyDeleteUser = true;
+    private boolean shouldDeleteLogicallyUser = true;
 
     @JsonIgnore
     @Override
@@ -80,7 +80,7 @@ public class User implements IdentifiedDataSerializable {
 //                .mapToInt(DeviceType::getNumber).toArray();
 //        out.writeIntArray(types);
         out.writeBoolean(deleteTwoSidedRelationships);
-        out.writeBoolean(logicallyDeleteUser);
+        out.writeBoolean(shouldDeleteLogicallyUser);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class User implements IdentifiedDataSerializable {
 //                .mapToObj(index -> DeviceType.values()[index])
 //                .collect(Collectors.toSet());
         deleteTwoSidedRelationships = in.readBoolean();
-        logicallyDeleteUser = in.readBoolean();
+        shouldDeleteLogicallyUser = in.readBoolean();
     }
 
     @Data

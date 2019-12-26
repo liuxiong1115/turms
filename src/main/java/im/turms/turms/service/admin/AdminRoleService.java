@@ -81,6 +81,23 @@ public class AdminRoleService {
                 .subscribe();
     }
 
+    public Mono<AdminRole> authAndAddAdminRole(
+            @NotNull String requesterAccount,
+            @NotNull Long roleId,
+            @NotNull @NoWhitespaceConstraint String name,
+            @NotEmpty Set<AdminPermission> permissions,
+            @NotNull Integer rank) {
+        return isAdminHigherThanRole(requesterAccount, roleId)
+                .flatMap(isHigher -> {
+                    if (isHigher) {
+                        return addAdminRole(roleId, name, permissions, rank);
+                    } else {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                    }
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
+    }
+
     public Mono<AdminRole> addAdminRole(
             @NotNull Long id,
             @NotNull @NoWhitespaceConstraint String name,
@@ -94,6 +111,26 @@ public class AdminRoleService {
             roles.put(adminRole.getId(), role);
             return role;
         });
+    }
+
+    public Mono<Boolean> authAndDeleteAdminRoles(
+            @NotNull String requesterAccount,
+            @NotEmpty Set<Long> roleIds) {
+        Long highestRoleId = null;
+        for (Long roleId : roleIds) {
+            if (highestRoleId == null || highestRoleId < roleId) {
+                highestRoleId = roleId;
+            }
+        }
+        return isAdminHigherThanRole(requesterAccount, highestRoleId)
+                .flatMap(isHigher -> {
+                    if (isHigher) {
+                        return deleteAdminRoles(roleIds);
+                    } else {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                    }
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
     }
 
     public Mono<Boolean> deleteAdminRoles(@NotEmpty Set<Long> roleIds) {
@@ -114,31 +151,56 @@ public class AdminRoleService {
                 });
     }
 
+    public Mono<Boolean> authAndUpdateAdminRole(
+            @NotNull String requesterAccount,
+            @NotEmpty Set<Long> roleIds,
+            @Nullable @NoWhitespaceConstraint String newName,
+            @Nullable Set<AdminPermission> permissions,
+            @Nullable Integer rank) {
+        Long highestRoleId = null;
+        for (Long roleId : roleIds) {
+            if (highestRoleId == null || highestRoleId < roleId) {
+                highestRoleId = roleId;
+            }
+        }
+        return isAdminHigherThanRole(requesterAccount, highestRoleId)
+                .flatMap(isHigher -> {
+                    if (isHigher) {
+                        return updateAdminRole(roleIds, newName, permissions, rank);
+                    } else {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                    }
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
+    }
+
     public Mono<Boolean> updateAdminRole(
-            @NotNull Long roleId,
+            @NotEmpty Set<Long> roleIds,
             @Nullable @NoWhitespaceConstraint String newName,
             @Nullable Set<AdminPermission> permissions,
             @Nullable Integer rank) {
         Validator.throwIfAllFalsy(newName, permissions, rank);
-        if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
+        if (roleIds.contains(ADMIN_ROLE_ROOT_ID)) {
             throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
         }
-        Query query = new Query().addCriteria(Criteria.where(Constants.ID).is(roleId));
+        Query query = new Query().addCriteria(Criteria.where(Constants.ID).in(roleIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(AdminRole.Fields.name, newName)
                 .setIfNotNull(AdminRole.Fields.permissions, permissions)
                 .setIfNotNull(AdminRole.Fields.rank, rank)
                 .build();
-        return mongoTemplate.updateFirst(query, update, AdminRole.class)
+        return mongoTemplate.updateMulti(query, update, AdminRole.class)
                 .map(result -> {
                     if (result.wasAcknowledged()) {
-                        AdminRole adminRole = roles.get(roleId);
-                        if (adminRole != null) {
-                            adminRole.setName(newName);
-                            adminRole.setPermissions(permissions);
-                            adminRole.setRank(rank);
-                        } else {
-                            queryAndCacheRole(roleId);
+                        for (Long roleId : roleIds) {
+                            AdminRole adminRole = roles.get(roleId);
+                            if (adminRole != null) {
+                                adminRole.setName(newName);
+                                adminRole.setPermissions(permissions);
+                                adminRole.setRank(rank);
+                            } else {
+                                queryAndCacheRole(roleId);
+                            }
                         }
                         return true;
                     } else {

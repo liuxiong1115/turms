@@ -408,7 +408,7 @@ public class MessageService {
                 .buildQuery();
         if (shouldDeleteLogically == null) {
             shouldDeleteLogically = turmsClusterManager.getTurmsProperties()
-                    .getMessage().isLogicallyDeleteMessageByDefault();
+                    .getMessage().isShouldDeleteLogicallyMessageByDefault();
         }
         if (shouldDeleteLogically) {
             Update update = new Update().set(Message.Fields.deletionDate, new Date());

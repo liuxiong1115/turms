@@ -49,18 +49,6 @@ public class AdminActionLogController {
         this.pageUtil = pageUtil;
     }
 
-    @DeleteMapping
-    @RequiredPermission(ADMIN_ACTION_LOG_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminActionLog(
-            @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Set<String> accounts,
-            @RequestParam(required = false) Date logDateStart,
-            @RequestParam(required = false) Date logDateEnd) {
-        Mono<Boolean> deleted = adminActionLogService
-                .deleteAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd));
-        return ResponseFactory.acknowledged(deleted);
-    }
-
     @GetMapping
     @RequiredPermission(ADMIN_ACTION_LOG_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<AdminActionLogDTO>>>> queryAdminActionLogs(
@@ -92,5 +80,13 @@ public class AdminActionLogController {
                 .queryAdminActionLogs(ids, accounts, DateRange.of(logDateStart, logDateEnd), page, size)
                 .map(AdminActionLogDTO::from);
         return ResponseFactory.page(count, adminActionLogsFlux);
+    }
+
+    @DeleteMapping
+    @RequiredPermission(ADMIN_ACTION_LOG_DELETE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminActionLog(
+            @RequestParam(required = false) Set<Long> ids) {
+        Mono<Boolean> deleted = adminActionLogService.deleteAdminActionLogs(ids);
+        return ResponseFactory.acknowledged(deleted);
     }
 }
