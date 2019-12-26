@@ -158,9 +158,9 @@ public class MessageController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteMessages(
             @RequestParam Set<Long> messagesIds,
             @RequestParam(defaultValue = "false") Boolean deleteMessagesStatuses,
-            @RequestParam(required = false) Boolean logicallyDelete) {
+            @RequestParam(required = false) Boolean shouldDeleteLogically) {
         Mono<Boolean> deleted = messageService
-                .deleteMessages(messagesIds, deleteMessagesStatuses, logicallyDelete);
+                .deleteMessages(messagesIds, deleteMessagesStatuses, shouldDeleteLogically);
         return ResponseFactory.acknowledged(deleted);
     }
 

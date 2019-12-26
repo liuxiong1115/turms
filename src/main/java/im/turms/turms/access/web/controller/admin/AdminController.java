@@ -69,10 +69,10 @@ public class AdminController {
     @PostMapping
     @RequiredPermission(ADMIN_CREATE)
     public Mono<ResponseEntity<ResponseDTO<Admin>>> addAdmin(
-            @RequestHeader String account,
+            @RequestHeader("account") String requesterAccount,
             @RequestBody AddAdminDTO addAdminDTO) {
         Mono<Admin> generatedAdmin = adminService.authAndAddAdmin(
-                account,
+                requesterAccount,
                 addAdminDTO.getAccount(),
                 addAdminDTO.getPassword(),
                 addAdminDTO.getRoleId(),
@@ -82,23 +82,14 @@ public class AdminController {
         return ResponseFactory.okIfTruthy(generatedAdmin);
     }
 
-    @DeleteMapping
-    @RequiredPermission(ADMIN_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdmins(
-            @RequestHeader String account,
-            @RequestParam Set<String> accounts) {
-        Mono<Boolean> deleted = adminService.authAndDeleteAdmins(account, accounts);
-        return ResponseFactory.acknowledged(deleted);
-    }
-
     @PutMapping
     @RequiredPermission(ADMIN_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdmins(
-            @RequestHeader String account,
+            @RequestHeader("account") String requesterAccount,
             @RequestParam Set<String> accounts,
             @RequestBody UpdateAdminDTO updateAdminDTO) {
         Mono<Boolean> updated = adminService.authAndUpdateAdmins(
-                account,
+                requesterAccount,
                 accounts,
                 updateAdminDTO.getPassword(),
                 updateAdminDTO.getName(),
@@ -110,11 +101,11 @@ public class AdminController {
     @RequiredPermission(ADMIN_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<Admin>>>> queryAdmins(
             @RequestParam(required = false) Set<String> accounts,
-            @RequestParam(required = false) Long roleId,
+            @RequestParam(required = false) Set<Long> roleIds,
             @RequestParam(defaultValue = "false") boolean withPassword,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Flux<Admin> admins = adminService.queryAdmins(accounts, roleId, withPassword, 0, size);
+        Flux<Admin> admins = adminService.queryAdmins(accounts, roleIds, withPassword, 0, size);
         return ResponseFactory.okIfTruthy(admins);
     }
 
@@ -122,13 +113,22 @@ public class AdminController {
     @RequiredPermission(ADMIN_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Admin>>>> queryAdmins(
             @RequestParam(required = false) Set<String> accounts,
-            @RequestParam(required = false) Long roleId,
+            @RequestParam(required = false) Set<Long> roleIds,
             @RequestParam(defaultValue = "false") boolean withPassword,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Mono<Long> count = adminService.countAdmins(accounts, roleId);
-        Flux<Admin> admins = adminService.queryAdmins(accounts, roleId, withPassword, page, size);
+        Mono<Long> count = adminService.countAdmins(accounts, roleIds);
+        Flux<Admin> admins = adminService.queryAdmins(accounts, roleIds, withPassword, page, size);
         return ResponseFactory.page(count, admins);
+    }
+
+    @DeleteMapping
+    @RequiredPermission(ADMIN_DELETE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdmins(
+            @RequestHeader("account") String requesterAccount,
+            @RequestParam Set<String> accounts) {
+        Mono<Boolean> deleted = adminService.authAndDeleteAdmins(requesterAccount, accounts);
+        return ResponseFactory.acknowledged(deleted);
     }
 }

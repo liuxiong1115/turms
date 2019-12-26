@@ -78,13 +78,9 @@ public class AdminActionLogService {
     }
 
     public Mono<Boolean> deleteAdminActionLogs(
-            @Nullable Set<Long> ids,
-            @Nullable Set<String> accounts,
-            @Nullable DateRange logDateRange) {
+            @Nullable Set<Long> ids) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.logDate, logDateRange)
                 .buildQuery();
         return mongoTemplate.remove(query, AdminActionLog.class)
                 .map(DeleteResult::wasAcknowledged);

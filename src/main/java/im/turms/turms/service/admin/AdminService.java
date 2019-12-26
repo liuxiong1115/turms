@@ -235,13 +235,13 @@ public class AdminService {
 
     public Flux<Admin> queryAdmins(
             @Nullable Set<String> accounts,
-            @Nullable Long roleId,
+            @Nullable Set<Long> roleIds,
             boolean withPassword,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, accounts)
-                .addIsIfNotNull(Admin.Fields.roleId, roleId)
+                .addInIfNotNull(Admin.Fields.roleId, roleIds)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, Admin.class).map(admin -> {
             if (withPassword) {
@@ -357,10 +357,10 @@ public class AdminService {
                 });
     }
 
-    public Mono<Long> countAdmins(@Nullable Set<String> accounts, @Nullable Long roleId) {
+    public Mono<Long> countAdmins(@Nullable Set<String> accounts, @Nullable Set<Long> roleIds) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, accounts)
-                .addIsIfNotNull(Admin.Fields.roleId, roleId)
+                .addInIfNotNull(Admin.Fields.roleId, roleIds)
                 .buildQuery();
         return mongoTemplate.count(query, Admin.class);
     }

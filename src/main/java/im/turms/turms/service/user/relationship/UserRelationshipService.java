@@ -17,7 +17,6 @@
 
 package im.turms.turms.service.user.relationship;
 
-import com.google.common.collect.HashMultimap;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.annotation.constraint.UserRelationshipKeyConstraint;
@@ -122,16 +121,15 @@ public class UserRelationshipService {
     }
 
     public Mono<Boolean> deleteOneSidedRelationships(@NotEmpty Set<UserRelationship.@UserRelationshipKeyConstraint Key> keys) {
-        HashMultimap<Long, Long> multimap = HashMultimap.create();
-        for (UserRelationship.Key key : keys) {
-            multimap.put(key.getOwnerId(), key.getRelatedUserId());
-        }
-        ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
-        for (Long ownerId : multimap.keySet()) {
-            Set<Long> relatedUserIds = multimap.get(ownerId);
-            monos.add(deleteOneSidedRelationships(ownerId, relatedUserIds));
-        }
-        return Flux.merge(monos).all(value -> value);
+        return MapUtil.fluxMerge(multimap -> {
+            for (UserRelationship.Key key : keys) {
+                multimap.put(key.getOwnerId(), key.getRelatedUserId());
+            }
+            return null;
+        }, (monos, key, values) -> {
+            monos.add(deleteOneSidedRelationships(key, values));
+            return null;
+        });
     }
 
     public Mono<Boolean> deleteOneSidedRelationship(
