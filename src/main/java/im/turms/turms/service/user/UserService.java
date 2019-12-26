@@ -289,15 +289,15 @@ public class UserService {
             @Nullable Boolean shouldDeleteLogically) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         if (shouldDeleteLogically == null) {
-            shouldDeleteLogically = turmsClusterManager.getTurmsProperties().getUser().isLogicallyDeleteUser();
+            shouldDeleteLogically = turmsClusterManager.getTurmsProperties().getUser().isShouldDeleteLogicallyUser();
         }
         Mono<Boolean> deleteMono;
         if (deleteRelationshipsAndGroups) {
-            boolean finalLogicallyDeleteUser = shouldDeleteLogically;
+            boolean finalshouldDeleteLogicallyUser = shouldDeleteLogically;
             deleteMono = mongoTemplate.inTransaction()
                     .execute(operations -> {
                         Mono<Boolean> updateOrRemove;
-                        if (finalLogicallyDeleteUser) {
+                        if (finalshouldDeleteLogicallyUser) {
                             Update update = new Update().set(User.Fields.deletionDate, new Date());
                             updateOrRemove = operations.updateMulti(query, update, User.class)
                                     .map(UpdateResult::wasAcknowledged);
@@ -308,7 +308,7 @@ public class UserService {
                         return updateOrRemove
                                 .flatMap(acknowledged -> {
                                     if (acknowledged != null && acknowledged) {
-                                        if (finalLogicallyDeleteUser) {
+                                        if (finalshouldDeleteLogicallyUser) {
                                             return userRelationshipService.deleteAllRelationships(userIds, operations, true)
                                                     .then(userRelationshipGroupService.deleteAllRelationshipGroups(userIds, operations, true))
                                                     .thenReturn(true);

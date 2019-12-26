@@ -53,7 +53,7 @@ public class Group implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     private boolean allowRecallingPendingGroupInvitationByOwnerAndManager = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean logicallyDeleteGroupByDefault = true;
+    private boolean shouldDeleteLogicallyGroupByDefault = true;
     @JsonView(MutablePropertiesView.class)
     private boolean deleteExpiryGroupInvitations = false;
     @JsonView(MutablePropertiesView.class)
@@ -81,7 +81,7 @@ public class Group implements IdentifiedDataSerializable {
         out.writeInt(groupJoinRequestTimeToLiveHours);
         out.writeBoolean(allowRecallingJoinRequestSentByOneself);
         out.writeBoolean(allowRecallingPendingGroupInvitationByOwnerAndManager);
-        out.writeBoolean(logicallyDeleteGroupByDefault);
+        out.writeBoolean(shouldDeleteLogicallyGroupByDefault);
         out.writeBoolean(deleteExpiryGroupInvitations);
         out.writeBoolean(deleteExpiryGroupJoinRequests);
     }
@@ -96,7 +96,7 @@ public class Group implements IdentifiedDataSerializable {
         groupJoinRequestTimeToLiveHours = in.readInt();
         allowRecallingJoinRequestSentByOneself = in.readBoolean();
         allowRecallingPendingGroupInvitationByOwnerAndManager = in.readBoolean();
-        logicallyDeleteGroupByDefault = in.readBoolean();
+        shouldDeleteLogicallyGroupByDefault = in.readBoolean();
         deleteExpiryGroupInvitations = in.readBoolean();
         deleteExpiryGroupJoinRequests = in.readBoolean();
     }

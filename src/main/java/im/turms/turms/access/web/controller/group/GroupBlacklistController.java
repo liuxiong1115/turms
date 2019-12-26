@@ -32,6 +32,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import static im.turms.turms.constant.AdminPermission.*;
 
@@ -46,21 +47,45 @@ public class GroupBlacklistController {
         this.groupBlacklistService = groupBlacklistService;
     }
 
+    @PostMapping
+    @RequiredPermission(GROUP_BLACKLIST_CREATE)
+    public Mono<ResponseEntity<ResponseDTO<GroupBlacklistedUser>>> addGroupBlacklistedUser(@RequestBody AddGroupBlacklistedUserDTO addGroupBlacklistedUserDTO) {
+        Mono<GroupBlacklistedUser> createMono = groupBlacklistService.addBlacklistedUser(
+                addGroupBlacklistedUserDTO.getGroupId(),
+                addGroupBlacklistedUserDTO.getUserId(),
+                addGroupBlacklistedUserDTO.getRequesterId(),
+                addGroupBlacklistedUserDTO.getBlockDate());
+        return ResponseFactory.okIfTruthy(createMono);
+    }
+
+    @PutMapping
+    @RequiredPermission(GROUP_BLACKLIST_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupBlacklistedUsers(
+            @RequestParam GroupBlacklistedUser.KeyList keys,
+            @RequestBody UpdateGroupBlacklistedUserDTO updateGroupBlacklistedUserDTO) {
+        Mono<Boolean> updateMono = groupBlacklistService.updateBlacklistedUsers(
+                new HashSet<>(keys.getKeys()),
+                updateGroupBlacklistedUserDTO.getGroupId(),
+                updateGroupBlacklistedUserDTO.getBlockDate(),
+                updateGroupBlacklistedUserDTO.getRequesterId());
+        return ResponseFactory.acknowledged(updateMono);
+    }
+
     @GetMapping
     @RequiredPermission(GROUP_BLACKLIST_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupBlacklistedUser>>>> queryGroupBlacklistedUsers(
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Set<Long> groupIds,
+            @RequestParam(required = false) Set<Long> userIds,
             @RequestParam(required = false) Date blockDateStart,
             @RequestParam(required = false) Date blockDateEnd,
-            @RequestParam(required = false) Long requesterId,
+            @RequestParam(required = false) Set<Long> requesterIds,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Flux<GroupBlacklistedUser> userFlux = groupBlacklistService.queryBlacklistedUsers(
-                groupId,
-                userId,
+                groupIds,
+                userIds,
                 DateRange.of(blockDateStart, blockDateEnd),
-                requesterId,
+                requesterIds,
                 0,
                 size);
         return ResponseFactory.okIfTruthy(userFlux);
@@ -69,64 +94,33 @@ public class GroupBlacklistController {
     @GetMapping("/page")
     @RequiredPermission(GROUP_BLACKLIST_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupBlacklistedUser>>>> queryGroupBlacklistedUsers(
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Set<Long> groupIds,
+            @RequestParam(required = false) Set<Long> userIds,
             @RequestParam(required = false) Date blockDateStart,
             @RequestParam(required = false) Date blockDateEnd,
-            @RequestParam(required = false) Long requesterId,
+            @RequestParam(required = false) Set<Long> requesterIds,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Mono<Long> count = groupBlacklistService.countBlacklistedUsers(groupId,
-                userId,
+        Mono<Long> count = groupBlacklistService.countBlacklistedUsers(groupIds,
+                userIds,
                 DateRange.of(blockDateStart, blockDateEnd),
-                requesterId);
+                requesterIds);
         Flux<GroupBlacklistedUser> userFlux = groupBlacklistService.queryBlacklistedUsers(
-                groupId,
-                userId,
+                groupIds,
+                userIds,
                 DateRange.of(blockDateStart, blockDateEnd),
-                requesterId,
+                requesterIds,
                 page,
                 size);
         return ResponseFactory.page(count, userFlux);
     }
 
-    @PostMapping
-    @RequiredPermission(GROUP_BLACKLIST_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<GroupBlacklistedUser>>> addGroupBlacklistedUser(@RequestBody AddGroupBlacklistedUserDTO dto) {
-        Mono<GroupBlacklistedUser> createMono = groupBlacklistService.addBlacklistedUser(
-                dto.getGroupId(),
-                dto.getUserId(),
-                dto.getRequesterId(),
-                dto.getBlockDate());
-        return ResponseFactory.okIfTruthy(createMono);
-    }
-
-    @PutMapping
-    @RequiredPermission(GROUP_BLACKLIST_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupBlacklistedUsers(
-            @RequestParam GroupBlacklistedUser.KeyList keys,
-            @RequestBody UpdateGroupBlacklistedUserDTO dto) {
-        Mono<Boolean> updateMono = groupBlacklistService.updateBlacklistedUsers(
-                new HashSet<>(keys.getKeys()),
-                dto.getBlockDate(),
-                dto.getRequesterId());
-        return ResponseFactory.acknowledged(updateMono);
-    }
-
     @DeleteMapping
     @RequiredPermission(GROUP_BLACKLIST_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupBlacklistedUsers(
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Date blockDateStart,
-            @RequestParam(required = false) Date blockDateEnd,
-            @RequestParam(required = false) Long requesterId) {
-        Mono<Boolean> deleteMono = groupBlacklistService.deleteBlacklistedUsers(
-                groupId,
-                userId,
-                DateRange.of(blockDateStart, blockDateEnd),
-                requesterId);
+            @RequestParam GroupBlacklistedUser.KeyList keys) {
+        Mono<Boolean> deleteMono = groupBlacklistService.deleteBlacklistedUsers(new HashSet<>(keys.getKeys()));
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

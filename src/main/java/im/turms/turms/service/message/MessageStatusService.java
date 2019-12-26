@@ -1,14 +1,10 @@
 package im.turms.turms.service.message;
 
-import com.google.common.collect.HashMultimap;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.annotation.constraint.MessageDeliveryStatusConstraint;
 import im.turms.turms.annotation.constraint.MessageStatusKeyConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.UpdateBuilder;
-import im.turms.turms.common.Validator;
+import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -28,7 +24,10 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -88,16 +87,21 @@ public class MessageStatusService {
         if (isIllegalRecall || isIllegalRead) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION);
         }
-        HashMultimap<Long, Long> multimap = HashMultimap.create();
-        for (MessageStatus.Key key : keys) {
-            multimap.put(key.getMessageId(), key.getRecipientId());
-        }
-        ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
-        for (Long messageId : multimap.keySet()) {
-            Set<Long> recipientIds = multimap.get(messageId);
-            monos.add(updateMessageStatuses(messageId, recipientIds, recallDate, readDate, receptionDate, operations));
-        }
-        return Flux.merge(monos).all(value -> value);
+        return MapUtil.fluxMerge(multimap -> {
+            for (MessageStatus.Key key : keys) {
+                multimap.put(key.getMessageId(), key.getRecipientId());
+            }
+            return null;
+        }, (monos, key, values) -> {
+            monos.add(updateMessageStatuses(
+                    key,
+                    values,
+                    recallDate,
+                    readDate,
+                    receptionDate,
+                    operations));
+            return null;
+        });
     }
 
     public Mono<Boolean> updateMessageStatuses(

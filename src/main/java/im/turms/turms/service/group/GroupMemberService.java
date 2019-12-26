@@ -17,7 +17,6 @@
 
 package im.turms.turms.service.group;
 
-import com.google.common.collect.HashMultimap;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.annotation.constraint.GroupMemberKeyConstraint;
@@ -234,16 +233,22 @@ public class GroupMemberService {
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
         Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
-        HashMultimap<Long, Long> multimap = HashMultimap.create();
-        for (GroupMember.Key key : keys) {
-            multimap.put(key.getGroupId(), key.getUserId());
-        }
-        ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
-        for (Long groupId : multimap.keySet()) {
-            Set<Long> memberIds = multimap.get(groupId);
-            monos.add(updateGroupMembers(groupId, memberIds, name, role, joinDate, muteEndDate, operations));
-        }
-        return Flux.merge(monos).all(value -> value);
+        return MapUtil.fluxMerge(multimap -> {
+            for (GroupMember.Key key : keys) {
+                multimap.put(key.getGroupId(), key.getUserId());
+            }
+            return null;
+        }, (monos, key, values) -> {
+            monos.add(updateGroupMembers(
+                    key,
+                    values,
+                    name,
+                    role,
+                    joinDate,
+                    muteEndDate,
+                    operations));
+            return null;
+        });
     }
 
     public Flux<Long> getMembersIdsByGroupId(@NotNull Long groupId) {
@@ -649,15 +654,17 @@ public class GroupMemberService {
     }
 
     public Mono<Boolean> deleteAllGroupMembers(
-            @NotNull Long groupId,
+            @Nullable Set<Long> groupIds,
             @Nullable ReactiveMongoOperations operations) {
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId));
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID_GROUP_ID, groupIds)
+                .buildQuery();
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.remove(query, GroupMember.class)
                 .flatMap(result -> {
                     if (result.wasAcknowledged()) {
-                        return groupVersionService.updateMembersVersion(groupId)
+                        return groupVersionService.updateMembersVersion(groupIds)
                                 .thenReturn(true);
                     } else {
                         return Mono.just(false);

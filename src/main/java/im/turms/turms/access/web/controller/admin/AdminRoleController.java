@@ -47,8 +47,11 @@ public class AdminRoleController {
 
     @PostMapping
     @RequiredPermission(ADMIN_ROLE_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<AdminRole>>> addAdminRole(@RequestBody AddAdminRoleDTO addAdminRoleDTO) {
-        Mono<AdminRole> adminRoleMono = adminRoleService.addAdminRole(
+    public Mono<ResponseEntity<ResponseDTO<AdminRole>>> addAdminRole(
+            @RequestHeader("account") String requesterAccount,
+            @RequestBody AddAdminRoleDTO addAdminRoleDTO) {
+        Mono<AdminRole> adminRoleMono = adminRoleService.authAndAddAdminRole(
+                requesterAccount,
                 addAdminRoleDTO.getId(),
                 addAdminRoleDTO.getName(),
                 addAdminRoleDTO.getPermissions(),
@@ -56,20 +59,15 @@ public class AdminRoleController {
         return ResponseFactory.okIfTruthy(adminRoleMono);
     }
 
-    @DeleteMapping
-    @RequiredPermission(ADMIN_ROLE_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminRoles(@RequestParam Set<Long> ids) {
-        Mono<Boolean> deleted = adminRoleService.deleteAdminRoles(ids);
-        return ResponseFactory.acknowledged(deleted);
-    }
-
     @PutMapping
     @RequiredPermission(ADMIN_ROLE_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdminRole(
-            @RequestParam Long id,
+            @RequestHeader("account") String requesterAccount,
+            @RequestParam Set<Long> ids,
             @RequestBody UpdateAdminRoleDTO updateAdminRoleDTO) {
-        Mono<Boolean> updated = adminRoleService.updateAdminRole(
-                id,
+        Mono<Boolean> updated = adminRoleService.authAndUpdateAdminRole(
+                requesterAccount,
+                ids,
                 updateAdminRoleDTO.getName(),
                 updateAdminRoleDTO.getPermissions(),
                 updateAdminRoleDTO.getRank());
@@ -118,5 +116,14 @@ public class AdminRoleController {
                 page,
                 size);
         return ResponseFactory.page(count, adminRolesFlux);
+    }
+
+    @DeleteMapping
+    @RequiredPermission(ADMIN_ROLE_DELETE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminRoles(
+            @RequestHeader("account") String requesterAccount,
+            @RequestParam Set<Long> ids) {
+        Mono<Boolean> deleted = adminRoleService.authAndDeleteAdminRoles(requesterAccount, ids);
+        return ResponseFactory.acknowledged(deleted);
     }
 }
