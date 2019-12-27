@@ -28,19 +28,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateMessageDTO {
+    private Long id;
     private ChatType chatType;
-
     private Boolean isSystemMessage;
-
     private String text;
-
     private List<byte[]> records;
-
     private Long senderId;
-
     private Long targetId;
-
     private Integer burnAfter;
-
     private Long referenceId;
 }

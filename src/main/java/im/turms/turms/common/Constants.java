@@ -24,12 +24,10 @@ import im.turms.turms.constant.DeviceType;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Constants {
@@ -73,6 +71,7 @@ public class Constants {
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final Object EMPTY_OBJECT = new Object();
     public static final Pair EMPTY_PAIR = Pair.of(null, null);
+    public static final Mono EMPTY_SET_MONO = Mono.just(Collections.emptySet());
     public static final Date EPOCH = new Date(0);
     public static final Date MAX_DATE = new Date(Long.MAX_VALUE);
     public static final Set<DeviceType> ALL_DEVICE_TYPES = Arrays.stream(DeviceType.values()).collect(Collectors.toSet());
@@ -83,9 +82,13 @@ public class Constants {
     public static final TaskScheduler TASK_SCHEDULER = new DefaultManagedTaskScheduler();
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-    public static final TypeReference<HashMap<String, Object>> TYPE_REF_MAP = new TypeReference<>() {};
+    public static final TypeReference<HashMap<String, Object>> TYPE_REF_MAP = new TypeReference<>() {
+    };
 
     public static <T, R> Pair<T, R> emptyPair() {
         return EMPTY_PAIR;
+    }
+    public static <T> Mono<Set<T>> emptySetMono() {
+        return EMPTY_SET_MONO;
     }
 }

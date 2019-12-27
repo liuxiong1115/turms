@@ -59,21 +59,6 @@ public class AdminRoleController {
         return ResponseFactory.okIfTruthy(adminRoleMono);
     }
 
-    @PutMapping
-    @RequiredPermission(ADMIN_ROLE_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdminRole(
-            @RequestHeader("account") String requesterAccount,
-            @RequestParam Set<Long> ids,
-            @RequestBody UpdateAdminRoleDTO updateAdminRoleDTO) {
-        Mono<Boolean> updated = adminRoleService.authAndUpdateAdminRole(
-                requesterAccount,
-                ids,
-                updateAdminRoleDTO.getName(),
-                updateAdminRoleDTO.getPermissions(),
-                updateAdminRoleDTO.getRank());
-        return ResponseFactory.acknowledged(updated);
-    }
-
     @GetMapping
     @RequiredPermission(ADMIN_ROLE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<AdminRole>>>> queryAdminRoles(
@@ -116,6 +101,21 @@ public class AdminRoleController {
                 page,
                 size);
         return ResponseFactory.page(count, adminRolesFlux);
+    }
+
+    @PutMapping
+    @RequiredPermission(ADMIN_ROLE_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdminRole(
+            @RequestHeader("account") String requesterAccount,
+            @RequestParam Set<Long> ids,
+            @RequestBody UpdateAdminRoleDTO updateAdminRoleDTO) {
+        Mono<Boolean> updated = adminRoleService.authAndUpdateAdminRole(
+                requesterAccount,
+                ids,
+                updateAdminRoleDTO.getName(),
+                updateAdminRoleDTO.getPermissions(),
+                updateAdminRoleDTO.getRank());
+        return ResponseFactory.acknowledged(updated);
     }
 
     @DeleteMapping

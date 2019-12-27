@@ -251,10 +251,10 @@ public class GroupJoinRequestService {
 
     public Flux<GroupJoinRequest> queryJoinRequests(
             @Nullable Set<Long> ids,
-            @Nullable Long groupId,
-            @Nullable Long requesterId,
-            @Nullable Long responderId,
-            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable Set<Long> groupIds,
+            @Nullable Set<Long> requesterIds,
+            @Nullable Set<Long> responderIds,
+            @Nullable Set<@RequestStatusConstraint RequestStatus> statuses,
             @Nullable DateRange creationDateRange,
             @Nullable DateRange responseDateRange,
             @Nullable DateRange expirationDateRange,
@@ -263,10 +263,10 @@ public class GroupJoinRequestService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(GroupJoinRequest.Fields.groupId, groupId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
+                .addInIfNotNull(GroupJoinRequest.Fields.groupId, groupIds)
+                .addInIfNotNull(GroupJoinRequest.Fields.requesterId, requesterIds)
+                .addInIfNotNull(GroupJoinRequest.Fields.responderId, responderIds)
+                .addInIfNotNull(GroupJoinRequest.Fields.status, statuses)
                 .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateRange)
                 .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateRange)
                 .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateRange)
@@ -276,10 +276,10 @@ public class GroupJoinRequestService {
 
     public Mono<Long> countJoinRequests(
             @Nullable Set<Long> ids,
-            @Nullable Long groupId,
-            @Nullable Long requesterId,
-            @Nullable Long responderId,
-            @Nullable @RequestStatusConstraint RequestStatus status,
+            @Nullable Set<Long> groupId,
+            @Nullable Set<Long> requesterId,
+            @Nullable Set<Long> responderId,
+            @Nullable Set<@RequestStatusConstraint RequestStatus> status,
             @Nullable DateRange creationDateRange,
             @Nullable DateRange responseDateRange,
             @Nullable DateRange expirationDateRange) {
@@ -297,25 +297,10 @@ public class GroupJoinRequestService {
         return mongoTemplate.count(query, GroupJoinRequest.class);
     }
 
-    public Mono<Boolean> deleteJoinRequests(
-            @Nullable Set<Long> ids,
-            @Nullable Long groupId,
-            @Nullable Long requesterId,
-            @Nullable Long responderId,
-            @Nullable @RequestStatusConstraint RequestStatus status,
-            @Nullable DateRange creationDateRange,
-            @Nullable DateRange responseDateRange,
-            @Nullable DateRange expirationDateRange) {
+    public Mono<Boolean> deleteJoinRequests(@Nullable Set<Long> ids) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(GroupJoinRequest.Fields.groupId, groupId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateRange)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateRange)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateRange)
                 .buildQuery();
         return mongoTemplate.remove(query, GroupJoinRequest.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -347,6 +332,7 @@ public class GroupJoinRequestService {
     }
 
     public Mono<GroupJoinRequest> createGroupJoinRequest(
+            @Nullable Long id,
             @NotNull Long groupId,
             @NotNull Long requesterId,
             @NotNull Long responderId,
@@ -357,7 +343,7 @@ public class GroupJoinRequestService {
             @Nullable Date expirationDate) {
         Date now = new Date();
         GroupJoinRequest groupJoinRequest = new GroupJoinRequest();
-        groupJoinRequest.setId(turmsClusterManager.generateRandomId());
+        groupJoinRequest.setId(id != null ? id : turmsClusterManager.generateRandomId());
         groupJoinRequest.setContent(content);
         if (creationDate == null) {
             creationDate = now;

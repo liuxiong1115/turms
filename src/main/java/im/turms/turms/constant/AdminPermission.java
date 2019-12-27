@@ -48,8 +48,6 @@ public enum AdminPermission {
     USER_FRIEND_REQUEST_UPDATE,
     USER_FRIEND_REQUEST_QUERY,
 
-    USER_JOINED_GROUP_QUERY,
-
     USER_ONLINE_INFO_UPDATE,
     USER_ONLINE_INFO_QUERY,
 
@@ -138,7 +136,6 @@ public enum AdminPermission {
         permissions.add(USER_RELATIONSHIP_GROUP_DELETE);
         permissions.add(USER_RELATIONSHIP_GROUP_UPDATE);
         permissions.add(USER_RELATIONSHIP_GROUP_QUERY);
-        permissions.add(USER_JOINED_GROUP_QUERY);
         permissions.add(USER_ONLINE_INFO_UPDATE);
         permissions.add(USER_ONLINE_INFO_QUERY);
         return permissions;

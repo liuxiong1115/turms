@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = UserRelationshipGroupKeyConstraint.UserRelationshipGroupKeyValidator.class)
 @Documented
 public @interface UserRelationshipGroupKeyConstraint {
-    String message() default "UserRelationshipGroupKeyConstraint";
+    String message() default "The user relationship group key must be not null";
 
     Class<?>[] groups() default {};
 

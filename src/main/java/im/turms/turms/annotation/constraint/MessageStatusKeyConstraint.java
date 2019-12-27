@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = MessageStatusKeyConstraint.MessageStatusKeyValidator.class)
 @Documented
 public @interface MessageStatusKeyConstraint {
-    String message() default "MessageStatusKeyConstraint";
+    String message() default "The message status key must be not null";
 
     Class<?>[] groups() default {};
 

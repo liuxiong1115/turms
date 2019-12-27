@@ -47,14 +47,30 @@ public class GroupInvitationController {
         this.groupInvitationService = groupInvitationService;
     }
 
+    @PostMapping
+    @RequiredPermission(GROUP_INVITATION_CREATE)
+    public Mono<ResponseEntity<ResponseDTO<GroupInvitation>>> addGroupInvitation(@RequestBody AddGroupInvitationDTO addGroupInvitationDTO) {
+        Mono<GroupInvitation> createMono = groupInvitationService.createGroupInvitation(
+                addGroupInvitationDTO.getId(),
+                addGroupInvitationDTO.getGroupId(),
+                addGroupInvitationDTO.getInviterId(),
+                addGroupInvitationDTO.getInviteeId(),
+                addGroupInvitationDTO.getContent(),
+                addGroupInvitationDTO.getStatus(),
+                addGroupInvitationDTO.getCreationDate(),
+                addGroupInvitationDTO.getResponseDate(),
+                addGroupInvitationDTO.getExpirationDate());
+        return ResponseFactory.okIfTruthy(createMono);
+    }
+
     @GetMapping
     @RequiredPermission(GROUP_INVITATION_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupInvitation>>>> queryGroupInvitations(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long inviterId,
-            @RequestParam(required = false) Long inviteeId,
-            @RequestParam(required = false) RequestStatus status,
+            @RequestParam(required = false) Set<Long> groupIds,
+            @RequestParam(required = false) Set<Long> inviterIds,
+            @RequestParam(required = false) Set<Long> inviteeIds,
+            @RequestParam(required = false) Set<RequestStatus> statuses,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
             @RequestParam(required = false) Date responseDateStart,
@@ -65,10 +81,10 @@ public class GroupInvitationController {
         size = pageUtil.getSize(size);
         Flux<GroupInvitation> invitationFlux = groupInvitationService.queryInvitations(
                 ids,
-                groupId,
-                inviterId,
-                inviteeId,
-                status,
+                groupIds,
+                inviterIds,
+                inviteeIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd),
@@ -81,10 +97,10 @@ public class GroupInvitationController {
     @RequiredPermission(GROUP_INVITATION_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupInvitation>>>> queryGroupInvitations(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long inviterId,
-            @RequestParam(required = false) Long inviteeId,
-            @RequestParam(required = false) RequestStatus status,
+            @RequestParam(required = false) Set<Long> groupIds,
+            @RequestParam(required = false) Set<Long> inviterIds,
+            @RequestParam(required = false) Set<Long> inviteeIds,
+            @RequestParam(required = false) Set<RequestStatus> statuses,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
             @RequestParam(required = false) Date responseDateStart,
@@ -96,19 +112,19 @@ public class GroupInvitationController {
         size = pageUtil.getSize(size);
         Mono<Long> count = groupInvitationService.countInvitations(
                 ids,
-                groupId,
-                inviterId,
-                inviteeId,
-                status,
+                groupIds,
+                inviterIds,
+                inviteeIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd));
         Flux<GroupInvitation> invitationFlux = groupInvitationService.queryInvitations(
                 ids,
-                groupId,
-                inviterId,
-                inviteeId,
-                status,
+                groupIds,
+                inviterIds,
+                inviteeIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd),
@@ -117,61 +133,28 @@ public class GroupInvitationController {
         return ResponseFactory.page(count, invitationFlux);
     }
 
-    @PostMapping
-    @RequiredPermission(GROUP_INVITATION_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<GroupInvitation>>> addGroupInvitation(@RequestBody AddGroupInvitationDTO dto) {
-        Mono<GroupInvitation> createMono = groupInvitationService.createGroupInvitation(
-                dto.getGroupId(),
-                dto.getInviterId(),
-                dto.getInviteeId(),
-                dto.getContent(),
-                dto.getStatus(),
-                dto.getCreationDate(),
-                dto.getResponseDate(),
-                dto.getExpirationDate());
-        return ResponseFactory.okIfTruthy(createMono);
-    }
-
     @PutMapping
     @RequiredPermission(GROUP_INVITATION_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupInvitations(
             @RequestParam Set<Long> ids,
-            @RequestBody UpdateGroupInvitationDTO dto) {
+            @RequestBody UpdateGroupInvitationDTO updateGroupInvitationDTO) {
         Mono<Boolean> updateMono = groupInvitationService.updateInvitations(
                 ids,
-                dto.getInviterId(),
-                dto.getInviteeId(),
-                dto.getContent(),
-                dto.getStatus(),
-                dto.getCreationDate(),
-                dto.getResponseDate(),
-                dto.getExpirationDate());
+                updateGroupInvitationDTO.getInviterId(),
+                updateGroupInvitationDTO.getInviteeId(),
+                updateGroupInvitationDTO.getContent(),
+                updateGroupInvitationDTO.getStatus(),
+                updateGroupInvitationDTO.getCreationDate(),
+                updateGroupInvitationDTO.getResponseDate(),
+                updateGroupInvitationDTO.getExpirationDate());
         return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping
     @RequiredPermission(GROUP_INVITATION_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupInvitations(
-            @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long inviterId,
-            @RequestParam(required = false) Long inviteeId,
-            @RequestParam(required = false) RequestStatus status,
-            @RequestParam(required = false) Date creationDateStart,
-            @RequestParam(required = false) Date creationDateEnd,
-            @RequestParam(required = false) Date responseDateStart,
-            @RequestParam(required = false) Date responseDateEnd,
-            @RequestParam(required = false) Date expirationDateStart,
-            @RequestParam(required = false) Date expirationDateEnd) {
-        Mono<Boolean> deleteMono = groupInvitationService.deleteInvitations(
-                ids,
-                groupId,
-                inviterId,
-                inviteeId,
-                status,
-                DateRange.of(creationDateStart, creationDateEnd),
-                DateRange.of(responseDateStart, responseDateEnd),
-                DateRange.of(expirationDateStart, expirationDateEnd));
+            @RequestParam(required = false) Set<Long> ids) {
+        Mono<Boolean> deleteMono = groupInvitationService.deleteInvitations(ids);
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

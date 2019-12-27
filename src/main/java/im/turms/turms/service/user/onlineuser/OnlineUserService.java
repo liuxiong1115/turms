@@ -239,13 +239,13 @@ public class OnlineUserService {
         return setLocalUserDevicesOffline(userId, Collections.singleton(deviceType), closeStatus);
     }
 
-    public Flux<Boolean> setUsersOffline(
+    public Mono<Boolean> setUsersOffline(
             @NotEmpty Set<Long> userIds,
             @NotNull CloseStatus closeStatus) {
         List<Mono<Boolean>> list = userIds.stream()
                 .map(userId -> setUserOffline(userId, closeStatus))
                 .collect(Collectors.toList());
-        return Flux.merge(list);
+        return Flux.merge(list).all(value -> value);
     }
 
     public Mono<Boolean> setUserOffline(
@@ -266,6 +266,17 @@ public class OnlineUserService {
                 return Mono.just(false);
             }
         }
+    }
+
+    public Mono<Boolean> setUsersDevicesOffline(
+            @NotEmpty Set<Long> userIds,
+            @NotEmpty Set<@DeviceTypeConstraint DeviceType> deviceTypes,
+            @NotNull CloseStatus closeStatus) {
+        List<Mono<Boolean>> monos = new ArrayList<>(userIds.size());
+        for (Long userId : userIds) {
+            monos.add(setUserDevicesOffline(userId, deviceTypes, closeStatus));
+        }
+        return Flux.merge(monos).all(value -> value);
     }
 
     public Mono<Boolean> setUserDevicesOffline(
@@ -474,6 +485,14 @@ public class OnlineUserService {
         } else {
             return null;
         }
+    }
+
+    public Mono<Boolean> updateOnlineUsersStatus(@NotEmpty Set<Long> userIds, @NotNull UserStatus userStatus) {
+        List<Mono<Boolean>> monos = new ArrayList<>(userIds.size());
+        for (Long userId : userIds) {
+            monos.add(updateOnlineUserStatus(userId, userStatus));
+        }
+        return Flux.merge(monos).all(value -> value);
     }
 
     public Mono<Boolean> updateOnlineUserStatus(@NotNull Long userId, @NotNull UserStatus userStatus) {

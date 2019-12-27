@@ -29,6 +29,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.Set;
 
 import static im.turms.turms.constant.AdminPermission.*;
 
@@ -41,6 +42,23 @@ public class GroupTypeController {
     public GroupTypeController(GroupTypeService groupTypeService, PageUtil pageUtil) {
         this.groupTypeService = groupTypeService;
         this.pageUtil = pageUtil;
+    }
+
+    @PostMapping
+    @RequiredPermission(GROUP_TYPE_CREATE)
+    public Mono<ResponseEntity<ResponseDTO<GroupType>>> addGroupType(@RequestBody AddGroupTypeDTO addGroupTypeDTO) {
+        Mono<GroupType> addedGroupType = groupTypeService.addGroupType(
+                addGroupTypeDTO.getName(),
+                addGroupTypeDTO.getGroupSizeLimit(),
+                addGroupTypeDTO.getInvitationStrategy(),
+                addGroupTypeDTO.getJoinStrategy(),
+                addGroupTypeDTO.getGroupInfoUpdateStrategy(),
+                addGroupTypeDTO.getMemberInfoUpdateStrategy(),
+                addGroupTypeDTO.getGuestSpeakable(),
+                addGroupTypeDTO.getSelfInfoUpdatable(),
+                addGroupTypeDTO.getEnableReadReceipt(),
+                addGroupTypeDTO.getMessageEditable());
+        return ResponseFactory.okIfTruthy(addedGroupType);
     }
 
     @GetMapping
@@ -63,29 +81,13 @@ public class GroupTypeController {
         return ResponseFactory.page(count, groupTypesFlux);
     }
 
-    @PostMapping
-    @RequiredPermission(GROUP_TYPE_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<GroupType>>> addGroupType(@RequestBody AddGroupTypeDTO addGroupTypeDTO) {
-        Mono<GroupType> addedGroupType = groupTypeService.addGroupType(addGroupTypeDTO.getName(),
-                addGroupTypeDTO.getGroupSizeLimit(),
-                addGroupTypeDTO.getInvitationStrategy(),
-                addGroupTypeDTO.getJoinStrategy(),
-                addGroupTypeDTO.getGroupInfoUpdateStrategy(),
-                addGroupTypeDTO.getMemberInfoUpdateStrategy(),
-                addGroupTypeDTO.getGuestSpeakable(),
-                addGroupTypeDTO.getSelfInfoUpdatable(),
-                addGroupTypeDTO.getEnableReadReceipt(),
-                addGroupTypeDTO.getMessageEditable());
-        return ResponseFactory.okIfTruthy(addedGroupType);
-    }
-
     @PutMapping
     @RequiredPermission(GROUP_TYPE_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupType(
-            @RequestParam Long typeId,
+            @RequestParam Set<Long> ids,
             @RequestBody UpdateGroupTypeDTO updateGroupTypeDTO) {
-        Mono<Boolean> updated = groupTypeService.updateGroupType(
-                typeId,
+        Mono<Boolean> updated = groupTypeService.updateGroupTypes(
+                ids,
                 updateGroupTypeDTO.getName(),
                 updateGroupTypeDTO.getGroupSizeLimit(),
                 updateGroupTypeDTO.getInvitationStrategy(),
@@ -101,8 +103,8 @@ public class GroupTypeController {
 
     @DeleteMapping
     @RequiredPermission(GROUP_TYPE_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupType(@RequestParam Long groupTypeId) {
-        Mono<Boolean> deleted = groupTypeService.deleteGroupType(groupTypeId);
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupType(@RequestParam Set<Long> ids) {
+        Mono<Boolean> deleted = groupTypeService.deleteGroupTypes(ids);
         return ResponseFactory.acknowledged(deleted);
     }
 }

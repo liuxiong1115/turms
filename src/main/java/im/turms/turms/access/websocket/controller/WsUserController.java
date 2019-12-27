@@ -224,12 +224,12 @@ public class WsUserController {
                 Mono<Set<Long>> queryMembersIds = Mono.just(Collections.emptySet());
                 Mono<Set<Long>> queryRelatedUsersIds = Mono.just(Collections.emptySet());
                 if (notifyMembers) {
-                    queryMembersIds = groupMemberService.queryUserJoinedGroupsMembersIds(
-                            turmsRequestWrapper.getUserId());
+                    queryMembersIds = groupMemberService.queryUsersJoinedGroupsMembersIds(
+                            Set.of(turmsRequestWrapper.getUserId()));
                 }
                 if (notifyRelatedUser) {
                     queryRelatedUsersIds = userRelationshipService.queryRelatedUsersIds(
-                            turmsRequestWrapper.getUserId(),
+                            Set.of(turmsRequestWrapper.getUserId()),
                             false)
                             .collect(Collectors.toSet());
                 }
@@ -269,7 +269,7 @@ public class WsUserController {
                     .flatMap(updated -> {
                         if (updated != null && updated) {
                             if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyRelatedUsersAfterUserInfoUpdated()) {
-                                return userRelationshipService.queryRelatedUsersIds(turmsRequestWrapper.getUserId(), false)
+                                return userRelationshipService.queryRelatedUsersIds(Set.of(turmsRequestWrapper.getUserId()), false)
                                         .collect(Collectors.toSet())
                                         .map(relatedUsersIds -> {
                                             if (relatedUsersIds.isEmpty()) {

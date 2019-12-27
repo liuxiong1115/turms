@@ -52,30 +52,49 @@ public class MessageController {
         this.dateTimeUtil = dateTimeUtil;
     }
 
+    @PostMapping
+    @RequiredPermission(MESSAGE_CREATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> createMessages(
+            @RequestParam(defaultValue = "true") Boolean shouldSend,
+            @RequestBody CreateMessageDTO createMessageDTO) {
+        Mono<Boolean> acknowledged = messageService.sendMessage(
+                shouldSend,
+                createMessageDTO.getId(),
+                createMessageDTO.getChatType(),
+                createMessageDTO.getIsSystemMessage(),
+                createMessageDTO.getText(),
+                createMessageDTO.getRecords(),
+                createMessageDTO.getSenderId(),
+                createMessageDTO.getTargetId(),
+                createMessageDTO.getBurnAfter(),
+                createMessageDTO.getReferenceId());
+        return ResponseFactory.acknowledged(acknowledged);
+    }
+
     @GetMapping
     @RequiredPermission(MESSAGE_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<Collection<Message>>>> queryCompleteMessages(
+    public Mono<ResponseEntity<ResponseDTO<Collection<Message>>>> queryMessages(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) ChatType chatType,
             @RequestParam(required = false) Boolean areSystemMessages,
-            @RequestParam(required = false) Long senderId,
-            @RequestParam(required = false) Long targetId,
+            @RequestParam(required = false) Set<Long> senderIds,
+            @RequestParam(required = false) Set<Long> targetIds,
             @RequestParam(required = false) Date deliveryDateStart,
             @RequestParam(required = false) Date deliveryDateEnd,
             @RequestParam(required = false) Date deletionDateStart,
             @RequestParam(required = false) Date deletionDateEnd,
-            @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
+            @RequestParam(required = false) Set<MessageDeliveryStatus> deliveryStatuses,
             @RequestParam(required = false) Integer size) {
-        Flux<Message> completeMessages = messageService.queryCompleteMessages(
+        Flux<Message> completeMessages = messageService.queryMessages(
                 false,
                 ids,
                 chatType,
                 areSystemMessages,
-                senderId,
-                targetId,
+                senderIds,
+                targetIds,
                 DateRange.of(deliveryDateStart, deliveryDateEnd),
                 DateRange.of(deletionDateStart, deletionDateEnd),
-                deliveryStatus,
+                deliveryStatuses,
                 0,
                 pageUtil.getSize(size));
         return ResponseFactory.okIfTruthy(completeMessages);
@@ -83,85 +102,41 @@ public class MessageController {
 
     @GetMapping("/page")
     @RequiredPermission(MESSAGE_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Message>>>> queryCompleteMessages(
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Message>>>> queryMessages(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) ChatType chatType,
             @RequestParam(required = false) Boolean areSystemMessages,
-            @RequestParam(required = false) Long senderId,
-            @RequestParam(required = false) Long targetId,
+            @RequestParam(required = false) Set<Long> senderIds,
+            @RequestParam(required = false) Set<Long> targetIds,
             @RequestParam(required = false) Date deliveryDateStart,
             @RequestParam(required = false) Date deliveryDateEnd,
             @RequestParam(required = false) Date deletionDateStart,
             @RequestParam(required = false) Date deletionDateEnd,
-            @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
+            @RequestParam(required = false) Set<MessageDeliveryStatus> deliveryStatuses,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         Mono<Long> count = messageService.countMessages(
                 ids,
                 chatType,
                 areSystemMessages,
-                senderId,
-                targetId,
+                senderIds,
+                targetIds,
                 DateRange.of(deliveryDateStart, deliveryDateEnd),
                 DateRange.of(deletionDateStart, deletionDateEnd),
-                deliveryStatus);
-        Flux<Message> completeMessages = messageService.queryCompleteMessages(
+                deliveryStatuses);
+        Flux<Message> completeMessages = messageService.queryMessages(
                 false,
                 ids,
                 chatType,
                 areSystemMessages,
-                senderId,
-                targetId,
+                senderIds,
+                targetIds,
                 DateRange.of(deliveryDateStart, deliveryDateEnd),
                 DateRange.of(deletionDateStart, deletionDateEnd),
-                deliveryStatus,
+                deliveryStatuses,
                 page,
                 pageUtil.getSize(size));
         return ResponseFactory.page(count, completeMessages);
-    }
-
-    @PostMapping
-    @RequiredPermission(MESSAGE_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> createMessages(
-            @RequestParam(defaultValue = "true") Boolean deliver,
-            @RequestBody CreateMessageDTO dto) {
-        Mono<Boolean> acknowledged = messageService.sendMessage(
-                deliver,
-                dto.getChatType(),
-                dto.getIsSystemMessage(),
-                dto.getText(),
-                dto.getRecords(),
-                dto.getSenderId(),
-                dto.getTargetId(),
-                dto.getBurnAfter(),
-                dto.getReferenceId());
-        return ResponseFactory.acknowledged(acknowledged);
-    }
-
-    @PutMapping
-    @RequiredPermission(MESSAGE_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateMessages(
-            @RequestParam Set<Long> ids,
-            @RequestBody UpdateMessageDTO dto) {
-        Mono<Boolean> acknowledged = messageService.updateMessage(
-                ids,
-                dto.getIsSystemMessage(),
-                dto.getText(),
-                dto.getRecords(),
-                dto.getBurnAfter(),
-                null);
-        return ResponseFactory.acknowledged(acknowledged);
-    }
-
-    @DeleteMapping
-    @RequiredPermission(MESSAGE_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteMessages(
-            @RequestParam Set<Long> messagesIds,
-            @RequestParam(defaultValue = "false") Boolean deleteMessagesStatuses,
-            @RequestParam(required = false) Boolean shouldDeleteLogically) {
-        Mono<Boolean> deleted = messageService
-                .deleteMessages(messagesIds, deleteMessagesStatuses, shouldDeleteLogically);
-        return ResponseFactory.acknowledged(deleted);
     }
 
     @GetMapping("/count")
@@ -254,5 +229,31 @@ public class MessageController {
             }
         }
         return ResponseFactory.okIfTruthy(Flux.merge(counts).then(Mono.just(statistics)));
+    }
+
+    @PutMapping
+    @RequiredPermission(MESSAGE_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateMessages(
+            @RequestParam Set<Long> ids,
+            @RequestBody UpdateMessageDTO updateMessageDTO) {
+        Mono<Boolean> acknowledged = messageService.updateMessage(
+                ids,
+                updateMessageDTO.getIsSystemMessage(),
+                updateMessageDTO.getText(),
+                updateMessageDTO.getRecords(),
+                updateMessageDTO.getBurnAfter(),
+                null);
+        return ResponseFactory.acknowledged(acknowledged);
+    }
+
+    @DeleteMapping
+    @RequiredPermission(MESSAGE_DELETE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteMessages(
+            @RequestParam Set<Long> ids,
+            @RequestParam(defaultValue = "false") Boolean shouldDeleteMessagesStatuses,
+            @RequestParam(required = false) Boolean shouldDeleteLogically) {
+        Mono<Boolean> deleted = messageService
+                .deleteMessages(ids, shouldDeleteMessagesStatuses, shouldDeleteLogically);
+        return ResponseFactory.acknowledged(deleted);
     }
 }

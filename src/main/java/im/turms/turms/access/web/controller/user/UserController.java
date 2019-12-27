@@ -53,54 +53,6 @@ public class UserController {
         this.dateTimeUtil = dateTimeUtil;
     }
 
-    @GetMapping
-    @RequiredPermission(USER_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<Collection<User>>>> queryUsers(
-            @RequestParam(required = false) Set<Long> userIds,
-            @RequestParam(required = false) Date registrationDateStart,
-            @RequestParam(required = false) Date registrationDateEnd,
-            @RequestParam(required = false) Date deletionDateStart,
-            @RequestParam(required = false) Date deletionDateEnd,
-            @RequestParam(required = false) Boolean isActive,
-            @RequestParam(required = false) Integer size) {
-        size = pageUtil.getSize(size);
-        Flux<User> usersFlux = userService.queryUsers(
-                userIds,
-                DateRange.of(registrationDateStart, registrationDateEnd),
-                DateRange.of(deletionDateStart, deletionDateEnd),
-                isActive,
-                0,
-                size);
-        return ResponseFactory.okIfTruthy(usersFlux);
-    }
-
-    @GetMapping("/page")
-    @RequiredPermission(USER_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<User>>>> queryUsers(
-            @RequestParam(required = false) Set<Long> userIds,
-            @RequestParam(required = false) Date registrationDateStart,
-            @RequestParam(required = false) Date registrationDateEnd,
-            @RequestParam(required = false) Date deletionDateStart,
-            @RequestParam(required = false) Date deletionDateEnd,
-            @RequestParam(required = false) Boolean isActive,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(required = false) Integer size) {
-        size = pageUtil.getSize(size);
-        Mono<Long> count = userService.countUsers(
-                userIds,
-                DateRange.of(registrationDateStart, registrationDateEnd),
-                DateRange.of(deletionDateStart, deletionDateEnd),
-                isActive);
-        Flux<User> usersFlux = userService.queryUsers(
-                userIds,
-                DateRange.of(registrationDateStart, registrationDateEnd),
-                DateRange.of(deletionDateStart, deletionDateEnd),
-                isActive,
-                page,
-                size);
-        return ResponseFactory.page(count, usersFlux);
-    }
-
     @PostMapping
     @RequiredPermission(USER_CREATE)
     public Mono<ResponseEntity<ResponseDTO<User>>> addUser(@RequestBody AddUserDTO addUserDTO) {
@@ -116,31 +68,52 @@ public class UserController {
         return ResponseFactory.okIfTruthy(addUser);
     }
 
-    @DeleteMapping
-    @RequiredPermission(USER_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteUsers(
-            @RequestParam Set<Long> userIds,
-            @RequestParam(defaultValue = "true") boolean deleteRelationshipsAndGroups,
-            @RequestParam(required = false) Boolean shouldDeleteLogically) {
-        Mono<Boolean> deleted = userService.deleteUsers(userIds, deleteRelationshipsAndGroups, shouldDeleteLogically);
-        return ResponseFactory.acknowledged(deleted);
+    @GetMapping
+    @RequiredPermission(USER_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<Collection<User>>>> queryUsers(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Date registrationDateStart,
+            @RequestParam(required = false) Date registrationDateEnd,
+            @RequestParam(required = false) Date deletionDateStart,
+            @RequestParam(required = false) Date deletionDateEnd,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Flux<User> usersFlux = userService.queryUsers(
+                ids,
+                DateRange.of(registrationDateStart, registrationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                isActive,
+                0,
+                size);
+        return ResponseFactory.okIfTruthy(usersFlux);
     }
 
-    @PutMapping
-    @RequiredPermission(USER_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUser(
-            @RequestParam Set<Long> userIds,
-            @RequestBody UpdateUserDTO updateUserDTO) {
-        Mono<Boolean> updated = userService.updateUsers(
-                userIds,
-                updateUserDTO.getPassword(),
-                updateUserDTO.getName(),
-                updateUserDTO.getIntro(),
-                updateUserDTO.getProfilePictureUrl(),
-                updateUserDTO.getProfileAccess(),
-                updateUserDTO.getRegistrationDate(),
-                updateUserDTO.getIsActive());
-        return ResponseFactory.acknowledged(updated);
+    @GetMapping("/page")
+    @RequiredPermission(USER_QUERY)
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<User>>>> queryUsers(
+            @RequestParam(required = false) Set<Long> ids,
+            @RequestParam(required = false) Date registrationDateStart,
+            @RequestParam(required = false) Date registrationDateEnd,
+            @RequestParam(required = false) Date deletionDateStart,
+            @RequestParam(required = false) Date deletionDateEnd,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
+        Mono<Long> count = userService.countUsers(
+                ids,
+                DateRange.of(registrationDateStart, registrationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                isActive);
+        Flux<User> usersFlux = userService.queryUsers(
+                ids,
+                DateRange.of(registrationDateStart, registrationDateEnd),
+                DateRange.of(deletionDateStart, deletionDateEnd),
+                isActive,
+                page,
+                size);
+        return ResponseFactory.page(count, usersFlux);
     }
 
     @GetMapping("/count")
@@ -230,5 +203,32 @@ public class UserController {
             }
         }
         return ResponseFactory.okIfTruthy(Flux.merge(counts).then(Mono.just(statistics)));
+    }
+
+    @PutMapping
+    @RequiredPermission(USER_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUser(
+            @RequestParam Set<Long> ids,
+            @RequestBody UpdateUserDTO updateUserDTO) {
+        Mono<Boolean> updated = userService.updateUsers(
+                ids,
+                updateUserDTO.getPassword(),
+                updateUserDTO.getName(),
+                updateUserDTO.getIntro(),
+                updateUserDTO.getProfilePictureUrl(),
+                updateUserDTO.getProfileAccess(),
+                updateUserDTO.getRegistrationDate(),
+                updateUserDTO.getIsActive());
+        return ResponseFactory.acknowledged(updated);
+    }
+
+    @DeleteMapping
+    @RequiredPermission(USER_DELETE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteUsers(
+            @RequestParam Set<Long> ids,
+            @RequestParam(defaultValue = "true") Boolean shouldDeleteRelationshipsAndGroups,
+            @RequestParam(required = false) Boolean shouldDeleteLogically) {
+        Mono<Boolean> deleted = userService.deleteUsers(ids, shouldDeleteRelationshipsAndGroups, shouldDeleteLogically);
+        return ResponseFactory.acknowledged(deleted);
     }
 }

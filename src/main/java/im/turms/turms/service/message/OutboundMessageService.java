@@ -51,7 +51,7 @@ public class OutboundMessageService {
             @Nullable WebSocketMessage clientMessage,
             @Nullable byte[] clientMessageBytes,
             @NotNull Long recipientId,
-            boolean relayable) {
+            boolean isRelayable) {
         if (clientMessage == null && clientMessageBytes == null) {
             throw new IllegalArgumentException();
         }
@@ -75,7 +75,7 @@ public class OutboundMessageService {
                 }
                 return Mono.just(true);
             }
-        } else if (relayable) {
+        } else if (isRelayable) {
             Member member = turmsClusterManager.getMemberByUserId(recipientId);
             if (member != null) {
                 DeliveryUserMessageTask task = new DeliveryUserMessageTask(clientMessageBytes, recipientId);

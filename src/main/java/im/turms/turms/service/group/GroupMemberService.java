@@ -144,14 +144,14 @@ public class GroupMemberService {
                             // Because successorId is null
                             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
                         } else {
-                            return deleteGroupMember(groupId, deleteMemberId, null);
+                            return deleteGroupMembers(groupId, Set.of(deleteMemberId), null);
                         }
                     });
         } else {
             return isOwnerOrManager(requesterId, groupId)
                     .flatMap(isOwnerOrManager -> {
                         if (isOwnerOrManager != null && isOwnerOrManager) {
-                            return deleteGroupMember(groupId, deleteMemberId, null);
+                            return deleteGroupMembers(groupId, Set.of(deleteMemberId), null);
                         } else {
                             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                         }
@@ -159,13 +159,13 @@ public class GroupMemberService {
         }
     }
 
-    public Mono<Boolean> deleteGroupMember(
+    public Mono<Boolean> deleteGroupMembers(
             @NotNull Long groupId,
-            @NotNull Long deleteMemberId,
+            @NotEmpty Set<Long> deleteMemberIds,
             @Nullable ReactiveMongoOperations operations) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
-                .addCriteria(Criteria.where(ID_USER_ID).is(deleteMemberId));
+                .addCriteria(Criteria.where(ID_USER_ID).in(deleteMemberIds));
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.remove(query, GroupMember.class)
                 .flatMap(result -> {
@@ -176,6 +176,12 @@ public class GroupMemberService {
                         return Mono.just(false);
                     }
                 });
+    }
+
+    public Mono<Boolean> deleteGroupMembers() {
+        Query query = new Query();
+        return mongoTemplate.remove(query, GroupMember.class)
+                .map(DeleteResult::wasAcknowledged);
     }
 
     public Mono<Boolean> updateGroupMember(
@@ -431,21 +437,21 @@ public class GroupMemberService {
                 .defaultIfEmpty(false);
     }
 
-    public Flux<Long> queryUserJoinedGroupsIds(
-            @NotNull Long userId,
+    public Flux<Long> queryUsersJoinedGroupsIds(
+            @NotEmpty Set<Long> userIds,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addIsIfNotNull(ID_USER_ID, userId)
+                .addInIfNotNull(ID_USER_ID, userIds)
                 .paginateIfNotNull(page, size);
         query.fields().include(ID_GROUP_ID);
         return mongoTemplate.find(query, GroupMember.class)
                 .map(groupMember -> groupMember.getKey().getGroupId());
     }
 
-    public Mono<Set<Long>> queryUserJoinedGroupsMembersIds(@NotNull Long userId) {
-        return queryUserJoinedGroupsIds(userId, null, null)
+    public Mono<Set<Long>> queryUsersJoinedGroupsMembersIds(@NotEmpty Set<Long> userIds) {
+        return queryUsersJoinedGroupsIds(userIds, null, null)
                 .collect(Collectors.toSet())
                 .flatMap(groupsIds -> queryGroupMembersIds(groupsIds)
                         .collect(Collectors.toSet()));
@@ -494,19 +500,19 @@ public class GroupMemberService {
                 .map(member -> member.getKey().getUserId());
     }
 
-    public Flux<GroupMember> queryGroupMembers(
-            @Nullable Long groupId,
-            @Nullable Long userId,
-            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
+    public Flux<GroupMember> queryGroupsMembers(
+            @Nullable Set<Long> groupIds,
+            @Nullable Set<Long> userIds,
+            @Nullable Set<@GroupMemberRoleConstraint GroupMemberRole> roles,
             @Nullable DateRange joinDateRange,
             @Nullable DateRange muteEndDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addIsIfNotNull(ID_GROUP_ID, groupId)
-                .addIsIfNotNull(ID_USER_ID, userId)
-                .addIsIfNotNull(GroupMember.Fields.role, role)
+                .addInIfNotNull(ID_GROUP_ID, groupIds)
+                .addInIfNotNull(ID_USER_ID, userIds)
+                .addInIfNotNull(GroupMember.Fields.role, roles)
                 .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateRange)
                 .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateRange)
                 .paginateIfNotNull(page, size);
@@ -514,38 +520,32 @@ public class GroupMemberService {
     }
 
     public Mono<Long> countMembers(
-            @Nullable Long groupId,
-            @Nullable Long userId,
-            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
+            @Nullable Set<Long> groupIds,
+            @Nullable Set<Long> userIds,
+            @Nullable Set<@GroupMemberRoleConstraint GroupMemberRole> roles,
             @Nullable DateRange joinDateRange,
             @Nullable DateRange muteEndDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addIsIfNotNull(ID_GROUP_ID, groupId)
-                .addIsIfNotNull(ID_USER_ID, userId)
-                .addIsIfNotNull(GroupMember.Fields.role, role)
+                .addInIfNotNull(ID_GROUP_ID, groupIds)
+                .addInIfNotNull(ID_USER_ID, userIds)
+                .addInIfNotNull(GroupMember.Fields.role, roles)
                 .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateRange)
                 .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, GroupMember.class);
     }
 
-    public Mono<Boolean> deleteMembers(
-            @Nullable Long groupId,
-            @Nullable Long userId,
-            @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
-            @Nullable DateRange joinDateRange,
-            @Nullable DateRange muteEndDateRange) {
-        Query query = QueryBuilder
-                .newBuilder()
-                .addIsIfNotNull(ID_GROUP_ID, groupId)
-                .addIsIfNotNull(ID_USER_ID, userId)
-                .addIsIfNotNull(GroupMember.Fields.role, role)
-                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateRange)
-                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateRange)
-                .buildQuery();
-        return mongoTemplate.remove(query, GroupMember.class)
-                .map(DeleteResult::wasAcknowledged);
+    public Mono<Boolean> deleteGroupsMembers(@NotEmpty Set<GroupMember.Key> keys) {
+        return MapUtil.fluxMerge(map -> {
+            for (GroupMember.Key key : keys) {
+                map.put(key.getGroupId(), key.getUserId());
+            }
+            return null;
+        }, (monos, key, values) -> {
+            monos.add(deleteGroupMembers(key, values, null));
+            return null;
+        });
     }
 
     public Flux<GroupMember> queryGroupMembers(@NotNull Long groupId, @NotEmpty Set<Long> membersIds) {
@@ -602,7 +602,7 @@ public class GroupMemberService {
                 })
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return queryGroupMembers(groupId, null, null, null, null, null, null)
+                        return queryGroupsMembers(Set.of(groupId), null, null, null, null, null, null)
                                 .collectList()
                                 .flatMap(members -> {
                                     if (members.isEmpty()) {
@@ -708,10 +708,5 @@ public class GroupMemberService {
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).is(userId));
         return mongoTemplate.exists(query, GroupMember.class);
-    }
-
-    public Mono<Long> countUserJoinedGroupsIds(@NotNull Long userId) {
-        Query query = new Query().addCriteria(Criteria.where(ID_USER_ID).is(userId));
-        return mongoTemplate.count(query, GroupMember.class);
     }
 }

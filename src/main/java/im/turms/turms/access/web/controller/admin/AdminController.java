@@ -82,21 +82,6 @@ public class AdminController {
         return ResponseFactory.okIfTruthy(generatedAdmin);
     }
 
-    @PutMapping
-    @RequiredPermission(ADMIN_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdmins(
-            @RequestHeader("account") String requesterAccount,
-            @RequestParam Set<String> accounts,
-            @RequestBody UpdateAdminDTO updateAdminDTO) {
-        Mono<Boolean> updated = adminService.authAndUpdateAdmins(
-                requesterAccount,
-                accounts,
-                updateAdminDTO.getPassword(),
-                updateAdminDTO.getName(),
-                updateAdminDTO.getRoleId());
-        return ResponseFactory.acknowledged(updated);
-    }
-
     @GetMapping
     @RequiredPermission(ADMIN_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<Admin>>>> queryAdmins(
@@ -121,6 +106,20 @@ public class AdminController {
         Mono<Long> count = adminService.countAdmins(accounts, roleIds);
         Flux<Admin> admins = adminService.queryAdmins(accounts, roleIds, withPassword, page, size);
         return ResponseFactory.page(count, admins);
+    }
+    @PutMapping
+    @RequiredPermission(ADMIN_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdmins(
+            @RequestHeader("account") String requesterAccount,
+            @RequestParam Set<String> accounts,
+            @RequestBody UpdateAdminDTO updateAdminDTO) {
+        Mono<Boolean> updated = adminService.authAndUpdateAdmins(
+                requesterAccount,
+                accounts,
+                updateAdminDTO.getPassword(),
+                updateAdminDTO.getName(),
+                updateAdminDTO.getRoleId());
+        return ResponseFactory.acknowledged(updated);
     }
 
     @DeleteMapping

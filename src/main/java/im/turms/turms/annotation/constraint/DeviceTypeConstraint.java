@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = DeviceTypeConstraint.GroupMemberRoleValidator.class)
 @Documented
 public @interface DeviceTypeConstraint {
-    String message() default "DeviceTypeConstraint";
+    String message() default "The device type must not be UNRECOGNIZED";
 
     Class<?>[] groups() default {};
 

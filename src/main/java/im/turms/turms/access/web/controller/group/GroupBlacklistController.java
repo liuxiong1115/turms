@@ -58,19 +58,6 @@ public class GroupBlacklistController {
         return ResponseFactory.okIfTruthy(createMono);
     }
 
-    @PutMapping
-    @RequiredPermission(GROUP_BLACKLIST_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupBlacklistedUsers(
-            @RequestParam GroupBlacklistedUser.KeyList keys,
-            @RequestBody UpdateGroupBlacklistedUserDTO updateGroupBlacklistedUserDTO) {
-        Mono<Boolean> updateMono = groupBlacklistService.updateBlacklistedUsers(
-                new HashSet<>(keys.getKeys()),
-                updateGroupBlacklistedUserDTO.getGroupId(),
-                updateGroupBlacklistedUserDTO.getBlockDate(),
-                updateGroupBlacklistedUserDTO.getRequesterId());
-        return ResponseFactory.acknowledged(updateMono);
-    }
-
     @GetMapping
     @RequiredPermission(GROUP_BLACKLIST_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupBlacklistedUser>>>> queryGroupBlacklistedUsers(
@@ -114,6 +101,19 @@ public class GroupBlacklistController {
                 page,
                 size);
         return ResponseFactory.page(count, userFlux);
+    }
+
+    @PutMapping
+    @RequiredPermission(GROUP_BLACKLIST_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupBlacklistedUsers(
+            @RequestParam GroupBlacklistedUser.KeyList keys,
+            @RequestBody UpdateGroupBlacklistedUserDTO updateGroupBlacklistedUserDTO) {
+        Mono<Boolean> updateMono = groupBlacklistService.updateBlacklistedUsers(
+                new HashSet<>(keys.getKeys()),
+                updateGroupBlacklistedUserDTO.getGroupId(),
+                updateGroupBlacklistedUserDTO.getBlockDate(),
+                updateGroupBlacklistedUserDTO.getRequesterId());
+        return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping

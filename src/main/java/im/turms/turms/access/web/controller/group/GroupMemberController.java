@@ -33,6 +33,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import static im.turms.turms.constant.AdminPermission.*;
 
@@ -47,22 +48,36 @@ public class GroupMemberController {
         this.groupMemberService = groupMemberService;
     }
 
+    @PostMapping
+    @RequiredPermission(GROUP_MEMBER_CREATE)
+    public Mono<ResponseEntity<ResponseDTO<GroupMember>>> addGroupMember(@RequestBody AddGroupMemberDTO addGroupMemberDTO) {
+        Mono<GroupMember> createMono = groupMemberService.addGroupMember(
+                addGroupMemberDTO.getGroupId(),
+                addGroupMemberDTO.getUserId(),
+                addGroupMemberDTO.getRole(),
+                addGroupMemberDTO.getName(),
+                addGroupMemberDTO.getJoinDate(),
+                addGroupMemberDTO.getMuteEndDate(),
+                null);
+        return ResponseFactory.okIfTruthy(createMono);
+    }
+
     @GetMapping
     @RequiredPermission(GROUP_MEMBER_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupMember>>>> queryGroupMembers(
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) GroupMemberRole role,
+            @RequestParam(required = false) Set<Long> groupIds,
+            @RequestParam(required = false) Set<Long> userIds,
+            @RequestParam(required = false) Set<GroupMemberRole> roles,
             @RequestParam(required = false) Date joinDateStart,
             @RequestParam(required = false) Date joinDateEnd,
             @RequestParam(required = false) Date muteEndDateStart,
             @RequestParam(required = false) Date muteEndDateEnd,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Flux<GroupMember> groupMemberFlux = groupMemberService.queryGroupMembers(
-                groupId,
-                userId,
-                role,
+        Flux<GroupMember> groupMemberFlux = groupMemberService.queryGroupsMembers(
+                groupIds,
+                userIds,
+                roles,
                 DateRange.of(joinDateStart, joinDateEnd),
                 DateRange.of(muteEndDateStart, muteEndDateEnd),
                 0,
@@ -73,9 +88,9 @@ public class GroupMemberController {
     @GetMapping("/page")
     @RequiredPermission(GROUP_MEMBER_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupMember>>>> queryGroupMembers(
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) GroupMemberRole role,
+            @RequestParam(required = false) Set<Long> groupIds,
+            @RequestParam(required = false) Set<Long> userIds,
+            @RequestParam(required = false) Set<GroupMemberRole> roles,
             @RequestParam(required = false) Date joinDateStart,
             @RequestParam(required = false) Date joinDateEnd,
             @RequestParam(required = false) Date muteEndDateStart,
@@ -84,15 +99,15 @@ public class GroupMemberController {
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Mono<Long> count = groupMemberService.countMembers(
-                groupId,
-                userId,
-                role,
+                groupIds,
+                userIds,
+                roles,
                 DateRange.of(joinDateStart, joinDateEnd),
                 DateRange.of(muteEndDateStart, muteEndDateEnd));
-        Flux<GroupMember> userFlux = groupMemberService.queryGroupMembers(
-                groupId,
-                userId,
-                role,
+        Flux<GroupMember> userFlux = groupMemberService.queryGroupsMembers(
+                groupIds,
+                userIds,
+                roles,
                 DateRange.of(joinDateStart, joinDateEnd),
                 DateRange.of(muteEndDateStart, muteEndDateEnd),
                 page,
@@ -100,31 +115,17 @@ public class GroupMemberController {
         return ResponseFactory.page(count, userFlux);
     }
 
-    @PostMapping
-    @RequiredPermission(GROUP_MEMBER_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<GroupMember>>> addGroupMember(@RequestBody AddGroupMemberDTO dto) {
-        Mono<GroupMember> createMono = groupMemberService.addGroupMember(
-                dto.getGroupId(),
-                dto.getUserId(),
-                dto.getRole(),
-                dto.getName(),
-                dto.getJoinDate(),
-                dto.getMuteEndDate(),
-                null);
-        return ResponseFactory.okIfTruthy(createMono);
-    }
-
     @PutMapping
     @RequiredPermission(GROUP_MEMBER_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupMembers(
             @RequestParam GroupMember.KeyList keys,
-            @RequestBody UpdateGroupMemberDTO dto) {
+            @RequestBody UpdateGroupMemberDTO updateGroupMemberDTO) {
         Mono<Boolean> updateMono = groupMemberService.updateGroupMembers(
                 new HashSet<>(keys.getKeys()),
-                dto.getName(),
-                dto.getRole(),
-                dto.getJoinDate(),
-                dto.getMuteEndDate(),
+                updateGroupMemberDTO.getName(),
+                updateGroupMemberDTO.getRole(),
+                updateGroupMemberDTO.getJoinDate(),
+                updateGroupMemberDTO.getMuteEndDate(),
                 null);
         return ResponseFactory.acknowledged(updateMono);
     }
@@ -132,19 +133,13 @@ public class GroupMemberController {
     @DeleteMapping
     @RequiredPermission(GROUP_MEMBER_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupMembers(
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) GroupMemberRole role,
-            @RequestParam(required = false) Date joinDateStart,
-            @RequestParam(required = false) Date joinDateEnd,
-            @RequestParam(required = false) Date muteEndDateStart,
-            @RequestParam(required = false) Date muteEndDateEnd) {
-        Mono<Boolean> deleteMono = groupMemberService.deleteMembers(
-                groupId,
-                userId,
-                role,
-                DateRange.of(joinDateStart, joinDateEnd),
-                DateRange.of(muteEndDateStart, muteEndDateEnd));
+            @RequestParam(required = false) GroupMember.KeyList keys) {
+        Mono<Boolean> deleteMono;
+        if (keys != null && !keys.getKeys().isEmpty()) {
+            deleteMono = groupMemberService.deleteGroupsMembers(new HashSet<>(keys.getKeys()));
+        } else {
+            deleteMono = groupMemberService.deleteGroupMembers();
+        }
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

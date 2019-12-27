@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = GroupMemberKeyConstraint.GroupMemberKeyValidator.class)
 @Documented
 public @interface GroupMemberKeyConstraint {
-    String message() default "GroupMemberKeyConstraint";
+    String message() default "The group member key must be not null";
 
     Class<?>[] groups() default {};
 
