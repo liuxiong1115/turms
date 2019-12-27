@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = GroupQuestionIdAndAnswerConstraint.GroupQuestionIdAndAnswerValidator.class)
 @Documented
 public @interface GroupQuestionIdAndAnswerConstraint {
-    String message() default "GroupQuestionIdAndAnswerConstraint";
+    String message() default "The question ID and answer must be not null";
 
     Class<?>[] groups() default {};
 

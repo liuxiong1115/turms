@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = RequestStatusConstraint.RequestStatusValidator.class)
 @Documented
 public @interface RequestStatusConstraint {
-    String message() default "RequestStatusConstraint";
+    String message() default "The request status must not be UNRECOGNIZED";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 

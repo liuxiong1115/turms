@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = ChatTypeConstraint.ChatTypeValidator.class)
 @Documented
 public @interface ChatTypeConstraint {
-    String message() default "ChatTypeConstraint";
+    String message() default "The chat type must not be UNRECOGNIZED";
 
     Class<?>[] groups() default {};
 

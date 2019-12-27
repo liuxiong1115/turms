@@ -42,7 +42,9 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 import java.util.function.Function;
 
 import static im.turms.turms.common.Constants.*;
@@ -61,9 +63,12 @@ public class GroupTypeService {
     }
 
     @PostHazelcastInitialized
-    public static Function<TurmsClusterManager, Void> initGroupTypes() {
+    public Function<TurmsClusterManager, Void> initGroupTypes() {
         return turmsClusterManager -> {
             groupTypeMap = turmsClusterManager.getHazelcastInstance().getReplicatedMap(HAZELCAST_GROUP_TYPES_MAP);
+            if (groupTypeMap.isEmpty()) {
+                loadAllGroupTypes().subscribe();
+            }
             groupTypeMap.putIfAbsent(
                     DEFAULT_GROUP_TYPE_ID,
                     new GroupType(
@@ -80,6 +85,11 @@ public class GroupTypeService {
                             true));
             return null;
         };
+    }
+
+    public Flux<GroupType> loadAllGroupTypes() {
+        return mongoTemplate.find(new Query(), GroupType.class)
+                .doOnNext(groupType -> groupTypeMap.put(groupType.getId(), groupType));
     }
 
     public GroupType getDefaultGroupType() {
@@ -124,8 +134,8 @@ public class GroupTypeService {
         return mongoTemplate.insert(groupType);
     }
 
-    public Mono<Boolean> updateGroupType(
-            @NotNull Long id,
+    public Mono<Boolean> updateGroupTypes(
+            @NotEmpty Set<Long> ids,
             @Nullable @NoWhitespaceConstraint String name,
             @Nullable @Min(1) Integer groupSizeLimit,
             @Nullable GroupInvitationStrategy groupInvitationStrategy,
@@ -147,7 +157,7 @@ public class GroupTypeService {
                 selfInfoUpdatable,
                 enableReadReceipt,
                 messageEditable);
-        Query query = new Query().addCriteria(Criteria.where(ID).is(id));
+        Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(GroupType.Fields.name, name)
                 .setIfNotNull(GroupType.Fields.groupSizeLimit, groupSizeLimit)
@@ -160,20 +170,32 @@ public class GroupTypeService {
                 .setIfNotNull(GroupType.Fields.enableReadReceipt, enableReadReceipt)
                 .setIfNotNull(GroupType.Fields.messageEditable, messageEditable)
                 .build();
-        return mongoTemplate.findAndModify(query, update, GroupType.class)
-                .doOnNext(groupType -> groupTypeMap.put(id, groupType))
-                .thenReturn(true);
+        return mongoTemplate.updateMulti(query, update, GroupType.class)
+                .flatMap(result -> {
+                    if (result.wasAcknowledged()) {
+                        return loadAllGroupTypes().then(Mono.just(true));
+                    } else {
+                        return Mono.just(false);
+                    }
+                });
     }
 
-    public Mono<Boolean> deleteGroupType(@NotNull Long groupTypeId) {
-        Validator.throwIfAnyNull(groupTypeId);
-        Query query = new Query().addCriteria(Criteria.where(ID).is(groupTypeId));
-        groupTypeMap.remove(groupTypeId);
+    public Mono<Boolean> deleteGroupTypes(@Nullable Set<Long> groupTypeIds) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, groupTypeIds)
+                .buildQuery();
+        if (groupTypeIds != null) {
+            for (Long id : groupTypeIds) {
+                groupTypeMap.remove(id);
+            }
+        } else {
+            groupTypeMap.clear();
+        }
         return mongoTemplate.remove(query, GroupType.class).map(DeleteResult::wasAcknowledged);
     }
 
     public Mono<GroupType> queryGroupType(@NotNull Long groupTypeId) {
-        Validator.throwIfAnyNull(groupTypeId);
         GroupType groupType = groupTypeMap.get(groupTypeId);
         if (groupType != null) {
             return Mono.just(groupType);

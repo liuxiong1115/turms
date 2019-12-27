@@ -28,6 +28,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddGroupJoinRequestDTO {
+    private Long id;
     private String content;
     private RequestStatus status;
     private Date creationDate;

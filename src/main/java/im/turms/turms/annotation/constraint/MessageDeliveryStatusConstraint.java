@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = MessageDeliveryStatusConstraint.MessageDeliveryStatusValidator.class)
 @Documented
 public @interface MessageDeliveryStatusConstraint {
-    String message() default "MessageDeliveryStatusConstraint";
+    String message() default "The message delivery status must not be UNRECOGNIZED";
 
     Class<?>[] groups() default {};
 

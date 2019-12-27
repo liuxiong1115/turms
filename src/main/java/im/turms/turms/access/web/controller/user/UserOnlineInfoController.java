@@ -3,6 +3,7 @@ package im.turms.turms.access.web.controller.user;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.common.PageUtil;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
@@ -34,12 +35,14 @@ public class UserOnlineInfoController {
     private final OnlineUserService onlineUserService;
     private final UsersNearbyService usersNearbyService;
     private final TurmsClusterManager turmsClusterManager;
+    private final PageUtil pageUtil;
 
-    public UserOnlineInfoController(UserService userService, OnlineUserService onlineUserService, UsersNearbyService usersNearbyService, TurmsClusterManager turmsClusterManager) {
+    public UserOnlineInfoController(UserService userService, OnlineUserService onlineUserService, UsersNearbyService usersNearbyService, TurmsClusterManager turmsClusterManager, PageUtil pageUtil) {
         this.userService = userService;
         this.onlineUserService = onlineUserService;
         this.usersNearbyService = usersNearbyService;
         this.turmsClusterManager = turmsClusterManager;
+        this.pageUtil = pageUtil;
     }
 
     @GetMapping("/count")
@@ -49,20 +52,20 @@ public class UserOnlineInfoController {
     }
 
     /**
-     * @param number only works when userIds is null or empty
+     * @param size only works when userIds is null or empty
      */
     @GetMapping("/statuses")
     @RequiredPermission(USER_ONLINE_INFO_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<UserOnlineInfo>>>> queryOnlineUsersStatus(
             @RequestParam(required = false) Set<Long> userIds,
-            @RequestParam(defaultValue = "20") Integer number,
-            @RequestParam(defaultValue = "true") Boolean checkIfExists) {
+            @RequestParam(required = false) Integer size,
+            @RequestParam(defaultValue = "true") Boolean shouldCheckIfExists) {
         if (userIds != null && !userIds.isEmpty()) {
             List<Mono<UserOnlineInfo>> userOnlineInfoMonos = new ArrayList<>(userIds.size());
             for (Long userId : userIds) {
                 Mono<UserOnlineInfo> userOnlineInfoMno = onlineUserService.queryUserOnlineInfo(userId);
                 userOnlineInfoMno = userOnlineInfoMno.flatMap(info -> {
-                    if (info.getUserStatus() == UserStatus.OFFLINE && checkIfExists) {
+                    if (info.getUserStatus() == UserStatus.OFFLINE && shouldCheckIfExists) {
                         return userService.userExists(userId)
                                 .flatMap(exists -> {
                                     if (exists) {
@@ -79,33 +82,14 @@ public class UserOnlineInfoController {
             }
             return ResponseFactory.okIfTruthy(Flux.merge(userOnlineInfoMonos));
         } else {
-            if (number > turmsClusterManager.getTurmsProperties().getSecurity()
+            size = pageUtil.getSize(size);
+            if (size > turmsClusterManager.getTurmsProperties().getSecurity()
                     .getMaxQueryOnlineUsersStatusPerRequest()) {
                 throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
             }
-            Flux<UserOnlineInfo> userOnlineInfoFlux = onlineUserService.queryUserOnlineInfos(number);
+            Flux<UserOnlineInfo> userOnlineInfoFlux = onlineUserService.queryUserOnlineInfos(size);
             return ResponseFactory.okIfTruthy(userOnlineInfoFlux);
         }
-    }
-
-    @PutMapping("/statuses")
-    @RequiredPermission(USER_ONLINE_INFO_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUserOnlineStatus(
-            @RequestParam Long userId,
-            @RequestParam(required = false) Set<DeviceType> deviceTypes,
-            @RequestBody UpdateOnlineStatusDTO updateOnlineStatusDTO) {
-        Mono<Boolean> updated;
-        UserStatus onlineStatus = updateOnlineStatusDTO.getOnlineStatus();
-        if (onlineStatus == UserStatus.OFFLINE) {
-            if (deviceTypes != null) {
-                updated = onlineUserService.setUserDevicesOffline(userId, deviceTypes, CloseStatus.NORMAL);
-            } else {
-                updated = onlineUserService.setUserOffline(userId, CloseStatus.NORMAL);
-            }
-        } else {
-            updated = onlineUserService.updateOnlineUserStatus(userId, onlineStatus);
-        }
-        return ResponseFactory.acknowledged(updated);
     }
 
     @GetMapping("/users-nearby")
@@ -124,5 +108,25 @@ public class UserOnlineInfoController {
     public ResponseEntity<ResponseDTO<Collection<UserLocation>>> queryUserLocations(@RequestParam Long userId) {
         SortedSet<UserLocation> userLocations = onlineUserService.getUserLocations(userId);
         return ResponseFactory.okIfTruthy(userLocations);
+    }
+
+    @PutMapping("/statuses")
+    @RequiredPermission(USER_ONLINE_INFO_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUserOnlineStatus(
+            @RequestParam Set<Long> userIds,
+            @RequestParam(required = false) Set<DeviceType> deviceTypes,
+            @RequestBody UpdateOnlineStatusDTO updateOnlineStatusDTO) {
+        Mono<Boolean> updated;
+        UserStatus onlineStatus = updateOnlineStatusDTO.getOnlineStatus();
+        if (onlineStatus == UserStatus.OFFLINE) {
+            if (deviceTypes != null) {
+                updated = onlineUserService.setUsersDevicesOffline(userIds, deviceTypes, CloseStatus.NORMAL);
+            } else {
+                updated = onlineUserService.setUsersOffline(userIds, CloseStatus.NORMAL);
+            }
+        } else {
+            updated = onlineUserService.updateOnlineUsersStatus(userIds, onlineStatus);
+        }
+        return ResponseFactory.acknowledged(updated);
     }
 }

@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = ResponseActionConstraint.ResponseActionValidator.class)
 @Documented
 public @interface ResponseActionConstraint {
-    String message() default "ResponseActionConstraint";
+    String message() default "The response action must not be UNRECOGNIZED";
 
     Class<?>[] groups() default {};
 

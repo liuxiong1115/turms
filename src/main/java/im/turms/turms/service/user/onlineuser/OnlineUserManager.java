@@ -76,7 +76,7 @@ public class OnlineUserManager {
             @NotNull WebSocketSession webSocketSession,
             @NotNull FluxSink<WebSocketMessage> notificationSink,
             @NotNull Timeout heartbeatTimeout,
-            @NotNull Long logId) {
+            @Nullable Long logId) {
         setOfflineByDeviceType(deviceType, CloseStatus.POLICY_VIOLATION);
         Session session = new Session(
                 deviceType,

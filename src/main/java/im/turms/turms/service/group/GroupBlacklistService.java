@@ -93,14 +93,14 @@ public class GroupBlacklistService {
                                 false,
                                 false);
                         if (operations != null) {
-                            Mono<Boolean> delete = groupMemberService.deleteGroupMember(groupId, blacklistedUserId, operations);
+                            Mono<Boolean> delete = groupMemberService.deleteGroupMembers(groupId, Set.of(blacklistedUserId), operations);
                             return Mono.zip(delete, operations.insert(blacklistedUser), updateVersion)
                                     .thenReturn(true);
                         } else {
                             return mongoTemplate
                                     .inTransaction()
                                     .execute(newOperations ->
-                                            Mono.zip(groupMemberService.deleteGroupMember(groupId, blacklistedUserId, newOperations),
+                                            Mono.zip(groupMemberService.deleteGroupMembers(groupId, Set.of(blacklistedUserId), newOperations),
                                                     newOperations.insert(blacklistedUser),
                                                     updateVersion)
                                                     .thenReturn(true))

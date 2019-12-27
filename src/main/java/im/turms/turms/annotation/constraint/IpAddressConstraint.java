@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = IpAddressConstraint.IpAddressValidator.class)
 @Documented
 public @interface IpAddressConstraint {
-    String message() default "IpAddressConstraint";
+    String message() default "The string must be a valid IP";
 
     Class<?>[] groups() default {};
 

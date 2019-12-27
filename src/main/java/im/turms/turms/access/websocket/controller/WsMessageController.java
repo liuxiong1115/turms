@@ -90,6 +90,7 @@ public class WsMessageController {
                 Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
                 Date deliveryDate = new Date(request.getDeliveryDate());
                 pairMono = messageService.authAndSendMessage(
+                        null,
                         turmsRequestWrapper.getUserId(),
                         request.getToId(),
                         request.getChatType(),
@@ -149,9 +150,10 @@ public class WsMessageController {
                 size = turmsClusterManager.getTurmsProperties().getMessage().getDefaultMessagesNumberWithTotal();
             }
             size = pageUtil.getSize(size);
-            return messageService.queryCompleteMessages(
+            return messageService.queryMessages(
                     false, null, null, null, null,
-                    turmsRequestWrapper.getUserId(), null, null, MessageDeliveryStatus.READY, 0, size)
+                    Set.of(turmsRequestWrapper.getUserId()), null, null,
+                    Set.of(MessageDeliveryStatus.READY), 0, size)
                     .doOnNext(message -> multimap.put(Triple.of(message.getChatType(),
                             message.getIsSystemMessage(),
                             message.getChatType() == ChatType.GROUP ? message.getTargetId() : message.getSenderId()), message))
@@ -194,7 +196,7 @@ public class WsMessageController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryMessagesRequest() {
         return turmsRequestWrapper -> {
             QueryMessagesRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessagesRequest();
-            List<Long> idsList = request.getIdsCount() != 0 ? request.getIdsList() : null;
+            List<Long> idList = request.getIdsCount() != 0 ? request.getIdsList() : null;
             ChatType chatType = request.getChatType();
             Boolean areSystemMessages = request.hasAreSystemMessages() ? request.getAreSystemMessages().getValue() : null;
             Long fromId = request.hasFromId() ? request.getFromId().getValue() : null;
@@ -210,7 +212,7 @@ public class WsMessageController {
             Integer size = request.hasSize() ? pageUtil.getSize(request.getSize().getValue()) : null;
             return messageService.authAndQueryCompleteMessages(
                     true,
-                    idsList,
+                    idList,
                     chatType,
                     areSystemMessages,
                     fromId,

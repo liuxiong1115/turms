@@ -47,14 +47,30 @@ public class GroupJoinRequestController {
         this.pageUtil = pageUtil;
     }
 
+    @PostMapping
+    @RequiredPermission(GROUP_JOIN_REQUEST_CREATE)
+    public Mono<ResponseEntity<ResponseDTO<GroupJoinRequest>>> addGroupJoinRequest(@RequestBody AddGroupJoinRequestDTO addGroupJoinRequestDTO) {
+        Mono<GroupJoinRequest> createMono = groupJoinRequestService.createGroupJoinRequest(
+                addGroupJoinRequestDTO.getId(),
+                addGroupJoinRequestDTO.getGroupId(),
+                addGroupJoinRequestDTO.getRequesterId(),
+                addGroupJoinRequestDTO.getResponderId(),
+                addGroupJoinRequestDTO.getContent(),
+                addGroupJoinRequestDTO.getStatus(),
+                addGroupJoinRequestDTO.getCreationDate(),
+                addGroupJoinRequestDTO.getResponseDate(),
+                addGroupJoinRequestDTO.getExpirationDate());
+        return ResponseFactory.okIfTruthy(createMono);
+    }
+
     @GetMapping
     @RequiredPermission(GROUP_JOIN_REQUEST_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupJoinRequest>>>> queryGroupJoinRequests(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long requesterId,
-            @RequestParam(required = false) Long responderId,
-            @RequestParam(required = false) RequestStatus status,
+            @RequestParam(required = false) Set<Long> groupIds,
+            @RequestParam(required = false) Set<Long> requesterIds,
+            @RequestParam(required = false) Set<Long> responderIds,
+            @RequestParam(required = false) Set<RequestStatus> statuses,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
             @RequestParam(required = false) Date responseDateStart,
@@ -65,10 +81,10 @@ public class GroupJoinRequestController {
         size = pageUtil.getSize(size);
         Flux<GroupJoinRequest> joinRequestFlux = groupJoinRequestService.queryJoinRequests(
                 ids,
-                groupId,
-                requesterId,
-                responderId,
-                status,
+                groupIds,
+                requesterIds,
+                responderIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd),
@@ -81,10 +97,10 @@ public class GroupJoinRequestController {
     @RequiredPermission(GROUP_JOIN_REQUEST_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupJoinRequest>>>> queryGroupJoinRequests(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long requesterId,
-            @RequestParam(required = false) Long responderId,
-            @RequestParam(required = false) RequestStatus status,
+            @RequestParam(required = false) Set<Long> groupIds,
+            @RequestParam(required = false) Set<Long> requesterIds,
+            @RequestParam(required = false) Set<Long> responderIds,
+            @RequestParam(required = false) Set<RequestStatus> statuses,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
             @RequestParam(required = false) Date responseDateStart,
@@ -96,19 +112,19 @@ public class GroupJoinRequestController {
         size = pageUtil.getSize(size);
         Mono<Long> count = groupJoinRequestService.countJoinRequests(
                 ids,
-                groupId,
-                requesterId,
-                responderId,
-                status,
+                groupIds,
+                requesterIds,
+                responderIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd));
         Flux<GroupJoinRequest> joinRequestFlux = groupJoinRequestService.queryJoinRequests(
                 ids,
-                groupId,
-                requesterId,
-                responderId,
-                status,
+                groupIds,
+                requesterIds,
+                responderIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd),
@@ -117,61 +133,28 @@ public class GroupJoinRequestController {
         return ResponseFactory.page(count, joinRequestFlux);
     }
 
-    @PostMapping
-    @RequiredPermission(GROUP_JOIN_REQUEST_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<GroupJoinRequest>>> addGroupJoinRequest(@RequestBody AddGroupJoinRequestDTO dto) {
-        Mono<GroupJoinRequest> createMono = groupJoinRequestService.createGroupJoinRequest(
-                dto.getGroupId(),
-                dto.getRequesterId(),
-                dto.getResponderId(),
-                dto.getContent(),
-                dto.getStatus(),
-                dto.getCreationDate(),
-                dto.getResponseDate(),
-                dto.getExpirationDate());
-        return ResponseFactory.okIfTruthy(createMono);
-    }
-
     @PutMapping
     @RequiredPermission(GROUP_JOIN_REQUEST_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupJoinRequests(
             @RequestParam Set<Long> ids,
-            @RequestBody UpdateGroupJoinRequestDTO dto) {
+            @RequestBody UpdateGroupJoinRequestDTO updateGroupJoinRequestDTO) {
         Mono<Boolean> updateMono = groupJoinRequestService.updateJoinRequests(
                 ids,
-                dto.getRequesterId(),
-                dto.getResponderId(),
-                dto.getContent(),
-                dto.getStatus(),
-                dto.getCreationDate(),
-                dto.getResponseDate(),
-                dto.getExpirationDate());
+                updateGroupJoinRequestDTO.getRequesterId(),
+                updateGroupJoinRequestDTO.getResponderId(),
+                updateGroupJoinRequestDTO.getContent(),
+                updateGroupJoinRequestDTO.getStatus(),
+                updateGroupJoinRequestDTO.getCreationDate(),
+                updateGroupJoinRequestDTO.getResponseDate(),
+                updateGroupJoinRequestDTO.getExpirationDate());
         return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping
     @RequiredPermission(GROUP_JOIN_REQUEST_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupJoinRequests(
-            @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId,
-            @RequestParam(required = false) Long inviterId,
-            @RequestParam(required = false) Long inviteeId,
-            @RequestParam(required = false) RequestStatus status,
-            @RequestParam(required = false) Date creationDateStart,
-            @RequestParam(required = false) Date creationDateEnd,
-            @RequestParam(required = false) Date responseDateStart,
-            @RequestParam(required = false) Date responseDateEnd,
-            @RequestParam(required = false) Date expirationDateStart,
-            @RequestParam(required = false) Date expirationDateEnd) {
-        Mono<Boolean> deleteMono = groupJoinRequestService.deleteJoinRequests(
-                ids,
-                groupId,
-                inviterId,
-                inviteeId,
-                status,
-                DateRange.of(creationDateStart, creationDateEnd),
-                DateRange.of(responseDateStart, responseDateEnd),
-                DateRange.of(expirationDateStart, expirationDateEnd));
+            @RequestParam(required = false) Set<Long> ids) {
+        Mono<Boolean> deleteMono = groupJoinRequestService.deleteJoinRequests(ids);
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

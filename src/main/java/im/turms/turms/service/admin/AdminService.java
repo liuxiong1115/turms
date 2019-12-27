@@ -73,7 +73,7 @@ public class AdminService {
     public Function<TurmsClusterManager, Void> initAdminsCache() {
         return clusterManager -> {
             adminMap = clusterManager.getHazelcastInstance().getReplicatedMap(HAZELCAST_ADMINS_MAP);
-            if (adminMap.size() == 0) {
+            if (adminMap.isEmpty()) {
                 loadAllAdmins();
             }
             rootAdminExists().subscribe(exists -> {
@@ -292,7 +292,9 @@ public class AdminService {
             @Nullable @NoWhitespaceConstraint String rawPassword,
             @Nullable @NoWhitespaceConstraint String name,
             @Nullable Long roleId) {
-        if (targetAccounts.size() == 1 && targetAccounts.iterator().next().equals(requesterAccount)) {
+        Validator.throwIfAllNull(rawPassword, name, roleId);
+        boolean onlyUpdateOneself = targetAccounts.size() == 1 && targetAccounts.iterator().next().equals(requesterAccount);
+        if (onlyUpdateOneself) {
             if (roleId == null) {
                 return updateAdmins(targetAccounts, rawPassword, name, null);
             } else {
@@ -302,14 +304,18 @@ public class AdminService {
             return adminRoleService.isAdminHigherThanAdmins(requesterAccount, targetAccounts)
                     .flatMap(triple -> {
                         if (triple.getLeft()) {
-                            return adminRoleService.queryRankByRole(roleId)
-                                    .flatMap(rank -> {
-                                        if (triple.getMiddle() > rank) {
-                                            return updateAdmins(targetAccounts, rawPassword, name, roleId);
-                                        } else {
-                                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                                        }
-                                    });
+                            if (roleId != null) {
+                                return adminRoleService.queryRankByRole(roleId)
+                                        .flatMap(targetRoleRank -> {
+                                            if (triple.getMiddle() > targetRoleRank) {
+                                                return updateAdmins(targetAccounts, rawPassword, name, roleId);
+                                            } else {
+                                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                                            }
+                                        });
+                            } else {
+                                return updateAdmins(targetAccounts, rawPassword, name, null);
+                            }
                         } else {
                             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                         }
