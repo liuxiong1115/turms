@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = NoWhitespaceConstraint.NoWhitespaceValidator.class)
 @Documented
 public @interface NoWhitespaceConstraint {
-    String message() default "NoWhitespaceConstraint";
+    String message() default "The string must not contain whitespace";
 
     Class<?>[] groups() default {};
 

@@ -20,7 +20,6 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -46,7 +45,7 @@ public class UserFriendRequestService {
     private final UserVersionService userVersionService;
     private final UserRelationshipService userRelationshipService;
 
-    public UserFriendRequestService(@Lazy TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, UserVersionService userVersionService, @Lazy UserRelationshipService userRelationshipService, TaskScheduler taskScheduler) {
+    public UserFriendRequestService(@Lazy TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, UserVersionService userVersionService, @Lazy UserRelationshipService userRelationshipService) {
         this.turmsClusterManager = turmsClusterManager;
         this.mongoTemplate = mongoTemplate;
         this.userVersionService = userVersionService;
@@ -101,6 +100,7 @@ public class UserFriendRequestService {
     }
 
     public Mono<UserFriendRequest> createFriendRequest(
+            @Nullable Long id,
             @NotNull Long requesterId,
             @NotNull Long recipientId,
             @NotNull String content,
@@ -113,7 +113,7 @@ public class UserFriendRequestService {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         UserFriendRequest userFriendRequest = new UserFriendRequest();
-        userFriendRequest.setId(turmsClusterManager.generateRandomId());
+        userFriendRequest.setId(id != null ? id : turmsClusterManager.generateRandomId());
         userFriendRequest.setContent(content);
         Date now = new Date();
         if (creationDate == null) {
@@ -170,7 +170,7 @@ public class UserFriendRequestService {
                         }
                         return requestExistsMono.flatMap(requestExists -> {
                             if (requestExists != null && !requestExists) {
-                                return createFriendRequest(requesterId, recipientId, content, RequestStatus.PENDING, creationDate, null, null, null);
+                                return createFriendRequest(null, requesterId, recipientId, content, RequestStatus.PENDING, creationDate, null, null, null);
                             } else {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED));
                             }
@@ -327,23 +327,10 @@ public class UserFriendRequestService {
                 });
     }
 
-    public Mono<Boolean> deleteFriendRequests(
-            @Nullable Set<Long> ids,
-            @Nullable Long requesterId,
-            @Nullable Long recipientId,
-            @Nullable RequestStatus status,
-            @Nullable DateRange creationDateRange,
-            @Nullable DateRange responseDateRange,
-            @Nullable DateRange expirationDateRange) {
+    public Mono<Boolean> deleteFriendRequests(@Nullable Set<Long> ids) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(UserFriendRequest.Fields.requesterId, requesterId)
-                .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
-                .addIsIfNotNull(UserFriendRequest.Fields.status, status)
-                .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateRange)
-                .addBetweenIfNotNull(UserFriendRequest.Fields.responseDate, responseDateRange)
-                .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateRange)
                 .buildQuery();
         return mongoTemplate.remove(query, UserFriendRequest.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -351,9 +338,9 @@ public class UserFriendRequestService {
 
     public Flux<UserFriendRequest> queryFriendRequests(
             @Nullable Set<Long> ids,
-            @Nullable Long requesterId,
-            @Nullable Long recipientId,
-            @Nullable RequestStatus status,
+            @Nullable Set<Long> requesterIds,
+            @Nullable Set<Long> recipientIds,
+            @Nullable Set<RequestStatus> statuses,
             @Nullable DateRange creationDateRange,
             @Nullable DateRange responseDateRange,
             @Nullable DateRange expirationDateRange,
@@ -362,9 +349,9 @@ public class UserFriendRequestService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(UserFriendRequest.Fields.requesterId, requesterId)
-                .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
-                .addIsIfNotNull(UserFriendRequest.Fields.status, status)
+                .addInIfNotNull(UserFriendRequest.Fields.requesterId, requesterIds)
+                .addInIfNotNull(UserFriendRequest.Fields.recipientId, recipientIds)
+                .addInIfNotNull(UserFriendRequest.Fields.status, statuses)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateRange)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.responseDate, responseDateRange)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateRange)
@@ -374,18 +361,18 @@ public class UserFriendRequestService {
 
     public Mono<Long> countFriendRequests(
             @Nullable Set<Long> ids,
-            @Nullable Long requesterId,
-            @Nullable Long recipientId,
-            @Nullable RequestStatus status,
+            @Nullable Set<Long> requesterIds,
+            @Nullable Set<Long> recipientIds,
+            @Nullable Set<RequestStatus> statuses,
             @Nullable DateRange creationDateRange,
             @Nullable DateRange responseDateRange,
             @Nullable DateRange expirationDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(UserFriendRequest.Fields.requesterId, requesterId)
-                .addIsIfNotNull(UserFriendRequest.Fields.recipientId, recipientId)
-                .addIsIfNotNull(UserFriendRequest.Fields.status, status)
+                .addInIfNotNull(UserFriendRequest.Fields.requesterId, requesterIds)
+                .addInIfNotNull(UserFriendRequest.Fields.recipientId, recipientIds)
+                .addInIfNotNull(UserFriendRequest.Fields.status, statuses)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.creationDate, creationDateRange)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.responseDate, responseDateRange)
                 .addBetweenIfNotNull(UserFriendRequest.Fields.expirationDate, expirationDateRange)

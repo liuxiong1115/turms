@@ -225,14 +225,14 @@ public class GroupQuestionService {
 
     public Flux<GroupJoinQuestion> queryGroupJoinQuestions(
             @Nullable Set<Long> ids,
-            @Nullable Long groupId,
+            @Nullable Set<Long> groupIds,
             @Nullable Integer page,
             @Nullable Integer size,
             boolean withAnswers) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
+                .addInIfNotNull(GroupJoinQuestion.Fields.groupId, groupIds)
                 .paginateIfNotNull(page, size);
         if (!withAnswers) {
             query.fields().exclude(GroupJoinQuestion.Fields.answers);
@@ -240,20 +240,19 @@ public class GroupQuestionService {
         return mongoTemplate.find(query, GroupJoinQuestion.class);
     }
 
-    public Mono<Long> countGroupJoinQuestions(@Nullable Set<Long> ids, @Nullable Long groupId) {
+    public Mono<Long> countGroupJoinQuestions(@Nullable Set<Long> ids, @Nullable Set<Long> groupIds) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
+                .addInIfNotNull(GroupJoinQuestion.Fields.groupId, groupIds)
                 .buildQuery();
         return mongoTemplate.count(query, GroupJoinQuestion.class);
     }
 
-    public Mono<Boolean> deleteGroupJoinQuestion(@Nullable Set<Long> ids, @Nullable Long groupId) {
+    public Mono<Boolean> deleteGroupJoinQuestions(@Nullable Set<Long> ids) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
                 .buildQuery();
         return mongoTemplate.remove(query, GroupJoinQuestion.class)
                 .map(DeleteResult::wasAcknowledged);
@@ -281,7 +280,7 @@ public class GroupQuestionService {
                 })
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return queryGroupJoinQuestions(null, groupId, null, null, false)
+                        return queryGroupJoinQuestions(null, Set.of(groupId), null, null, false)
                                 .collect(Collectors.toSet())
                                 .map(groupJoinQuestions -> {
                                     if (groupJoinQuestions.isEmpty()) {

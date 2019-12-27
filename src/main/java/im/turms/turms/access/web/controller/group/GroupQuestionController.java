@@ -48,37 +48,36 @@ public class GroupQuestionController {
     @RequiredPermission(GROUP_QUESTION_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<GroupJoinQuestion>>>> queryGroupJoinQuestions(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId,
+            @RequestParam(required = false) Set<Long> groupIds,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Flux<GroupJoinQuestion> groupJoinQuestionFlux = groupQuestionService
-                .queryGroupJoinQuestions(ids, groupId, 0, size, true);
+                .queryGroupJoinQuestions(ids, groupIds, 0, size, true);
         return ResponseFactory.okIfTruthy(groupJoinQuestionFlux);
     }
 
     @GetMapping("/page")
     @RequiredPermission(GROUP_QUESTION_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupJoinQuestion>>>> queryGroupsInformation(
+    public Mono<ResponseEntity<ResponseDTO<PaginationDTO<GroupJoinQuestion>>>> queryGroupJoinQuestions(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId,
+            @RequestParam(required = false) Set<Long> groupIds,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Mono<Long> count = groupQuestionService.countGroupJoinQuestions(ids, groupId);
+        Mono<Long> count = groupQuestionService.countGroupJoinQuestions(ids, groupIds);
         Flux<GroupJoinQuestion> groupJoinQuestionFlux = groupQuestionService
-                .queryGroupJoinQuestions(ids, groupId, page, size, true);
+                .queryGroupJoinQuestions(ids, groupIds, page, size, true);
         return ResponseFactory.page(count, groupJoinQuestionFlux);
     }
 
     @PostMapping
     @RequiredPermission(GROUP_QUESTION_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<GroupJoinQuestion>>> addGroupJoinQuestion(@RequestBody AddGroupJoinQuestionDTO dto) {
-        Mono<GroupJoinQuestion> createMono = groupQuestionService
-                .createGroupJoinQuestion(
-                        dto.getGroupId(),
-                        dto.getQuestion(),
-                        dto.getAnswers(),
-                        dto.getScore());
+    public Mono<ResponseEntity<ResponseDTO<GroupJoinQuestion>>> addGroupJoinQuestion(@RequestBody AddGroupJoinQuestionDTO addGroupJoinQuestionDTO) {
+        Mono<GroupJoinQuestion> createMono = groupQuestionService.createGroupJoinQuestion(
+                addGroupJoinQuestionDTO.getGroupId(),
+                addGroupJoinQuestionDTO.getQuestion(),
+                addGroupJoinQuestionDTO.getAnswers(),
+                addGroupJoinQuestionDTO.getScore());
         return ResponseFactory.okIfTruthy(createMono);
     }
 
@@ -86,22 +85,21 @@ public class GroupQuestionController {
     @RequiredPermission(GROUP_QUESTION_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupJoinQuestions(
             @RequestParam Set<Long> ids,
-            @RequestBody UpdateGroupJoinQuestionDTO dto) {
+            @RequestBody UpdateGroupJoinQuestionDTO updateGroupJoinQuestionDTO) {
         Mono<Boolean> updateMono = groupQuestionService.updateGroupJoinQuestions(
                 ids,
-                dto.getGroupId(),
-                dto.getQuestion(),
-                dto.getAnswers(),
-                dto.getScore());
+                updateGroupJoinQuestionDTO.getGroupId(),
+                updateGroupJoinQuestionDTO.getQuestion(),
+                updateGroupJoinQuestionDTO.getAnswers(),
+                updateGroupJoinQuestionDTO.getScore());
         return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping
     @RequiredPermission(GROUP_QUESTION_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupJoinQuestions(
-            @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long groupId) {
-        Mono<Boolean> deleteMono = groupQuestionService.deleteGroupJoinQuestion(ids, groupId);
+            @RequestParam(required = false) Set<Long> ids) {
+        Mono<Boolean> deleteMono = groupQuestionService.deleteGroupJoinQuestions(ids);
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

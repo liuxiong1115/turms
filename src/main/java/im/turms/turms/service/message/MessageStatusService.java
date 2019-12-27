@@ -51,20 +51,20 @@ public class MessageStatusService {
         return mongoTemplate.exists(query, MessageStatus.class);
     }
 
-    public Flux<Long> queryMessagesIdsByDeliveryStatusAndTargetId(
-            @NotNull MessageDeliveryStatus deliveryStatus,
+    public Flux<Long> queryMessagesIdsByDeliveryStatusesAndTargetIds(
+            @NotEmpty Set<MessageDeliveryStatus> deliveryStatuses,
             @Nullable ChatType chatType,
-            @Nullable Long targetId) {
+            @Nullable Set<Long> targetIds) {
         Query query = new Query()
-                .addCriteria(Criteria.where(MessageStatus.Fields.deliveryStatus).is(deliveryStatus));
+                .addCriteria(Criteria.where(MessageStatus.Fields.deliveryStatus).in(deliveryStatuses));
         if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP) {
-            if (targetId == null) {
+            if (targetIds == null || targetIds.isEmpty()) {
                 return Flux.empty();
             }
             if (chatType == ChatType.PRIVATE) {
-                query.addCriteria(Criteria.where(ID_RECIPIENT_ID).is(targetId));
+                query.addCriteria(Criteria.where(ID_RECIPIENT_ID).in(targetIds));
             } else {
-                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(targetId));
+                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).in(targetIds));
             }
         }
         query.fields().include(ID_MESSAGE_ID);
@@ -176,8 +176,8 @@ public class MessageStatusService {
             @Nullable Set<Long> messageIds,
             @Nullable Set<Long> recipientIds,
             @Nullable Boolean isSystemMessage,
-            @Nullable Long senderId,
-            @Nullable MessageDeliveryStatus deliveryStatus,
+            @Nullable Set<Long> senderIds,
+            @Nullable Set<MessageDeliveryStatus> deliveryStatuses,
             @Nullable DateRange receptionDateRange,
             @Nullable DateRange readDateRange,
             @Nullable DateRange recallDateRange,
@@ -188,8 +188,8 @@ public class MessageStatusService {
                 .addInIfNotNull(ID_MESSAGE_ID, messageIds)
                 .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
                 .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, isSystemMessage)
-                .addIsIfNotNull(MessageStatus.Fields.senderId, senderId)
-                .addIsIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatus)
+                .addInIfNotNull(MessageStatus.Fields.senderId, senderIds)
+                .addInIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatuses)
                 .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateRange)
                 .addBetweenIfNotNull(MessageStatus.Fields.readDate, readDateRange)
                 .addBetweenIfNotNull(MessageStatus.Fields.recallDate, recallDateRange)
@@ -201,8 +201,8 @@ public class MessageStatusService {
             @Nullable Set<Long> messageIds,
             @Nullable Set<Long> recipientIds,
             @Nullable Boolean isSystemMessage,
-            @Nullable Long senderId,
-            @Nullable MessageDeliveryStatus deliveryStatus,
+            @Nullable Set<Long> senderIds,
+            @Nullable Set<MessageDeliveryStatus> deliveryStatuses,
             @Nullable DateRange receptionDateRange,
             @Nullable DateRange readDateRange,
             @Nullable DateRange recallDateRange) {
@@ -211,8 +211,8 @@ public class MessageStatusService {
                 .addInIfNotNull(ID_MESSAGE_ID, messageIds)
                 .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
                 .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, isSystemMessage)
-                .addIsIfNotNull(MessageStatus.Fields.senderId, senderId)
-                .addIsIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatus)
+                .addInIfNotNull(MessageStatus.Fields.senderId, senderIds)
+                .addInIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatuses)
                 .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateRange)
                 .addBetweenIfNotNull(MessageStatus.Fields.readDate, readDateRange)
                 .addBetweenIfNotNull(MessageStatus.Fields.recallDate, recallDateRange)

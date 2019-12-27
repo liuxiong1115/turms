@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = GroupMemberRoleConstraint.GroupMemberRoleValidator.class)
 @Documented
 public @interface GroupMemberRoleConstraint {
-    String message() default "GroupMemberRoleConstraint";
+    String message() default "The group member role must not be UNRECOGNIZED";
 
     Class<?>[] groups() default {};
 

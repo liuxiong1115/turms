@@ -58,8 +58,8 @@ public class MessageStatusController {
             @RequestParam(required = false) Set<Long> messageIds,
             @RequestParam(required = false) Set<Long> recipientIds,
             @RequestParam(required = false) Boolean areSystemMessages,
-            @RequestParam(required = false) Long senderId,
-            @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
+            @RequestParam(required = false) Set<Long> senderIds,
+            @RequestParam(required = false) Set<MessageDeliveryStatus> deliveryStatuses,
             @RequestParam(required = false) Date receptionDateStart,
             @RequestParam(required = false) Date receptionDateEnd,
             @RequestParam(required = false) Date readDateStart,
@@ -67,12 +67,13 @@ public class MessageStatusController {
             @RequestParam(required = false) Date recallDateStart,
             @RequestParam(required = false) Date recallDateEnd,
             @RequestParam(required = false) Integer size) {
+        size = pageUtil.getSize(size);
         Flux<MessageStatus> messageStatuses = messageStatusService.queryMessageStatuses(
                 messageIds,
                 recipientIds,
                 areSystemMessages,
-                senderId,
-                deliveryStatus,
+                senderIds,
+                deliveryStatuses,
                 DateRange.of(receptionDateStart, receptionDateEnd),
                 DateRange.of(readDateStart, readDateEnd),
                 DateRange.of(recallDateStart, recallDateEnd),
@@ -87,8 +88,8 @@ public class MessageStatusController {
             @RequestParam(required = false) Set<Long> messageIds,
             @RequestParam(required = false) Set<Long> recipientIds,
             @RequestParam(required = false) Boolean areSystemMessages,
-            @RequestParam(required = false) Long senderId,
-            @RequestParam(required = false) MessageDeliveryStatus deliveryStatus,
+            @RequestParam(required = false) Set<Long> senderIds,
+            @RequestParam(required = false) Set<MessageDeliveryStatus> deliveryStatuses,
             @RequestParam(required = false) Date receptionDateStart,
             @RequestParam(required = false) Date receptionDateEnd,
             @RequestParam(required = false) Date readDateStart,
@@ -102,8 +103,8 @@ public class MessageStatusController {
                 messageIds,
                 recipientIds,
                 areSystemMessages,
-                senderId,
-                deliveryStatus,
+                senderIds,
+                deliveryStatuses,
                 DateRange.of(receptionDateStart, receptionDateEnd),
                 DateRange.of(readDateStart, readDateEnd),
                 DateRange.of(recallDateStart, recallDateEnd));
@@ -111,8 +112,8 @@ public class MessageStatusController {
                 messageIds,
                 recipientIds,
                 areSystemMessages,
-                senderId,
-                deliveryStatus,
+                senderIds,
+                deliveryStatuses,
                 DateRange.of(receptionDateStart, receptionDateEnd),
                 DateRange.of(readDateStart, readDateEnd),
                 DateRange.of(recallDateStart, recallDateEnd),
@@ -125,12 +126,12 @@ public class MessageStatusController {
     @RequiredPermission(MESSAGE_STATUS_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateMessageStatuses(
             @RequestParam MessageStatus.KeyList keys,
-            @RequestBody UpdateMessageStatusDTO dto) {
+            @RequestBody UpdateMessageStatusDTO updateMessageStatusDTO) {
         Mono<Boolean> updateMono = messageStatusService.updateMessageStatuses(
                 new HashSet<>(keys.getKeys()),
-                dto.getRecallDate(),
-                dto.getReadDate(),
-                dto.getReceptionDate(),
+                updateMessageStatusDTO.getRecallDate(),
+                updateMessageStatusDTO.getReadDate(),
+                updateMessageStatusDTO.getReceptionDate(),
                 null);
         return ResponseFactory.acknowledged(updateMono);
     }

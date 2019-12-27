@@ -49,68 +49,27 @@ public class UserFriendRequestController {
 
     @PostMapping
     @RequiredPermission(USER_FRIEND_REQUEST_CREATE)
-    public Mono<ResponseEntity<ResponseDTO<UserFriendRequest>>> createFriendRequest(@RequestBody AddFriendRequestDTO dto) {
+    public Mono<ResponseEntity<ResponseDTO<UserFriendRequest>>> createFriendRequest(@RequestBody AddFriendRequestDTO addFriendRequestDTO) {
         Mono<UserFriendRequest> createMono = userFriendRequestService.createFriendRequest(
-                dto.getRequesterId(),
-                dto.getRecipientId(),
-                dto.getContent(),
-                dto.getStatus(),
-                dto.getCreationDate(),
-                dto.getResponseDate(),
-                dto.getExpirationDate(),
-                dto.getReason());
+                addFriendRequestDTO.getId(),
+                addFriendRequestDTO.getRequesterId(),
+                addFriendRequestDTO.getRecipientId(),
+                addFriendRequestDTO.getContent(),
+                addFriendRequestDTO.getStatus(),
+                addFriendRequestDTO.getCreationDate(),
+                addFriendRequestDTO.getResponseDate(),
+                addFriendRequestDTO.getExpirationDate(),
+                addFriendRequestDTO.getReason());
         return ResponseFactory.okIfTruthy(createMono);
-    }
-
-    @DeleteMapping
-    @RequiredPermission(USER_FRIEND_REQUEST_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteFriendRequests(
-            @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long requesterId,
-            @RequestParam(required = false) Long recipientId,
-            @RequestParam(required = false) RequestStatus status,
-            @RequestParam(required = false) Date creationDateStart,
-            @RequestParam(required = false) Date creationDateEnd,
-            @RequestParam(required = false) Date responseDateStart,
-            @RequestParam(required = false) Date responseDateEnd,
-            @RequestParam(required = false) Date expirationDateStart,
-            @RequestParam(required = false) Date expirationDateEnd) {
-        Mono<Boolean> deleteMono = userFriendRequestService.deleteFriendRequests(
-                ids,
-                requesterId,
-                recipientId,
-                status,
-                DateRange.of(creationDateStart, creationDateEnd),
-                DateRange.of(responseDateStart, responseDateEnd),
-                DateRange.of(expirationDateStart, expirationDateEnd));
-        return ResponseFactory.acknowledged(deleteMono);
-    }
-
-    @PutMapping
-    @RequiredPermission(USER_FRIEND_REQUEST_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateFriendRequests(
-            @RequestParam Set<Long> ids,
-            @RequestBody UpdateFriendRequestDTO dto) {
-        Mono<Boolean> updateMono = userFriendRequestService.updateFriendRequests(
-                ids,
-                dto.getRequesterId(),
-                dto.getRecipientId(),
-                dto.getContent(),
-                dto.getStatus(),
-                dto.getReason(),
-                dto.getCreationDate(),
-                dto.getResponseDate(),
-                dto.getExpirationDate());
-        return ResponseFactory.acknowledged(updateMono);
     }
 
     @GetMapping
     @RequiredPermission(USER_FRIEND_REQUEST_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<UserFriendRequest>>>> queryFriendRequests(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long requesterId,
-            @RequestParam(required = false) Long recipientId,
-            @RequestParam(required = false) RequestStatus status,
+            @RequestParam(required = false) Set<Long> requesterIds,
+            @RequestParam(required = false) Set<Long> recipientIds,
+            @RequestParam(required = false) Set<RequestStatus> statuses,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
             @RequestParam(required = false) Date responseDateStart,
@@ -121,9 +80,9 @@ public class UserFriendRequestController {
         size = pageUtil.getSize(size);
         Flux<UserFriendRequest> userFriendRequestFlux = userFriendRequestService.queryFriendRequests(
                 ids,
-                requesterId,
-                recipientId,
-                status,
+                requesterIds,
+                recipientIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd),
@@ -136,9 +95,9 @@ public class UserFriendRequestController {
     @RequiredPermission(USER_FRIEND_REQUEST_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<UserFriendRequest>>>> queryFriendRequests(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) Long requesterId,
-            @RequestParam(required = false) Long recipientId,
-            @RequestParam(required = false) RequestStatus status,
+            @RequestParam(required = false) Set<Long> requesterIds,
+            @RequestParam(required = false) Set<Long> recipientIds,
+            @RequestParam(required = false) Set<RequestStatus> statuses,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
             @RequestParam(required = false) Date responseDateStart,
@@ -150,22 +109,47 @@ public class UserFriendRequestController {
         size = pageUtil.getSize(size);
         Mono<Long> count = userFriendRequestService.countFriendRequests(
                 ids,
-                requesterId,
-                recipientId,
-                status,
+                requesterIds,
+                recipientIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd));
         Flux<UserFriendRequest> userFriendRequestFlux = userFriendRequestService.queryFriendRequests(
                 ids,
-                requesterId,
-                recipientId,
-                status,
+                requesterIds,
+                recipientIds,
+                statuses,
                 DateRange.of(creationDateStart, creationDateEnd),
                 DateRange.of(responseDateStart, responseDateEnd),
                 DateRange.of(expirationDateStart, expirationDateEnd),
                 page,
                 size);
         return ResponseFactory.page(count, userFriendRequestFlux);
+    }
+
+    @PutMapping
+    @RequiredPermission(USER_FRIEND_REQUEST_UPDATE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateFriendRequests(
+            @RequestParam Set<Long> ids,
+            @RequestBody UpdateFriendRequestDTO updateFriendRequestDTO) {
+        Mono<Boolean> updateMono = userFriendRequestService.updateFriendRequests(
+                ids,
+                updateFriendRequestDTO.getRequesterId(),
+                updateFriendRequestDTO.getRecipientId(),
+                updateFriendRequestDTO.getContent(),
+                updateFriendRequestDTO.getStatus(),
+                updateFriendRequestDTO.getReason(),
+                updateFriendRequestDTO.getCreationDate(),
+                updateFriendRequestDTO.getResponseDate(),
+                updateFriendRequestDTO.getExpirationDate());
+        return ResponseFactory.acknowledged(updateMono);
+    }
+
+    @DeleteMapping
+    @RequiredPermission(USER_FRIEND_REQUEST_DELETE)
+    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteFriendRequests(@RequestParam(required = false) Set<Long> ids) {
+        Mono<Boolean> deleteMono = userFriendRequestService.deleteFriendRequests(ids);
+        return ResponseFactory.acknowledged(deleteMono);
     }
 }

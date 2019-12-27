@@ -61,7 +61,7 @@ public class AdminRoleService {
     public Function<TurmsClusterManager, Void> initAdminRolesCache() {
         return turmsClusterManager -> {
             roles = turmsClusterManager.getHazelcastInstance().getReplicatedMap(Constants.HAZELCAST_ROLES_MAP);
-            if (roles.size() == 0) {
+            if (roles.isEmpty()) {
                 loadAllRoles();
             }
             roles.putIfAbsent(
@@ -294,6 +294,9 @@ public class AdminRoleService {
                         .map(roleRank -> rank > roleRank));
     }
 
+    /**
+     * @return isAdminHigherThanAdmins, admin rank, admins ranks
+     */
     public Mono<Triple<Boolean, Integer, Set<Integer>>> isAdminHigherThanAdmins(
             @NotNull String account,
             @NotEmpty Set<String> accounts) {

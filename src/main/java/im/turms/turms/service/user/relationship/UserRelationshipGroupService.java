@@ -314,6 +314,11 @@ public class UserRelationshipGroupService {
         }
     }
 
+    public Mono<Boolean> deleteRelationshipGroups() {
+        return mongoTemplate.remove(new Query(), UserRelationshipGroup.class)
+                .map(DeleteResult::wasAcknowledged);
+    }
+
     public Mono<Boolean> deleteRelationshipGroups(@NotEmpty Set<UserRelationshipGroup.@UserRelationshipKeyConstraint Key> keys) {
         HashMultimap<Long, Integer> multimap = HashMultimap.create();
         for (UserRelationshipGroup.Key key : keys) {

@@ -28,6 +28,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddFriendRequestDTO {
+    private Long id;
     private Long requesterId;
     private Long recipientId;
     private String content;

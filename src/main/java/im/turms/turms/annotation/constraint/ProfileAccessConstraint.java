@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = ProfileAccessConstraint.ProfileAccessValidator.class)
 @Documented
 public @interface ProfileAccessConstraint {
-    String message() default "ProfileAccessConstraint";
+    String message() default "The profile access strategy must not be UNRECOGNIZED";
 
     Class<?>[] groups() default {};
 
