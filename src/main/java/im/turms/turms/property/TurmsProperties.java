@@ -53,6 +53,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
             .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
             .writerWithView(MutablePropertiesView.class);
+
     @JsonView(MutablePropertiesView.class)
     private Cache cache = new Cache();
     @JsonView(MutablePropertiesView.class)
@@ -130,6 +131,10 @@ public class TurmsProperties implements IdentifiedDataSerializable {
                 .readerForUpdating(propertiesToUpdate)
                 .forType(TurmsProperties.class);
         return objectReader.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(propertiesForUpdating));
+    }
+
+    public TurmsProperties reset() throws IOException {
+        return merge(this, new TurmsProperties());
     }
 
     public static Map<String, Object> mergePropertiesWithMetadata(
