@@ -48,8 +48,6 @@ public class User implements IdentifiedDataSerializable {
      */
     @JsonView(MutablePropertiesView.class)
     private boolean useOsAsDefaultDeviceType = true;
-//    @JsonView(MutablePropertiesView.class)
-//    private Set<DeviceType> mainDeviceTypes = ALL_DEVICE_TYPES;
     @JsonView(MutablePropertiesView.class)
     private boolean deleteTwoSidedRelationships = false;
     @JsonView(MutablePropertiesView.class)
@@ -75,10 +73,6 @@ public class User implements IdentifiedDataSerializable {
         friendRequest.writeData(out);
         out.writeInt(logOnlineUserNumberIntervalSeconds);
         out.writeBoolean(useOsAsDefaultDeviceType);
-//        int[] types = mainDeviceTypes
-//                .stream()
-//                .mapToInt(DeviceType::getNumber).toArray();
-//        out.writeIntArray(types);
         out.writeBoolean(deleteTwoSidedRelationships);
         out.writeBoolean(shouldDeleteLogicallyUser);
     }
@@ -91,10 +85,6 @@ public class User implements IdentifiedDataSerializable {
         friendRequest.readData(in);
         logOnlineUserNumberIntervalSeconds = in.readInt();
         useOsAsDefaultDeviceType = in.readBoolean();
-        int[] types = in.readIntArray();
-//        mainDeviceTypes = Arrays.stream(types)
-//                .mapToObj(index -> DeviceType.values()[index])
-//                .collect(Collectors.toSet());
         deleteTwoSidedRelationships = in.readBoolean();
         shouldDeleteLogicallyUser = in.readBoolean();
     }
