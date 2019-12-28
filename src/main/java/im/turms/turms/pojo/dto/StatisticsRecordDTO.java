@@ -8,7 +8,6 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 public class StatisticsRecordDTO {
-    private Date startDate;
-    private Date endDate;
+    private Date date;
     private Long total;
 }

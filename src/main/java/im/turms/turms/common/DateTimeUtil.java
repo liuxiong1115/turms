@@ -171,7 +171,6 @@ public class DateTimeUtil {
                     areSystemMessages);
             monos.add(result.map(total -> new StatisticsRecordDTO(
                     datePair.getLeft(),
-                    datePair.getRight(),
                     total)));
         }
         return merge(monos);
@@ -187,7 +186,6 @@ public class DateTimeUtil {
             Mono<Long> result = function.apply(DateRange.of(datePair.getLeft(), datePair.getRight()));
             monos.add(result.map(total -> new StatisticsRecordDTO(
                     datePair.getLeft(),
-                    datePair.getRight(),
                     total)));
         }
         return merge(monos);
@@ -235,11 +233,11 @@ public class DateTimeUtil {
 
     private Mono<List<StatisticsRecordDTO>> merge(List<Mono<StatisticsRecordDTO>> monos) {
         Flux<StatisticsRecordDTO> resultFlux = Flux.mergeOrdered((o1, o2) -> {
-            Date startDate1 = o1.getStartDate();
-            Date startDate2 = o2.getStartDate();
-            if (startDate1.before(startDate2)) {
+            Date date1 = o1.getDate();
+            Date date2 = o2.getDate();
+            if (date1.before(date2)) {
                 return -1;
-            } else if (startDate1.after(startDate2)) {
+            } else if (date1.after(date2)) {
                 return 1;
             }
             return 0;
