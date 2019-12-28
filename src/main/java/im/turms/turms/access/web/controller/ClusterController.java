@@ -94,13 +94,23 @@ public class ClusterController {
      */
     @PutMapping("/config")
     @RequiredPermission(CLUSTER_CONFIG_UPDATE)
-    public ResponseEntity<ResponseDTO<TurmsProperties>> updateClusterConfig(@RequestBody TurmsProperties turmsProperties) throws IOException {
-        TurmsProperties mergedProperties = TurmsProperties.merge(
-                turmsClusterManager.getTurmsProperties(),
-                turmsProperties);
-        turmsClusterManager.updateProperties(mergedProperties);
-        userSimultaneousLoginService.applyStrategy(
-                mergedProperties.getUser().getSimultaneousLogin().getStrategy());
-        return ResponseFactory.okIfTruthy(mergedProperties);
+    public ResponseEntity<ResponseDTO<TurmsProperties>> updateClusterConfig(
+            @RequestParam(defaultValue = "false") Boolean shouldReset,
+            @RequestBody(required = false) TurmsProperties turmsProperties) throws IOException {
+        if (shouldReset) {
+            return ResponseFactory.okIfTruthy(turmsClusterManager.getTurmsProperties().reset());
+        } else {
+            if (turmsProperties != null) {
+                TurmsProperties mergedProperties = TurmsProperties.merge(
+                        turmsClusterManager.getTurmsProperties(),
+                        turmsProperties);
+                turmsClusterManager.updateProperties(mergedProperties);
+                userSimultaneousLoginService.applyStrategy(
+                        mergedProperties.getUser().getSimultaneousLogin().getStrategy());
+                return ResponseFactory.okIfTruthy(mergedProperties);
+            } else {
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            }
+        }
     }
 }
