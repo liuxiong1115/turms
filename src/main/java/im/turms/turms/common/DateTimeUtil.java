@@ -102,22 +102,6 @@ public class DateTimeUtil {
         if (!endDate.after(startDate)) {
             return Collections.emptyList();
         } else {
-            switch (divideBy) {
-                case HOUR:
-                    startDate = DateUtils.truncate(startDate, Calendar.HOUR);
-                    endDate = DateUtils.truncate(endDate, Calendar.HOUR);
-                    break;
-                case DAY:
-                    startDate = DateUtils.truncate(startDate, Calendar.DAY_OF_MONTH);
-                    endDate = DateUtils.truncate(endDate, Calendar.DAY_OF_MONTH);
-                    break;
-                case MONTH:
-                    startDate = DateUtils.truncate(startDate, Calendar.MONTH);
-                    endDate = DateUtils.truncate(endDate, Calendar.MONTH);
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + divideBy);
-            }
             if (startDate.getTime() == endDate.getTime()) {
                 return Collections.emptyList();
             } else {
@@ -142,7 +126,7 @@ public class DateTimeUtil {
                     calendar.setTime(startDate);
                     calendar.add(unit, 1);
                     Date currentEndDate = calendar.getTime();
-                    if (currentEndDate.after(endDate)) {
+                    if (endDate.before(currentEndDate)) {
                         break;
                     } else {
                         Pair<Date, Date> datePair = Pair.of(startDate, currentEndDate);
