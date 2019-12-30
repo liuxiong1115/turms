@@ -223,16 +223,16 @@ public class DateTimeUtil {
     }
 
     private Mono<List<StatisticsRecordDTO>> merge(List<Mono<StatisticsRecordDTO>> monos) {
-        Flux<StatisticsRecordDTO> resultFlux = Flux.mergeOrdered((o1, o2) -> {
-            Date date1 = o1.getDate();
-            Date date2 = o2.getDate();
-            if (date1.before(date2)) {
-                return -1;
-            } else if (date1.after(date2)) {
-                return 1;
-            }
-            return 0;
-        }, Flux.merge(monos));
-        return resultFlux.collectList();
+        return Flux.merge(monos)
+                .collectSortedList((o1, o2) -> {
+                    Date date1 = o1.getDate();
+                    Date date2 = o2.getDate();
+                    if (date1.before(date2)) {
+                        return -1;
+                    } else if (date1.after(date2)) {
+                        return 1;
+                    }
+                    return 0;
+                });
     }
 }
