@@ -22,7 +22,6 @@ import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.DivideBy;
 import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.dto.StatisticsRecordDTO;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -121,10 +120,18 @@ public class DateTimeUtil {
                 }
                 List<Pair<Date, Date>> lists = new LinkedList<>();
                 while (true) {
-                    // Note: Do not use Instant because it doesn't support to plus months
+                    // Note: Do not use Instant because it doesn't support plussing months
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(startDate);
-                    calendar.add(unit, 1);
+                    if (unit == Calendar.MONTH) {
+                        Calendar nextMonth = Calendar.getInstance();
+                        nextMonth.setTime(startDate);
+                        nextMonth.add(Calendar.MONTH, 1);
+                        int days = nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        calendar.add(Calendar.DAY_OF_YEAR, days);
+                    } else {
+                        calendar.add(unit, 1);
+                    }
                     Date currentEndDate = calendar.getTime();
                     if (endDate.before(currentEndDate)) {
                         break;
