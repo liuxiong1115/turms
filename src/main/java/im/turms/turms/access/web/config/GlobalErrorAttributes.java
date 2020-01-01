@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
 import static im.turms.turms.common.Constants.STATUS;
@@ -37,20 +38,15 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
             boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(request, false);
         Throwable throwable = super.getError(request);
+        throwable = translate(throwable);
         if (throwable instanceof TurmsBusinessException) {
             TurmsStatusCode code = ((TurmsBusinessException) throwable).getCode();
             errorAttributes.put(STATUS, code.getHttpStatusCode());
             errorAttributes.put(ResponseDTO.Fields.code, code.getBusinessCode());
             errorAttributes.put(ResponseDTO.Fields.reason, code.getReason());
         } else if ((Integer) errorAttributes.get(STATUS) == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-            Object messageObj = errorAttributes.get("message");
-            boolean isClientError;
-            if (messageObj == null) { // For NullPointerException
-                isClientError = true;
-            } else {
-                String message = messageObj.toString();
-                isClientError = message.contains("WebFlux") || message.contains("cast");
-            }
+            String message = errorAttributes.get("message").toString();
+            boolean isClientError = message.contains("WebFlux") || message.contains("cast");
             if (isClientError) {
                 errorAttributes.put(STATUS, 400);
             }
@@ -64,5 +60,14 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
         errorAttributes.remove("error");
         errorAttributes.remove("message");
         return errorAttributes;
+    }
+
+    public Throwable translate(Throwable throwable) {
+        if (throwable instanceof ConstraintViolationException
+                || throwable instanceof NullPointerException) {
+            return TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        } else {
+            return throwable;
+        }
     }
 }
