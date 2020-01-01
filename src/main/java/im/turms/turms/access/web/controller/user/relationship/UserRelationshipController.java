@@ -109,7 +109,7 @@ public class UserRelationshipController {
     @PutMapping
     @RequiredPermission(USER_RELATIONSHIP_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateRelationships(
-            @RequestParam(required = false) UserRelationship.KeyList keys,
+            UserRelationship.KeyList keys,
             @RequestBody UpdateRelationshipDTO updateRelationshipDTO) {
         Mono<Boolean> updated = userRelationshipService.updateUserOneSidedRelationships(
                 new HashSet<>(keys.getKeys()),
@@ -122,7 +122,7 @@ public class UserRelationshipController {
     @DeleteMapping
     @RequiredPermission(USER_RELATIONSHIP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteRelationships(
-            @RequestParam(required = false) UserRelationship.KeyList keys) {
+            UserRelationship.KeyList keys) {
         Mono<Boolean> deleted = userRelationshipService.deleteOneSidedRelationships(new HashSet<>(keys.getKeys()));
         return ResponseFactory.acknowledged(deleted);
     }

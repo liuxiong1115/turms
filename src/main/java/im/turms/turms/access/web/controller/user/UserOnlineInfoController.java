@@ -52,17 +52,17 @@ public class UserOnlineInfoController {
     }
 
     /**
-     * @param size only works when userIds is null or empty
+     * @param size only works when ids is null or empty
      */
     @GetMapping("/statuses")
     @RequiredPermission(USER_ONLINE_INFO_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<UserOnlineInfo>>>> queryOnlineUsersStatus(
-            @RequestParam(required = false) Set<Long> userIds,
+            @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Integer size,
             @RequestParam(defaultValue = "true") Boolean shouldCheckIfExists) {
-        if (userIds != null && !userIds.isEmpty()) {
-            List<Mono<UserOnlineInfo>> userOnlineInfoMonos = new ArrayList<>(userIds.size());
-            for (Long userId : userIds) {
+        if (ids != null && !ids.isEmpty()) {
+            List<Mono<UserOnlineInfo>> userOnlineInfoMonos = new ArrayList<>(ids.size());
+            for (Long userId : ids) {
                 Mono<UserOnlineInfo> userOnlineInfoMno = onlineUserService.queryUserOnlineInfo(userId);
                 userOnlineInfoMno = userOnlineInfoMno.flatMap(info -> {
                     if (info.getUserStatus() == UserStatus.OFFLINE && shouldCheckIfExists) {
