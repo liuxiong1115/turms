@@ -474,7 +474,7 @@ public class MessageService {
                 .setIfNotNull(Message.Fields.records, records)
                 .build();
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        return mongoOperations.updateFirst(query, update, Message.class)
+        return mongoOperations.updateMulti(query, update, Message.class)
                 .map(UpdateResult::wasAcknowledged);
     }
 

@@ -138,7 +138,7 @@ public class UserVersionService {
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         Update update = new Update().set(field, new Date());
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        return mongoOperations.updateFirst(query, update, UserVersion.class)
+        return mongoOperations.updateMulti(query, update, UserVersion.class)
                 .map(UpdateResult::wasAcknowledged);
     }
 
