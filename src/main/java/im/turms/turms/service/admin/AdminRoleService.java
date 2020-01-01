@@ -26,6 +26,7 @@ import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.AdminRole;
 import org.apache.commons.lang3.tuple.Triple;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -49,6 +50,8 @@ import static im.turms.turms.common.Constants.*;
 @Validated
 public class AdminRoleService {
     private static ReplicatedMap<Long, AdminRole> roles;
+    private static final int MIN_ROLE_NAME_LIMIT = 1;
+    private static final int MAX_ROLE_NAME_LIMIT = 32;
     private final ReactiveMongoTemplate mongoTemplate;
     private final AdminService adminService;
 
@@ -84,7 +87,7 @@ public class AdminRoleService {
     public Mono<AdminRole> authAndAddAdminRole(
             @NotNull String requesterAccount,
             @NotNull Long roleId,
-            @NotNull @NoWhitespaceConstraint String name,
+            @NotNull @NoWhitespaceConstraint @Length(min = MIN_ROLE_NAME_LIMIT, max = MAX_ROLE_NAME_LIMIT) String name,
             @NotEmpty Set<AdminPermission> permissions,
             @NotNull Integer rank) {
         return isAdminHigherThanRole(requesterAccount, roleId)
@@ -100,7 +103,7 @@ public class AdminRoleService {
 
     public Mono<AdminRole> addAdminRole(
             @NotNull Long id,
-            @NotNull @NoWhitespaceConstraint String name,
+            @NotNull @NoWhitespaceConstraint @Length(min = MIN_ROLE_NAME_LIMIT, max = MAX_ROLE_NAME_LIMIT) String name,
             @NotEmpty Set<AdminPermission> permissions,
             @NotNull Integer rank) {
         AdminRole adminRole = new AdminRole(id, name, permissions, rank);
@@ -154,7 +157,7 @@ public class AdminRoleService {
     public Mono<Boolean> authAndUpdateAdminRole(
             @NotNull String requesterAccount,
             @NotEmpty Set<Long> roleIds,
-            @Nullable @NoWhitespaceConstraint String newName,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_ROLE_NAME_LIMIT, max = MAX_ROLE_NAME_LIMIT) String newName,
             @Nullable Set<AdminPermission> permissions,
             @Nullable Integer rank) {
         Long highestRoleId = null;
@@ -176,7 +179,7 @@ public class AdminRoleService {
 
     public Mono<Boolean> updateAdminRole(
             @NotEmpty Set<Long> roleIds,
-            @Nullable @NoWhitespaceConstraint String newName,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_ROLE_NAME_LIMIT, max = MAX_ROLE_NAME_LIMIT) String newName,
             @Nullable Set<AdminPermission> permissions,
             @Nullable Integer rank) {
         Validator.throwIfAllFalsy(newName, permissions, rank);

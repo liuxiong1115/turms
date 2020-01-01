@@ -27,6 +27,7 @@ import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.admin.AdminInfo;
 import im.turms.turms.pojo.domain.Admin;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -59,6 +60,12 @@ public class AdminService {
     public static String ROOT_ADMIN_ACCOUNT = "turms";
     //Account -> AdminInfo
     private static ReplicatedMap<String, AdminInfo> adminMap;
+    private static final int MIN_ACCOUNT_LIMIT = 1;
+    private static final int MIN_PASSWORD_LIMIT = 1;
+    private static final int MIN_NAME_LIMIT = 1;
+    public static final int MAX_ACCOUNT_LIMIT = 32;
+    public static final int MAX_PASSWORD_LIMIT = 32;
+    public static final int MAX_NAME_LIMIT = 32;
     private final TurmsPasswordUtil turmsPasswordUtil;
     private final ReactiveMongoTemplate mongoTemplate;
     private final AdminRoleService adminRoleService;
@@ -103,10 +110,10 @@ public class AdminService {
 
     public Mono<Admin> authAndAddAdmin(
             @NotNull String requesterAccount,
-            @Nullable @NoWhitespaceConstraint String account,
-            @Nullable @NoWhitespaceConstraint String rawPassword,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_ACCOUNT_LIMIT, max = MAX_ACCOUNT_LIMIT) String account,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_PASSWORD_LIMIT, max = MAX_PASSWORD_LIMIT) String rawPassword,
             @NotNull Long roleId,
-            @Nullable @NoWhitespaceConstraint String name,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_NAME_LIMIT, max = MAX_NAME_LIMIT) String name,
             @Nullable @PastOrPresent Date registrationDate,
             boolean upsert) {
         if (roleId.equals(ADMIN_ROLE_ROOT_ID)) {
@@ -124,10 +131,10 @@ public class AdminService {
     }
 
     public Mono<Admin> addAdmin(
-            @Nullable @NoWhitespaceConstraint String account,
-            @Nullable @NoWhitespaceConstraint String rawPassword,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_ACCOUNT_LIMIT, max = MAX_ACCOUNT_LIMIT) String account,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_PASSWORD_LIMIT, max = MAX_PASSWORD_LIMIT) String rawPassword,
             @NotNull Long roleId,
-            @Nullable @NoWhitespaceConstraint String name,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_NAME_LIMIT, max = MAX_NAME_LIMIT) String name,
             @Nullable @PastOrPresent Date registrationDate,
             boolean upsert) {
         account = account != null ? account : RandomStringUtils.randomAlphabetic(16);
@@ -289,8 +296,8 @@ public class AdminService {
     public Mono<Boolean> authAndUpdateAdmins(
             @NotNull String requesterAccount,
             @NotEmpty Set<String> targetAccounts,
-            @Nullable @NoWhitespaceConstraint String rawPassword,
-            @Nullable @NoWhitespaceConstraint String name,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_PASSWORD_LIMIT, max = MAX_PASSWORD_LIMIT) String rawPassword,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_NAME_LIMIT, max = MAX_NAME_LIMIT) String name,
             @Nullable Long roleId) {
         Validator.throwIfAllNull(rawPassword, name, roleId);
         boolean onlyUpdateOneself = targetAccounts.size() == 1 && targetAccounts.iterator().next().equals(requesterAccount);
@@ -326,8 +333,8 @@ public class AdminService {
 
     public Mono<Boolean> updateAdmins(
             @NotEmpty Set<String> targetAccounts,
-            @Nullable @NoWhitespaceConstraint String rawPassword,
-            @Nullable @NoWhitespaceConstraint String name,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_PASSWORD_LIMIT, max = MAX_PASSWORD_LIMIT) String rawPassword,
+            @Nullable @NoWhitespaceConstraint @Length(min = MIN_NAME_LIMIT, max = MAX_NAME_LIMIT) String name,
             @Nullable Long roleId) {
         Validator.throwIfAllNull(rawPassword, name, roleId);
         Query query = new Query();
