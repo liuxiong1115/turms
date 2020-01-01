@@ -106,7 +106,7 @@ public class GroupBlacklistController {
     @PutMapping
     @RequiredPermission(GROUP_BLACKLIST_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupBlacklistedUsers(
-            @RequestParam GroupBlacklistedUser.KeyList keys,
+            GroupBlacklistedUser.KeyList keys,
             @RequestBody UpdateGroupBlacklistedUserDTO updateGroupBlacklistedUserDTO) {
         Mono<Boolean> updateMono = groupBlacklistService.updateBlacklistedUsers(
                 new HashSet<>(keys.getKeys()),
@@ -119,7 +119,7 @@ public class GroupBlacklistController {
     @DeleteMapping
     @RequiredPermission(GROUP_BLACKLIST_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupBlacklistedUsers(
-            @RequestParam GroupBlacklistedUser.KeyList keys) {
+            GroupBlacklistedUser.KeyList keys) {
         Mono<Boolean> deleteMono = groupBlacklistService.deleteBlacklistedUsers(new HashSet<>(keys.getKeys()));
         return ResponseFactory.acknowledged(deleteMono);
     }
