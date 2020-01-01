@@ -62,7 +62,7 @@ public class UserRelationshipGroupController {
     @DeleteMapping
     @RequiredPermission(USER_RELATIONSHIP_GROUP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteRelationshipGroups(
-            @RequestParam(required = false) UserRelationshipGroup.KeyList keys) {
+            UserRelationshipGroup.KeyList keys) {
         Mono<Boolean> deleted;
         if (keys != null && !keys.getKeys().isEmpty()) {
             deleted = userRelationshipGroupService.deleteRelationshipGroups(new HashSet<>(keys.getKeys()));

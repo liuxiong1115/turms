@@ -125,7 +125,7 @@ public class MessageStatusController {
     @PutMapping
     @RequiredPermission(MESSAGE_STATUS_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateMessageStatuses(
-            @RequestParam MessageStatus.KeyList keys,
+            MessageStatus.KeyList keys,
             @RequestBody UpdateMessageStatusDTO updateMessageStatusDTO) {
         Mono<Boolean> updateMono = messageStatusService.updateMessageStatuses(
                 new HashSet<>(keys.getKeys()),

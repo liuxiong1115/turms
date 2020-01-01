@@ -118,7 +118,7 @@ public class GroupMemberController {
     @PutMapping
     @RequiredPermission(GROUP_MEMBER_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupMembers(
-            @RequestParam GroupMember.KeyList keys,
+            GroupMember.KeyList keys,
             @RequestBody UpdateGroupMemberDTO updateGroupMemberDTO) {
         Mono<Boolean> updateMono = groupMemberService.updateGroupMembers(
                 new HashSet<>(keys.getKeys()),
@@ -133,7 +133,7 @@ public class GroupMemberController {
     @DeleteMapping
     @RequiredPermission(GROUP_MEMBER_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupMembers(
-            @RequestParam(required = false) GroupMember.KeyList keys) {
+            GroupMember.KeyList keys) {
         Mono<Boolean> deleteMono;
         if (keys != null && !keys.getKeys().isEmpty()) {
             deleteMono = groupMemberService.deleteGroupsMembers(new HashSet<>(keys.getKeys()));
