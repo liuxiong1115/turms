@@ -123,7 +123,7 @@ public class MessageStatusService {
                 .setIfNotNull(MessageStatus.Fields.receptionDate, receptionDate)
                 .build();
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        return mongoOperations.updateFirst(query, update, MessageStatus.class)
+        return mongoOperations.updateMulti(query, update, MessageStatus.class)
                 .map(UpdateResult::wasAcknowledged);
     }
 

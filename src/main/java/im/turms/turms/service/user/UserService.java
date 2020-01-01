@@ -293,11 +293,11 @@ public class UserService {
         }
         Mono<Boolean> deleteMono;
         if (deleteRelationshipsAndGroups) {
-            boolean finalshouldDeleteLogicallyUser = shouldDeleteLogically;
+            boolean finalShouldDeleteLogically = shouldDeleteLogically;
             deleteMono = mongoTemplate.inTransaction()
                     .execute(operations -> {
                         Mono<Boolean> updateOrRemove;
-                        if (finalshouldDeleteLogicallyUser) {
+                        if (finalShouldDeleteLogically) {
                             Update update = new Update().set(User.Fields.deletionDate, new Date());
                             updateOrRemove = operations.updateMulti(query, update, User.class)
                                     .map(UpdateResult::wasAcknowledged);
@@ -308,7 +308,7 @@ public class UserService {
                         return updateOrRemove
                                 .flatMap(acknowledged -> {
                                     if (acknowledged != null && acknowledged) {
-                                        if (finalshouldDeleteLogicallyUser) {
+                                        if (finalShouldDeleteLogically) {
                                             return userRelationshipService.deleteAllRelationships(userIds, operations, true)
                                                     .then(userRelationshipGroupService.deleteAllRelationshipGroups(userIds, operations, true))
                                                     .thenReturn(true);

@@ -144,7 +144,7 @@ public class GroupVersionService {
                 .addInIfNotNull(ID, groupIds)
                 .buildQuery();
         Update update = new Update().set(field, new Date());
-        return mongoTemplate.updateFirst(query, update, GroupVersion.class)
+        return mongoTemplate.updateMulti(query, update, GroupVersion.class)
                 .map(UpdateResult::wasAcknowledged);
     }
 
