@@ -107,7 +107,7 @@ public class GroupVersionService {
         return updateSpecificVersion(groupId, GroupVersion.Fields.info);
     }
 
-    public Mono<Boolean> updateMembersVersion(@NotEmpty Long groupId) {
+    public Mono<Boolean> updateMembersVersion(@NotNull Long groupId) {
         return updateSpecificVersion(groupId, GroupVersion.Fields.members);
     }
 

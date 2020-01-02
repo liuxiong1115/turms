@@ -75,12 +75,10 @@ public class UserRelationshipGroupController {
     @PutMapping
     @RequiredPermission(USER_RELATIONSHIP_GROUP_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateRelationshipGroups(
-            @RequestParam Long ownerId,
-            @RequestParam(required = false) Set<Long> indexes,
+            UserRelationshipGroup.KeyList keys,
             @RequestBody UpdateRelationshipGroupDTO updateRelationshipGroupDTO) {
         Mono<Boolean> updated = userRelationshipGroupService.updateRelationshipGroups(
-                ownerId,
-                indexes,
+                new HashSet<>(keys.getKeys()),
                 updateRelationshipGroupDTO.getOwnerId(),
                 updateRelationshipGroupDTO.getIndex(),
                 updateRelationshipGroupDTO.getName(),
@@ -91,33 +89,33 @@ public class UserRelationshipGroupController {
     @GetMapping
     @RequiredPermission(USER_RELATIONSHIP_GROUP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<UserRelationshipGroup>>>> queryRelationshipGroups(
-            @RequestParam Long ownerId,
-            @RequestParam(required = false) Set<Long> indexes,
-            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Set<Long> ownerIds,
+            @RequestParam(required = false) Set<Integer> indexes,
+            @RequestParam(required = false) Set<String> names,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Flux<UserRelationshipGroup> queryFlux = userRelationshipGroupService.queryRelationshipGroups(
-                ownerId, indexes, name, DateRange.of(creationDateStart, creationDateEnd), 0, size);
+                ownerIds, indexes, names, DateRange.of(creationDateStart, creationDateEnd), 0, size);
         return ResponseFactory.okIfTruthy(queryFlux);
     }
 
     @GetMapping("/page")
     @RequiredPermission(USER_RELATIONSHIP_GROUP_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<UserRelationshipGroup>>>> queryRelationshipGroups(
-            @RequestParam Long ownerId,
-            @RequestParam(required = false) Set<Long> indexes,
-            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Set<Long> ownerIds,
+            @RequestParam(required = false) Set<Integer> indexes,
+            @RequestParam(required = false) Set<String> names,
             @RequestParam(required = false) Date creationDateStart,
             @RequestParam(required = false) Date creationDateEnd,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
         Mono<Long> count = userRelationshipGroupService.countRelationshipGroups(
-                ownerId, indexes, name, DateRange.of(creationDateStart, creationDateEnd));
+                ownerIds, indexes, names, DateRange.of(creationDateStart, creationDateEnd));
         Flux<UserRelationshipGroup> queryFlux = userRelationshipGroupService.queryRelationshipGroups(
-                ownerId, indexes, name, DateRange.of(creationDateStart, creationDateEnd), page, size);
+                ownerIds, indexes, names, DateRange.of(creationDateStart, creationDateEnd), page, size);
         return ResponseFactory.page(count, queryFlux);
     }
 }
