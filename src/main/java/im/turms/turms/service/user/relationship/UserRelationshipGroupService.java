@@ -87,24 +87,6 @@ public class UserRelationshipGroupService {
         return mongoTemplate.find(query, UserRelationshipGroup.class);
     }
 
-    public Mono<Int64ValuesWithVersion> queryRelationshipGroupsIndexesWithVersion(
-            @NotNull Long ownerId,
-            @Nullable Date lastUpdatedDate) {
-        return userVersionService.queryRelationshipGroupsLastUpdatedDate(ownerId)
-                .defaultIfEmpty(MAX_DATE)
-                .flatMap(date -> {
-                    if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
-                        Int64ValuesWithVersion.Builder builder = Int64ValuesWithVersion.newBuilder();
-                        builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(date.getTime()).build());
-                        return queryRelationshipGroupsIndexes(ownerId)
-                                .map(builder::addValues)
-                                .then(Mono.just(builder.build()));
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
-                    }
-                });
-    }
-
     public Mono<UserRelationshipGroupsWithVersion> queryRelationshipGroupsInfosWithVersion(
             @NotNull Long ownerId,
             @Nullable Date lastUpdatedDate) {
@@ -195,6 +177,9 @@ public class UserRelationshipGroupService {
             @NotEmpty Set<Integer> groupIndexes,
             @NotNull Long relatedUserId,
             @Nullable ReactiveMongoOperations operations) {
+        if (ownerId.equals(relatedUserId)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         return userRelationshipService.hasOneSidedRelationship(ownerId, relatedUserId)
                 .flatMap(hasRelationship -> {
                     if (hasRelationship != null && hasRelationship) {

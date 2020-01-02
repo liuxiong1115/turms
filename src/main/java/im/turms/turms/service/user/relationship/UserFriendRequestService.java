@@ -109,7 +109,7 @@ public class UserFriendRequestService {
             @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate,
             @Nullable String reason) {
-        if (status == RequestStatus.UNRECOGNIZED) {
+        if (status == RequestStatus.UNRECOGNIZED || requesterId.equals(recipientId)) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         UserFriendRequest userFriendRequest = new UserFriendRequest();
@@ -152,7 +152,8 @@ public class UserFriendRequestService {
             @NotNull @PastOrPresent Date creationDate) {
         int contentLimit = turmsClusterManager.getTurmsProperties()
                 .getUser().getFriendRequest().getContentLimit();
-        if (contentLimit != 0 && content.length() > contentLimit) {
+        if ((contentLimit != 0 && content.length() > contentLimit)
+                || requesterId.equals(recipientId)) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
         // if requester is stranger for recipient, requester isn't blocked and already a friend.
@@ -231,6 +232,9 @@ public class UserFriendRequestService {
             @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
         Validator.throwIfAllNull(requesterId, recipientId, content, status, reason, creationDate, responseDate, expirationDate);
+        if (requesterId != null && requesterId.equals(recipientId)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()

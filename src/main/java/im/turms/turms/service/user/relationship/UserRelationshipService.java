@@ -388,6 +388,9 @@ public class UserRelationshipService {
             @NotNull Long userOneId,
             @NotNull Long userTwoId,
             @Nullable ReactiveMongoOperations operations) {
+        if (userOneId.equals(userTwoId)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         Date now = new Date();
         if (operations != null) {
             return Mono.zip(upsertOneSidedRelationship(
@@ -414,6 +417,9 @@ public class UserRelationshipService {
             @Nullable @PastOrPresent Date establishmentDate,
             boolean upsert,
             @Nullable ReactiveMongoOperations operations) {
+        if (ownerId.equals(relatedUserId)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         UserRelationship userRelationship = new UserRelationship();
         userRelationship.setKey(new UserRelationship.Key(ownerId, relatedUserId));
         userRelationship.setIsBlocked(isBlocked != null && isBlocked);
@@ -479,6 +485,13 @@ public class UserRelationshipService {
             @Nullable Long newOwnerId,
             @Nullable Boolean isBlocked,
             @Nullable @PastOrPresent Date establishmentDate) {
+        if (newOwnerId != null) {
+            for (UserRelationship.Key key : keys) {
+                if (newOwnerId.equals(key.getRelatedUserId())) {
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                }
+            }
+        }
         return MapUtil.fluxMerge(map -> {
             for (UserRelationship.Key key : keys) {
                 map.put(key.getOwnerId(), key.getRelatedUserId());
@@ -497,6 +510,13 @@ public class UserRelationshipService {
             @Nullable Boolean isBlocked,
             @Nullable @PastOrPresent Date establishmentDate) {
         Validator.throwIfAllNull(newOwnerId, isBlocked, establishmentDate);
+        if (newOwnerId != null) {
+            for (Long relatedUsersId : relatedUsersIds) {
+                if (newOwnerId.equals(relatedUsersId)) {
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                }
+            }
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).in(relatedUsersIds));
