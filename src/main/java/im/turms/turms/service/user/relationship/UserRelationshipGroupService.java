@@ -4,7 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.turms.annotation.constraint.UserRelationshipKeyConstraint;
+import im.turms.turms.annotation.constraint.UserRelationshipGroupKeyConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.QueryBuilder;
@@ -12,7 +12,6 @@ import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.common.DateRange;
-import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
 import im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion;
 import im.turms.turms.pojo.domain.UserRelationshipGroup;
 import im.turms.turms.pojo.domain.UserRelationshipGroupMember;
@@ -71,14 +70,6 @@ public class UserRelationshipGroupService {
                 creationDate);
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.insert(group);
-    }
-
-    public Flux<Integer> queryRelationshipGroupsIndexes(@NotNull Long ownerId) {
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId));
-        query.fields().include(ID_INDEX);
-        return mongoTemplate.find(query, UserRelationshipGroup.class)
-                .map(group -> group.getKey().getIndex());
     }
 
     public Flux<UserRelationshipGroup> queryRelationshipGroupsInfos(@NotNull Long ownerId) {
@@ -148,8 +139,26 @@ public class UserRelationshipGroupService {
     }
 
     public Mono<Boolean> updateRelationshipGroups(
+            @NotEmpty Set<UserRelationshipGroup.@UserRelationshipGroupKeyConstraint Key> keys,
+            @Nullable Long newOwnerId,
+            @Nullable Integer newIndex,
+            @Nullable String name,
+            @Nullable @PastOrPresent Date creationDate) {
+        HashMultimap<Long, Integer> multimap = HashMultimap.create();
+        for (UserRelationshipGroup.Key key : keys) {
+            multimap.put(key.getOwnerId(), key.getIndex());
+        }
+        ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
+        for (Long ownerId : multimap.keySet()) {
+            Set<Integer> indexes = multimap.get(ownerId);
+            monos.add(updateRelationshipGroups(ownerId, indexes, newOwnerId, newIndex, name, creationDate));
+        }
+        return Flux.merge(monos).all(value -> value);
+    }
+
+    public Mono<Boolean> updateRelationshipGroups(
             @NotNull Long ownerId,
-            @Nullable Set<Long> indexes,
+            @Nullable Set<Integer> indexes,
             @Nullable Long newOwnerId,
             @Nullable Integer newIndex,
             @Nullable String name,
@@ -304,7 +313,7 @@ public class UserRelationshipGroupService {
                 .map(DeleteResult::wasAcknowledged);
     }
 
-    public Mono<Boolean> deleteRelationshipGroups(@NotEmpty Set<UserRelationshipGroup.@UserRelationshipKeyConstraint Key> keys) {
+    public Mono<Boolean> deleteRelationshipGroups(@NotEmpty Set<UserRelationshipGroup.@UserRelationshipGroupKeyConstraint Key> keys) {
         HashMultimap<Long, Integer> multimap = HashMultimap.create();
         for (UserRelationshipGroup.Key key : keys) {
             multimap.put(key.getOwnerId(), key.getIndex());
@@ -328,32 +337,32 @@ public class UserRelationshipGroupService {
     }
 
     public Flux<UserRelationshipGroup> queryRelationshipGroups(
-            @Nullable Long ownerId,
-            @Nullable Set<Long> indexes,
-            @Nullable String name,
+            @Nullable Set<Long> ownerIds,
+            @Nullable Set<Integer> indexes,
+            @Nullable Set<String> names,
             @Nullable DateRange creationDateRange,
             @Nullable Integer page,
             @Nullable Integer size) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addIsIfNotNull(ID_OWNER_ID, ownerId)
+                .addInIfNotNull(ID_OWNER_ID, ownerIds)
                 .addInIfNotNull(ID_INDEX, indexes)
-                .addIsIfNotNull(UserRelationshipGroup.Fields.name, name)
+                .addInIfNotNull(UserRelationshipGroup.Fields.name, names)
                 .addBetweenIfNotNull(UserRelationshipGroup.Fields.creationDate, creationDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, UserRelationshipGroup.class);
     }
 
     public Mono<Long> countRelationshipGroups(
-            @Nullable Long ownerId,
-            @Nullable Set<Long> indexes,
-            @Nullable String name,
+            @Nullable Set<Long> ownerIds,
+            @Nullable Set<Integer> indexes,
+            @Nullable Set<String> names,
             @Nullable DateRange creationDateRange) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addIsIfNotNull(ID_OWNER_ID, ownerId)
+                .addInIfNotNull(ID_OWNER_ID, ownerIds)
                 .addInIfNotNull(ID_INDEX, indexes)
-                .addIsIfNotNull(UserRelationshipGroup.Fields.name, name)
+                .addInIfNotNull(UserRelationshipGroup.Fields.name, names)
                 .addBetweenIfNotNull(UserRelationshipGroup.Fields.creationDate, creationDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, UserRelationshipGroup.class);
