@@ -56,6 +56,12 @@ public class ResponseFactory {
         return okIfTruthy(mono);
     }
 
+    public static Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> acknowledged(Mono<Boolean> data) {
+        return okIfTruthy(data.map(AcknowledgedDTO::new));
+    }
+
+    // Base methods
+
     public static <T> Mono<ResponseEntity<ResponseDTO<Collection<T>>>> okIfTruthy(Flux<T> data) {
         return data
                 .collectList()
@@ -94,10 +100,6 @@ public class ResponseFactory {
             return ResponseEntity.status(TurmsStatusCode.FAILED.getHttpStatusCode())
                     .body(new ResponseDTO<>(TurmsStatusCode.FAILED, null));
         }
-    }
-
-    public static Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> acknowledged(Mono<Boolean> data) {
-        return okIfTruthy(data.map(AcknowledgedDTO::new));
     }
 
     public static ResponseEntity<ResponseDTO<AcknowledgedDTO>> acknowledged(Boolean data) {
