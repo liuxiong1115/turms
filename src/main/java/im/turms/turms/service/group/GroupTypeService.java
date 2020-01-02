@@ -23,12 +23,13 @@ import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.GroupInvitationStrategy;
 import im.turms.turms.constant.GroupJoinStrategy;
 import im.turms.turms.constant.GroupUpdateStrategy;
-import im.turms.turms.pojo.domain.Group;
+import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.domain.GroupType;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -181,17 +182,24 @@ public class GroupTypeService {
     }
 
     public Mono<Boolean> deleteGroupTypes(@Nullable Set<Long> groupTypeIds) {
-        Query query = QueryBuilder
-                .newBuilder()
-                .addInIfNotNull(ID, groupTypeIds)
-                .buildQuery();
         if (groupTypeIds != null) {
+            if (groupTypeIds.contains(DEFAULT_GROUP_TYPE_ID)) {
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            }
             for (Long id : groupTypeIds) {
                 groupTypeMap.remove(id);
             }
         } else {
-            groupTypeMap.clear();
+            for (Long key : groupTypeMap.keySet()) {
+                if (!key.equals(DEFAULT_GROUP_TYPE_ID)) {
+                    groupTypeMap.remove(key);
+                }
+            }
         }
+        Query query = QueryBuilder
+                .newBuilder()
+                .addInIfNotNull(ID, groupTypeIds)
+                .buildQuery();
         return mongoTemplate.remove(query, GroupType.class).map(DeleteResult::wasAcknowledged);
     }
 
@@ -222,13 +230,6 @@ public class GroupTypeService {
                         }
                     });
         }
-    }
-
-    public Mono<Long> queryGroupTypeIdByGroupId(@NotNull Long groupId) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
-        query.fields().include(Group.Fields.typeId);
-        return mongoTemplate.findOne(query, Group.class)
-                .map(Group::getTypeId);
     }
 
     public Mono<Long> countGroupTypes() {
