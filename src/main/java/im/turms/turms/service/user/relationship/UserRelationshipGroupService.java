@@ -229,7 +229,7 @@ public class UserRelationshipGroupService {
                                 .zipWith(userVersionService.updateRelationshipGroupsVersion(ownerId))
                                 .thenReturn(true);
                     })
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                    .retryWhen(TRANSACTION_RETRY)
                     .single();
         }
     }

@@ -79,7 +79,7 @@ public class UserRelationshipService {
                                 }
                             });
                 })
-                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                .retryWhen(TRANSACTION_RETRY)
                 .single();
     }
 
@@ -111,7 +111,7 @@ public class UserRelationshipService {
                                         return Mono.just(false);
                                     }
                                 }))
-                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                        .retryWhen(TRANSACTION_RETRY)
                         .single();
             }
         } else {
@@ -152,7 +152,7 @@ public class UserRelationshipService {
                                     ownerId, relatedUserId, newOperations, true))
                             .zipWith(userVersionService.updateRelationshipsVersion(ownerId, newOperations))
                             .thenReturn(true))
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                    .retryWhen(TRANSACTION_RETRY)
                     .single();
         }
     }
@@ -164,7 +164,7 @@ public class UserRelationshipService {
                 .execute(operations -> deleteOneSidedRelationship(userOneId, userTwoId, operations)
                         .zipWith(deleteOneSidedRelationship(userTwoId, userOneId, operations))
                         .map(results -> results.getT1() && results.getT2()))
-                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                .retryWhen(TRANSACTION_RETRY)
                 .single();
     }
 
@@ -403,7 +403,7 @@ public class UserRelationshipService {
             return mongoTemplate.inTransaction()
                     .execute(newOperations -> friendTwoUsers(userOneId, userTwoId, newOperations)
                             .map(objects -> objects))
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                    .retryWhen(TRANSACTION_RETRY)
                     .single();
         }
     }

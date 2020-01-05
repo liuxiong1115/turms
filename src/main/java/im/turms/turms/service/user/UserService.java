@@ -185,7 +185,7 @@ public class UserService {
                         .then(userRelationshipGroupService.createRelationshipGroup(finalId, 0, "", now, operations))
                         .then(userVersionService.upsertEmptyUserVersion(user.getId(), operations))
                         .thenReturn(user))
-                .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                .retryWhen(TRANSACTION_RETRY)
                 .single();
     }
 
@@ -323,7 +323,7 @@ public class UserService {
                                     }
                                 });
                     })
-                    .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                    .retryWhen(TRANSACTION_RETRY)
                     .single();
         } else {
             if (shouldDeleteLogically) {
@@ -341,7 +341,7 @@ public class UserService {
                                         return Mono.just(false);
                                     }
                                 }))
-                        .retryBackoff(MONGO_TRANSACTION_RETRIES_NUMBER, MONGO_TRANSACTION_BACKOFF)
+                        .retryWhen(TRANSACTION_RETRY)
                         .single();
             }
         }
