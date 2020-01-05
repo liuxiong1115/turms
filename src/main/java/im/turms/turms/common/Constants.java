@@ -22,9 +22,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import im.turms.turms.constant.DeviceType;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import reactor.core.publisher.Mono;
+import reactor.retry.Retry;
 
 import java.time.Duration;
 import java.util.*;
@@ -77,7 +79,11 @@ public class Constants {
     public static final Set<DeviceType> ALL_DEVICE_TYPES = Arrays.stream(DeviceType.values()).collect(Collectors.toSet());
 
     public static final int MONGO_TRANSACTION_RETRIES_NUMBER = 3;
-    public static final Duration MONGO_TRANSACTION_BACKOFF = Duration.ofSeconds(3);
+    public static final Duration MONGO_TRANSACTION_BACKOFF = Duration.ofMillis(1500);
+    public static final Retry<Object> INSERT_RETRY = Retry.allBut(DuplicateKeyException.class)
+            .retryMax(MONGO_TRANSACTION_RETRIES_NUMBER)
+            .fixedBackoff(MONGO_TRANSACTION_BACKOFF);
+    public static final Retry<Object> TRANSACTION_RETRY = INSERT_RETRY;
 
     public static final TaskScheduler TASK_SCHEDULER = new DefaultManagedTaskScheduler();
     public static final ObjectMapper MAPPER = new ObjectMapper()
@@ -88,6 +94,7 @@ public class Constants {
     public static <T, R> Pair<T, R> emptyPair() {
         return EMPTY_PAIR;
     }
+
     public static <T> Mono<Set<T>> emptySetMono() {
         return EMPTY_SET_MONO;
     }
