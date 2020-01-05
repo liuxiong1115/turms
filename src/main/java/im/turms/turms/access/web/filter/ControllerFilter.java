@@ -69,6 +69,9 @@ public class ControllerFilter implements WebFilter {
         Object handlerMethodObject = requestMappingHandlerMapping.getHandler(exchange)
                 .toProcessor()
                 .peek();
+        if (isDevAndSwaggerRequest(exchange)) {
+            return chain.filter(exchange);
+        }
         if (handlerMethodObject instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handlerMethodObject;
             Pair<String, String> pair = parseAccountAndPassword(exchange);
@@ -105,7 +108,7 @@ public class ControllerFilter implements WebFilter {
                 }
             }
         } else {
-            if (isHandshakeRequest(exchange) || isCorsPreflightRequest(exchange) || isDevAndSwaggerRequest(exchange)) {
+            if (isHandshakeRequest(exchange) || isCorsPreflightRequest(exchange)) {
                 return chain.filter(exchange);
             } else {
                 Pair<String, String> pair = parseAccountAndPassword(exchange);
@@ -220,9 +223,10 @@ public class ControllerFilter implements WebFilter {
     private boolean isDevAndSwaggerRequest(@NotNull ServerWebExchange exchange) {
         if (CompilerOptions.env == CompilerOptions.Value.DEV_ENV) {
             String path = exchange.getRequest().getURI().getPath();
-            return path.startsWith("/swagger-ui.html")
-                    || path.startsWith("/webjars/springfox-swagger-ui")
-                    || path.startsWith("/v2/api-docs");
+            return path.startsWith("/v2/api-docs")
+                    || path.startsWith("/swagger-resources")
+                    || path.startsWith("/swagger-ui.html")
+                    || path.startsWith("/webjars/springfox-swagger-ui");
         } else {
             return false;
         }
