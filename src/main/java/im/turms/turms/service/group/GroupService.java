@@ -88,6 +88,8 @@ public class GroupService {
             @Nullable @URL String profilePictureUrl,
             @Nullable @Min(value = 0) Integer minimumScore,
             @Nullable Long groupTypeId,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable Boolean isActive) {
         Long groupId = turmsClusterManager.generateRandomId();
@@ -95,13 +97,14 @@ public class GroupService {
         group.setId(groupId);
         group.setCreatorId(creatorId);
         group.setOwnerId(ownerId);
-        group.setOwnerId(creatorId);
         group.setName(groupName);
         group.setIntro(intro);
         group.setAnnouncement(announcement);
         group.setProfilePictureUrl(profilePictureUrl);
         group.setMinimumScore(minimumScore);
         group.setTypeId(groupTypeId);
+        group.setCreationDate(creationDate);
+        group.setDeletionDate(deletionDate);
         group.setMuteEndDate(muteEndDate);
         group.setActive(isActive);
         return mongoTemplate
@@ -114,7 +117,8 @@ public class GroupService {
                                 null,
                                 new Date(),
                                 null,
-                                operations))
+                                operations,
+                                false))
                         .flatMap(results -> groupVersionService.upsert(groupId)
                                 .thenReturn(results.getT1())))
                 .retryWhen(TRANSACTION_RETRY)
@@ -130,8 +134,13 @@ public class GroupService {
             @Nullable @URL String profilePictureUrl,
             @Nullable @Min(value = 0) Integer minimumScore,
             @Nullable Long groupTypeId,
+            @Nullable @PastOrPresent Date creationDate,
+            @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable Boolean isActive) {
+        if (creationDate != null && deletionDate != null && deletionDate.before(creationDate)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
         if (groupTypeId == null) {
             groupTypeId = DEFAULT_GROUP_TYPE_ID;
         }
@@ -161,6 +170,8 @@ public class GroupService {
                                 profilePictureUrl,
                                 minimumScore,
                                 finalGroupTypeId,
+                                creationDate,
+                                deletionDate,
                                 muteEndDate,
                                 isActive);
                     } else {
