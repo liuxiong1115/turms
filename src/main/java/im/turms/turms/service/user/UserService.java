@@ -285,58 +285,26 @@ public class UserService {
 
     public Mono<Boolean> deleteUsers(
             @NotEmpty Set<Long> userIds,
-            boolean deleteRelationshipsAndGroups,
             @Nullable Boolean shouldDeleteLogically) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         if (shouldDeleteLogically == null) {
             shouldDeleteLogically = turmsClusterManager.getTurmsProperties().getUser().isShouldDeleteLogicallyUser();
         }
-        Mono<Boolean> deleteMono;
-        if (deleteRelationshipsAndGroups) {
-            boolean finalShouldDeleteLogically = shouldDeleteLogically;
-            deleteMono = mongoTemplate.inTransaction()
-                    .execute(operations -> {
-                        Mono<Boolean> updateOrRemove;
-                        if (finalShouldDeleteLogically) {
+        Mono<Boolean> deleteOrUpdateMono;
+        if (shouldDeleteLogically) {
                             Update update = new Update().set(User.Fields.deletionDate, new Date());
-                            updateOrRemove = operations.updateMulti(query, update, User.class)
+            deleteOrUpdateMono = mongoTemplate.updateMulti(query, update, User.class)
                                     .map(UpdateResult::wasAcknowledged);
                         } else {
-                            updateOrRemove = operations.remove(query, User.class)
-                                    .map(DeleteResult::wasAcknowledged);
-                        }
-                        return updateOrRemove
+            deleteOrUpdateMono = mongoTemplate.inTransaction()
+                    .execute(operations -> operations.remove(query, User.class)
+                            .map(DeleteResult::wasAcknowledged)
                                 .flatMap(acknowledged -> {
                                     if (acknowledged != null && acknowledged) {
-                                        if (finalShouldDeleteLogically) {
-                                            return userRelationshipService.deleteAllRelationships(userIds, operations, true)
-                                                    .then(userRelationshipGroupService.deleteAllRelationshipGroups(userIds, operations, true))
-                                                    .thenReturn(true);
-                                        } else {
                                             return userRelationshipService.deleteAllRelationships(userIds, operations, false)
                                                     .then(userRelationshipGroupService.deleteAllRelationshipGroups(userIds, operations, false))
                                                     .then(userVersionService.delete(userIds, operations))
                                                     .thenReturn(true);
-                                        }
-                                    } else {
-                                        return Mono.just(false);
-                                    }
-                                });
-                    })
-                    .retryWhen(TRANSACTION_RETRY)
-                    .single();
-        } else {
-            if (shouldDeleteLogically) {
-                Update update = new Update().set(User.Fields.deletionDate, new Date());
-                deleteMono = mongoTemplate.updateMulti(query, update, User.class)
-                        .map(UpdateResult::wasAcknowledged);
-            } else {
-                deleteMono = mongoTemplate.inTransaction()
-                        .execute(operations -> operations.remove(query, User.class)
-                                .flatMap(result -> {
-                                    if (result.wasAcknowledged()) {
-                                        return userVersionService.delete(userIds, operations)
-                                                .thenReturn(true);
                                     } else {
                                         return Mono.just(false);
                                     }
@@ -344,8 +312,7 @@ public class UserService {
                         .retryWhen(TRANSACTION_RETRY)
                         .single();
             }
-        }
-        return deleteMono.flatMap(success -> {
+        return deleteOrUpdateMono.flatMap(success -> {
             if (success) {
                 return onlineUserService.setUsersOffline(userIds, CloseStatus.NOT_ACCEPTABLE).then(Mono.just(true));
             } else {
