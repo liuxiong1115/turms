@@ -66,6 +66,8 @@ public class GroupController {
                 addGroupDTO.getProfilePictureUrl(),
                 addGroupDTO.getMinimumScore(),
                 addGroupDTO.getTypeId(),
+                addGroupDTO.getCreationDate(),
+                addGroupDTO.getDeletionDate(),
                 addGroupDTO.getMuteEndDate(),
                 addGroupDTO.getIsActive());
         return ResponseFactory.okIfTruthy(createdGroup);
