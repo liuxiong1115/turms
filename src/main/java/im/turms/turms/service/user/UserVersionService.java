@@ -47,13 +47,6 @@ public class UserVersionService {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public Mono<Date> queryInformationLastUpdatedDate(@NotNull Long userId) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
-        query.fields().include(UserVersion.Fields.info);
-        return mongoTemplate.findOne(query, UserVersion.class)
-                .map(UserVersion::getInfo);
-    }
-
     public Mono<Date> queryRelationshipsLastUpdatedDate(@NotNull Long userId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
         query.fields().include(UserVersion.Fields.relationships);
@@ -96,10 +89,6 @@ public class UserVersionService {
         userVersion.setUserId(userId);
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.save(userVersion);
-    }
-
-    public Mono<Boolean> updateInformationVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.info, null);
     }
 
     public Mono<Boolean> updateRelationshipsVersion(@NotNull Long userId, @Nullable ReactiveMongoOperations operations) {

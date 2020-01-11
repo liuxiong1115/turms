@@ -55,4 +55,7 @@ public class User {
 
     @Indexed
     private Boolean active;
+
+    @Indexed
+    private Date lastUpdateDate;
 }
