@@ -85,7 +85,8 @@ public class UserController {
                 DateRange.of(deletionDateStart, deletionDateEnd),
                 isActive,
                 0,
-                size);
+                size,
+                true);
         return ResponseFactory.okIfTruthy(usersFlux);
     }
 
@@ -112,7 +113,8 @@ public class UserController {
                 DateRange.of(deletionDateStart, deletionDateEnd),
                 isActive,
                 page,
-                size);
+                size,
+                true);
         return ResponseFactory.page(count, usersFlux);
     }
 
@@ -147,7 +149,7 @@ public class UserController {
             }
             if (loggedInStartDate != null || loggedInEndDate != null) {
                 counts.add(userService.countLoggedInUsers(
-                        DateRange.of(loggedInStartDate, loggedInEndDate))
+                        DateRange.of(loggedInStartDate, loggedInEndDate), true)
                         .doOnNext(statistics::setLoggedInUsers));
             }
             if (maxOnlineUsersStartDate != null || maxOnlineUsersEndDate != null) {
@@ -157,7 +159,7 @@ public class UserController {
             }
             if (counts.isEmpty() || registeredStartDate != null || registeredEndDate != null) {
                 counts.add(userService.countRegisteredUsers(
-                        DateRange.of(registeredStartDate, registeredEndDate))
+                        DateRange.of(registeredStartDate, registeredEndDate), true)
                         .doOnNext(statistics::setRegisteredUsers));
             }
         } else {
@@ -181,7 +183,7 @@ public class UserController {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         DateRange.of(loggedInStartDate, loggedInEndDate),
                         divideBy,
-                        userService::countLoggedInUsers)
+                        dateRange -> userService.countLoggedInUsers(dateRange, true))
                         .doOnNext(statistics::setLoggedInUsersRecords));
             }
             if (maxOnlineUsersStartDate != null && maxOnlineUsersEndDate != null) {
@@ -195,7 +197,7 @@ public class UserController {
                 counts.add(dateTimeUtil.checkAndQueryBetweenDate(
                         DateRange.of(registeredStartDate, registeredEndDate),
                         divideBy,
-                        userService::countRegisteredUsers)
+                        dateRange -> userService.countRegisteredUsers(dateRange, true))
                         .doOnNext(statistics::setRegisteredUsersRecords));
             }
             if (counts.isEmpty()) {

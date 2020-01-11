@@ -60,8 +60,7 @@ public class MongoDataGenerator {
             TurmsLogger.log("All collections are cleared");
         }
         TurmsLogger.log("Start creating collections...");
-        Mono.zip(
-                objects -> objects,
+        Mono.when(
                 createCollectionIfNotExist(Admin.class, null),
                 createCollectionIfNotExist(AdminActionLog.class, null),
                 createCollectionIfNotExist(AdminRole.class, null),
@@ -79,8 +78,7 @@ public class MongoDataGenerator {
                 createCollectionIfNotExist(UserLocation.class, null),
                 createCollectionIfNotExist(UserLoginLog.class, null),
                 createCollectionIfNotExist(UserOnlineUserNumber.class, null),
-                createCollectionIfNotExist(UserPermissionGroup.class, null),
-                createCollectionIfNotExist(UserPermissionGroupMember.class, null),
+                createCollectionIfNotExist(UserPermissionType.class, null),
                 createCollectionIfNotExist(UserRelationship.class, null),
                 createCollectionIfNotExist(UserRelationshipGroup.class, null),
                 createCollectionIfNotExist(UserRelationshipGroupMember.class, null),
@@ -265,9 +263,10 @@ public class MongoDataGenerator {
                         now,
                         null,
                         true,
+                        0,
                         now);
                 UserVersion userVersion = new UserVersion(
-                        (long) i, now, now, now, now, now);
+                        (long) i, now, now, now, now, now, now);
                 UserRelationshipGroup relationshipGroup = new UserRelationshipGroup((long) i, 0, "", now);
                 objects.add(user);
                 objects.add(userVersion);

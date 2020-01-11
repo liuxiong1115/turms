@@ -66,7 +66,7 @@ public class UserOnlineInfoController {
                 Mono<UserOnlineInfo> userOnlineInfoMno = onlineUserService.queryUserOnlineInfo(userId);
                 userOnlineInfoMno = userOnlineInfoMno.flatMap(info -> {
                     if (info.getUserStatus() == UserStatus.OFFLINE && shouldCheckIfExists) {
-                        return userService.userExists(userId)
+                        return userService.userExists(userId, false)
                                 .flatMap(exists -> {
                                     if (exists) {
                                         return Mono.just(info);

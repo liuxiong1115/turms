@@ -394,10 +394,9 @@ public class MessageService {
                         return allowedMono.flatMap(allowed -> {
                             if (allowed) {
                                 return mongoTemplate.inTransaction()
-                                        .execute(operations -> Mono.zip(
-                                                operations.remove(messagesQuery, Message.class),
-                                                operations.remove(messagesStatusesQuery, MessageStatus.class))
-                                                .thenReturn(true))
+                                        .execute(operations -> operations.remove(messagesQuery, Message.class)
+                                                .then(operations.remove(messagesStatusesQuery, MessageStatus.class)
+                                                .thenReturn(true)))
                                         .retryWhen(TRANSACTION_RETRY)
                                         .single();
                             } else {
@@ -428,9 +427,8 @@ public class MessageService {
             Update update = new Update().set(Message.Fields.deletionDate, new Date());
             if (deleteMessageStatus) {
                 return mongoTemplate.inTransaction()
-                        .execute(operations -> Mono.zip(
-                                operations.updateMulti(queryMessage, update, Message.class),
-                                operations.remove(queryMessageStatus, MessageStatus.class))
+                        .execute(operations -> operations.updateMulti(queryMessage, update, Message.class)
+                                .then(operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
                         .retryWhen(TRANSACTION_RETRY)
                         .single();
@@ -441,9 +439,8 @@ public class MessageService {
         } else {
             if (deleteMessageStatus) {
                 return mongoTemplate.inTransaction()
-                        .execute(operations -> Mono.zip(
-                                operations.remove(queryMessage, Message.class),
-                                operations.remove(queryMessageStatus, MessageStatus.class))
+                        .execute(operations -> operations.remove(queryMessage, Message.class)
+                                .then(operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
                         .retryWhen(TRANSACTION_RETRY)
                         .single();
@@ -704,8 +701,7 @@ public class MessageService {
                         if (readyUpdateMessageStatus) {
                             updateMonos.add(messageStatusService.updateMessageStatus(messageId, recipientId, recallDate, readDate, null, operations));
                         }
-                        return Mono.zip(updateMonos, objects -> objects)
-                                .thenReturn(true);
+                        return Mono.when(updateMonos).thenReturn(true);
                     })
                     .retryWhen(TRANSACTION_RETRY)
                     .single();

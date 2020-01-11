@@ -31,7 +31,10 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -140,8 +143,6 @@ public class UserRelationshipGroupService {
 
     public Mono<Boolean> updateRelationshipGroups(
             @NotEmpty Set<UserRelationshipGroup.@UserRelationshipGroupKeyConstraint Key> keys,
-            @Nullable Long newOwnerId,
-            @Nullable Integer newIndex,
             @Nullable String name,
             @Nullable @PastOrPresent Date creationDate) {
         HashMultimap<Long, Integer> multimap = HashMultimap.create();
@@ -151,7 +152,7 @@ public class UserRelationshipGroupService {
         ArrayList<Mono<Boolean>> monos = new ArrayList<>(multimap.keySet().size());
         for (Long ownerId : multimap.keySet()) {
             Set<Integer> indexes = multimap.get(ownerId);
-            monos.add(updateRelationshipGroups(ownerId, indexes, newOwnerId, newIndex, name, creationDate));
+            monos.add(updateRelationshipGroups(ownerId, indexes, name, creationDate));
         }
         return Flux.merge(monos).all(value -> value);
     }
@@ -159,13 +160,8 @@ public class UserRelationshipGroupService {
     public Mono<Boolean> updateRelationshipGroups(
             @NotNull Long ownerId,
             @Nullable Set<Integer> indexes,
-            @Nullable Long newOwnerId,
-            @Nullable Integer newIndex,
             @Nullable String name,
             @Nullable @PastOrPresent Date creationDate) {
-        if (newIndex != null && indexes != null && indexes.size() > 1) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-        }
         Query query = QueryBuilder
                 .newBuilder()
                 .addIsIfNotNull(ID_OWNER_ID, ownerId)
@@ -173,7 +169,6 @@ public class UserRelationshipGroupService {
                 .buildQuery();
         Update update = UpdateBuilder
                 .newBuilder()
-                .setIfNotNull(ID_OWNER_ID, newOwnerId)
                 .setIfNotNull(UserRelationshipGroup.Fields.name, name)
                 .setIfNotNull(UserRelationshipGroup.Fields.creationDate, creationDate)
                 .build();
@@ -200,8 +195,7 @@ public class UserRelationshipGroupService {
                             monos.add(mongoOperations.save(member));
                         }
                         monos.add(userVersionService.updateRelationshipGroupsVersion(ownerId));
-                        return Mono.zip(monos, objects -> objects)
-                                .thenReturn(true);
+                        return Mono.when(monos).thenReturn(true);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -225,8 +219,8 @@ public class UserRelationshipGroupService {
                                 .addCriteria(Criteria.where(ID_GROUP_INDEX).is(deleteGroupIndex));
                         Update update = new Update().set(ID_GROUP_INDEX, existingUsersToTargetGroupIndex);
                         return operations.findAndModify(query, update, UserRelationshipGroupMember.class)
-                                .zipWith(operations.remove(query, UserRelationshipGroup.class))
-                                .zipWith(userVersionService.updateRelationshipGroupsVersion(ownerId))
+                                .then(operations.remove(query, UserRelationshipGroup.class))
+                                .then(userVersionService.updateRelationshipGroupsVersion(ownerId))
                                 .thenReturn(true);
                     })
                     .retryWhen(TRANSACTION_RETRY)
@@ -237,11 +231,12 @@ public class UserRelationshipGroupService {
     public Mono<Boolean> deleteAllRelationshipGroups(
             @NotEmpty Set<Long> ownerIds,
             @Nullable ReactiveMongoOperations operations,
-            boolean updateVersion) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where(ID_OWNER_ID).in(ownerIds));
+            boolean updateRelationshipGroupsVersion) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(ID_OWNER_ID).in(ownerIds))
+                .addCriteria(Criteria.where(ID_GROUP_INDEX).ne(0));
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        if (updateVersion) {
+        if (updateRelationshipGroupsVersion) {
             return mongoOperations.remove(query, UserRelationshipGroup.class)
                     .flatMap(result -> {
                         if (result.wasAcknowledged()) {
@@ -262,23 +257,23 @@ public class UserRelationshipGroupService {
             @NotNull Long relatedUserId,
             @Nullable ReactiveMongoOperations operations,
             boolean updateVersion) {
-        return deleteRelatedUsersFromAllRelationshipGroups(ownerId, Collections.singleton(relatedUserId), operations, updateVersion);
+        return deleteRelatedUsersFromAllRelationshipGroups(Set.of(ownerId), Set.of(relatedUserId), operations, updateVersion);
     }
 
     public Mono<Boolean> deleteRelatedUsersFromAllRelationshipGroups(
-            @NotNull Long ownerId,
+            @NotEmpty Set<Long> ownerIds,
             @NotEmpty Set<Long> relatedUserIds,
             @Nullable ReactiveMongoOperations operations,
-            boolean updateVersion) {
+            boolean updateRelationshipGroupsMembersVersion) {
         Query query = new Query()
-                .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
+                .addCriteria(Criteria.where(ID_OWNER_ID).in(ownerIds))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).in(relatedUserIds));
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        if (updateVersion) {
+        if (updateRelationshipGroupsMembersVersion) {
             return mongoOperations.remove(query, UserRelationshipGroupMember.class)
                     .flatMap(result -> {
                         if (result.wasAcknowledged()) {
-                            return userVersionService.updateRelationshipGroupsVersion(ownerId)
+                            return userVersionService.updateRelationshipGroupsVersion(ownerIds)
                                     .thenReturn(true);
                         } else {
                             return Mono.just(false);

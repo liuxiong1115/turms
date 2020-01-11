@@ -50,6 +50,7 @@ public enum TurmsStatusCode {
     SUCCESSOR_NOT_GROUP_MEMBER(4015, "The successor is not the group member", 400),
     TARGET_USERS_UNAUTHORIZED(4016, "The target users are unauthorized", 400),
     UNAUTHORIZED(4017, "Unauthorized", 401),
+    TARGET_USERS_NOT_EXIST(4018, "The target users do not exist", 401),
 
     LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500);
 

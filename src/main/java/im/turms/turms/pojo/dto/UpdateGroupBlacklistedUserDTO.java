@@ -27,7 +27,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateGroupBlacklistedUserDTO {
-    private Long groupId;
     private Date blockDate;
     private Long requesterId;
 }

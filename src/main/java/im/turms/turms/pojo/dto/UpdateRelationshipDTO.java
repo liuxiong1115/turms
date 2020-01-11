@@ -27,7 +27,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateRelationshipDTO {
-    private Long ownerId;
     private Boolean isBlocked;
     private Date establishmentDate;
 }
