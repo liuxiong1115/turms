@@ -57,5 +57,8 @@ public class User {
     private Boolean active;
 
     @Indexed
+    private Integer permissionTypeId;
+
+    @Indexed
     private Date lastUpdateDate;
 }

@@ -21,15 +21,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.util.Map;
+
+//TODO: in 0.9.0
 @Data
 @FieldNameConstants
 @NoArgsConstructor
-public class UserPermissionGroupMember {
+public class UserPermissionType {
     @Id
-    private Long userId;
+    private Long id;
 
-    @Indexed
-    private Long permissionGroupId;
+    // group type id -> limit
+    private Map<Long, Integer> groupTypeLimit;
 }

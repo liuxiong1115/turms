@@ -79,8 +79,6 @@ public class UserRelationshipGroupController {
             @RequestBody UpdateRelationshipGroupDTO updateRelationshipGroupDTO) {
         Mono<Boolean> updated = userRelationshipGroupService.updateRelationshipGroups(
                 new HashSet<>(keys.getKeys()),
-                updateRelationshipGroupDTO.getOwnerId(),
-                updateRelationshipGroupDTO.getIndex(),
                 updateRelationshipGroupDTO.getName(),
                 updateRelationshipGroupDTO.getCreationDate());
         return ResponseFactory.acknowledged(updated);

@@ -115,6 +115,10 @@ public class GroupVersionService {
         return updateSpecificVersion(groupIds, GroupVersion.Fields.members);
     }
 
+    public Mono<Boolean> updateMembersVersion() {
+        return updateSpecificVersion(GroupVersion.Fields.members);
+    }
+
     public Mono<Boolean> updateBlacklistVersion(@NotNull Long groupId) {
         return updateSpecificVersion(groupId, GroupVersion.Fields.blacklist);
     }
@@ -135,6 +139,12 @@ public class GroupVersionService {
         Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
         Update update = new Update().set(field, new Date());
         return mongoTemplate.updateFirst(query, update, GroupVersion.class)
+                .map(UpdateResult::wasAcknowledged);
+    }
+
+    public Mono<Boolean> updateSpecificVersion(@NotNull String field) {
+        Update update = new Update().set(field, new Date());
+        return mongoTemplate.updateMulti(new Query(), update, GroupVersion.class)
                 .map(UpdateResult::wasAcknowledged);
     }
 

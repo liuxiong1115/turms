@@ -18,7 +18,6 @@
 package im.turms.turms.service.group;
 
 import com.google.protobuf.Int64Value;
-import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.annotation.constraint.GroupMemberKeyConstraint;
 import im.turms.turms.annotation.constraint.GroupMemberRoleConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
@@ -32,7 +31,7 @@ import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.group.GroupMembersWithVersion;
 import im.turms.turms.pojo.domain.GroupBlacklistedUser;
 import im.turms.turms.pojo.domain.GroupMember;
-import im.turms.turms.pojo.domain.UserPermissionGroup;
+import im.turms.turms.pojo.domain.UserPermissionType;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -61,7 +60,7 @@ import static im.turms.turms.common.Constants.*;
 @Service
 @Validated
 public class GroupMemberService {
-    private static final UserPermissionGroup EMPTY_USER_GROUP_TYPE_PERMISSION = new UserPermissionGroup();
+    private static final UserPermissionType EMPTY_USER_GROUP_TYPE_PERMISSION = new UserPermissionType();
     private final ReactiveMongoTemplate mongoTemplate;
     private final GroupService groupService;
     private final GroupVersionService groupVersionService;
@@ -144,14 +143,14 @@ public class GroupMemberService {
                             // Because successorId is null
                             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
                         } else {
-                            return deleteGroupMembers(groupId, Set.of(deleteMemberId), null);
+                            return deleteGroupMembers(groupId, Set.of(deleteMemberId), null, true);
                         }
                     });
         } else {
             return isOwnerOrManager(requesterId, groupId)
                     .flatMap(isOwnerOrManager -> {
                         if (isOwnerOrManager != null && isOwnerOrManager) {
-                            return deleteGroupMembers(groupId, Set.of(deleteMemberId), null);
+                            return deleteGroupMembers(groupId, Set.of(deleteMemberId), null, true);
                         } else {
                             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                         }
@@ -162,7 +161,8 @@ public class GroupMemberService {
     public Mono<Boolean> deleteGroupMembers(
             @NotNull Long groupId,
             @NotEmpty Set<Long> deleteMemberIds,
-            @Nullable ReactiveMongoOperations operations) {
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateGroupMembersVersion) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).in(deleteMemberIds));
@@ -170,18 +170,16 @@ public class GroupMemberService {
         return mongoOperations.remove(query, GroupMember.class)
                 .flatMap(result -> {
                     if (result.wasAcknowledged()) {
-                        return groupVersionService.updateMembersVersion(groupId)
-                                .thenReturn(true);
+                        if (updateGroupMembersVersion) {
+                            return groupVersionService.updateMembersVersion(groupId)
+                                    .thenReturn(true);
+                        } else {
+                            return Mono.just(true);
+                        }
                     } else {
                         return Mono.just(false);
                     }
                 });
-    }
-
-    public Mono<Boolean> deleteGroupMembers() {
-        Query query = new Query();
-        return mongoTemplate.remove(query, GroupMember.class)
-                .map(DeleteResult::wasAcknowledged);
     }
 
     public Mono<Boolean> updateGroupMember(
@@ -191,8 +189,9 @@ public class GroupMemberService {
             @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
             @Nullable @PastOrPresent Date joinDate,
             @Nullable Date muteEndDate,
-            @Nullable ReactiveMongoOperations operations) {
-        return updateGroupMembers(groupId, Set.of(memberId), name, role, joinDate, muteEndDate, operations);
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateGroupMembersVersion) {
+        return updateGroupMembers(groupId, Set.of(memberId), name, role, joinDate, muteEndDate, operations, updateGroupMembersVersion);
     }
 
     public Mono<Boolean> updateGroupMembers(
@@ -202,7 +201,8 @@ public class GroupMemberService {
             @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
             @Nullable @PastOrPresent Date joinDate,
             @Nullable Date muteEndDate,
-            @Nullable ReactiveMongoOperations operations) {
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateGroupMembersVersion) {
         Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
@@ -223,8 +223,12 @@ public class GroupMemberService {
         return mongoOperations.updateMulti(query, update, GroupMember.class)
                 .flatMap(result -> {
                     if (result.wasAcknowledged()) {
-                        return groupVersionService.updateMembersVersion(groupId)
-                                .thenReturn(true);
+                        if (updateGroupMembersVersion) {
+                            return groupVersionService.updateMembersVersion(groupId)
+                                    .thenReturn(true);
+                        } else {
+                            return Mono.just(true);
+                        }
                     } else {
                         return Mono.just(false);
                     }
@@ -237,7 +241,8 @@ public class GroupMemberService {
             @Nullable @GroupMemberRoleConstraint GroupMemberRole role,
             @Nullable @PastOrPresent Date joinDate,
             @Nullable Date muteEndDate,
-            @Nullable ReactiveMongoOperations operations) {
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateGroupMembersVersion) {
         Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
         return MapUtil.fluxMerge(multimap -> {
             for (GroupMember.Key key : keys) {
@@ -252,7 +257,8 @@ public class GroupMemberService {
                     role,
                     joinDate,
                     muteEndDate,
-                    operations));
+                    operations,
+                    updateGroupMembersVersion));
             return null;
         });
     }
@@ -464,8 +470,8 @@ public class GroupMemberService {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_USER_ID).is(requesterId))
                 .addCriteria(Criteria.where(ID_GROUP_TYPE_ID));
-        query.fields().include(UserPermissionGroup.Fields.groupTypeLimit);
-        return mongoTemplate.findOne(query, UserPermissionGroup.class)
+        query.fields().include(UserPermissionType.Fields.groupTypeLimit);
+        return mongoTemplate.findOne(query, UserPermissionType.class)
                 .defaultIfEmpty(EMPTY_USER_GROUP_TYPE_PERMISSION)
                 .flatMap(permission -> groupService.countOwnedGroups(requesterId, groupTypeId)
                         .map(ownedGroupsNumber -> {
@@ -536,14 +542,30 @@ public class GroupMemberService {
         return mongoTemplate.count(query, GroupMember.class);
     }
 
-    public Mono<Boolean> deleteGroupsMembers(@NotEmpty Set<GroupMember.Key> keys) {
+    public Mono<Boolean> deleteGroupMembers(boolean updateGroupMembersVersion) {
+        Query query = new Query();
+        return mongoTemplate.remove(query, GroupMember.class)
+                .flatMap(result -> {
+                    if (result.wasAcknowledged()) {
+                        if (updateGroupMembersVersion) {
+                            return groupVersionService.updateMembersVersion().thenReturn(true);
+                        } else {
+                            return Mono.just(true);
+                        }
+                    } else {
+                        return Mono.just(false);
+                    }
+                });
+    }
+
+    public Mono<Boolean> deleteGroupsMembers(@NotEmpty Set<GroupMember.Key> keys, boolean updateGroupsMembersVersion) {
         return MapUtil.fluxMerge(map -> {
             for (GroupMember.Key key : keys) {
                 map.put(key.getGroupId(), key.getUserId());
             }
             return null;
         }, (monos, key, values) -> {
-            monos.add(deleteGroupMembers(key, values, null));
+            monos.add(deleteGroupMembers(key, values, null, updateGroupsMembersVersion));
             return null;
         });
     }
@@ -646,7 +668,7 @@ public class GroupMemberService {
         return authorized
                 .flatMap(isAuthorized -> {
                     if (isAuthorized != null && isAuthorized) {
-                        return updateGroupMember(groupId, memberId, name, role, new Date(), muteEndDate, null);
+                        return updateGroupMember(groupId, memberId, name, role, new Date(), muteEndDate, null, false);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }

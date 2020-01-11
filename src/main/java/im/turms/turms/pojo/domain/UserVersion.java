@@ -32,9 +32,10 @@ import java.util.Date;
 public class UserVersion {
     @Id
     private Long userId;
-    private Date relationships;
     private Date friendRequests;
+    private Date relationships;
     private Date relationshipGroups;
+    private Date relationshipGroupsMembers;
     private Date groupInvitations;
     private Date joinedGroups;
 }

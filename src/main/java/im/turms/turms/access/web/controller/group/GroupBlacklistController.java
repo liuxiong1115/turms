@@ -110,7 +110,6 @@ public class GroupBlacklistController {
             @RequestBody UpdateGroupBlacklistedUserDTO updateGroupBlacklistedUserDTO) {
         Mono<Boolean> updateMono = groupBlacklistService.updateBlacklistedUsers(
                 new HashSet<>(keys.getKeys()),
-                updateGroupBlacklistedUserDTO.getGroupId(),
                 updateGroupBlacklistedUserDTO.getBlockDate(),
                 updateGroupBlacklistedUserDTO.getRequesterId());
         return ResponseFactory.acknowledged(updateMono);

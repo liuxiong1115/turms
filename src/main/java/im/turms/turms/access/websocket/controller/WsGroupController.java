@@ -254,7 +254,8 @@ public class WsGroupController {
                     turmsRequestWrapper.getUserId(),
                     request.getGroupId(),
                     request.getUnblacklistedUserId(),
-                    null)
+                    null,
+                    true)
                     .map(success -> {
                         if (success != null && success
                                 && turmsClusterManager.getTurmsProperties().getNotification().isNotifyUserAfterUnblacklistedByGroup()) {

@@ -126,7 +126,8 @@ public class GroupMemberController {
                 updateGroupMemberDTO.getRole(),
                 updateGroupMemberDTO.getJoinDate(),
                 updateGroupMemberDTO.getMuteEndDate(),
-                null);
+                null,
+                true);
         return ResponseFactory.acknowledged(updateMono);
     }
 
@@ -136,9 +137,9 @@ public class GroupMemberController {
             GroupMember.KeyList keys) {
         Mono<Boolean> deleteMono;
         if (keys != null && !keys.getKeys().isEmpty()) {
-            deleteMono = groupMemberService.deleteGroupsMembers(new HashSet<>(keys.getKeys()));
+            deleteMono = groupMemberService.deleteGroupsMembers(new HashSet<>(keys.getKeys()), true);
         } else {
-            deleteMono = groupMemberService.deleteGroupMembers();
+            deleteMono = groupMemberService.deleteGroupMembers(true);
         }
         return ResponseFactory.acknowledged(deleteMono);
     }

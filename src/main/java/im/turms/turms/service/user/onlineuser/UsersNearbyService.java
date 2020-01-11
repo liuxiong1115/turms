@@ -159,7 +159,7 @@ public class UsersNearbyService {
             @Nullable Double maxDistance) {
         return queryUsersIdsNearby(userId, deviceType, maxPeopleNumber, maxDistance)
                 .collect(Collectors.toSet())
-                .flatMapMany(userService::queryUsersProfiles);
+                .flatMapMany(ids -> userService.queryUsersProfiles(ids, false));
     }
 
     public Flux<Long> queryUsersIdsNearby(

@@ -111,6 +111,14 @@ public class UserVersionService {
         return updateSpecificVersion(userIds, UserVersion.Fields.relationshipGroups, null);
     }
 
+    public Mono<Boolean> updateRelationshipGroupsMembersVersion(@NotNull Long userId) {
+        return updateSpecificVersion(userId, UserVersion.Fields.relationshipGroupsMembers, null);
+    }
+
+    public Mono<Boolean> updateRelationshipGroupsMembersVersion(@NotEmpty Set<Long> userIds) {
+        return updateSpecificVersion(userIds, UserVersion.Fields.relationshipGroupsMembers, null);
+    }
+
     public Mono<Boolean> updateGroupInvitationsVersion(@NotNull Long userId) {
         return updateSpecificVersion(userId, UserVersion.Fields.groupInvitations, null);
     }

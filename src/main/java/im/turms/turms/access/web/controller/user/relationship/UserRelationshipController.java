@@ -113,7 +113,6 @@ public class UserRelationshipController {
             @RequestBody UpdateRelationshipDTO updateRelationshipDTO) {
         Mono<Boolean> updated = userRelationshipService.updateUserOneSidedRelationships(
                 new HashSet<>(keys.getKeys()),
-                updateRelationshipDTO.getOwnerId(),
                 updateRelationshipDTO.getIsBlocked(),
                 updateRelationshipDTO.getEstablishmentDate());
         return ResponseFactory.acknowledged(updated);

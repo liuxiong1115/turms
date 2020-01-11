@@ -255,6 +255,30 @@ public class GroupInvitationService {
                 });
     }
 
+    public Mono<GroupInvitationsWithVersion> queryUserGroupInvitationsWithVersion(
+            @NotNull Long userId,
+            @Nullable Date lastUpdatedDate) {
+        return userVersionService.queryGroupInvitationsLastUpdatedDate(userId)
+                .defaultIfEmpty(MAX_DATE)
+                .flatMap(version -> {
+                    if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
+                        return queryGroupInvitationsByInviteeId(userId)
+                                .collect(Collectors.toSet())
+                                .map(groupInvitations -> {
+                                    GroupInvitationsWithVersion.Builder builder = GroupInvitationsWithVersion.newBuilder();
+                                    for (GroupInvitation groupInvitation : groupInvitations) {
+                                        builder.addGroupInvitations(ProtoUtil.groupInvitation2proto(groupInvitation));
+                                    }
+                                    return builder
+                                            .setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build())
+                                            .build();
+                                });
+                    } else {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
+                    }
+                });
+    }
+
     public Mono<GroupInvitationsWithVersion> queryGroupInvitationsWithVersion(
             @NotNull Long userId,
             @NotNull Long groupId,
