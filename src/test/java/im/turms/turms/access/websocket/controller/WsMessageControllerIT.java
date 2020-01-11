@@ -48,14 +48,15 @@ public class WsMessageControllerIT extends BaseControllerIT {
 
     @BeforeEach
     void setUp(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
+        Date now = new Date();
         User userOne = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
+                "", ProfileAccessStrategy.ALL, now, now, true, now);
         User userTwo = new User(2L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
+                "", ProfileAccessStrategy.ALL, now, now, true, now);
         User userThree = new User(3L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
-        UserRelationship relationshipOne = new UserRelationship(1L, 2L, false, new Date());
-        UserRelationship relationshipTwo = new UserRelationship(2L, 1L, false, new Date());
+                "", ProfileAccessStrategy.ALL, now, now, true, now);
+        UserRelationship relationshipOne = new UserRelationship(1L, 2L, false, now);
+        UserRelationship relationshipTwo = new UserRelationship(2L, 1L, false, now);
         mongoTemplate.save(userOne);
         mongoTemplate.save(userTwo);
         mongoTemplate.save(relationshipOne);

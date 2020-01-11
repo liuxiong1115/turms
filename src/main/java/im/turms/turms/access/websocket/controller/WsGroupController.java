@@ -87,6 +87,8 @@ public class WsGroupController {
                     minimumScore,
                     groupTypeId,
                     muteEndDate,
+                    null,
+                    null,
                     true)
                     .map(group -> RequestResult.responseId(group.getId()));
         };
