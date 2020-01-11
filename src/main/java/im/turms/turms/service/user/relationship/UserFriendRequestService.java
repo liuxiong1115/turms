@@ -215,9 +215,8 @@ public class UserFriendRequestService {
         return mongoOperations.findAndModify(query, update, UserFriendRequest.class)
                 .thenReturn(true)
                 .defaultIfEmpty(false)
-                .zipWith(
-                        queryRecipientId(requestId)
-                                .map(userVersionService::updateFriendRequestsVersion))
+                .zipWith(queryRecipientId(requestId)
+                        .map(userVersionService::updateFriendRequestsVersion))
                 .map(Tuple2::getT1);
     }
 
@@ -278,7 +277,7 @@ public class UserFriendRequestService {
                                 case ACCEPT:
                                     return mongoTemplate.inTransaction()
                                             .execute(operations -> updatePendingFriendRequestStatus(friendRequestId, RequestStatus.ACCEPTED, reason, operations)
-                                                    .zipWith(userRelationshipService.friendTwoUsers(request.getRequesterId(), requesterId, operations))
+                                                    .then(userRelationshipService.friendTwoUsers(request.getRequesterId(), requesterId, operations))
                                                     .thenReturn(true))
                                             .retryWhen(TRANSACTION_RETRY)
                                             .single();

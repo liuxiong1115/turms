@@ -46,7 +46,7 @@ public class WsUserControllerIT extends BaseControllerIT {
     public static void initUser(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
         Date now = new Date();
         User user = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, now, now, true, now);
+                "", ProfileAccessStrategy.ALL, now, now, true, 0, now);
         mongoTemplate.save(user);
     }
 

@@ -33,6 +33,7 @@ import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.pojo.request.user.*;
+import im.turms.turms.service.group.GroupInvitationService;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -52,15 +53,17 @@ public class WsUserController {
     private final UsersNearbyService usersNearbyService;
     private final OnlineUserService onlineUserService;
     private final GroupMemberService groupMemberService;
+    private final GroupInvitationService groupInvitationService;
     private final TurmsClusterManager turmsClusterManager;
 
-    public WsUserController(UserService userService, UsersNearbyService usersNearbyService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService, UserRelationshipService userRelationshipService) {
+    public WsUserController(UserService userService, UsersNearbyService usersNearbyService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService, UserRelationshipService userRelationshipService, GroupInvitationService groupInvitationService) {
         this.userService = userService;
         this.usersNearbyService = usersNearbyService;
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
         this.groupMemberService = groupMemberService;
         this.userRelationshipService = userRelationshipService;
+        this.groupInvitationService = groupInvitationService;
     }
 
     @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_USER_GROUP_INVITATIONS_REQUEST)
@@ -68,7 +71,7 @@ public class WsUserController {
         return turmsRequestWrapper -> {
             QueryUserGroupInvitationsRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUserGroupInvitationsRequest();
             Date lastUpdatedDate = request.hasLastUpdatedDate() ? new Date(request.getLastUpdatedDate().getValue()) : null;
-            return userService.queryUserGroupInvitationsWithVersion(
+            return groupInvitationService.queryUserGroupInvitationsWithVersion(
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
                     .map(groupInvitationsWithVersion -> RequestResult.responseData(TurmsNotification.Data
@@ -84,7 +87,8 @@ public class WsUserController {
             QueryUserProfileRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUserProfileRequest();
             return userService.authAndQueryUserProfile(
                     turmsRequestWrapper.getUserId(),
-                    request.getUserId())
+                    request.getUserId(),
+                    false)
                     .map(user -> {
                         UsersInfosWithVersion.Builder userBuilder = UsersInfosWithVersion
                                 .newBuilder()

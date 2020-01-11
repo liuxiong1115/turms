@@ -17,7 +17,6 @@
 
 package im.turms.turms.service.user;
 
-import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.annotation.constraint.ProfileAccessConstraint;
@@ -27,12 +26,10 @@ import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.ProfileAccessStrategy;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.common.DateRange;
-import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
 import im.turms.turms.pojo.domain.GroupInvitation;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLoginLog;
 import im.turms.turms.pojo.domain.UserOnlineUserNumber;
-import im.turms.turms.service.group.GroupInvitationService;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
@@ -56,7 +53,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
 
@@ -64,7 +60,6 @@ import static im.turms.turms.common.Constants.*;
 @Validated
 public class UserService {
     private final GroupMemberService groupMemberService;
-    private final GroupInvitationService groupInvitationService;
     private final UserRelationshipService userRelationshipService;
     private final UserRelationshipGroupService userRelationshipGroupService;
     private final UserVersionService userVersionService;
@@ -73,14 +68,13 @@ public class UserService {
     private final TurmsPasswordUtil turmsPasswordUtil;
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, GroupInvitationService groupInvitationService, @Lazy OnlineUserService onlineUserService, UserRelationshipGroupService userRelationshipGroupService) {
+    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, @Lazy OnlineUserService onlineUserService, UserRelationshipGroupService userRelationshipGroupService) {
         this.userRelationshipService = userRelationshipService;
         this.groupMemberService = groupMemberService;
         this.turmsPasswordUtil = turmsPasswordUtil;
         this.turmsClusterManager = turmsClusterManager;
         this.userVersionService = userVersionService;
         this.mongoTemplate = mongoTemplate;
-        this.groupInvitationService = groupInvitationService;
         this.onlineUserService = onlineUserService;
         this.userRelationshipGroupService = userRelationshipGroupService;
     }
@@ -180,53 +174,16 @@ public class UserService {
                 registrationDate,
                 null,
                 isActive,
+                0,
                 now);
         Long finalId = id;
         return mongoTemplate.inTransaction()
-                .execute(operations -> operations.insert(user)
+                .execute(operations -> operations.save(user)
                         .then(userRelationshipGroupService.createRelationshipGroup(finalId, 0, "", now, operations))
                         .then(userVersionService.upsertEmptyUserVersion(user.getId(), operations))
                         .thenReturn(user))
                 .retryWhen(TRANSACTION_RETRY)
                 .single();
-    }
-
-    public Flux<GroupInvitation> queryUserGroupInvitations(
-            @NotNull Long userId,
-            @Nullable Date lastUpdatedDate) {
-        return userVersionService.queryGroupInvitationsLastUpdatedDate(userId)
-                .defaultIfEmpty(MAX_DATE)
-                .flatMapMany(version -> {
-                    if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return groupInvitationService.queryGroupInvitationsByInviteeId(userId);
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
-                    }
-                });
-    }
-
-    public Mono<GroupInvitationsWithVersion> queryUserGroupInvitationsWithVersion(
-            @NotNull Long userId,
-            @Nullable Date lastUpdatedDate) {
-        return userVersionService.queryGroupInvitationsLastUpdatedDate(userId)
-                .defaultIfEmpty(MAX_DATE)
-                .flatMap(version -> {
-                    if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return groupInvitationService.queryGroupInvitationsByInviteeId(userId)
-                                .collect(Collectors.toSet())
-                                .map(groupInvitations -> {
-                                    GroupInvitationsWithVersion.Builder builder = GroupInvitationsWithVersion.newBuilder();
-                                    for (GroupInvitation groupInvitation : groupInvitations) {
-                                        builder.addGroupInvitations(ProtoUtil.groupInvitation2proto(groupInvitation));
-                                    }
-                                    return builder
-                                            .setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build())
-                                            .build();
-                                });
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
-                    }
-                });
     }
 
     public Mono<Boolean> isAllowToQueryUserProfile(
@@ -252,28 +209,35 @@ public class UserService {
 
     public Mono<User> authAndQueryUserProfile(
             @NotNull Long requesterId,
-            @NotNull Long userId) {
-        return authAndQueryUsersProfiles(requesterId, Collections.singleton(userId)).single();
+            @NotNull Long userId,
+            boolean shouldQueryDeletedRecords) {
+        return authAndQueryUsersProfiles(requesterId, Set.of(userId), shouldQueryDeletedRecords).single();
     }
 
     public Flux<User> authAndQueryUsersProfiles(
             @NotNull Long requesterId,
-            @NotEmpty Set<Long> userIds) {
+            @NotEmpty Set<Long> userIds,
+            boolean shouldQueryDeletedRecords) {
         List<Mono<Boolean>> monos = new ArrayList<>(userIds.size());
         for (Long userId : userIds) {
-            monos.add(isAllowToQueryUserProfile(requesterId, userId));
+            monos.add(isAllowToQueryUserProfile(requesterId, userId)
+                    .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.TARGET_USERS_NOT_EXIST))));
         }
         return Mono.zip(monos, objects -> objects)
                 .flatMapMany(results -> {
                     if (!BooleanUtils.and((Boolean[]) results)) {
                         throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
                     }
-                    return queryUsersProfiles(userIds);
+                    return queryUsersProfiles(userIds, shouldQueryDeletedRecords);
                 });
     }
 
-    public Flux<User> queryUsersProfiles(@NotEmpty Set<Long> userIds) {
-        Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
+    public Flux<User> queryUsersProfiles(@NotEmpty Set<Long> userIds, boolean shouldQueryDeletedRecords) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .add(Criteria.where(ID).in(userIds))
+                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .buildQuery();
         query.fields()
                 .include(ID)
                 .include(User.Fields.name)
@@ -289,12 +253,12 @@ public class UserService {
             @NotEmpty Set<Long> userIds,
             @Nullable Boolean shouldDeleteLogically) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
-        if (shouldDeleteLogically == null) {
-            shouldDeleteLogically = turmsClusterManager.getTurmsProperties().getUser().isShouldDeleteLogicallyUser();
-        }
         Mono<Boolean> deleteOrUpdateMono;
         if (shouldDeleteLogically) {
-            Update update = new Update().set(User.Fields.deletionDate, new Date());
+            Date now = new Date();
+            Update update = new Update()
+                    .set(User.Fields.deletionDate, now)
+                    .set(User.Fields.lastUpdateDate, now);
             deleteOrUpdateMono = mongoTemplate.updateMulti(query, update, User.class)
                     .map(UpdateResult::wasAcknowledged);
         } else {
@@ -323,8 +287,12 @@ public class UserService {
         });
     }
 
-    public Mono<Boolean> userExists(@NotNull Long userId) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
+    public Mono<Boolean> userExists(@NotNull Long userId, boolean shouldQueryDeletedRecords) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .add(Criteria.where(ID).is(userId))
+                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .buildQuery();
         return mongoTemplate.exists(query, User.class);
     }
 
@@ -353,20 +321,23 @@ public class UserService {
             @Nullable DateRange deletionDateRange,
             @Nullable Boolean isActive,
             @Nullable Integer page,
-            @Nullable Integer size) {
+            @Nullable Integer size,
+            boolean shouldQueryDeletedRecords) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, userIds)
                 .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateRange)
                 .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateRange)
                 .addIsIfNotNull(User.Fields.active, isActive)
+                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, User.class);
     }
 
-    public Mono<Long> countRegisteredUsers(@Nullable DateRange dateRange) {
+    public Mono<Long> countRegisteredUsers(@Nullable DateRange dateRange, boolean shouldQueryDeletedRecords) {
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(User.Fields.registrationDate, dateRange)
+                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
@@ -378,9 +349,10 @@ public class UserService {
         return mongoTemplate.count(query, User.class);
     }
 
-    public Mono<Long> countLoggedInUsers(@Nullable DateRange dateRange) {
+    public Mono<Long> countLoggedInUsers(@Nullable DateRange dateRange, boolean shouldQueryDeletedRecords) {
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, dateRange)
+                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
@@ -389,8 +361,12 @@ public class UserService {
                 UserLoginLog.class);
     }
 
-    public Mono<Long> countUsers() {
-        return mongoTemplate.count(new Query(), User.class);
+    public Mono<Long> countUsers(boolean shouldQueryDeletedRecords) {
+        Query query = QueryBuilder
+                .newBuilder()
+                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .buildQuery();
+        return mongoTemplate.count(query, User.class);
     }
 
     public Mono<Long> countUsers(
@@ -460,10 +436,5 @@ public class UserService {
                         return Mono.just(false);
                     }
                 });
-    }
-
-    @Deprecated
-    private void notifyUserStatusChange() {
-        throw new UnsupportedOperationException("Server should not to notify users of the changes of others' statues actively because of the huge cost of resources");
     }
 }

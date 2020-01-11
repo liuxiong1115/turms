@@ -27,8 +27,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateRelationshipGroupDTO {
-    private Long ownerId;
-    private Integer index;
     private String name;
     private Date creationDate;
 }

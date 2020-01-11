@@ -93,25 +93,25 @@ public class GroupBlacklistService {
                                 false,
                                 false);
                         if (operations != null) {
-                            Mono<Boolean> delete = groupMemberService.deleteGroupMembers(groupId, Set.of(blacklistedUserId), operations);
-                            return Mono.zip(delete, operations.insert(blacklistedUser), updateVersion)
+                            return groupMemberService.deleteGroupMembers(groupId, Set.of(blacklistedUserId), operations, false)
+                                    .then(operations.insert(blacklistedUser))
+                                    .then(updateVersion)
                                     .thenReturn(true);
                         } else {
                             return mongoTemplate
                                     .inTransaction()
-                                    .execute(newOperations ->
-                                            Mono.zip(groupMemberService.deleteGroupMembers(groupId, Set.of(blacklistedUserId), newOperations),
-                                                    newOperations.insert(blacklistedUser),
-                                                    updateVersion)
-                                                    .thenReturn(true))
+                                    .execute(newOperations -> groupMemberService.deleteGroupMembers(groupId, Set.of(blacklistedUserId), newOperations, false)
+                                            .then(newOperations.insert(blacklistedUser))
+                                            .then(updateVersion)
+                                            .thenReturn(true))
                                     .retryWhen(TRANSACTION_RETRY)
                                     .single();
                         }
                     } else {
                         Mono<Boolean> updateVersion = groupVersionService.updateBlacklistVersion(groupId);
                         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-                        return Mono.zip(mongoOperations.insert(blacklistedUser),
-                                updateVersion)
+                        return mongoOperations.insert(blacklistedUser)
+                                .then(updateVersion)
                                 .thenReturn(true);
                     }
                 });
@@ -121,7 +121,8 @@ public class GroupBlacklistService {
             @NotNull Long requesterId,
             @NotNull Long groupId,
             @NotNull Long unblacklistedUserId,
-            @Nullable ReactiveMongoOperations operations) {
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateBlacklistVersion) {
         return groupMemberService
                 .isOwnerOrManager(requesterId, groupId)
                 .flatMap(authenticated -> {
@@ -133,8 +134,12 @@ public class GroupBlacklistService {
                         return mongoOperations.remove(query, GroupBlacklistedUser.class)
                                 .flatMap(result -> {
                                     if (result.wasAcknowledged()) {
-                                        return groupVersionService.updateBlacklistVersion(groupId)
-                                                .thenReturn(true);
+                                        if (updateBlacklistVersion) {
+                                            return groupVersionService.updateBlacklistVersion(groupId)
+                                                    .thenReturn(true);
+                                        } else {
+                                            return Mono.just(true);
+                                        }
                                     } else {
                                         return Mono.just(false);
                                     }
@@ -227,7 +232,7 @@ public class GroupBlacklistService {
                                     }
                                     return ids;
                                 })
-                                .flatMapMany(userService::queryUsersProfiles)
+                                .flatMapMany(ids -> userService.queryUsersProfiles(ids, false))
                                 .collect(Collectors.toSet())
                                 .map(users -> {
                                     if (users.isEmpty()) {
@@ -262,19 +267,14 @@ public class GroupBlacklistService {
     public Mono<Boolean> updateBlacklistedUsers(
             @NotNull Long groupId,
             @NotEmpty Set<Long> userIds,
-            @Nullable Long newGroupId,
             @Nullable @PastOrPresent Date blockDate,
             @Nullable Long requesterId) {
-        Validator.throwIfAllNull(newGroupId, blockDate, requesterId);
-        if (newGroupId != null && newGroupId.equals(groupId) && blockDate == null && requesterId == null) {
-            return Mono.just(true);
-        }
+        Validator.throwIfAllNull(blockDate, requesterId);
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).in(userIds));
         Update update = UpdateBuilder
                 .newBuilder()
-                .setIfNotNull(ID_GROUP_ID, newGroupId)
                 .setIfNotNull(GroupBlacklistedUser.Fields.blockDate, blockDate)
                 .setIfNotNull(GroupBlacklistedUser.Fields.requesterId, requesterId)
                 .build();
@@ -284,10 +284,9 @@ public class GroupBlacklistService {
 
     public Mono<Boolean> updateBlacklistedUsers(
             @NotEmpty Set<GroupBlacklistedUser.Key> keys,
-            @Nullable Long newGroupId,
             @Nullable @PastOrPresent Date blockDate,
             @Nullable Long requesterId) {
-        Validator.throwIfAllNull(newGroupId, blockDate, requesterId);
+        Validator.throwIfAllNull(blockDate, requesterId);
         return MapUtil.fluxMerge(multimap -> {
             for (GroupBlacklistedUser.Key key : keys) {
                 multimap.put(key.getGroupId(), key.getUserId());
@@ -297,7 +296,6 @@ public class GroupBlacklistService {
             monos.add(updateBlacklistedUsers(
                     key,
                     values,
-                    newGroupId,
                     blockDate,
                     requesterId));
             return null;

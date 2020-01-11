@@ -311,7 +311,7 @@ public class GroupService {
                                     Mono<Boolean> deleteOrUpdateOwnerMono;
                                     if (quitAfterTransfer) {
                                         deleteOrUpdateOwnerMono = groupMemberService.deleteGroupMembers(
-                                                groupId, Set.of(ownerId), operations);
+                                                groupId, Set.of(ownerId), operations, false);
                                     } else {
                                         deleteOrUpdateOwnerMono = groupMemberService.updateGroupMember(
                                                 groupId,
@@ -320,7 +320,8 @@ public class GroupService {
                                                 GroupMemberRole.MEMBER,
                                                 null,
                                                 null,
-                                                operations);
+                                                operations,
+                                                false);
                                     }
                                     Mono<Boolean> update = groupMemberService.updateGroupMember(
                                             groupId,
@@ -329,7 +330,8 @@ public class GroupService {
                                             GroupMemberRole.OWNER,
                                             null,
                                             null,
-                                            operations);
+                                            operations,
+                                            true);
                                     return Mono.zip(deleteOrUpdateOwnerMono, update)
                                             .map(results -> results.getT1() && results.getT2());
                                 })));
@@ -582,7 +584,7 @@ public class GroupService {
                     if (monos.isEmpty()) {
                         throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
                     } else {
-                        return Mono.zip(monos, objects -> objects).thenReturn(true);
+                        return Mono.when(monos).thenReturn(true);
                     }
                 })
                 .retryWhen(TRANSACTION_RETRY)
@@ -640,7 +642,7 @@ public class GroupService {
                             if (monos.isEmpty()) {
                                 return Mono.just(true);
                             } else {
-                                return Mono.zip(monos, objects -> objects).thenReturn(true);
+                                return Mono.when(monos).thenReturn(true);
                             }
                         })
                         .retryWhen(TRANSACTION_RETRY)
