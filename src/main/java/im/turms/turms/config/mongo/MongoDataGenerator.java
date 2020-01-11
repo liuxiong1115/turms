@@ -264,9 +264,10 @@ public class MongoDataGenerator {
                         ProfileAccessStrategy.ALL,
                         now,
                         null,
-                        true);
+                        true,
+                        now);
                 UserVersion userVersion = new UserVersion(
-                        (long) i, now, now, now, now, now, now);
+                        (long) i, now, now, now, now, now);
                 UserRelationshipGroup relationshipGroup = new UserRelationshipGroup((long) i, 0, "", now);
                 objects.add(user);
                 objects.add(userVersion);

@@ -117,8 +117,7 @@ public class GroupService {
                                 null,
                                 new Date(),
                                 null,
-                                operations,
-                                false))
+                                operations))
                         .flatMap(results -> groupVersionService.upsert(groupId)
                                 .thenReturn(results.getT1())))
                 .retryWhen(TRANSACTION_RETRY)

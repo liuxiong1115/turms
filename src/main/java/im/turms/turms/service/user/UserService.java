@@ -162,7 +162,6 @@ public class UserService {
             @Nullable @PastOrPresent Date registrationDate,
             @Nullable Boolean isActive) {
         Date now = new Date();
-        User user = new User();
         id = id != null ? id : turmsClusterManager.generateRandomId();
         rawPassword = rawPassword != null ? rawPassword : RandomStringUtils.randomAlphanumeric(16);
         name = name != null ? name : "";
@@ -171,14 +170,17 @@ public class UserService {
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
         registrationDate = registrationDate != null ? registrationDate : now;
         isActive = isActive != null ? isActive : false;
-        user.setId(id);
-        user.setPassword(turmsPasswordUtil.encodeUserPassword(rawPassword));
-        user.setName(name);
-        user.setIntro(intro);
-        user.setProfilePictureUrl(profilePictureUrl);
-        user.setProfileAccess(profileAccess);
-        user.setRegistrationDate(registrationDate);
-        user.setActive(isActive);
+        User user = new User(
+                id,
+                turmsPasswordUtil.encodeUserPassword(rawPassword),
+                name,
+                intro,
+                profilePictureUrl,
+                profileAccess,
+                registrationDate,
+                null,
+                isActive,
+                now);
         Long finalId = id;
         return mongoTemplate.inTransaction()
                 .execute(operations -> operations.insert(user)
@@ -292,26 +294,26 @@ public class UserService {
         }
         Mono<Boolean> deleteOrUpdateMono;
         if (shouldDeleteLogically) {
-                            Update update = new Update().set(User.Fields.deletionDate, new Date());
+            Update update = new Update().set(User.Fields.deletionDate, new Date());
             deleteOrUpdateMono = mongoTemplate.updateMulti(query, update, User.class)
-                                    .map(UpdateResult::wasAcknowledged);
-                        } else {
+                    .map(UpdateResult::wasAcknowledged);
+        } else {
             deleteOrUpdateMono = mongoTemplate.inTransaction()
                     .execute(operations -> operations.remove(query, User.class)
                             .map(DeleteResult::wasAcknowledged)
-                                .flatMap(acknowledged -> {
-                                    if (acknowledged != null && acknowledged) {
-                                            return userRelationshipService.deleteAllRelationships(userIds, operations, false)
-                                                    .then(userRelationshipGroupService.deleteAllRelationshipGroups(userIds, operations, false))
-                                                    .then(userVersionService.delete(userIds, operations))
-                                                    .thenReturn(true);
-                                    } else {
-                                        return Mono.just(false);
-                                    }
-                                }))
-                        .retryWhen(TRANSACTION_RETRY)
-                        .single();
-            }
+                            .flatMap(acknowledged -> {
+                                if (acknowledged != null && acknowledged) {
+                                    return userRelationshipService.deleteAllRelationships(userIds, operations, false)
+                                            .then(userRelationshipGroupService.deleteAllRelationshipGroups(userIds, operations, false))
+                                            .then(userVersionService.delete(userIds, operations))
+                                            .thenReturn(true);
+                                } else {
+                                    return Mono.just(false);
+                                }
+                            }))
+                    .retryWhen(TRANSACTION_RETRY)
+                    .single();
+        }
         return deleteOrUpdateMono.flatMap(success -> {
             if (success) {
                 return onlineUserService.setUsersOffline(userIds, CloseStatus.NOT_ACCEPTABLE).then(Mono.just(true));
@@ -443,21 +445,16 @@ public class UserService {
                 .setIfNotNull(User.Fields.profileAccess, profileAccessStrategy)
                 .setIfNotNull(User.Fields.registrationDate, registrationDate)
                 .setIfNotNull(User.Fields.active, isActive)
+                .setIfNotNull(User.Fields.lastUpdateDate, new Date())
                 .build();
         return mongoTemplate.updateMulti(query, update, User.class)
                 .flatMap(result -> {
                     if (result.wasAcknowledged()) {
-                        List<Mono<Boolean>> monos = new ArrayList<>(userIds.size());
-                        for (Long userId : userIds) {
-                            monos.add(userVersionService.updateInformationVersion(userId));
-                        }
                         if (isActive != null && !isActive) {
-                            return Mono.zip(monos, objects -> objects)
-                                    .then(onlineUserService.setUsersOffline(userIds, CloseStatus.NOT_ACCEPTABLE).then())
+                            return Mono.just(onlineUserService.setUsersOffline(userIds, CloseStatus.NOT_ACCEPTABLE))
                                     .thenReturn(true);
                         } else {
-                            return Mono.zip(monos, objects -> objects)
-                                    .thenReturn(true);
+                            return Mono.just(true);
                         }
                     } else {
                         return Mono.just(false);

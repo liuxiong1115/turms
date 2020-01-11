@@ -50,8 +50,9 @@ public class TurmsHandshakeWebSocketServiceIT {
 
     @BeforeAll
     public static void initUser(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
+        Date now = new Date();
         User user = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, new Date(), new Date(), true);
+                "", ProfileAccessStrategy.ALL, now, now, true, now);
         mongoTemplate.save(user);
     }
 
