@@ -149,7 +149,7 @@ public class GroupService {
                     if (existed != null && existed) {
                         return countUserOwnedGroupNumber(creatorId);
                     } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.TYPE_NOT_EXISTS));
                     }
                 })
                 .flatMap(ownedGroupNumber -> {
