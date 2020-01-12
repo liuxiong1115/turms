@@ -26,7 +26,6 @@ import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.ProfileAccessStrategy;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.common.DateRange;
-import im.turms.turms.pojo.domain.GroupInvitation;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLoginLog;
 import im.turms.turms.pojo.domain.UserOnlineUserNumber;
@@ -236,7 +235,7 @@ public class UserService {
         Query query = QueryBuilder
                 .newBuilder()
                 .add(Criteria.where(ID).in(userIds))
-                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         query.fields()
                 .include(ID)
@@ -291,7 +290,7 @@ public class UserService {
         Query query = QueryBuilder
                 .newBuilder()
                 .add(Criteria.where(ID).is(userId))
-                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.exists(query, User.class);
     }
@@ -329,7 +328,7 @@ public class UserService {
                 .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateRange)
                 .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateRange)
                 .addIsIfNotNull(User.Fields.active, isActive)
-                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, User.class);
     }
@@ -337,7 +336,7 @@ public class UserService {
     public Mono<Long> countRegisteredUsers(@Nullable DateRange dateRange, boolean shouldQueryDeletedRecords) {
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(User.Fields.registrationDate, dateRange)
-                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
@@ -352,7 +351,7 @@ public class UserService {
     public Mono<Long> countLoggedInUsers(@Nullable DateRange dateRange, boolean shouldQueryDeletedRecords) {
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, dateRange)
-                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
@@ -364,7 +363,7 @@ public class UserService {
     public Mono<Long> countUsers(boolean shouldQueryDeletedRecords) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addNotNullIfTrue(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }

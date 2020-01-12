@@ -8,6 +8,7 @@ import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.*;
 import im.turms.turms.pojo.domain.*;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.CollectionOptions;
@@ -103,8 +104,8 @@ public class MongoDataGenerator {
         if (isDevEnv()) {
             TurmsLogger.log("Start mocking...");
             // Admin
-            final int ADMIN_COUNT = 5;
-            final int USER_COUNT = 100;
+            final int ADMIN_COUNT = 10;
+            final int USER_COUNT = 500;
             final Date now = new Date();
             List<Object> objects = new LinkedList<>();
             for (int i = 1; i <= ADMIN_COUNT; i++) {
@@ -113,14 +114,14 @@ public class MongoDataGenerator {
                         passwordUtil.encodeAdminPassword("123"),
                         "myname",
                         1L,
-                        now);
+                        DateUtils.addDays(now, -i));
                 objects.add(admin);
             }
             for (int i = 1; i <= 100; i++) {
                 AdminActionLog adminActionLog = new AdminActionLog(
                         turmsClusterManager.generateRandomId(),
                         "account" + (1 + i % ADMIN_COUNT),
-                        new Date(),
+                        DateUtils.addDays(now, -i),
                         InetAddresses.coerceToInteger(InetAddress.getLocalHost()),
                         "testaction",
                         null,
@@ -167,7 +168,7 @@ public class MongoDataGenerator {
                         (long) i,
                         "test-content",
                         RequestStatus.PENDING,
-                        now,
+                        DateUtils.addDays(now, -i),
                         null,
                         null);
                 objects.add(groupInvitation);
@@ -198,7 +199,7 @@ public class MongoDataGenerator {
                         (long) i,
                         "test-name",
                         i == 1 ? GroupMemberRole.OWNER : GroupMemberRole.MEMBER,
-                        new Date(),
+                        now,
                         i > USER_COUNT / 10 / 2 ? new Date(9999999999999L) : null);
                 objects.add(groupMember);
             }
@@ -210,7 +211,7 @@ public class MongoDataGenerator {
                         id,
                         ChatType.PRIVATE,
                         false,
-                        now,
+                        DateUtils.addHours(now, -i),
                         "private-message-text" + RandomStringUtils.randomAlphanumeric(16),
                         1L,
                         (long) 2 + (i % 9),
@@ -243,7 +244,7 @@ public class MongoDataGenerator {
                             1L,
                             false,
                             1L,
-                            (long) j,
+                            j,
                             MessageDeliveryStatus.READY);
                     objects.add(groupMessageStatus);
                 }
@@ -253,6 +254,7 @@ public class MongoDataGenerator {
 
             // User
             for (int i = 1; i <= USER_COUNT; i++) {
+                Date userDate = DateUtils.addDays(now, -i);
                 User user = new User(
                         (long) i,
                         passwordUtil.encodeUserPassword("123"),
@@ -260,14 +262,14 @@ public class MongoDataGenerator {
                         "user-intro",
                         null,
                         ProfileAccessStrategy.ALL,
-                        now,
+                        userDate,
                         null,
                         true,
                         0,
-                        now);
+                        userDate);
                 UserVersion userVersion = new UserVersion(
-                        (long) i, now, now, now, now, now, now);
-                UserRelationshipGroup relationshipGroup = new UserRelationshipGroup((long) i, 0, "", now);
+                        (long) i, userDate, userDate, userDate, userDate, userDate, userDate);
+                UserRelationshipGroup relationshipGroup = new UserRelationshipGroup((long) i, 0, "", userDate);
                 objects.add(user);
                 objects.add(userVersion);
                 objects.add(relationshipGroup);
