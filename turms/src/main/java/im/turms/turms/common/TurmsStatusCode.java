@@ -49,8 +49,9 @@ public enum TurmsStatusCode {
     SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE(4014, "A different device has logged into your account", 409),
     SUCCESSOR_NOT_GROUP_MEMBER(4015, "The successor is not the group member", 400),
     TARGET_USERS_UNAUTHORIZED(4016, "The target users are unauthorized", 400),
-    TARGET_USERS_NOT_EXIST(4017, "The target users do not exist", 401),
-    UNAUTHORIZED(4018, "Unauthorized", 401),
+    TARGET_USERS_NOT_EXIST(4017, "The target users do not exist", 404),
+    TYPE_NOT_EXISTS(4018, "The resource type does not exist", 404),
+    UNAUTHORIZED(4019, "Unauthorized", 401),
 
     LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500);
 
