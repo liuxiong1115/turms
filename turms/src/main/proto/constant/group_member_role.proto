@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package im.turms.proto;
+
+option java_package = "im.turms.turms.constant";
+option java_multiple_files = true;
+
+enum GroupMemberRole {
+    OWNER = 0;
+    MANAGER = 1;
+    MEMBER = 2;
+    GUEST = 3;
+    ANONYMOUS_GUEST = 4;
+}
