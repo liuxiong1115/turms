@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package im.turms.proto;
+
+option java_package = "im.turms.turms.constant";
+option java_multiple_files = true;
+
+enum DeviceType {
+    DESKTOP = 0;
+    BROWSER = 1;
+    IOS = 2;
+    ANDROID = 3;
+    OTHERS = 4;
+    UNKNOWN = 5;
+}
