@@ -64,8 +64,8 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder addNotNullIfTrue(@NotNull String key, boolean isTrue) {
-        if (isTrue) {
+    public QueryBuilder addNotNullIfFalse(@NotNull String key, boolean bool) {
+        if (!bool) {
             criteriaList.add(Criteria.where(key).ne(null));
         }
         return this;
