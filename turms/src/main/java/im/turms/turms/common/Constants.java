@@ -52,10 +52,10 @@ public class Constants {
     public static final String HAZELCAST_ROLES_MAP = "adminRoles";
     public static final String HAZELCAST_GROUP_TYPES_MAP = "groupTypes";
 
-    public static final String EXPIRY_USER_FRIEND_REQUESTS_CLEANER_CRON = "0 0 2 * * ?";
-    public static final String EXPIRY_GROUP_INVITATIONS_CLEANER_CRON = "0 15 2 * * ?";
-    public static final String EXPIRY_GROUP_JOIN_REQUESTS_CLEANER_CRON = "0 30 2 * * ?";
-    public static final String EXPIRY_MESSAGES_CLEANER_CRON = "0 45 2 * * ?";
+    public static final String EXPIRED_USER_FRIEND_REQUESTS_CLEANER_CRON = "0 0 2 * * ?";
+    public static final String EXPIRED_GROUP_INVITATIONS_CLEANER_CRON = "0 15 2 * * ?";
+    public static final String EXPIRED_GROUP_JOIN_REQUESTS_CLEANER_CRON = "0 30 2 * * ?";
+    public static final String EXPIRED_MESSAGES_CLEANER_CRON = "0 45 2 * * ?";
     public static final String ONLINE_USERS_NUMBER_PERSISTER_CRON = "0 0/5 * * * ?";
 
     public static final String ACCOUNT = "account";

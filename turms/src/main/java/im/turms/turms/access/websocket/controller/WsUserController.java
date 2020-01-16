@@ -221,7 +221,7 @@ public class WsUserController {
             boolean updated = onlineUserService.getLocalOnlineUserManager(turmsRequestWrapper.getUserId())
                     .setUserOnlineStatus(userStatus);
             boolean notifyMembers = turmsClusterManager.getTurmsProperties().getNotification().isNotifyMembersAfterOtherMemberOnlineStatusUpdated();
-            boolean notifyRelatedUser = turmsClusterManager.getTurmsProperties().getNotification().isNotifyRelatedUsersAfterOtherRelatedUsersOnlineStatusUpdated();
+            boolean notifyRelatedUser = turmsClusterManager.getTurmsProperties().getNotification().isNotifyRelatedUsersAfterOtherRelatedUserOnlineStatusUpdated();
             if (!notifyMembers && !notifyRelatedUser) {
                 return Mono.just(RequestResult.okIfTrue(updated));
             } else {
@@ -272,7 +272,7 @@ public class WsUserController {
                     null)
                     .flatMap(updated -> {
                         if (updated != null && updated) {
-                            if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyRelatedUsersAfterUserInfoUpdated()) {
+                            if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyRelatedUsersAfterOtherRelatedUserInfoUpdated()) {
                                 return userRelationshipService.queryRelatedUsersIds(Set.of(turmsRequestWrapper.getUserId()), false)
                                         .collect(Collectors.toSet())
                                         .map(relatedUsersIds -> {

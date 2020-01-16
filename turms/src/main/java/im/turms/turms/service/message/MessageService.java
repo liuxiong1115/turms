@@ -26,7 +26,7 @@ import im.turms.turms.common.*;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
 import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.plugin.ExpiryMessageAutoDeletionNotificationHandler;
+import im.turms.turms.plugin.ExpiredMessageAutoDeletionNotificationHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.domain.Message;
@@ -84,13 +84,13 @@ public class MessageService {
         this.outboundMessageService = outboundMessageService;
     }
 
-    @Scheduled(cron = EXPIRY_MESSAGES_CLEANER_CRON)
-    public void expiryMessagesCleaner() {
+    @Scheduled(cron = EXPIRED_MESSAGES_CLEANER_CRON)
+    public void expiredMessagesCleaner() {
         if (turmsClusterManager.isCurrentMemberMaster()) {
             int messagesTimeToLiveHours = turmsClusterManager.getTurmsProperties()
-                    .getMessage().getMessagesTimeToLiveHours();
+                    .getMessage().getMessageTimeToLiveHours();
             if (messagesTimeToLiveHours != 0) {
-                deleteExpiryMessagesAndStatuses(messagesTimeToLiveHours).subscribe();
+                deleteExpiredMessagesAndStatuses(messagesTimeToLiveHours).subscribe();
             }
         }
     }
@@ -120,7 +120,7 @@ public class MessageService {
                     if (deliveryDate != null) {
                         long elapsedTime = (deliveryDate.getTime() - System.currentTimeMillis()) / 1000;
                         return elapsedTime < turmsClusterManager.getTurmsProperties()
-                                .getMessage().getAllowableRecallDurationSeconds();
+                                .getMessage().getAvailableRecallDurationSeconds();
                     } else {
                         return false;
                     }
@@ -352,7 +352,7 @@ public class MessageService {
                 .single();
     }
 
-    public Flux<Long> queryExpiryMessagesIds(@NotNull Integer timeToLiveHours) {
+    public Flux<Long> queryExpiredMessagesIds(@NotNull Integer timeToLiveHours) {
         Date beforeDate = Date.from(Instant.now().minus(timeToLiveHours, ChronoUnit.HOURS));
         Query query = new Query()
                 .addCriteria(Criteria.where(Message.Fields.deliveryDate).lt(beforeDate));
@@ -361,8 +361,8 @@ public class MessageService {
                 .map(Message::getId);
     }
 
-    public Mono<Boolean> deleteExpiryMessagesAndStatuses(@NotNull Integer timeToLiveHours) {
-        return queryExpiryMessagesIds(timeToLiveHours)
+    public Mono<Boolean> deleteExpiredMessagesAndStatuses(@NotNull Integer timeToLiveHours) {
+        return queryExpiredMessagesIds(timeToLiveHours)
                 .collectList()
                 .flatMap(messagesIds -> {
                     if (messagesIds.isEmpty()) {
@@ -376,8 +376,8 @@ public class MessageService {
                                     .collectList()
                                     .flatMap(messages -> {
                                         Mono<Boolean> mono = Mono.just(true);
-                                        for (ExpiryMessageAutoDeletionNotificationHandler handler : turmsPluginManager
-                                                .getExpiryMessageAutoDeletionNotificationHandlerList()) {
+                                        for (ExpiredMessageAutoDeletionNotificationHandler handler : turmsPluginManager
+                                                .getExpiredMessageAutoDeletionNotificationHandlerList()) {
                                             mono = mono
                                                     .defaultIfEmpty(true)
                                                     .flatMap(allowed -> {
@@ -421,7 +421,7 @@ public class MessageService {
                 .buildQuery();
         if (shouldDeleteLogically == null) {
             shouldDeleteLogically = turmsClusterManager.getTurmsProperties()
-                    .getMessage().isShouldDeleteLogicallyMessageByDefault();
+                    .getMessage().isShouldDeleteMessageLogicallyByDefault();
         }
         if (shouldDeleteLogically) {
             Update update = new Update().set(Message.Fields.deletionDate, new Date());
@@ -669,7 +669,7 @@ public class MessageService {
                             return isMessageRecallable(messageId)
                                     .flatMap(recallable -> {
                                         if (recallable == null || !recallable) {
-                                            return Mono.error(TurmsBusinessException.get(EXPIRY_RESOURCE));
+                                            return Mono.error(TurmsBusinessException.get(EXPIRED_RESOURCE));
                                         }
                                         return updateMessageAndMessageStatus(messageId, recipientId, text, records, recallDate, readDate);
                                     });

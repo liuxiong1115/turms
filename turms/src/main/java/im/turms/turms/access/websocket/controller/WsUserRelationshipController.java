@@ -64,7 +64,7 @@ public class WsUserRelationshipController {
                     new Date())
                     .map(friendRequest -> {
                         if (turmsClusterManager.getTurmsProperties()
-                                .getNotification().isNotifyRecipientAfterReceivedFriendRequest()) {
+                                .getNotification().isNotifyRecipientWhenReceivingFriendRequest()) {
                             return RequestResult.responseIdAndRecipientData(
                                     friendRequest.getId(),
                                     request.getRecipientId(),
@@ -127,7 +127,7 @@ public class WsUserRelationshipController {
             int targetGroupIndex = request.hasTargetGroupIndex() ?
                     request.getTargetGroupIndex().getValue() : DEFAULT_RELATIONSHIP_GROUP_INDEX;
             if (turmsClusterManager.getTurmsProperties().getNotification()
-                    .isNotifyRelatedUserAfterOneSidedRelationshipGroupUpdatedByOthers()) {
+                    .isNotifyMembersAfterOneSidedRelationshipGroupUpdatedByOthers()) {
                 return userRelationshipGroupService.queryRelatedUsersIdsInRelationshipGroup(
                         turmsRequestWrapper.getUserId(),
                         groupIndex)
@@ -156,7 +156,7 @@ public class WsUserRelationshipController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteRelationshipRequest() {
         return turmsRequestWrapper -> {
             DeleteRelationshipRequest request = turmsRequestWrapper.getTurmsRequest().getDeleteRelationshipRequest();
-            boolean deleteTwoSidedRelationships = turmsClusterManager.getTurmsProperties().getUser().isDeleteTwoSidedRelationships();
+            boolean deleteTwoSidedRelationships = turmsClusterManager.getTurmsProperties().getUser().isShouldDeleteTwoSidedRelationships();
             Mono<Boolean> deleteMono;
             if (deleteTwoSidedRelationships) {
                 deleteMono = userRelationshipService.deleteTwoSidedRelationships(
@@ -171,7 +171,7 @@ public class WsUserRelationshipController {
             return deleteMono.map(deleted -> {
                 if (deleted != null && deleted
                         && turmsClusterManager.getTurmsProperties().getNotification()
-                        .isNotifyRelatedUserAfterRemoveFromRelationshipGroupByOthers()) {
+                        .isNotifyMemberAfterRemovedFromRelationshipGroupByOthers()) {
                     return RequestResult.recipientData(
                             request.getRelatedUserId(),
                             turmsRequestWrapper.getTurmsRequest());

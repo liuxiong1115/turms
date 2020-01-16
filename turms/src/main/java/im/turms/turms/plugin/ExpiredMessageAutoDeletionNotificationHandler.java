@@ -28,6 +28,6 @@ import java.util.List;
  * The plugin is useful when developers needing to persist messages in other places
  * while deleting them in the databases for turms servers.
  */
-public interface ExpiryMessageAutoDeletionNotificationHandler extends ExtensionPoint {
+public interface ExpiredMessageAutoDeletionNotificationHandler extends ExtensionPoint {
     Mono<Boolean> allowDeleting(@NotEmpty List<Message> message);
 }

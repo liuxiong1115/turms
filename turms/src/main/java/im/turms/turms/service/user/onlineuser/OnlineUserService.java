@@ -603,7 +603,7 @@ public class OnlineUserService {
     }
 
     public Integer getDisconnectionReason(@NotNull Long userId, @NotNull String sessionId) {
-        if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryingLoginFailedReason()) {
+        if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryLoginFailedReason()) {
             return disconnectionReasonCache.getIfPresent(Pair.of(userId, sessionId));
         } else {
             return null;

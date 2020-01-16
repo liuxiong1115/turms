@@ -189,11 +189,11 @@ public class DateTimeUtil {
             @Nullable ChatType chatType,
             @Nullable Boolean areSystemMessages) {
         int maxHourRanges = turmsClusterManager.getTurmsProperties()
-                .getSecurity().getMaxHourRangesPerCountRequest();
+                .getSecurity().getMaxHourDifferencePerCountRequest();
         int maxDayRanges = turmsClusterManager.getTurmsProperties()
-                .getSecurity().getMaxDayRangesPerCountRequest();
+                .getSecurity().getMaxDayDifferencePerCountRequest();
         int maxMonthRanges = turmsClusterManager.getTurmsProperties()
-                .getSecurity().getMaxMonthRangesPerCountRequest();
+                .getSecurity().getMaxMonthDifferencePerCountRequest();
         boolean checked = checkRangesNumber(dateRange, divideBy,
                 maxHourRanges, maxDayRanges, maxMonthRanges);
         if (checked) {
@@ -208,11 +208,11 @@ public class DateTimeUtil {
             @NotNull DivideBy divideBy,
             @NotNull Function<DateRange, Mono<Long>> function) {
         int maxHourRanges = turmsClusterManager.getTurmsProperties()
-                .getSecurity().getMaxHourRangesPerCountRequest();
+                .getSecurity().getMaxHourDifferencePerCountRequest();
         int maxDayRanges = turmsClusterManager.getTurmsProperties()
-                .getSecurity().getMaxDayRangesPerCountRequest();
+                .getSecurity().getMaxDayDifferencePerCountRequest();
         int maxMonthRanges = turmsClusterManager.getTurmsProperties()
-                .getSecurity().getMaxMonthRangesPerCountRequest();
+                .getSecurity().getMaxMonthDifferencePerCountRequest();
         boolean checked = checkRangesNumber(dateRange, divideBy,
                 maxHourRanges, maxDayRanges, maxMonthRanges);
         if (checked) {

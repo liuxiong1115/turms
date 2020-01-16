@@ -147,7 +147,7 @@ public class WsMessageController {
             Multimap<Triple<ChatType, Boolean, Long>, Message> multimap = LinkedListMultimap.create();
             Integer size = request.hasSize() ? request.getSize().getValue() : null;
             if (size == null) {
-                size = turmsClusterManager.getTurmsProperties().getMessage().getDefaultMessagesNumberWithTotal();
+                size = turmsClusterManager.getTurmsProperties().getMessage().getDefaultAvailableMessagesNumberWithTotal();
             }
             size = pageUtil.getSize(size);
             return messageService.queryMessages(
@@ -339,7 +339,7 @@ public class WsMessageController {
                             date = readDate;
                         }
                         if (turmsClusterManager.getTurmsProperties().getMessage()
-                                .isDeletePrivateMessageAfterAcknowledged()) {
+                                .isShouldDeletePrivateMessageAfterAcknowledged()) {
                             return messageService.deleteMessage(messageId, true, false);
                         } else {
                             return messageStatusService.updateMessagesReadDate(

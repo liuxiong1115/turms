@@ -74,19 +74,19 @@ public class GroupInvitationService {
         this.groupVersionService = groupVersionService;
     }
 
-    @Scheduled(cron = EXPIRY_GROUP_INVITATIONS_CLEANER_CRON)
+    @Scheduled(cron = EXPIRED_GROUP_INVITATIONS_CLEANER_CRON)
     public void groupInvitationsCleaner() {
         if (turmsClusterManager.isCurrentMemberMaster()) {
             if (turmsClusterManager.getTurmsProperties().getGroup()
-                    .isDeleteExpiryGroupInvitations()) {
-                removeAllExpiryGroupInvitations().subscribe();
+                    .isShouldDeleteExpiredGroupInvitationsAutomatically()) {
+                removeAllExpiredGroupInvitations().subscribe();
             } else {
-                updateExpiryRequestsStatus().subscribe();
+                updateExpiredRequestsStatus().subscribe();
             }
         }
     }
 
-    public Mono<Boolean> removeAllExpiryGroupInvitations() {
+    public Mono<Boolean> removeAllExpiredGroupInvitations() {
         Date now = new Date();
         Query query = new Query()
                 .addCriteria(Criteria.where(GroupInvitation.Fields.expirationDate).lt(now));
@@ -95,11 +95,11 @@ public class GroupInvitationService {
     }
 
     /**
-     * Warning: Only use expirationDate to check whether a request is expiry.
+     * Warning: Only use expirationDate to check whether a request is expired.
      * Because of the excessive resource consumption, the request status of requests
      * won't be expiry immediately when reaching the expiration date.
      */
-    public Mono<Boolean> updateExpiryRequestsStatus() {
+    public Mono<Boolean> updateExpiredRequestsStatus() {
         Date now = new Date();
         Query query = new Query()
                 .addCriteria(Criteria.where(GroupInvitation.Fields.expirationDate).lt(now))

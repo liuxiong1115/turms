@@ -24,6 +24,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
+import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
@@ -31,59 +32,63 @@ import java.io.IOException;
 @Data
 public class Message implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
+    @Description("The time type for the delivery time of message")
     private TimeType timeType = TimeType.LOCAL_SERVER_TIME;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to check if the target(recipient or group) of a message is active and not deleted")
     private boolean checkIfTargetActiveAndNotDeleted = true;
 
-    /**
-     * The maximum length of a message allowed to send.
-     */
     @JsonView(MutablePropertiesView.class)
+    @Description("The maximum allowed length for the text of a message")
     private int maxTextLimit = 500;
     @JsonView(MutablePropertiesView.class)
+    @Description("The maximum allowed size for the records of a message")
     private int maxRecordsSizeBytes = 15 * 1024 * 1024;
-    /**
-     * Whether to persist messages in databases.
-     * Note: If false, senders will not get the message id after sending a message and also cannot edit a message
-     */
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to persist messages in databases.\n" +
+            "Note: If false, senders will not get the message ID after the message has sent and cannot edit it")
     private boolean messagePersistent = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to persist the records of messages in databases")
     private boolean recordsPersistent = false;
-    /**
-     * Whether to persist the status of messages.
-     * If messageStatusPersistent is false, users will not receive the messages sent to them when they were offline.
-     * NOTE: This is a major factor that influences performance.
-     * Scenario: If a group have 500 members, 500 MessageStatuses will be persisted
-     * when a user send a message to the group
-     */
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to persist the status of messages.\n" +
+            "If false, users will not receive the messages sent to them when they were offline.\n" +
+            "NOTE: This is a major factor that affects performance")
     private boolean messageStatusPersistent = true;
     @JsonView(MutablePropertiesView.class)
-    private int messagesTimeToLiveHours = 0;
+    @Description("A message will become expired after the TTL has elapsed. 0 means infinite")
+    private int messageTimeToLiveHours = 0;
     @JsonView(MutablePropertiesView.class)
-    private boolean shouldDeleteLogicallyMessageByDefault = true;
-    private ReadReceipt readReceipt = new ReadReceipt();
+    @Description("Whether to delete messages logically by default")
+    private boolean shouldDeleteMessageLogicallyByDefault = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to allow users to send messages to a stranger")
     private boolean allowSendingMessagesToStranger = false;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to allow users to send messages to themselves")
     private boolean allowSendingMessagesToOneself = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean deletePrivateMessageAfterAcknowledged = false;
-    /**
-     * NOTE: To recall messages, more system resources are needed. So, turn it off if you don't need it.
-     */
+    @Description("Whether to delete private messages after acknowledged by the recipient")
+    private boolean shouldDeletePrivateMessageAfterAcknowledged = false;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to allow users to recall messages.\n" +
+            "Note: To recall messages, more system resources are needed")
     private boolean allowRecallingMessage = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to allow the sender of a message to edit the message")
     private boolean allowEditingMessageBySender = true;
     @JsonView(MutablePropertiesView.class)
-    private int allowableRecallDurationSeconds = 60 * 5;
+    @Description("The available recall duration for the sender of a message")
+    private int availableRecallDurationSeconds = 60 * 5;
+    @JsonView(MutablePropertiesView.class)
+    @Description("The default available messages number with the \"total\" field that users request")
+    private int defaultAvailableMessagesNumberWithTotal = 1;
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to update the read date when users querying messages")
+    private boolean shouldUpdateReadDateWhenUserQueryingMessage = true;
+    private ReadReceipt readReceipt = new ReadReceipt();
     private TypingStatus typingStatus = new TypingStatus();
-    @JsonView(MutablePropertiesView.class)
-    private int defaultMessagesNumberWithTotal = 1;
-    @JsonView(MutablePropertiesView.class)
-    private boolean updateReadDateAutomaticallyAfterUserQueryingMessage = true;
 
     @JsonIgnore
     @Override
@@ -106,18 +111,18 @@ public class Message implements IdentifiedDataSerializable {
         out.writeBoolean(messagePersistent);
         out.writeBoolean(recordsPersistent);
         out.writeBoolean(messageStatusPersistent);
-        out.writeInt(messagesTimeToLiveHours);
-        out.writeBoolean(shouldDeleteLogicallyMessageByDefault);
+        out.writeInt(messageTimeToLiveHours);
+        out.writeBoolean(shouldDeleteMessageLogicallyByDefault);
         readReceipt.writeData(out);
         out.writeBoolean(allowSendingMessagesToStranger);
         out.writeBoolean(allowSendingMessagesToOneself);
-        out.writeBoolean(deletePrivateMessageAfterAcknowledged);
+        out.writeBoolean(shouldDeletePrivateMessageAfterAcknowledged);
         out.writeBoolean(allowRecallingMessage);
         out.writeBoolean(allowEditingMessageBySender);
-        out.writeInt(allowableRecallDurationSeconds);
+        out.writeInt(availableRecallDurationSeconds);
         typingStatus.writeData(out);
-        out.writeInt(defaultMessagesNumberWithTotal);
-        out.writeBoolean(updateReadDateAutomaticallyAfterUserQueryingMessage);
+        out.writeInt(defaultAvailableMessagesNumberWithTotal);
+        out.writeBoolean(shouldUpdateReadDateWhenUserQueryingMessage);
     }
 
     @Override
@@ -129,18 +134,18 @@ public class Message implements IdentifiedDataSerializable {
         messagePersistent = in.readBoolean();
         recordsPersistent = in.readBoolean();
         messageStatusPersistent = in.readBoolean();
-        messagesTimeToLiveHours = in.readInt();
-        shouldDeleteLogicallyMessageByDefault = in.readBoolean();
+        messageTimeToLiveHours = in.readInt();
+        shouldDeleteMessageLogicallyByDefault = in.readBoolean();
         readReceipt.readData(in);
         allowSendingMessagesToStranger = in.readBoolean();
         allowSendingMessagesToOneself = in.readBoolean();
-        deletePrivateMessageAfterAcknowledged = in.readBoolean();
+        shouldDeletePrivateMessageAfterAcknowledged = in.readBoolean();
         allowRecallingMessage = in.readBoolean();
         allowEditingMessageBySender = in.readBoolean();
-        allowableRecallDurationSeconds = in.readInt();
+        availableRecallDurationSeconds = in.readInt();
         typingStatus.readData(in);
-        defaultMessagesNumberWithTotal = in.readInt();
-        updateReadDateAutomaticallyAfterUserQueryingMessage = in.readBoolean();
+        defaultAvailableMessagesNumberWithTotal = in.readInt();
+        shouldUpdateReadDateWhenUserQueryingMessage = in.readBoolean();
     }
 
     public enum TimeType {
@@ -151,6 +156,7 @@ public class Message implements IdentifiedDataSerializable {
     @Data
     public static class TypingStatus implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
+        @Description("Whether to notify users of typing statuses sent by other users")
         boolean enabled = true;
 
         @JsonIgnore
@@ -179,8 +185,10 @@ public class Message implements IdentifiedDataSerializable {
     @Data
     public static class ReadReceipt implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
+        @Description("Whether to allow to update the read date of messages")
         private boolean enabled = true;
         @JsonView(MutablePropertiesView.class)
+        @Description("Whether to use server time to set the read date of messages")
         private boolean useServerTime = true;
 
         @JsonIgnore

@@ -24,6 +24,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
+import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.io.IOException;
 @Data
 public class Plugin implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to enable plugins")
     private boolean enabled = true;
 
     @JsonIgnore

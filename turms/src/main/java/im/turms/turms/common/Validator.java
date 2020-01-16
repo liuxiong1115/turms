@@ -6,9 +6,11 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 public class Validator {
-    private Validator() {}
+    private Validator() {
+    }
 
     public static void throwIfAllNull(Object... array) {
         if (areAllNull(array)) {
@@ -70,7 +72,7 @@ public class Validator {
         throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
     }
 
-    public static boolean areAllNull(Object ...array) {
+    public static boolean areAllNull(Object... array) {
         if (array == null) {
             return true;
         } else {
@@ -83,9 +85,21 @@ public class Validator {
         return true;
     }
 
-    public static void throwIfFalseAndAllNull(boolean bool, Object ...array) {
+    public static void throwIfFalseAndAllNull(boolean bool, Object... array) {
         if (!bool && areAllNull(array)) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
+    }
+
+    public static void throwIfEmpty(Object object) {
+        if (object instanceof Map) {
+            if (((Map) object).isEmpty()) {
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            }
+        } else if (object instanceof Collection) {
+            if (((Collection) object).isEmpty()) {
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            }
         }
     }
 }

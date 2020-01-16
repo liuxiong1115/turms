@@ -184,7 +184,7 @@ public class GroupService {
             @Nullable Boolean shouldDeleteLogically) {
         if (shouldDeleteLogically == null) {
             shouldDeleteLogically = turmsClusterManager.getTurmsProperties()
-                    .getGroup().isShouldDeleteLogicallyGroupByDefault();
+                    .getGroup().isShouldDeleteGroupLogicallyByDefault();
         }
         boolean finalShouldDeleteLogically = shouldDeleteLogically;
         return mongoTemplate.inTransaction()
