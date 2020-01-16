@@ -249,7 +249,7 @@ public class MessageStatusService {
         Query query = new Query().addCriteria(Criteria.where(ID).in(messagesIds));
         Update update = new Update().set(MessageStatus.Fields.deliveryStatus, MessageDeliveryStatus.RECEIVED);
         if (turmsClusterManager.getTurmsProperties().getMessage()
-                .isUpdateReadDateAutomaticallyAfterUserQueryingMessage()) {
+                .isShouldUpdateReadDateWhenUserQueryingMessage()) {
             Date now = new Date();
             update.set(MessageStatus.Fields.readDate, now);
         }

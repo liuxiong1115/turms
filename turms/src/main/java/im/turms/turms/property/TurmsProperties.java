@@ -32,6 +32,7 @@ import im.turms.turms.property.business.Message;
 import im.turms.turms.property.business.Notification;
 import im.turms.turms.property.business.User;
 import im.turms.turms.property.env.*;
+import jdk.jfr.Description;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -44,6 +45,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ConfigurationProperties(prefix = "turms")
 @Data
@@ -156,21 +158,27 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         String packageName = TurmsProperties.class.getPackageName();
         List<Field> fieldList;
         if (onlyMutable) {
-            fieldList = FieldUtils.getFieldsListWithAnnotation(clazz, JsonView.class);
+            fieldList = FieldUtils.getFieldsListWithAnnotation(clazz, JsonView.class)
+                    .stream()
+                    .filter(TurmsProperties::isMutableProperty)
+                    .collect(Collectors.toList());
         } else {
             fieldList = FieldUtils.getAllFieldsList(clazz);
         }
         for (Field field : fieldList) {
             if (field.getType().getTypeName().startsWith(packageName)) {
                 if (field.getType().isEnum()) {
-                    if (withMutableFlag) {
-                        map.put(field.getName(), Map.of("type", "enum",
-                                "options", field.getType().getEnumConstants(),
-                                "mutable", field.isAnnotationPresent(JsonView.class)));
-                    } else {
-                        map.put(field.getName(), Map.of("type", "enum",
-                                "options", field.getType().getEnumConstants()));
+                    HashMap<Object, Object> fieldMap = new HashMap<>(5);
+                    fieldMap.put("type", "enum");
+                    fieldMap.put("options", field.getType().getEnumConstants());
+                    fieldMap.put("deprecated", field.isAnnotationPresent(Deprecated.class));
+                    if (field.isAnnotationPresent(Description.class)) {
+                        fieldMap.put("desc", field.getDeclaredAnnotation(Description.class).value());
                     }
+                    if (withMutableFlag) {
+                        fieldMap.put("mutable", TurmsProperties.isMutableProperty(field));
+                    }
+                    map.put(field.getName(), fieldMap);
                 } else {
                     Object any = getMetadata(new HashMap<>(), field.getType(), onlyMutable, withMutableFlag);
                     map.put(field.getName(), any);
@@ -180,14 +188,30 @@ public class TurmsProperties implements IdentifiedDataSerializable {
                 if (typeName.equals(String.class.getTypeName())) {
                     typeName = "string";
                 }
-                if (withMutableFlag) {
-                    map.put(field.getName(), Map.of("type", typeName,
-                            "mutable", field.isAnnotationPresent(JsonView.class)));
-                } else {
-                    map.put(field.getName(), Map.of("type", typeName));
+                HashMap<Object, Object> fieldMap = new HashMap<>(4);
+                fieldMap.put("type", typeName);
+                fieldMap.put("deprecated", field.isAnnotationPresent(Deprecated.class));
+                if (field.isAnnotationPresent(Description.class)) {
+                    fieldMap.put("desc", field.getDeclaredAnnotation(Description.class).value());
                 }
+                if (withMutableFlag) {
+                    fieldMap.put("mutable", TurmsProperties.isMutableProperty(field));
+                }
+                map.put(field.getName(), fieldMap);
             }
         }
         return map;
+    }
+
+    private static boolean isMutableProperty(Field field) {
+        if (field.isAnnotationPresent(JsonView.class)) {
+            JsonView jsonView = field.getDeclaredAnnotation(JsonView.class);
+            for (Class<?> clazz : jsonView.value()) {
+                if (clazz == MutablePropertiesView.class) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

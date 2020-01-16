@@ -24,6 +24,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
+import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
@@ -31,21 +32,26 @@ import java.io.IOException;
 @Data
 public class Session implements IdentifiedDataSerializable {
     /**
-     * If the Turms server don't receive any request (including heartbeat request) from the client during requestTimeout,
+     * ,
      * the session will be closed.
      */
     @JsonView(MutablePropertiesView.class)
+    @Description("A websocket connection will be closed if the turms server don't receive any request (including heartbeat request) from the client during requestHeartbeatTimeoutSeconds")
     private int requestHeartbeatTimeoutSeconds = 50;
     @JsonView(MutablePropertiesView.class)
+    @Description("The minimum interval between requests from a client to refresh the heartbeat timer")
     private int minHeartbeatRefreshIntervalSeconds = 3;
     @JsonView(MutablePropertiesView.class)
-    private boolean enableQueryingLoginFailedReason = true;
+    @Description("Whether to enable to query the login failed reason")
+    private boolean enableQueryLoginFailedReason = true;
     @JsonView(MutablePropertiesView.class)
-    private boolean enableQueryingDisconnectionReason = true;
+    @Description("Whether to enable to query the disconnection reason")
+    private boolean enableQueryDisconnectionReason = true;
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyClientsOfSessionInfoAfterConnected = true;
+    @Description("Whether to notify clients of the session information after connected with a turms server")
+    private boolean shouldNotifyClientsOfSessionInfoAfterConnected = true;
     /**
-     * If the Turms server only receives heartbeat requests from the client during maxIdleTime,
+     * If the turms server only receives heartbeat requests from the client during maxIdleTime,
      * the session will be closed when the Session Cleaner detects it.
      */
 //    @JsonView(MutablePropertiesView.class)
@@ -67,9 +73,9 @@ public class Session implements IdentifiedDataSerializable {
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeInt(requestHeartbeatTimeoutSeconds);
         out.writeInt(minHeartbeatRefreshIntervalSeconds);
-        out.writeBoolean(enableQueryingLoginFailedReason);
-        out.writeBoolean(enableQueryingDisconnectionReason);
-        out.writeBoolean(notifyClientsOfSessionInfoAfterConnected);
+        out.writeBoolean(enableQueryLoginFailedReason);
+        out.writeBoolean(enableQueryDisconnectionReason);
+        out.writeBoolean(shouldNotifyClientsOfSessionInfoAfterConnected);
 //        out.writeInt(idleHeartbeatTimeoutSeconds);
     }
 
@@ -77,9 +83,9 @@ public class Session implements IdentifiedDataSerializable {
     public void readData(ObjectDataInput in) throws IOException {
         requestHeartbeatTimeoutSeconds = in.readInt();
         minHeartbeatRefreshIntervalSeconds = in.readInt();
-        enableQueryingLoginFailedReason = in.readBoolean();
-        enableQueryingDisconnectionReason = in.readBoolean();
-        notifyClientsOfSessionInfoAfterConnected = in.readBoolean();
+        enableQueryLoginFailedReason = in.readBoolean();
+        enableQueryDisconnectionReason = in.readBoolean();
+        shouldNotifyClientsOfSessionInfoAfterConnected = in.readBoolean();
 //        idleHeartbeatTimeoutSeconds = in.readInt();
     }
 }

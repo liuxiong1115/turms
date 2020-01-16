@@ -145,7 +145,7 @@ public class TurmsClusterManager {
     public boolean isWorkable() {
         if (hazelcastInstance != null) {
             return hasJoinedCluster
-                    && sharedTurmsProperties.getCluster().getMinimumQuorumToRun()
+                    && sharedTurmsProperties.getCluster().getMinimumQuorumToServe()
                     <= membersSnapshot.size();
         } else {
             return false;

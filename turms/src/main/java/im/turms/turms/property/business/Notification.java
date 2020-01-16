@@ -24,6 +24,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
+import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
@@ -32,49 +33,70 @@ import java.io.IOException;
 public class Notification implements IdentifiedDataSerializable {
     // User
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyRelatedUsersAfterUserInfoUpdated = false;
+    @Description("Whether to notify related users after other related user's information has been updated")
+    private boolean notifyRelatedUsersAfterOtherRelatedUserInfoUpdated = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyRelatedUsersAfterOtherRelatedUsersOnlineStatusUpdated = false;
+    @Description("Whether to notify related users after other related user's online status has been updated")
+    private boolean notifyRelatedUsersAfterOtherRelatedUserOnlineStatusUpdated = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyRecipientAfterReceivedFriendRequest = true;
+    @Description("Whether to notify the recipient when receiving a friend request")
+    private boolean notifyRecipientWhenReceivingFriendRequest = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the requester after a friend request has been updated")
     private boolean notifyRequesterAfterFriendRequestUpdated = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the related user after a one-sided relationship has benn updated by others")
+    private boolean notifyRelatedUserAfterOneSidedRelationshipUpdatedByOthers = false;
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the related user after added to a one-sided relationship group by others")
     private boolean notifyRelatedUserAfterAddedToOneSidedRelationshipGroupByOthers = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyRelatedUserAfterOneSidedRelationshipGroupUpdatedByOthers = false;
+    @Description("Whether to notify members after a one-sided relationship group has been updated by others")
+    private boolean notifyMembersAfterOneSidedRelationshipGroupUpdatedByOthers = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyRelatedUserAfterRemoveFromRelationshipGroupByOthers = false;
-    @JsonView(MutablePropertiesView.class)
-    private boolean notifyRelatedUserAfterOneSidedRelationshipUpdatedByOthers = false;
+    @Description("Whether to notify the member after removed from a one-sided relationship group by others")
+    private boolean notifyMemberAfterRemovedFromRelationshipGroupByOthers = false;
 
     // Group
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify members after a group has been removed")
     private boolean notifyMembersAfterGroupDeleted = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify members after a group has been updated")
     private boolean notifyMembersAfterGroupUpdate = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify members after other group member's online status has been updated")
     private boolean notifyMembersAfterOtherMemberOnlineStatusUpdated = false;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify members after other group member's information has been updated")
     private boolean notifyMembersAfterOtherMemberInfoUpdated = false;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the user after blacklisted by a group")
     private boolean notifyUserAfterBlacklistedByGroup = false;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the user after unblacklisted by a group")
     private boolean notifyUserAfterUnblacklistedByGroup = false;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the user after invited by a group")
     private boolean notifyUserAfterInvitedByGroup = true;
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyAdminsAndOwnerAfterReceiveJoinRequest = true;
+    @Description("Whether to notify the owner and managers after a join request has been received")
+    private boolean notifyOwnerAndManagersAfterReceivingJoinRequest = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the invitee after a group invitation has been recalled")
     private boolean notifyInviteeAfterGroupInvitationRecalled = true;
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyManagersAndOwnerAfterGroupJoinRequestRecalled = true;
+    @Description("Whether to notify the owner and managers after a group invitation has been recalled")
+    private boolean notifyOwnerAndManagersAfterGroupJoinRequestRecalled = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the user after added to a group by others")
     private boolean notifyUserAfterAddedToGroupByOthers = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to notify the user after removed from a group by others")
     private boolean notifyUserAfterRemovedFromGroupByOthers = true;
     @JsonView(MutablePropertiesView.class)
-    private boolean notifyMemberAfterUpdatedByOthers = true;
+    @Description("Whether to notify members after its member information has been updated by others")
+    private boolean notifyMemberAfterInfoUpdatedByOthers = true;
 
     @JsonIgnore
     @Override
@@ -91,13 +113,13 @@ public class Notification implements IdentifiedDataSerializable {
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
         // User
-        out.writeBoolean(notifyRelatedUsersAfterUserInfoUpdated);
-        out.writeBoolean(notifyRelatedUsersAfterOtherRelatedUsersOnlineStatusUpdated);
-        out.writeBoolean(notifyRecipientAfterReceivedFriendRequest);
+        out.writeBoolean(notifyRelatedUsersAfterOtherRelatedUserInfoUpdated);
+        out.writeBoolean(notifyRelatedUsersAfterOtherRelatedUserOnlineStatusUpdated);
+        out.writeBoolean(notifyRecipientWhenReceivingFriendRequest);
         out.writeBoolean(notifyRequesterAfterFriendRequestUpdated);
         out.writeBoolean(notifyRelatedUserAfterAddedToOneSidedRelationshipGroupByOthers);
-        out.writeBoolean(notifyRelatedUserAfterOneSidedRelationshipGroupUpdatedByOthers);
-        out.writeBoolean(notifyRelatedUserAfterRemoveFromRelationshipGroupByOthers);
+        out.writeBoolean(notifyMembersAfterOneSidedRelationshipGroupUpdatedByOthers);
+        out.writeBoolean(notifyMemberAfterRemovedFromRelationshipGroupByOthers);
         out.writeBoolean(notifyRelatedUserAfterOneSidedRelationshipUpdatedByOthers);
 
         // Group
@@ -108,24 +130,24 @@ public class Notification implements IdentifiedDataSerializable {
         out.writeBoolean(notifyUserAfterBlacklistedByGroup);
         out.writeBoolean(notifyUserAfterUnblacklistedByGroup);
         out.writeBoolean(notifyUserAfterInvitedByGroup);
-        out.writeBoolean(notifyAdminsAndOwnerAfterReceiveJoinRequest);
+        out.writeBoolean(notifyOwnerAndManagersAfterReceivingJoinRequest);
         out.writeBoolean(notifyInviteeAfterGroupInvitationRecalled);
-        out.writeBoolean(notifyManagersAndOwnerAfterGroupJoinRequestRecalled);
+        out.writeBoolean(notifyOwnerAndManagersAfterGroupJoinRequestRecalled);
         out.writeBoolean(notifyUserAfterAddedToGroupByOthers);
         out.writeBoolean(notifyUserAfterRemovedFromGroupByOthers);
-        out.writeBoolean(notifyMemberAfterUpdatedByOthers);
+        out.writeBoolean(notifyMemberAfterInfoUpdatedByOthers);
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         // User
-        notifyRelatedUsersAfterUserInfoUpdated = in.readBoolean();
-        notifyRelatedUsersAfterOtherRelatedUsersOnlineStatusUpdated = in.readBoolean();
-        notifyRecipientAfterReceivedFriendRequest = in.readBoolean();
+        notifyRelatedUsersAfterOtherRelatedUserInfoUpdated = in.readBoolean();
+        notifyRelatedUsersAfterOtherRelatedUserOnlineStatusUpdated = in.readBoolean();
+        notifyRecipientWhenReceivingFriendRequest = in.readBoolean();
         notifyRequesterAfterFriendRequestUpdated = in.readBoolean();
         notifyRelatedUserAfterAddedToOneSidedRelationshipGroupByOthers = in.readBoolean();
-        notifyRelatedUserAfterOneSidedRelationshipGroupUpdatedByOthers = in.readBoolean();
-        notifyRelatedUserAfterRemoveFromRelationshipGroupByOthers = in.readBoolean();
+        notifyMembersAfterOneSidedRelationshipGroupUpdatedByOthers = in.readBoolean();
+        notifyMemberAfterRemovedFromRelationshipGroupByOthers = in.readBoolean();
         notifyRelatedUserAfterOneSidedRelationshipUpdatedByOthers = in.readBoolean();
 
         // Group
@@ -136,11 +158,11 @@ public class Notification implements IdentifiedDataSerializable {
         notifyUserAfterBlacklistedByGroup = in.readBoolean();
         notifyUserAfterUnblacklistedByGroup = in.readBoolean();
         notifyUserAfterInvitedByGroup = in.readBoolean();
-        notifyAdminsAndOwnerAfterReceiveJoinRequest = in.readBoolean();
+        notifyOwnerAndManagersAfterReceivingJoinRequest = in.readBoolean();
         notifyInviteeAfterGroupInvitationRecalled = in.readBoolean();
-        notifyManagersAndOwnerAfterGroupJoinRequestRecalled = in.readBoolean();
+        notifyOwnerAndManagersAfterGroupJoinRequestRecalled = in.readBoolean();
         notifyUserAfterAddedToGroupByOthers = in.readBoolean();
         notifyUserAfterRemovedFromGroupByOthers = in.readBoolean();
-        notifyMemberAfterUpdatedByOthers = in.readBoolean();
+        notifyMemberAfterInfoUpdatedByOthers = in.readBoolean();
     }
 }

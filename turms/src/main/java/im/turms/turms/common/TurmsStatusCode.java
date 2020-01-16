@@ -35,7 +35,7 @@ public enum TurmsStatusCode {
 
     DISABLE_FUNCTION(4001, "The function has been disabled in servers", 405),
     EXPIRY_DATE_BEFORE_NOW(4002, "Expiration date must be greater than now", 400),
-    EXPIRY_RESOURCE(4003, "The target resource has expired", 400),
+    EXPIRED_RESOURCE(4003, "The target resource has expired", 400),
     DUPLICATE_KEY(4004, "The record being added contains a duplicate key", 400),
     ILLEGAL_ARGUMENTS(4005, "Illegal arguments", 400),
     ILLEGAL_DATE_FORMAT(4006, "Illegal date format", 400),

@@ -24,34 +24,33 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
+import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
 
 @Data
 public class User implements IdentifiedDataSerializable {
-    /**
-     * If 0, these requests will not to be deleted
-     */
     @JsonView(MutablePropertiesView.class)
-    private int friendRequestExpiryHours = 30 * 24;
+    @Description("A friend request will become expired after the TTL has elapsed. 0 means infinite")
+    private int friendRequestTimeToLiveHours = 30 * 24;
     private Location location = new Location();
     private SimultaneousLogin simultaneousLogin = new SimultaneousLogin();
     private FriendRequest friendRequest = new FriendRequest();
     //TODO
     @JsonView(MutablePropertiesView.class)
-    private int logOnlineUserNumberIntervalSeconds = 60 * 5;
-    /**
-     * If true, use the operating system class as the device type rather than the agent class.
-     * Note: Because Turms only provide turms-client-js for now,
-     * all turms clients except the ones running on Node.js will recognized as browser environment
-     */
+    @Description("The inverval to log online users' number")
+    private int logOnlineUsersNumberIntervalSeconds = 60 * 5;
     @JsonView(MutablePropertiesView.class)
-    private boolean useOsAsDefaultDeviceType = true;
+    @Description("Whether to use the operating system class as the device type instead of the agent class")
+    private boolean shouldUseOsAsDefaultDeviceType = true;
     @JsonView(MutablePropertiesView.class)
-    private boolean deleteTwoSidedRelationships = false;
+    @Description("Whether to delete the two-sided relationships when a user requests to delete a relationship")
+    private boolean shouldDeleteTwoSidedRelationships = false;
+    //TODO
     @JsonView(MutablePropertiesView.class)
-    private boolean shouldDeleteLogicallyUser = true;
+    @Description("Whether to delete a user logically")
+    private boolean shouldDeleteUserLogically = true;
 
     @JsonIgnore
     @Override
@@ -67,39 +66,44 @@ public class User implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeInt(friendRequestExpiryHours);
+        out.writeInt(friendRequestTimeToLiveHours);
         location.writeData(out);
         simultaneousLogin.writeData(out);
         friendRequest.writeData(out);
-        out.writeInt(logOnlineUserNumberIntervalSeconds);
-        out.writeBoolean(useOsAsDefaultDeviceType);
-        out.writeBoolean(deleteTwoSidedRelationships);
-        out.writeBoolean(shouldDeleteLogicallyUser);
+        out.writeInt(logOnlineUsersNumberIntervalSeconds);
+        out.writeBoolean(shouldUseOsAsDefaultDeviceType);
+        out.writeBoolean(shouldDeleteTwoSidedRelationships);
+        out.writeBoolean(shouldDeleteUserLogically);
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        friendRequestExpiryHours = in.readInt();
+        friendRequestTimeToLiveHours = in.readInt();
         location.readData(in);
         simultaneousLogin.readData(in);
         friendRequest.readData(in);
-        logOnlineUserNumberIntervalSeconds = in.readInt();
-        useOsAsDefaultDeviceType = in.readBoolean();
-        deleteTwoSidedRelationships = in.readBoolean();
-        shouldDeleteLogicallyUser = in.readBoolean();
+        logOnlineUsersNumberIntervalSeconds = in.readInt();
+        shouldUseOsAsDefaultDeviceType = in.readBoolean();
+        shouldDeleteTwoSidedRelationships = in.readBoolean();
+        shouldDeleteUserLogically = in.readBoolean();
     }
 
+    //TODO
     @Data
     public static class Location implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
+        @Description("Whether to handle users' location")
         private boolean enabled = true;
         @JsonView(MutablePropertiesView.class)
+        @Description("Whether to persist users' location")
         private boolean persistent = true;
         @JsonView(MutablePropertiesView.class)
-        private int maxQueryUsersNearbyNumber = 20;
+        @Description("The maximum available number of users nearby records for query")
+        private int maxAvailableUsersNearbyNumberForQuery = 20;
         @JsonView(MutablePropertiesView.class)
-        private double maxDistance = 0.1;
-        @JsonView(MutablePropertiesView.class)
+        @Description("The maximum distance for query")
+        private double maxDistanceForQuery = 0.1;
+        @Description("The cron to remove users' locations")
         private String removeLocationsCron = ""; //TODO
 
         @JsonIgnore
@@ -118,8 +122,8 @@ public class User implements IdentifiedDataSerializable {
         public void writeData(ObjectDataOutput out) throws IOException {
             out.writeBoolean(enabled);
             out.writeBoolean(persistent);
-            out.writeInt(maxQueryUsersNearbyNumber);
-            out.writeDouble(maxDistance);
+            out.writeInt(maxAvailableUsersNearbyNumberForQuery);
+            out.writeDouble(maxDistanceForQuery);
             out.writeUTF(removeLocationsCron);
         }
 
@@ -127,8 +131,8 @@ public class User implements IdentifiedDataSerializable {
         public void readData(ObjectDataInput in) throws IOException {
             enabled = in.readBoolean();
             persistent = in.readBoolean();
-            maxQueryUsersNearbyNumber = in.readInt();
-            maxDistance = in.readDouble();
+            maxAvailableUsersNearbyNumberForQuery = in.readInt();
+            maxDistanceForQuery = in.readDouble();
             removeLocationsCron = in.readUTF();
         }
     }
@@ -139,11 +143,14 @@ public class User implements IdentifiedDataSerializable {
          * if 0, there is no length limit.
          */
         @JsonView(MutablePropertiesView.class)
+        @Description("The maximum allowed length for the text of a friend request")
         private int contentLimit = 200;
         @JsonView(MutablePropertiesView.class)
-        private boolean deleteExpiryRequests = false;
+        @Description("Whether to delete expired automatically")
+        private boolean shouldDeleteExpiredRequestsAutomatically = false;
         @JsonView(MutablePropertiesView.class)
-        private boolean allowResendRequestAfterDeclinedOrIgnoredOrExpired = false;
+        @Description("Whether to allow resending a friend request after the previous request has been declined, ignored, or expired")
+        private boolean allowResendingRequestAfterDeclinedOrIgnoredOrExpired = false;
 
         @JsonIgnore
         @Override
@@ -160,25 +167,28 @@ public class User implements IdentifiedDataSerializable {
         @Override
         public void writeData(ObjectDataOutput out) throws IOException {
             out.writeInt(contentLimit);
-            out.writeBoolean(deleteExpiryRequests);
-            out.writeBoolean(allowResendRequestAfterDeclinedOrIgnoredOrExpired);
+            out.writeBoolean(shouldDeleteExpiredRequestsAutomatically);
+            out.writeBoolean(allowResendingRequestAfterDeclinedOrIgnoredOrExpired);
         }
 
         @Override
         public void readData(ObjectDataInput in) throws IOException {
             contentLimit = in.readInt();
-            deleteExpiryRequests = in.readBoolean();
-            allowResendRequestAfterDeclinedOrIgnoredOrExpired = in.readBoolean();
+            shouldDeleteExpiredRequestsAutomatically = in.readBoolean();
+            allowResendingRequestAfterDeclinedOrIgnoredOrExpired = in.readBoolean();
         }
     }
 
     @Data
     public static class SimultaneousLogin implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
+        @Description("The simultaneous login strategy to control which devices can be online at the same time")
         private SimultaneousLoginStrategy strategy = SimultaneousLoginStrategy.ALLOW_ONE_DEVICE_OF_DESKTOP_AND_ONE_DEVICE_OF_MOBILE_ONLINE;
         @JsonView(MutablePropertiesView.class)
+        @Description("The conflict strategy handles what should do if a device is ready to be online while its conflicted devices have been online")
         private ConflictStrategy conflictStrategy = ConflictStrategy.FORCE_LOGGED_DEVICES_OFFLINE;
         @JsonView(MutablePropertiesView.class)
+        @Description("Whether to allow unknown devices coexist with known devices")
         private boolean allowUnknownDeviceCoexistsWithKnownDevice = false;
 
         @JsonIgnore

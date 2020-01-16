@@ -21,7 +21,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
-import im.turms.turms.common.Validator;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.plugin.UserAuthenticator;
@@ -99,7 +98,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                         }
                         Pair<String, DeviceType> loggingInDeviceType = SessionUtil.parseDeviceTypeFromRequest(
                                 request,
-                                turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
+                                turmsClusterManager.getTurmsProperties().getUser().isShouldUseOsAsDefaultDeviceType());
                         if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, loggingInDeviceType.getRight())) {
                             return cacheAndReturnError(HttpStatus.CONFLICT, userId, requestId);
                         } else {
@@ -160,7 +159,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
     }
 
     public Object getFailedReason(@NotNull Long userId, @NotNull Long requestId) {
-        if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryingLoginFailedReason()) {
+        if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryLoginFailedReason()) {
             return loginFailedReasonCache.getIfPresent(Pair.of(userId, requestId));
         } else {
             return null;
