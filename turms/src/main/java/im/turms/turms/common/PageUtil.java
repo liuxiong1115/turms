@@ -33,9 +33,9 @@ public class PageUtil {
     // TODO: more options
     public int getSize(@Nullable Integer size) {
         if (size == null || size <= 0) {
-            return turmsClusterManager.getTurmsProperties().getSecurity().getDefaultReturnedRecordsPerRequest();
+            return turmsClusterManager.getTurmsProperties().getSecurity().getDefaultAvailableRecordsPerRequest();
         } else {
-            int maxLimit = turmsClusterManager.getTurmsProperties().getSecurity().getMaxReturnedRecordsPerRequest();
+            int maxLimit = turmsClusterManager.getTurmsProperties().getSecurity().getMaxAvailableRecordsPerRequest();
             if (size > maxLimit) {
                 size = maxLimit;
             }

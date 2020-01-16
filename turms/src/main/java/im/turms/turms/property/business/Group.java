@@ -24,6 +24,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
+import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
@@ -31,33 +32,38 @@ import java.io.IOException;
 @Data
 public class Group implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
+    @Deprecated
     private int userOwnedGroupLimit = 10;
     @JsonView(MutablePropertiesView.class)
+    @Deprecated
     private int userOwnedLimitForEachGroupTypeByDefault = Integer.MAX_VALUE;
     @JsonView(MutablePropertiesView.class)
+    @Description("The maximum allowed length for the text of a group invitation")
     private int groupInvitationContentLimit = 200;
-    /**
-     * 0 is infinite.
-     */
     @JsonView(MutablePropertiesView.class)
+    @Description("A group invitation will become expired after the TTL has elapsed. 0 means infinite")
     private int groupInvitationTimeToLiveHours = 0;
     @JsonView(MutablePropertiesView.class)
+    @Description("The maximum allowed length for the text of a group join request")
     private int groupJoinRequestContentLimit = 200;
-    /**
-     * 0 is infinite.
-     */
     @JsonView(MutablePropertiesView.class)
+    @Description("A group join request will become expired after the TTL has elapsed. 0 means infinite")
     private int groupJoinRequestTimeToLiveHours = 0;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to allow users to recall the join requests sent by themselves")
     private boolean allowRecallingJoinRequestSentByOneself = false;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to allow the owner and managers of a group to recall pending group invitations")
     private boolean allowRecallingPendingGroupInvitationByOwnerAndManager = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean shouldDeleteLogicallyGroupByDefault = true;
+    @Description("Whether to delete groups logically by default")
+    private boolean shouldDeleteGroupLogicallyByDefault = true;
     @JsonView(MutablePropertiesView.class)
-    private boolean deleteExpiryGroupInvitations = false;
+    @Description("Whether to delete expired group invitations automatically")
+    private boolean shouldDeleteExpiredGroupInvitationsAutomatically = false;
     @JsonView(MutablePropertiesView.class)
-    private boolean deleteExpiryGroupJoinRequests = false;
+    @Description("Whether to delete expired group join requests automatically")
+    private boolean shouldDeleteExpiredGroupJoinRequestsAutomatically = false;
 
     @JsonIgnore
     @Override
@@ -81,9 +87,9 @@ public class Group implements IdentifiedDataSerializable {
         out.writeInt(groupJoinRequestTimeToLiveHours);
         out.writeBoolean(allowRecallingJoinRequestSentByOneself);
         out.writeBoolean(allowRecallingPendingGroupInvitationByOwnerAndManager);
-        out.writeBoolean(shouldDeleteLogicallyGroupByDefault);
-        out.writeBoolean(deleteExpiryGroupInvitations);
-        out.writeBoolean(deleteExpiryGroupJoinRequests);
+        out.writeBoolean(shouldDeleteGroupLogicallyByDefault);
+        out.writeBoolean(shouldDeleteExpiredGroupInvitationsAutomatically);
+        out.writeBoolean(shouldDeleteExpiredGroupJoinRequestsAutomatically);
     }
 
     @Override
@@ -96,8 +102,8 @@ public class Group implements IdentifiedDataSerializable {
         groupJoinRequestTimeToLiveHours = in.readInt();
         allowRecallingJoinRequestSentByOneself = in.readBoolean();
         allowRecallingPendingGroupInvitationByOwnerAndManager = in.readBoolean();
-        shouldDeleteLogicallyGroupByDefault = in.readBoolean();
-        deleteExpiryGroupInvitations = in.readBoolean();
-        deleteExpiryGroupJoinRequests = in.readBoolean();
+        shouldDeleteGroupLogicallyByDefault = in.readBoolean();
+        shouldDeleteExpiredGroupInvitationsAutomatically = in.readBoolean();
+        shouldDeleteExpiredGroupJoinRequestsAutomatically = in.readBoolean();
     }
 }

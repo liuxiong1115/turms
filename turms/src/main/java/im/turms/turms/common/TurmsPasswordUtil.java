@@ -35,7 +35,7 @@ public class TurmsPasswordUtil {
         this.turmsProperties = turmsProperties;
     }
 
-    public String encodePassword(Security.PasswordEncodeStrategy strategy, String rawPassword) {
+    public String encodePassword(Security.PasswordEncodingAlgorithm strategy, String rawPassword) {
         switch (strategy) {
             case BCRYPT:
                 return bCryptPasswordEncoder.encode(rawPassword);
@@ -48,29 +48,29 @@ public class TurmsPasswordUtil {
     }
 
     public String encodeAdminPassword(String rawPassword) {
-        return encodePassword(turmsProperties.getSecurity().getAdminPasswordEncodeStrategy(),
+        return encodePassword(turmsProperties.getSecurity().getAdminPasswordEncodingAlgorithm(),
                 rawPassword);
     }
 
     public String encodeUserPassword(String rawPassword) {
-        return encodePassword(turmsProperties.getSecurity().getUserPasswordEncodeStrategy(),
+        return encodePassword(turmsProperties.getSecurity().getUserPasswordEncodingAlgorithm(),
                 rawPassword);
     }
 
     public boolean matchesAdminPassword(String rawPassword, String encodedPassword) {
-        return matchesPassword(turmsProperties.getSecurity().getAdminPasswordEncodeStrategy(),
+        return matchesPassword(turmsProperties.getSecurity().getAdminPasswordEncodingAlgorithm(),
                 rawPassword,
                 encodedPassword);
     }
 
     public boolean matchesUserPassword(String rawPassword, String encodedPassword) {
-        return matchesPassword(turmsProperties.getSecurity().getUserPasswordEncodeStrategy(),
+        return matchesPassword(turmsProperties.getSecurity().getUserPasswordEncodingAlgorithm(),
                 rawPassword,
                 encodedPassword);
     }
 
     public boolean matchesPassword(
-            Security.PasswordEncodeStrategy strategy,
+            Security.PasswordEncodingAlgorithm strategy,
             String rawPassword,
             String encodedPassword) {
         switch (strategy) {

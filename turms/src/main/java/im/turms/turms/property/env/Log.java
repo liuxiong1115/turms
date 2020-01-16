@@ -24,6 +24,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
+import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
@@ -32,9 +33,11 @@ import java.io.IOException;
 public class Log implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to log admins' actions")
     private boolean logAdminAction = true;
 
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to log users' login actions")
     private boolean logUserLogin = true;
 
     @JsonIgnore

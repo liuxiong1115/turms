@@ -25,36 +25,48 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
+import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
 
 @Data
 public class Security implements IdentifiedDataSerializable {
-    private PasswordEncodeStrategy userPasswordEncodeStrategy = PasswordEncodeStrategy.SALTED_SHA256;
-    private PasswordEncodeStrategy adminPasswordEncodeStrategy = PasswordEncodeStrategy.BCRYPT;
+
+    @Description("The password encoding algorithm for users")
+    private PasswordEncodingAlgorithm userPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.SALTED_SHA256;
+    @Description("The password encoding algorithm for admins")
+    private PasswordEncodingAlgorithm adminPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.BCRYPT;
 
     @JsonView(MutablePropertiesView.class)
-    private int maxDaysDifferencePerRequest = 3 * 30;
+    @Description("The maximum day difference for each query request")
+    private int maxDayDifferencePerRequest = 3 * 30;
     @JsonView(MutablePropertiesView.class)
-    private int maxHourRangesPerCountRequest = 24;
+    @Description("The maximum hour difference for each count request")
+    private int maxHourDifferencePerCountRequest = 24;
     @JsonView(MutablePropertiesView.class)
-    private int maxDayRangesPerCountRequest = 31;
+    @Description("The maximum day difference for each count request")
+    private int maxDayDifferencePerCountRequest = 31;
     @JsonView(MutablePropertiesView.class)
-    private int maxMonthRangesPerCountRequest = 12;
+    @Description("The maximum month difference for each count request")
+    private int maxMonthDifferencePerCountRequest = 12;
     @JsonView(MutablePropertiesView.class)
-    private int maxReturnedRecordsPerRequest = 100;
+    @Description("The maximum available records for each query request")
+    private int maxAvailableRecordsPerRequest = 100;
     @JsonView(MutablePropertiesView.class)
-    private int maxQueryOnlineUsersStatusPerRequest = 20;
+    @Description("The maximum available online users' status for each query request")
+    private int maxAvailableOnlineUsersStatusPerRequest = 20;
 
     @JsonView(MutablePropertiesView.class)
-    private int defaultReturnedRecordsPerRequest = 10;
+    @Description("The default available records for each query request")
+    private int defaultAvailableRecordsPerRequest = 10;
 
     /**
      * If 0, there is no debounce.
-     * Better set the same value as client's for better UX.
+     * Better set the same value as client's for a better UX.
      */
     @JsonView(MutablePropertiesView.class)
+    @Description("The minimum allowed interval between client requests")
     private int minClientRequestsIntervalMillis = 0;
 
     @JsonIgnore
@@ -71,33 +83,33 @@ public class Security implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeInt(userPasswordEncodeStrategy.ordinal());
-        out.writeInt(adminPasswordEncodeStrategy.ordinal());
-        out.writeInt(maxDaysDifferencePerRequest);
-        out.writeInt(maxHourRangesPerCountRequest);
-        out.writeInt(maxDayRangesPerCountRequest);
-        out.writeInt(maxMonthRangesPerCountRequest);
-        out.writeInt(maxReturnedRecordsPerRequest);
-        out.writeInt(maxQueryOnlineUsersStatusPerRequest);
-        out.writeInt(defaultReturnedRecordsPerRequest);
+        out.writeInt(userPasswordEncodingAlgorithm.ordinal());
+        out.writeInt(adminPasswordEncodingAlgorithm.ordinal());
+        out.writeInt(maxDayDifferencePerRequest);
+        out.writeInt(maxHourDifferencePerCountRequest);
+        out.writeInt(maxDayDifferencePerCountRequest);
+        out.writeInt(maxMonthDifferencePerCountRequest);
+        out.writeInt(maxAvailableRecordsPerRequest);
+        out.writeInt(maxAvailableOnlineUsersStatusPerRequest);
+        out.writeInt(defaultAvailableRecordsPerRequest);
         out.writeInt(minClientRequestsIntervalMillis);
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        userPasswordEncodeStrategy = PasswordEncodeStrategy.values()[in.readInt()];
-        adminPasswordEncodeStrategy = PasswordEncodeStrategy.values()[in.readInt()];
-        maxDaysDifferencePerRequest = in.readInt();
-        maxHourRangesPerCountRequest = in.readInt();
-        maxDayRangesPerCountRequest = in.readInt();
-        maxMonthRangesPerCountRequest = in.readInt();
-        maxReturnedRecordsPerRequest = in.readInt();
-        maxQueryOnlineUsersStatusPerRequest = in.readInt();
-        defaultReturnedRecordsPerRequest = in.readInt();
+        userPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.values()[in.readInt()];
+        adminPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.values()[in.readInt()];
+        maxDayDifferencePerRequest = in.readInt();
+        maxHourDifferencePerCountRequest = in.readInt();
+        maxDayDifferencePerCountRequest = in.readInt();
+        maxMonthDifferencePerCountRequest = in.readInt();
+        maxAvailableRecordsPerRequest = in.readInt();
+        maxAvailableOnlineUsersStatusPerRequest = in.readInt();
+        defaultAvailableRecordsPerRequest = in.readInt();
         minClientRequestsIntervalMillis = in.readInt();
     }
 
-    public enum PasswordEncodeStrategy {
+    public enum PasswordEncodingAlgorithm {
         BCRYPT,
         SALTED_SHA256,
         RAW //NO-OP

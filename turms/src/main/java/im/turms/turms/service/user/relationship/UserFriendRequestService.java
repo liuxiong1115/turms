@@ -52,19 +52,19 @@ public class UserFriendRequestService {
         this.userRelationshipService = userRelationshipService;
     }
 
-    @Scheduled(cron = EXPIRY_USER_FRIEND_REQUESTS_CLEANER_CRON)
+    @Scheduled(cron = EXPIRED_USER_FRIEND_REQUESTS_CLEANER_CRON)
     public void userFriendRequestsCleaner() {
         if (turmsClusterManager.isCurrentMemberMaster()) {
             if (turmsClusterManager.getTurmsProperties().getUser()
-                    .getFriendRequest().isDeleteExpiryRequests()) {
-                removeAllExpiryFriendRequests().subscribe();
+                    .getFriendRequest().isShouldDeleteExpiredRequestsAutomatically()) {
+                removeAllExpiredFriendRequests().subscribe();
             } else {
-                updateExpiryRequestsStatus().subscribe();
+                updateExpiredRequestsStatus().subscribe();
             }
         }
     }
 
-    public Mono<Boolean> removeAllExpiryFriendRequests() {
+    public Mono<Boolean> removeAllExpiredFriendRequests() {
         Date now = new Date();
         Query query = new Query()
                 .addCriteria(Criteria.where(UserFriendRequest.Fields.expirationDate).lt(now));
@@ -73,11 +73,11 @@ public class UserFriendRequestService {
     }
 
     /**
-     * Warning: Only use expirationDate to check whether a request is expiry.
+     * Warning: Only use expirationDate to check whether a request is expired.
      * Because of the excessive resource consumption, the request status of requests
-     * won't be expiry immediately when reaching the expiration date.
+     * won't be expired immediately when reaching the expiration date.
      */
-    public Mono<Boolean> updateExpiryRequestsStatus() {
+    public Mono<Boolean> updateExpiredRequestsStatus() {
         Date now = new Date();
         Query query = new Query()
                 .addCriteria(Criteria.where(UserFriendRequest.Fields.expirationDate).lt(now))
@@ -124,12 +124,12 @@ public class UserFriendRequestService {
         if (expirationDate != null) {
             userFriendRequest.setExpirationDate(expirationDate);
         } else {
-            int friendRequestExpiryHours = turmsClusterManager.getTurmsProperties()
-                    .getUser().getFriendRequestExpiryHours();
-            if (friendRequestExpiryHours != 0) {
+            int timeToLiveHours = turmsClusterManager.getTurmsProperties()
+                    .getUser().getFriendRequestTimeToLiveHours();
+            if (timeToLiveHours != 0) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.add(Calendar.HOUR, turmsClusterManager.getTurmsProperties()
-                        .getUser().getFriendRequestExpiryHours());
+                        .getUser().getFriendRequestTimeToLiveHours());
                 userFriendRequest.setExpirationDate(calendar.getTime());
             }
         }
@@ -164,7 +164,7 @@ public class UserFriendRequestService {
                         // Allow to create a friend request even there is already an accepted request
                         // because the relationships can be deleted and rebuilt
                         if (turmsClusterManager.getTurmsProperties().getUser()
-                                .getFriendRequest().isAllowResendRequestAfterDeclinedOrIgnoredOrExpired()) {
+                                .getFriendRequest().isAllowResendingRequestAfterDeclinedOrIgnoredOrExpired()) {
                             requestExistsMono = hasPendingFriendRequest(requesterId, recipientId);
                         } else {
                             requestExistsMono = hasPendingOrDeclinedOrIgnoredOrExpiredRequest(requesterId, recipientId);

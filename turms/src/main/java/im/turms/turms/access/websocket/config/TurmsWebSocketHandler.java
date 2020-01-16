@@ -79,7 +79,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
         deviceType = UserAgentUtil.detectDeviceTypeIfUnset(
                 deviceType,
                 deviceDetails,
-                turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
+                turmsClusterManager.getTurmsProperties().getUser().isShouldUseOsAsDefaultDeviceType());
         InetSocketAddress ip = session.getHandshakeInfo().getRemoteAddress();
         if (userId != null && ip != null) {
             Integer ipInNumber;
@@ -112,7 +112,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
                                             Collections.singleton(finalDeviceType),
                                             CloseStatus.SERVER_ERROR);
                                 } else if (turmsClusterManager.getTurmsProperties().getSession()
-                                        .isNotifyClientsOfSessionInfoAfterConnected()) {
+                                        .isShouldNotifyClientsOfSessionInfoAfterConnected()) {
                                     String address = turmsClusterManager.getLocalTurmsServerAddress();
                                     WebSocketMessage message = generateSessionNotification(session, address);
                                     notificationSink.next(message);

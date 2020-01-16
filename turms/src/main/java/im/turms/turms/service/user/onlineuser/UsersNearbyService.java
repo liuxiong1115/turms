@@ -173,14 +173,14 @@ public class UsersNearbyService {
                         .getTurmsProperties()
                         .getUser()
                         .getLocation()
-                        .getMaxQueryUsersNearbyNumber();
+                        .getMaxAvailableUsersNearbyNumberForQuery();
             }
             if (maxDistance == null) {
                 maxDistance = turmsClusterManager
                         .getTurmsProperties()
                         .getUser()
                         .getLocation()
-                        .getMaxDistance();
+                        .getMaxDistanceForQuery();
             }
             Double finalMaxDistance = maxDistance;
             Integer finalMaxPeopleNumber = maxNumber;

@@ -84,7 +84,7 @@ public class UserOnlineInfoController {
         } else {
             size = pageUtil.getSize(size);
             if (size > turmsClusterManager.getTurmsProperties().getSecurity()
-                    .getMaxQueryOnlineUsersStatusPerRequest()) {
+                    .getMaxAvailableOnlineUsersStatusPerRequest()) {
                 throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
             }
             Flux<UserOnlineInfo> userOnlineInfoFlux = onlineUserService.queryUserOnlineInfos(size);

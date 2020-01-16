@@ -348,7 +348,7 @@ public class WsGroupController {
                     request.getGroupId(),
                     request.getContent())
                     .flatMap(joinRequest -> {
-                        if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyAdminsAndOwnerAfterReceiveJoinRequest()) {
+                        if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyOwnerAndManagersAfterReceivingJoinRequest()) {
                             return groupMemberService.queryGroupManagersAndOwnerId(request.getGroupId())
                                     .collect(Collectors.toSet())
                                     .map(recipientsIds -> {
@@ -424,7 +424,7 @@ public class WsGroupController {
                     request.getRequestId())
                     .flatMap(recalled -> {
                         if (recalled != null && recalled
-                                && turmsClusterManager.getTurmsProperties().getNotification().isNotifyManagersAndOwnerAfterGroupJoinRequestRecalled()) {
+                                && turmsClusterManager.getTurmsProperties().getNotification().isNotifyOwnerAndManagersAfterGroupJoinRequestRecalled()) {
                             return groupJoinRequestService.queryGroupId(request.getRequestId())
                                     .flatMap(groupId -> groupMemberService.queryGroupManagersAndOwnerId(groupId)
                                             .collect(Collectors.toSet())
@@ -640,7 +640,7 @@ public class WsGroupController {
                                                 groupMembersIds,
                                                 turmsRequestWrapper.getTurmsRequest()));
                             } else if (!turmsRequestWrapper.getUserId().equals(request.getMemberId())
-                                    && turmsClusterManager.getTurmsProperties().getNotification().isNotifyMemberAfterUpdatedByOthers()) {
+                                    && turmsClusterManager.getTurmsProperties().getNotification().isNotifyMemberAfterInfoUpdatedByOthers()) {
                                 return Mono.just(RequestResult.recipientData(
                                         turmsRequestWrapper.getUserId(),
                                         turmsRequestWrapper.getTurmsRequest()));
