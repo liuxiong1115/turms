@@ -1,10 +1,10 @@
-package im.turms.client.incubor.service;
+package im.turms.client.incubator.service;
 
-import im.turms.client.incubor.TurmsClient;
-import im.turms.client.incubor.driver.TurmsDriver;
-import im.turms.client.incubor.model.UserInfoWithVersion;
-import im.turms.client.incubor.util.MapUtil;
-import im.turms.client.incubor.util.NotificationUtil;
+import im.turms.client.incubator.TurmsClient;
+import im.turms.client.incubator.driver.TurmsDriver;
+import im.turms.client.incubator.model.UserInfoWithVersion;
+import im.turms.client.incubator.util.MapUtil;
+import im.turms.client.incubator.util.NotificationUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.DeviceType;
@@ -17,7 +17,6 @@ import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
 import im.turms.turms.pojo.bo.user.*;
 import im.turms.turms.pojo.request.user.*;
 import im.turms.turms.pojo.request.user.relationship.*;
-import lombok.Getter;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
@@ -30,9 +29,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class UserService {
     private TurmsClient turmsClient;
-    @Getter
     private Long userId;
-    @Getter
     private String password;
     private UserLocation location;
     private UserStatus userOnlineStatus;
@@ -59,9 +56,8 @@ public class UserService {
         this.password = password;
         this.userOnlineStatus = userOnlineStatus;
         this.deviceType = deviceType;
-        long requestId = (long) Math.ceil(Math.random() * Long.MAX_VALUE);
         TurmsDriver driver = turmsClient.getDriver();
-        return driver.connect(userId, password, requestId, driver.getWebsocketUrl(), null, location, userOnlineStatus, deviceType)
+        return driver.connect(userId, password, null, location, userOnlineStatus, deviceType)
                 .thenApply(webSocket -> null);
     }
 
@@ -73,7 +69,7 @@ public class UserService {
         }
     }
 
-    public CompletableFuture<WebSocket> logout() {
+    public CompletableFuture<Void> logout() {
         return turmsClient.getDriver().disconnect();
     }
 
@@ -350,5 +346,25 @@ public class UserService {
                         "name", name,
                         "address", address))
                 .thenApply(notification -> null);
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public UserLocation getLocation() {
+        return location;
+    }
+
+    public UserStatus getUserOnlineStatus() {
+        return userOnlineStatus;
+    }
+
+    public DeviceType getDeviceType() {
+        return deviceType;
     }
 }

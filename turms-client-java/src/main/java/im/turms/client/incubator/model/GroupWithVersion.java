@@ -1,12 +1,10 @@
-package im.turms.client.incubor.model;
+package im.turms.client.incubator.model;
 
 import com.google.protobuf.Int64Value;
 import im.turms.turms.pojo.bo.group.Group;
 import im.turms.turms.pojo.bo.group.GroupsWithVersion;
 import im.turms.turms.pojo.notification.TurmsNotification;
-import lombok.Data;
 
-@Data
 public class GroupWithVersion {
     private Group group;
     private long lastUpdatedDate;
@@ -30,5 +28,21 @@ public class GroupWithVersion {
             }
         }
         return null;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public long getLastUpdatedDate() {
+        return lastUpdatedDate;
+    }
+
+    public void setLastUpdatedDate(long lastUpdatedDate) {
+        this.lastUpdatedDate = lastUpdatedDate;
     }
 }

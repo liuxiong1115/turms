@@ -1,4 +1,4 @@
-package im.turms.client.incubor.util;
+package im.turms.client.incubator.util;
 
 import java.util.Collections;
 import java.util.HashMap;
