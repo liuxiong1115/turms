@@ -33,7 +33,6 @@ import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.context.annotation.Lazy;
@@ -224,8 +223,10 @@ public class UserService {
         }
         return Mono.zip(monos, objects -> objects)
                 .flatMapMany(results -> {
-                    if (!BooleanUtils.and((Boolean[]) results)) {
-                        throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+                    for (Object result : results) {
+                        if (!(boolean) result) {
+                            throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
+                        }
                     }
                     return queryUsersProfiles(userIds, shouldQueryDeletedRecords);
                 });
@@ -235,7 +236,7 @@ public class UserService {
         Query query = QueryBuilder
                 .newBuilder()
                 .add(Criteria.where(ID).in(userIds))
-                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         query.fields()
                 .include(ID)
@@ -290,7 +291,7 @@ public class UserService {
         Query query = QueryBuilder
                 .newBuilder()
                 .add(Criteria.where(ID).is(userId))
-                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.exists(query, User.class);
     }
@@ -328,7 +329,7 @@ public class UserService {
                 .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateRange)
                 .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateRange)
                 .addIsIfNotNull(User.Fields.active, isActive)
-                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, User.class);
     }
@@ -336,7 +337,7 @@ public class UserService {
     public Mono<Long> countRegisteredUsers(@Nullable DateRange dateRange, boolean shouldQueryDeletedRecords) {
         Query query = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(User.Fields.registrationDate, dateRange)
-                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
@@ -351,7 +352,7 @@ public class UserService {
     public Mono<Long> countLoggedInUsers(@Nullable DateRange dateRange, boolean shouldQueryDeletedRecords) {
         Criteria criteria = QueryBuilder.newBuilder()
                 .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, dateRange)
-                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
@@ -363,7 +364,7 @@ public class UserService {
     public Mono<Long> countUsers(boolean shouldQueryDeletedRecords) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addNotNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }

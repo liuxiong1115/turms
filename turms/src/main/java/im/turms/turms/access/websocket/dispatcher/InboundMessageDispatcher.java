@@ -34,7 +34,6 @@ import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.service.message.OutboundMessageService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -145,7 +144,14 @@ public class InboundMessageDispatcher {
                     monos.add(mono);
                 }
                 return Mono.zip(monos, results -> results)
-                        .map(results -> BooleanUtils.and((Boolean[]) results));
+                        .map(results -> {
+                            for (Object result : results) {
+                                if (!(boolean) result) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        });
             }
         } else {
             return Mono.just(true);

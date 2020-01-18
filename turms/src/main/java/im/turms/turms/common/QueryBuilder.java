@@ -64,9 +64,9 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder addNotNullIfFalse(@NotNull String key, boolean bool) {
+    public QueryBuilder addIsNullIfFalse(@NotNull String key, boolean bool) {
         if (!bool) {
-            criteriaList.add(Criteria.where(key).ne(null));
+            criteriaList.add(Criteria.where(key).is(null));
         }
         return this;
     }
