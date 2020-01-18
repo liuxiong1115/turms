@@ -12,9 +12,9 @@ public class GroupWithVersion {
     public static GroupWithVersion from(TurmsNotification notification) {
         if (notification != null) {
             TurmsNotification.Data data = notification.getData();
-            if (data != null) {
+            if (notification.hasData()) {
                 GroupsWithVersion groupsWithVersion = data.getGroupsWithVersion();
-                if (groupsWithVersion != null) {
+                if (data.hasGroupsWithVersion()) {
                     GroupWithVersion groupWithVersion = new GroupWithVersion();
                     if (groupsWithVersion.getGroupsCount() > 0) {
                         groupWithVersion.setGroup(groupsWithVersion.getGroups(0));

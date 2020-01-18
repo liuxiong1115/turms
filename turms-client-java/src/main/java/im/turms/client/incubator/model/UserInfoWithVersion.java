@@ -12,9 +12,9 @@ public class UserInfoWithVersion {
     public static UserInfoWithVersion from(TurmsNotification notification) {
         if (notification != null) {
             TurmsNotification.Data data = notification.getData();
-            if (data != null) {
+            if (notification.hasData()) {
                 UsersInfosWithVersion usersInfosWithVersion = data.getUsersInfosWithVersion();
-                if (usersInfosWithVersion != null) {
+                if (data.hasUsersInfosWithVersion()) {
                     UserInfoWithVersion userInfoWithVersion = new UserInfoWithVersion();
                     if (usersInfosWithVersion.getUserInfosCount() > 0) {
                         userInfoWithVersion.setUserInfo(usersInfosWithVersion.getUserInfos(0));
