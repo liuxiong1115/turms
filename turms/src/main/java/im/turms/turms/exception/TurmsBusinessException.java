@@ -38,4 +38,13 @@ public class TurmsBusinessException extends NoStackTraceException {
     public static TurmsBusinessException get(@NotNull TurmsStatusCode code) {
         return EXCEPTION_POOL.computeIfAbsent(code, key -> new TurmsBusinessException(code));
     }
+
+    public static TurmsBusinessException get(int statusCode) {
+        for (TurmsStatusCode value : TurmsStatusCode.values()) {
+            if (value.getBusinessCode() == statusCode) {
+                return get(value);
+            }
+        }
+        return null;
+    }
 }

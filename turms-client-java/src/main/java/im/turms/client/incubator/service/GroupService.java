@@ -39,28 +39,28 @@ public class GroupService {
 
     public CompletableFuture<Long> createGroup(
             @NotNull String name,
-            String intro,
-            String announcement,
-            String profilePictureUrl,
-            Integer minimumScore,
-            Date muteEndDate,
-            Integer groupTypeId) {
+            @Nullable String intro,
+            @Nullable String announcement,
+            @Nullable String profilePictureUrl,
+            @Nullable Integer minimumScore,
+            @Nullable Date muteEndDate,
+            @Nullable Integer groupTypeId) {
         Validator.throwIfAnyFalsy(name);
         return this.turmsClient.getDriver()
                 .send(CreateGroupRequest.newBuilder(), MapUtil.of(
                         "name", name,
                         "intro", intro,
                         "announcement", announcement,
-                        "minimumScore", minimumScore,
-                        "muteEndDate", muteEndDate,
-                        "profilePictureUrl", profilePictureUrl,
-                        "groupTypeId", groupTypeId))
+                        "minimum_score", minimumScore,
+                        "mute_end_date", muteEndDate,
+                        "profile_picture_url", profilePictureUrl,
+                        "group_type_id", groupTypeId))
                 .thenApply(NotificationUtil::getFirstIdFromIds);
     }
 
     public CompletableFuture<Void> deleteGroup(long groupId) {
         return turmsClient.getDriver()
-                .send(DeleteGroupRequest.newBuilder(), MapUtil.of("groupId", groupId))
+                .send(DeleteGroupRequest.newBuilder(), MapUtil.of("group_id", groupId))
                 .thenApply(turmsNotification -> null);
     }
 
@@ -79,16 +79,16 @@ public class GroupService {
                 muteEndDate, successorId);
         return turmsClient.getDriver()
                 .send(UpdateGroupRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "groupName", groupName,
+                        "group_id", groupId,
+                        "group_name", groupName,
                         "intro", intro,
                         "announcement", announcement,
-                        "profilePictureUrl", profilePictureUrl,
-                        "muteEndDate", muteEndDate,
-                        "minimumScore", minimumScore,
-                        "groupTypeId", groupTypeId,
-                        "successorId", successorId,
-                        "quitAfterTransfer", quitAfterTransfer))
+                        "profile_picture_url", profilePictureUrl,
+                        "mute_end_date", muteEndDate,
+                        "minimum_score", minimumScore,
+                        "group_type_id", groupTypeId,
+                        "successor_id", successorId,
+                        "quit_after_transfer", quitAfterTransfer))
                 .thenApply(turmsNotification -> null);
     }
 
@@ -111,22 +111,22 @@ public class GroupService {
     public CompletableFuture<GroupWithVersion> queryGroup(long groupId, @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryGroupRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "group_id", groupId,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(GroupWithVersion::from);
     }
 
     public CompletableFuture<List<Long>> queryJoinedGroupsIds(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryJoinedGroupsIdsRequest.newBuilder(), MapUtil.of(
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(NotificationUtil::getIds);
     }
 
     public CompletableFuture<GroupWithVersion> queryJoinedGroupsInfos(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryJoinedGroupsInfosRequest.newBuilder(), MapUtil.of(
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(GroupWithVersion::from);
     }
 
@@ -138,7 +138,7 @@ public class GroupService {
         Validator.throwIfAnyFalsy(question, answers);
         return turmsClient.getDriver()
                 .send(CreateGroupJoinQuestionRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
+                        "group_id", groupId,
                         "question", question,
                         "answers", answers,
                         "score", score))
@@ -148,7 +148,7 @@ public class GroupService {
     public CompletableFuture<Void> deleteGroupJoinQuestion(long questionId) {
         return turmsClient.getDriver()
                 .send(DeleteGroupJoinQuestionRequest.newBuilder(), MapUtil.of(
-                        "questionId", questionId))
+                        "question_id", questionId))
                 .thenApply(notification -> null);
     }
 
@@ -160,7 +160,7 @@ public class GroupService {
         Validator.throwIfAllFalsy(question, answers, score);
         return turmsClient.getDriver()
                 .send(UpdateGroupJoinQuestionRequest.newBuilder(), MapUtil.of(
-                        "questionId", questionId,
+                        "question_id", questionId,
                         "question", question,
                         "answers", answers,
                         "score", score))
@@ -171,16 +171,16 @@ public class GroupService {
     public CompletableFuture<Void> blacklistUser(long groupId, long userId) {
         return turmsClient.getDriver()
                 .send(CreateGroupBlacklistedUserRequest.newBuilder(), MapUtil.of(
-                        "blacklistedUserId", userId,
-                        "groupId", groupId))
+                        "blacklisted_user_id", userId,
+                        "group_id", groupId))
                 .thenApply(notification -> null);
     }
 
     public CompletableFuture<Void> unblacklistUser(long groupId, long userId) {
         return turmsClient.getDriver()
                 .send(DeleteGroupBlacklistedUserRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "unblacklistedUserId", userId))
+                        "group_id", groupId,
+                        "unblacklisted_user_id", userId))
                 .thenApply(notification -> null);
     }
 
@@ -189,8 +189,8 @@ public class GroupService {
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryGroupBlacklistedUsersIdsRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "group_id", groupId,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(NotificationUtil::getIds);
     }
 
@@ -199,8 +199,8 @@ public class GroupService {
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryGroupBlacklistedUsersInfosRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "group_id", groupId,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getUsersInfosWithVersion());
     }
 
@@ -212,8 +212,8 @@ public class GroupService {
         Validator.throwIfAnyFalsy(content);
         return turmsClient.getDriver()
                 .send(CreateGroupInvitationRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "inviteeId", inviteeId,
+                        "group_id", groupId,
+                        "invitee_id", inviteeId,
                         "content", content))
                 .thenApply(NotificationUtil::getFirstIdFromIds);
     }
@@ -221,15 +221,15 @@ public class GroupService {
     public CompletableFuture<Void> deleteInvitation(long invitationId) {
         return turmsClient.getDriver()
                 .send(DeleteGroupInvitationRequest.newBuilder(), MapUtil.of(
-                        "invitationId", invitationId))
+                        "invitation_id", invitationId))
                 .thenApply(notification -> null);
     }
 
     public CompletableFuture<GroupInvitationsWithVersion> queryInvitations(long groupId, @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryGroupInvitationsRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "group_id", groupId,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getGroupInvitationsWithVersion());
     }
 
@@ -237,7 +237,7 @@ public class GroupService {
         Validator.throwIfAnyFalsy(content);
         return turmsClient.getDriver()
                 .send(CreateGroupJoinRequestRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
+                        "group_id", groupId,
                         "content", content))
                 .thenApply(NotificationUtil::getFirstIdFromIds);
     }
@@ -245,7 +245,7 @@ public class GroupService {
     public CompletableFuture<Void> deleteJoinRequest(long requestId) {
         return turmsClient.getDriver()
                 .send(DeleteGroupJoinRequestRequest.newBuilder(), MapUtil.of(
-                        "requestId", requestId))
+                        "request_id", requestId))
                 .thenApply(notification -> null);
     }
 
@@ -253,8 +253,8 @@ public class GroupService {
             long groupId, @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryGroupJoinRequestsRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "group_id", groupId,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getGroupJoinRequestsWithVersion());
     }
 
@@ -267,9 +267,9 @@ public class GroupService {
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryGroupJoinQuestionsRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "withAnswers", withAnswers,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "group_id", groupId,
+                        "with_answers", withAnswers,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getGroupJoinQuestionsWithVersion());
     }
 
@@ -277,7 +277,7 @@ public class GroupService {
         Validator.throwIfEmpty(questionIdAndAnswerMap);
         return turmsClient.getDriver()
                 .send(CheckGroupJoinQuestionsAnswersRequest.newBuilder(), MapUtil.of(
-                        "questionIdAndAnswer", questionIdAndAnswerMap))
+                        "question_id_and_answer", questionIdAndAnswerMap))
                 .thenApply(notification -> notification.getData().getSuccess().getValue());
     }
 
@@ -290,11 +290,11 @@ public class GroupService {
             @Nullable Date muteEndDate) {
         return turmsClient.getDriver()
                 .send(CreateGroupMemberRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "userId", userId,
+                        "group_id", groupId,
+                        "user_id", userId,
                         "name", name,
                         "role", role,
-                        "muteEndDate", muteEndDate))
+                        "mute_end_date", muteEndDate))
                 .thenApply(notification -> null);
 
     }
@@ -306,18 +306,18 @@ public class GroupService {
             @Nullable Boolean quitAfterTransfer) {
         return turmsClient.getDriver()
                 .send(DeleteGroupMemberRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "groupMemberId", turmsClient.getUserService().getUserId(),
-                        "successorId", successorId,
-                        "quitAfterTransfer", quitAfterTransfer))
+                        "group_id", groupId,
+                        "group_member_id", turmsClient.getUserService().getUserId(),
+                        "successor_id", successorId,
+                        "quit_after_transfer", quitAfterTransfer))
                 .thenApply(notification -> null);
     }
 
     public CompletableFuture<Void> removeGroupMember(long groupId, long memberId) {
         return turmsClient.getDriver()
                 .send(DeleteGroupMemberRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "groupMemberId", memberId))
+                        "group_id", groupId,
+                        "group_member_id", memberId))
                 .thenApply(notification -> null);
     }
 
@@ -330,11 +330,11 @@ public class GroupService {
         Validator.throwIfAllFalsy(name, role, muteEndDate);
         return turmsClient.getDriver()
                 .send(UpdateGroupMemberRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "memberId", memberId,
+                        "group_id", groupId,
+                        "member_id", memberId,
                         "name", name,
                         "role", role,
-                        "muteEndDate", muteEndDate))
+                        "mute_end_date", muteEndDate))
                 .thenApply(notification -> null);
     }
 
@@ -356,9 +356,9 @@ public class GroupService {
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryGroupMembersRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "lastUpdatedDate", lastUpdatedDate,
-                        "withStatus", withStatus))
+                        "group_id", groupId,
+                        "last_updated_date", lastUpdatedDate,
+                        "with_status", withStatus))
                 .thenApply(notification -> notification.getData().getGroupMembersWithVersion());
     }
 
@@ -369,9 +369,9 @@ public class GroupService {
         Validator.throwIfAnyFalsy(membersIds);
         return turmsClient.getDriver()
                 .send(QueryGroupMembersRequest.newBuilder(), MapUtil.of(
-                        "groupId", groupId,
-                        "groupMembersIds", membersIds,
-                        "withStatus", withStatus))
+                        "group_id", groupId,
+                        "group_members_ids", membersIds,
+                        "with_status", withStatus))
                 .thenApply(notification -> notification.getData().getGroupMembersWithVersion());
     }
 }

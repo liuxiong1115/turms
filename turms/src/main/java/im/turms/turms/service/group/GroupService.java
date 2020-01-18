@@ -204,7 +204,7 @@ public class GroupService {
                     }
                     return updateOrRemoveMono.flatMap(acknowledged -> {
                         if (acknowledged != null && acknowledged) {
-                            return groupMemberService.deleteAllGroupMembers(groupIds, operations)
+                            return groupMemberService.deleteAllGroupMembers(groupIds, operations, false)
                                     .then(groupVersionService.delete(groupIds, operations));
                         } else {
                             return Mono.just(false);
