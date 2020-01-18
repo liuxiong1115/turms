@@ -121,7 +121,7 @@ public class GroupService {
                         .flatMap(results -> groupVersionService.upsert(groupId)
                                 .thenReturn(results.getT1())))
                 .retryWhen(TRANSACTION_RETRY)
-                .single();
+                .singleOrEmpty();
     }
 
     public Mono<Group> authAndCreateGroup(
@@ -212,7 +212,7 @@ public class GroupService {
                     });
                 })
                 .retryWhen(TRANSACTION_RETRY)
-                .single();
+                .singleOrEmpty();
     }
 
     public Flux<Group> queryGroups(
@@ -588,7 +588,7 @@ public class GroupService {
                     }
                 })
                 .retryWhen(TRANSACTION_RETRY)
-                .single();
+                .singleOrEmpty();
     }
 
     public Mono<Boolean> authAndUpdateGroup(
@@ -646,7 +646,7 @@ public class GroupService {
                             }
                         })
                         .retryWhen(TRANSACTION_RETRY)
-                        .single();
+                        .singleOrEmpty();
             } else {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
             }
