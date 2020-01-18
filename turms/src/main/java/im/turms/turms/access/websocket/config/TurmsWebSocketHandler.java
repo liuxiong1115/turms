@@ -29,6 +29,7 @@ import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.signal.Session;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -67,13 +68,11 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
     @Override
     public Mono<Void> handle(WebSocketSession session) {
         Map<String, String> cookies = SessionUtil.getCookiesFromSession(session);
-        if (cookies == null || cookies.isEmpty()) {
-            return session.close();
-        }
-        Long userId = SessionUtil.getUserIdFromCookies(cookies);
-        DeviceType deviceType = SessionUtil.getDeviceTypeFromCookies(cookies);
-        UserStatus userStatus = SessionUtil.getUserStatusFromCookies(cookies);
-        PointFloat userLocation = SessionUtil.getLocationFromCookies(cookies);
+        HttpHeaders headers = session.getHandshakeInfo().getHeaders();
+        Long userId = SessionUtil.getUserIdFromCookiesOrHeaders(cookies, headers);
+        DeviceType deviceType = SessionUtil.getDeviceTypeFromCookies(cookies, headers);
+        UserStatus userStatus = SessionUtil.getUserStatusFromCookies(cookies, headers);
+        PointFloat userLocation = SessionUtil.getLocationFromCookies(cookies, headers);
         String agent = session.getHandshakeInfo().getHeaders().getFirst("User-Agent");
         Map<String, String> deviceDetails = UserAgentUtil.parse(agent);
         deviceType = UserAgentUtil.detectDeviceTypeIfUnset(
