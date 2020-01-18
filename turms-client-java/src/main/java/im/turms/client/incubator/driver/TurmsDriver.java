@@ -1,9 +1,11 @@
 package im.turms.client.incubator.driver;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import im.turms.client.incubator.common.Function5;
+import im.turms.client.incubator.common.TurmsLogger;
 import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Function;
+import java.util.logging.Level;
 
 public class TurmsDriver {
     private static final Integer HEARTBEAT_INTERVAL = 20 * 1000;
@@ -172,15 +175,22 @@ public class TurmsDriver {
                             }
                             if (notification != null) {
                                 long requestId = notification.getRequestId().getValue();
-                                if (notification.getData() != null && notification.getData().getSession() != null) {
-                                    sessionId = notification.getData().getSession().getSessionId();
-                                    address = notification.getData().getSession().getAddress();
+                                if (notification.hasData()) {
+                                    if (notification.getData().hasSession()) {
+                                        sessionId = notification.getData().getSession().getSessionId();
+                                        address = notification.getData().getSession().getAddress();
+                                    } else {
+                                        CompletableFuture<TurmsNotification> future = requestMap.get(requestId).getValue();
+                                        if (future != null) {
+                                            future.complete(notification);
+                                        } else {
+                                            TurmsLogger.logger.log(Level.WARNING, "Unknown request ID:", requestId);
+                                        }
+                                    }
                                 }
                                 if (onMessage != null) {
                                     onMessage.apply(notification);
                                 }
-                                CompletableFuture<TurmsNotification> future = requestMap.get(requestId).getValue();
-                                future.complete(notification);
                             }
                             return CompletableFuture.completedStage(notification);
                         }
@@ -219,15 +229,17 @@ public class TurmsDriver {
         Descriptors.Descriptor requestDescriptor = requestBuilder.getDescriptorForType();
         Descriptors.FieldDescriptor fieldDescriptor = requestDescriptor.findFieldByName(fieldName);
         requestBuilder.setField(fieldDescriptor, builder.build());
-        return send(requestBuilder.build());
+        return send(requestBuilder);
     }
 
-    public CompletableFuture<TurmsNotification> send(TurmsRequest request) {
+    public CompletableFuture<TurmsNotification> send(TurmsRequest.Builder requestBuilder) {
         if (this.connected()) {
             Date now = new Date();
             if (minRequestsInterval == 0 || now.getTime() - this.lastRequestDate.getTime() > minRequestsInterval) {
                 lastRequestDate = now;
                 long requestId = generateRandomId();
+                requestBuilder.setRequestId(Int64Value.newBuilder().setValue(requestId).build());
+                TurmsRequest request = requestBuilder.build();
                 ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
                 CompletableFuture<TurmsNotification> future = new CompletableFuture<>();
                 websocket.sendBinary(data, true).whenComplete((webSocket, throwable) -> {
