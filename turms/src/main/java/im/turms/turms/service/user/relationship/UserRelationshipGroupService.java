@@ -224,7 +224,7 @@ public class UserRelationshipGroupService {
                                 .thenReturn(true);
                     })
                     .retryWhen(TRANSACTION_RETRY)
-                    .single();
+                    .singleOrEmpty();
         }
     }
 

@@ -80,7 +80,7 @@ public class UserRelationshipService {
                             });
                 })
                 .retryWhen(TRANSACTION_RETRY)
-                .single();
+                .singleOrEmpty();
     }
 
     public Mono<Boolean> deleteAllRelationships(
@@ -112,7 +112,7 @@ public class UserRelationshipService {
                                     }
                                 }))
                         .retryWhen(TRANSACTION_RETRY)
-                        .single();
+                        .singleOrEmpty();
             }
         } else {
             ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
@@ -153,7 +153,7 @@ public class UserRelationshipService {
                             .then(userVersionService.updateRelationshipsVersion(ownerId, newOperations))
                             .thenReturn(true))
                     .retryWhen(TRANSACTION_RETRY)
-                    .single();
+                    .singleOrEmpty();
         }
     }
 
@@ -165,7 +165,7 @@ public class UserRelationshipService {
                         .zipWith(deleteOneSidedRelationship(userTwoId, userOneId, operations))
                         .map(results -> results.getT1() && results.getT2()))
                 .retryWhen(TRANSACTION_RETRY)
-                .single();
+                .singleOrEmpty();
     }
 
     private Flux<Long> queryMembersRelatedUsersIds(
@@ -403,7 +403,7 @@ public class UserRelationshipService {
             return mongoTemplate.inTransaction()
                     .execute(newOperations -> friendTwoUsers(userOneId, userTwoId, newOperations))
                     .retryWhen(TRANSACTION_RETRY)
-                    .single();
+                    .singleOrEmpty();
         }
     }
 

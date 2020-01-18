@@ -181,7 +181,7 @@ public class UserService {
                         .then(userVersionService.upsertEmptyUserVersion(user.getId(), operations))
                         .thenReturn(user))
                 .retryWhen(TRANSACTION_RETRY)
-                .single();
+                .singleOrEmpty();
     }
 
     public Mono<Boolean> isAllowToQueryUserProfile(
@@ -209,7 +209,7 @@ public class UserService {
             @NotNull Long requesterId,
             @NotNull Long userId,
             boolean shouldQueryDeletedRecords) {
-        return authAndQueryUsersProfiles(requesterId, Set.of(userId), shouldQueryDeletedRecords).single();
+        return authAndQueryUsersProfiles(requesterId, Set.of(userId), shouldQueryDeletedRecords).singleOrEmpty();
     }
 
     public Flux<User> authAndQueryUsersProfiles(
@@ -276,7 +276,7 @@ public class UserService {
                                 }
                             }))
                     .retryWhen(TRANSACTION_RETRY)
-                    .single();
+                    .singleOrEmpty();
         }
         return deleteOrUpdateMono.flatMap(success -> {
             if (success) {
