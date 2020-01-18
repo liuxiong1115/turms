@@ -37,16 +37,16 @@ public class MessageService {
             @Nullable String text,
             @Nullable byte[] records,
             @Nullable Integer burnAfter) {
-        Validator.throwIfAnyFalsy(chatType, toId, deliveryDate);
+        Validator.throwIfAnyFalsy(chatType, deliveryDate);
         Validator.throwIfAllFalsy(text, records);
         return turmsClient.getDriver()
                 .send(CreateMessageRequest.newBuilder(), MapUtil.of(
-                        "chatType", chatType,
-                        "toId", toId,
-                        "deliveryDate", deliveryDate,
+                        "chat_type", chatType,
+                        "to_id", toId,
+                        "delivery_date", deliveryDate,
                         "text", text,
                         "records", records,
-                        "burnAfter", burnAfter))
+                        "burn_after", burnAfter))
                 .thenApply(NotificationUtil::getFirstIdFromIds);
     }
 
@@ -57,9 +57,9 @@ public class MessageService {
         Validator.throwIfAnyFalsy(chatType);
         return turmsClient.getDriver()
                 .send(CreateMessageRequest.newBuilder(), MapUtil.of(
-                        "messageId", messageId,
-                        "chatType", chatType,
-                        "toId", targetId))
+                        "message_id", messageId,
+                        "chat_type", chatType,
+                        "to_id", targetId))
                 .thenApply(NotificationUtil::getFirstIdFromIds);
     }
 
@@ -70,7 +70,7 @@ public class MessageService {
         Validator.throwIfAllFalsy(text, records);
         return turmsClient.getDriver()
                 .send(UpdateMessageRequest.newBuilder(), MapUtil.of(
-                        "messageId", messageId,
+                        "message_id", messageId,
                         "text", text,
                         "records", records))
                 .thenApply(notification -> null);
@@ -91,13 +91,13 @@ public class MessageService {
         return turmsClient.getDriver()
                 .send(QueryMessagesRequest.newBuilder(), MapUtil.of(
                         "ids", ids,
-                        "chatType", chatType,
-                        "areSystemMessages", areSystemMessages,
-                        "fromId", senderId,
-                        "deliveryDateAfter", deliveryDateStart,
-                        "deliveryDateBefore", deliveryDateEnd,
+                        "chat_type", chatType,
+                        "are_system_messages", areSystemMessages,
+                        "from_id", senderId,
+                        "delivery_date_after", deliveryDateStart,
+                        "delivery_date_before", deliveryDateEnd,
                         "size", size,
-                        "deliveryStatus", deliveryStatus))
+                        "delivery_status", deliveryStatus))
                 .thenApply(notification -> notification.getData().getMessages().getMessagesList());
     }
 
@@ -114,7 +114,7 @@ public class MessageService {
     public CompletableFuture<List<MessageStatus>> queryMessageStatus(long messageId) {
         return turmsClient.getDriver()
                 .send(QueryMessageStatusesRequest.newBuilder(), MapUtil.of(
-                        "messageId", messageId))
+                        "message_id", messageId))
                 .thenApply(notification -> notification.getData().getMessageStatuses().getMessageStatusesList());
     }
 
@@ -124,8 +124,8 @@ public class MessageService {
         }
         return turmsClient.getDriver()
                 .send(UpdateMessageRequest.newBuilder(), MapUtil.of(
-                        "messageId", messageId,
-                        "recallDate", recallDate))
+                        "message_id", messageId,
+                        "recall_date", recallDate))
                 .thenApply(notification -> null);
     }
 
@@ -135,8 +135,8 @@ public class MessageService {
         }
         return turmsClient.getDriver()
                 .send(UpdateMessageRequest.newBuilder(), MapUtil.of(
-                        "messageId", messageId,
-                        "readDate", readDate))
+                        "message_id", messageId,
+                        "read_date", readDate))
                 .thenApply(notification -> null);
     }
 
@@ -150,8 +150,8 @@ public class MessageService {
         Validator.throwIfAnyFalsy(chatType);
         return turmsClient.getDriver()
                 .send(UpdateTypingStatusRequest.newBuilder(), MapUtil.of(
-                        "chatType", chatType,
-                        "toId", targetId))
+                        "chat_type", chatType,
+                        "to_id", targetId))
                 .thenApply(notification -> null);
     }
 
