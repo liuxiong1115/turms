@@ -1,32 +1,23 @@
-package im.turms.client.incubor.driver;
+package im.turms.client.incubator.driver;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import im.turms.client.incubor.TurmsClient;
-import im.turms.client.incubor.common.TriFunction;
+import im.turms.client.incubator.common.Function5;
 import im.turms.turms.common.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.Validator;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.user.UserLocation;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.net.CookieManager;
-import java.net.CookieStore;
-import java.net.HttpCookie;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -55,41 +46,36 @@ public class TurmsDriver {
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> heartbeatFuture;
     private final HashMap<Long, Pair<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
-    //TODO: https://github.com/turms-im/turms/issues/182
-    @Setter
-    private Function<TurmsNotification, Void> onMessage;
-    @Setter
-    private TriFunction<Boolean, TurmsStatusCode, Throwable, Void> onClose;
 
-    private TurmsClient turmsClient;
-    @Getter
+    //TODO: https://github.com/turms-im/turms/issues/182
+    private Function<TurmsNotification, Void> onMessage;
+    private Function5<Boolean, TurmsStatusCode, Throwable, Integer, String, Void> onClose;
+
     private String websocketUrl = "ws://localhost:9510";
     private String httpUrl = "http://localhost:9510";
     private int connectionTimeout = 10 * 1000;
     private int minRequestsInterval = 0;
     private Date lastRequestDate = new Date(0);
-    private boolean queryReasonWhenLoginFailed = true;
-    private boolean queryReasonWhenDisconnected = true;
     private Long userId;
     private String password;
-    private Long connectionRequestId;
+    private UserLocation userLocation;
+    private UserStatus userOnlineStatus;
+    private DeviceType deviceType;
     private String sessionId;
     private String address;
 
-    public TurmsDriver(@NotNull TurmsClient client,
-                       String websocketUrl,
-                       Integer connectionTimeout,
-                       Integer minRequestsInterval,
-                       String httpUrl,
-                       Boolean queryReasonWhenLoginFailed,
-                       Boolean queryReasonWhenDisconnected) {
-        this.turmsClient = client;
-        if (queryReasonWhenLoginFailed == null) {
-            queryReasonWhenLoginFailed = true;
-        }
-        if (queryReasonWhenDisconnected == null) {
-            queryReasonWhenDisconnected = true;
-        }
+    public void setOnMessage(Function<TurmsNotification, Void> onMessage) {
+        this.onMessage = onMessage;
+    }
+
+    public void setOnClose(Function5<Boolean, TurmsStatusCode, Throwable, Integer, String, Void> onClose) {
+        this.onClose = onClose;
+    }
+
+    public TurmsDriver(@Nullable String websocketUrl,
+                       @Nullable Integer connectionTimeout,
+                       @Nullable Integer minRequestsInterval,
+                       @Nullable String httpUrl) {
         if (websocketUrl != null) {
             this.websocketUrl = websocketUrl;
         }
@@ -103,14 +89,13 @@ public class TurmsDriver {
         if (httpUrl != null) {
             this.httpUrl = httpUrl;
         }
-        this.queryReasonWhenLoginFailed = queryReasonWhenLoginFailed;
-        this.queryReasonWhenDisconnected = queryReasonWhenDisconnected;
     }
 
-    public CompletableFuture<WebSocket> sendHeartbeat() {
+    public CompletableFuture<Void> sendHeartbeat() {
         if (this.connected()) {
             lastRequestDate = new Date();
-            return websocket.sendBinary(ByteBuffer.allocate(0), true);
+            return websocket.sendBinary(ByteBuffer.allocate(0), true)
+                    .thenApply(webSocket -> null);
         } else {
             return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
         }
@@ -120,20 +105,20 @@ public class TurmsDriver {
         return websocket != null && !websocket.isInputClosed() && !websocket.isOutputClosed();
     }
 
-    public CompletableFuture<WebSocket> disconnect() {
+    public CompletableFuture<Void> disconnect() {
         if (connected()) {
-            return this.websocket.sendClose(WebSocket.NORMAL_CLOSURE, null);
+            return this.websocket
+                    .sendClose(WebSocket.NORMAL_CLOSURE, "")
+                    .thenApply(webSocket -> null);
         } else {
             return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
         }
     }
 
-    public CompletableFuture<WebSocket> connect(
+    public CompletableFuture<Void> connect(
             @NotNull long userId,
             @NotNull String password,
-            long requestId,
-            String url,
-            Integer connectionTimeout,
+            @Nullable Integer connectionTimeout,
             @Nullable UserLocation userLocation,
             @Nullable UserStatus userOnlineStatus,
             @Nullable DeviceType deviceType) {
@@ -146,14 +131,17 @@ public class TurmsDriver {
         } else {
             this.userId = userId;
             this.password = password;
-            this.connectionRequestId = requestId;
+            this.userLocation = userLocation;
+            this.userOnlineStatus = userOnlineStatus;
+            this.deviceType = deviceType;
+            long connectionRequestId = (long) Math.ceil(Math.random() * Long.MAX_VALUE);
             WebSocket.Builder builder = HttpClient.newHttpClient()
                     .newWebSocketBuilder();
-            builder.header(REQUEST_ID_FIELD, String.valueOf(requestId));
+            builder.header(REQUEST_ID_FIELD, String.valueOf(connectionRequestId));
             builder.header(USER_ID_FIELD, String.valueOf(userId));
             builder.header(PASSWORD_FIELD, password);
             if (userLocation != null) {
-                String location = String.format("%f:%f", userLocation.getLongitude(), userLocation.getLatitude());
+                String location = String.format("%f%s%f", userLocation.getLongitude(), LOCATION_SPLIT, userLocation.getLatitude());
                 builder.header(USER_LOCATION_FIELD, location);
             }
             if (userOnlineStatus != null) {
@@ -164,21 +152,26 @@ public class TurmsDriver {
             }
             return builder
                     .connectTimeout(Duration.ofSeconds(finalConnectionTimeout))
-                    .buildAsync(URI.create(url), new WebSocket.Listener() {
-                        @SneakyThrows
+                    .buildAsync(URI.create(websocketUrl), new WebSocket.Listener() {
+
                         @Override
                         public void onOpen(WebSocket webSocket) {
                             webSocket.request(1);
                             onWebsocketOpen();
                         }
 
-                        @SneakyThrows
                         @Override
                         public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
                             webSocket.request(1);
-                            TurmsNotification notification = TurmsNotification.parseFrom(data);
-                            //TODO: notify
+                            TurmsNotification notification;
+                            try {
+                                notification = TurmsNotification.parseFrom(data);
+                            } catch (InvalidProtocolBufferException e) {
+                                e.printStackTrace();
+                                return CompletableFuture.failedStage(e);
+                            }
                             if (notification != null) {
+                                long requestId = notification.getRequestId().getValue();
                                 if (notification.getData() != null && notification.getData().getSession() != null) {
                                     sessionId = notification.getData().getSession().getSessionId();
                                     address = notification.getData().getSession().getAddress();
@@ -186,6 +179,8 @@ public class TurmsDriver {
                                 if (onMessage != null) {
                                     onMessage.apply(notification);
                                 }
+                                CompletableFuture<TurmsNotification> future = requestMap.get(requestId).getValue();
+                                future.complete(notification);
                             }
                             return CompletableFuture.completedStage(notification);
                         }
@@ -194,7 +189,7 @@ public class TurmsDriver {
                         public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
                             webSocket.request(1);
                             if (statusCode == WebSocket.NORMAL_CLOSURE) {
-                                onWebsocketClose();
+                                onWebsocketClose(statusCode, reason);
                             }
                             return null;
                         }
@@ -208,12 +203,9 @@ public class TurmsDriver {
                         if (webSocket != null) {
                             this.websocket = webSocket;
                         }
-                    });
+                    })
+                    .thenApply(webSocket -> null);
         }
-    }
-
-    public CompletableFuture<TurmsNotification> send(Message.Builder builder) {
-        return send(builder, null);
     }
 
     public CompletableFuture<TurmsNotification> send(Message.Builder builder, Map<String, ?> fields) {
@@ -242,11 +234,6 @@ public class TurmsDriver {
                     if (throwable != null) {
                         future.completeExceptionally(throwable);
                     } else {
-                        heartbeatFuture = this.heartbeatTimer.scheduleAtFixedRate(
-                                this::checkAndSendHeartbeatTask,
-                                heartbeatInterval,
-                                heartbeatInterval,
-                                TimeUnit.SECONDS);
                         requestMap.put(requestId, Pair.of(request, future));
                     }
                 });
@@ -269,6 +256,11 @@ public class TurmsDriver {
 
     private void onWebsocketOpen() {
         isSessionEstablished = true;
+        heartbeatFuture = this.heartbeatTimer.scheduleAtFixedRate(
+                this::checkAndSendHeartbeatTask,
+                heartbeatInterval,
+                heartbeatInterval,
+                TimeUnit.SECONDS);
     }
 
     private void checkAndSendHeartbeatTask() {
@@ -278,20 +270,14 @@ public class TurmsDriver {
         }
     }
 
-    private void onWebsocketClose() {
+    private void onWebsocketClose(int statusCode, String reason) {
         boolean wasLogged = isSessionEstablished;
         isSessionEstablished = false;
         cancelHeartbeatFuture();
-        if (onClose != null) {
-            if (queryReasonWhenDisconnected && userId != null && sessionId != null) {
-                queryReasonWhenDisconnected(userId, sessionId)
-                        .whenComplete((response, throwable) -> {
-                            TurmsStatusCode code = TurmsStatusCode.from(Integer.parseInt(response.body()));
-                            onClose.apply(wasLogged, code, throwable);
-                        });
-            } else {
-                onClose.apply(wasLogged, TurmsStatusCode.CLIENT_SESSION_ALREADY_ESTABLISHED, null);
-            }
+        if (statusCode == 307) {
+            this.connect(userId, password, connectionTimeout, userLocation, userOnlineStatus, deviceType);
+        } else if (onClose != null) {
+            onClose.apply(wasLogged, TurmsStatusCode.CLIENT_SESSION_ALREADY_ESTABLISHED, null, statusCode, reason);
         }
     }
 
@@ -299,47 +285,7 @@ public class TurmsDriver {
         boolean wasLogged = isSessionEstablished;
         isSessionEstablished = false;
         cancelHeartbeatFuture();
-        if (!wasLogged && queryReasonWhenLoginFailed && userId != null && connectionRequestId != null) {
-            queryLoginFailedReason(this.userId, this.connectionRequestId)
-                    .whenComplete((response, throwable) -> {
-                        if (throwable != null) {
-                            onClose.apply(wasLogged, null, throwable);
-                        } else {
-                            if (response.statusCode() == 307) {
-                                turmsClient.getUserService().relogin();
-                            } else {
-                                if (onClose != null) {
-                                    onClose.apply(wasLogged, TurmsStatusCode.NOT_RESPONSIBLE, null);
-                                }
-                            }
-                        }
-                    });
-        } else {
-            onClose.apply(wasLogged, null, error);
-        }
-    }
-
-    private CompletableFuture<HttpResponse<String>> queryLoginFailedReason(long userId, long requestId) {
-        if (httpClient == null) {
-            httpClient = HttpClient.newHttpClient();
-        }
-        String requestUrl = String.format("%s/reasons/login-failed?userId=%d&requestId=%d", httpUrl, userId, requestId);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(requestUrl))
-                .build();
-        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-    }
-
-    private CompletableFuture<HttpResponse<String>> queryReasonWhenDisconnected(long userId, @NotNull String sessionId) {
-        Validator.throwIfAnyFalsy(sessionId);
-        if (httpClient == null) {
-            httpClient = HttpClient.newHttpClient();
-        }
-        String requestUrl = String.format("%s/reasons/disconnection?userId=%d&sessionId=%s", httpUrl, userId, sessionId);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(requestUrl))
-                .build();
-        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        onClose.apply(wasLogged, null, error, null, null);
     }
 
     private void cancelHeartbeatFuture() {

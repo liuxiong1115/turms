@@ -1,12 +1,10 @@
-package im.turms.client.incubor.model;
+package im.turms.client.incubator.model;
 
 import com.google.protobuf.Int64Value;
 import im.turms.turms.pojo.bo.user.UserInfo;
 import im.turms.turms.pojo.bo.user.UsersInfosWithVersion;
 import im.turms.turms.pojo.notification.TurmsNotification;
-import lombok.Data;
 
-@Data
 public class UserInfoWithVersion {
     private UserInfo userInfo;
     private long lastUpdatedDate;
@@ -30,5 +28,21 @@ public class UserInfoWithVersion {
             }
         }
         return null;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
+    public long getLastUpdatedDate() {
+        return lastUpdatedDate;
+    }
+
+    public void setLastUpdatedDate(long lastUpdatedDate) {
+        this.lastUpdatedDate = lastUpdatedDate;
     }
 }
