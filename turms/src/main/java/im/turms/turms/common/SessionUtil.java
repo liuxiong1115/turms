@@ -19,21 +19,19 @@ package im.turms.turms.common;
 
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.google.common.base.Enums;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.socket.WebSocketSession;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,6 +47,25 @@ public class SessionUtil {
     public static final String USER_LOCATION_FIELD = "loc";
     public static final String USER_DEVICE_DETAILS = "dd";
     private static final String LOCATION_SPLIT = ":";
+
+    private static String getFirstValue(ServerHttpRequest request, String key) {
+        String value = request.getHeaders().getFirst(key);
+        if (value == null) {
+            value = getFirstCookieValue(request.getCookies(), key);
+        }
+        return value;
+    }
+
+    private static String getFirstValue(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers, @NotNull String key) {
+        String value = null;
+        if (cookies != null) {
+            value = cookies.get(key);
+        }
+        if (value == null && headers != null) {
+            value = headers.getFirst(key);
+        }
+        return value;
+    }
 
     private static String getFirstCookieValue(MultiValueMap<String, HttpCookie> cookies, String key) {
         if (cookies != null && !cookies.isEmpty() && key != null && !key.isBlank()) {
@@ -102,7 +119,7 @@ public class SessionUtil {
     }
 
     public static DeviceType getDeviceTypeFromRequest(ServerHttpRequest request) {
-        String deviceType = getFirstCookieValue(request.getCookies(), DEVICE_TYPE_FIELD);
+        String deviceType = getFirstValue(request, DEVICE_TYPE_FIELD);
         if (deviceType != null) {
             switch (deviceType.toUpperCase()) {
                 case "DESKTOP":
@@ -145,7 +162,7 @@ public class SessionUtil {
     }
 
     public static String getUserStatusFromRequest(ServerHttpRequest request) {
-        return getFirstCookieValue(request.getCookies(), USER_ONLINE_STATUS_FIELD);
+        return getFirstValue(request, USER_ONLINE_STATUS_FIELD);
     }
 
     public static void putUserId(Map<String, Object> attributes, Long userId) {
@@ -170,15 +187,10 @@ public class SessionUtil {
     }
 
     private static Long getLongFromRequest(ServerHttpRequest request, String fieldName) {
-        String longValue = getFirstCookieValue(request.getCookies(), fieldName);
+        String longValue = getFirstValue(request, fieldName);
         try {
             if (longValue != null && !longValue.isBlank()) {
                 return Long.parseLong(longValue);
-            } else {
-                longValue = request.getHeaders().getFirst(fieldName);
-                if (longValue != null && !longValue.isBlank()) {
-                    return Long.parseLong(longValue);
-                }
             }
             return null;
         } catch (NumberFormatException exception) {
@@ -187,15 +199,11 @@ public class SessionUtil {
     }
 
     public static String getPasswordFromRequest(ServerHttpRequest request) {
-        String password = getFirstCookieValue(request.getCookies(), PASSWORD_FIELD);
-        if (password == null || password.isBlank()) {
-            password = request.getHeaders().getFirst(PASSWORD_FIELD);
-        }
-        return password;
+        return getFirstValue(request, PASSWORD_FIELD);
     }
 
     public static String getLocationFromRequest(ServerHttpRequest request) {
-        return getFirstCookieValue(request.getCookies(), USER_LOCATION_FIELD);
+        return getFirstValue(request, USER_LOCATION_FIELD);
     }
 
     public static PointFloat getLocationFromSession(WebSocketSession session) {
@@ -246,8 +254,8 @@ public class SessionUtil {
         }
     }
 
-    public static Long getUserIdFromCookies(Map<String, String> cookies) {
-        String userId = cookies.get(USER_ID_FIELD);
+    public static Long getUserIdFromCookiesOrHeaders(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
+        String userId = getFirstValue(cookies, headers, USER_ID_FIELD);
         if (userId != null) {
             return Long.parseLong(userId);
         } else {
@@ -255,8 +263,8 @@ public class SessionUtil {
         }
     }
 
-    public static DeviceType getDeviceTypeFromCookies(Map<String, String> cookies) {
-        String deviceType = cookies.get(DEVICE_TYPE_FIELD);
+    public static DeviceType getDeviceTypeFromCookies(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
+        String deviceType = getFirstValue(cookies, headers, DEVICE_TYPE_FIELD);
         if (deviceType != null) {
             return Enums.getIfPresent(DeviceType.class, deviceType).or(DeviceType.UNKNOWN);
         } else {
@@ -264,8 +272,8 @@ public class SessionUtil {
         }
     }
 
-    public static UserStatus getUserStatusFromCookies(Map<String, String> cookies) {
-        String userStatus = cookies.get(USER_ONLINE_STATUS_FIELD);
+    public static UserStatus getUserStatusFromCookies(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
+        String userStatus = getFirstValue(cookies, headers, USER_ONLINE_STATUS_FIELD);
         if (userStatus != null) {
             return Enums.getIfPresent(UserStatus.class, userStatus).or(UserStatus.AVAILABLE);
         } else {
@@ -273,8 +281,8 @@ public class SessionUtil {
         }
     }
 
-    public static PointFloat getLocationFromCookies(Map<String, String> cookies) {
-        String location = cookies.get(USER_LOCATION_FIELD);
+    public static PointFloat getLocationFromCookies(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
+        String location = getFirstValue(cookies, headers, USER_LOCATION_FIELD);
         if (location != null) {
             String[] split = location.split(LOCATION_SPLIT);
             if (split.length == 2) {
@@ -282,18 +290,5 @@ public class SessionUtil {
             }
         }
         return null;
-    }
-
-    public static DBObject getDeviceDetailsFromCookies(Map<String, String> cookies) {
-        String deviceDetails = cookies.get(USER_DEVICE_DETAILS);
-        if (deviceDetails != null) {
-            try {
-                return BasicDBObject.parse(URLDecoder.decode(deviceDetails, StandardCharsets.UTF_8));
-            } catch (Exception e) {
-                return new BasicDBObject();
-            }
-        } else {
-            return new BasicDBObject();
-        }
     }
 }
