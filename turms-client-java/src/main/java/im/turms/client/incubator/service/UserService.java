@@ -21,7 +21,6 @@ import im.turms.turms.pojo.request.user.relationship.*;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.net.http.WebSocket;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -45,13 +44,13 @@ public class UserService {
             @Nullable UserLocation location,
             @Nullable UserStatus userOnlineStatus,
             @Nullable DeviceType deviceType) {
+        Validator.throwIfAnyFalsy(password);
         if (userOnlineStatus == null) {
             userOnlineStatus = UserStatus.AVAILABLE;
         }
         if (deviceType == null) {
             deviceType = DeviceType.UNKNOWN;
         }
-        Validator.throwIfAnyFalsy(password);
         this.userId = userId;
         this.password = password;
         this.userOnlineStatus = userOnlineStatus;
@@ -80,7 +79,7 @@ public class UserService {
         }
         return turmsClient.getDriver()
                 .send(UpdateUserOnlineStatusRequest.newBuilder(), MapUtil.of(
-                        "userStatus", onlineStatus))
+                        "user_status", onlineStatus))
                 .thenApply(notification -> null);
     }
 
@@ -102,15 +101,15 @@ public class UserService {
                 .send(UpdateUserRequest.newBuilder(), MapUtil.of(
                         "name", name,
                         "intro", intro,
-                        "profilePictureUrl", profilePictureUrl,
-                        "profileAccessStrategy", profileAccessStrategy))
+                        "profile_picture_url", profilePictureUrl,
+                        "profile_access_strategy", profileAccessStrategy))
                 .thenApply(notification -> null);
     }
 
     public CompletableFuture<GroupInvitationsWithVersion> queryUserGroupInvitations(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryUserGroupInvitationsRequest.newBuilder(), MapUtil.of(
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getGroupInvitationsWithVersion());
     }
 
@@ -120,8 +119,8 @@ public class UserService {
         Validator.throwIfAnyFalsy(userId);
         return turmsClient.getDriver()
                 .send(QueryUserProfileRequest.newBuilder(), MapUtil.of(
-                        "userId", userId,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "user_id", userId,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(UserInfoWithVersion::from);
     }
 
@@ -135,7 +134,7 @@ public class UserService {
                         "latitude", latitude,
                         "longitude", longitude,
                         "distance", distance,
-                        "maxNumber", maxNumber))
+                        "max_number", maxNumber))
                 .thenApply(NotificationUtil::getIds);
     }
 
@@ -150,7 +149,7 @@ public class UserService {
                         "latitude", latitude,
                         "longitude", longitude,
                         "distance", distance,
-                        "maxNumber", maxNumber))
+                        "max_number", maxNumber))
                 .thenApply(notification -> notification.getData().getUsersInfosWithVersion().getUserInfosList());
     }
 
@@ -158,7 +157,7 @@ public class UserService {
         Validator.throwIfAnyFalsy(usersIds);
         return turmsClient.getDriver()
                 .send(QueryUsersOnlineStatusRequest.newBuilder(), MapUtil.of(
-                        "usersIds", usersIds))
+                        "users_ids", usersIds))
                 .thenApply(notification -> notification.getData().getUsersOnlineStatuses().getUserStatusesList());
     }
 
@@ -172,10 +171,10 @@ public class UserService {
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryRelationshipsRequest.newBuilder(), MapUtil.of(
-                        "relatedUsersIds", relatedUsersIds,
-                        "isBlocked", isBlocked,
-                        "groupIndex", groupIndex,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "related_users_ids", relatedUsersIds,
+                        "is_blocked", isBlocked,
+                        "group_index", groupIndex,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getUserRelationshipsWithVersion());
     }
 
@@ -185,9 +184,9 @@ public class UserService {
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryRelatedUsersIdsRequest.newBuilder(), MapUtil.of(
-                        "isBlocked", isBlocked,
-                        "groupIndex", groupIndex,
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "is_blocked", isBlocked,
+                        "group_index", groupIndex,
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getIdsWithVersion());
     }
 
@@ -209,9 +208,9 @@ public class UserService {
             @Nullable Integer groupIndex) {
         return turmsClient.getDriver()
                 .send(CreateRelationshipRequest.newBuilder(), MapUtil.of(
-                        "userId", userId,
-                        "isBlocked", isBlocked,
-                        "groupIndex", groupIndex))
+                        "user_id", userId,
+                        "is_blocked", isBlocked,
+                        "group_index", groupIndex))
                 .thenApply(notification -> null);
     }
 
@@ -233,9 +232,9 @@ public class UserService {
             @Nullable Integer targetGroupIndex) {
         return turmsClient.getDriver()
                 .send(DeleteRelationshipRequest.newBuilder(), MapUtil.of(
-                        "relatedUserId", relatedUserId,
-                        "groupIndex", deleteGroupIndex,
-                        "targetGroupIndex", targetGroupIndex))
+                        "related_user_id", relatedUserId,
+                        "group_index", deleteGroupIndex,
+                        "target_group_index", targetGroupIndex))
                 .thenApply(notification -> null);
     }
 
@@ -246,9 +245,9 @@ public class UserService {
         Validator.throwIfAllFalsy(isBlocked, groupIndex);
         return turmsClient.getDriver()
                 .send(UpdateRelationshipRequest.newBuilder(), MapUtil.of(
-                        "relatedUserId", relatedUserId,
+                        "related_user_id", relatedUserId,
                         "blocked", isBlocked,
-                        "newGroupIndex", groupIndex))
+                        "new_group_index", groupIndex))
                 .thenApply(notification -> null);
     }
 
@@ -258,7 +257,7 @@ public class UserService {
         Validator.throwIfAnyFalsy(content);
         return turmsClient.getDriver()
                 .send(CreateFriendRequestRequest.newBuilder(), MapUtil.of(
-                        "recipientId", recipientId,
+                        "recipient_id", recipientId,
                         "content", content))
                 .thenApply(notification -> null);
     }
@@ -270,8 +269,8 @@ public class UserService {
         Validator.throwIfAnyFalsy(responseAction);
         return turmsClient.getDriver()
                 .send(UpdateFriendRequestRequest.newBuilder(), MapUtil.of(
-                        "requestId", requestId,
-                        "responseAction", responseAction,
+                        "request_id", requestId,
+                        "response_action", responseAction,
                         "reason", reason))
                 .thenApply(notification -> null);
     }
@@ -279,7 +278,7 @@ public class UserService {
     public CompletableFuture<UserFriendRequestsWithVersion> queryFriendRequests(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryFriendRequestsRequest.newBuilder(), MapUtil.of(
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getUserFriendRequestsWithVersion());
     }
 
@@ -296,8 +295,8 @@ public class UserService {
             @Nullable Integer targetGroupIndex) {
         return turmsClient.getDriver()
                 .send(DeleteRelationshipGroupRequest.newBuilder(), MapUtil.of(
-                        "groupIndex", groupIndex,
-                        "targetGroupIndex", targetGroupIndex))
+                        "group_index", groupIndex,
+                        "target_group_index", targetGroupIndex))
                 .thenApply(notification -> null);
     }
 
@@ -307,15 +306,15 @@ public class UserService {
         Validator.throwIfAnyFalsy(newName);
         return turmsClient.getDriver()
                 .send(UpdateRelationshipGroupRequest.newBuilder(), MapUtil.of(
-                        "groupIndex", groupIndex,
-                        "newName", newName))
+                        "group_index", groupIndex,
+                        "new_name", newName))
                 .thenApply(notification -> null);
     }
 
     public CompletableFuture<UserRelationshipGroupsWithVersion> queryRelationshipGroups(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryRelationshipGroupsRequest.newBuilder(), MapUtil.of(
-                        "lastUpdatedDate", lastUpdatedDate))
+                        "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> notification.getData().getUserRelationshipGroupsWithVersion());
     }
 
@@ -324,8 +323,8 @@ public class UserService {
             int groupIndex) {
         return turmsClient.getDriver()
                 .send(UpdateRelationshipRequest.newBuilder(), MapUtil.of(
-                        "relatedUserId", relatedUserId,
-                        "newGroupIndex", groupIndex))
+                        "related_user_id", relatedUserId,
+                        "new_group_index", groupIndex))
                 .thenApply(notification -> null);
     }
 

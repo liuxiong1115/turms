@@ -677,7 +677,8 @@ public class GroupMemberService {
 
     public Mono<Boolean> deleteAllGroupMembers(
             @Nullable Set<Long> groupIds,
-            @Nullable ReactiveMongoOperations operations) {
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateMembersVersion) {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID_GROUP_ID, groupIds)
@@ -686,8 +687,12 @@ public class GroupMemberService {
         return mongoOperations.remove(query, GroupMember.class)
                 .flatMap(result -> {
                     if (result.wasAcknowledged()) {
-                        return groupVersionService.updateMembersVersion(groupIds)
-                                .thenReturn(true);
+                        if (updateMembersVersion) {
+                            return groupVersionService.updateMembersVersion(groupIds)
+                                    .thenReturn(true);
+                        } else {
+                            return Mono.just(true);
+                        }
                     } else {
                         return Mono.just(false);
                     }

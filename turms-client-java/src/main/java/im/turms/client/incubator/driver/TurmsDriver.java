@@ -5,8 +5,9 @@ import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import im.turms.client.incubator.common.Function5;
+import im.turms.client.incubator.common.StringUtil;
 import im.turms.client.incubator.common.TurmsLogger;
-import im.turms.turms.common.ProtoUtil;
+import im.turms.client.incubator.util.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
@@ -64,8 +65,6 @@ public class TurmsDriver {
     private UserLocation userLocation;
     private UserStatus userOnlineStatus;
     private DeviceType deviceType;
-    private String sessionId;
-    private String address;
 
     public void setOnMessage(Function<TurmsNotification, Void> onMessage) {
         this.onMessage = onMessage;
@@ -170,26 +169,32 @@ public class TurmsDriver {
                             try {
                                 notification = TurmsNotification.parseFrom(data);
                             } catch (InvalidProtocolBufferException e) {
-                                e.printStackTrace();
+                                TurmsLogger.logger.log(Level.SEVERE, "", e);
                                 return CompletableFuture.failedStage(e);
                             }
                             if (notification != null) {
-                                long requestId = notification.getRequestId().getValue();
-                                if (notification.hasData()) {
-                                    if (notification.getData().hasSession()) {
-                                        sessionId = notification.getData().getSession().getSessionId();
-                                        address = notification.getData().getSession().getAddress();
-                                    } else {
-                                        CompletableFuture<TurmsNotification> future = requestMap.get(requestId).getValue();
-                                        if (future != null) {
-                                            future.complete(notification);
+                                boolean isSessionInfo = notification.hasData() && notification.getData().hasSession();
+                                if (!isSessionInfo) {
+                                    long requestId = notification.getRequestId().getValue();
+                                    Pair<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.get(requestId);
+                                    if (pair != null) {
+                                        CompletableFuture<TurmsNotification> future = pair.getValue();
+                                        if (notification.hasCode()) {
+                                            int code = notification.getCode().getValue();
+                                            if (code != TurmsStatusCode.OK.getBusinessCode()) {
+                                                future.completeExceptionally(TurmsBusinessException.get(code));
+                                            } else {
+                                                future.complete(notification);
+                                            }
                                         } else {
-                                            TurmsLogger.logger.log(Level.WARNING, "Unknown request ID:", requestId);
+                                            future.complete(notification);
                                         }
+                                    } else {
+                                        TurmsLogger.logger.log(Level.WARNING, "Unknown request ID:", requestId);
                                     }
-                                }
-                                if (onMessage != null) {
-                                    onMessage.apply(notification);
+                                    if (onMessage != null) {
+                                        onMessage.apply(notification);
+                                    }
                                 }
                             }
                             return CompletableFuture.completedStage(notification);
@@ -219,12 +224,11 @@ public class TurmsDriver {
     }
 
     public CompletableFuture<TurmsNotification> send(Message.Builder builder, Map<String, ?> fields) {
-        //TODO: test
         if (fields != null) {
             ProtoUtil.fillFields(builder, fields);
         }
         Descriptors.Descriptor descriptor = builder.getDescriptorForType();
-        String fieldName = descriptor.getName();
+        String fieldName = StringUtil.camelToSnakeCase(descriptor.getName());
         TurmsRequest.Builder requestBuilder = TurmsRequest.newBuilder();
         Descriptors.Descriptor requestDescriptor = requestBuilder.getDescriptorForType();
         Descriptors.FieldDescriptor fieldDescriptor = requestDescriptor.findFieldByName(fieldName);
@@ -242,11 +246,10 @@ public class TurmsDriver {
                 TurmsRequest request = requestBuilder.build();
                 ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
                 CompletableFuture<TurmsNotification> future = new CompletableFuture<>();
+                requestMap.put(requestId, Pair.of(request, future));
                 websocket.sendBinary(data, true).whenComplete((webSocket, throwable) -> {
                     if (throwable != null) {
                         future.completeExceptionally(throwable);
-                    } else {
-                        requestMap.put(requestId, Pair.of(request, future));
                     }
                 });
                 return future;
