@@ -1,4 +1,4 @@
-package im.turms.client.incubor.util;
+package im.turms.client.incubator.util;
 
 import im.turms.turms.pojo.bo.common.Int64Values;
 import im.turms.turms.pojo.notification.TurmsNotification;
