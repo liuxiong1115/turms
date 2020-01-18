@@ -280,7 +280,7 @@ public class UserFriendRequestService {
                                                     .then(userRelationshipService.friendTwoUsers(request.getRequesterId(), requesterId, operations))
                                                     .thenReturn(true))
                                             .retryWhen(TRANSACTION_RETRY)
-                                            .single();
+                                            .singleOrEmpty();
                                 case IGNORE:
                                     return updatePendingFriendRequestStatus(friendRequestId, RequestStatus.IGNORED, reason, null);
                                 case DECLINE:

@@ -105,7 +105,7 @@ public class GroupBlacklistService {
                                             .then(updateVersion)
                                             .thenReturn(true))
                                     .retryWhen(TRANSACTION_RETRY)
-                                    .single();
+                                    .singleOrEmpty();
                         }
                     } else {
                         Mono<Boolean> updateVersion = groupVersionService.updateBlacklistVersion(groupId);

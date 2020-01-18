@@ -349,7 +349,7 @@ public class MessageService {
                                 operations))
                         .map(Tuple2::getT1))
                 .retryWhen(TRANSACTION_RETRY)
-                .single();
+                .singleOrEmpty();
     }
 
     public Flux<Long> queryExpiredMessagesIds(@NotNull Integer timeToLiveHours) {
@@ -398,7 +398,7 @@ public class MessageService {
                                                 .then(operations.remove(messagesStatusesQuery, MessageStatus.class)
                                                 .thenReturn(true)))
                                         .retryWhen(TRANSACTION_RETRY)
-                                        .single();
+                                        .singleOrEmpty();
                             } else {
                                 return Mono.just(false);
                             }
@@ -431,7 +431,7 @@ public class MessageService {
                                 .then(operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
                         .retryWhen(TRANSACTION_RETRY)
-                        .single();
+                        .singleOrEmpty();
             } else {
                 return mongoTemplate.updateMulti(queryMessage, update, Message.class)
                         .map(UpdateResult::wasAcknowledged);
@@ -443,7 +443,7 @@ public class MessageService {
                                 .then(operations.remove(queryMessageStatus, MessageStatus.class))
                                 .thenReturn(true))
                         .retryWhen(TRANSACTION_RETRY)
-                        .single();
+                        .singleOrEmpty();
             }
             return mongoTemplate.remove(queryMessage, Message.class)
                     .map(DeleteResult::wasAcknowledged);
@@ -704,7 +704,7 @@ public class MessageService {
                         return Mono.when(updateMonos).thenReturn(true);
                     })
                     .retryWhen(TRANSACTION_RETRY)
-                    .single();
+                    .singleOrEmpty();
         } else {
             return Mono.just(true);
         }
