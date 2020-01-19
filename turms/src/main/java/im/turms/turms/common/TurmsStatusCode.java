@@ -33,7 +33,7 @@ public enum TurmsStatusCode {
     ALREADY_UP_TO_DATE(2002, "Already up-to-date", 204),
     RECIPIENTS_OFFLINE(2003, "The recipients are offline", 200),
 
-    DISABLE_FUNCTION(4001, "The function has been disabled in servers", 405),
+    DISABLED_FUNCTION(4001, "The function has been disabled in servers", 405),
     EXPIRY_DATE_BEFORE_NOW(4002, "Expiration date must be greater than now", 400),
     EXPIRED_RESOURCE(4003, "The target resource has expired", 406),
     DUPLICATE_KEY(4004, "The record being added contains a duplicate key", 406),
@@ -95,5 +95,13 @@ public enum TurmsStatusCode {
             }
         }
         return null;
+    }
+
+    public boolean isSuccess() {
+        return isSuccess(businessCode);
+    }
+
+    public static boolean isSuccess(int code) {
+        return 2000 <= code && code < 3000;
     }
 }

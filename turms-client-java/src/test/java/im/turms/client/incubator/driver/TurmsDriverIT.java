@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static helper.Constants.WS_URL;
+import static helper.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -23,7 +23,7 @@ public class TurmsDriverIT {
 
     @BeforeAll
     static void setup() {
-        turmsDriver = new TurmsDriver(WS_URL, null, null, null);
+        turmsDriver = new TurmsDriver(WS_URL, null, null);
     }
 
     @AfterAll
@@ -34,13 +34,13 @@ public class TurmsDriverIT {
     }
 
     @Test
-    @Order(1)
+    @Order(ORDER_FIRST)
     public void constructor_shouldReturnNotNullDriverInstance() {
         assertNotNull(turmsDriver);
     }
 
     @Test
-    @Order(2)
+    @Order(ORDER_HIGHEST_PRIORITY)
     public void connect_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         UserLocation location = UserLocation
                 .newBuilder()
@@ -53,14 +53,14 @@ public class TurmsDriverIT {
     }
 
     @Test
-    @Order(3)
+    @Order(ORDER_MIDDLE_PRIORITY)
     public void sendHeartbeat_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = turmsDriver.sendHeartbeat().get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
 
     @Test
-    @Order(4)
+    @Order(ORDER_MIDDLE_PRIORITY)
     public void sendTurmsRequest_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         QueryUserProfileRequest profileRequest = QueryUserProfileRequest.newBuilder()
                 .setUserId(1)
@@ -72,7 +72,7 @@ public class TurmsDriverIT {
     }
 
     @Test
-    @Order(Integer.MAX_VALUE)
+    @Order(ORDER_LOWEST_PRIORITY)
     public void disconnect_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = turmsDriver.disconnect().get(5, TimeUnit.SECONDS);
         assertNull(result);

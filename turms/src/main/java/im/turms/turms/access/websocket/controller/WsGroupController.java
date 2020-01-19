@@ -408,8 +408,7 @@ public class WsGroupController {
                                             turmsRequestWrapper.getTurmsRequest());
                                 }
                                 return RequestResult.okIfTrue(recalled);
-                            }))
-                    .defaultIfEmpty(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                            }));
         };
     }
 

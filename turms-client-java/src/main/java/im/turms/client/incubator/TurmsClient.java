@@ -17,9 +17,8 @@ public class TurmsClient {
     public TurmsClient(
             @NotNull String url,
             @Nullable Integer connectionTimeout,
-            @Nullable Integer minRequestsInterval,
-            @Nullable String httpUrl) {
-        driver = new TurmsDriver(url, connectionTimeout, minRequestsInterval, httpUrl);
+            @Nullable Integer minRequestsInterval) {
+        driver = new TurmsDriver(url, connectionTimeout, minRequestsInterval);
         userService = new UserService(this);
         groupService = new GroupService(this);
         messageService = new MessageService(this);

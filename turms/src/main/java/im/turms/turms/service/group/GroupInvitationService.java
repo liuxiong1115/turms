@@ -187,8 +187,10 @@ public class GroupInvitationService {
                 .include(GroupInvitation.Fields.status);
         return mongoTemplate.findOne(query, GroupInvitation.class)
                 .map(groupInvitation -> {
-                    if (groupInvitation.getStatus() == RequestStatus.PENDING
-                            && groupInvitation.getExpirationDate().before(new Date())) {
+                    Date expirationDate = groupInvitation.getExpirationDate();
+                    if (expirationDate != null
+                            && groupInvitation.getStatus() == RequestStatus.PENDING
+                            && expirationDate.getTime() < System.currentTimeMillis()) {
                         groupInvitation.setStatus(RequestStatus.EXPIRED);
                     }
                     return groupInvitation;
@@ -200,7 +202,7 @@ public class GroupInvitationService {
             @NotNull Long invitationId) {
         if (!turmsClusterManager.getTurmsProperties()
                 .getGroup().isAllowRecallingPendingGroupInvitationByOwnerAndManager()) {
-            throw TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION);
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
         }
         return queryGroupIdAndStatus(invitationId)
                 .flatMap(invitation -> {
@@ -234,8 +236,10 @@ public class GroupInvitationService {
                 .addCriteria(where(GroupInvitation.Fields.inviteeId).is(inviteeId));
         return mongoTemplate.find(query, GroupInvitation.class)
                 .map(groupInvitation -> {
-                    if (groupInvitation.getStatus() == RequestStatus.PENDING
-                            && groupInvitation.getExpirationDate().before(new Date())) {
+                    Date expirationDate = groupInvitation.getExpirationDate();
+                    if (expirationDate != null
+                            && groupInvitation.getStatus() == RequestStatus.PENDING
+                            && expirationDate.getTime() < System.currentTimeMillis()) {
                         groupInvitation.setStatus(RequestStatus.EXPIRED);
                     }
                     return groupInvitation;
@@ -247,8 +251,10 @@ public class GroupInvitationService {
                 .addCriteria(where(GroupInvitation.Fields.groupId).is(groupId));
         return mongoTemplate.find(query, GroupInvitation.class)
                 .map(groupInvitation -> {
-                    if (groupInvitation.getStatus() == RequestStatus.PENDING
-                            && groupInvitation.getExpirationDate().before(new Date())) {
+                    Date expirationDate = groupInvitation.getExpirationDate();
+                    if (expirationDate != null
+                            && groupInvitation.getStatus() == RequestStatus.PENDING
+                            && expirationDate.getTime() < System.currentTimeMillis()) {
                         groupInvitation.setStatus(RequestStatus.EXPIRED);
                     }
                     return groupInvitation;
@@ -282,7 +288,7 @@ public class GroupInvitationService {
     public Mono<GroupInvitationsWithVersion> queryGroupInvitationsWithVersion(
             @NotNull Long userId,
             @NotNull Long groupId,
-            @NotNull Date lastUpdatedDate) {
+            @Nullable Date lastUpdatedDate) {
         return groupMemberService.isOwnerOrManager(userId, groupId)
                 .flatMap(authenticated -> {
                     if (authenticated == null || !authenticated) {

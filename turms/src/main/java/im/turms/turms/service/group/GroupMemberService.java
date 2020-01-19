@@ -213,7 +213,7 @@ public class GroupMemberService {
                 .setIfNotNull(GroupMember.Fields.joinDate, joinDate)
                 .build();
         if (muteEndDate != null) {
-            if (muteEndDate.before(new Date())) {
+            if (muteEndDate.getTime() < System.currentTimeMillis()) {
                 update.unset(GroupMember.Fields.muteEndDate);
             } else {
                 update.set(GroupMember.Fields.muteEndDate, muteEndDate);

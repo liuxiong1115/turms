@@ -6,10 +6,8 @@ import im.turms.client.incubator.util.MapUtil;
 import im.turms.client.incubator.util.NotificationUtil;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.GroupMemberRole;
-import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
-import im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion;
-import im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion;
-import im.turms.turms.pojo.bo.group.GroupMembersWithVersion;
+import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
+import im.turms.turms.pojo.bo.group.*;
 import im.turms.turms.pojo.bo.user.UsersInfosWithVersion;
 import im.turms.turms.pojo.request.group.*;
 import im.turms.turms.pojo.request.group.blacklist.CreateGroupBlacklistedUserRequest;
@@ -66,15 +64,15 @@ public class GroupService {
 
     public CompletableFuture<Void> updateGroup(
             long groupId,
-            String groupName,
-            String intro,
-            String announcement,
-            String profilePictureUrl,
-            Integer minimumScore,
-            Long groupTypeId,
-            Date muteEndDate,
-            Long successorId,
-            Boolean quitAfterTransfer) {
+            @Nullable String groupName,
+            @Nullable String intro,
+            @Nullable String announcement,
+            @Nullable String profilePictureUrl,
+            @Nullable Integer minimumScore,
+            @Nullable Long groupTypeId,
+            @Nullable Date muteEndDate,
+            @Nullable Long successorId,
+            @Nullable Boolean quitAfterTransfer) {
         Validator.throwIfAllFalsy(groupName, intro, announcement, profilePictureUrl, minimumScore, groupTypeId,
                 muteEndDate, successorId);
         return turmsClient.getDriver()
@@ -116,18 +114,18 @@ public class GroupService {
                 .thenApply(GroupWithVersion::from);
     }
 
-    public CompletableFuture<List<Long>> queryJoinedGroupsIds(@Nullable Date lastUpdatedDate) {
+    public CompletableFuture<Int64ValuesWithVersion> queryJoinedGroupsIds(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryJoinedGroupsIdsRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(NotificationUtil::getIds);
+                .thenApply(notification -> notification.getData().getIdsWithVersion());
     }
 
-    public CompletableFuture<GroupWithVersion> queryJoinedGroupsInfos(@Nullable Date lastUpdatedDate) {
+    public CompletableFuture<GroupsWithVersion> queryJoinedGroupsInfos(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryJoinedGroupsInfosRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(GroupWithVersion::from);
+                .thenApply(notification -> notification.getData().getGroupsWithVersion());
     }
 
     public CompletableFuture<Long> addGroupJoinQuestion(
@@ -184,14 +182,14 @@ public class GroupService {
                 .thenApply(notification -> null);
     }
 
-    public CompletableFuture<List<Long>> queryBlacklistedUsersIds(
+    public CompletableFuture<Int64ValuesWithVersion> queryBlacklistedUsersIds(
             long groupId,
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryGroupBlacklistedUsersIdsRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(NotificationUtil::getIds);
+                .thenApply(notification -> notification.getData().getIdsWithVersion());
     }
 
     public CompletableFuture<UsersInfosWithVersion> queryBlacklistedUsersInfos(
