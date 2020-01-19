@@ -133,7 +133,7 @@ public class GroupInvitationService {
                                     return createGroupInvitation(null, groupId, inviterId, inviteeId, content,
                                             RequestStatus.PENDING, null, null, null);
                                 } else {
-                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REDUNDANT_REQUEST));
                                 }
                             });
                 });
