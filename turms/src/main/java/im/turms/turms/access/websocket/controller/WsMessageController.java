@@ -319,7 +319,7 @@ public class WsMessageController {
                         turmsRequestWrapper.getTurmsRequest(),
                         TurmsStatusCode.OK));
             } else {
-                return Mono.just(RequestResult.status(TurmsStatusCode.DISABLE_FUNCTION));
+                return Mono.just(RequestResult.status(TurmsStatusCode.DISABLED_FUNCTION));
             }
         };
     }

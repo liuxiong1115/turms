@@ -121,7 +121,7 @@ public class UserService {
                             .getMessage().isAllowSendingMessagesToOneself()) {
                         return Mono.just(true);
                     } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
                     }
                 } else {
                     if (turmsClusterManager.getTurmsProperties().getMessage().isAllowSendingMessagesToStranger()) {

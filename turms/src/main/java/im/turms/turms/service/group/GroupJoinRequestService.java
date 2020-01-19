@@ -158,8 +158,10 @@ public class GroupJoinRequestService {
                 .include(GroupJoinRequest.Fields.groupId);
         return mongoTemplate.findOne(query, GroupJoinRequest.class)
                 .map(groupJoinRequest -> {
-                    if (groupJoinRequest.getStatus() == RequestStatus.PENDING
-                            && groupJoinRequest.getExpirationDate().before(new Date())) {
+                    Date expirationDate = groupJoinRequest.getExpirationDate();
+                    if (expirationDate != null
+                            && groupJoinRequest.getStatus() == RequestStatus.PENDING
+                            && expirationDate.getTime() < System.currentTimeMillis()) {
                         groupJoinRequest.setStatus(RequestStatus.EXPIRED);
                     }
                     return groupJoinRequest;
@@ -168,7 +170,7 @@ public class GroupJoinRequestService {
 
     public Mono<Boolean> recallPendingGroupJoinRequest(@NotNull Long requesterId, @NotNull Long requestId) {
         if (!turmsClusterManager.getTurmsProperties().getGroup().isAllowRecallingJoinRequestSentByOneself()) {
-            throw TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION);
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
         }
         return queryRequesterIdAndStatusAndGroupId(requestId)
                 .flatMap(request -> {
@@ -198,8 +200,10 @@ public class GroupJoinRequestService {
         Query query = new Query().addCriteria(where(GroupJoinRequest.Fields.groupId).is(groupId));
         return mongoTemplate.find(query, GroupJoinRequest.class)
                 .map(groupJoinRequest -> {
-                    if (groupJoinRequest.getStatus() == RequestStatus.PENDING
-                            && groupJoinRequest.getExpirationDate().before(new Date())) {
+                    Date expirationDate = groupJoinRequest.getExpirationDate();
+                    if (expirationDate != null
+                            && groupJoinRequest.getStatus() == RequestStatus.PENDING
+                            && expirationDate.getTime() < System.currentTimeMillis()) {
                         groupJoinRequest.setStatus(RequestStatus.EXPIRED);
                     }
                     return groupJoinRequest;

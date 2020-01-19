@@ -3,7 +3,9 @@ package im.turms.client.incubator.util;
 
 import com.google.protobuf.*;
 import im.turms.client.incubator.common.TurmsLogger;
+import im.turms.turms.pojo.request.group.enrollment.CheckGroupJoinQuestionsAnswersRequest;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,6 @@ public class ProtoUtil {
         RESOLVER_MAP.put("google.protobuf.Int32Value.value", Int32Value.getDefaultInstance());
         RESOLVER_MAP.put("google.protobuf.Int64Value.value", Int64Value.getDefaultInstance());
         RESOLVER_MAP.put("google.protobuf.BoolValue.value", BoolValue.getDefaultInstance());
-//        RESOLVER_MAP.put("google.protobuf.FloatValue.value", FloatValue.getDefaultInstance());
     }
 
     private ProtoUtil() {
@@ -30,6 +31,11 @@ public class ProtoUtil {
             Descriptors.Descriptor descriptor = builder.getDescriptorForType();
             for (Map.Entry<String, ?> entry : fields.entrySet()) {
                 Object value = entry.getValue();
+                if (value instanceof Date) {
+                    value = ((Date) value).getTime();
+                } else if (value instanceof ProtocolMessageEnum) {
+                    value = ((ProtocolMessageEnum) value).getValueDescriptor();
+                }
                 if (value != null) {
                     String key = entry.getKey();
                     Descriptors.FieldDescriptor fieldDescriptor = descriptor.findFieldByName(key);
@@ -40,7 +46,12 @@ public class ProtoUtil {
                         if (javaType == Descriptors.FieldDescriptor.JavaType.MESSAGE) {
                             Descriptors.Descriptor messageType = fieldDescriptor.getMessageType();
                             List<Descriptors.FieldDescriptor> messageTypeFields = messageType.getFields();
-                            if (messageTypeFields.size() == 1) {
+                            boolean isMap = messageTypeFields.size() == 2
+                                    && messageTypeFields.get(0).getJsonName().equals("key")
+                                    && messageTypeFields.get(1).getJsonName().equals("value");
+                            if (isMap) {
+                                builder = getCustomMapBuilder(builder, messageType, value);
+                            } else if (messageTypeFields.size() == 1) {
                                 Descriptors.FieldDescriptor subfieldDescriptor = messageTypeFields.get(0);
                                 String fullName = subfieldDescriptor.getFullName();
                                 GeneratedMessageV3 defaultMessage = RESOLVER_MAP.get(fullName);
@@ -60,6 +71,15 @@ public class ProtoUtil {
                     }
                 }
             }
+        }
+        return builder;
+    }
+
+    private static Message.Builder getCustomMapBuilder(Message.Builder builder, Descriptors.Descriptor messageType, Object value) {
+        if (messageType.getFullName().equals("im.turms.proto.CheckGroupJoinQuestionsAnswersRequest.QuestionIdAndAnswerEntry")) {
+            CheckGroupJoinQuestionsAnswersRequest.Builder requestBuilder = (CheckGroupJoinQuestionsAnswersRequest.Builder) builder;
+            requestBuilder.putAllQuestionIdAndAnswer((Map<Long, String>) value);
+            return requestBuilder;
         }
         return builder;
     }

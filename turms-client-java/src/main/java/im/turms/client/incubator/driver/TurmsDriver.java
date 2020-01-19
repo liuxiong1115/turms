@@ -46,20 +46,17 @@ public class TurmsDriver {
 
     private WebSocket websocket;
     private boolean isSessionEstablished;
-    private HttpClient httpClient;
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> heartbeatFuture;
     private final HashMap<Long, Pair<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
-    //TODO: https://github.com/turms-im/turms/issues/182
     private Function<TurmsNotification, Void> onMessage;
     private Function5<Boolean, TurmsStatusCode, Throwable, Integer, String, Void> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
-    private String httpUrl = "http://localhost:9510";
     private int connectionTimeout = 10 * 1000;
     private int minRequestsInterval = 0;
-    private Date lastRequestDate = new Date(0);
+    private long lastRequestDate = 0;
     private Long userId;
     private String password;
     private UserLocation userLocation;
@@ -76,8 +73,7 @@ public class TurmsDriver {
 
     public TurmsDriver(@Nullable String websocketUrl,
                        @Nullable Integer connectionTimeout,
-                       @Nullable Integer minRequestsInterval,
-                       @Nullable String httpUrl) {
+                       @Nullable Integer minRequestsInterval) {
         if (websocketUrl != null) {
             this.websocketUrl = websocketUrl;
         }
@@ -88,14 +84,11 @@ public class TurmsDriver {
             this.minRequestsInterval = minRequestsInterval;
         }
         this.heartbeatInterval = HEARTBEAT_INTERVAL;
-        if (httpUrl != null) {
-            this.httpUrl = httpUrl;
-        }
     }
 
     public CompletableFuture<Void> sendHeartbeat() {
         if (this.connected()) {
-            lastRequestDate = new Date();
+            lastRequestDate = System.currentTimeMillis();
             return websocket.sendBinary(ByteBuffer.allocate(0), true)
                     .thenApply(webSocket -> null);
         } else {
@@ -181,16 +174,21 @@ public class TurmsDriver {
                                         CompletableFuture<TurmsNotification> future = pair.getValue();
                                         if (notification.hasCode()) {
                                             int code = notification.getCode().getValue();
-                                            if (code != TurmsStatusCode.OK.getBusinessCode()) {
-                                                future.completeExceptionally(TurmsBusinessException.get(code));
-                                            } else {
+                                            if (TurmsStatusCode.isSuccess(code)) {
                                                 future.complete(notification);
+                                            } else {
+                                                TurmsBusinessException exception = TurmsBusinessException.get(code);
+                                                if (exception != null) {
+                                                    future.completeExceptionally(exception);
+                                                } else {
+                                                    TurmsLogger.logger.log(Level.WARNING, "Unknown status code");
+                                                }
                                             }
                                         } else {
                                             future.complete(notification);
                                         }
                                     } else {
-                                        TurmsLogger.logger.log(Level.WARNING, "Unknown request ID:", requestId);
+                                        TurmsLogger.logger.log(Level.WARNING, "Unknown request ID: {}", requestId);
                                     }
                                     if (onMessage != null) {
                                         onMessage.apply(notification);
@@ -239,8 +237,8 @@ public class TurmsDriver {
     public CompletableFuture<TurmsNotification> send(TurmsRequest.Builder requestBuilder) {
         if (this.connected()) {
             Date now = new Date();
-            if (minRequestsInterval == 0 || now.getTime() - this.lastRequestDate.getTime() > minRequestsInterval) {
-                lastRequestDate = now;
+            if (minRequestsInterval == 0 || now.getTime() - lastRequestDate > minRequestsInterval) {
+                lastRequestDate = now.getTime();
                 long requestId = generateRandomId();
                 requestBuilder.setRequestId(Int64Value.newBuilder().setValue(requestId).build());
                 TurmsRequest request = requestBuilder.build();
@@ -279,7 +277,7 @@ public class TurmsDriver {
     }
 
     private void checkAndSendHeartbeatTask() {
-        long difference = System.currentTimeMillis() - lastRequestDate.getTime();
+        long difference = System.currentTimeMillis() - lastRequestDate;
         if (difference > minRequestsInterval) {
             this.sendHeartbeat();
         }
