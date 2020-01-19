@@ -53,6 +53,7 @@ public enum TurmsStatusCode {
     TYPE_NOT_EXISTS(4018, "The resource type does not exist", 404),
     UNAUTHORIZED(4019, "Unauthorized", 401),
     REDUNDANT_REQUEST(4020, "The request is redundant", 406),
+    ALREADY_GROUP_MEMBER(4021, "The user is already a member of the group", 406),
 
     LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500),
 
