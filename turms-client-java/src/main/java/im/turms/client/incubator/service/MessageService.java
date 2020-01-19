@@ -67,7 +67,9 @@ public class MessageService {
             long messageId,
             @Nullable String text,
             @Nullable byte[] records) {
-        Validator.throwIfAllFalsy(text, records);
+        if (Validator.areAllFalsy(text, records)) {
+            return CompletableFuture.completedFuture(null);
+        }
         return turmsClient.getDriver()
                 .send(UpdateMessageRequest.newBuilder(), MapUtil.of(
                         "message_id", messageId,

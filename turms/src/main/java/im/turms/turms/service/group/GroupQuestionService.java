@@ -341,7 +341,9 @@ public class GroupQuestionService {
             @Nullable String question,
             @Nullable Set<String> answers,
             @Nullable Integer score) {
-        Validator.throwIfAllFalsy(groupId, question, answers, score);
+        if (Validator.areAllFalsy(groupId, question, answers, score)) {
+            return Mono.just(true);
+        }
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
