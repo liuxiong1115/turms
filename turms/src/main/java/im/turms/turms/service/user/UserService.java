@@ -52,7 +52,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.common.Constants.ID;
+import static im.turms.turms.common.Constants.TRANSACTION_RETRY;
 
 @Component
 @Validated
@@ -404,14 +405,15 @@ public class UserService {
             @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccessStrategy,
             @Nullable @PastOrPresent Date registrationDate,
             @Nullable Boolean isActive) {
-        Validator.throwIfAllFalsy(
-                password,
+        if (Validator.areAllFalsy(password,
                 name,
                 intro,
                 profilePictureUrl,
                 profileAccessStrategy,
                 registrationDate,
-                isActive);
+                isActive)) {
+            return Mono.just(true);
+        }
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(User.Fields.password, password)

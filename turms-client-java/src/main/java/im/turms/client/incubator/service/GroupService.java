@@ -73,8 +73,10 @@ public class GroupService {
             @Nullable Date muteEndDate,
             @Nullable Long successorId,
             @Nullable Boolean quitAfterTransfer) {
-        Validator.throwIfAllFalsy(groupName, intro, announcement, profilePictureUrl, minimumScore, groupTypeId,
-                muteEndDate, successorId);
+        if (Validator.areAllFalsy(groupName, intro, announcement, profilePictureUrl, minimumScore, groupTypeId,
+                muteEndDate, successorId)) {
+            return CompletableFuture.completedFuture(null);
+        }
         return turmsClient.getDriver()
                 .send(UpdateGroupRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
@@ -155,7 +157,9 @@ public class GroupService {
             @Nullable String question,
             @Nullable List<String> answers,
             @Nullable Integer score) {
-        Validator.throwIfAllFalsy(question, answers, score);
+        if (Validator.areAllFalsy(question, answers, score)) {
+            return CompletableFuture.completedFuture(null);
+        }
         return turmsClient.getDriver()
                 .send(UpdateGroupJoinQuestionRequest.newBuilder(), MapUtil.of(
                         "question_id", questionId,
@@ -325,7 +329,9 @@ public class GroupService {
             @Nullable String name,
             @Nullable GroupMemberRole role,
             @Nullable Date muteEndDate) {
-        Validator.throwIfAllFalsy(name, role, muteEndDate);
+        if (Validator.areAllFalsy(name, role, muteEndDate)) {
+            return CompletableFuture.completedFuture(null);
+        }
         return turmsClient.getDriver()
                 .send(UpdateGroupMemberRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,

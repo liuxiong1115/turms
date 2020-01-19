@@ -182,7 +182,9 @@ public class AdminRoleService {
             @Nullable @NoWhitespaceConstraint @Length(min = MIN_ROLE_NAME_LIMIT, max = MAX_ROLE_NAME_LIMIT) String newName,
             @Nullable Set<AdminPermission> permissions,
             @Nullable Integer rank) {
-        Validator.throwIfAllFalsy(newName, permissions, rank);
+        if (Validator.areAllFalsy(newName, permissions, rank)) {
+            return Mono.just(true);
+        }
         if (roleIds.contains(ADMIN_ROLE_ROOT_ID)) {
             throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
         }
