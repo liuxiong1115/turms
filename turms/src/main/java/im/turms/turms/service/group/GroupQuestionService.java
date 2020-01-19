@@ -120,9 +120,9 @@ public class GroupQuestionService {
                                 return groupMemberService.exists(groupId, requesterId);
                             }
                         })
-                        .flatMap(exists -> {
-                            if (exists != null && exists) {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RESOURCES_HAVE_BEEN_HANDLED));
+                        .flatMap(isGroupMember -> {
+                            if (isGroupMember != null && isGroupMember) {
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_GROUP_MEMBER));
                             } else {
                                 return groupService.isGroupActiveAndNotDeleted(groupId);
                             }
