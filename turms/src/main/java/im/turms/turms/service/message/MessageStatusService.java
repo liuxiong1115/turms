@@ -85,7 +85,7 @@ public class MessageStatusService {
         boolean isIllegalRead = readDate != null
                 && !turmsClusterManager.getTurmsProperties().getMessage().getReadReceipt().isEnabled();
         if (isIllegalRecall || isIllegalRead) {
-            throw TurmsBusinessException.get(TurmsStatusCode.DISABLE_FUNCTION);
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
         }
         return MapUtil.fluxMerge(multimap -> {
             for (MessageStatus.Key key : keys) {

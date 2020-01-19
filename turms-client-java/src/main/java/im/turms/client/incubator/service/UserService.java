@@ -4,7 +4,6 @@ import im.turms.client.incubator.TurmsClient;
 import im.turms.client.incubator.driver.TurmsDriver;
 import im.turms.client.incubator.model.UserInfoWithVersion;
 import im.turms.client.incubator.util.MapUtil;
-import im.turms.client.incubator.util.NotificationUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.DeviceType;
@@ -124,7 +123,7 @@ public class UserService {
                 .thenApply(UserInfoWithVersion::from);
     }
 
-    public CompletableFuture<List<Long>> queryUsersIdsNearby(
+    public CompletableFuture<Int64ValuesWithVersion> queryUsersIdsNearby(
             float latitude,
             float longitude,
             @Nullable Integer distance,
@@ -135,7 +134,7 @@ public class UserService {
                         "longitude", longitude,
                         "distance", distance,
                         "max_number", maxNumber))
-                .thenApply(NotificationUtil::getIds);
+                .thenApply(notification -> notification.getData().getIdsWithVersion());
     }
 
     public CompletableFuture<List<UserInfo>> queryUsersInfosNearby(

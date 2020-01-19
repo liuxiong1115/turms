@@ -655,11 +655,11 @@ public class MessageService {
         if (updateMessageContent || recallDate != null) {
             if (recallDate != null && !turmsClusterManager.getTurmsProperties()
                     .getMessage().isAllowRecallingMessage()) {
-                throw TurmsBusinessException.get(DISABLE_FUNCTION);
+                throw TurmsBusinessException.get(DISABLED_FUNCTION);
             }
             if (updateMessageContent && !turmsClusterManager.getTurmsProperties()
                     .getMessage().isAllowEditingMessageBySender()) {
-                throw TurmsBusinessException.get(DISABLE_FUNCTION);
+                throw TurmsBusinessException.get(DISABLED_FUNCTION);
             }
             return isMessageSentByUser(messageId, requesterId)
                     .flatMap(isSentByUser -> {

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import im.turms.turms.constant.DeviceType;
+import im.turms.turms.exception.TurmsBusinessException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.TaskScheduler;
@@ -83,7 +84,7 @@ public class Constants {
     public static final Retry<Object> INSERT_RETRY = Retry.allBut(DuplicateKeyException.class)
             .retryMax(MONGO_TRANSACTION_RETRIES_NUMBER)
             .fixedBackoff(MONGO_TRANSACTION_BACKOFF);
-    public static final Retry<Object> TRANSACTION_RETRY = INSERT_RETRY;
+    public static final Retry<Object> TRANSACTION_RETRY = Retry.allBut(DuplicateKeyException.class, TurmsBusinessException.class);
 
     public static final TaskScheduler TASK_SCHEDULER = new DefaultManagedTaskScheduler();
     public static final ObjectMapper MAPPER = new ObjectMapper()

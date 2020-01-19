@@ -481,7 +481,7 @@ public class GroupService {
 
     public Mono<Int64ValuesWithVersion> queryJoinedGroupsIdsWithVersion(
             @NotNull Long memberId,
-            @NotNull Date lastUpdatedDate) {
+            @Nullable Date lastUpdatedDate) {
         return userVersionService
                 .queryJoinedGroupVersion(memberId)
                 .defaultIfEmpty(MAX_DATE)
@@ -507,7 +507,7 @@ public class GroupService {
 
     public Mono<GroupsWithVersion> queryJoinedGroupsWithVersion(
             @NotNull Long memberId,
-            @NotNull Date lastUpdatedDate) {
+            @Nullable Date lastUpdatedDate) {
         return userVersionService
                 .queryJoinedGroupVersion(memberId)
                 .defaultIfEmpty(MAX_DATE)

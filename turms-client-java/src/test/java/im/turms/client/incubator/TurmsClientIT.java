@@ -9,7 +9,7 @@ public class TurmsClientIT {
 
     @Test
     public void constructor_shouldReturnNotNullClientInstance() {
-        TurmsClient turmsClient = new TurmsClient(WS_URL, null, null, null);
+        TurmsClient turmsClient = new TurmsClient(WS_URL, null, null);
         assertNotNull(turmsClient);
     }
 }

@@ -313,8 +313,10 @@ public class UserFriendRequestService {
                                         UserFriendRequestsWithVersion.Builder builder = UserFriendRequestsWithVersion.newBuilder();
                                         builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                         for (UserFriendRequest request : requests) {
-                                            if (request.getStatus() == RequestStatus.PENDING
-                                                    && request.getExpirationDate().before(new Date())) {
+                                            Date expirationDate = request.getExpirationDate();
+                                            if (expirationDate != null
+                                                    && request.getStatus() == RequestStatus.PENDING
+                                                    && expirationDate.getTime() < System.currentTimeMillis()) {
                                                 request.setStatus(RequestStatus.EXPIRED);
                                             }
                                             builder.addUserFriendRequests(ProtoUtil.friendRequest2proto(request));

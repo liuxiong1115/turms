@@ -76,7 +76,7 @@ public class GroupTypeService {
                             DEFAULT_GROUP_TYPE_ID,
                             DEFAULT_GROUP_TYPE_NAME,
                             500,
-                            GroupInvitationStrategy.OWNER_MANAGER_MEMBER,
+                            GroupInvitationStrategy.OWNER_MANAGER_MEMBER_REQUIRING_ACCEPTANCE,
                             GroupJoinStrategy.DECLINE_ANY_REQUEST,
                             GroupUpdateStrategy.OWNER_MANAGER,
                             GroupUpdateStrategy.OWNER_MANAGER,
