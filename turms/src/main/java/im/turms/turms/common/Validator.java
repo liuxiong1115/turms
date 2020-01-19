@@ -54,22 +54,28 @@ public class Validator {
     }
 
     public static void throwIfAllFalsy(@NotEmpty Object... array) {
+        if (areAllFalsy(array)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        }
+    }
+
+    public static boolean areAllFalsy(Object... array) {
         for (Object o : array) {
             if (o != null) {
                 if (o instanceof String) {
                     if (!((String) o).isBlank()) {
-                        return;
+                        return false;
                     }
                 } else if (o instanceof Collection) {
                     if (!((Collection) o).isEmpty()) {
-                        return;
+                        return false;
                     }
                 } else {
-                    return;
+                    return false;
                 }
             }
         }
-        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        return true;
     }
 
     public static boolean areAllNull(Object... array) {

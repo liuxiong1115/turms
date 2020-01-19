@@ -95,7 +95,9 @@ public class UserService {
             @Nullable String intro,
             @Nullable String profilePictureUrl,
             @Nullable ProfileAccessStrategy profileAccessStrategy) {
-        Validator.throwIfAllFalsy(name, intro, profilePictureUrl, profileAccessStrategy);
+        if (Validator.areAllFalsy(name, intro, profilePictureUrl, profileAccessStrategy)) {
+            return CompletableFuture.completedFuture(null);
+        }
         return turmsClient.getDriver()
                 .send(UpdateUserRequest.newBuilder(), MapUtil.of(
                         "name", name,
@@ -241,7 +243,9 @@ public class UserService {
             long relatedUserId,
             @Nullable Boolean isBlocked,
             @Nullable Integer groupIndex) {
-        Validator.throwIfAllFalsy(isBlocked, groupIndex);
+        if (Validator.areAllFalsy(isBlocked, groupIndex)) {
+            return CompletableFuture.completedFuture(null);
+        }
         return turmsClient.getDriver()
                 .send(UpdateRelationshipRequest.newBuilder(), MapUtil.of(
                         "related_user_id", relatedUserId,
