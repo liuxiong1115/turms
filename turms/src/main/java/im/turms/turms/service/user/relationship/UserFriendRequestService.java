@@ -125,11 +125,11 @@ public class UserFriendRequestService {
             userFriendRequest.setExpirationDate(expirationDate);
         } else {
             int timeToLiveHours = turmsClusterManager.getTurmsProperties()
-                    .getUser().getFriendRequestTimeToLiveHours();
+                    .getUser().getFriendRequest().getFriendRequestTimeToLiveHours();
             if (timeToLiveHours != 0) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.add(Calendar.HOUR, turmsClusterManager.getTurmsProperties()
-                        .getUser().getFriendRequestTimeToLiveHours());
+                        .getUser().getFriendRequest().getFriendRequestTimeToLiveHours());
                 userFriendRequest.setExpirationDate(calendar.getTime());
             }
         }

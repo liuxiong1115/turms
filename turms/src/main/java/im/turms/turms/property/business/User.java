@@ -31,9 +31,6 @@ import java.io.IOException;
 
 @Data
 public class User implements IdentifiedDataSerializable {
-    @JsonView(MutablePropertiesView.class)
-    @Description("A friend request will become expired after the TTL has elapsed. 0 means infinite")
-    private int friendRequestTimeToLiveHours = 30 * 24;
     private Location location = new Location();
     private SimultaneousLogin simultaneousLogin = new SimultaneousLogin();
     private FriendRequest friendRequest = new FriendRequest();
@@ -66,7 +63,6 @@ public class User implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeInt(friendRequestTimeToLiveHours);
         location.writeData(out);
         simultaneousLogin.writeData(out);
         friendRequest.writeData(out);
@@ -78,7 +74,6 @@ public class User implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        friendRequestTimeToLiveHours = in.readInt();
         location.readData(in);
         simultaneousLogin.readData(in);
         friendRequest.readData(in);
@@ -151,6 +146,9 @@ public class User implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to allow resending a friend request after the previous request has been declined, ignored, or expired")
         private boolean allowResendingRequestAfterDeclinedOrIgnoredOrExpired = false;
+        @JsonView(MutablePropertiesView.class)
+        @Description("A friend request will become expired after the TTL has elapsed. 0 means infinite")
+        private int friendRequestTimeToLiveHours = 30 * 24;
 
         @JsonIgnore
         @Override
@@ -169,6 +167,7 @@ public class User implements IdentifiedDataSerializable {
             out.writeInt(contentLimit);
             out.writeBoolean(shouldDeleteExpiredRequestsAutomatically);
             out.writeBoolean(allowResendingRequestAfterDeclinedOrIgnoredOrExpired);
+            out.writeInt(friendRequestTimeToLiveHours);
         }
 
         @Override
@@ -176,6 +175,7 @@ public class User implements IdentifiedDataSerializable {
             contentLimit = in.readInt();
             shouldDeleteExpiredRequestsAutomatically = in.readBoolean();
             allowResendingRequestAfterDeclinedOrIgnoredOrExpired = in.readBoolean();
+            friendRequestTimeToLiveHours = in.readInt();
         }
     }
 
