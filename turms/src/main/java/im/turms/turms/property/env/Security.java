@@ -28,6 +28,7 @@ import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import java.io.IOException;
 
 @Data
@@ -40,25 +41,32 @@ public class Security implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum day difference for each query request")
+    @Min(0)
     private int maxDayDifferencePerRequest = 3 * 30;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum hour difference for each count request")
+    @Min(0)
     private int maxHourDifferencePerCountRequest = 24;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum day difference for each count request")
+    @Min(0)
     private int maxDayDifferencePerCountRequest = 31;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum month difference for each count request")
+    @Min(0)
     private int maxMonthDifferencePerCountRequest = 12;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum available records for each query request")
+    @Min(0)
     private int maxAvailableRecordsPerRequest = 100;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum available online users' status for each query request")
+    @Min(0)
     private int maxAvailableOnlineUsersStatusPerRequest = 20;
 
     @JsonView(MutablePropertiesView.class)
     @Description("The default available records for each query request")
+    @Min(0)
     private int defaultAvailableRecordsPerRequest = 10;
 
     /**
@@ -67,6 +75,7 @@ public class Security implements IdentifiedDataSerializable {
      */
     @JsonView(MutablePropertiesView.class)
     @Description("The minimum allowed interval between client requests")
+    @Min(0)
     private int minClientRequestsIntervalMillis = 0;
 
     @JsonIgnore

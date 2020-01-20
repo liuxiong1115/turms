@@ -27,16 +27,23 @@ import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import java.io.IOException;
 
 @Data
 public class User implements IdentifiedDataSerializable {
+    @Valid
     private Location location = new Location();
+    @Valid
     private SimultaneousLogin simultaneousLogin = new SimultaneousLogin();
+    @Valid
     private FriendRequest friendRequest = new FriendRequest();
     //TODO
     @JsonView(MutablePropertiesView.class)
     @Description("The inverval to log online users' number")
+    @Min(1)
     private int logOnlineUsersNumberIntervalSeconds = 60 * 5;
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to use the operating system class as the device type instead of the agent class")
@@ -94,9 +101,11 @@ public class User implements IdentifiedDataSerializable {
         private boolean persistent = true;
         @JsonView(MutablePropertiesView.class)
         @Description("The maximum available number of users nearby records for query")
+        @Min(0)
         private int maxAvailableUsersNearbyNumberForQuery = 20;
         @JsonView(MutablePropertiesView.class)
         @Description("The maximum distance for query")
+        @DecimalMin("0")
         private double maxDistanceForQuery = 0.1;
         @Description("The cron to remove users' locations")
         private String removeLocationsCron = ""; //TODO

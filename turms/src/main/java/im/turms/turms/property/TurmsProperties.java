@@ -37,7 +37,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -50,34 +52,50 @@ import java.util.stream.Collectors;
 @ConfigurationProperties(prefix = "turms")
 @Data
 @NoArgsConstructor
+@Validated
 public class TurmsProperties implements IdentifiedDataSerializable {
     public static final ObjectWriter MUTABLE_PROPERTIES_WRITER = new ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
             .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
             .writerWithView(MutablePropertiesView.class);
 
+    // Env
+    
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Cache cache = new Cache();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Cluster cluster = new Cluster();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Database database = new Database();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Log log = new Log();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Session session = new Session();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Security security = new Security();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Plugin plugin = new Plugin();
 
+    // Business
+
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Message message = new Message();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Group group = new Group();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private User user = new User();
     @JsonView(MutablePropertiesView.class)
+    @Valid
     private Notification notification = new Notification();
 
     @JsonIgnore
