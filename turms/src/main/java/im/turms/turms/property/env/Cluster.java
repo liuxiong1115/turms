@@ -27,6 +27,7 @@ import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import java.io.IOException;
 
 /**
@@ -47,6 +48,7 @@ public class Cluster implements IdentifiedDataSerializable {
      */
     @JsonView(MutablePropertiesView.class)
     @Description("A turms server can only start to serve when connecting the minimum number of other turms nodes")
+    @Min(1)
     private int minimumQuorumToServe = 1;
 
     @JsonIgnore

@@ -27,6 +27,7 @@ import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import java.io.IOException;
 
 @Data
@@ -37,9 +38,11 @@ public class Session implements IdentifiedDataSerializable {
      */
     @JsonView(MutablePropertiesView.class)
     @Description("A websocket connection will be closed if the turms server don't receive any request (including heartbeat request) from the client during requestHeartbeatTimeoutSeconds")
+    @Min(0)
     private int requestHeartbeatTimeoutSeconds = 50;
     @JsonView(MutablePropertiesView.class)
     @Description("The minimum interval between requests from a client to refresh the heartbeat timer")
+    @Min(0)
     private int minHeartbeatRefreshIntervalSeconds = 3;
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to enable to query the login failed reason")

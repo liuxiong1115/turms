@@ -27,6 +27,8 @@ import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.io.IOException;
 
 @Data
@@ -40,9 +42,11 @@ public class Message implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum allowed length for the text of a message")
+    @Min(0)
     private int maxTextLimit = 500;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum allowed size for the records of a message")
+    @Min(0)
     private int maxRecordsSizeBytes = 15 * 1024 * 1024;
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to persist messages in databases.\n" +
@@ -58,6 +62,7 @@ public class Message implements IdentifiedDataSerializable {
     private boolean messageStatusPersistent = true;
     @JsonView(MutablePropertiesView.class)
     @Description("A message will become expired after the TTL has elapsed. 0 means infinite")
+    @Min(0)
     private int messageTimeToLiveHours = 0;
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete messages logically by default")
@@ -80,14 +85,18 @@ public class Message implements IdentifiedDataSerializable {
     private boolean allowEditingMessageBySender = true;
     @JsonView(MutablePropertiesView.class)
     @Description("The available recall duration for the sender of a message")
+    @Min(0)
     private int availableRecallDurationSeconds = 60 * 5;
     @JsonView(MutablePropertiesView.class)
     @Description("The default available messages number with the \"total\" field that users request")
+    @Min(0)
     private int defaultAvailableMessagesNumberWithTotal = 1;
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to update the read date when users querying messages")
     private boolean shouldUpdateReadDateWhenUserQueryingMessage = true;
+    @Valid
     private ReadReceipt readReceipt = new ReadReceipt();
+    @Valid
     private TypingStatus typingStatus = new TypingStatus();
 
     @JsonIgnore
