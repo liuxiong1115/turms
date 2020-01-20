@@ -27,27 +27,34 @@ import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import java.io.IOException;
 
 @Data
 public class Group implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Deprecated
+    @Min(0)
     private int userOwnedGroupLimit = 10;
     @JsonView(MutablePropertiesView.class)
     @Deprecated
+    @Min(0)
     private int userOwnedLimitForEachGroupTypeByDefault = Integer.MAX_VALUE;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum allowed length for the text of a group invitation")
+    @Min(0)
     private int groupInvitationContentLimit = 200;
     @JsonView(MutablePropertiesView.class)
     @Description("A group invitation will become expired after the TTL has elapsed. 0 means infinite")
+    @Min(0)
     private int groupInvitationTimeToLiveHours = 0;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum allowed length for the text of a group join request")
+    @Min(0)
     private int groupJoinRequestContentLimit = 200;
     @JsonView(MutablePropertiesView.class)
     @Description("A group join request will become expired after the TTL has elapsed. 0 means infinite")
+    @Min(0)
     private int groupJoinRequestTimeToLiveHours = 0;
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow users to recall the join requests sent by themselves")
