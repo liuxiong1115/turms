@@ -80,7 +80,7 @@ public class SwaggerConfig {
                         typeResolver.resolve(WildcardType.class)))
                 .ignoredParameterTypes()
                 // TODO: Exclude the APIs that don't need these headers
-                //  Springfox don't support this for now) https://github.com/springfox/springfox/issues/1910
+                //  Springfox doesn't support this for now: https://github.com/springfox/springfox/issues/1910
                 .globalOperationParameters(parameters);
     }
 }
