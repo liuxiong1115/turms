@@ -167,6 +167,6 @@ public class UserSimultaneousLoginService {
                 .getSimultaneousLogin()
                 .getConflictStrategy();
         return !isConflicted(usingDeviceTypes, loggingInDeviceType) ||
-                strategy != User.SimultaneousLogin.ConflictStrategy.LOGGING_DEVICE_OFFLINE;
+                strategy != User.SimultaneousLogin.ConflictStrategy.LOGGING_IN_DEVICE_OFFLINE;
     }
 }
