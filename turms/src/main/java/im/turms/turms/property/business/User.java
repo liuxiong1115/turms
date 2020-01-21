@@ -195,7 +195,7 @@ public class User implements IdentifiedDataSerializable {
         private SimultaneousLoginStrategy strategy = SimultaneousLoginStrategy.ALLOW_ONE_DEVICE_OF_DESKTOP_AND_ONE_DEVICE_OF_MOBILE_ONLINE;
         @JsonView(MutablePropertiesView.class)
         @Description("The conflict strategy handles what should do if a device is ready to be online while its conflicted devices have been online")
-        private ConflictStrategy conflictStrategy = ConflictStrategy.FORCE_LOGGED_DEVICES_OFFLINE;
+        private ConflictStrategy conflictStrategy = ConflictStrategy.FORCE_LOGGED_IN_DEVICES_OFFLINE;
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to allow unknown devices coexist with known devices")
         private boolean allowUnknownDeviceCoexistsWithKnownDevice = false;
@@ -237,9 +237,9 @@ public class User implements IdentifiedDataSerializable {
         }
 
         public enum ConflictStrategy {
-            FORCE_LOGGED_DEVICES_OFFLINE,
-            //            ACQUIRE_LOGGED_DEVICES_PERMISSION,
-            LOGGING_DEVICE_OFFLINE
+            FORCE_LOGGED_IN_DEVICES_OFFLINE,
+            //            ACQUIRE_LOGGED_IN_DEVICES_PERMISSION,
+            LOGGING_IN_DEVICE_OFFLINE
         }
     }
 }
