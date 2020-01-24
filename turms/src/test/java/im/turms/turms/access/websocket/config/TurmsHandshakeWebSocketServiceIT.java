@@ -39,6 +39,7 @@ import java.util.Date;
 
 import static helper.util.LoginUtil.getLoginParams;
 import static helper.util.LoginUtil.getServerUrl;
+import static im.turms.turms.common.Constants.DEFAULT_USER_PERMISSION_GROUP_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -52,7 +53,7 @@ public class TurmsHandshakeWebSocketServiceIT {
     public static void initUser(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
         Date now = new Date();
         User user = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, now, now, true, 0, now);
+                "", ProfileAccessStrategy.ALL, DEFAULT_USER_PERMISSION_GROUP_ID, now, null, true, now);
         mongoTemplate.save(user);
     }
 

@@ -39,6 +39,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import java.util.Date;
 import java.util.function.Function;
 
+import static im.turms.turms.common.Constants.DEFAULT_USER_PERMISSION_GROUP_ID;
 import static org.mockito.Mockito.*;
 
 public class WsMessageControllerIT extends BaseControllerIT {
@@ -50,11 +51,11 @@ public class WsMessageControllerIT extends BaseControllerIT {
     void setUp(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
         Date now = new Date();
         User userOne = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, now, now, true, 0, now);
+                "", ProfileAccessStrategy.ALL, DEFAULT_USER_PERMISSION_GROUP_ID, now, null, true, now);
         User userTwo = new User(2L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, now, now, true, 0, now);
+                "", ProfileAccessStrategy.ALL, DEFAULT_USER_PERMISSION_GROUP_ID, now, null, true, now);
         User userThree = new User(3L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, now, now, true, 0, now);
+                "", ProfileAccessStrategy.ALL, DEFAULT_USER_PERMISSION_GROUP_ID, now, null, true, now);
         UserRelationship relationshipOne = new UserRelationship(1L, 2L, false, now);
         UserRelationship relationshipTwo = new UserRelationship(2L, 1L, false, now);
         mongoTemplate.save(userOne);

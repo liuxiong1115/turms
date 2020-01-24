@@ -31,7 +31,6 @@ import im.turms.turms.pojo.bo.common.DateRange;
 import im.turms.turms.pojo.bo.group.GroupMembersWithVersion;
 import im.turms.turms.pojo.domain.GroupBlacklistedUser;
 import im.turms.turms.pojo.domain.GroupMember;
-import im.turms.turms.pojo.domain.UserPermissionType;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -60,7 +59,6 @@ import static im.turms.turms.common.Constants.*;
 @Service
 @Validated
 public class GroupMemberService {
-    private static final UserPermissionType EMPTY_USER_GROUP_TYPE_PERMISSION = new UserPermissionType();
     private final ReactiveMongoTemplate mongoTemplate;
     private final GroupService groupService;
     private final GroupVersionService groupVersionService;
@@ -465,29 +463,6 @@ public class GroupMemberService {
                 .collect(Collectors.toSet())
                 .flatMap(groupsIds -> queryGroupMembersIds(groupsIds)
                         .collect(Collectors.toSet()));
-    }
-
-    //TODO: Creatable group types for admins
-    public Mono<Boolean> isAllowedToHaveGroupType(
-            @NotNull Long requesterId,
-            @NotNull Long groupTypeId) {
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_USER_ID).is(requesterId))
-                .addCriteria(Criteria.where(ID_GROUP_TYPE_ID));
-        query.fields().include(UserPermissionType.Fields.groupTypeLimit);
-        return mongoTemplate.findOne(query, UserPermissionType.class)
-                .defaultIfEmpty(EMPTY_USER_GROUP_TYPE_PERMISSION)
-                .flatMap(permission -> groupService.countOwnedGroups(requesterId, groupTypeId)
-                        .map(ownedGroupsNumber -> {
-                            int defaultLimit = turmsClusterManager.getTurmsProperties().getGroup()
-                                    .getUserOwnedLimitForEachGroupTypeByDefault();
-                            if (EMPTY_USER_GROUP_TYPE_PERMISSION == permission) {
-                                return ownedGroupsNumber < defaultLimit;
-                            } else {
-                                return ownedGroupsNumber < permission.getGroupTypeLimit().getOrDefault(
-                                        groupTypeId, defaultLimit);
-                            }
-                        }));
     }
 
     public Mono<Boolean> isAllowedToCreateJoinQuestion(

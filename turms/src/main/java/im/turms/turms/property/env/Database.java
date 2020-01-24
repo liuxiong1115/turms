@@ -75,7 +75,7 @@ public class Database implements IdentifiedDataSerializable {
         private com.mongodb.WriteConcern userLoginLog = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userMaxDailyOnlineUser = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userOnlineUserNumber = com.mongodb.WriteConcern.ACKNOWLEDGED;
-        private com.mongodb.WriteConcern userPermissionType = com.mongodb.WriteConcern.ACKNOWLEDGED;
+        private com.mongodb.WriteConcern userPermissionGroup = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userRelationship = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userRelationshipGroup = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userRelationshipGroupMember = com.mongodb.WriteConcern.ACKNOWLEDGED;

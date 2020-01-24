@@ -33,14 +33,6 @@ import java.io.IOException;
 @Data
 public class Group implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
-    @Deprecated
-    @Min(0)
-    private int userOwnedGroupLimit = 10;
-    @JsonView(MutablePropertiesView.class)
-    @Deprecated
-    @Min(0)
-    private int userOwnedLimitForEachGroupTypeByDefault = Integer.MAX_VALUE;
-    @JsonView(MutablePropertiesView.class)
     @Description("The maximum allowed length for the text of a group invitation")
     @Min(0)
     private int groupInvitationContentLimit = 200;
@@ -86,8 +78,6 @@ public class Group implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeInt(userOwnedGroupLimit);
-        out.writeInt(userOwnedLimitForEachGroupTypeByDefault);
         out.writeInt(groupInvitationContentLimit);
         out.writeInt(groupInvitationTimeToLiveHours);
         out.writeInt(groupJoinRequestContentLimit);
@@ -101,8 +91,6 @@ public class Group implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        userOwnedGroupLimit = in.readInt();
-        userOwnedLimitForEachGroupTypeByDefault = in.readInt();
         groupInvitationContentLimit = in.readInt();
         groupInvitationTimeToLiveHours = in.readInt();
         groupJoinRequestContentLimit = in.readInt();

@@ -36,17 +36,19 @@ import org.springframework.data.mongodb.core.query.Query;
 import java.util.Date;
 import java.util.function.Function;
 
+import static im.turms.turms.common.Constants.DEFAULT_USER_PERMISSION_GROUP_ID;
 import static im.turms.turms.pojo.notification.TurmsNotification.Data.KindCase.GROUP_INVITATIONS_WITH_VERSION;
 import static org.mockito.Mockito.*;
 
 public class WsUserControllerIT extends BaseControllerIT {
-    @LocalServerPort Integer port;
+    @LocalServerPort
+    Integer port;
 
     @BeforeAll
     public static void initUser(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
         Date now = new Date();
         User user = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, now, now, true, 0, now);
+                "", ProfileAccessStrategy.ALL, DEFAULT_USER_PERMISSION_GROUP_ID, now, null, true, now);
         mongoTemplate.save(user);
     }
 
