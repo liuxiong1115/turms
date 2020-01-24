@@ -153,11 +153,13 @@ public class TurmsClusterManager {
     }
 
     public boolean isCurrentMemberMaster() {
-        for (Member member : hazelcastInstance.getCluster().getMembers()) {
-            return member.getUuid()
+        Iterator<Member> iterator = hazelcastInstance.getCluster().getMembers().iterator();
+        if (iterator.hasNext()) {
+            return iterator.next().getUuid()
                     .equals(hazelcastInstance.getCluster().getLocalMember().getUuid());
+        } else {
+            return false;
         }
-        return false;
     }
 
     private void logWorkingRanges(@NotEmpty Set<Member> members, @NotNull Member localMember) {
@@ -374,8 +376,8 @@ public class TurmsClusterManager {
                 String address = memberAddressCache.getIfPresent(member.getUuid());
                 if (address != null) {
                     return Mono.just(address);
-            } else {
-                return turmsTaskExecutor.call(member,
+                } else {
+                    return turmsTaskExecutor.call(member,
                             new QueryResponsibleTurmsServerAddressTask())
                             .doOnNext(addr -> memberAddressCache.put(
                                     member.getUuid(), addr));

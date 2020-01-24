@@ -41,8 +41,6 @@ import java.util.List;
 // Reference: org/springframework/boot/autoconfigure/data/mongo/MongoReactiveDataAutoConfiguration.java
 @Configuration
 public class MongoConfig {
-    // Note: Remember changing to turmsClusterManager.getTurmsProperties() when needing to support updating
-    // config dynamically.
     private final TurmsProperties turmsProperties;
     private final MongoDbFactory mongoDbFactory;
     private final MongoMappingContext mongoMappingContext;

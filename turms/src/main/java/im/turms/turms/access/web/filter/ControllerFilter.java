@@ -73,63 +73,72 @@ public class ControllerFilter implements WebFilter {
             return chain.filter(exchange);
         }
         if (handlerMethodObject instanceof HandlerMethod) {
-            HandlerMethod handlerMethod = (HandlerMethod) handlerMethodObject;
+            return filterHandlerMethod(handlerMethodObject, exchange, chain);
+        } else {
+            return filterUnhandledRequest(exchange, chain);
+        }
+    }
+
+    private Mono<Void> filterHandlerMethod(Object handlerMethodObject, ServerWebExchange exchange, WebFilterChain chain) {
+        HandlerMethod handlerMethod = (HandlerMethod) handlerMethodObject;
+        Pair<String, String> pair = parseAccountAndPassword(exchange);
+        String account = pair.getLeft();
+        String password = pair.getRight();
+        RequiredPermission requiredPermission = handlerMethod.getMethodAnnotation(RequiredPermission.class);
+        if (requiredPermission != null && requiredPermission.value().equals(AdminPermission.NONE)) {
+            return chain.filter(exchange);
+        } else {
+            if (account != null && password != null) {
+                return adminService.authenticate(account, password)
+                        .flatMap(authenticated -> {
+                            if (authenticated != null && authenticated) {
+                                if (requiredPermission != null) {
+                                    return adminService.isAdminAuthorized(exchange, account, requiredPermission.value())
+                                            .flatMap(authorized -> {
+                                                if (authorized != null && authorized) {
+                                                    return tryPersistingAndPass(account, exchange, chain, handlerMethod);
+                                                } else {
+                                                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                                                    return Mono.empty();
+                                                }
+                                            });
+                                } else {
+                                    return tryPersistingAndPass(account, exchange, chain, handlerMethod);
+                                }
+                            } else {
+                                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                                return Mono.empty();
+                            }
+                        });
+            } else {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return Mono.empty();
+            }
+        }
+    }
+
+    private Mono<Void> filterUnhandledRequest(ServerWebExchange exchange, WebFilterChain chain) {
+        if (isHandshakeRequest(exchange) || isCorsPreflightRequest(exchange)) {
+            return chain.filter(exchange);
+        } else {
             Pair<String, String> pair = parseAccountAndPassword(exchange);
             String account = pair.getLeft();
             String password = pair.getRight();
-            RequiredPermission requiredPermission = handlerMethod.getMethodAnnotation(RequiredPermission.class);
-            if (requiredPermission != null && requiredPermission.value().equals(AdminPermission.NONE)) {
-                return chain.filter(exchange);
+            if (account != null && password != null) {
+                return adminService.authenticate(account, password)
+                        .flatMap(authenticated -> {
+                            if (authenticated) {
+                                return chain.filter(exchange);
+                            } else {
+                                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                                return Mono.empty();
+                            }
+                        });
             } else {
-                if (account != null && password != null) {
-                    return adminService.authenticate(account, password)
-                            .flatMap(authenticated -> {
-                                if (authenticated != null && authenticated) {
-                                    if (requiredPermission != null) {
-                                        return adminService.isAdminAuthorized(exchange, account, requiredPermission.value())
-                                                .flatMap(authorized -> {
-                                                    if (authorized != null && authorized) {
-                                                        return tryPersistingAndPass(account, exchange, chain, handlerMethod);
-                                                    } else {
-                                                        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                                                        return Mono.empty();
-                                                    }
-                                                });
-                                    } else {
-                                        return tryPersistingAndPass(account, exchange, chain, handlerMethod);
-                                    }
-                                } else {
-                                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                                    return Mono.empty();
-                                }
-                            });
-                } else {
-                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                }
-            }
-        } else {
-            if (isHandshakeRequest(exchange) || isCorsPreflightRequest(exchange)) {
-                return chain.filter(exchange);
-            } else {
-                Pair<String, String> pair = parseAccountAndPassword(exchange);
-                String account = pair.getLeft();
-                String password = pair.getRight();
-                if (account != null && password != null) {
-                    return adminService.authenticate(account, password)
-                            .flatMap(authenticated -> {
-                                if (authenticated) {
-                                    return chain.filter(exchange);
-                                } else {
-                                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                                    return Mono.empty();
-                                }
-                            });
-                } else {
-                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                }
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return Mono.empty();
             }
         }
-        return Mono.empty();
     }
 
     private Pair<String, String> parseAccountAndPassword(@NotNull ServerWebExchange exchange) {
@@ -173,7 +182,7 @@ public class ControllerFilter implements WebFilter {
             }
             String host = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
             if (callHandlers) {
-                adminActionLogService.triggeringLogHandlers(
+                adminActionLogService.triggerLogHandlers(
                         exchange,
                         null,
                         account,
@@ -194,7 +203,7 @@ public class ControllerFilter implements WebFilter {
                                 null)
                                 .doOnNext(log -> {
                                     if (callHandlers) {
-                                        adminActionLogService.triggeringLogHandlers(exchange, log);
+                                        adminActionLogService.triggerLogHandlers(exchange, log);
                                     }
                                 })
                                 .then())

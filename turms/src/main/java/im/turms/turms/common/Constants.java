@@ -84,7 +84,9 @@ public class Constants {
     public static final Retry<Object> INSERT_RETRY = Retry.allBut(DuplicateKeyException.class)
             .retryMax(MONGO_TRANSACTION_RETRIES_NUMBER)
             .fixedBackoff(MONGO_TRANSACTION_BACKOFF);
-    public static final Retry<Object> TRANSACTION_RETRY = Retry.allBut(DuplicateKeyException.class, TurmsBusinessException.class);
+    public static final Retry<Object> TRANSACTION_RETRY = Retry.allBut(DuplicateKeyException.class, TurmsBusinessException.class)
+            .retryMax(MONGO_TRANSACTION_RETRIES_NUMBER)
+            .fixedBackoff(MONGO_TRANSACTION_BACKOFF);
 
     public static final TaskScheduler TASK_SCHEDULER = new DefaultManagedTaskScheduler();
     public static final ObjectMapper MAPPER = new ObjectMapper()
