@@ -100,7 +100,7 @@ public class AdminActionLogService {
         return mongoTemplate.find(query, AdminActionLog.class);
     }
 
-    public void triggeringLogHandlers(
+    public void triggerLogHandlers(
             @NotNull ServerWebExchange exchange,
             @Nullable Long id,
             @Nullable String account,
@@ -123,7 +123,7 @@ public class AdminActionLogService {
         }
     }
 
-    public void triggeringLogHandlers(
+    public void triggerLogHandlers(
             @NotNull ServerWebExchange exchange,
             @NotNull AdminActionLog log) {
         for (LogHandler logHandler : turmsPluginManager.getLogHandlerList()) {
