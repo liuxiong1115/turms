@@ -299,7 +299,9 @@ public class AdminService {
             @Nullable @NoWhitespaceConstraint @Length(min = MIN_PASSWORD_LIMIT, max = MAX_PASSWORD_LIMIT) String rawPassword,
             @Nullable @NoWhitespaceConstraint @Length(min = MIN_NAME_LIMIT, max = MAX_NAME_LIMIT) String name,
             @Nullable Long roleId) {
-        Validator.throwIfAllNull(rawPassword, name, roleId);
+        if (Validator.areAllNull(rawPassword, name, roleId)) {
+            return Mono.just(true);
+        }
         boolean onlyUpdateOneself = targetAccounts.size() == 1 && targetAccounts.iterator().next().equals(requesterAccount);
         if (onlyUpdateOneself) {
             if (roleId == null) {
@@ -336,7 +338,9 @@ public class AdminService {
             @Nullable @NoWhitespaceConstraint @Length(min = MIN_PASSWORD_LIMIT, max = MAX_PASSWORD_LIMIT) String rawPassword,
             @Nullable @NoWhitespaceConstraint @Length(min = MIN_NAME_LIMIT, max = MAX_NAME_LIMIT) String name,
             @Nullable Long roleId) {
-        Validator.throwIfAllNull(rawPassword, name, roleId);
+        if (Validator.areAllNull(rawPassword, name, roleId)) {
+            return Mono.just(true);
+        }
         Query query = new Query();
         query.addCriteria(Criteria.where(ID).in(targetAccounts));
         String password = turmsPasswordUtil.encodeAdminPassword(rawPassword);

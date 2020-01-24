@@ -269,7 +269,9 @@ public class GroupBlacklistService {
             @NotEmpty Set<Long> userIds,
             @Nullable @PastOrPresent Date blockDate,
             @Nullable Long requesterId) {
-        Validator.throwIfAllNull(blockDate, requesterId);
+        if (Validator.areAllNull(blockDate, requesterId)) {
+            return Mono.just(true);
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).in(userIds));
@@ -286,7 +288,9 @@ public class GroupBlacklistService {
             @NotEmpty Set<GroupBlacklistedUser.Key> keys,
             @Nullable @PastOrPresent Date blockDate,
             @Nullable Long requesterId) {
-        Validator.throwIfAllNull(blockDate, requesterId);
+        if (Validator.areAllNull(blockDate, requesterId)) {
+            return Mono.just(true);
+        }
         return MapUtil.fluxMerge(multimap -> {
             for (GroupBlacklistedUser.Key key : keys) {
                 multimap.put(key.getGroupId(), key.getUserId());

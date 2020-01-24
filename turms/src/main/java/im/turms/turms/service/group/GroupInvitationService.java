@@ -392,7 +392,9 @@ public class GroupInvitationService {
             @Nullable @PastOrPresent Date creationDate,
             @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
-        Validator.throwIfAllNull(inviterId, inviteeId, content, status, creationDate, expirationDate);
+        if (Validator.areAllNull(inviterId, inviteeId, content, status, creationDate, expirationDate)) {
+            return Mono.just(true);
+        }
         Query query = new Query().addCriteria(where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()

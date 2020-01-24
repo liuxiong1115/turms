@@ -499,7 +499,9 @@ public class UserRelationshipService {
             @NotEmpty Set<Long> relatedUsersIds,
             @Nullable Boolean isBlocked,
             @Nullable @PastOrPresent Date establishmentDate) {
-        Validator.throwIfAllNull(isBlocked, establishmentDate);
+        if (Validator.areAllNull(isBlocked, establishmentDate)) {
+            return Mono.just(true);
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).in(relatedUsersIds));
