@@ -219,6 +219,7 @@ public class UserController {
                 updateUserDTO.getIntro(),
                 updateUserDTO.getProfilePictureUrl(),
                 updateUserDTO.getProfileAccess(),
+                updateUserDTO.getPermissionGroupId(),
                 updateUserDTO.getRegistrationDate(),
                 updateUserDTO.getIsActive());
         return ResponseFactory.acknowledged(updated);

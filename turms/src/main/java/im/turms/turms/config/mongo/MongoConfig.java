@@ -105,7 +105,7 @@ public class MongoConfig {
             if (entityType == UserLocation.class) return turmsProperties.getDatabase().getWriteConcern().getUserLocation();
             if (entityType == UserLoginLog.class) return turmsProperties.getDatabase().getWriteConcern().getUserLoginLog();
             if (entityType == UserOnlineUserNumber.class) return turmsProperties.getDatabase().getWriteConcern().getUserOnlineUserNumber();
-            if (entityType == UserPermissionType.class) return turmsProperties.getDatabase().getWriteConcern().getUserPermissionType();
+            if (entityType == UserPermissionGroup.class) return turmsProperties.getDatabase().getWriteConcern().getUserPermissionGroup();
             if (entityType == UserRelationship.class) return turmsProperties.getDatabase().getWriteConcern().getUserRelationship();
             if (entityType == UserRelationshipGroup.class) return turmsProperties.getDatabase().getWriteConcern().getUserRelationshipGroup();
             if (entityType == UserRelationshipGroupMember.class) return turmsProperties.getDatabase().getWriteConcern().getUserRelationshipGroupMember();

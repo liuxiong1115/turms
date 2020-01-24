@@ -48,6 +48,9 @@ public class User {
     private ProfileAccessStrategy profileAccess;
 
     @Indexed
+    private Long permissionGroupId;
+
+    @Indexed
     private Date registrationDate;
 
     @Indexed
@@ -55,9 +58,6 @@ public class User {
 
     @Indexed
     private Boolean active;
-
-    @Indexed
-    private Integer permissionTypeId;
 
     @Indexed
     private Date lastUpdateDate;

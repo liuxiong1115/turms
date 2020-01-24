@@ -26,8 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static im.turms.turms.common.Constants.ADMIN_ROLE_ROOT_ID;
-import static im.turms.turms.common.Constants.DEFAULT_GROUP_TYPE_ID;
+import static im.turms.turms.common.Constants.*;
 
 @Component
 public class MongoDataGenerator {
@@ -79,7 +78,7 @@ public class MongoDataGenerator {
                 createCollectionIfNotExist(UserLocation.class, null),
                 createCollectionIfNotExist(UserLoginLog.class, null),
                 createCollectionIfNotExist(UserOnlineUserNumber.class, null),
-                createCollectionIfNotExist(UserPermissionType.class, null),
+                createCollectionIfNotExist(UserPermissionGroup.class, null),
                 createCollectionIfNotExist(UserRelationship.class, null),
                 createCollectionIfNotExist(UserRelationshipGroup.class, null),
                 createCollectionIfNotExist(UserRelationshipGroupMember.class, null),
@@ -262,10 +261,10 @@ public class MongoDataGenerator {
                         "user-intro",
                         null,
                         ProfileAccessStrategy.ALL,
+                        DEFAULT_USER_PERMISSION_GROUP_ID,
                         userDate,
                         null,
                         true,
-                        0,
                         userDate);
                 UserVersion userVersion = new UserVersion(
                         (long) i, userDate, userDate, userDate, userDate, userDate, userDate);

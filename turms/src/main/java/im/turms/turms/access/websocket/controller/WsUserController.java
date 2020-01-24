@@ -269,6 +269,7 @@ public class WsUserController {
                     profilePictureUrl,
                     profileAccessStrategy,
                     null,
+                    null,
                     null)
                     .flatMap(updated -> {
                         if (updated != null && updated) {
