@@ -60,7 +60,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
             .writerWithView(MutablePropertiesView.class);
 
     // Env
-    
+
     @JsonView(MutablePropertiesView.class)
     @Valid
     private Cache cache = new Cache();

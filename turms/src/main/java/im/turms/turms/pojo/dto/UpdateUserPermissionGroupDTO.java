@@ -17,30 +17,19 @@
 
 package im.turms.turms.pojo.dto;
 
-import im.turms.turms.constant.ProfileAccessStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserDTO {
-    private String password;
-
-    private String name;
-
-    private String intro;
-
-    private String profilePictureUrl;
-
-    private ProfileAccessStrategy profileAccess;
-
-    private Long permissionGroupId;
-
-    private Date registrationDate;
-
-    private Boolean isActive;
+public class UpdateUserPermissionGroupDTO {
+    private Set<Long> creatableGroupTypeIds;
+    private Integer ownedGroupLimit;
+    private Integer ownedGroupLimitForEachGroupType;
+    private Map<Long, Integer> groupTypeLimits;
 }

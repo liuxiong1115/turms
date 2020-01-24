@@ -31,6 +31,8 @@ import im.turms.turms.pojo.bo.group.GroupsWithVersion;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.pojo.domain.GroupType;
+import im.turms.turms.pojo.domain.UserPermissionGroup;
+import im.turms.turms.service.user.UserPermissionGroupService;
 import im.turms.turms.service.user.UserVersionService;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -63,6 +65,7 @@ public class GroupService {
     private final UserVersionService userVersionService;
     private final TurmsClusterManager turmsClusterManager;
     private final GroupVersionService groupVersionService;
+    private final UserPermissionGroupService userPermissionGroupService;
 
     public GroupService(
             GroupMemberService groupMemberService,
@@ -70,13 +73,15 @@ public class GroupService {
             GroupTypeService groupTypeService,
             ReactiveMongoTemplate mongoTemplate,
             UserVersionService userVersionService,
-            GroupVersionService groupVersionService) {
+            GroupVersionService groupVersionService,
+            UserPermissionGroupService userPermissionGroupService) {
         this.groupMemberService = groupMemberService;
         this.turmsClusterManager = turmsClusterManager;
         this.groupTypeService = groupTypeService;
         this.mongoTemplate = mongoTemplate;
         this.userVersionService = userVersionService;
         this.groupVersionService = groupVersionService;
+        this.userPermissionGroupService = userPermissionGroupService;
     }
 
     public Mono<Group> createGroup(
@@ -144,21 +149,7 @@ public class GroupService {
             groupTypeId = DEFAULT_GROUP_TYPE_ID;
         }
         Long finalGroupTypeId = groupTypeId;
-        return groupTypeService.groupTypeExists(groupTypeId)
-                .flatMap(existed -> {
-                    if (existed != null && existed) {
-                        return countUserOwnedGroupNumber(creatorId);
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.TYPE_NOT_EXISTS));
-                    }
-                })
-                .flatMap(ownedGroupNumber -> {
-                    if (ownedGroupNumber < turmsClusterManager.getTurmsProperties().getGroup().getUserOwnedGroupLimit()) {
-                        return groupMemberService.isAllowedToHaveGroupType(creatorId, finalGroupTypeId);
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED));
-                    }
-                })
+        return isAllowedToCreateGroupAndHaveGroupType(creatorId, groupTypeId)
                 .flatMap(allowed -> {
                     if (allowed != null && allowed) {
                         return createGroup(creatorId,
@@ -302,7 +293,7 @@ public class GroupService {
                     return queryGroupTypeId(groupId);
                 })
                 .flatMap(groupTypeId ->
-                        groupMemberService.isAllowedToHaveGroupType(successorId, groupTypeId)
+                        isAllowedToCreateGroupAndHaveGroupType(successorId, groupTypeId)
                                 .flatMap(allowed -> {
                                     if (allowed == null || !allowed) {
                                         return Mono.error(TurmsBusinessException
@@ -621,7 +612,7 @@ public class GroupService {
                 authorizeMono = authorizeMono.flatMap(
                         authorized -> {
                             if (authorized != null && authorized) {
-                                return groupMemberService.isAllowedToHaveGroupType(requesterId, typeId);
+                                return isAllowedToCreateGroupAndHaveGroupType(requesterId, typeId);
                             } else {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                             }
@@ -657,6 +648,94 @@ public class GroupService {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
             }
         });
+    }
+
+
+    public Mono<Boolean> isAllowedToCreateGroupAndHaveGroupType(
+            @NotNull Long requesterId,
+            @NotNull Long groupTypeId) {
+        Mono<UserPermissionGroup> userPermissionGroupMono = userPermissionGroupService.queryUserPermissionGroupByUserId(requesterId);
+        return userPermissionGroupMono
+                .flatMap(userPermissionGroup -> isAllowedToCreateGroup(requesterId, userPermissionGroup)
+                        .flatMap(isAllowedToCreateGroup -> {
+                            if (isAllowedToCreateGroup) {
+                                return isAllowedHaveGroupType(requesterId, groupTypeId, userPermissionGroup);
+                            } else {
+                                return Mono.just(false);
+                            }
+                        }));
+    }
+
+    public Mono<Boolean> isAllowedToCreateGroup(
+            @NotNull Long requesterId,
+            @Nullable UserPermissionGroup auxiliaryUserPermissionGroup) {
+        Mono<UserPermissionGroup> userPermissionGroupMono;
+        if (auxiliaryUserPermissionGroup != null) {
+            userPermissionGroupMono = Mono.just(auxiliaryUserPermissionGroup);
+        } else {
+            userPermissionGroupMono = userPermissionGroupService.queryUserPermissionGroupByUserId(requesterId);
+        }
+        return userPermissionGroupMono
+                .flatMap(userPermissionGroup -> {
+                    if (userPermissionGroup.getOwnedGroupLimit() == Integer.MAX_VALUE) {
+                        return Mono.just(true);
+                    } else {
+                        return countOwnedGroups(requesterId)
+                                .map(ownedGroupsNumber -> {
+                                    if (ownedGroupsNumber < userPermissionGroup.getOwnedGroupLimit()) {
+                                        return true;
+                                    } else {
+                                        throw TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED);
+                                    }
+                                });
+                    }
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED)));
+    }
+
+    public Mono<Boolean> isAllowedHaveGroupType(
+            @NotNull Long requesterId,
+            @NotNull Long groupTypeId,
+            @Nullable UserPermissionGroup auxiliaryUserPermissionGroup) {
+        return groupTypeService.groupTypeExists(groupTypeId)
+                .flatMap(existed -> {
+                    if (existed != null && existed) {
+                        if (auxiliaryUserPermissionGroup != null) {
+                            return Mono.just(auxiliaryUserPermissionGroup);
+                        } else {
+                            return userPermissionGroupService.queryUserPermissionGroupByUserId(requesterId);
+                        }
+                    } else {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.TYPE_NOT_EXISTS));
+                    }
+                })
+                .flatMap(userPermissionGroup -> {
+                    if (userPermissionGroup.getCreatableGroupTypeIds().contains(groupTypeId)) {
+                        if (userPermissionGroup.getOwnedGroupLimitForEachGroupType() == Integer.MAX_VALUE
+                                && (userPermissionGroup.getGroupTypeLimits() == null
+                                || userPermissionGroup.getGroupTypeLimits().getOrDefault(groupTypeId, Integer.MAX_VALUE) == Integer.MAX_VALUE)) {
+                            return Mono.just(true);
+                        } else {
+                            return countOwnedGroups(requesterId, groupTypeId)
+                                    .map(ownedGroupsNumber -> {
+                                        if (ownedGroupsNumber < userPermissionGroup.getOwnedGroupLimitForEachGroupType()
+                                                && userPermissionGroup.getGroupTypeLimits().getOrDefault(groupTypeId, Integer.MAX_VALUE) < Integer.MAX_VALUE) {
+                                            return true;
+                                        } else {
+                                            throw TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED);
+                                        }
+                                    });
+                        }
+                    } else {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                    }
+                });
+    }
+
+    public Mono<Long> countOwnedGroups(@NotNull Long ownerId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(Group.Fields.ownerId).is(ownerId));
+        return mongoTemplate.count(query, Group.class);
     }
 
     public Mono<Long> countOwnedGroups(

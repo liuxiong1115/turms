@@ -51,6 +51,7 @@ public class Constants {
 
     public static final String HAZELCAST_ADMINS_MAP = "admins";
     public static final String HAZELCAST_ROLES_MAP = "adminRoles";
+    public static final String HAZELCAST_USER_PERMISSION_GROUPS_MAP = "userPermissionGroups";
     public static final String HAZELCAST_GROUP_TYPES_MAP = "groupTypes";
 
     public static final String EXPIRED_USER_FRIEND_REQUESTS_CLEANER_CRON = "0 0 2 * * ?";
@@ -64,13 +65,14 @@ public class Constants {
     public static final String STATUS = "status";
     public static final String TOTAL = "total";
 
-    public static final long RESERVED_ID = 0L;
-    public static final long ADMIN_ROLE_ROOT_ID = RESERVED_ID;
-    public static final long ADMIN_REQUESTER_ID = RESERVED_ID;
+    public static final Long RESERVED_ID = 0L;
+    public static final Long ADMIN_ROLE_ROOT_ID = RESERVED_ID;
+    public static final Long ADMIN_REQUESTER_ID = RESERVED_ID;
     public static final String ADMIN_ROLE_ROOT_NAME = "ROOT";
-    public static final long DEFAULT_GROUP_TYPE_ID = RESERVED_ID;
+    public static final Long DEFAULT_USER_PERMISSION_GROUP_ID = RESERVED_ID;
+    public static final Long DEFAULT_GROUP_TYPE_ID = RESERVED_ID;
     public static final String DEFAULT_GROUP_TYPE_NAME = "DEFAULT";
-    public static final int DEFAULT_RELATIONSHIP_GROUP_INDEX = (int) RESERVED_ID;
+    public static final Integer DEFAULT_RELATIONSHIP_GROUP_INDEX = Math.toIntExact(RESERVED_ID);
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final Object EMPTY_OBJECT = new Object();
     public static final Pair EMPTY_PAIR = Pair.of(null, null);

@@ -23,15 +23,28 @@ import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 
 import java.util.Map;
+import java.util.Set;
 
-//TODO: in 0.9.0
 @Data
 @FieldNameConstants
 @NoArgsConstructor
-public class UserPermissionType {
+public class UserPermissionGroup {
     @Id
     private Long id;
 
+    private Set<Long> creatableGroupTypeIds;
+
+    private Integer ownedGroupLimit;
+
+    private Integer ownedGroupLimitForEachGroupType;
     // group type id -> limit
-    private Map<Long, Integer> groupTypeLimit;
+    private Map<Long, Integer> groupTypeLimits;
+
+    public UserPermissionGroup(Long id, Set<Long> creatableGroupTypeIds, Integer ownedGroupLimit, Integer ownedGroupLimitForEachGroupType, Map<Long, Integer> groupTypeLimits) {
+        this.id = id;
+        this.creatableGroupTypeIds = creatableGroupTypeIds;
+        this.ownedGroupLimit = ownedGroupLimit;
+        this.ownedGroupLimitForEachGroupType = ownedGroupLimitForEachGroupType;
+        this.groupTypeLimits = groupTypeLimits;
+    }
 }

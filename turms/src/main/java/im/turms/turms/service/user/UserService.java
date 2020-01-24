@@ -52,8 +52,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 
-import static im.turms.turms.common.Constants.ID;
-import static im.turms.turms.common.Constants.TRANSACTION_RETRY;
+import static im.turms.turms.common.Constants.*;
 
 @Component
 @Validated
@@ -170,10 +169,10 @@ public class UserService {
                 intro,
                 profilePictureUrl,
                 profileAccess,
+                DEFAULT_USER_PERMISSION_GROUP_ID,
                 registrationDate,
                 null,
                 isActive,
-                0,
                 now);
         Long finalId = id;
         return mongoTemplate.inTransaction()
@@ -246,8 +245,16 @@ public class UserService {
                 .include(User.Fields.profilePictureUrl)
                 .include(User.Fields.registrationDate)
                 .include(User.Fields.profileAccess)
+                .include(User.Fields.permissionGroupId)
                 .include(User.Fields.active);
         return mongoTemplate.find(query, User.class);
+    }
+
+    public Mono<Long> queryUserPermissionGroupId(@NotNull Long userId) {
+        Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
+        query.fields().include(User.Fields.permissionGroupId);
+        return mongoTemplate.findOne(query, User.class)
+                .map(User::getPermissionGroupId);
     }
 
     public Mono<Boolean> deleteUsers(
@@ -304,6 +311,7 @@ public class UserService {
             @Nullable String intro,
             @Nullable @URL String profilePictureUrl,
             @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccessStrategy,
+            @Nullable Long permissionGroupId,
             @Nullable Boolean isActive,
             @Nullable @PastOrPresent Date registrationDate) {
         return updateUsers(Collections.singleton(userId),
@@ -312,6 +320,7 @@ public class UserService {
                 intro,
                 profilePictureUrl,
                 profileAccessStrategy,
+                permissionGroupId,
                 registrationDate,
                 isActive);
     }
@@ -403,6 +412,7 @@ public class UserService {
             @Nullable String intro,
             @Nullable @URL String profilePictureUrl,
             @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccessStrategy,
+            @Nullable Long permissionGroupId,
             @Nullable @PastOrPresent Date registrationDate,
             @Nullable Boolean isActive) {
         if (Validator.areAllFalsy(password,
@@ -421,6 +431,7 @@ public class UserService {
                 .setIfNotNull(User.Fields.intro, intro)
                 .setIfNotNull(User.Fields.profilePictureUrl, profilePictureUrl)
                 .setIfNotNull(User.Fields.profileAccess, profileAccessStrategy)
+                .setIfNotNull(User.Fields.permissionGroupId, permissionGroupId)
                 .setIfNotNull(User.Fields.registrationDate, registrationDate)
                 .setIfNotNull(User.Fields.active, isActive)
                 .setIfNotNull(User.Fields.lastUpdateDate, new Date())

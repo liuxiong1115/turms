@@ -48,6 +48,11 @@ public enum AdminPermission {
     USER_FRIEND_REQUEST_UPDATE,
     USER_FRIEND_REQUEST_QUERY,
 
+    USER_PERMISSION_GROUP_CREATE,
+    USER_PERMISSION_GROUP_DELETE,
+    USER_PERMISSION_GROUP_UPDATE,
+    USER_PERMISSION_GROUP_QUERY,
+
     USER_ONLINE_INFO_UPDATE,
     USER_ONLINE_INFO_QUERY,
 
@@ -136,6 +141,14 @@ public enum AdminPermission {
         permissions.add(USER_RELATIONSHIP_GROUP_DELETE);
         permissions.add(USER_RELATIONSHIP_GROUP_UPDATE);
         permissions.add(USER_RELATIONSHIP_GROUP_QUERY);
+        permissions.add(USER_FRIEND_REQUEST_CREATE);
+        permissions.add(USER_FRIEND_REQUEST_DELETE);
+        permissions.add(USER_FRIEND_REQUEST_UPDATE);
+        permissions.add(USER_FRIEND_REQUEST_QUERY);
+        permissions.add(USER_PERMISSION_GROUP_CREATE);
+        permissions.add(USER_PERMISSION_GROUP_DELETE);
+        permissions.add(USER_PERMISSION_GROUP_UPDATE);
+        permissions.add(USER_PERMISSION_GROUP_QUERY);
         permissions.add(USER_ONLINE_INFO_UPDATE);
         permissions.add(USER_ONLINE_INFO_QUERY);
         return permissions;
@@ -202,6 +215,7 @@ public enum AdminPermission {
 
     public static Set<AdminPermission> allCluster() {
         Set<AdminPermission> permissions = new HashSet<>();
+        permissions.add(CLUSTER_CONFIG_QUERY);
         permissions.add(CLUSTER_CONFIG_UPDATE);
         return permissions;
     }
