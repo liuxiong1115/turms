@@ -316,7 +316,7 @@ public class MessageService {
             @Nullable @Min(0) Integer burnAfter,
             @Nullable @PastOrPresent Date deliveryDate,
             @Nullable Long referenceId) {
-        Validator.throwIfAllNull(text, records);
+        Validator.throwIfAllFalsy(text, records);
         if (turmsClusterManager.getTurmsProperties().getMessage().getTimeType()
                 != im.turms.turms.property.business.Message.TimeType.CLIENT_TIME
                 || deliveryDate == null) {
@@ -464,7 +464,9 @@ public class MessageService {
             @Nullable List<byte[]> records,
             @Nullable @Min(0) Integer burnAfter,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAllNull(isSystemMessage, text, records, burnAfter);
+        if (Validator.areAllNull(isSystemMessage, text, records, burnAfter)) {
+            return Mono.just(true);
+        }
         Query query = new Query().addCriteria(Criteria.where(ID).in(messageIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(Message.Fields.text, text)
@@ -482,7 +484,6 @@ public class MessageService {
             @Nullable List<byte[]> records,
             @Nullable @Min(0) Integer burnAfter,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAllNull(messageId);
         return updateMessage(Collections.singleton(messageId), isSystemMessage, text,
                 records, burnAfter, operations);
     }

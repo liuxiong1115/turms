@@ -306,7 +306,9 @@ public class GroupQuestionService {
             @Nullable String question,
             @Nullable Set<String> answers,
             @Nullable Integer score) {
-        Validator.throwIfAllNull(question, answers, score);
+        if (Validator.areAllNull(question, answers, score)) {
+            return Mono.just(true);
+        }
         if (score != null && score < 0) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }

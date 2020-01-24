@@ -359,8 +359,10 @@ public class GroupService {
             @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAllNull(typeId, creatorId, ownerId, name, intro, announcement,
-                profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate);
+        if (Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
+                profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
+            return Mono.just(true);
+        }
         Query query = new Query().addCriteria(Criteria.where(ID).in(groupIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(Group.Fields.typeId, typeId)
@@ -407,8 +409,10 @@ public class GroupService {
             @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAllNull(typeId, creatorId, ownerId, name, intro, announcement,
-                profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate);
+        if (Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
+                profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
+            return Mono.just(true);
+        }
         return queryGroupType(groupId)
                 .flatMap(groupType -> {
                     GroupUpdateStrategy groupUpdateStrategy = groupType.getGroupInfoUpdateStrategy();
@@ -549,7 +553,7 @@ public class GroupService {
             @Nullable Date muteEndDate,
             @Nullable Long successorId,
             boolean quitAfterTransfer) {
-        Validator.throwIfAllNull(
+        if (Validator.areAllNull(
                 typeId,
                 creatorId,
                 ownerId,
@@ -562,7 +566,9 @@ public class GroupService {
                 creationDate,
                 deletionDate,
                 muteEndDate,
-                successorId);
+                successorId)) {
+            return Mono.just(true);
+        }
         return mongoTemplate
                 .inTransaction()
                 .execute(operations -> {

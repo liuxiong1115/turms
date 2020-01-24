@@ -230,7 +230,9 @@ public class UserFriendRequestService {
             @Nullable @PastOrPresent Date creationDate,
             @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
-        Validator.throwIfAllNull(requesterId, recipientId, content, status, reason, creationDate, responseDate, expirationDate);
+        if (Validator.areAllNull(requesterId, recipientId, content, status, reason, creationDate, responseDate, expirationDate)) {
+            return Mono.just(true);
+        }
         if (requesterId != null && requesterId.equals(recipientId)) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
