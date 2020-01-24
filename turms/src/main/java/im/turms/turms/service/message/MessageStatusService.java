@@ -79,7 +79,9 @@ public class MessageStatusService {
             @Nullable @PastOrPresent Date readDate,
             @Nullable @PastOrPresent Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAllNull(recallDate, readDate, receptionDate);
+        if (Validator.areAllNull(recallDate, readDate, receptionDate)) {
+            return Mono.just(true);
+        }
         boolean isIllegalRecall = recallDate != null
                 && !turmsClusterManager.getTurmsProperties().getMessage().isAllowRecallingMessage();
         boolean isIllegalRead = readDate != null
@@ -111,7 +113,9 @@ public class MessageStatusService {
             @Nullable @PastOrPresent Date readDate,
             @Nullable @PastOrPresent Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
-        Validator.throwIfAllNull(recallDate, readDate, receptionDate);
+        if (Validator.areAllNull(recallDate, readDate, receptionDate)) {
+            return Mono.just(true);
+        }
         Query query = QueryBuilder
                 .newBuilder()
                 .addIsIfNotNull(ID_MESSAGE_ID, messageId)

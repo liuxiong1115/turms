@@ -203,7 +203,9 @@ public class GroupMemberService {
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations,
             boolean updateGroupMembersVersion) {
-        Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
+        if (Validator.areAllNull(name, role, joinDate, muteEndDate)) {
+            return Mono.just(true);
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).in(memberIds));
@@ -243,7 +245,9 @@ public class GroupMemberService {
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations,
             boolean updateGroupMembersVersion) {
-        Validator.throwIfAllNull(name, role, joinDate, muteEndDate);
+        if (Validator.areAllNull(name, role, joinDate, muteEndDate)) {
+            return Mono.just(true);
+        }
         return MapUtil.fluxMerge(multimap -> {
             for (GroupMember.Key key : keys) {
                 multimap.put(key.getGroupId(), key.getUserId());

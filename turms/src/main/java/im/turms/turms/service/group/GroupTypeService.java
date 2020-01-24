@@ -147,8 +147,7 @@ public class GroupTypeService {
             @Nullable Boolean selfInfoUpdatable,
             @Nullable Boolean enableReadReceipt,
             @Nullable Boolean messageEditable) {
-        Validator.throwIfAllNull(
-                name,
+        if (Validator.areAllNull(name,
                 groupSizeLimit,
                 groupInvitationStrategy,
                 groupJoinStrategy,
@@ -157,7 +156,9 @@ public class GroupTypeService {
                 guestSpeakable,
                 selfInfoUpdatable,
                 enableReadReceipt,
-                messageEditable);
+                messageEditable)) {
+            return Mono.just(true);
+        }
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(GroupType.Fields.name, name)
