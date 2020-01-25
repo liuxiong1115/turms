@@ -17,18 +17,26 @@
 
 package im.turms.turms.config.hazelcast;
 
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.DataSerializableFactory;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.pojo.bo.admin.AdminInfo;
 import im.turms.turms.pojo.domain.Admin;
 import im.turms.turms.pojo.domain.AdminRole;
 import im.turms.turms.pojo.domain.GroupType;
+import im.turms.turms.pojo.domain.UserPermissionGroup;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.property.business.Group;
 import im.turms.turms.property.business.Message;
 import im.turms.turms.property.business.Notification;
 import im.turms.turms.property.business.User;
 import im.turms.turms.property.env.*;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class IdentifiedDataFactory implements DataSerializableFactory {
     public static final int FACTORY_ID = 1;
@@ -45,6 +53,8 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
                 return new AdminRole();
             case DOMAIN_GROUP_TYPE:
                 return new GroupType();
+            case DOMAIN_USER_PERMISSION_GROUP:
+                return new UserPermissionGroup();
             case PROPERTIES:
                 return new TurmsProperties();
             case PROPERTY_CACHE:
@@ -89,6 +99,7 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
         DOMAIN_ADMIN,
         DOMAIN_ADMIN_ROLE,
         DOMAIN_GROUP_TYPE,
+        DOMAIN_USER_PERMISSION_GROUP,
         PROPERTIES,
         PROPERTY_CACHE,
         PROPERTY_CLUSTER,
@@ -110,5 +121,26 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
         public Integer getValue() {
             return this.ordinal() + 1;
         }
+    }
+
+    public static void writeMap(Map map, ObjectDataOutput rawDataOutput) throws IOException {
+        int size = map.size();
+        rawDataOutput.writeInt(size);
+        final Set<Map.Entry> set = map.entrySet();
+        for (Map.Entry entry : set) {
+            final Object key = entry.getKey();
+            final Object value = entry.getValue();
+            rawDataOutput.writeObject(key);
+            rawDataOutput.writeObject(value);
+        }
+    }
+
+    public static Map readMaps(ObjectDataInput rawData) throws IOException {
+        final int size = rawData.readInt();
+        Map map = new HashMap<>(size);
+        for (int i = 0; i < size; i++) {
+            map.put(rawData.readObject(), rawData.readObject());
+        }
+        return map;
     }
 }
