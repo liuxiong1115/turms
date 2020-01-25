@@ -16,7 +16,7 @@ public final class UserInfoOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UserInfo_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UserInfo_fieldAccessorTable;
 
@@ -28,21 +28,21 @@ public final class UserInfoOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n\032model/user/user_info.proto\022\016im.turms.p" +
-                    "roto\032\036google/protobuf/wrappers.proto\032&co" +
-                    "nstant/profile_access_strategy.proto\"\247\003\n" +
-                    "\010UserInfo\022'\n\002id\030\001 \001(\0132\033.google.protobuf." +
-                    "Int64Value\022*\n\004name\030\002 \001(\0132\034.google.protob" +
-                    "uf.StringValue\022+\n\005intro\030\003 \001(\0132\034.google.p" +
-                    "rotobuf.StringValue\0229\n\023profile_picture_u" +
-                    "rl\030\004 \001(\0132\034.google.protobuf.StringValue\0226" +
-                    "\n\021registration_date\030\005 \001(\0132\033.google.proto" +
-                    "buf.Int64Value\0222\n\rdeletion_date\030\006 \001(\0132\033." +
-                    "google.protobuf.Int64Value\022*\n\006active\030\007 \001" +
-                    "(\0132\032.google.protobuf.BoolValue\022F\n\027profil" +
-                    "e_access_strategy\030\010 \001(\0162%.im.turms.proto" +
-                    ".ProfileAccessStrategyB\037\n\033im.turms.turms" +
-                    ".pojo.bo.userP\001b\006proto3"
+      "\n\032model/user/user_info.proto\022\016im.turms.p" +
+      "roto\032\036google/protobuf/wrappers.proto\032&co" +
+      "nstant/profile_access_strategy.proto\"\247\003\n" +
+      "\010UserInfo\022\'\n\002id\030\001 \001(\0132\033.google.protobuf." +
+      "Int64Value\022*\n\004name\030\002 \001(\0132\034.google.protob" +
+      "uf.StringValue\022+\n\005intro\030\003 \001(\0132\034.google.p" +
+      "rotobuf.StringValue\0229\n\023profile_picture_u" +
+      "rl\030\004 \001(\0132\034.google.protobuf.StringValue\0226" +
+      "\n\021registration_date\030\005 \001(\0132\033.google.proto" +
+      "buf.Int64Value\0222\n\rdeletion_date\030\006 \001(\0132\033." +
+      "google.protobuf.Int64Value\022*\n\006active\030\007 \001" +
+      "(\0132\032.google.protobuf.BoolValue\022F\n\027profil" +
+      "e_access_strategy\030\010 \001(\0162%.im.turms.proto" +
+      ".ProfileAccessStrategyB\037\n\033im.turms.turms" +
+      ".pojo.bo.userP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

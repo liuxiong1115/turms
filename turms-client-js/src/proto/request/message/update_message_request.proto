@@ -12,6 +12,6 @@ message UpdateMessageRequest {
     google.protobuf.BoolValue is_system_message = 2;
     google.protobuf.StringValue text = 3;
     repeated bytes records = 4;
-    google.protobuf.Int64Value recallDate = 5;
-    google.protobuf.Int64Value readDate = 6;
+    google.protobuf.Int64Value recall_date = 5;
+    google.protobuf.Int64Value read_date = 6;
 }

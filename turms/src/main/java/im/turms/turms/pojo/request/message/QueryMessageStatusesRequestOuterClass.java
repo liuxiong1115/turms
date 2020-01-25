@@ -16,7 +16,7 @@ public final class QueryMessageStatusesRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_QueryMessageStatusesRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_QueryMessageStatusesRequest_fieldAccessorTable;
 
@@ -28,11 +28,11 @@ public final class QueryMessageStatusesRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n4request/message/query_message_statuses" +
-                    "_request.proto\022\016im.turms.proto\"1\n\033QueryM" +
-                    "essageStatusesRequest\022\022\n\nmessage_id\030\001 \001(" +
-                    "\003B'\n#im.turms.turms.pojo.request.message" +
-                    "P\001b\006proto3"
+      "\n4request/message/query_message_statuses" +
+      "_request.proto\022\016im.turms.proto\"1\n\033QueryM" +
+      "essageStatusesRequest\022\022\n\nmessage_id\030\001 \001(" +
+      "\003B\'\n#im.turms.turms.pojo.request.message" +
+      "P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

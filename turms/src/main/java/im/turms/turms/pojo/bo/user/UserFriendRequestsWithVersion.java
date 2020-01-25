@@ -22,7 +22,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
-          UnusedPrivateParameter unused) {
+      UnusedPrivateParameter unused) {
     return new UserFriendRequestsWithVersion();
   }
 
@@ -31,22 +31,10 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-
-  // @@protoc_insertion_point(class_scope:im.turms.proto.UserFriendRequestsWithVersion)
-  private static final im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion();
-  }
-
-  private java.util.List<im.turms.turms.pojo.bo.user.UserFriendRequest> userFriendRequests_;
-
-  public static final int USER_FRIEND_REQUESTS_FIELD_NUMBER = 1;
-
   private UserFriendRequestsWithVersion(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     this();
     if (extensionRegistry == null) {
       throw new java.lang.NullPointerException();
@@ -68,7 +56,7 @@ private static final long serialVersionUID = 0L;
               mutable_bitField0_ |= 0x00000001;
             }
             userFriendRequests_.add(
-                    input.readMessage(im.turms.turms.pojo.bo.user.UserFriendRequest.parser(), extensionRegistry));
+                input.readMessage(im.turms.turms.pojo.bo.user.UserFriendRequest.parser(), extensionRegistry));
             break;
           }
           case 18: {
@@ -106,44 +94,58 @@ private static final long serialVersionUID = 0L;
       makeExtensionsImmutable();
     }
   }
-
   public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
+      getDescriptor() {
     return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOuterClass.internal_static_im_turms_proto_UserFriendRequestsWithVersion_descriptor;
   }
 
-  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOuterClass.internal_static_im_turms_proto_UserFriendRequestsWithVersion_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.class, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder.class);
   }
 
+  public static final int USER_FRIEND_REQUESTS_FIELD_NUMBER = 1;
+  private java.util.List<im.turms.turms.pojo.bo.user.UserFriendRequest> userFriendRequests_;
+  /**
+   * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
+   */
+  public java.util.List<im.turms.turms.pojo.bo.user.UserFriendRequest> getUserFriendRequestsList() {
+    return userFriendRequests_;
+  }
+  /**
+   * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
+   */
+  public java.util.List<? extends im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder> 
+      getUserFriendRequestsOrBuilderList() {
+    return userFriendRequests_;
+  }
   /**
    * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
    */
   public int getUserFriendRequestsCount() {
     return userFriendRequests_.size();
   }
-
-  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
+  /**
+   * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
+   */
+  public im.turms.turms.pojo.bo.user.UserFriendRequest getUserFriendRequests(int index) {
+    return userFriendRequests_.get(index);
   }
-
-  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
+  /**
+   * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
+   */
+  public im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder getUserFriendRequestsOrBuilder(
+      int index) {
+    return userFriendRequests_.get(index);
   }
 
   public static final int LAST_UPDATED_DATE_FIELD_NUMBER = 2;
   private com.google.protobuf.Int64Value lastUpdatedDate_;
-
   /**
    * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
-   *
    * @return Whether the lastUpdatedDate field is set.
    */
   public boolean hasLastUpdatedDate() {
@@ -198,18 +200,32 @@ private static final long serialVersionUID = 0L;
     }
     if (lastUpdatedDate_ != null) {
       size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(2, getLastUpdatedDate());
+        .computeMessageSize(2, getLastUpdatedDate());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion other = (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) obj;
+
+    if (!getUserFriendRequestsList()
+        .equals(other.getUserFriendRequestsList())) return false;
+    if (hasLastUpdatedDate() != other.hasLastUpdatedDate()) return false;
+    if (hasLastUpdatedDate()) {
+      if (!getLastUpdatedDate()
+          .equals(other.getLastUpdatedDate())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -232,185 +248,115 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
+  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(byte[] data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
   public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static Builder newBuilder(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-  }
-
-  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getDefaultInstance() {
-    return DEFAULT_INSTANCE;
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOuterClass.internal_static_im_turms_proto_UserFriendRequestsWithVersion_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.class, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder.class);
-  }
-
-  /**
-   * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
-   */
-  public java.util.List<im.turms.turms.pojo.bo.user.UserFriendRequest> getUserFriendRequestsList() {
-    return userFriendRequests_;
-  }
-
-  @java.lang.Override
-  public Builder newBuilderForType() {
-    return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
-  /**
-   * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
-   */
-  public java.util.List<? extends im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder>
-  getUserFriendRequestsOrBuilderList() {
-    return userFriendRequests_;
+  public static Builder newBuilder(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  /**
-   * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
-   */
-  public im.turms.turms.pojo.bo.user.UserFriendRequest getUserFriendRequests(int index) {
-    return userFriendRequests_.get(index);
-  }
-
-  /**
-   * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
-   */
-  public im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder getUserFriendRequestsOrBuilder(
-          int index) {
-    return userFriendRequests_.get(index);
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion other = (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) obj;
-
-    if (!getUserFriendRequestsList()
-            .equals(other.getUserFriendRequestsList())) return false;
-    if (hasLastUpdatedDate() != other.hasLastUpdatedDate()) return false;
-    if (hasLastUpdatedDate()) {
-      if (!getLastUpdatedDate()
-              .equals(other.getLastUpdatedDate())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<UserFriendRequestsWithVersion>
-          PARSER = new com.google.protobuf.AbstractParser<UserFriendRequestsWithVersion>() {
-    @java.lang.Override
-    public UserFriendRequestsWithVersion parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new UserFriendRequestsWithVersion(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<UserFriendRequestsWithVersion> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<UserFriendRequestsWithVersion> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.UserFriendRequestsWithVersion}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.UserFriendRequestsWithVersion)
-          im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder {
-    private java.util.List<im.turms.turms.pojo.bo.user.UserFriendRequest> userFriendRequests_ =
-            java.util.Collections.emptyList();
-    private com.google.protobuf.RepeatedFieldBuilderV3<
-            im.turms.turms.pojo.bo.user.UserFriendRequest, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder> userFriendRequestsBuilder_;
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.UserFriendRequestsWithVersion)
+      im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder {
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOuterClass.internal_static_im_turms_proto_UserFriendRequestsWithVersion_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOuterClass.internal_static_im_turms_proto_UserFriendRequestsWithVersion_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.class, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder.class);
+    }
 
     // Construct using im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.newBuilder()
     private Builder() {
@@ -418,7 +364,7 @@ private static final long serialVersionUID = 0L;
     }
 
     private Builder(
-            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
       maybeForceBuilderInitialization();
     }
@@ -446,62 +392,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
-      return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOuterClass.internal_static_im_turms_proto_UserFriendRequestsWithVersion_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
-      return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOuterClass.internal_static_im_turms_proto_UserFriendRequestsWithVersion_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.class, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder.class);
-    }
-
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
-    getDescriptorForType() {
+        getDescriptorForType() {
       return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOuterClass.internal_static_im_turms_proto_UserFriendRequestsWithVersion_descriptor;
     }
 
     @java.lang.Override
     public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getDefaultInstanceForType() {
       return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
-    }
-
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
-    }
-    @java.lang.Override
-    public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.setField(field, value);
-    }
-    @java.lang.Override
-    public Builder clearField(
-        com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-    @java.lang.Override
-    public Builder clearOneof(
-        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-    @java.lang.Override
-    public Builder setRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-
-    @java.lang.Override
-    public Builder addRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            java.lang.Object value) {
-      return super.addRepeatedField(field, value);
     }
 
     @java.lang.Override
@@ -536,21 +435,46 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public final boolean isInitialized() {
-      return true;
+    public Builder clone() {
+      return super.clone();
     }
-
+    @java.lang.Override
+    public Builder setField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.setField(field, value);
+    }
+    @java.lang.Override
+    public Builder clearField(
+        com.google.protobuf.Descriptors.FieldDescriptor field) {
+      return super.clearField(field);
+    }
+    @java.lang.Override
+    public Builder clearOneof(
+        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+      return super.clearOneof(oneof);
+    }
+    @java.lang.Override
+    public Builder setRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        int index, java.lang.Object value) {
+      return super.setRepeatedField(field, index, value);
+    }
+    @java.lang.Override
+    public Builder addRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.addRepeatedField(field, value);
+    }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) {
-        return mergeFrom((im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) other);
+        return mergeFrom((im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
-
-    private int bitField0_;
 
     public Builder mergeFrom(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion other) {
       if (other == im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance()) return this;
@@ -572,9 +496,9 @@ private static final long serialVersionUID = 0L;
             userFriendRequestsBuilder_ = null;
             userFriendRequests_ = other.userFriendRequests_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            userFriendRequestsBuilder_ =
-                    com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                            getUserFriendRequestsFieldBuilder() : null;
+            userFriendRequestsBuilder_ = 
+              com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                 getUserFriendRequestsFieldBuilder() : null;
           } else {
             userFriendRequestsBuilder_.addAllMessages(other.userFriendRequests_);
           }
@@ -589,10 +513,15 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
+    public final boolean isInitialized() {
+      return true;
+    }
+
+    @java.lang.Override
     public Builder mergeFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
       im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -606,13 +535,19 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
+    private int bitField0_;
 
+    private java.util.List<im.turms.turms.pojo.bo.user.UserFriendRequest> userFriendRequests_ =
+      java.util.Collections.emptyList();
     private void ensureUserFriendRequestsIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
         userFriendRequests_ = new java.util.ArrayList<im.turms.turms.pojo.bo.user.UserFriendRequest>(userFriendRequests_);
         bitField0_ |= 0x00000001;
-      }
+       }
     }
+
+    private com.google.protobuf.RepeatedFieldBuilderV3<
+        im.turms.turms.pojo.bo.user.UserFriendRequest, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder> userFriendRequestsBuilder_;
 
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
@@ -624,7 +559,6 @@ private static final long serialVersionUID = 0L;
         return userFriendRequestsBuilder_.getMessageList();
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
@@ -635,7 +569,6 @@ private static final long serialVersionUID = 0L;
         return userFriendRequestsBuilder_.getCount();
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
@@ -646,12 +579,11 @@ private static final long serialVersionUID = 0L;
         return userFriendRequestsBuilder_.getMessage(index);
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public Builder setUserFriendRequests(
-            int index, im.turms.turms.pojo.bo.user.UserFriendRequest value) {
+        int index, im.turms.turms.pojo.bo.user.UserFriendRequest value) {
       if (userFriendRequestsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -664,12 +596,11 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public Builder setUserFriendRequests(
-            int index, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder builderForValue) {
+        int index, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder builderForValue) {
       if (userFriendRequestsBuilder_ == null) {
         ensureUserFriendRequestsIsMutable();
         userFriendRequests_.set(index, builderForValue.build());
@@ -679,7 +610,6 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
@@ -696,12 +626,11 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public Builder addUserFriendRequests(
-            int index, im.turms.turms.pojo.bo.user.UserFriendRequest value) {
+        int index, im.turms.turms.pojo.bo.user.UserFriendRequest value) {
       if (userFriendRequestsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -714,12 +643,11 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public Builder addUserFriendRequests(
-            im.turms.turms.pojo.bo.user.UserFriendRequest.Builder builderForValue) {
+        im.turms.turms.pojo.bo.user.UserFriendRequest.Builder builderForValue) {
       if (userFriendRequestsBuilder_ == null) {
         ensureUserFriendRequestsIsMutable();
         userFriendRequests_.add(builderForValue.build());
@@ -729,12 +657,11 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public Builder addUserFriendRequests(
-            int index, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder builderForValue) {
+        int index, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder builderForValue) {
       if (userFriendRequestsBuilder_ == null) {
         ensureUserFriendRequestsIsMutable();
         userFriendRequests_.add(index, builderForValue.build());
@@ -744,16 +671,15 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public Builder addAllUserFriendRequests(
-            java.lang.Iterable<? extends im.turms.turms.pojo.bo.user.UserFriendRequest> values) {
+        java.lang.Iterable<? extends im.turms.turms.pojo.bo.user.UserFriendRequest> values) {
       if (userFriendRequestsBuilder_ == null) {
         ensureUserFriendRequestsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-                values, userFriendRequests_);
+            values, userFriendRequests_);
         onChanged();
       } else {
         userFriendRequestsBuilder_.addAllMessages(values);
@@ -786,70 +712,62 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public im.turms.turms.pojo.bo.user.UserFriendRequest.Builder getUserFriendRequestsBuilder(
-            int index) {
+        int index) {
       return getUserFriendRequestsFieldBuilder().getBuilder(index);
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder getUserFriendRequestsOrBuilder(
-            int index) {
+        int index) {
       if (userFriendRequestsBuilder_ == null) {
-        return userFriendRequests_.get(index);
-      } else {
+        return userFriendRequests_.get(index);  } else {
         return userFriendRequestsBuilder_.getMessageOrBuilder(index);
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
-    public java.util.List<? extends im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder>
-    getUserFriendRequestsOrBuilderList() {
+    public java.util.List<? extends im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder> 
+         getUserFriendRequestsOrBuilderList() {
       if (userFriendRequestsBuilder_ != null) {
         return userFriendRequestsBuilder_.getMessageOrBuilderList();
       } else {
         return java.util.Collections.unmodifiableList(userFriendRequests_);
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public im.turms.turms.pojo.bo.user.UserFriendRequest.Builder addUserFriendRequestsBuilder() {
       return getUserFriendRequestsFieldBuilder().addBuilder(
-              im.turms.turms.pojo.bo.user.UserFriendRequest.getDefaultInstance());
+          im.turms.turms.pojo.bo.user.UserFriendRequest.getDefaultInstance());
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
     public im.turms.turms.pojo.bo.user.UserFriendRequest.Builder addUserFriendRequestsBuilder(
-            int index) {
+        int index) {
       return getUserFriendRequestsFieldBuilder().addBuilder(
-              index, im.turms.turms.pojo.bo.user.UserFriendRequest.getDefaultInstance());
+          index, im.turms.turms.pojo.bo.user.UserFriendRequest.getDefaultInstance());
     }
-
     /**
      * <code>repeated .im.turms.proto.UserFriendRequest user_friend_requests = 1;</code>
      */
-    public java.util.List<im.turms.turms.pojo.bo.user.UserFriendRequest.Builder>
-    getUserFriendRequestsBuilderList() {
+    public java.util.List<im.turms.turms.pojo.bo.user.UserFriendRequest.Builder> 
+         getUserFriendRequestsBuilderList() {
       return getUserFriendRequestsFieldBuilder().getBuilderList();
     }
-
     private com.google.protobuf.RepeatedFieldBuilderV3<
-            im.turms.turms.pojo.bo.user.UserFriendRequest, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder>
-    getUserFriendRequestsFieldBuilder() {
+        im.turms.turms.pojo.bo.user.UserFriendRequest, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder> 
+        getUserFriendRequestsFieldBuilder() {
       if (userFriendRequestsBuilder_ == null) {
         userFriendRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-                im.turms.turms.pojo.bo.user.UserFriendRequest, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder>(
+            im.turms.turms.pojo.bo.user.UserFriendRequest, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder>(
                 userFriendRequests_,
                 ((bitField0_ & 0x00000001) != 0),
                 getParentForChildren(),
@@ -946,7 +864,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getLastUpdatedDateBuilder() {
-
+      
       onChanged();
       return getLastUpdatedDateFieldBuilder().getBuilder();
     }
@@ -961,13 +879,12 @@ private static final long serialVersionUID = 0L;
             com.google.protobuf.Int64Value.getDefaultInstance() : lastUpdatedDate_;
       }
     }
-
     /**
      * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
-    getLastUpdatedDateFieldBuilder() {
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
+        getLastUpdatedDateFieldBuilder() {
       if (lastUpdatedDateBuilder_ == null) {
         lastUpdatedDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
             com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
@@ -992,6 +909,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.UserFriendRequestsWithVersion)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.UserFriendRequestsWithVersion)
+  private static final im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion();
+  }
+
+  public static im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<UserFriendRequestsWithVersion>
+      PARSER = new com.google.protobuf.AbstractParser<UserFriendRequestsWithVersion>() {
+    @java.lang.Override
+    public UserFriendRequestsWithVersion parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new UserFriendRequestsWithVersion(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<UserFriendRequestsWithVersion> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<UserFriendRequestsWithVersion> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

@@ -16,7 +16,7 @@ public final class MessageStatusesOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_MessageStatuses_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_MessageStatuses_fieldAccessorTable;
 
@@ -28,24 +28,24 @@ public final class MessageStatusesOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n$model/message/message_statuses.proto\022\016" +
-                    "im.turms.proto\032\"model/message/message_st" +
-                    "atus.proto\"J\n\017MessageStatuses\0227\n\020message" +
-                    "_statuses\030\001 \003(\0132\035.im.turms.proto.Message" +
-                    "StatusB\"\n\036im.turms.turms.pojo.bo.message" +
-                    "P\001b\006proto3"
+      "\n$model/message/message_statuses.proto\022\016" +
+      "im.turms.proto\032\"model/message/message_st" +
+      "atus.proto\"J\n\017MessageStatuses\0227\n\020message" +
+      "_statuses\030\001 \003(\0132\035.im.turms.proto.Message" +
+      "StatusB\"\n\036im.turms.turms.pojo.bo.message" +
+      "P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                im.turms.turms.pojo.bo.message.MessageStatusOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          im.turms.turms.pojo.bo.message.MessageStatusOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_MessageStatuses_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_im_turms_proto_MessageStatuses_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-            internal_static_im_turms_proto_MessageStatuses_descriptor,
-            new java.lang.String[]{"MessageStatuses",});
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_im_turms_proto_MessageStatuses_descriptor,
+        new java.lang.String[] { "MessageStatuses", });
     im.turms.turms.pojo.bo.message.MessageStatusOuterClass.getDescriptor();
   }
 

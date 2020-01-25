@@ -16,7 +16,7 @@ public final class AcknowledgeOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_Acknowledge_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_Acknowledge_fieldAccessorTable;
 
@@ -28,12 +28,12 @@ public final class AcknowledgeOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n\036model/signal/acknowledge.proto\022\016im.tur" +
-                    "ms.proto\032\036google/protobuf/wrappers.proto" +
-                    "\"U\n\013Acknowledge\022\025\n\rdelivery_date\030\001 \001(\003\022/" +
-                    "\n\nmessage_id\030\002 \001(\0132\033.google.protobuf.Int" +
-                    "64ValueB!\n\035im.turms.turms.pojo.bo.signal" +
-                    "P\001b\006proto3"
+      "\n\036model/signal/acknowledge.proto\022\016im.tur" +
+      "ms.proto\032\036google/protobuf/wrappers.proto" +
+      "\"U\n\013Acknowledge\022\025\n\rdelivery_date\030\001 \001(\003\022/" +
+      "\n\nmessage_id\030\002 \001(\0132\033.google.protobuf.Int" +
+      "64ValueB!\n\035im.turms.turms.pojo.bo.signal" +
+      "P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

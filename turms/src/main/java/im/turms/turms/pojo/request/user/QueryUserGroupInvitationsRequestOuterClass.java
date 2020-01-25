@@ -16,7 +16,7 @@ public final class QueryUserGroupInvitationsRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_QueryUserGroupInvitationsRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_QueryUserGroupInvitationsRequest_fieldAccessorTable;
 
@@ -28,13 +28,13 @@ public final class QueryUserGroupInvitationsRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n7request/user/query_user_group_invitati" +
-                    "ons_request.proto\022\016im.turms.proto\032\036googl" +
-                    "e/protobuf/wrappers.proto\"Z\n QueryUserGr" +
-                    "oupInvitationsRequest\0226\n\021last_updated_da" +
-                    "te\030\001 \001(\0132\033.google.protobuf.Int64ValueB$\n" +
-                    " im.turms.turms.pojo.request.userP\001b\006pro" +
-                    "to3"
+      "\n7request/user/query_user_group_invitati" +
+      "ons_request.proto\022\016im.turms.proto\032\036googl" +
+      "e/protobuf/wrappers.proto\"Z\n QueryUserGr" +
+      "oupInvitationsRequest\0226\n\021last_updated_da" +
+      "te\030\001 \001(\0132\033.google.protobuf.Int64ValueB$\n" +
+      " im.turms.turms.pojo.request.userP\001b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

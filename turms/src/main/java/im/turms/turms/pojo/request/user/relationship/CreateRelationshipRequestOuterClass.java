@@ -16,7 +16,7 @@ public final class CreateRelationshipRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_CreateRelationshipRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_CreateRelationshipRequest_fieldAccessorTable;
 
@@ -28,14 +28,14 @@ public final class CreateRelationshipRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n;request/user/relationship/create_relat" +
-                    "ionship_request.proto\022\016im.turms.proto\032\036g" +
-                    "oogle/protobuf/wrappers.proto\"r\n\031CreateR" +
-                    "elationshipRequest\022\017\n\007user_id\030\001 \001(\003\022\022\n\ni" +
-                    "s_blocked\030\002 \001(\010\0220\n\013group_index\030\003 \001(\0132\033.g" +
-                    "oogle.protobuf.Int32ValueB1\n-im.turms.tu" +
-                    "rms.pojo.request.user.relationshipP\001b\006pr" +
-                    "oto3"
+      "\n;request/user/relationship/create_relat" +
+      "ionship_request.proto\022\016im.turms.proto\032\036g" +
+      "oogle/protobuf/wrappers.proto\"r\n\031CreateR" +
+      "elationshipRequest\022\017\n\007user_id\030\001 \001(\003\022\022\n\ni" +
+      "s_blocked\030\002 \001(\010\0220\n\013group_index\030\003 \001(\0132\033.g" +
+      "oogle.protobuf.Int32ValueB1\n-im.turms.tu" +
+      "rms.pojo.request.user.relationshipP\001b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

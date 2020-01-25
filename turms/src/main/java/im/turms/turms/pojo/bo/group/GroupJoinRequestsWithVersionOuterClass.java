@@ -16,7 +16,7 @@ public final class GroupJoinRequestsWithVersionOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_GroupJoinRequestsWithVersion_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_GroupJoinRequestsWithVersion_fieldAccessorTable;
 
@@ -28,21 +28,21 @@ public final class GroupJoinRequestsWithVersionOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n2model/group/group_join_requests_with_v" +
-                    "ersion.proto\022\016im.turms.proto\032\036google/pro" +
-                    "tobuf/wrappers.proto\032$model/group/group_" +
-                    "join_request.proto\"\225\001\n\034GroupJoinRequests" +
-                    "WithVersion\022=\n\023group_join_requests\030\001 \003(\013" +
-                    "2 .im.turms.proto.GroupJoinRequest\0226\n\021la" +
-                    "st_updated_date\030\002 \001(\0132\033.google.protobuf." +
-                    "Int64ValueB \n\034im.turms.turms.pojo.bo.gro" +
-                    "upP\001b\006proto3"
+      "\n2model/group/group_join_requests_with_v" +
+      "ersion.proto\022\016im.turms.proto\032\036google/pro" +
+      "tobuf/wrappers.proto\032$model/group/group_" +
+      "join_request.proto\"\225\001\n\034GroupJoinRequests" +
+      "WithVersion\022=\n\023group_join_requests\030\001 \003(\013" +
+      "2 .im.turms.proto.GroupJoinRequest\0226\n\021la" +
+      "st_updated_date\030\002 \001(\0132\033.google.protobuf." +
+      "Int64ValueB \n\034im.turms.turms.pojo.bo.gro" +
+      "upP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                com.google.protobuf.WrappersProto.getDescriptor(),
-                im.turms.turms.pojo.bo.group.GroupJoinRequestOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.WrappersProto.getDescriptor(),
+          im.turms.turms.pojo.bo.group.GroupJoinRequestOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_GroupJoinRequestsWithVersion_descriptor =
       getDescriptor().getMessageTypes().get(0);

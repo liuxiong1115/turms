@@ -16,7 +16,7 @@ public final class QueryUsersIdsNearbyRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_QueryUsersIdsNearbyRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_QueryUsersIdsNearbyRequest_fieldAccessorTable;
 
@@ -28,14 +28,14 @@ public final class QueryUsersIdsNearbyRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n1request/user/query_users_ids_nearby_re" +
-                    "quest.proto\022\016im.turms.proto\032\036google/prot" +
-                    "obuf/wrappers.proto\"\240\001\n\032QueryUsersIdsNea" +
-                    "rbyRequest\022\020\n\010latitude\030\001 \001(\002\022\021\n\tlongitud" +
-                    "e\030\002 \001(\002\022-\n\010distance\030\003 \001(\0132\033.google.proto" +
-                    "buf.FloatValue\022.\n\tmaxNumber\030\004 \001(\0132\033.goog" +
-                    "le.protobuf.Int32ValueB$\n im.turms.turms" +
-                    ".pojo.request.userP\001b\006proto3"
+      "\n1request/user/query_users_ids_nearby_re" +
+      "quest.proto\022\016im.turms.proto\032\036google/prot" +
+      "obuf/wrappers.proto\"\240\001\n\032QueryUsersIdsNea" +
+      "rbyRequest\022\020\n\010latitude\030\001 \001(\002\022\021\n\tlongitud" +
+      "e\030\002 \001(\002\022-\n\010distance\030\003 \001(\0132\033.google.proto" +
+      "buf.FloatValue\022.\n\tmaxNumber\030\004 \001(\0132\033.goog" +
+      "le.protobuf.Int32ValueB$\n im.turms.turms" +
+      ".pojo.request.userP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

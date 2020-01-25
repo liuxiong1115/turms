@@ -16,7 +16,7 @@ public final class UpdateGroupMemberRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UpdateGroupMemberRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UpdateGroupMemberRequest_fieldAccessorTable;
 
@@ -28,17 +28,17 @@ public final class UpdateGroupMemberRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n6request/group/member/update_group_memb" +
-                    "er_request.proto\022\016im.turms.proto\032\036google" +
-                    "/protobuf/wrappers.proto\032 constant/group" +
-                    "_member_role.proto\"\316\001\n\030UpdateGroupMember" +
-                    "Request\022\020\n\010group_id\030\001 \001(\003\022\021\n\tmember_id\030\002" +
-                    " \001(\003\022*\n\004name\030\003 \001(\0132\034.google.protobuf.Str" +
-                    "ingValue\022-\n\004role\030\004 \001(\0162\037.im.turms.proto." +
-                    "GroupMemberRole\0222\n\rmute_end_date\030\005 \001(\0132\033" +
-                    ".google.protobuf.Int64ValueB,\n(im.turms." +
-                    "turms.pojo.request.group.memberP\001b\006proto" +
-                    "3"
+      "\n6request/group/member/update_group_memb" +
+      "er_request.proto\022\016im.turms.proto\032\036google" +
+      "/protobuf/wrappers.proto\032 constant/group" +
+      "_member_role.proto\"\316\001\n\030UpdateGroupMember" +
+      "Request\022\020\n\010group_id\030\001 \001(\003\022\021\n\tmember_id\030\002" +
+      " \001(\003\022*\n\004name\030\003 \001(\0132\034.google.protobuf.Str" +
+      "ingValue\022-\n\004role\030\004 \001(\0162\037.im.turms.proto." +
+      "GroupMemberRole\0222\n\rmute_end_date\030\005 \001(\0132\033" +
+      ".google.protobuf.Int64ValueB,\n(im.turms." +
+      "turms.pojo.request.group.memberP\001b\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

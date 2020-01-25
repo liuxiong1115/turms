@@ -16,7 +16,7 @@ public final class GroupJoinQuestionsWithVersionOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_GroupJoinQuestionsWithVersion_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_GroupJoinQuestionsWithVersion_fieldAccessorTable;
 
@@ -28,21 +28,21 @@ public final class GroupJoinQuestionsWithVersionOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n3model/group/group_join_questions_with_" +
-                    "version.proto\022\016im.turms.proto\032\036google/pr" +
-                    "otobuf/wrappers.proto\032%model/group/group" +
-                    "_join_question.proto\"\230\001\n\035GroupJoinQuesti" +
-                    "onsWithVersion\022?\n\024group_join_questions\030\001" +
-                    " \003(\0132!.im.turms.proto.GroupJoinQuestion\022" +
-                    "6\n\021last_updated_date\030\002 \001(\0132\033.google.prot" +
-                    "obuf.Int64ValueB \n\034im.turms.turms.pojo.b" +
-                    "o.groupP\001b\006proto3"
+      "\n3model/group/group_join_questions_with_" +
+      "version.proto\022\016im.turms.proto\032\036google/pr" +
+      "otobuf/wrappers.proto\032%model/group/group" +
+      "_join_question.proto\"\230\001\n\035GroupJoinQuesti" +
+      "onsWithVersion\022?\n\024group_join_questions\030\001" +
+      " \003(\0132!.im.turms.proto.GroupJoinQuestion\022" +
+      "6\n\021last_updated_date\030\002 \001(\0132\033.google.prot" +
+      "obuf.Int64ValueB \n\034im.turms.turms.pojo.b" +
+      "o.groupP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                com.google.protobuf.WrappersProto.getDescriptor(),
-                im.turms.turms.pojo.bo.group.GroupJoinQuestionOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.WrappersProto.getDescriptor(),
+          im.turms.turms.pojo.bo.group.GroupJoinQuestionOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_GroupJoinQuestionsWithVersion_descriptor =
       getDescriptor().getMessageTypes().get(0);

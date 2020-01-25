@@ -16,7 +16,7 @@ public final class UpdateUserOnlineStatusRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UpdateUserOnlineStatusRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UpdateUserOnlineStatusRequest_fieldAccessorTable;
 
@@ -28,12 +28,12 @@ public final class UpdateUserOnlineStatusRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n4request/user/update_user_online_status" +
-                    "_request.proto\022\016im.turms.proto\032\032constant" +
-                    "/user_status.proto\"P\n\035UpdateUserOnlineSt" +
-                    "atusRequest\022/\n\013user_status\030\001 \001(\0162\032.im.tu" +
-                    "rms.proto.UserStatusB$\n im.turms.turms.p" +
-                    "ojo.request.userP\001b\006proto3"
+      "\n4request/user/update_user_online_status" +
+      "_request.proto\022\016im.turms.proto\032\032constant" +
+      "/user_status.proto\"P\n\035UpdateUserOnlineSt" +
+      "atusRequest\022/\n\013user_status\030\001 \001(\0162\032.im.tu" +
+      "rms.proto.UserStatusB$\n im.turms.turms.p" +
+      "ojo.request.userP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

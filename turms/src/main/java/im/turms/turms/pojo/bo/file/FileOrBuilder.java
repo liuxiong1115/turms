@@ -7,24 +7,20 @@ public interface FileOrBuilder extends
     // @@protoc_insertion_point(interface_extends:im.turms.proto.File)
     com.google.protobuf.MessageOrBuilder {
 
-    /**
-     * <code>.im.turms.proto.File.Description description = 1;</code>
-     *
-     * @return Whether the description field is set.
-     */
-    boolean hasDescription();
-
-    /**
-     * <code>.im.turms.proto.File.Description description = 1;</code>
-     *
-     * @return The description.
-     */
-    im.turms.turms.pojo.bo.file.File.Description getDescription();
-
-    /**
-     * <code>.im.turms.proto.File.Description description = 1;</code>
-     */
-    im.turms.turms.pojo.bo.file.File.DescriptionOrBuilder getDescriptionOrBuilder();
+  /**
+   * <code>.im.turms.proto.File.Description description = 1;</code>
+   * @return Whether the description field is set.
+   */
+  boolean hasDescription();
+  /**
+   * <code>.im.turms.proto.File.Description description = 1;</code>
+   * @return The description.
+   */
+  im.turms.turms.pojo.bo.file.File.Description getDescription();
+  /**
+   * <code>.im.turms.proto.File.Description description = 1;</code>
+   */
+  im.turms.turms.pojo.bo.file.File.DescriptionOrBuilder getDescriptionOrBuilder();
 
   /**
    * <code>.google.protobuf.BytesValue data = 2;</code>

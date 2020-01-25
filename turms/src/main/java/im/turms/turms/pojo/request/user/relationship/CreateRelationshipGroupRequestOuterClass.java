@@ -16,7 +16,7 @@ public final class CreateRelationshipGroupRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_CreateRelationshipGroupRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_CreateRelationshipGroupRequest_fieldAccessorTable;
 
@@ -28,11 +28,11 @@ public final class CreateRelationshipGroupRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\nArequest/user/relationship/create_relat" +
-                    "ionship_group_request.proto\022\016im.turms.pr" +
-                    "oto\".\n\036CreateRelationshipGroupRequest\022\014\n" +
-                    "\004name\030\001 \001(\tB1\n-im.turms.turms.pojo.reque" +
-                    "st.user.relationshipP\001b\006proto3"
+      "\nArequest/user/relationship/create_relat" +
+      "ionship_group_request.proto\022\016im.turms.pr" +
+      "oto\".\n\036CreateRelationshipGroupRequest\022\014\n" +
+      "\004name\030\001 \001(\tB1\n-im.turms.turms.pojo.reque" +
+      "st.user.relationshipP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

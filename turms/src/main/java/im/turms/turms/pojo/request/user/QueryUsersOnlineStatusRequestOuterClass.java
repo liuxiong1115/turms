@@ -16,7 +16,7 @@ public final class QueryUsersOnlineStatusRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_QueryUsersOnlineStatusRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_QueryUsersOnlineStatusRequest_fieldAccessorTable;
 
@@ -28,11 +28,11 @@ public final class QueryUsersOnlineStatusRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n4request/user/query_users_online_status" +
-                    "_request.proto\022\016im.turms.proto\"2\n\035QueryU" +
-                    "sersOnlineStatusRequest\022\021\n\tusers_ids\030\001 \003" +
-                    "(\003B$\n im.turms.turms.pojo.request.userP\001" +
-                    "b\006proto3"
+      "\n4request/user/query_users_online_status" +
+      "_request.proto\022\016im.turms.proto\"2\n\035QueryU" +
+      "sersOnlineStatusRequest\022\021\n\tusers_ids\030\001 \003" +
+      "(\003B$\n im.turms.turms.pojo.request.userP\001" +
+      "b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

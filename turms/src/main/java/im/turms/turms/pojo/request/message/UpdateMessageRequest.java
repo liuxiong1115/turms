@@ -232,47 +232,47 @@ private static final long serialVersionUID = 0L;
     return records_.get(index);
   }
 
-  public static final int RECALLDATE_FIELD_NUMBER = 5;
+  public static final int RECALL_DATE_FIELD_NUMBER = 5;
   private com.google.protobuf.Int64Value recallDate_;
   /**
-   * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+   * <code>.google.protobuf.Int64Value recall_date = 5;</code>
    * @return Whether the recallDate field is set.
    */
   public boolean hasRecallDate() {
     return recallDate_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+   * <code>.google.protobuf.Int64Value recall_date = 5;</code>
    * @return The recallDate.
    */
   public com.google.protobuf.Int64Value getRecallDate() {
     return recallDate_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : recallDate_;
   }
   /**
-   * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+   * <code>.google.protobuf.Int64Value recall_date = 5;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getRecallDateOrBuilder() {
     return getRecallDate();
   }
 
-  public static final int READDATE_FIELD_NUMBER = 6;
+  public static final int READ_DATE_FIELD_NUMBER = 6;
   private com.google.protobuf.Int64Value readDate_;
   /**
-   * <code>.google.protobuf.Int64Value readDate = 6;</code>
+   * <code>.google.protobuf.Int64Value read_date = 6;</code>
    * @return Whether the readDate field is set.
    */
   public boolean hasReadDate() {
     return readDate_ != null;
   }
   /**
-   * <code>.google.protobuf.Int64Value readDate = 6;</code>
+   * <code>.google.protobuf.Int64Value read_date = 6;</code>
    * @return The readDate.
    */
   public com.google.protobuf.Int64Value getReadDate() {
     return readDate_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : readDate_;
   }
   /**
-   * <code>.google.protobuf.Int64Value readDate = 6;</code>
+   * <code>.google.protobuf.Int64Value read_date = 6;</code>
    */
   public com.google.protobuf.Int64ValueOrBuilder getReadDateOrBuilder() {
     return getReadDate();
@@ -414,11 +414,11 @@ private static final long serialVersionUID = 0L;
       hash = (53 * hash) + getRecordsList().hashCode();
     }
     if (hasRecallDate()) {
-      hash = (37 * hash) + RECALLDATE_FIELD_NUMBER;
+      hash = (37 * hash) + RECALL_DATE_FIELD_NUMBER;
       hash = (53 * hash) + getRecallDate().hashCode();
     }
     if (hasReadDate()) {
-      hash = (37 * hash) + READDATE_FIELD_NUMBER;
+      hash = (37 * hash) + READ_DATE_FIELD_NUMBER;
       hash = (53 * hash) + getReadDate().hashCode();
     }
     hash = (29 * hash) + unknownFields.hashCode();
@@ -1095,14 +1095,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> recallDateBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      * @return Whether the recallDate field is set.
      */
     public boolean hasRecallDate() {
       return recallDateBuilder_ != null || recallDate_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      * @return The recallDate.
      */
     public com.google.protobuf.Int64Value getRecallDate() {
@@ -1113,7 +1113,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      */
     public Builder setRecallDate(com.google.protobuf.Int64Value value) {
       if (recallDateBuilder_ == null) {
@@ -1129,7 +1129,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      */
     public Builder setRecallDate(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1143,7 +1143,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      */
     public Builder mergeRecallDate(com.google.protobuf.Int64Value value) {
       if (recallDateBuilder_ == null) {
@@ -1161,7 +1161,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      */
     public Builder clearRecallDate() {
       if (recallDateBuilder_ == null) {
@@ -1175,7 +1175,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRecallDateBuilder() {
       
@@ -1183,7 +1183,7 @@ private static final long serialVersionUID = 0L;
       return getRecallDateFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getRecallDateOrBuilder() {
       if (recallDateBuilder_ != null) {
@@ -1194,7 +1194,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+     * <code>.google.protobuf.Int64Value recall_date = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
@@ -1214,14 +1214,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> readDateBuilder_;
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      * @return Whether the readDate field is set.
      */
     public boolean hasReadDate() {
       return readDateBuilder_ != null || readDate_ != null;
     }
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      * @return The readDate.
      */
     public com.google.protobuf.Int64Value getReadDate() {
@@ -1232,7 +1232,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      */
     public Builder setReadDate(com.google.protobuf.Int64Value value) {
       if (readDateBuilder_ == null) {
@@ -1248,7 +1248,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      */
     public Builder setReadDate(
         com.google.protobuf.Int64Value.Builder builderForValue) {
@@ -1262,7 +1262,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      */
     public Builder mergeReadDate(com.google.protobuf.Int64Value value) {
       if (readDateBuilder_ == null) {
@@ -1280,7 +1280,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      */
     public Builder clearReadDate() {
       if (readDateBuilder_ == null) {
@@ -1294,7 +1294,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      */
     public com.google.protobuf.Int64Value.Builder getReadDateBuilder() {
       
@@ -1302,7 +1302,7 @@ private static final long serialVersionUID = 0L;
       return getReadDateFieldBuilder().getBuilder();
     }
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      */
     public com.google.protobuf.Int64ValueOrBuilder getReadDateOrBuilder() {
       if (readDateBuilder_ != null) {
@@ -1313,7 +1313,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.google.protobuf.Int64Value readDate = 6;</code>
+     * <code>.google.protobuf.Int64Value read_date = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
