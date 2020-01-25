@@ -16,7 +16,7 @@ public final class UpdateTypingStatusRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UpdateTypingStatusRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UpdateTypingStatusRequest_fieldAccessorTable;
 
@@ -28,12 +28,12 @@ public final class UpdateTypingStatusRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n2request/message/update_typing_status_r" +
-                    "equest.proto\022\016im.turms.proto\032\030constant/c" +
-                    "hat_type.proto\"W\n\031UpdateTypingStatusRequ" +
-                    "est\022+\n\tchat_type\030\001 \001(\0162\030.im.turms.proto." +
-                    "ChatType\022\r\n\005to_id\030\002 \001(\003B'\n#im.turms.turm" +
-                    "s.pojo.request.messageP\001b\006proto3"
+      "\n2request/message/update_typing_status_r" +
+      "equest.proto\022\016im.turms.proto\032\030constant/c" +
+      "hat_type.proto\"W\n\031UpdateTypingStatusRequ" +
+      "est\022+\n\tchat_type\030\001 \001(\0162\030.im.turms.proto." +
+      "ChatType\022\r\n\005to_id\030\002 \001(\003B\'\n#im.turms.turm" +
+      "s.pojo.request.messageP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

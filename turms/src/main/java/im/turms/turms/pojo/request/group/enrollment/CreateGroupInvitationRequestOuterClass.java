@@ -16,7 +16,7 @@ public final class CreateGroupInvitationRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_CreateGroupInvitationRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_CreateGroupInvitationRequest_fieldAccessorTable;
 
@@ -28,12 +28,12 @@ public final class CreateGroupInvitationRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n>request/group/enrollment/create_group_" +
-                    "invitation_request.proto\022\016im.turms.proto" +
-                    "\"U\n\034CreateGroupInvitationRequest\022\020\n\010grou" +
-                    "p_id\030\001 \001(\003\022\022\n\ninvitee_id\030\002 \001(\003\022\017\n\007conten" +
-                    "t\030\003 \001(\tB0\n,im.turms.turms.pojo.request.g" +
-                    "roup.enrollmentP\001b\006proto3"
+      "\n>request/group/enrollment/create_group_" +
+      "invitation_request.proto\022\016im.turms.proto" +
+      "\"U\n\034CreateGroupInvitationRequest\022\020\n\010grou" +
+      "p_id\030\001 \001(\003\022\022\n\ninvitee_id\030\002 \001(\003\022\017\n\007conten" +
+      "t\030\003 \001(\tB0\n,im.turms.turms.pojo.request.g" +
+      "roup.enrollmentP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

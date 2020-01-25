@@ -21,7 +21,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
-          UnusedPrivateParameter unused) {
+      UnusedPrivateParameter unused) {
     return new ImageFile();
   }
 
@@ -30,103 +30,16 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-
-  // @@protoc_insertion_point(class_scope:im.turms.proto.ImageFile)
-  private static final im.turms.turms.pojo.bo.file.ImageFile DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.file.ImageFile();
-  }
-
-  private im.turms.turms.pojo.bo.file.ImageFile.Description description_;
-
-  public interface DescriptionOrBuilder extends
-          // @@protoc_insertion_point(interface_extends:im.turms.proto.ImageFile.Description)
-          com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>string url = 1;</code>
-     *
-     * @return The url.
-     */
-    java.lang.String getUrl();
-
-    /**
-     * <code>string url = 1;</code>
-     *
-     * @return The bytes for url.
-     */
-    com.google.protobuf.ByteString
-    getUrlBytes();
-
-    /**
-     * <code>.google.protobuf.BoolValue original = 2;</code>
-     *
-     * @return Whether the original field is set.
-     */
-    boolean hasOriginal();
-
-    /**
-     * <code>.google.protobuf.BoolValue original = 2;</code>
-     *
-     * @return The original.
-     */
-    com.google.protobuf.BoolValue getOriginal();
-
-    /**
-     * <code>.google.protobuf.BoolValue original = 2;</code>
-     */
-    com.google.protobuf.BoolValueOrBuilder getOriginalOrBuilder();
-
-    /**
-     * <code>.google.protobuf.Int32Value image_size = 3;</code>
-     *
-     * @return Whether the imageSize field is set.
-     */
-    boolean hasImageSize();
-
-    /**
-     * <code>.google.protobuf.Int32Value image_size = 3;</code>
-     *
-     * @return The imageSize.
-     */
-    com.google.protobuf.Int32Value getImageSize();
-
-    /**
-     * <code>.google.protobuf.Int32Value image_size = 3;</code>
-     */
-    com.google.protobuf.Int32ValueOrBuilder getImageSizeOrBuilder();
-
-    /**
-     * <code>.google.protobuf.Int32Value file_size = 4;</code>
-     *
-     * @return Whether the fileSize field is set.
-     */
-    boolean hasFileSize();
-
-    /**
-     * <code>.google.protobuf.Int32Value file_size = 4;</code>
-     *
-     * @return The fileSize.
-     */
-    com.google.protobuf.Int32Value getFileSize();
-
-    /**
-     * <code>.google.protobuf.Int32Value file_size = 4;</code>
-     */
-    com.google.protobuf.Int32ValueOrBuilder getFileSizeOrBuilder();
-  }
-
   private ImageFile(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     this();
     if (extensionRegistry == null) {
       throw new java.lang.NullPointerException();
     }
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-            com.google.protobuf.UnknownFieldSet.newBuilder();
+        com.google.protobuf.UnknownFieldSet.newBuilder();
     try {
       boolean done = false;
       while (!done) {
@@ -163,7 +76,7 @@ private static final long serialVersionUID = 0L;
           }
           default: {
             if (!parseUnknownField(
-                    input, unknownFields, extensionRegistry, tag)) {
+                input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
             break;
@@ -174,288 +87,91 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
   }
-
-  public static final int DESCRIPTION_FIELD_NUMBER = 1;
-
   public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
+      getDescriptor() {
     return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_descriptor;
-  }
-
-  /**
-   * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
-   *
-   * @return Whether the description field is set.
-   */
-  public boolean hasDescription() {
-    return description_ != null;
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-
-  public static final int DATA_FIELD_NUMBER = 2;
-  private com.google.protobuf.BytesValue data_;
-
-  /**
-   * <code>.google.protobuf.BytesValue data = 2;</code>
-   *
-   * @return Whether the data field is set.
-   */
-  public boolean hasData() {
-    return data_ != null;
-  }
-
-  /**
-   * <code>.google.protobuf.BytesValue data = 2;</code>
-   *
-   * @return The data.
-   */
-  public com.google.protobuf.BytesValue getData() {
-    return data_ == null ? com.google.protobuf.BytesValue.getDefaultInstance() : data_;
-  }
-
-  /**
-   * <code>.google.protobuf.BytesValue data = 2;</code>
-   */
-  public com.google.protobuf.BytesValueOrBuilder getDataOrBuilder() {
-    return getData();
-  }
-
-  private byte memoizedIsInitialized = -1;
-
-  @java.lang.Override
-  public final boolean isInitialized() {
-    byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
-
-    memoizedIsInitialized = 1;
-    return true;
-  }
-
-  @java.lang.Override
-  public void writeTo(com.google.protobuf.CodedOutputStream output)
-          throws java.io.IOException {
-    if (description_ != null) {
-      output.writeMessage(1, getDescription());
-    }
-    if (data_ != null) {
-      output.writeMessage(2, getData());
-    }
-    unknownFields.writeTo(output);
-  }
-
-  @java.lang.Override
-  public int getSerializedSize() {
-    int size = memoizedSize;
-    if (size != -1) return size;
-
-    size = 0;
-    if (description_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(1, getDescription());
-    }
-    if (data_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(2, getData());
-    }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
-    return size;
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-
-  @java.lang.Override
-  public int hashCode() {
-    if (memoizedHashCode != 0) {
-      return memoizedHashCode;
-    }
-    int hash = 41;
-    hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasDescription()) {
-      hash = (37 * hash) + DESCRIPTION_FIELD_NUMBER;
-      hash = (53 * hash) + getDescription().hashCode();
-    }
-    if (hasData()) {
-      hash = (37 * hash) + DATA_FIELD_NUMBER;
-      hash = (53 * hash) + getData().hashCode();
-    }
-    hash = (29 * hash) + unknownFields.hashCode();
-    memoizedHashCode = hash;
-    return hash;
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static Builder newBuilder(im.turms.turms.pojo.bo.file.ImageFile prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-  }
-
-  public static im.turms.turms.pojo.bo.file.ImageFile getDefaultInstance() {
-    return DEFAULT_INSTANCE;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
+      internalGetFieldAccessorTable() {
     return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.bo.file.ImageFile.class, im.turms.turms.pojo.bo.file.ImageFile.Builder.class);
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.bo.file.ImageFile.class, im.turms.turms.pojo.bo.file.ImageFile.Builder.class);
   }
 
-  @java.lang.Override
-  public Builder newBuilderForType() {
-    return newBuilder();
+  public interface DescriptionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:im.turms.proto.ImageFile.Description)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string url = 1;</code>
+     * @return The url.
+     */
+    java.lang.String getUrl();
+    /**
+     * <code>string url = 1;</code>
+     * @return The bytes for url.
+     */
+    com.google.protobuf.ByteString
+        getUrlBytes();
+
+    /**
+     * <code>.google.protobuf.BoolValue original = 2;</code>
+     * @return Whether the original field is set.
+     */
+    boolean hasOriginal();
+    /**
+     * <code>.google.protobuf.BoolValue original = 2;</code>
+     * @return The original.
+     */
+    com.google.protobuf.BoolValue getOriginal();
+    /**
+     * <code>.google.protobuf.BoolValue original = 2;</code>
+     */
+    com.google.protobuf.BoolValueOrBuilder getOriginalOrBuilder();
+
+    /**
+     * <code>.google.protobuf.Int32Value image_size = 3;</code>
+     * @return Whether the imageSize field is set.
+     */
+    boolean hasImageSize();
+    /**
+     * <code>.google.protobuf.Int32Value image_size = 3;</code>
+     * @return The imageSize.
+     */
+    com.google.protobuf.Int32Value getImageSize();
+    /**
+     * <code>.google.protobuf.Int32Value image_size = 3;</code>
+     */
+    com.google.protobuf.Int32ValueOrBuilder getImageSizeOrBuilder();
+
+    /**
+     * <code>.google.protobuf.Int32Value file_size = 4;</code>
+     * @return Whether the fileSize field is set.
+     */
+    boolean hasFileSize();
+    /**
+     * <code>.google.protobuf.Int32Value file_size = 4;</code>
+     * @return The fileSize.
+     */
+    com.google.protobuf.Int32Value getFileSize();
+    /**
+     * <code>.google.protobuf.Int32Value file_size = 4;</code>
+     */
+    com.google.protobuf.Int32ValueOrBuilder getFileSizeOrBuilder();
   }
-
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
-
-  /**
-   * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
-   *
-   * @return The description.
-   */
-  public im.turms.turms.pojo.bo.file.ImageFile.Description getDescription() {
-    return description_ == null ? im.turms.turms.pojo.bo.file.ImageFile.Description.getDefaultInstance() : description_;
-  }
-
-  @java.lang.Override
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
-  }
-
-  @java.lang.Override
-  protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-    Builder builder = new Builder(parent);
-    return builder;
-  }
-
-  /**
-   * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
-   */
-  public im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder getDescriptionOrBuilder() {
-    return getDescription();
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.bo.file.ImageFile)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.bo.file.ImageFile other = (im.turms.turms.pojo.bo.file.ImageFile) obj;
-
-    if (hasDescription() != other.hasDescription()) return false;
-    if (hasDescription()) {
-      if (!getDescription()
-              .equals(other.getDescription())) return false;
-    }
-    if (hasData() != other.hasData()) return false;
-    if (hasData()) {
-      if (!getData()
-              .equals(other.getData())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.bo.file.ImageFile getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.ImageFile.Description}
    */
-  public static final class Description extends
-          com.google.protobuf.GeneratedMessageV3 implements
+  public  static final class Description extends
+      com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:im.turms.proto.ImageFile.Description)
       DescriptionOrBuilder {
   private static final long serialVersionUID = 0L;
@@ -544,7 +260,7 @@ private static final long serialVersionUID = 0L;
             }
             default: {
               if (!parseUnknownField(
-                      input, unknownFields, extensionRegistry, tag)) {
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -555,32 +271,59 @@ private static final long serialVersionUID = 0L;
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-                e).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_Description_descriptor;
+    }
 
-    // @@protoc_insertion_point(class_scope:im.turms.proto.ImageFile.Description)
-    private static final im.turms.turms.pojo.bo.file.ImageFile.Description DEFAULT_INSTANCE;
-
-    static {
-      DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.file.ImageFile.Description();
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_Description_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.bo.file.ImageFile.Description.class, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder.class);
     }
 
     public static final int URL_FIELD_NUMBER = 1;
     private volatile java.lang.Object url_;
-
-    public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
-      return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_Description_descriptor;
+    /**
+     * <code>string url = 1;</code>
+     * @return The url.
+     */
+    public java.lang.String getUrl() {
+      java.lang.Object ref = url_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        url_ = s;
+        return s;
+      }
     }
-
-    public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
-            java.nio.ByteBuffer data)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
+    /**
+     * <code>string url = 1;</code>
+     * @return The bytes for url.
+     */
+    public com.google.protobuf.ByteString
+        getUrlBytes() {
+      java.lang.Object ref = url_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        url_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     public static final int ORIGINAL_FIELD_NUMBER = 2;
@@ -692,26 +435,50 @@ private static final long serialVersionUID = 0L;
       }
       if (original_ != null) {
         size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(2, getOriginal());
+          .computeMessageSize(2, getOriginal());
       }
       if (imageSize_ != null) {
         size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(3, getImageSize());
+          .computeMessageSize(3, getImageSize());
       }
       if (fileSize_ != null) {
         size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(4, getFileSize());
+          .computeMessageSize(4, getFileSize());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
-            java.nio.ByteBuffer data,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof im.turms.turms.pojo.bo.file.ImageFile.Description)) {
+        return super.equals(obj);
+      }
+      im.turms.turms.pojo.bo.file.ImageFile.Description other = (im.turms.turms.pojo.bo.file.ImageFile.Description) obj;
+
+      if (!getUrl()
+          .equals(other.getUrl())) return false;
+      if (hasOriginal() != other.hasOriginal()) return false;
+      if (hasOriginal()) {
+        if (!getOriginal()
+            .equals(other.getOriginal())) return false;
+      }
+      if (hasImageSize() != other.hasImageSize()) return false;
+      if (hasImageSize()) {
+        if (!getImageSize()
+            .equals(other.getImageSize())) return false;
+      }
+      if (hasFileSize() != other.hasFileSize()) return false;
+      if (hasFileSize()) {
+        if (!getFileSize()
+            .equals(other.getFileSize())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -741,226 +508,118 @@ private static final long serialVersionUID = 0L;
     }
 
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
-            com.google.protobuf.ByteString data)
-            throws com.google.protobuf.InvalidProtocolBufferException {
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
-            com.google.protobuf.ByteString data,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-
+    public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(byte[] data)
-            throws com.google.protobuf.InvalidProtocolBufferException {
+        throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
-            byte[] data,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(java.io.InputStream input)
-            throws java.io.IOException {
+        throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-              .parseWithIOException(PARSER, input);
+          .parseWithIOException(PARSER, input);
     }
-
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
-            java.io.InputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-              .parseWithIOException(PARSER, input, extensionRegistry);
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
-
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseDelimitedFrom(java.io.InputStream input)
-            throws java.io.IOException {
+        throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-              .parseDelimitedWithIOException(PARSER, input);
+          .parseDelimitedWithIOException(PARSER, input);
     }
-
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseDelimitedFrom(
-            java.io.InputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-              .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
-            com.google.protobuf.CodedInputStream input)
-            throws java.io.IOException {
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-              .parseWithIOException(PARSER, input);
+          .parseWithIOException(PARSER, input);
     }
-
     public static im.turms.turms.pojo.bo.file.ImageFile.Description parseFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
-              .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public static Builder newBuilder(im.turms.turms.pojo.bo.file.ImageFile.Description prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-
-    public static im.turms.turms.pojo.bo.file.ImageFile.Description getDefaultInstance() {
-      return DEFAULT_INSTANCE;
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
     @java.lang.Override
-    public Builder newBuilderForType() {
-      return newBuilder();
-    }
-
+    public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
-      return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_Description_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.bo.file.ImageFile.Description.class, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder.class);
+    public static Builder newBuilder(im.turms.turms.pojo.bo.file.ImageFile.Description prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-
     @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
-              ? new Builder() : new Builder().mergeFrom(this);
+          ? new Builder() : new Builder().mergeFrom(this);
     }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
-
-    /**
-     * <code>string url = 1;</code>
-     *
-     * @return The url.
-     */
-    public java.lang.String getUrl() {
-      java.lang.Object ref = url_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs =
-                (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        url_ = s;
-        return s;
-      }
-    }
-
-    /**
-     * <code>string url = 1;</code>
-     *
-     * @return The bytes for url.
-     */
-    public com.google.protobuf.ByteString
-    getUrlBytes() {
-      java.lang.Object ref = url_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b =
-                com.google.protobuf.ByteString.copyFromUtf8(
-                        (java.lang.String) ref);
-        url_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-        return true;
-      }
-      if (!(obj instanceof im.turms.turms.pojo.bo.file.ImageFile.Description)) {
-        return super.equals(obj);
-      }
-      im.turms.turms.pojo.bo.file.ImageFile.Description other = (im.turms.turms.pojo.bo.file.ImageFile.Description) obj;
-
-      if (!getUrl()
-              .equals(other.getUrl())) return false;
-      if (hasOriginal() != other.hasOriginal()) return false;
-      if (hasOriginal()) {
-        if (!getOriginal()
-                .equals(other.getOriginal())) return false;
-      }
-      if (hasImageSize() != other.hasImageSize()) return false;
-      if (hasImageSize()) {
-        if (!getImageSize()
-                .equals(other.getImageSize())) return false;
-      }
-      if (hasFileSize() != other.hasFileSize()) return false;
-      if (hasFileSize()) {
-        if (!getFileSize()
-                .equals(other.getFileSize())) return false;
-      }
-      return unknownFields.equals(other.unknownFields);
-    }
-
-    @java.lang.Override
-    public im.turms.turms.pojo.bo.file.ImageFile.Description getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<Description>
-            PARSER = new com.google.protobuf.AbstractParser<Description>() {
-      @java.lang.Override
-      public Description parsePartialFrom(
-              com.google.protobuf.CodedInputStream input,
-              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-              throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Description(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<Description> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Description> getParserForType() {
-      return PARSER;
-    }
-
     /**
      * Protobuf type {@code im.turms.proto.ImageFile.Description}
      */
     public static final class Builder extends
-            com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-            // @@protoc_insertion_point(builder_implements:im.turms.proto.ImageFile.Description)
-            im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder {
-      // Construct using im.turms.turms.pojo.bo.file.ImageFile.Description.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:im.turms.proto.ImageFile.Description)
+        im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
-      getDescriptor() {
+          getDescriptor() {
         return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_Description_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internalGetFieldAccessorTable() {
+          internalGetFieldAccessorTable() {
         return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_Description_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 im.turms.turms.pojo.bo.file.ImageFile.Description.class, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder.class);
+      }
+
+      // Construct using im.turms.turms.pojo.bo.file.ImageFile.Description.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
       }
 
       private Builder(
@@ -1001,7 +660,7 @@ private static final long serialVersionUID = 0L;
 
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
-      getDescriptorForType() {
+          getDescriptorForType() {
         return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_Description_descriptor;
       }
 
@@ -1064,22 +723,20 @@ private static final long serialVersionUID = 0L;
       }
       @java.lang.Override
       public Builder setRepeatedField(
-              com.google.protobuf.Descriptors.FieldDescriptor field,
-              int index, java.lang.Object value) {
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
         return super.setRepeatedField(field, index, value);
       }
-
       @java.lang.Override
       public Builder addRepeatedField(
-              com.google.protobuf.Descriptors.FieldDescriptor field,
-              java.lang.Object value) {
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
         return super.addRepeatedField(field, value);
       }
-
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof im.turms.turms.pojo.bo.file.ImageFile.Description) {
-          return mergeFrom((im.turms.turms.pojo.bo.file.ImageFile.Description) other);
+          return mergeFrom((im.turms.turms.pojo.bo.file.ImageFile.Description)other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -1115,7 +772,7 @@ private static final long serialVersionUID = 0L;
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-              throws java.io.IOException {
+          throws java.io.IOException {
         im.turms.turms.pojo.bo.file.ImageFile.Description parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -1147,44 +804,23 @@ private static final long serialVersionUID = 0L;
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string url = 1;</code>
-       *
        * @return The bytes for url.
        */
       public com.google.protobuf.ByteString
-      getUrlBytes() {
+          getUrlBytes() {
         java.lang.Object ref = url_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-                  com.google.protobuf.ByteString.copyFromUtf8(
-                          (java.lang.String) ref);
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
           url_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
-      /**
-       * <code>string url = 1;</code>
-       *
-       * @param value The bytes for url to set.
-       * @return This builder for chaining.
-       */
-      public Builder setUrlBytes(
-              com.google.protobuf.ByteString value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        checkByteStringIsUtf8(value);
-
-        url_ = value;
-        onChanged();
-        return this;
-      }
-
       /**
        * <code>string url = 1;</code>
        * @param value The url to set.
@@ -1195,19 +831,34 @@ private static final long serialVersionUID = 0L;
         if (value == null) {
     throw new NullPointerException();
   }
-
+  
         url_ = value;
         onChanged();
         return this;
       }
-
       /**
        * <code>string url = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearUrl() {
-
+        
         url_ = getDefaultInstance().getUrl();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string url = 1;</code>
+       * @param value The bytes for url to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUrlBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        url_ = value;
         onChanged();
         return this;
       }
@@ -1295,12 +946,11 @@ private static final long serialVersionUID = 0L;
 
         return this;
       }
-
       /**
        * <code>.google.protobuf.BoolValue original = 2;</code>
        */
       public com.google.protobuf.BoolValue.Builder getOriginalBuilder() {
-
+        
         onChanged();
         return getOriginalFieldBuilder().getBuilder();
       }
@@ -1319,7 +969,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.BoolValue original = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>
+          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
           getOriginalFieldBuilder() {
         if (originalBuilder_ == null) {
           originalBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1419,7 +1069,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.Int32Value image_size = 3;</code>
        */
       public com.google.protobuf.Int32Value.Builder getImageSizeBuilder() {
-
+        
         onChanged();
         return getImageSizeFieldBuilder().getBuilder();
       }
@@ -1438,7 +1088,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.Int32Value image_size = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+          com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
           getImageSizeFieldBuilder() {
         if (imageSizeBuilder_ == null) {
           imageSizeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1538,7 +1188,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.Int32Value file_size = 4;</code>
        */
       public com.google.protobuf.Int32Value.Builder getFileSizeBuilder() {
-
+        
         onChanged();
         return getFileSizeFieldBuilder().getBuilder();
       }
@@ -1557,7 +1207,7 @@ private static final long serialVersionUID = 0L;
        * <code>.google.protobuf.Int32Value file_size = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+          com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
           getFileSizeFieldBuilder() {
         if (fileSizeBuilder_ == null) {
           fileSizeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1569,16 +1219,15 @@ private static final long serialVersionUID = 0L;
         }
         return fileSizeBuilder_;
       }
-
       @java.lang.Override
       public final Builder setUnknownFields(
-              final com.google.protobuf.UnknownFieldSet unknownFields) {
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
       @java.lang.Override
       public final Builder mergeUnknownFields(
-              final com.google.protobuf.UnknownFieldSet unknownFields) {
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
       }
 
@@ -1586,38 +1235,284 @@ private static final long serialVersionUID = 0L;
       // @@protoc_insertion_point(builder_scope:im.turms.proto.ImageFile.Description)
     }
 
+    // @@protoc_insertion_point(class_scope:im.turms.proto.ImageFile.Description)
+    private static final im.turms.turms.pojo.bo.file.ImageFile.Description DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.file.ImageFile.Description();
+    }
+
+    public static im.turms.turms.pojo.bo.file.ImageFile.Description getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Description>
+        PARSER = new com.google.protobuf.AbstractParser<Description>() {
+      @java.lang.Override
+      public Description parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Description(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Description> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Description> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public im.turms.turms.pojo.bo.file.ImageFile.Description getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
-  private static final com.google.protobuf.Parser<ImageFile>
-          PARSER = new com.google.protobuf.AbstractParser<ImageFile>() {
-    @java.lang.Override
-    public ImageFile parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new ImageFile(input, extensionRegistry);
-    }
-  };
+  public static final int DESCRIPTION_FIELD_NUMBER = 1;
+  private im.turms.turms.pojo.bo.file.ImageFile.Description description_;
+  /**
+   * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
+   * @return Whether the description field is set.
+   */
+  public boolean hasDescription() {
+    return description_ != null;
+  }
+  /**
+   * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
+   * @return The description.
+   */
+  public im.turms.turms.pojo.bo.file.ImageFile.Description getDescription() {
+    return description_ == null ? im.turms.turms.pojo.bo.file.ImageFile.Description.getDefaultInstance() : description_;
+  }
+  /**
+   * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
+   */
+  public im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder getDescriptionOrBuilder() {
+    return getDescription();
+  }
 
-  public static com.google.protobuf.Parser<ImageFile> parser() {
-    return PARSER;
+  public static final int DATA_FIELD_NUMBER = 2;
+  private com.google.protobuf.BytesValue data_;
+  /**
+   * <code>.google.protobuf.BytesValue data = 2;</code>
+   * @return Whether the data field is set.
+   */
+  public boolean hasData() {
+    return data_ != null;
+  }
+  /**
+   * <code>.google.protobuf.BytesValue data = 2;</code>
+   * @return The data.
+   */
+  public com.google.protobuf.BytesValue getData() {
+    return data_ == null ? com.google.protobuf.BytesValue.getDefaultInstance() : data_;
+  }
+  /**
+   * <code>.google.protobuf.BytesValue data = 2;</code>
+   */
+  public com.google.protobuf.BytesValueOrBuilder getDataOrBuilder() {
+    return getData();
+  }
+
+  private byte memoizedIsInitialized = -1;
+  @java.lang.Override
+  public final boolean isInitialized() {
+    byte isInitialized = memoizedIsInitialized;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
+
+    memoizedIsInitialized = 1;
+    return true;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<ImageFile> getParserForType() {
-    return PARSER;
+  public void writeTo(com.google.protobuf.CodedOutputStream output)
+                      throws java.io.IOException {
+    if (description_ != null) {
+      output.writeMessage(1, getDescription());
+    }
+    if (data_ != null) {
+      output.writeMessage(2, getData());
+    }
+    unknownFields.writeTo(output);
   }
 
+  @java.lang.Override
+  public int getSerializedSize() {
+    int size = memoizedSize;
+    if (size != -1) return size;
+
+    size = 0;
+    if (description_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getDescription());
+    }
+    if (data_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(2, getData());
+    }
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
+    return size;
+  }
+
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.bo.file.ImageFile)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.bo.file.ImageFile other = (im.turms.turms.pojo.bo.file.ImageFile) obj;
+
+    if (hasDescription() != other.hasDescription()) return false;
+    if (hasDescription()) {
+      if (!getDescription()
+          .equals(other.getDescription())) return false;
+    }
+    if (hasData() != other.hasData()) return false;
+    if (hasData()) {
+      if (!getData()
+          .equals(other.getData())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
+  }
+
+  @java.lang.Override
+  public int hashCode() {
+    if (memoizedHashCode != 0) {
+      return memoizedHashCode;
+    }
+    int hash = 41;
+    hash = (19 * hash) + getDescriptor().hashCode();
+    if (hasDescription()) {
+      hash = (37 * hash) + DESCRIPTION_FIELD_NUMBER;
+      hash = (53 * hash) + getDescription().hashCode();
+    }
+    if (hasData()) {
+      hash = (37 * hash) + DATA_FIELD_NUMBER;
+      hash = (53 * hash) + getData().hashCode();
+    }
+    hash = (29 * hash) + unknownFields.hashCode();
+    memoizedHashCode = hash;
+    return hash;
+  }
+
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(byte[] data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(java.io.InputStream input)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseWithIOException(PARSER, input);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseWithIOException(PARSER, input, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseDelimitedFrom(java.io.InputStream input)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseDelimitedWithIOException(PARSER, input);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseDelimitedFrom(
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseWithIOException(PARSER, input);
+  }
+  public static im.turms.turms.pojo.bo.file.ImageFile parseFrom(
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseWithIOException(PARSER, input, extensionRegistry);
+  }
+
+  @java.lang.Override
+  public Builder newBuilderForType() { return newBuilder(); }
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
+  }
+  public static Builder newBuilder(im.turms.turms.pojo.bo.file.ImageFile prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  @java.lang.Override
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
+
+  @java.lang.Override
+  protected Builder newBuilderForType(
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+    Builder builder = new Builder(parent);
+    return builder;
+  }
   /**
    * Protobuf type {@code im.turms.proto.ImageFile}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.ImageFile)
-          im.turms.turms.pojo.bo.file.ImageFileOrBuilder {
-    private im.turms.turms.pojo.bo.file.ImageFile.Description description_;
-    private com.google.protobuf.SingleFieldBuilderV3<
-            im.turms.turms.pojo.bo.file.ImageFile.Description, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder, im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder> descriptionBuilder_;
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.ImageFile)
+      im.turms.turms.pojo.bo.file.ImageFileOrBuilder {
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.bo.file.ImageFile.class, im.turms.turms.pojo.bo.file.ImageFile.Builder.class);
+    }
 
     // Construct using im.turms.turms.pojo.bo.file.ImageFile.newBuilder()
     private Builder() {
@@ -1629,13 +1524,11 @@ private static final long serialVersionUID = 0L;
       super(parent);
       maybeForceBuilderInitialization();
     }
-
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessageV3
               .alwaysUseFieldBuilders) {
       }
     }
-
     @java.lang.Override
     public Builder clear() {
       super.clear();
@@ -1654,19 +1547,6 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
-      return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
-      return im.turms.turms.pojo.bo.file.ImageFileOuterClass.internal_static_im_turms_proto_ImageFile_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.bo.file.ImageFile.class, im.turms.turms.pojo.bo.file.ImageFile.Builder.class);
-    }
-
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
@@ -1676,43 +1556,6 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public im.turms.turms.pojo.bo.file.ImageFile getDefaultInstanceForType() {
       return im.turms.turms.pojo.bo.file.ImageFile.getDefaultInstance();
-    }
-
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
-    }
-    @java.lang.Override
-    public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.setField(field, value);
-    }
-
-    @java.lang.Override
-    public Builder clearField(
-            com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-
-    @java.lang.Override
-    public Builder clearOneof(
-            com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-
-    @java.lang.Override
-    public Builder setRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-
-    @java.lang.Override
-    public Builder addRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            java.lang.Object value) {
-      return super.addRepeatedField(field, value);
     }
 
     @java.lang.Override
@@ -1742,14 +1585,41 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public final boolean isInitialized() {
-      return true;
+    public Builder clone() {
+      return super.clone();
     }
-
+    @java.lang.Override
+    public Builder setField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.setField(field, value);
+    }
+    @java.lang.Override
+    public Builder clearField(
+        com.google.protobuf.Descriptors.FieldDescriptor field) {
+      return super.clearField(field);
+    }
+    @java.lang.Override
+    public Builder clearOneof(
+        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+      return super.clearOneof(oneof);
+    }
+    @java.lang.Override
+    public Builder setRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        int index, java.lang.Object value) {
+      return super.setRepeatedField(field, index, value);
+    }
+    @java.lang.Override
+    public Builder addRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.addRepeatedField(field, value);
+    }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.bo.file.ImageFile) {
-        return mergeFrom((im.turms.turms.pojo.bo.file.ImageFile) other);
+        return mergeFrom((im.turms.turms.pojo.bo.file.ImageFile)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -1770,9 +1640,14 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
+    public final boolean isInitialized() {
+      return true;
+    }
+
+    @java.lang.Override
     public Builder mergeFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       im.turms.turms.pojo.bo.file.ImageFile parsedMessage = null;
       try {
@@ -1788,18 +1663,18 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
+    private im.turms.turms.pojo.bo.file.ImageFile.Description description_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        im.turms.turms.pojo.bo.file.ImageFile.Description, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder, im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder> descriptionBuilder_;
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
-     *
      * @return Whether the description field is set.
      */
     public boolean hasDescription() {
       return descriptionBuilder_ != null || description_ != null;
     }
-
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
-     *
      * @return The description.
      */
     public im.turms.turms.pojo.bo.file.ImageFile.Description getDescription() {
@@ -1809,7 +1684,6 @@ private static final long serialVersionUID = 0L;
         return descriptionBuilder_.getMessage();
       }
     }
-
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
@@ -1826,12 +1700,11 @@ private static final long serialVersionUID = 0L;
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
     public Builder setDescription(
-            im.turms.turms.pojo.bo.file.ImageFile.Description.Builder builderForValue) {
+        im.turms.turms.pojo.bo.file.ImageFile.Description.Builder builderForValue) {
       if (descriptionBuilder_ == null) {
         description_ = builderForValue.build();
         onChanged();
@@ -1841,7 +1714,6 @@ private static final long serialVersionUID = 0L;
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
@@ -1849,7 +1721,7 @@ private static final long serialVersionUID = 0L;
       if (descriptionBuilder_ == null) {
         if (description_ != null) {
           description_ =
-                  im.turms.turms.pojo.bo.file.ImageFile.Description.newBuilder(description_).mergeFrom(value).buildPartial();
+            im.turms.turms.pojo.bo.file.ImageFile.Description.newBuilder(description_).mergeFrom(value).buildPartial();
         } else {
           description_ = value;
         }
@@ -1860,7 +1732,6 @@ private static final long serialVersionUID = 0L;
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
@@ -1875,16 +1746,14 @@ private static final long serialVersionUID = 0L;
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
     public im.turms.turms.pojo.bo.file.ImageFile.Description.Builder getDescriptionBuilder() {
-
+      
       onChanged();
       return getDescriptionFieldBuilder().getBuilder();
     }
-
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
@@ -1893,19 +1762,18 @@ private static final long serialVersionUID = 0L;
         return descriptionBuilder_.getMessageOrBuilder();
       } else {
         return description_ == null ?
-                im.turms.turms.pojo.bo.file.ImageFile.Description.getDefaultInstance() : description_;
+            im.turms.turms.pojo.bo.file.ImageFile.Description.getDefaultInstance() : description_;
       }
     }
-
     /**
      * <code>.im.turms.proto.ImageFile.Description description = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            im.turms.turms.pojo.bo.file.ImageFile.Description, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder, im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder>
-    getDescriptionFieldBuilder() {
+        im.turms.turms.pojo.bo.file.ImageFile.Description, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder, im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder> 
+        getDescriptionFieldBuilder() {
       if (descriptionBuilder_ == null) {
         descriptionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                im.turms.turms.pojo.bo.file.ImageFile.Description, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder, im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder>(
+            im.turms.turms.pojo.bo.file.ImageFile.Description, im.turms.turms.pojo.bo.file.ImageFile.Description.Builder, im.turms.turms.pojo.bo.file.ImageFile.DescriptionOrBuilder>(
                 getDescription(),
                 getParentForChildren(),
                 isClean());
@@ -2001,11 +1869,10 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BytesValue data = 2;</code>
      */
     public com.google.protobuf.BytesValue.Builder getDataBuilder() {
-
+      
       onChanged();
       return getDataFieldBuilder().getBuilder();
     }
-
     /**
      * <code>.google.protobuf.BytesValue data = 2;</code>
      */
@@ -2017,12 +1884,11 @@ private static final long serialVersionUID = 0L;
             com.google.protobuf.BytesValue.getDefaultInstance() : data_;
       }
     }
-
     /**
      * <code>.google.protobuf.BytesValue data = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder>
+        com.google.protobuf.BytesValue, com.google.protobuf.BytesValue.Builder, com.google.protobuf.BytesValueOrBuilder> 
         getDataFieldBuilder() {
       if (dataBuilder_ == null) {
         dataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2048,6 +1914,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.ImageFile)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.ImageFile)
+  private static final im.turms.turms.pojo.bo.file.ImageFile DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.file.ImageFile();
+  }
+
+  public static im.turms.turms.pojo.bo.file.ImageFile getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<ImageFile>
+      PARSER = new com.google.protobuf.AbstractParser<ImageFile>() {
+    @java.lang.Override
+    public ImageFile parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new ImageFile(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<ImageFile> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<ImageFile> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.bo.file.ImageFile getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

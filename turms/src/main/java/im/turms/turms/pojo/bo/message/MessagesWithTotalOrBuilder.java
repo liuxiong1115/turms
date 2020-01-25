@@ -30,31 +30,27 @@ public interface MessagesWithTotalOrBuilder extends
    */
   long getFromId();
 
-    /**
-     * <code>repeated .im.turms.proto.Message messages = 4;</code>
-     */
-    java.util.List<im.turms.turms.pojo.bo.message.Message>
-    getMessagesList();
-
-    /**
-     * <code>repeated .im.turms.proto.Message messages = 4;</code>
-     */
-    im.turms.turms.pojo.bo.message.Message getMessages(int index);
-
-    /**
-     * <code>repeated .im.turms.proto.Message messages = 4;</code>
-     */
-    int getMessagesCount();
-
-    /**
-     * <code>repeated .im.turms.proto.Message messages = 4;</code>
-     */
-    java.util.List<? extends im.turms.turms.pojo.bo.message.MessageOrBuilder>
-    getMessagesOrBuilderList();
-
-    /**
-     * <code>repeated .im.turms.proto.Message messages = 4;</code>
-     */
-    im.turms.turms.pojo.bo.message.MessageOrBuilder getMessagesOrBuilder(
-            int index);
+  /**
+   * <code>repeated .im.turms.proto.Message messages = 4;</code>
+   */
+  java.util.List<im.turms.turms.pojo.bo.message.Message> 
+      getMessagesList();
+  /**
+   * <code>repeated .im.turms.proto.Message messages = 4;</code>
+   */
+  im.turms.turms.pojo.bo.message.Message getMessages(int index);
+  /**
+   * <code>repeated .im.turms.proto.Message messages = 4;</code>
+   */
+  int getMessagesCount();
+  /**
+   * <code>repeated .im.turms.proto.Message messages = 4;</code>
+   */
+  java.util.List<? extends im.turms.turms.pojo.bo.message.MessageOrBuilder> 
+      getMessagesOrBuilderList();
+  /**
+   * <code>repeated .im.turms.proto.Message messages = 4;</code>
+   */
+  im.turms.turms.pojo.bo.message.MessageOrBuilder getMessagesOrBuilder(
+      int index);
 }

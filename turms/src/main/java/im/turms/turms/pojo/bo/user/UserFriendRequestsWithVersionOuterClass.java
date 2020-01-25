@@ -16,7 +16,7 @@ public final class UserFriendRequestsWithVersionOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UserFriendRequestsWithVersion_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UserFriendRequestsWithVersion_fieldAccessorTable;
 
@@ -28,21 +28,21 @@ public final class UserFriendRequestsWithVersionOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n2model/user/user_friend_requests_with_v" +
-                    "ersion.proto\022\016im.turms.proto\032\036google/pro" +
-                    "tobuf/wrappers.proto\032$model/user/user_fr" +
-                    "iend_request.proto\"\230\001\n\035UserFriendRequest" +
-                    "sWithVersion\022?\n\024user_friend_requests\030\001 \003" +
-                    "(\0132!.im.turms.proto.UserFriendRequest\0226\n" +
-                    "\021last_updated_date\030\002 \001(\0132\033.google.protob" +
-                    "uf.Int64ValueB\037\n\033im.turms.turms.pojo.bo." +
-                    "userP\001b\006proto3"
+      "\n2model/user/user_friend_requests_with_v" +
+      "ersion.proto\022\016im.turms.proto\032\036google/pro" +
+      "tobuf/wrappers.proto\032$model/user/user_fr" +
+      "iend_request.proto\"\230\001\n\035UserFriendRequest" +
+      "sWithVersion\022?\n\024user_friend_requests\030\001 \003" +
+      "(\0132!.im.turms.proto.UserFriendRequest\0226\n" +
+      "\021last_updated_date\030\002 \001(\0132\033.google.protob" +
+      "uf.Int64ValueB\037\n\033im.turms.turms.pojo.bo." +
+      "userP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                com.google.protobuf.WrappersProto.getDescriptor(),
-                im.turms.turms.pojo.bo.user.UserFriendRequestOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.WrappersProto.getDescriptor(),
+          im.turms.turms.pojo.bo.user.UserFriendRequestOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_UserFriendRequestsWithVersion_descriptor =
       getDescriptor().getMessageTypes().get(0);

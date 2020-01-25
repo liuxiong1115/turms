@@ -16,7 +16,7 @@ public final class UserStatusDetailOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UserStatusDetail_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UserStatusDetail_fieldAccessorTable;
 
@@ -28,14 +28,14 @@ public final class UserStatusDetailOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n#model/user/user_status_detail.proto\022\016i" +
-                    "m.turms.proto\032\032constant/user_status.prot" +
-                    "o\032\032constant/device_type.proto\"\214\001\n\020UserSt" +
-                    "atusDetail\022\017\n\007user_id\030\001 \001(\003\022/\n\013user_stat" +
-                    "us\030\002 \001(\0162\032.im.turms.proto.UserStatus\0226\n\022" +
-                    "using_device_types\030\003 \003(\0162\032.im.turms.prot" +
-                    "o.DeviceTypeB\037\n\033im.turms.turms.pojo.bo.u" +
-                    "serP\001b\006proto3"
+      "\n#model/user/user_status_detail.proto\022\016i" +
+      "m.turms.proto\032\032constant/user_status.prot" +
+      "o\032\032constant/device_type.proto\"\214\001\n\020UserSt" +
+      "atusDetail\022\017\n\007user_id\030\001 \001(\003\022/\n\013user_stat" +
+      "us\030\002 \001(\0162\032.im.turms.proto.UserStatus\0226\n\022" +
+      "using_device_types\030\003 \003(\0162\032.im.turms.prot" +
+      "o.DeviceTypeB\037\n\033im.turms.turms.pojo.bo.u" +
+      "serP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

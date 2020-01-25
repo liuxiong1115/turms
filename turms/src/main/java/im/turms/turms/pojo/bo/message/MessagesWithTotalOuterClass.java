@@ -16,7 +16,7 @@ public final class MessagesWithTotalOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_MessagesWithTotal_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_MessagesWithTotal_fieldAccessorTable;
 
@@ -28,20 +28,20 @@ public final class MessagesWithTotalOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n'model/message/messages_with_total.prot" +
-                    "o\022\016im.turms.proto\032\030constant/chat_type.pr" +
-                    "oto\032\033model/message/message.proto\"\213\001\n\021Mes" +
-                    "sagesWithTotal\022\r\n\005total\030\001 \001(\005\022+\n\tchat_ty" +
-                    "pe\030\002 \001(\0162\030.im.turms.proto.ChatType\022\017\n\007fr" +
-                    "om_id\030\003 \001(\003\022)\n\010messages\030\004 \003(\0132\027.im.turms" +
-                    ".proto.MessageB\"\n\036im.turms.turms.pojo.bo" +
-                    ".messageP\001b\006proto3"
+      "\n\'model/message/messages_with_total.prot" +
+      "o\022\016im.turms.proto\032\030constant/chat_type.pr" +
+      "oto\032\033model/message/message.proto\"\213\001\n\021Mes" +
+      "sagesWithTotal\022\r\n\005total\030\001 \001(\005\022+\n\tchat_ty" +
+      "pe\030\002 \001(\0162\030.im.turms.proto.ChatType\022\017\n\007fr" +
+      "om_id\030\003 \001(\003\022)\n\010messages\030\004 \003(\0132\027.im.turms" +
+      ".proto.MessageB\"\n\036im.turms.turms.pojo.bo" +
+      ".messageP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                im.turms.turms.constant.ChatTypeOuterClass.getDescriptor(),
-                im.turms.turms.pojo.bo.message.MessageOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          im.turms.turms.constant.ChatTypeOuterClass.getDescriptor(),
+          im.turms.turms.pojo.bo.message.MessageOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_MessagesWithTotal_descriptor =
       getDescriptor().getMessageTypes().get(0);

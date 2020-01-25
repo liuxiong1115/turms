@@ -7,31 +7,27 @@ public interface MessagesWithTotalListOrBuilder extends
     // @@protoc_insertion_point(interface_extends:im.turms.proto.MessagesWithTotalList)
     com.google.protobuf.MessageOrBuilder {
 
-    /**
-     * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
-     */
-    java.util.List<im.turms.turms.pojo.bo.message.MessagesWithTotal>
-    getMessagesWithTotalListList();
-
-    /**
-     * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
-     */
-    im.turms.turms.pojo.bo.message.MessagesWithTotal getMessagesWithTotalList(int index);
-
-    /**
-     * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
-     */
-    int getMessagesWithTotalListCount();
-
-    /**
-     * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
-     */
-    java.util.List<? extends im.turms.turms.pojo.bo.message.MessagesWithTotalOrBuilder>
-    getMessagesWithTotalListOrBuilderList();
-
-    /**
-     * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
-     */
-    im.turms.turms.pojo.bo.message.MessagesWithTotalOrBuilder getMessagesWithTotalListOrBuilder(
-            int index);
+  /**
+   * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
+   */
+  java.util.List<im.turms.turms.pojo.bo.message.MessagesWithTotal> 
+      getMessagesWithTotalListList();
+  /**
+   * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
+   */
+  im.turms.turms.pojo.bo.message.MessagesWithTotal getMessagesWithTotalList(int index);
+  /**
+   * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
+   */
+  int getMessagesWithTotalListCount();
+  /**
+   * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
+   */
+  java.util.List<? extends im.turms.turms.pojo.bo.message.MessagesWithTotalOrBuilder> 
+      getMessagesWithTotalListOrBuilderList();
+  /**
+   * <code>repeated .im.turms.proto.MessagesWithTotal messages_with_total_list = 1;</code>
+   */
+  im.turms.turms.pojo.bo.message.MessagesWithTotalOrBuilder getMessagesWithTotalListOrBuilder(
+      int index);
 }

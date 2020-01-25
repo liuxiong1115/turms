@@ -16,7 +16,7 @@ public final class DeleteGroupJoinQuestionRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_DeleteGroupJoinQuestionRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_DeleteGroupJoinQuestionRequest_fieldAccessorTable;
 
@@ -28,11 +28,11 @@ public final class DeleteGroupJoinQuestionRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\nArequest/group/enrollment/delete_group_" +
-                    "join_question_request.proto\022\016im.turms.pr" +
-                    "oto\"5\n\036DeleteGroupJoinQuestionRequest\022\023\n" +
-                    "\013question_id\030\001 \001(\003B0\n,im.turms.turms.poj" +
-                    "o.request.group.enrollmentP\001b\006proto3"
+      "\nArequest/group/enrollment/delete_group_" +
+      "join_question_request.proto\022\016im.turms.pr" +
+      "oto\"5\n\036DeleteGroupJoinQuestionRequest\022\023\n" +
+      "\013question_id\030\001 \001(\003B0\n,im.turms.turms.poj" +
+      "o.request.group.enrollmentP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

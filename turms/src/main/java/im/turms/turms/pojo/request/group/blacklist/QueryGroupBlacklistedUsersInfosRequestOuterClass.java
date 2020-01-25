@@ -16,7 +16,7 @@ public final class QueryGroupBlacklistedUsersInfosRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_QueryGroupBlacklistedUsersInfosRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_QueryGroupBlacklistedUsersInfosRequest_fieldAccessorTable;
 
@@ -28,14 +28,14 @@ public final class QueryGroupBlacklistedUsersInfosRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\nIrequest/group/blacklist/query_group_bl" +
-                    "acklisted_users_infos_request.proto\022\016im." +
-                    "turms.proto\032\036google/protobuf/wrappers.pr" +
-                    "oto\"r\n&QueryGroupBlacklistedUsersInfosRe" +
-                    "quest\022\020\n\010group_id\030\001 \001(\003\0226\n\021last_updated_" +
-                    "date\030\002 \001(\0132\033.google.protobuf.Int64ValueB" +
-                    "/\n+im.turms.turms.pojo.request.group.bla" +
-                    "cklistP\001b\006proto3"
+      "\nIrequest/group/blacklist/query_group_bl" +
+      "acklisted_users_infos_request.proto\022\016im." +
+      "turms.proto\032\036google/protobuf/wrappers.pr" +
+      "oto\"r\n&QueryGroupBlacklistedUsersInfosRe" +
+      "quest\022\020\n\010group_id\030\001 \001(\003\0226\n\021last_updated_" +
+      "date\030\002 \001(\0132\033.google.protobuf.Int64ValueB" +
+      "/\n+im.turms.turms.pojo.request.group.bla" +
+      "cklistP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

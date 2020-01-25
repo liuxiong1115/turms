@@ -16,7 +16,7 @@ public final class GroupJoinRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_GroupJoinRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_GroupJoinRequest_fieldAccessorTable;
 
@@ -28,21 +28,21 @@ public final class GroupJoinRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n$model/group/group_join_request.proto\022\016" +
-                    "im.turms.proto\032\036google/protobuf/wrappers" +
-                    ".proto\032\035constant/request_status.proto\"\230\003" +
-                    "\n\020GroupJoinRequest\022'\n\002id\030\001 \001(\0132\033.google." +
-                    "protobuf.Int64Value\0222\n\rcreation_date\030\002 \001" +
-                    "(\0132\033.google.protobuf.Int64Value\022-\n\007conte" +
-                    "nt\030\003 \001(\0132\034.google.protobuf.StringValue\022-" +
-                    "\n\006status\030\004 \001(\0162\035.im.turms.proto.RequestS" +
-                    "tatus\0224\n\017expiration_date\030\005 \001(\0132\033.google." +
-                    "protobuf.Int64Value\022-\n\010group_id\030\006 \001(\0132\033." +
-                    "google.protobuf.Int64Value\0221\n\014requester_" +
-                    "id\030\007 \001(\0132\033.google.protobuf.Int64Value\0221\n" +
-                    "\014responder_id\030\010 \001(\0132\033.google.protobuf.In" +
-                    "t64ValueB \n\034im.turms.turms.pojo.bo.group" +
-                    "P\001b\006proto3"
+      "\n$model/group/group_join_request.proto\022\016" +
+      "im.turms.proto\032\036google/protobuf/wrappers" +
+      ".proto\032\035constant/request_status.proto\"\230\003" +
+      "\n\020GroupJoinRequest\022\'\n\002id\030\001 \001(\0132\033.google." +
+      "protobuf.Int64Value\0222\n\rcreation_date\030\002 \001" +
+      "(\0132\033.google.protobuf.Int64Value\022-\n\007conte" +
+      "nt\030\003 \001(\0132\034.google.protobuf.StringValue\022-" +
+      "\n\006status\030\004 \001(\0162\035.im.turms.proto.RequestS" +
+      "tatus\0224\n\017expiration_date\030\005 \001(\0132\033.google." +
+      "protobuf.Int64Value\022-\n\010group_id\030\006 \001(\0132\033." +
+      "google.protobuf.Int64Value\0221\n\014requester_" +
+      "id\030\007 \001(\0132\033.google.protobuf.Int64Value\0221\n" +
+      "\014responder_id\030\010 \001(\0132\033.google.protobuf.In" +
+      "t64ValueB \n\034im.turms.turms.pojo.bo.group" +
+      "P\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

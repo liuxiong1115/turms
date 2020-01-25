@@ -16,7 +16,7 @@ public final class GroupMemberOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_GroupMember_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_GroupMember_fieldAccessorTable;
 
@@ -28,22 +28,22 @@ public final class GroupMemberOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n\036model/group/group_member.proto\022\016im.tur" +
-                    "ms.proto\032\036google/protobuf/wrappers.proto" +
-                    "\032 constant/group_member_role.proto\032\032cons" +
-                    "tant/user_status.proto\032\032constant/device_" +
-                    "type.proto\"\222\003\n\013GroupMember\022-\n\010group_id\030\001" +
-                    " \001(\0132\033.google.protobuf.Int64Value\022,\n\007use" +
-                    "r_id\030\002 \001(\0132\033.google.protobuf.Int64Value\022" +
-                    "*\n\004name\030\003 \001(\0132\034.google.protobuf.StringVa" +
-                    "lue\022-\n\004role\030\004 \001(\0162\037.im.turms.proto.Group" +
-                    "MemberRole\022.\n\tjoin_date\030\005 \001(\0132\033.google.p" +
-                    "rotobuf.Int64Value\0222\n\rmute_end_date\030\006 \001(" +
-                    "\0132\033.google.protobuf.Int64Value\022/\n\013user_s" +
-                    "tatus\030\007 \001(\0162\032.im.turms.proto.UserStatus\022" +
-                    "6\n\022using_device_types\030\010 \003(\0162\032.im.turms.p" +
-                    "roto.DeviceTypeB \n\034im.turms.turms.pojo.b" +
-                    "o.groupP\001b\006proto3"
+      "\n\036model/group/group_member.proto\022\016im.tur" +
+      "ms.proto\032\036google/protobuf/wrappers.proto" +
+      "\032 constant/group_member_role.proto\032\032cons" +
+      "tant/user_status.proto\032\032constant/device_" +
+      "type.proto\"\222\003\n\013GroupMember\022-\n\010group_id\030\001" +
+      " \001(\0132\033.google.protobuf.Int64Value\022,\n\007use" +
+      "r_id\030\002 \001(\0132\033.google.protobuf.Int64Value\022" +
+      "*\n\004name\030\003 \001(\0132\034.google.protobuf.StringVa" +
+      "lue\022-\n\004role\030\004 \001(\0162\037.im.turms.proto.Group" +
+      "MemberRole\022.\n\tjoin_date\030\005 \001(\0132\033.google.p" +
+      "rotobuf.Int64Value\0222\n\rmute_end_date\030\006 \001(" +
+      "\0132\033.google.protobuf.Int64Value\022/\n\013user_s" +
+      "tatus\030\007 \001(\0162\032.im.turms.proto.UserStatus\022" +
+      "6\n\022using_device_types\030\010 \003(\0162\032.im.turms.p" +
+      "roto.DeviceTypeB \n\034im.turms.turms.pojo.b" +
+      "o.groupP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

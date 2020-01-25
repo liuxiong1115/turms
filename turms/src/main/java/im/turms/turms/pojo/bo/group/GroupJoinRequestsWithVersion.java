@@ -22,7 +22,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
-          UnusedPrivateParameter unused) {
+      UnusedPrivateParameter unused) {
     return new GroupJoinRequestsWithVersion();
   }
 
@@ -31,22 +31,10 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-
-  // @@protoc_insertion_point(class_scope:im.turms.proto.GroupJoinRequestsWithVersion)
-  private static final im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion();
-  }
-
-  private java.util.List<im.turms.turms.pojo.bo.group.GroupJoinRequest> groupJoinRequests_;
-
-  public static final int GROUP_JOIN_REQUESTS_FIELD_NUMBER = 1;
-
   private GroupJoinRequestsWithVersion(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     this();
     if (extensionRegistry == null) {
       throw new java.lang.NullPointerException();
@@ -68,7 +56,7 @@ private static final long serialVersionUID = 0L;
               mutable_bitField0_ |= 0x00000001;
             }
             groupJoinRequests_.add(
-                    input.readMessage(im.turms.turms.pojo.bo.group.GroupJoinRequest.parser(), extensionRegistry));
+                input.readMessage(im.turms.turms.pojo.bo.group.GroupJoinRequest.parser(), extensionRegistry));
             break;
           }
           case 18: {
@@ -106,44 +94,58 @@ private static final long serialVersionUID = 0L;
       makeExtensionsImmutable();
     }
   }
-
   public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
+      getDescriptor() {
     return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOuterClass.internal_static_im_turms_proto_GroupJoinRequestsWithVersion_descriptor;
   }
 
-  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOuterClass.internal_static_im_turms_proto_GroupJoinRequestsWithVersion_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.class, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder.class);
   }
 
+  public static final int GROUP_JOIN_REQUESTS_FIELD_NUMBER = 1;
+  private java.util.List<im.turms.turms.pojo.bo.group.GroupJoinRequest> groupJoinRequests_;
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
+   */
+  public java.util.List<im.turms.turms.pojo.bo.group.GroupJoinRequest> getGroupJoinRequestsList() {
+    return groupJoinRequests_;
+  }
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
+   */
+  public java.util.List<? extends im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder> 
+      getGroupJoinRequestsOrBuilderList() {
+    return groupJoinRequests_;
+  }
   /**
    * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
    */
   public int getGroupJoinRequestsCount() {
     return groupJoinRequests_.size();
   }
-
-  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
+   */
+  public im.turms.turms.pojo.bo.group.GroupJoinRequest getGroupJoinRequests(int index) {
+    return groupJoinRequests_.get(index);
   }
-
-  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
+   */
+  public im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder getGroupJoinRequestsOrBuilder(
+      int index) {
+    return groupJoinRequests_.get(index);
   }
 
   public static final int LAST_UPDATED_DATE_FIELD_NUMBER = 2;
   private com.google.protobuf.Int64Value lastUpdatedDate_;
-
   /**
    * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
-   *
    * @return Whether the lastUpdatedDate field is set.
    */
   public boolean hasLastUpdatedDate() {
@@ -198,18 +200,32 @@ private static final long serialVersionUID = 0L;
     }
     if (lastUpdatedDate_ != null) {
       size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(2, getLastUpdatedDate());
+        .computeMessageSize(2, getLastUpdatedDate());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion other = (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) obj;
+
+    if (!getGroupJoinRequestsList()
+        .equals(other.getGroupJoinRequestsList())) return false;
+    if (hasLastUpdatedDate() != other.hasLastUpdatedDate()) return false;
+    if (hasLastUpdatedDate()) {
+      if (!getLastUpdatedDate()
+          .equals(other.getLastUpdatedDate())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -232,185 +248,115 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
+  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(byte[] data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
   public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static Builder newBuilder(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-  }
-
-  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion getDefaultInstance() {
-    return DEFAULT_INSTANCE;
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOuterClass.internal_static_im_turms_proto_GroupJoinRequestsWithVersion_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.class, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder.class);
-  }
-
-  /**
-   * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
-   */
-  public java.util.List<im.turms.turms.pojo.bo.group.GroupJoinRequest> getGroupJoinRequestsList() {
-    return groupJoinRequests_;
-  }
-
-  @java.lang.Override
-  public Builder newBuilderForType() {
-    return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
-  /**
-   * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
-   */
-  public java.util.List<? extends im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder>
-  getGroupJoinRequestsOrBuilderList() {
-    return groupJoinRequests_;
+  public static Builder newBuilder(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  /**
-   * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
-   */
-  public im.turms.turms.pojo.bo.group.GroupJoinRequest getGroupJoinRequests(int index) {
-    return groupJoinRequests_.get(index);
-  }
-
-  /**
-   * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
-   */
-  public im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder getGroupJoinRequestsOrBuilder(
-          int index) {
-    return groupJoinRequests_.get(index);
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion other = (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) obj;
-
-    if (!getGroupJoinRequestsList()
-            .equals(other.getGroupJoinRequestsList())) return false;
-    if (hasLastUpdatedDate() != other.hasLastUpdatedDate()) return false;
-    if (hasLastUpdatedDate()) {
-      if (!getLastUpdatedDate()
-              .equals(other.getLastUpdatedDate())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<GroupJoinRequestsWithVersion>
-          PARSER = new com.google.protobuf.AbstractParser<GroupJoinRequestsWithVersion>() {
-    @java.lang.Override
-    public GroupJoinRequestsWithVersion parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new GroupJoinRequestsWithVersion(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<GroupJoinRequestsWithVersion> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<GroupJoinRequestsWithVersion> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.GroupJoinRequestsWithVersion}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.GroupJoinRequestsWithVersion)
-          im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder {
-    private java.util.List<im.turms.turms.pojo.bo.group.GroupJoinRequest> groupJoinRequests_ =
-            java.util.Collections.emptyList();
-    private com.google.protobuf.RepeatedFieldBuilderV3<
-            im.turms.turms.pojo.bo.group.GroupJoinRequest, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder> groupJoinRequestsBuilder_;
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.GroupJoinRequestsWithVersion)
+      im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder {
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOuterClass.internal_static_im_turms_proto_GroupJoinRequestsWithVersion_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOuterClass.internal_static_im_turms_proto_GroupJoinRequestsWithVersion_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.class, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder.class);
+    }
 
     // Construct using im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.newBuilder()
     private Builder() {
@@ -418,7 +364,7 @@ private static final long serialVersionUID = 0L;
     }
 
     private Builder(
-            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
       maybeForceBuilderInitialization();
     }
@@ -446,62 +392,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
-      return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOuterClass.internal_static_im_turms_proto_GroupJoinRequestsWithVersion_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
-      return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOuterClass.internal_static_im_turms_proto_GroupJoinRequestsWithVersion_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.class, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder.class);
-    }
-
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
-    getDescriptorForType() {
+        getDescriptorForType() {
       return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOuterClass.internal_static_im_turms_proto_GroupJoinRequestsWithVersion_descriptor;
     }
 
     @java.lang.Override
     public im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion getDefaultInstanceForType() {
       return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance();
-    }
-
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
-    }
-    @java.lang.Override
-    public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.setField(field, value);
-    }
-    @java.lang.Override
-    public Builder clearField(
-        com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-    @java.lang.Override
-    public Builder clearOneof(
-        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-    @java.lang.Override
-    public Builder setRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-
-    @java.lang.Override
-    public Builder addRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            java.lang.Object value) {
-      return super.addRepeatedField(field, value);
     }
 
     @java.lang.Override
@@ -536,21 +435,46 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public final boolean isInitialized() {
-      return true;
+    public Builder clone() {
+      return super.clone();
     }
-
+    @java.lang.Override
+    public Builder setField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.setField(field, value);
+    }
+    @java.lang.Override
+    public Builder clearField(
+        com.google.protobuf.Descriptors.FieldDescriptor field) {
+      return super.clearField(field);
+    }
+    @java.lang.Override
+    public Builder clearOneof(
+        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+      return super.clearOneof(oneof);
+    }
+    @java.lang.Override
+    public Builder setRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        int index, java.lang.Object value) {
+      return super.setRepeatedField(field, index, value);
+    }
+    @java.lang.Override
+    public Builder addRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.addRepeatedField(field, value);
+    }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) {
-        return mergeFrom((im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) other);
+        return mergeFrom((im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
-
-    private int bitField0_;
 
     public Builder mergeFrom(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion other) {
       if (other == im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance()) return this;
@@ -572,9 +496,9 @@ private static final long serialVersionUID = 0L;
             groupJoinRequestsBuilder_ = null;
             groupJoinRequests_ = other.groupJoinRequests_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            groupJoinRequestsBuilder_ =
-                    com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                            getGroupJoinRequestsFieldBuilder() : null;
+            groupJoinRequestsBuilder_ = 
+              com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                 getGroupJoinRequestsFieldBuilder() : null;
           } else {
             groupJoinRequestsBuilder_.addAllMessages(other.groupJoinRequests_);
           }
@@ -589,10 +513,15 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
+    public final boolean isInitialized() {
+      return true;
+    }
+
+    @java.lang.Override
     public Builder mergeFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
       im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -606,13 +535,19 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
+    private int bitField0_;
 
+    private java.util.List<im.turms.turms.pojo.bo.group.GroupJoinRequest> groupJoinRequests_ =
+      java.util.Collections.emptyList();
     private void ensureGroupJoinRequestsIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
         groupJoinRequests_ = new java.util.ArrayList<im.turms.turms.pojo.bo.group.GroupJoinRequest>(groupJoinRequests_);
         bitField0_ |= 0x00000001;
-      }
+       }
     }
+
+    private com.google.protobuf.RepeatedFieldBuilderV3<
+        im.turms.turms.pojo.bo.group.GroupJoinRequest, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder> groupJoinRequestsBuilder_;
 
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
@@ -624,7 +559,6 @@ private static final long serialVersionUID = 0L;
         return groupJoinRequestsBuilder_.getMessageList();
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
@@ -635,7 +569,6 @@ private static final long serialVersionUID = 0L;
         return groupJoinRequestsBuilder_.getCount();
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
@@ -646,12 +579,11 @@ private static final long serialVersionUID = 0L;
         return groupJoinRequestsBuilder_.getMessage(index);
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public Builder setGroupJoinRequests(
-            int index, im.turms.turms.pojo.bo.group.GroupJoinRequest value) {
+        int index, im.turms.turms.pojo.bo.group.GroupJoinRequest value) {
       if (groupJoinRequestsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -664,12 +596,11 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public Builder setGroupJoinRequests(
-            int index, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder builderForValue) {
+        int index, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder builderForValue) {
       if (groupJoinRequestsBuilder_ == null) {
         ensureGroupJoinRequestsIsMutable();
         groupJoinRequests_.set(index, builderForValue.build());
@@ -679,7 +610,6 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
@@ -696,12 +626,11 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public Builder addGroupJoinRequests(
-            int index, im.turms.turms.pojo.bo.group.GroupJoinRequest value) {
+        int index, im.turms.turms.pojo.bo.group.GroupJoinRequest value) {
       if (groupJoinRequestsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -714,12 +643,11 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public Builder addGroupJoinRequests(
-            im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder builderForValue) {
+        im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder builderForValue) {
       if (groupJoinRequestsBuilder_ == null) {
         ensureGroupJoinRequestsIsMutable();
         groupJoinRequests_.add(builderForValue.build());
@@ -729,12 +657,11 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public Builder addGroupJoinRequests(
-            int index, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder builderForValue) {
+        int index, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder builderForValue) {
       if (groupJoinRequestsBuilder_ == null) {
         ensureGroupJoinRequestsIsMutable();
         groupJoinRequests_.add(index, builderForValue.build());
@@ -744,16 +671,15 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public Builder addAllGroupJoinRequests(
-            java.lang.Iterable<? extends im.turms.turms.pojo.bo.group.GroupJoinRequest> values) {
+        java.lang.Iterable<? extends im.turms.turms.pojo.bo.group.GroupJoinRequest> values) {
       if (groupJoinRequestsBuilder_ == null) {
         ensureGroupJoinRequestsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-                values, groupJoinRequests_);
+            values, groupJoinRequests_);
         onChanged();
       } else {
         groupJoinRequestsBuilder_.addAllMessages(values);
@@ -786,70 +712,62 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder getGroupJoinRequestsBuilder(
-            int index) {
+        int index) {
       return getGroupJoinRequestsFieldBuilder().getBuilder(index);
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder getGroupJoinRequestsOrBuilder(
-            int index) {
+        int index) {
       if (groupJoinRequestsBuilder_ == null) {
-        return groupJoinRequests_.get(index);
-      } else {
+        return groupJoinRequests_.get(index);  } else {
         return groupJoinRequestsBuilder_.getMessageOrBuilder(index);
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
-    public java.util.List<? extends im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder>
-    getGroupJoinRequestsOrBuilderList() {
+    public java.util.List<? extends im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder> 
+         getGroupJoinRequestsOrBuilderList() {
       if (groupJoinRequestsBuilder_ != null) {
         return groupJoinRequestsBuilder_.getMessageOrBuilderList();
       } else {
         return java.util.Collections.unmodifiableList(groupJoinRequests_);
       }
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder addGroupJoinRequestsBuilder() {
       return getGroupJoinRequestsFieldBuilder().addBuilder(
-              im.turms.turms.pojo.bo.group.GroupJoinRequest.getDefaultInstance());
+          im.turms.turms.pojo.bo.group.GroupJoinRequest.getDefaultInstance());
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
     public im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder addGroupJoinRequestsBuilder(
-            int index) {
+        int index) {
       return getGroupJoinRequestsFieldBuilder().addBuilder(
-              index, im.turms.turms.pojo.bo.group.GroupJoinRequest.getDefaultInstance());
+          index, im.turms.turms.pojo.bo.group.GroupJoinRequest.getDefaultInstance());
     }
-
     /**
      * <code>repeated .im.turms.proto.GroupJoinRequest group_join_requests = 1;</code>
      */
-    public java.util.List<im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder>
-    getGroupJoinRequestsBuilderList() {
+    public java.util.List<im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder> 
+         getGroupJoinRequestsBuilderList() {
       return getGroupJoinRequestsFieldBuilder().getBuilderList();
     }
-
     private com.google.protobuf.RepeatedFieldBuilderV3<
-            im.turms.turms.pojo.bo.group.GroupJoinRequest, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder>
-    getGroupJoinRequestsFieldBuilder() {
+        im.turms.turms.pojo.bo.group.GroupJoinRequest, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder> 
+        getGroupJoinRequestsFieldBuilder() {
       if (groupJoinRequestsBuilder_ == null) {
         groupJoinRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-                im.turms.turms.pojo.bo.group.GroupJoinRequest, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder>(
+            im.turms.turms.pojo.bo.group.GroupJoinRequest, im.turms.turms.pojo.bo.group.GroupJoinRequest.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestOrBuilder>(
                 groupJoinRequests_,
                 ((bitField0_ & 0x00000001) != 0),
                 getParentForChildren(),
@@ -946,7 +864,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getLastUpdatedDateBuilder() {
-
+      
       onChanged();
       return getLastUpdatedDateFieldBuilder().getBuilder();
     }
@@ -961,13 +879,12 @@ private static final long serialVersionUID = 0L;
             com.google.protobuf.Int64Value.getDefaultInstance() : lastUpdatedDate_;
       }
     }
-
     /**
      * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
-    getLastUpdatedDateFieldBuilder() {
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
+        getLastUpdatedDateFieldBuilder() {
       if (lastUpdatedDateBuilder_ == null) {
         lastUpdatedDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
             com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
@@ -992,6 +909,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.GroupJoinRequestsWithVersion)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.GroupJoinRequestsWithVersion)
+  private static final im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion();
+  }
+
+  public static im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<GroupJoinRequestsWithVersion>
+      PARSER = new com.google.protobuf.AbstractParser<GroupJoinRequestsWithVersion>() {
+    @java.lang.Override
+    public GroupJoinRequestsWithVersion parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new GroupJoinRequestsWithVersion(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<GroupJoinRequestsWithVersion> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<GroupJoinRequestsWithVersion> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

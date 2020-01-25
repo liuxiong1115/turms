@@ -159,26 +159,29 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
   }
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+    return im.turms.turms.pojo.bo.user.UserFriendRequestOuterClass.internal_static_im_turms_proto_UserFriendRequest_descriptor;
+  }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.UserFriendRequest)
-  private static final im.turms.turms.pojo.bo.user.UserFriendRequest DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.user.UserFriendRequest();
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.bo.user.UserFriendRequestOuterClass.internal_static_im_turms_proto_UserFriendRequest_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.bo.user.UserFriendRequest.class, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder.class);
   }
 
   public static final int ID_FIELD_NUMBER = 1;
   private com.google.protobuf.Int64Value id_;
-
   /**
    * <code>.google.protobuf.Int64Value id = 1;</code>
-   *
    * @return Whether the id field is set.
    */
   public boolean hasId() {
@@ -432,16 +435,61 @@ private static final long serialVersionUID = 0L;
     }
     if (recipientId_ != null) {
       size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(8, getRecipientId());
+        .computeMessageSize(8, getRecipientId());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
-    return im.turms.turms.pojo.bo.user.UserFriendRequestOuterClass.internal_static_im_turms_proto_UserFriendRequest_descriptor;
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.bo.user.UserFriendRequest)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.bo.user.UserFriendRequest other = (im.turms.turms.pojo.bo.user.UserFriendRequest) obj;
+
+    if (hasId() != other.hasId()) return false;
+    if (hasId()) {
+      if (!getId()
+          .equals(other.getId())) return false;
+    }
+    if (hasCreationDate() != other.hasCreationDate()) return false;
+    if (hasCreationDate()) {
+      if (!getCreationDate()
+          .equals(other.getCreationDate())) return false;
+    }
+    if (hasContent() != other.hasContent()) return false;
+    if (hasContent()) {
+      if (!getContent()
+          .equals(other.getContent())) return false;
+    }
+    if (requestStatus_ != other.requestStatus_) return false;
+    if (hasReason() != other.hasReason()) return false;
+    if (hasReason()) {
+      if (!getReason()
+          .equals(other.getReason())) return false;
+    }
+    if (hasExpirationDate() != other.hasExpirationDate()) return false;
+    if (hasExpirationDate()) {
+      if (!getExpirationDate()
+          .equals(other.getExpirationDate())) return false;
+    }
+    if (hasRequesterId() != other.hasRequesterId()) return false;
+    if (hasRequesterId()) {
+      if (!getRequesterId()
+          .equals(other.getRequesterId())) return false;
+    }
+    if (hasRecipientId() != other.hasRecipientId()) return false;
+    if (hasRecipientId()) {
+      if (!getRecipientId()
+          .equals(other.getRecipientId())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -487,220 +535,118 @@ private static final long serialVersionUID = 0L;
   }
 
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.user.UserFriendRequest parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
   public static Builder newBuilder(im.turms.turms.pojo.bo.user.UserFriendRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  public static im.turms.turms.pojo.bo.user.UserFriendRequest getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.bo.user.UserFriendRequestOuterClass.internal_static_im_turms_proto_UserFriendRequest_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.bo.user.UserFriendRequest.class, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder.class);
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.bo.user.UserFriendRequest)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.bo.user.UserFriendRequest other = (im.turms.turms.pojo.bo.user.UserFriendRequest) obj;
-
-    if (hasId() != other.hasId()) return false;
-    if (hasId()) {
-      if (!getId()
-              .equals(other.getId())) return false;
-    }
-    if (hasCreationDate() != other.hasCreationDate()) return false;
-    if (hasCreationDate()) {
-      if (!getCreationDate()
-              .equals(other.getCreationDate())) return false;
-    }
-    if (hasContent() != other.hasContent()) return false;
-    if (hasContent()) {
-      if (!getContent()
-              .equals(other.getContent())) return false;
-    }
-    if (requestStatus_ != other.requestStatus_) return false;
-    if (hasReason() != other.hasReason()) return false;
-    if (hasReason()) {
-      if (!getReason()
-              .equals(other.getReason())) return false;
-    }
-    if (hasExpirationDate() != other.hasExpirationDate()) return false;
-    if (hasExpirationDate()) {
-      if (!getExpirationDate()
-              .equals(other.getExpirationDate())) return false;
-    }
-    if (hasRequesterId() != other.hasRequesterId()) return false;
-    if (hasRequesterId()) {
-      if (!getRequesterId()
-              .equals(other.getRequesterId())) return false;
-    }
-    if (hasRecipientId() != other.hasRecipientId()) return false;
-    if (hasRecipientId()) {
-      if (!getRecipientId()
-              .equals(other.getRecipientId())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.bo.user.UserFriendRequest getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<UserFriendRequest>
-          PARSER = new com.google.protobuf.AbstractParser<UserFriendRequest>() {
-    @java.lang.Override
-    public UserFriendRequest parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new UserFriendRequest(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<UserFriendRequest> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<UserFriendRequest> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.UserFriendRequest}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.UserFriendRequest)
-          im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder {
-    // Construct using im.turms.turms.pojo.bo.user.UserFriendRequest.newBuilder()
-    private Builder() {
-      maybeForceBuilderInitialization();
-    }
-
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.UserFriendRequest)
+      im.turms.turms.pojo.bo.user.UserFriendRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
+        getDescriptor() {
       return im.turms.turms.pojo.bo.user.UserFriendRequestOuterClass.internal_static_im_turms_proto_UserFriendRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
+        internalGetFieldAccessorTable() {
       return im.turms.turms.pojo.bo.user.UserFriendRequestOuterClass.internal_static_im_turms_proto_UserFriendRequest_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.bo.user.UserFriendRequest.class, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder.class);
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.bo.user.UserFriendRequest.class, im.turms.turms.pojo.bo.user.UserFriendRequest.Builder.class);
+    }
+
+    // Construct using im.turms.turms.pojo.bo.user.UserFriendRequest.newBuilder()
+    private Builder() {
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
@@ -858,11 +804,10 @@ private static final long serialVersionUID = 0L;
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
-
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.bo.user.UserFriendRequest) {
-        return mergeFrom((im.turms.turms.pojo.bo.user.UserFriendRequest) other);
+        return mergeFrom((im.turms.turms.pojo.bo.user.UserFriendRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -1011,7 +956,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value id = 1;</code>
      */
     public com.google.protobuf.Int64Value.Builder getIdBuilder() {
-
+      
       onChanged();
       return getIdFieldBuilder().getBuilder();
     }
@@ -1030,7 +975,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value id = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getIdFieldBuilder() {
       if (idBuilder_ == null) {
         idBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1130,7 +1075,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value creation_date = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getCreationDateBuilder() {
-
+      
       onChanged();
       return getCreationDateFieldBuilder().getBuilder();
     }
@@ -1149,7 +1094,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value creation_date = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getCreationDateFieldBuilder() {
       if (creationDateBuilder_ == null) {
         creationDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1249,7 +1194,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue content = 3;</code>
      */
     public com.google.protobuf.StringValue.Builder getContentBuilder() {
-
+      
       onChanged();
       return getContentFieldBuilder().getBuilder();
     }
@@ -1268,7 +1213,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue content = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getContentFieldBuilder() {
       if (contentBuilder_ == null) {
         contentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1317,7 +1262,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       requestStatus_ = value.getNumber();
       onChanged();
       return this;
@@ -1327,7 +1272,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearRequestStatus() {
-
+      
       requestStatus_ = 0;
       onChanged();
       return this;
@@ -1420,7 +1365,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue reason = 5;</code>
      */
     public com.google.protobuf.StringValue.Builder getReasonBuilder() {
-
+      
       onChanged();
       return getReasonFieldBuilder().getBuilder();
     }
@@ -1439,7 +1384,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.StringValue reason = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
         getReasonFieldBuilder() {
       if (reasonBuilder_ == null) {
         reasonBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1539,7 +1484,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value expiration_date = 6;</code>
      */
     public com.google.protobuf.Int64Value.Builder getExpirationDateBuilder() {
-
+      
       onChanged();
       return getExpirationDateFieldBuilder().getBuilder();
     }
@@ -1558,7 +1503,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value expiration_date = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getExpirationDateFieldBuilder() {
       if (expirationDateBuilder_ == null) {
         expirationDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1658,7 +1603,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value requester_id = 7;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRequesterIdBuilder() {
-
+      
       onChanged();
       return getRequesterIdFieldBuilder().getBuilder();
     }
@@ -1677,7 +1622,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value requester_id = 7;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getRequesterIdFieldBuilder() {
       if (requesterIdBuilder_ == null) {
         requesterIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1777,7 +1722,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRecipientIdBuilder() {
-
+      
       onChanged();
       return getRecipientIdFieldBuilder().getBuilder();
     }
@@ -1796,7 +1741,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value recipient_id = 8;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getRecipientIdFieldBuilder() {
       if (recipientIdBuilder_ == null) {
         recipientIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1822,6 +1767,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.UserFriendRequest)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.UserFriendRequest)
+  private static final im.turms.turms.pojo.bo.user.UserFriendRequest DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.user.UserFriendRequest();
+  }
+
+  public static im.turms.turms.pojo.bo.user.UserFriendRequest getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<UserFriendRequest>
+      PARSER = new com.google.protobuf.AbstractParser<UserFriendRequest>() {
+    @java.lang.Override
+    public UserFriendRequest parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new UserFriendRequest(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<UserFriendRequest> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<UserFriendRequest> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.bo.user.UserFriendRequest getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

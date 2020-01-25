@@ -16,7 +16,7 @@ public final class UserRelationshipsWithVersionOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UserRelationshipsWithVersion_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UserRelationshipsWithVersion_fieldAccessorTable;
 
@@ -28,21 +28,21 @@ public final class UserRelationshipsWithVersionOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n0model/user/user_relationships_with_ver" +
-                    "sion.proto\022\016im.turms.proto\032\036google/proto" +
-                    "buf/wrappers.proto\032\"model/user/user_rela" +
-                    "tionship.proto\"\224\001\n\034UserRelationshipsWith" +
-                    "Version\022<\n\022user_relationships\030\001 \003(\0132 .im" +
-                    ".turms.proto.UserRelationship\0226\n\021last_up" +
-                    "dated_date\030\002 \001(\0132\033.google.protobuf.Int64" +
-                    "ValueB\037\n\033im.turms.turms.pojo.bo.userP\001b\006" +
-                    "proto3"
+      "\n0model/user/user_relationships_with_ver" +
+      "sion.proto\022\016im.turms.proto\032\036google/proto" +
+      "buf/wrappers.proto\032\"model/user/user_rela" +
+      "tionship.proto\"\224\001\n\034UserRelationshipsWith" +
+      "Version\022<\n\022user_relationships\030\001 \003(\0132 .im" +
+      ".turms.proto.UserRelationship\0226\n\021last_up" +
+      "dated_date\030\002 \001(\0132\033.google.protobuf.Int64" +
+      "ValueB\037\n\033im.turms.turms.pojo.bo.userP\001b\006" +
+      "proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                com.google.protobuf.WrappersProto.getDescriptor(),
-                im.turms.turms.pojo.bo.user.UserRelationshipOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.WrappersProto.getDescriptor(),
+          im.turms.turms.pojo.bo.user.UserRelationshipOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_UserRelationshipsWithVersion_descriptor =
       getDescriptor().getMessageTypes().get(0);

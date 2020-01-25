@@ -123,7 +123,7 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       if (((mutable_bitField0_ & 0x00000001) != 0)) {
         relatedUsersIds_.makeImmutable(); // C
@@ -132,24 +132,27 @@ private static final long serialVersionUID = 0L;
       makeExtensionsImmutable();
     }
   }
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+    return im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOuterClass.internal_static_im_turms_proto_QueryRelationshipsRequest_descriptor;
+  }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.QueryRelationshipsRequest)
-  private static final im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest();
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOuterClass.internal_static_im_turms_proto_QueryRelationshipsRequest_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.class, im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.Builder.class);
   }
 
   public static final int RELATED_USERS_IDS_FIELD_NUMBER = 1;
   private com.google.protobuf.Internal.LongList relatedUsersIds_;
-
   /**
    * <code>repeated int64 related_users_ids = 1;</code>
-   *
    * @return A list containing the relatedUsersIds.
    */
   public java.util.List<java.lang.Long>
-  getRelatedUsersIdsList() {
+      getRelatedUsersIdsList() {
     return relatedUsersIds_;
   }
   /**
@@ -302,16 +305,42 @@ private static final long serialVersionUID = 0L;
     }
     if (lastUpdatedDate_ != null) {
       size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(4, getLastUpdatedDate());
+        .computeMessageSize(4, getLastUpdatedDate());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
-    return im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOuterClass.internal_static_im_turms_proto_QueryRelationshipsRequest_descriptor;
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest other = (im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest) obj;
+
+    if (!getRelatedUsersIdsList()
+        .equals(other.getRelatedUsersIdsList())) return false;
+    if (hasIsBlocked() != other.hasIsBlocked()) return false;
+    if (hasIsBlocked()) {
+      if (!getIsBlocked()
+          .equals(other.getIsBlocked())) return false;
+    }
+    if (hasGroupIndex() != other.hasGroupIndex()) return false;
+    if (hasGroupIndex()) {
+      if (!getGroupIndex()
+          .equals(other.getGroupIndex())) return false;
+    }
+    if (hasLastUpdatedDate() != other.hasLastUpdatedDate()) return false;
+    if (hasLastUpdatedDate()) {
+      if (!getLastUpdatedDate()
+          .equals(other.getLastUpdatedDate())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -343,201 +372,118 @@ private static final long serialVersionUID = 0L;
   }
 
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
   public static Builder newBuilder(im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOuterClass.internal_static_im_turms_proto_QueryRelationshipsRequest_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.class, im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.Builder.class);
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest other = (im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest) obj;
-
-    if (!getRelatedUsersIdsList()
-            .equals(other.getRelatedUsersIdsList())) return false;
-    if (hasIsBlocked() != other.hasIsBlocked()) return false;
-    if (hasIsBlocked()) {
-      if (!getIsBlocked()
-              .equals(other.getIsBlocked())) return false;
-    }
-    if (hasGroupIndex() != other.hasGroupIndex()) return false;
-    if (hasGroupIndex()) {
-      if (!getGroupIndex()
-              .equals(other.getGroupIndex())) return false;
-    }
-    if (hasLastUpdatedDate() != other.hasLastUpdatedDate()) return false;
-    if (hasLastUpdatedDate()) {
-      if (!getLastUpdatedDate()
-              .equals(other.getLastUpdatedDate())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<QueryRelationshipsRequest>
-          PARSER = new com.google.protobuf.AbstractParser<QueryRelationshipsRequest>() {
-    @java.lang.Override
-    public QueryRelationshipsRequest parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new QueryRelationshipsRequest(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<QueryRelationshipsRequest> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<QueryRelationshipsRequest> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.QueryRelationshipsRequest}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.QueryRelationshipsRequest)
-          im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOrBuilder {
-    // Construct using im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.newBuilder()
-    private Builder() {
-      maybeForceBuilderInitialization();
-    }
-
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.QueryRelationshipsRequest)
+      im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
+        getDescriptor() {
       return im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOuterClass.internal_static_im_turms_proto_QueryRelationshipsRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
+        internalGetFieldAccessorTable() {
       return im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequestOuterClass.internal_static_im_turms_proto_QueryRelationshipsRequest_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.class, im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.Builder.class);
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.class, im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.Builder.class);
+    }
+
+    // Construct using im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.newBuilder()
+    private Builder() {
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
@@ -656,11 +602,10 @@ private static final long serialVersionUID = 0L;
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
-
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest) {
-        return mergeFrom((im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest) other);
+        return mergeFrom((im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -668,8 +613,7 @@ private static final long serialVersionUID = 0L;
     }
 
     public Builder mergeFrom(im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest other) {
-      if (other == im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.getDefaultInstance())
-        return this;
+      if (other == im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest.getDefaultInstance()) return this;
       if (!other.relatedUsersIds_.isEmpty()) {
         if (relatedUsersIds_.isEmpty()) {
           relatedUsersIds_ = other.relatedUsersIds_;
@@ -885,7 +829,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BoolValue is_blocked = 2;</code>
      */
     public com.google.protobuf.BoolValue.Builder getIsBlockedBuilder() {
-
+      
       onChanged();
       return getIsBlockedFieldBuilder().getBuilder();
     }
@@ -904,7 +848,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.BoolValue is_blocked = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>
+        com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
         getIsBlockedFieldBuilder() {
       if (isBlockedBuilder_ == null) {
         isBlockedBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1004,7 +948,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value group_index = 3;</code>
      */
     public com.google.protobuf.Int32Value.Builder getGroupIndexBuilder() {
-
+      
       onChanged();
       return getGroupIndexFieldBuilder().getBuilder();
     }
@@ -1023,7 +967,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value group_index = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getGroupIndexFieldBuilder() {
       if (groupIndexBuilder_ == null) {
         groupIndexBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1123,7 +1067,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 4;</code>
      */
     public com.google.protobuf.Int64Value.Builder getLastUpdatedDateBuilder() {
-
+      
       onChanged();
       return getLastUpdatedDateFieldBuilder().getBuilder();
     }
@@ -1142,7 +1086,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value last_updated_date = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getLastUpdatedDateFieldBuilder() {
       if (lastUpdatedDateBuilder_ == null) {
         lastUpdatedDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1168,6 +1112,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.QueryRelationshipsRequest)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.QueryRelationshipsRequest)
+  private static final im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest();
+  }
+
+  public static im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<QueryRelationshipsRequest>
+      PARSER = new com.google.protobuf.AbstractParser<QueryRelationshipsRequest>() {
+    @java.lang.Override
+    public QueryRelationshipsRequest parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new QueryRelationshipsRequest(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<QueryRelationshipsRequest> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<QueryRelationshipsRequest> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.request.user.relationship.QueryRelationshipsRequest getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

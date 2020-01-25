@@ -16,12 +16,12 @@ public final class CheckGroupJoinQuestionsAnswersRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_CheckGroupJoinQuestionsAnswersRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_CheckGroupJoinQuestionsAnswersRequest_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_CheckGroupJoinQuestionsAnswersRequest_QuestionIdAndAnswerEntry_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_CheckGroupJoinQuestionsAnswersRequest_QuestionIdAndAnswerEntry_fieldAccessorTable;
 
@@ -33,16 +33,16 @@ public final class CheckGroupJoinQuestionsAnswersRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\nIrequest/group/enrollment/check_group_j" +
-                    "oin_questions_answers_request.proto\022\016im." +
-                    "turms.proto\"\323\001\n%CheckGroupJoinQuestionsA" +
-                    "nswersRequest\022n\n\026question_id_and_answer\030" +
-                    "\001 \003(\0132N.im.turms.proto.CheckGroupJoinQue" +
-                    "stionsAnswersRequest.QuestionIdAndAnswer" +
-                    "Entry\032:\n\030QuestionIdAndAnswerEntry\022\013\n\003key" +
-                    "\030\001 \001(\003\022\r\n\005value\030\002 \001(\t:\0028\001B0\n,im.turms.tu" +
-                    "rms.pojo.request.group.enrollmentP\001b\006pro" +
-                    "to3"
+      "\nIrequest/group/enrollment/check_group_j" +
+      "oin_questions_answers_request.proto\022\016im." +
+      "turms.proto\"\323\001\n%CheckGroupJoinQuestionsA" +
+      "nswersRequest\022n\n\026question_id_and_answer\030" +
+      "\001 \003(\0132N.im.turms.proto.CheckGroupJoinQue" +
+      "stionsAnswersRequest.QuestionIdAndAnswer" +
+      "Entry\032:\n\030QuestionIdAndAnswerEntry\022\013\n\003key" +
+      "\030\001 \001(\003\022\r\n\005value\030\002 \001(\t:\0028\001B0\n,im.turms.tu" +
+      "rms.pojo.request.group.enrollmentP\001b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

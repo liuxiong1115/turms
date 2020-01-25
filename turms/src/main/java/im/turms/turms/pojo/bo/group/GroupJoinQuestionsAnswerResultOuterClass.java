@@ -16,7 +16,7 @@ public final class GroupJoinQuestionsAnswerResultOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_GroupJoinQuestionsAnswerResult_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_GroupJoinQuestionsAnswerResult_fieldAccessorTable;
 
@@ -28,11 +28,11 @@ public final class GroupJoinQuestionsAnswerResultOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n4model/group/group_join_questions_answe" +
-                    "r_result.proto\022\016im.turms.proto\"V\n\036GroupJ" +
-                    "oinQuestionsAnswerResult\022\r\n\005score\030\001 \001(\005\022" +
-                    "\025\n\rquestions_ids\030\002 \003(\003\022\016\n\006joined\030\003 \001(\010B " +
-                    "\n\034im.turms.turms.pojo.bo.groupP\001b\006proto3"
+      "\n4model/group/group_join_questions_answe" +
+      "r_result.proto\022\016im.turms.proto\"V\n\036GroupJ" +
+      "oinQuestionsAnswerResult\022\r\n\005score\030\001 \001(\005\022" +
+      "\025\n\rquestions_ids\030\002 \003(\003\022\016\n\006joined\030\003 \001(\010B " +
+      "\n\034im.turms.turms.pojo.bo.groupP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

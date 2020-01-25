@@ -61,32 +61,32 @@ public interface UpdateMessageRequestOrBuilder extends
   com.google.protobuf.ByteString getRecords(int index);
 
   /**
-   * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+   * <code>.google.protobuf.Int64Value recall_date = 5;</code>
    * @return Whether the recallDate field is set.
    */
   boolean hasRecallDate();
   /**
-   * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+   * <code>.google.protobuf.Int64Value recall_date = 5;</code>
    * @return The recallDate.
    */
   com.google.protobuf.Int64Value getRecallDate();
   /**
-   * <code>.google.protobuf.Int64Value recallDate = 5;</code>
+   * <code>.google.protobuf.Int64Value recall_date = 5;</code>
    */
   com.google.protobuf.Int64ValueOrBuilder getRecallDateOrBuilder();
 
   /**
-   * <code>.google.protobuf.Int64Value readDate = 6;</code>
+   * <code>.google.protobuf.Int64Value read_date = 6;</code>
    * @return Whether the readDate field is set.
    */
   boolean hasReadDate();
   /**
-   * <code>.google.protobuf.Int64Value readDate = 6;</code>
+   * <code>.google.protobuf.Int64Value read_date = 6;</code>
    * @return The readDate.
    */
   com.google.protobuf.Int64Value getReadDate();
   /**
-   * <code>.google.protobuf.Int64Value readDate = 6;</code>
+   * <code>.google.protobuf.Int64Value read_date = 6;</code>
    */
   com.google.protobuf.Int64ValueOrBuilder getReadDateOrBuilder();
 }

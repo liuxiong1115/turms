@@ -79,26 +79,29 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
   }
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+    return im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOuterClass.internal_static_im_turms_proto_DeleteRelationshipGroupRequest_descriptor;
+  }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.DeleteRelationshipGroupRequest)
-  private static final im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest();
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOuterClass.internal_static_im_turms_proto_DeleteRelationshipGroupRequest_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.class, im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.Builder.class);
   }
 
   public static final int GROUP_INDEX_FIELD_NUMBER = 1;
   private int groupIndex_;
-
   /**
    * <code>int32 group_index = 1;</code>
-   *
    * @return The groupIndex.
    */
   public int getGroupIndex() {
@@ -163,16 +166,32 @@ private static final long serialVersionUID = 0L;
     }
     if (targetGroupIndex_ != null) {
       size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(2, getTargetGroupIndex());
+        .computeMessageSize(2, getTargetGroupIndex());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
-    return im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOuterClass.internal_static_im_turms_proto_DeleteRelationshipGroupRequest_descriptor;
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest other = (im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest) obj;
+
+    if (getGroupIndex()
+        != other.getGroupIndex()) return false;
+    if (hasTargetGroupIndex() != other.hasTargetGroupIndex()) return false;
+    if (hasTargetGroupIndex()) {
+      if (!getTargetGroupIndex()
+          .equals(other.getTargetGroupIndex())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -194,191 +213,118 @@ private static final long serialVersionUID = 0L;
   }
 
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
   public static Builder newBuilder(im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOuterClass.internal_static_im_turms_proto_DeleteRelationshipGroupRequest_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.class, im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.Builder.class);
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest other = (im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest) obj;
-
-    if (getGroupIndex()
-            != other.getGroupIndex()) return false;
-    if (hasTargetGroupIndex() != other.hasTargetGroupIndex()) return false;
-    if (hasTargetGroupIndex()) {
-      if (!getTargetGroupIndex()
-              .equals(other.getTargetGroupIndex())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<DeleteRelationshipGroupRequest>
-          PARSER = new com.google.protobuf.AbstractParser<DeleteRelationshipGroupRequest>() {
-    @java.lang.Override
-    public DeleteRelationshipGroupRequest parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new DeleteRelationshipGroupRequest(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<DeleteRelationshipGroupRequest> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<DeleteRelationshipGroupRequest> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.DeleteRelationshipGroupRequest}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.DeleteRelationshipGroupRequest)
-          im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOrBuilder {
-    // Construct using im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.newBuilder()
-    private Builder() {
-      maybeForceBuilderInitialization();
-    }
-
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.DeleteRelationshipGroupRequest)
+      im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
+        getDescriptor() {
       return im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOuterClass.internal_static_im_turms_proto_DeleteRelationshipGroupRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
+        internalGetFieldAccessorTable() {
       return im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequestOuterClass.internal_static_im_turms_proto_DeleteRelationshipGroupRequest_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.class, im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.Builder.class);
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.class, im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.Builder.class);
+    }
+
+    // Construct using im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.newBuilder()
+    private Builder() {
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
@@ -470,11 +416,10 @@ private static final long serialVersionUID = 0L;
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
-
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest) {
-        return mergeFrom((im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest) other);
+        return mergeFrom((im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -482,8 +427,7 @@ private static final long serialVersionUID = 0L;
     }
 
     public Builder mergeFrom(im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest other) {
-      if (other == im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.getDefaultInstance())
-        return this;
+      if (other == im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest.getDefaultInstance()) return this;
       if (other.getGroupIndex() != 0) {
         setGroupIndex(other.getGroupIndex());
       }
@@ -533,7 +477,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setGroupIndex(int value) {
-
+      
       groupIndex_ = value;
       onChanged();
       return this;
@@ -543,7 +487,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearGroupIndex() {
-
+      
       groupIndex_ = 0;
       onChanged();
       return this;
@@ -636,7 +580,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value target_group_index = 2;</code>
      */
     public com.google.protobuf.Int32Value.Builder getTargetGroupIndexBuilder() {
-
+      
       onChanged();
       return getTargetGroupIndexFieldBuilder().getBuilder();
     }
@@ -655,7 +599,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value target_group_index = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
         getTargetGroupIndexFieldBuilder() {
       if (targetGroupIndexBuilder_ == null) {
         targetGroupIndexBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -681,6 +625,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.DeleteRelationshipGroupRequest)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.DeleteRelationshipGroupRequest)
+  private static final im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest();
+  }
+
+  public static im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<DeleteRelationshipGroupRequest>
+      PARSER = new com.google.protobuf.AbstractParser<DeleteRelationshipGroupRequest>() {
+    @java.lang.Override
+    public DeleteRelationshipGroupRequest parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new DeleteRelationshipGroupRequest(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<DeleteRelationshipGroupRequest> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<DeleteRelationshipGroupRequest> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.request.user.relationship.DeleteRelationshipGroupRequest getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

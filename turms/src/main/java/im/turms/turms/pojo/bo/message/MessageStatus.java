@@ -133,26 +133,29 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
   }
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+    return im.turms.turms.pojo.bo.message.MessageStatusOuterClass.internal_static_im_turms_proto_MessageStatus_descriptor;
+  }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.MessageStatus)
-  private static final im.turms.turms.pojo.bo.message.MessageStatus DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.message.MessageStatus();
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.bo.message.MessageStatusOuterClass.internal_static_im_turms_proto_MessageStatus_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.bo.message.MessageStatus.class, im.turms.turms.pojo.bo.message.MessageStatus.Builder.class);
   }
 
   public static final int MESSAGE_ID_FIELD_NUMBER = 1;
   private com.google.protobuf.Int64Value messageId_;
-
   /**
    * <code>.google.protobuf.Int64Value message_id = 1;</code>
-   *
    * @return Whether the messageId field is set.
    */
   public boolean hasMessageId() {
@@ -346,16 +349,51 @@ private static final long serialVersionUID = 0L;
     }
     if (recallDate_ != null) {
       size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(6, getRecallDate());
+        .computeMessageSize(6, getRecallDate());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
-    return im.turms.turms.pojo.bo.message.MessageStatusOuterClass.internal_static_im_turms_proto_MessageStatus_descriptor;
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.bo.message.MessageStatus)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.bo.message.MessageStatus other = (im.turms.turms.pojo.bo.message.MessageStatus) obj;
+
+    if (hasMessageId() != other.hasMessageId()) return false;
+    if (hasMessageId()) {
+      if (!getMessageId()
+          .equals(other.getMessageId())) return false;
+    }
+    if (hasToUserId() != other.hasToUserId()) return false;
+    if (hasToUserId()) {
+      if (!getToUserId()
+          .equals(other.getToUserId())) return false;
+    }
+    if (deliveryStatus_ != other.deliveryStatus_) return false;
+    if (hasReceptionDate() != other.hasReceptionDate()) return false;
+    if (hasReceptionDate()) {
+      if (!getReceptionDate()
+          .equals(other.getReceptionDate())) return false;
+    }
+    if (hasReadDate() != other.hasReadDate()) return false;
+    if (hasReadDate()) {
+      if (!getReadDate()
+          .equals(other.getReadDate())) return false;
+    }
+    if (hasRecallDate() != other.hasRecallDate()) return false;
+    if (hasRecallDate()) {
+      if (!getRecallDate()
+          .equals(other.getRecallDate())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -393,210 +431,118 @@ private static final long serialVersionUID = 0L;
   }
 
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.bo.message.MessageStatus parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
   public static Builder newBuilder(im.turms.turms.pojo.bo.message.MessageStatus prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  public static im.turms.turms.pojo.bo.message.MessageStatus getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.bo.message.MessageStatusOuterClass.internal_static_im_turms_proto_MessageStatus_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.bo.message.MessageStatus.class, im.turms.turms.pojo.bo.message.MessageStatus.Builder.class);
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.bo.message.MessageStatus)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.bo.message.MessageStatus other = (im.turms.turms.pojo.bo.message.MessageStatus) obj;
-
-    if (hasMessageId() != other.hasMessageId()) return false;
-    if (hasMessageId()) {
-      if (!getMessageId()
-              .equals(other.getMessageId())) return false;
-    }
-    if (hasToUserId() != other.hasToUserId()) return false;
-    if (hasToUserId()) {
-      if (!getToUserId()
-              .equals(other.getToUserId())) return false;
-    }
-    if (deliveryStatus_ != other.deliveryStatus_) return false;
-    if (hasReceptionDate() != other.hasReceptionDate()) return false;
-    if (hasReceptionDate()) {
-      if (!getReceptionDate()
-              .equals(other.getReceptionDate())) return false;
-    }
-    if (hasReadDate() != other.hasReadDate()) return false;
-    if (hasReadDate()) {
-      if (!getReadDate()
-              .equals(other.getReadDate())) return false;
-    }
-    if (hasRecallDate() != other.hasRecallDate()) return false;
-    if (hasRecallDate()) {
-      if (!getRecallDate()
-              .equals(other.getRecallDate())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.bo.message.MessageStatus getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<MessageStatus>
-          PARSER = new com.google.protobuf.AbstractParser<MessageStatus>() {
-    @java.lang.Override
-    public MessageStatus parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new MessageStatus(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<MessageStatus> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<MessageStatus> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.MessageStatus}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.MessageStatus)
-          im.turms.turms.pojo.bo.message.MessageStatusOrBuilder {
-    // Construct using im.turms.turms.pojo.bo.message.MessageStatus.newBuilder()
-    private Builder() {
-      maybeForceBuilderInitialization();
-    }
-
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.MessageStatus)
+      im.turms.turms.pojo.bo.message.MessageStatusOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
+        getDescriptor() {
       return im.turms.turms.pojo.bo.message.MessageStatusOuterClass.internal_static_im_turms_proto_MessageStatus_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
+        internalGetFieldAccessorTable() {
       return im.turms.turms.pojo.bo.message.MessageStatusOuterClass.internal_static_im_turms_proto_MessageStatus_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.bo.message.MessageStatus.class, im.turms.turms.pojo.bo.message.MessageStatus.Builder.class);
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.bo.message.MessageStatus.class, im.turms.turms.pojo.bo.message.MessageStatus.Builder.class);
+    }
+
+    // Construct using im.turms.turms.pojo.bo.message.MessageStatus.newBuilder()
+    private Builder() {
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
@@ -732,11 +678,10 @@ private static final long serialVersionUID = 0L;
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
-
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.bo.message.MessageStatus) {
-        return mergeFrom((im.turms.turms.pojo.bo.message.MessageStatus) other);
+        return mergeFrom((im.turms.turms.pojo.bo.message.MessageStatus)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -879,7 +824,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value message_id = 1;</code>
      */
     public com.google.protobuf.Int64Value.Builder getMessageIdBuilder() {
-
+      
       onChanged();
       return getMessageIdFieldBuilder().getBuilder();
     }
@@ -898,7 +843,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value message_id = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getMessageIdFieldBuilder() {
       if (messageIdBuilder_ == null) {
         messageIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -998,7 +943,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value to_user_id = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getToUserIdBuilder() {
-
+      
       onChanged();
       return getToUserIdFieldBuilder().getBuilder();
     }
@@ -1017,7 +962,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value to_user_id = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getToUserIdFieldBuilder() {
       if (toUserIdBuilder_ == null) {
         toUserIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1066,7 +1011,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-
+      
       deliveryStatus_ = value.getNumber();
       onChanged();
       return this;
@@ -1076,7 +1021,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearDeliveryStatus() {
-
+      
       deliveryStatus_ = 0;
       onChanged();
       return this;
@@ -1169,7 +1114,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value reception_date = 4;</code>
      */
     public com.google.protobuf.Int64Value.Builder getReceptionDateBuilder() {
-
+      
       onChanged();
       return getReceptionDateFieldBuilder().getBuilder();
     }
@@ -1188,7 +1133,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value reception_date = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getReceptionDateFieldBuilder() {
       if (receptionDateBuilder_ == null) {
         receptionDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1288,7 +1233,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value read_date = 5;</code>
      */
     public com.google.protobuf.Int64Value.Builder getReadDateBuilder() {
-
+      
       onChanged();
       return getReadDateFieldBuilder().getBuilder();
     }
@@ -1307,7 +1252,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value read_date = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getReadDateFieldBuilder() {
       if (readDateBuilder_ == null) {
         readDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1407,7 +1352,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value recall_date = 6;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRecallDateBuilder() {
-
+      
       onChanged();
       return getRecallDateFieldBuilder().getBuilder();
     }
@@ -1426,7 +1371,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value recall_date = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getRecallDateFieldBuilder() {
       if (recallDateBuilder_ == null) {
         recallDateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1452,6 +1397,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.MessageStatus)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.MessageStatus)
+  private static final im.turms.turms.pojo.bo.message.MessageStatus DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.bo.message.MessageStatus();
+  }
+
+  public static im.turms.turms.pojo.bo.message.MessageStatus getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<MessageStatus>
+      PARSER = new com.google.protobuf.AbstractParser<MessageStatus>() {
+    @java.lang.Override
+    public MessageStatus parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new MessageStatus(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<MessageStatus> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<MessageStatus> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.bo.message.MessageStatus getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

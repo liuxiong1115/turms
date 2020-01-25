@@ -7,33 +7,29 @@ public interface UsersInfosWithVersionOrBuilder extends
     // @@protoc_insertion_point(interface_extends:im.turms.proto.UsersInfosWithVersion)
     com.google.protobuf.MessageOrBuilder {
 
-    /**
-     * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
-     */
-    java.util.List<im.turms.turms.pojo.bo.user.UserInfo>
-    getUserInfosList();
-
-    /**
-     * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
-     */
-    im.turms.turms.pojo.bo.user.UserInfo getUserInfos(int index);
-
-    /**
-     * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
-     */
-    int getUserInfosCount();
-
-    /**
-     * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
-     */
-    java.util.List<? extends im.turms.turms.pojo.bo.user.UserInfoOrBuilder>
-    getUserInfosOrBuilderList();
-
-    /**
-     * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
-     */
-    im.turms.turms.pojo.bo.user.UserInfoOrBuilder getUserInfosOrBuilder(
-            int index);
+  /**
+   * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
+   */
+  java.util.List<im.turms.turms.pojo.bo.user.UserInfo> 
+      getUserInfosList();
+  /**
+   * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
+   */
+  im.turms.turms.pojo.bo.user.UserInfo getUserInfos(int index);
+  /**
+   * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
+   */
+  int getUserInfosCount();
+  /**
+   * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
+   */
+  java.util.List<? extends im.turms.turms.pojo.bo.user.UserInfoOrBuilder> 
+      getUserInfosOrBuilderList();
+  /**
+   * <code>repeated .im.turms.proto.UserInfo user_infos = 1;</code>
+   */
+  im.turms.turms.pojo.bo.user.UserInfoOrBuilder getUserInfosOrBuilder(
+      int index);
 
   /**
    * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>

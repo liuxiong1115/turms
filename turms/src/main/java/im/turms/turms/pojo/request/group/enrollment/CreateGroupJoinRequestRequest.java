@@ -73,26 +73,29 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
   }
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+    return im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.internal_static_im_turms_proto_CreateGroupJoinRequestRequest_descriptor;
+  }
 
-  // @@protoc_insertion_point(class_scope:im.turms.proto.CreateGroupJoinRequestRequest)
-  private static final im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest DEFAULT_INSTANCE;
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest();
+  @java.lang.Override
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+    return im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.internal_static_im_turms_proto_CreateGroupJoinRequestRequest_fieldAccessorTable
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.class, im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.Builder.class);
   }
 
   public static final int GROUP_ID_FIELD_NUMBER = 1;
   private long groupId_;
-
   /**
    * <code>int64 group_id = 1;</code>
-   *
    * @return The groupId.
    */
   public long getGroupId() {
@@ -101,20 +104,41 @@ private static final long serialVersionUID = 0L;
 
   public static final int CONTENT_FIELD_NUMBER = 2;
   private volatile java.lang.Object content_;
-
-  public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
-    return im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.internal_static_im_turms_proto_CreateGroupJoinRequestRequest_descriptor;
+  /**
+   * <code>string content = 2;</code>
+   * @return The content.
+   */
+  public java.lang.String getContent() {
+    java.lang.Object ref = content_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      content_ = s;
+      return s;
+    }
   }
-
-  public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
+  /**
+   * <code>string content = 2;</code>
+   * @return The bytes for content.
+   */
+  public com.google.protobuf.ByteString
+      getContentBytes() {
+    java.lang.Object ref = content_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      content_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
   }
 
   private byte memoizedIsInitialized = -1;
-
   @java.lang.Override
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -145,7 +169,7 @@ private static final long serialVersionUID = 0L;
     size = 0;
     if (groupId_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
-              .computeInt64Size(1, groupId_);
+        .computeInt64Size(1, groupId_);
     }
     if (!getContentBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, content_);
@@ -155,11 +179,22 @@ private static final long serialVersionUID = 0L;
     return size;
   }
 
-  public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest other = (im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest) obj;
+
+    if (getGroupId()
+        != other.getGroupId()) return false;
+    if (!getContent()
+        .equals(other.getContent())) return false;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -180,213 +215,118 @@ private static final long serialVersionUID = 0L;
   }
 
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
+  public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
+        .parseDelimitedWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
+        .parseWithIOException(PARSER, input);
   }
-
   public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static Builder newBuilder(im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-  }
-
-  public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest getDefaultInstance() {
-    return DEFAULT_INSTANCE;
+        .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() {
-    return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
-  @java.lang.Override
-  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
-    return im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.internal_static_im_turms_proto_CreateGroupJoinRequestRequest_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.class, im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.Builder.class);
+  public static Builder newBuilder(im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
-
-  /**
-   * <code>string content = 2;</code>
-   *
-   * @return The content.
-   */
-  public java.lang.String getContent() {
-    java.lang.Object ref = content_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      content_ = s;
-      return s;
-    }
-  }
-
-  /**
-   * <code>string content = 2;</code>
-   *
-   * @return The bytes for content.
-   */
-  public com.google.protobuf.ByteString
-  getContentBytes() {
-    java.lang.Object ref = content_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                      (java.lang.String) ref);
-      content_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest other = (im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest) obj;
-
-    if (getGroupId()
-            != other.getGroupId()) return false;
-    if (!getContent()
-            .equals(other.getContent())) return false;
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
-  }
-
-  private static final com.google.protobuf.Parser<CreateGroupJoinRequestRequest>
-          PARSER = new com.google.protobuf.AbstractParser<CreateGroupJoinRequestRequest>() {
-    @java.lang.Override
-    public CreateGroupJoinRequestRequest parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new CreateGroupJoinRequestRequest(input, extensionRegistry);
-    }
-  };
-
-  public static com.google.protobuf.Parser<CreateGroupJoinRequestRequest> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<CreateGroupJoinRequestRequest> getParserForType() {
-    return PARSER;
-  }
-
   /**
    * Protobuf type {@code im.turms.proto.CreateGroupJoinRequestRequest}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.CreateGroupJoinRequestRequest)
-          im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOrBuilder {
-    // Construct using im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.newBuilder()
-    private Builder() {
-      maybeForceBuilderInitialization();
-    }
-
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.CreateGroupJoinRequestRequest)
+      im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
+        getDescriptor() {
       return im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.internal_static_im_turms_proto_CreateGroupJoinRequestRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
+        internalGetFieldAccessorTable() {
       return im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.internal_static_im_turms_proto_CreateGroupJoinRequestRequest_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.class, im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.Builder.class);
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.class, im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.Builder.class);
+    }
+
+    // Construct using im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.newBuilder()
+    private Builder() {
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
@@ -411,7 +351,7 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
-    getDescriptorForType() {
+        getDescriptorForType() {
       return im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequestOuterClass.internal_static_im_turms_proto_CreateGroupJoinRequestRequest_descriptor;
     }
 
@@ -470,11 +410,10 @@ private static final long serialVersionUID = 0L;
         java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
-
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest) {
-        return mergeFrom((im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest) other);
+        return mergeFrom((im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -482,8 +421,7 @@ private static final long serialVersionUID = 0L;
     }
 
     public Builder mergeFrom(im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest other) {
-      if (other == im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.getDefaultInstance())
-        return this;
+      if (other == im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest.getDefaultInstance()) return this;
       if (other.getGroupId() != 0L) {
         setGroupId(other.getGroupId());
       }
@@ -505,7 +443,7 @@ private static final long serialVersionUID = 0L;
     public Builder mergeFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        throws java.io.IOException {
       im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -534,7 +472,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setGroupId(long value) {
-
+      
       groupId_ = value;
       onChanged();
       return this;
@@ -544,7 +482,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearGroupId() {
-
+      
       groupId_ = 0L;
       onChanged();
       return this;
@@ -572,61 +510,56 @@ private static final long serialVersionUID = 0L;
      * @return The bytes for content.
      */
     public com.google.protobuf.ByteString
-    getContentBytes() {
+        getContentBytes() {
       java.lang.Object ref = content_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
-                com.google.protobuf.ByteString.copyFromUtf8(
-                        (java.lang.String) ref);
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
         content_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
-
     /**
      * <code>string content = 2;</code>
-     *
-     * @param value The bytes for content to set.
-     * @return This builder for chaining.
-     */
-    public Builder setContentBytes(
-            com.google.protobuf.ByteString value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      checkByteStringIsUtf8(value);
-
-      content_ = value;
-      onChanged();
-      return this;
-    }
-
-    /**
-     * <code>string content = 2;</code>
-     *
      * @param value The content to set.
      * @return This builder for chaining.
      */
     public Builder setContent(
-            java.lang.String value) {
+        java.lang.String value) {
       if (value == null) {
-        throw new NullPointerException();
-      }
-
+    throw new NullPointerException();
+  }
+  
       content_ = value;
       onChanged();
       return this;
     }
-
     /**
      * <code>string content = 2;</code>
      * @return This builder for chaining.
      */
     public Builder clearContent() {
-
+      
       content_ = getDefaultInstance().getContent();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string content = 2;</code>
+     * @param value The bytes for content to set.
+     * @return This builder for chaining.
+     */
+    public Builder setContentBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      content_ = value;
       onChanged();
       return this;
     }
@@ -644,6 +577,41 @@ private static final long serialVersionUID = 0L;
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.CreateGroupJoinRequestRequest)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.CreateGroupJoinRequestRequest)
+  private static final im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest();
+  }
+
+  public static im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<CreateGroupJoinRequestRequest>
+      PARSER = new com.google.protobuf.AbstractParser<CreateGroupJoinRequestRequest>() {
+    @java.lang.Override
+    public CreateGroupJoinRequestRequest parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new CreateGroupJoinRequestRequest(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<CreateGroupJoinRequestRequest> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<CreateGroupJoinRequestRequest> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.request.group.enrollment.CreateGroupJoinRequestRequest getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

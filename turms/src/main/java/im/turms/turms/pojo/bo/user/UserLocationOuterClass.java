@@ -16,7 +16,7 @@ public final class UserLocationOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UserLocation_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UserLocation_fieldAccessorTable;
 
@@ -28,14 +28,14 @@ public final class UserLocationOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n\036model/user/user_location.proto\022\016im.tur" +
-                    "ms.proto\032\036google/protobuf/wrappers.proto" +
-                    "\"\276\001\n\014UserLocation\022\020\n\010latitude\030\001 \001(\002\022\021\n\tl" +
-                    "ongitude\030\002 \001(\002\022*\n\004name\030\003 \001(\0132\034.google.pr" +
-                    "otobuf.StringValue\022-\n\007address\030\004 \001(\0132\034.go" +
-                    "ogle.protobuf.StringValue\022.\n\ttimestamp\030\005" +
-                    " \001(\0132\033.google.protobuf.Int64ValueB\037\n\033im." +
-                    "turms.turms.pojo.bo.userP\001b\006proto3"
+      "\n\036model/user/user_location.proto\022\016im.tur" +
+      "ms.proto\032\036google/protobuf/wrappers.proto" +
+      "\"\276\001\n\014UserLocation\022\020\n\010latitude\030\001 \001(\002\022\021\n\tl" +
+      "ongitude\030\002 \001(\002\022*\n\004name\030\003 \001(\0132\034.google.pr" +
+      "otobuf.StringValue\022-\n\007address\030\004 \001(\0132\034.go" +
+      "ogle.protobuf.StringValue\022.\n\ttimestamp\030\005" +
+      " \001(\0132\033.google.protobuf.Int64ValueB\037\n\033im." +
+      "turms.turms.pojo.bo.userP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

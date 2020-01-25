@@ -16,7 +16,7 @@ public final class MessagesWithTotalListOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_MessagesWithTotalList_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_MessagesWithTotalList_fieldAccessorTable;
 
@@ -28,25 +28,25 @@ public final class MessagesWithTotalListOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n,model/message/messages_with_total_list" +
-                    ".proto\022\016im.turms.proto\032'model/message/me" +
-                    "ssages_with_total.proto\"\\\n\025MessagesWithT" +
-                    "otalList\022C\n\030messages_with_total_list\030\001 \003" +
-                    "(\0132!.im.turms.proto.MessagesWithTotalB\"\n" +
-                    "\036im.turms.turms.pojo.bo.messageP\001b\006proto" +
-                    "3"
+      "\n,model/message/messages_with_total_list" +
+      ".proto\022\016im.turms.proto\032\'model/message/me" +
+      "ssages_with_total.proto\"\\\n\025MessagesWithT" +
+      "otalList\022C\n\030messages_with_total_list\030\001 \003" +
+      "(\0132!.im.turms.proto.MessagesWithTotalB\"\n" +
+      "\036im.turms.turms.pojo.bo.messageP\001b\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                im.turms.turms.pojo.bo.message.MessagesWithTotalOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          im.turms.turms.pojo.bo.message.MessagesWithTotalOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_MessagesWithTotalList_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_im_turms_proto_MessagesWithTotalList_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-            internal_static_im_turms_proto_MessagesWithTotalList_descriptor,
-            new java.lang.String[]{"MessagesWithTotalList",});
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_im_turms_proto_MessagesWithTotalList_descriptor,
+        new java.lang.String[] { "MessagesWithTotalList", });
     im.turms.turms.pojo.bo.message.MessagesWithTotalOuterClass.getDescriptor();
   }
 
