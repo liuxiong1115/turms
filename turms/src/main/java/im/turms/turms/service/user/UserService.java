@@ -151,6 +151,7 @@ public class UserService {
             @Nullable String intro,
             @Nullable @URL String profilePictureUrl,
             @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccess,
+            @Nullable Long permissionGroupId,
             @Nullable @PastOrPresent Date registrationDate,
             @Nullable Boolean isActive) {
         Date now = new Date();
@@ -160,6 +161,7 @@ public class UserService {
         intro = intro != null ? intro : "";
         profilePictureUrl = profilePictureUrl != null ? profilePictureUrl : "";
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
+        permissionGroupId = permissionGroupId != null ? permissionGroupId : DEFAULT_USER_PERMISSION_GROUP_ID;
         registrationDate = registrationDate != null ? registrationDate : now;
         isActive = isActive != null ? isActive : false;
         User user = new User(
@@ -169,7 +171,7 @@ public class UserService {
                 intro,
                 profilePictureUrl,
                 profileAccess,
-                DEFAULT_USER_PERMISSION_GROUP_ID,
+                permissionGroupId,
                 registrationDate,
                 null,
                 isActive,

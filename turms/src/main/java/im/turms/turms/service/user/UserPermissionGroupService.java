@@ -40,6 +40,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -75,7 +76,7 @@ public class UserPermissionGroupService {
                             Set.of(DEFAULT_GROUP_TYPE_ID),
                             Integer.MAX_VALUE,
                             Integer.MAX_VALUE,
-                            null));
+                            Collections.emptyMap()));
             return null;
         };
     }
@@ -104,7 +105,7 @@ public class UserPermissionGroupService {
             @NotNull Set<Long> creatableGroupTypeIds,
             @NotNull Integer ownedGroupLimit,
             @NotNull Integer ownedGroupLimitForEachGroupType,
-            @Nullable Map<Long, Integer> groupTypeLimitMap) {
+            @NotNull Map<Long, Integer> groupTypeLimitMap) {
         if (id == null) {
             id = turmsClusterManager.generateRandomId();
         }
