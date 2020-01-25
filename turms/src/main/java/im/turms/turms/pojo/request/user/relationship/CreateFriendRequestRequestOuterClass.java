@@ -16,7 +16,7 @@ public final class CreateFriendRequestRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_CreateFriendRequestRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_CreateFriendRequestRequest_fieldAccessorTable;
 
@@ -28,12 +28,12 @@ public final class CreateFriendRequestRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n=request/user/relationship/create_frien" +
-                    "d_request_request.proto\022\016im.turms.proto\"" +
-                    "C\n\032CreateFriendRequestRequest\022\024\n\014recipie" +
-                    "nt_id\030\001 \001(\003\022\017\n\007content\030\002 \001(\tB1\n-im.turms" +
-                    ".turms.pojo.request.user.relationshipP\001b" +
-                    "\006proto3"
+      "\n=request/user/relationship/create_frien" +
+      "d_request_request.proto\022\016im.turms.proto\"" +
+      "C\n\032CreateFriendRequestRequest\022\024\n\014recipie" +
+      "nt_id\030\001 \001(\003\022\017\n\007content\030\002 \001(\tB1\n-im.turms" +
+      ".turms.pojo.request.user.relationshipP\001b" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

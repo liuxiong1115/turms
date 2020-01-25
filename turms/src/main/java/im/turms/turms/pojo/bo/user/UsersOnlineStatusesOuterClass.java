@@ -16,7 +16,7 @@ public final class UsersOnlineStatusesOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UsersOnlineStatuses_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UsersOnlineStatuses_fieldAccessorTable;
 
@@ -28,24 +28,24 @@ public final class UsersOnlineStatusesOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n&model/user/users_online_statuses.proto" +
-                    "\022\016im.turms.proto\032#model/user/user_status" +
-                    "_detail.proto\"N\n\023UsersOnlineStatuses\0227\n\r" +
-                    "user_statuses\030\001 \003(\0132 .im.turms.proto.Use" +
-                    "rStatusDetailB\037\n\033im.turms.turms.pojo.bo." +
-                    "userP\001b\006proto3"
+      "\n&model/user/users_online_statuses.proto" +
+      "\022\016im.turms.proto\032#model/user/user_status" +
+      "_detail.proto\"N\n\023UsersOnlineStatuses\0227\n\r" +
+      "user_statuses\030\001 \003(\0132 .im.turms.proto.Use" +
+      "rStatusDetailB\037\n\033im.turms.turms.pojo.bo." +
+      "userP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                im.turms.turms.pojo.bo.user.UserStatusDetailOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          im.turms.turms.pojo.bo.user.UserStatusDetailOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_UsersOnlineStatuses_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_im_turms_proto_UsersOnlineStatuses_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-            internal_static_im_turms_proto_UsersOnlineStatuses_descriptor,
-            new java.lang.String[]{"UserStatuses",});
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_im_turms_proto_UsersOnlineStatuses_descriptor,
+        new java.lang.String[] { "UserStatuses", });
     im.turms.turms.pojo.bo.user.UserStatusDetailOuterClass.getDescriptor();
   }
 

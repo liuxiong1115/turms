@@ -16,7 +16,7 @@ public final class GroupInvitationsWithVersionOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_GroupInvitationsWithVersion_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_GroupInvitationsWithVersion_fieldAccessorTable;
 
@@ -28,21 +28,21 @@ public final class GroupInvitationsWithVersionOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n0model/group/group_invitations_with_ver" +
-                    "sion.proto\022\016im.turms.proto\032\036google/proto" +
-                    "buf/wrappers.proto\032\"model/group/group_in" +
-                    "vitation.proto\"\221\001\n\033GroupInvitationsWithV" +
-                    "ersion\022:\n\021group_invitations\030\001 \003(\0132\037.im.t" +
-                    "urms.proto.GroupInvitation\0226\n\021last_updat" +
-                    "ed_date\030\002 \001(\0132\033.google.protobuf.Int64Val" +
-                    "ueB \n\034im.turms.turms.pojo.bo.groupP\001b\006pr" +
-                    "oto3"
+      "\n0model/group/group_invitations_with_ver" +
+      "sion.proto\022\016im.turms.proto\032\036google/proto" +
+      "buf/wrappers.proto\032\"model/group/group_in" +
+      "vitation.proto\"\221\001\n\033GroupInvitationsWithV" +
+      "ersion\022:\n\021group_invitations\030\001 \003(\0132\037.im.t" +
+      "urms.proto.GroupInvitation\0226\n\021last_updat" +
+      "ed_date\030\002 \001(\0132\033.google.protobuf.Int64Val" +
+      "ueB \n\034im.turms.turms.pojo.bo.groupP\001b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                com.google.protobuf.WrappersProto.getDescriptor(),
-                im.turms.turms.pojo.bo.group.GroupInvitationOuterClass.getDescriptor(),
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.WrappersProto.getDescriptor(),
+          im.turms.turms.pojo.bo.group.GroupInvitationOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_GroupInvitationsWithVersion_descriptor =
       getDescriptor().getMessageTypes().get(0);

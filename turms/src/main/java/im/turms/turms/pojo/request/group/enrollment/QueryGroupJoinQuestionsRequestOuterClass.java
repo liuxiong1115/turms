@@ -16,7 +16,7 @@ public final class QueryGroupJoinQuestionsRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_QueryGroupJoinQuestionsRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_QueryGroupJoinQuestionsRequest_fieldAccessorTable;
 
@@ -28,14 +28,14 @@ public final class QueryGroupJoinQuestionsRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\nArequest/group/enrollment/query_group_j" +
-                    "oin_questions_request.proto\022\016im.turms.pr" +
-                    "oto\032\036google/protobuf/wrappers.proto\"\200\001\n\036" +
-                    "QueryGroupJoinQuestionsRequest\022\020\n\010group_" +
-                    "id\030\001 \001(\003\022\024\n\014with_answers\030\002 \001(\010\0226\n\021last_u" +
-                    "pdated_date\030\003 \001(\0132\033.google.protobuf.Int6" +
-                    "4ValueB0\n,im.turms.turms.pojo.request.gr" +
-                    "oup.enrollmentP\001b\006proto3"
+      "\nArequest/group/enrollment/query_group_j" +
+      "oin_questions_request.proto\022\016im.turms.pr" +
+      "oto\032\036google/protobuf/wrappers.proto\"\200\001\n\036" +
+      "QueryGroupJoinQuestionsRequest\022\020\n\010group_" +
+      "id\030\001 \001(\003\022\024\n\014with_answers\030\002 \001(\010\0226\n\021last_u" +
+      "pdated_date\030\003 \001(\0132\033.google.protobuf.Int6" +
+      "4ValueB0\n,im.turms.turms.pojo.request.gr" +
+      "oup.enrollmentP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

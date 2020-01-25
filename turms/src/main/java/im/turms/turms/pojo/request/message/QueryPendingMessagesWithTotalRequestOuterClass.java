@@ -16,7 +16,7 @@ public final class QueryPendingMessagesWithTotalRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_fieldAccessorTable;
 
@@ -28,13 +28,13 @@ public final class QueryPendingMessagesWithTotalRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n?request/message/query_pending_messages" +
-                    "_with_total_request.proto\022\016im.turms.prot" +
-                    "o\032\036google/protobuf/wrappers.proto\"Q\n$Que" +
-                    "ryPendingMessagesWithTotalRequest\022)\n\004siz" +
-                    "e\030\001 \001(\0132\033.google.protobuf.Int32ValueB'\n#" +
-                    "im.turms.turms.pojo.request.messageP\001b\006p" +
-                    "roto3"
+      "\n?request/message/query_pending_messages" +
+      "_with_total_request.proto\022\016im.turms.prot" +
+      "o\032\036google/protobuf/wrappers.proto\"Q\n$Que" +
+      "ryPendingMessagesWithTotalRequest\022)\n\004siz" +
+      "e\030\001 \001(\0132\033.google.protobuf.Int32ValueB\'\n#" +
+      "im.turms.turms.pojo.request.messageP\001b\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

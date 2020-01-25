@@ -6,60 +6,40 @@ package im.turms.turms.pojo.notification;
 /**
  * Protobuf type {@code im.turms.proto.TurmsNotification}
  */
-public final class TurmsNotification extends
-        com.google.protobuf.GeneratedMessageV3 implements
-        // @@protoc_insertion_point(message_implements:im.turms.proto.TurmsNotification)
-        TurmsNotificationOrBuilder {
-  private static final long serialVersionUID = 0L;
-  public static final int RELAYED_REQUEST_FIELD_NUMBER = 5;
-  // @@protoc_insertion_point(class_scope:im.turms.proto.TurmsNotification)
-  private static final im.turms.turms.pojo.notification.TurmsNotification DEFAULT_INSTANCE;
-  private static final com.google.protobuf.Parser<TurmsNotification>
-          PARSER = new com.google.protobuf.AbstractParser<TurmsNotification>() {
-    @java.lang.Override
-    public TurmsNotification parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return new TurmsNotification(input, extensionRegistry);
-    }
-  };
+public  final class TurmsNotification extends
+    com.google.protobuf.GeneratedMessageV3 implements
+    // @@protoc_insertion_point(message_implements:im.turms.proto.TurmsNotification)
+    TurmsNotificationOrBuilder {
+private static final long serialVersionUID = 0L;
+  // Use TurmsNotification.newBuilder() to construct.
+  private TurmsNotification(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    super(builder);
+  }
+  private TurmsNotification() {
+  }
+
+  @java.lang.Override
+  @SuppressWarnings({"unused"})
+  protected java.lang.Object newInstance(
+      UnusedPrivateParameter unused) {
+    return new TurmsNotification();
+  }
 
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
   getUnknownFields() {
     return this.unknownFields;
   }
-
-  static {
-    DEFAULT_INSTANCE = new im.turms.turms.pojo.notification.TurmsNotification();
-  }
-
-  private com.google.protobuf.Int64Value requestId_;
-  private com.google.protobuf.Int32Value code_;
-  private im.turms.turms.pojo.notification.TurmsNotification.Data data_;
-  private im.turms.turms.pojo.request.TurmsRequest relayedRequest_;
-
-  public static final int REQUEST_ID_FIELD_NUMBER = 1;
-
-  // Use TurmsNotification.newBuilder() to construct.
-  private TurmsNotification(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-    super(builder);
-  }
-
-  private TurmsNotification() {
-  }
-
   private TurmsNotification(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
     this();
     if (extensionRegistry == null) {
       throw new java.lang.NullPointerException();
     }
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-            com.google.protobuf.UnknownFieldSet.newBuilder();
+        com.google.protobuf.UnknownFieldSet.newBuilder();
     try {
       boolean done = false;
       while (!done) {
@@ -159,519 +139,39 @@ public final class TurmsNotification extends
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-              e).setUnfinishedMessage(this);
+          e).setUnfinishedMessage(this);
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
   }
-
   public static final com.google.protobuf.Descriptors.Descriptor
-  getDescriptor() {
+      getDescriptor() {
     return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_descriptor;
-  }
-
-  public static final int CODE_FIELD_NUMBER = 2;
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
-          java.nio.ByteBuffer data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
-          java.nio.ByteBuffer data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-
-  public static final int REASON_FIELD_NUMBER = 3;
-  private com.google.protobuf.StringValue reason_;
-
-  /**
-   * <code>.google.protobuf.StringValue reason = 3;</code>
-   *
-   * @return Whether the reason field is set.
-   */
-  public boolean hasReason() {
-    return reason_ != null;
-  }
-
-  /**
-   * <code>.google.protobuf.StringValue reason = 3;</code>
-   *
-   * @return The reason.
-   */
-  public com.google.protobuf.StringValue getReason() {
-    return reason_ == null ? com.google.protobuf.StringValue.getDefaultInstance() : reason_;
-  }
-
-  /**
-   * <code>.google.protobuf.StringValue reason = 3;</code>
-   */
-  public com.google.protobuf.StringValueOrBuilder getReasonOrBuilder() {
-    return getReason();
-  }
-
-  public static final int DATA_FIELD_NUMBER = 4;
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-    return PARSER.parseFrom(data, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input);
-  }
-
-  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessageV3
-            .parseWithIOException(PARSER, input, extensionRegistry);
-  }
-
-  public static Builder newBuilder(im.turms.turms.pojo.notification.TurmsNotification prototype) {
-    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-  }
-
-  public static final int REQUESTER_ID_FIELD_NUMBER = 6;
-  private com.google.protobuf.Int64Value requesterId_;
-
-  public static im.turms.turms.pojo.notification.TurmsNotification getDefaultInstance() {
-    return DEFAULT_INSTANCE;
-  }
-
-  public static com.google.protobuf.Parser<TurmsNotification> parser() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  @SuppressWarnings({"unused"})
-  protected java.lang.Object newInstance(
-          UnusedPrivateParameter unused) {
-    return new TurmsNotification();
-  }
-
-  private byte memoizedIsInitialized = -1;
-
-  @java.lang.Override
-  public final boolean isInitialized() {
-    byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
-
-    memoizedIsInitialized = 1;
-    return true;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-  internalGetFieldAccessorTable() {
+      internalGetFieldAccessorTable() {
     return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                    im.turms.turms.pojo.notification.TurmsNotification.class, im.turms.turms.pojo.notification.TurmsNotification.Builder.class);
-  }
-
-  /**
-   * <pre>
-   * Note: request_id is allowed to be duplicated because
-   * it is used for clients to identify the response of the same request id in a session
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value request_id = 1;</code>
-   *
-   * @return Whether the requestId field is set.
-   */
-  public boolean hasRequestId() {
-    return requestId_ != null;
-  }
-
-  /**
-   * <pre>
-   * Note: request_id is allowed to be duplicated because
-   * it is used for clients to identify the response of the same request id in a session
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value request_id = 1;</code>
-   *
-   * @return The requestId.
-   */
-  public com.google.protobuf.Int64Value getRequestId() {
-    return requestId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : requestId_;
-  }
-
-  /**
-   * <pre>
-   * Note: request_id is allowed to be duplicated because
-   * it is used for clients to identify the response of the same request id in a session
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value request_id = 1;</code>
-   */
-  public com.google.protobuf.Int64ValueOrBuilder getRequestIdOrBuilder() {
-    return getRequestId();
-  }
-
-  /**
-   * <code>.google.protobuf.Int32Value code = 2;</code>
-   *
-   * @return Whether the code field is set.
-   */
-  public boolean hasCode() {
-    return code_ != null;
-  }
-
-  /**
-   * <code>.google.protobuf.Int32Value code = 2;</code>
-   *
-   * @return The code.
-   */
-  public com.google.protobuf.Int32Value getCode() {
-    return code_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : code_;
-  }
-
-  /**
-   * <code>.google.protobuf.Int32Value code = 2;</code>
-   */
-  public com.google.protobuf.Int32ValueOrBuilder getCodeOrBuilder() {
-    return getCode();
-  }
-
-  /**
-   * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
-   *
-   * @return Whether the data field is set.
-   */
-  public boolean hasData() {
-    return data_ != null;
-  }
-
-  /**
-   * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
-   *
-   * @return The data.
-   */
-  public im.turms.turms.pojo.notification.TurmsNotification.Data getData() {
-    return data_ == null ? im.turms.turms.pojo.notification.TurmsNotification.Data.getDefaultInstance() : data_;
-  }
-
-  /**
-   * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
-   */
-  public im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder getDataOrBuilder() {
-    return getData();
-  }
-
-  /**
-   * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
-   *
-   * @return Whether the relayedRequest field is set.
-   */
-  public boolean hasRelayedRequest() {
-    return relayedRequest_ != null;
-  }
-
-  /**
-   * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
-   *
-   * @return The relayedRequest.
-   */
-  public im.turms.turms.pojo.request.TurmsRequest getRelayedRequest() {
-    return relayedRequest_ == null ? im.turms.turms.pojo.request.TurmsRequest.getDefaultInstance() : relayedRequest_;
-  }
-
-  /**
-   * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
-   */
-  public im.turms.turms.pojo.request.TurmsRequestOrBuilder getRelayedRequestOrBuilder() {
-    return getRelayedRequest();
-  }
-
-  /**
-   * <pre>
-   * requester_id only exists when a requester trigger a notification to its recipients
-   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsNotification
-   * when recipients need the requester_id.
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
-   *
-   * @return Whether the requesterId field is set.
-   */
-  public boolean hasRequesterId() {
-    return requesterId_ != null;
-  }
-
-  /**
-   * <pre>
-   * requester_id only exists when a requester trigger a notification to its recipients
-   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsNotification
-   * when recipients need the requester_id.
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
-   *
-   * @return The requesterId.
-   */
-  public com.google.protobuf.Int64Value getRequesterId() {
-    return requesterId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : requesterId_;
-  }
-
-  /**
-   * <pre>
-   * requester_id only exists when a requester trigger a notification to its recipients
-   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsNotification
-   * when recipients need the requester_id.
-   * </pre>
-   *
-   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
-   */
-  public com.google.protobuf.Int64ValueOrBuilder getRequesterIdOrBuilder() {
-    return getRequesterId();
-  }
-
-  @java.lang.Override
-  public Builder newBuilderForType() {
-    return newBuilder();
-  }
-
-  public static Builder newBuilder() {
-    return DEFAULT_INSTANCE.toBuilder();
-  }
-
-  @java.lang.Override
-  public void writeTo(com.google.protobuf.CodedOutputStream output)
-          throws java.io.IOException {
-    if (requestId_ != null) {
-      output.writeMessage(1, getRequestId());
-    }
-    if (code_ != null) {
-      output.writeMessage(2, getCode());
-    }
-    if (reason_ != null) {
-      output.writeMessage(3, getReason());
-    }
-    if (data_ != null) {
-      output.writeMessage(4, getData());
-    }
-    if (relayedRequest_ != null) {
-      output.writeMessage(5, getRelayedRequest());
-    }
-    if (requesterId_ != null) {
-      output.writeMessage(6, getRequesterId());
-    }
-    unknownFields.writeTo(output);
-  }
-
-  @java.lang.Override
-  public Builder toBuilder() {
-    return this == DEFAULT_INSTANCE
-            ? new Builder() : new Builder().mergeFrom(this);
-  }
-
-  @java.lang.Override
-  protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-    Builder builder = new Builder(parent);
-    return builder;
-  }
-
-  @java.lang.Override
-  public int getSerializedSize() {
-    int size = memoizedSize;
-    if (size != -1) return size;
-
-    size = 0;
-    if (requestId_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(1, getRequestId());
-    }
-    if (code_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(2, getCode());
-    }
-    if (reason_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(3, getReason());
-    }
-    if (data_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(4, getData());
-    }
-    if (relayedRequest_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(5, getRelayedRequest());
-    }
-    if (requesterId_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(6, getRequesterId());
-    }
-    size += unknownFields.getSerializedSize();
-    memoizedSize = size;
-    return size;
-  }
-
-  @java.lang.Override
-  public boolean equals(final java.lang.Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (!(obj instanceof im.turms.turms.pojo.notification.TurmsNotification)) {
-      return super.equals(obj);
-    }
-    im.turms.turms.pojo.notification.TurmsNotification other = (im.turms.turms.pojo.notification.TurmsNotification) obj;
-
-    if (hasRequestId() != other.hasRequestId()) return false;
-    if (hasRequestId()) {
-      if (!getRequestId()
-              .equals(other.getRequestId())) return false;
-    }
-    if (hasCode() != other.hasCode()) return false;
-    if (hasCode()) {
-      if (!getCode()
-              .equals(other.getCode())) return false;
-    }
-    if (hasReason() != other.hasReason()) return false;
-    if (hasReason()) {
-      if (!getReason()
-              .equals(other.getReason())) return false;
-    }
-    if (hasData() != other.hasData()) return false;
-    if (hasData()) {
-      if (!getData()
-              .equals(other.getData())) return false;
-    }
-    if (hasRelayedRequest() != other.hasRelayedRequest()) return false;
-    if (hasRelayedRequest()) {
-      if (!getRelayedRequest()
-              .equals(other.getRelayedRequest())) return false;
-    }
-    if (hasRequesterId() != other.hasRequesterId()) return false;
-    if (hasRequesterId()) {
-      if (!getRequesterId()
-              .equals(other.getRequesterId())) return false;
-    }
-    return unknownFields.equals(other.unknownFields);
-  }
-
-  @java.lang.Override
-  public int hashCode() {
-    if (memoizedHashCode != 0) {
-      return memoizedHashCode;
-    }
-    int hash = 41;
-    hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasRequestId()) {
-      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getRequestId().hashCode();
-    }
-    if (hasCode()) {
-      hash = (37 * hash) + CODE_FIELD_NUMBER;
-      hash = (53 * hash) + getCode().hashCode();
-    }
-    if (hasReason()) {
-      hash = (37 * hash) + REASON_FIELD_NUMBER;
-      hash = (53 * hash) + getReason().hashCode();
-    }
-    if (hasData()) {
-      hash = (37 * hash) + DATA_FIELD_NUMBER;
-      hash = (53 * hash) + getData().hashCode();
-    }
-    if (hasRelayedRequest()) {
-      hash = (37 * hash) + RELAYED_REQUEST_FIELD_NUMBER;
-      hash = (53 * hash) + getRelayedRequest().hashCode();
-    }
-    if (hasRequesterId()) {
-      hash = (37 * hash) + REQUESTER_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getRequesterId().hashCode();
-    }
-    hash = (29 * hash) + unknownFields.hashCode();
-    memoizedHashCode = hash;
-    return hash;
-  }
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<TurmsNotification> getParserForType() {
-    return PARSER;
-  }
-
-  @java.lang.Override
-  public im.turms.turms.pojo.notification.TurmsNotification getDefaultInstanceForType() {
-    return DEFAULT_INSTANCE;
+        .ensureFieldAccessorsInitialized(
+            im.turms.turms.pojo.notification.TurmsNotification.class, im.turms.turms.pojo.notification.TurmsNotification.Builder.class);
   }
 
   public interface DataOrBuilder extends
-          // @@protoc_insertion_point(interface_extends:im.turms.proto.TurmsNotification.Data)
-          com.google.protobuf.MessageOrBuilder {
+      // @@protoc_insertion_point(interface_extends:im.turms.proto.TurmsNotification.Data)
+      com.google.protobuf.MessageOrBuilder {
 
     /**
      * <code>.im.turms.proto.Int64Values ids = 1;</code>
-     *
      * @return Whether the ids field is set.
      */
     boolean hasIds();
-
     /**
      * <code>.im.turms.proto.Int64Values ids = 1;</code>
-     *
      * @return The ids.
      */
     im.turms.turms.pojo.bo.common.Int64Values getIds();
-
     /**
      * <code>.im.turms.proto.Int64Values ids = 1;</code>
      */
@@ -679,11 +179,9 @@ public final class TurmsNotification extends
 
     /**
      * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
-     *
      * @return Whether the idsWithVersion field is set.
      */
     boolean hasIdsWithVersion();
-
     /**
      * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
      * @return The idsWithVersion.
@@ -699,14 +197,11 @@ public final class TurmsNotification extends
      * @return Whether the success field is set.
      */
     boolean hasSuccess();
-
     /**
      * <code>.google.protobuf.BoolValue success = 3;</code>
-     *
      * @return The success.
      */
     com.google.protobuf.BoolValue getSuccess();
-
     /**
      * <code>.google.protobuf.BoolValue success = 3;</code>
      */
@@ -714,18 +209,14 @@ public final class TurmsNotification extends
 
     /**
      * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
-     *
      * @return Whether the acknowledge field is set.
      */
     boolean hasAcknowledge();
-
     /**
      * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
-     *
      * @return The acknowledge.
      */
     im.turms.turms.pojo.bo.signal.Acknowledge getAcknowledge();
-
     /**
      * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
      */
@@ -736,14 +227,11 @@ public final class TurmsNotification extends
      * @return Whether the session field is set.
      */
     boolean hasSession();
-
     /**
      * <code>.im.turms.proto.Session session = 5;</code>
-     *
      * @return The session.
      */
     im.turms.turms.pojo.bo.signal.Session getSession();
-
     /**
      * <code>.im.turms.proto.Session session = 5;</code>
      */
@@ -754,14 +242,11 @@ public final class TurmsNotification extends
      * @return Whether the messages field is set.
      */
     boolean hasMessages();
-
     /**
      * <code>.im.turms.proto.Messages messages = 6;</code>
-     *
      * @return The messages.
      */
     im.turms.turms.pojo.bo.message.Messages getMessages();
-
     /**
      * <code>.im.turms.proto.Messages messages = 6;</code>
      */
@@ -772,14 +257,11 @@ public final class TurmsNotification extends
      * @return Whether the messageStatuses field is set.
      */
     boolean hasMessageStatuses();
-
     /**
      * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
-     *
      * @return The messageStatuses.
      */
     im.turms.turms.pojo.bo.message.MessageStatuses getMessageStatuses();
-
     /**
      * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
      */
@@ -787,18 +269,14 @@ public final class TurmsNotification extends
 
     /**
      * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
-     *
      * @return Whether the messagesWithTotalList field is set.
      */
     boolean hasMessagesWithTotalList();
-
     /**
      * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
-     *
      * @return The messagesWithTotalList.
      */
     im.turms.turms.pojo.bo.message.MessagesWithTotalList getMessagesWithTotalList();
-
     /**
      * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
      */
@@ -809,14 +287,11 @@ public final class TurmsNotification extends
      * @return Whether the usersInfosWithVersion field is set.
      */
     boolean hasUsersInfosWithVersion();
-
     /**
      * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
-     *
      * @return The usersInfosWithVersion.
      */
     im.turms.turms.pojo.bo.user.UsersInfosWithVersion getUsersInfosWithVersion();
-
     /**
      * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
      */
@@ -827,14 +302,11 @@ public final class TurmsNotification extends
      * @return Whether the usersOnlineStatuses field is set.
      */
     boolean hasUsersOnlineStatuses();
-
     /**
      * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
-     *
      * @return The usersOnlineStatuses.
      */
     im.turms.turms.pojo.bo.user.UsersOnlineStatuses getUsersOnlineStatuses();
-
     /**
      * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
      */
@@ -845,14 +317,11 @@ public final class TurmsNotification extends
      * @return Whether the userFriendRequestsWithVersion field is set.
      */
     boolean hasUserFriendRequestsWithVersion();
-
     /**
      * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
-     *
      * @return The userFriendRequestsWithVersion.
      */
     im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getUserFriendRequestsWithVersion();
-
     /**
      * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
      */
@@ -863,14 +332,11 @@ public final class TurmsNotification extends
      * @return Whether the userRelationshipGroupsWithVersion field is set.
      */
     boolean hasUserRelationshipGroupsWithVersion();
-
     /**
      * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-     *
      * @return The userRelationshipGroupsWithVersion.
      */
     im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion getUserRelationshipGroupsWithVersion();
-
     /**
      * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
      */
@@ -881,14 +347,11 @@ public final class TurmsNotification extends
      * @return Whether the userRelationshipsWithVersion field is set.
      */
     boolean hasUserRelationshipsWithVersion();
-
     /**
      * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-     *
      * @return The userRelationshipsWithVersion.
      */
     im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion getUserRelationshipsWithVersion();
-
     /**
      * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
      */
@@ -899,14 +362,11 @@ public final class TurmsNotification extends
      * @return Whether the groupInvitationsWithVersion field is set.
      */
     boolean hasGroupInvitationsWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
-     *
      * @return The groupInvitationsWithVersion.
      */
     im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion getGroupInvitationsWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
      */
@@ -917,14 +377,11 @@ public final class TurmsNotification extends
      * @return Whether the groupJoinQuestionAnswerResult field is set.
      */
     boolean hasGroupJoinQuestionAnswerResult();
-
     /**
      * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
-     *
      * @return The groupJoinQuestionAnswerResult.
      */
     im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult getGroupJoinQuestionAnswerResult();
-
     /**
      * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
      */
@@ -932,18 +389,14 @@ public final class TurmsNotification extends
 
     /**
      * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
-     *
      * @return Whether the groupJoinRequestsWithVersion field is set.
      */
     boolean hasGroupJoinRequestsWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
-     *
      * @return The groupJoinRequestsWithVersion.
      */
     im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion getGroupJoinRequestsWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
      */
@@ -951,18 +404,14 @@ public final class TurmsNotification extends
 
     /**
      * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
-     *
      * @return Whether the groupJoinQuestionsWithVersion field is set.
      */
     boolean hasGroupJoinQuestionsWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
-     *
      * @return The groupJoinQuestionsWithVersion.
      */
     im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion getGroupJoinQuestionsWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
      */
@@ -970,18 +419,14 @@ public final class TurmsNotification extends
 
     /**
      * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
-     *
      * @return Whether the groupMembersWithVersion field is set.
      */
     boolean hasGroupMembersWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
-     *
      * @return The groupMembersWithVersion.
      */
     im.turms.turms.pojo.bo.group.GroupMembersWithVersion getGroupMembersWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
      */
@@ -997,29 +442,25 @@ public final class TurmsNotification extends
      * @return The groupsWithVersion.
      */
     im.turms.turms.pojo.bo.group.GroupsWithVersion getGroupsWithVersion();
-
     /**
      * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
      */
     im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder getGroupsWithVersionOrBuilder();
 
-    im.turms.turms.pojo.notification.TurmsNotification.Data.KindCase getKindCase();
+    public im.turms.turms.pojo.notification.TurmsNotification.Data.KindCase getKindCase();
   }
-
   /**
    * Protobuf type {@code im.turms.proto.TurmsNotification.Data}
    */
-  public static final class Data extends
-          com.google.protobuf.GeneratedMessageV3 implements
-          // @@protoc_insertion_point(message_implements:im.turms.proto.TurmsNotification.Data)
-          DataOrBuilder {
-    private static final long serialVersionUID = 0L;
-
+  public  static final class Data extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:im.turms.proto.TurmsNotification.Data)
+      DataOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Data.newBuilder() to construct.
     private Data(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-
     private Data() {
     }
 
@@ -1035,24 +476,16 @@ public final class TurmsNotification extends
     getUnknownFields() {
       return this.unknownFields;
     }
-
-    // @@protoc_insertion_point(class_scope:im.turms.proto.TurmsNotification.Data)
-    private static final im.turms.turms.pojo.notification.TurmsNotification.Data DEFAULT_INSTANCE;
-
-    static {
-      DEFAULT_INSTANCE = new im.turms.turms.pojo.notification.TurmsNotification.Data();
-    }
-
     private Data(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-              com.google.protobuf.UnknownFieldSet.newBuilder();
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -1067,7 +500,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.common.Int64Values) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.common.Int64Values.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.common.Int64Values.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.common.Int64Values) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1137,7 +570,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.message.Messages) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.message.Messages.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.message.Messages.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.message.Messages) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1151,7 +584,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.message.MessageStatuses) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.message.MessageStatuses.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.message.MessageStatuses.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.message.MessageStatuses) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1165,7 +598,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.message.MessagesWithTotalList.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.message.MessagesWithTotalList.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1179,7 +612,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.user.UsersInfosWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.user.UsersInfosWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1193,7 +626,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.user.UsersOnlineStatuses.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.user.UsersOnlineStatuses.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1207,7 +640,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1221,7 +654,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1235,7 +668,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1249,7 +682,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1263,7 +696,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1277,7 +710,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1291,7 +724,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1305,7 +738,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.group.GroupMembersWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.group.GroupMembersWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1319,7 +752,7 @@ public final class TurmsNotification extends
                 subBuilder = ((im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_).toBuilder();
               }
               kind_ =
-                      input.readMessage(im.turms.turms.pojo.bo.group.GroupsWithVersion.parser(), extensionRegistry);
+                  input.readMessage(im.turms.turms.pojo.bo.group.GroupsWithVersion.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom((im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_);
                 kind_ = subBuilder.buildPartial();
@@ -1329,7 +762,7 @@ public final class TurmsNotification extends
             }
             default: {
               if (!parseUnknownField(
-                      input, unknownFields, extensionRegistry, tag)) {
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -1340,53 +773,129 @@ public final class TurmsNotification extends
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-                e).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.notification.TurmsNotification.Data.class, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder.class);
+    }
 
     private int kindCase_ = 0;
     private java.lang.Object kind_;
+    public enum KindCase
+        implements com.google.protobuf.Internal.EnumLite,
+            com.google.protobuf.AbstractMessage.InternalOneOfEnum {
+      IDS(1),
+      IDS_WITH_VERSION(2),
+      SUCCESS(3),
+      ACKNOWLEDGE(4),
+      SESSION(5),
+      MESSAGES(6),
+      MESSAGE_STATUSES(7),
+      MESSAGES_WITH_TOTAL_LIST(8),
+      USERS_INFOS_WITH_VERSION(9),
+      USERS_ONLINE_STATUSES(10),
+      USER_FRIEND_REQUESTS_WITH_VERSION(11),
+      USER_RELATIONSHIP_GROUPS_WITH_VERSION(12),
+      USER_RELATIONSHIPS_WITH_VERSION(13),
+      GROUP_INVITATIONS_WITH_VERSION(14),
+      GROUP_JOIN_QUESTION_ANSWER_RESULT(15),
+      GROUP_JOIN_REQUESTS_WITH_VERSION(16),
+      GROUP_JOIN_QUESTIONS_WITH_VERSION(17),
+      GROUP_MEMBERS_WITH_VERSION(18),
+      GROUPS_WITH_VERSION(19),
+      KIND_NOT_SET(0);
+      private final int value;
+      private KindCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @param value The number of the enum to look for.
+       * @return The enum associated with the given number.
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static KindCase valueOf(int value) {
+        return forNumber(value);
+      }
 
-    public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
-      return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_descriptor;
-    }
+      public static KindCase forNumber(int value) {
+        switch (value) {
+          case 1: return IDS;
+          case 2: return IDS_WITH_VERSION;
+          case 3: return SUCCESS;
+          case 4: return ACKNOWLEDGE;
+          case 5: return SESSION;
+          case 6: return MESSAGES;
+          case 7: return MESSAGE_STATUSES;
+          case 8: return MESSAGES_WITH_TOTAL_LIST;
+          case 9: return USERS_INFOS_WITH_VERSION;
+          case 10: return USERS_ONLINE_STATUSES;
+          case 11: return USER_FRIEND_REQUESTS_WITH_VERSION;
+          case 12: return USER_RELATIONSHIP_GROUPS_WITH_VERSION;
+          case 13: return USER_RELATIONSHIPS_WITH_VERSION;
+          case 14: return GROUP_INVITATIONS_WITH_VERSION;
+          case 15: return GROUP_JOIN_QUESTION_ANSWER_RESULT;
+          case 16: return GROUP_JOIN_REQUESTS_WITH_VERSION;
+          case 17: return GROUP_JOIN_QUESTIONS_WITH_VERSION;
+          case 18: return GROUP_MEMBERS_WITH_VERSION;
+          case 19: return GROUPS_WITH_VERSION;
+          case 0: return KIND_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
 
     public KindCase
     getKindCase() {
       return KindCase.forNumber(
-              kindCase_);
+          kindCase_);
     }
 
     public static final int IDS_FIELD_NUMBER = 1;
-
     /**
      * <code>.im.turms.proto.Int64Values ids = 1;</code>
-     *
      * @return Whether the ids field is set.
      */
     public boolean hasIds() {
       return kindCase_ == 1;
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
-            java.nio.ByteBuffer data)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
+    /**
+     * <code>.im.turms.proto.Int64Values ids = 1;</code>
+     * @return The ids.
+     */
+    public im.turms.turms.pojo.bo.common.Int64Values getIds() {
+      if (kindCase_ == 1) {
+         return (im.turms.turms.pojo.bo.common.Int64Values) kind_;
+      }
+      return im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
-            java.nio.ByteBuffer data,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
+    /**
+     * <code>.im.turms.proto.Int64Values ids = 1;</code>
+     */
+    public im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder getIdsOrBuilder() {
+      if (kindCase_ == 1) {
+         return (im.turms.turms.pojo.bo.common.Int64Values) kind_;
+      }
+      return im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
     }
 
     public static final int IDS_WITH_VERSION_FIELD_NUMBER = 2;
-
     /**
      * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
      * @return Whether the idsWithVersion field is set.
@@ -1394,173 +903,195 @@ public final class TurmsNotification extends
     public boolean hasIdsWithVersion() {
       return kindCase_ == 2;
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
+    /**
+     * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+     * @return The idsWithVersion.
+     */
+    public im.turms.turms.pojo.bo.common.Int64ValuesWithVersion getIdsWithVersion() {
+      if (kindCase_ == 2) {
+         return (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_;
+      }
+      return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
+    /**
+     * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+     */
+    public im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder getIdsWithVersionOrBuilder() {
+      if (kindCase_ == 2) {
+         return (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_;
+      }
+      return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
     }
 
     public static final int SUCCESS_FIELD_NUMBER = 3;
-
     /**
      * <code>.google.protobuf.BoolValue success = 3;</code>
-     *
      * @return Whether the success field is set.
      */
     public boolean hasSuccess() {
       return kindCase_ == 3;
     }
-
     /**
      * <code>.google.protobuf.BoolValue success = 3;</code>
-     *
      * @return The success.
      */
     public com.google.protobuf.BoolValue getSuccess() {
       if (kindCase_ == 3) {
-        return (com.google.protobuf.BoolValue) kind_;
+         return (com.google.protobuf.BoolValue) kind_;
       }
       return com.google.protobuf.BoolValue.getDefaultInstance();
     }
-
     /**
      * <code>.google.protobuf.BoolValue success = 3;</code>
      */
     public com.google.protobuf.BoolValueOrBuilder getSuccessOrBuilder() {
       if (kindCase_ == 3) {
-        return (com.google.protobuf.BoolValue) kind_;
+         return (com.google.protobuf.BoolValue) kind_;
       }
       return com.google.protobuf.BoolValue.getDefaultInstance();
     }
 
     public static final int ACKNOWLEDGE_FIELD_NUMBER = 4;
-
     /**
      * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
-     *
      * @return Whether the acknowledge field is set.
      */
     public boolean hasAcknowledge() {
       return kindCase_ == 4;
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(byte[] data)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
+    /**
+     * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+     * @return The acknowledge.
+     */
+    public im.turms.turms.pojo.bo.signal.Acknowledge getAcknowledge() {
+      if (kindCase_ == 4) {
+         return (im.turms.turms.pojo.bo.signal.Acknowledge) kind_;
+      }
+      return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
-            byte[] data,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
+    /**
+     * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+     */
+    public im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder getAcknowledgeOrBuilder() {
+      if (kindCase_ == 4) {
+         return (im.turms.turms.pojo.bo.signal.Acknowledge) kind_;
+      }
+      return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
     }
 
     public static final int SESSION_FIELD_NUMBER = 5;
-
     /**
      * <code>.im.turms.proto.Session session = 5;</code>
-     *
      * @return Whether the session field is set.
      */
     public boolean hasSession() {
       return kindCase_ == 5;
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(java.io.InputStream input)
-            throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-              .parseWithIOException(PARSER, input);
+    /**
+     * <code>.im.turms.proto.Session session = 5;</code>
+     * @return The session.
+     */
+    public im.turms.turms.pojo.bo.signal.Session getSession() {
+      if (kindCase_ == 5) {
+         return (im.turms.turms.pojo.bo.signal.Session) kind_;
+      }
+      return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
-            java.io.InputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-              .parseWithIOException(PARSER, input, extensionRegistry);
+    /**
+     * <code>.im.turms.proto.Session session = 5;</code>
+     */
+    public im.turms.turms.pojo.bo.signal.SessionOrBuilder getSessionOrBuilder() {
+      if (kindCase_ == 5) {
+         return (im.turms.turms.pojo.bo.signal.Session) kind_;
+      }
+      return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
     }
 
     public static final int MESSAGES_FIELD_NUMBER = 6;
-
     /**
      * <code>.im.turms.proto.Messages messages = 6;</code>
-     *
      * @return Whether the messages field is set.
      */
     public boolean hasMessages() {
       return kindCase_ == 6;
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseDelimitedFrom(java.io.InputStream input)
-            throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-              .parseDelimitedWithIOException(PARSER, input);
+    /**
+     * <code>.im.turms.proto.Messages messages = 6;</code>
+     * @return The messages.
+     */
+    public im.turms.turms.pojo.bo.message.Messages getMessages() {
+      if (kindCase_ == 6) {
+         return (im.turms.turms.pojo.bo.message.Messages) kind_;
+      }
+      return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseDelimitedFrom(
-            java.io.InputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-              .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    /**
+     * <code>.im.turms.proto.Messages messages = 6;</code>
+     */
+    public im.turms.turms.pojo.bo.message.MessagesOrBuilder getMessagesOrBuilder() {
+      if (kindCase_ == 6) {
+         return (im.turms.turms.pojo.bo.message.Messages) kind_;
+      }
+      return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
     }
 
     public static final int MESSAGE_STATUSES_FIELD_NUMBER = 7;
-
     /**
      * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
-     *
      * @return Whether the messageStatuses field is set.
      */
     public boolean hasMessageStatuses() {
       return kindCase_ == 7;
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
-            com.google.protobuf.CodedInputStream input)
-            throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-              .parseWithIOException(PARSER, input);
+    /**
+     * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+     * @return The messageStatuses.
+     */
+    public im.turms.turms.pojo.bo.message.MessageStatuses getMessageStatuses() {
+      if (kindCase_ == 7) {
+         return (im.turms.turms.pojo.bo.message.MessageStatuses) kind_;
+      }
+      return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-              .parseWithIOException(PARSER, input, extensionRegistry);
+    /**
+     * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+     */
+    public im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder getMessageStatusesOrBuilder() {
+      if (kindCase_ == 7) {
+         return (im.turms.turms.pojo.bo.message.MessageStatuses) kind_;
+      }
+      return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
     }
 
     public static final int MESSAGES_WITH_TOTAL_LIST_FIELD_NUMBER = 8;
-
     /**
      * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
-     *
      * @return Whether the messagesWithTotalList field is set.
      */
     public boolean hasMessagesWithTotalList() {
       return kindCase_ == 8;
     }
-
-    public static Builder newBuilder(im.turms.turms.pojo.notification.TurmsNotification.Data prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    /**
+     * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+     * @return The messagesWithTotalList.
+     */
+    public im.turms.turms.pojo.bo.message.MessagesWithTotalList getMessagesWithTotalList() {
+      if (kindCase_ == 8) {
+         return (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_;
+      }
+      return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
     }
-
-    public static im.turms.turms.pojo.notification.TurmsNotification.Data getDefaultInstance() {
-      return DEFAULT_INSTANCE;
+    /**
+     * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+     */
+    public im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder getMessagesWithTotalListOrBuilder() {
+      if (kindCase_ == 8) {
+         return (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_;
+      }
+      return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
     }
 
     public static final int USERS_INFOS_WITH_VERSION_FIELD_NUMBER = 9;
-
     /**
      * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
      * @return Whether the usersInfosWithVersion field is set.
@@ -1568,25 +1099,24 @@ public final class TurmsNotification extends
     public boolean hasUsersInfosWithVersion() {
       return kindCase_ == 9;
     }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
-      return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.notification.TurmsNotification.Data.class, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder.class);
-    }
-
     /**
-     * <code>.im.turms.proto.Int64Values ids = 1;</code>
-     *
-     * @return The ids.
+     * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+     * @return The usersInfosWithVersion.
      */
-    public im.turms.turms.pojo.bo.common.Int64Values getIds() {
-      if (kindCase_ == 1) {
-        return (im.turms.turms.pojo.bo.common.Int64Values) kind_;
+    public im.turms.turms.pojo.bo.user.UsersInfosWithVersion getUsersInfosWithVersion() {
+      if (kindCase_ == 9) {
+         return (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
+    }
+    /**
+     * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+     */
+    public im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder getUsersInfosWithVersionOrBuilder() {
+      if (kindCase_ == 9) {
+         return (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_;
+      }
+      return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
     }
 
     public static final int USERS_ONLINE_STATUSES_FIELD_NUMBER = 10;
@@ -1597,26 +1127,24 @@ public final class TurmsNotification extends
     public boolean hasUsersOnlineStatuses() {
       return kindCase_ == 10;
     }
-
     /**
-     * <code>.im.turms.proto.Int64Values ids = 1;</code>
+     * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+     * @return The usersOnlineStatuses.
      */
-    public im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder getIdsOrBuilder() {
-      if (kindCase_ == 1) {
-        return (im.turms.turms.pojo.bo.common.Int64Values) kind_;
+    public im.turms.turms.pojo.bo.user.UsersOnlineStatuses getUsersOnlineStatuses() {
+      if (kindCase_ == 10) {
+         return (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_;
       }
-      return im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
-     * @return The idsWithVersion.
+     * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
      */
-    public im.turms.turms.pojo.bo.common.Int64ValuesWithVersion getIdsWithVersion() {
-      if (kindCase_ == 2) {
-        return (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_;
+    public im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder getUsersOnlineStatusesOrBuilder() {
+      if (kindCase_ == 10) {
+         return (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_;
       }
-      return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
     }
 
     public static final int USER_FRIEND_REQUESTS_WITH_VERSION_FIELD_NUMBER = 11;
@@ -1627,27 +1155,24 @@ public final class TurmsNotification extends
     public boolean hasUserFriendRequestsWithVersion() {
       return kindCase_ == 11;
     }
-
     /**
-     * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+     * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
+     * @return The userFriendRequestsWithVersion.
      */
-    public im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder getIdsWithVersionOrBuilder() {
-      if (kindCase_ == 2) {
-        return (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_;
+    public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getUserFriendRequestsWithVersion() {
+      if (kindCase_ == 11) {
+         return (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
-     *
-     * @return The acknowledge.
+     * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
      */
-    public im.turms.turms.pojo.bo.signal.Acknowledge getAcknowledge() {
-      if (kindCase_ == 4) {
-        return (im.turms.turms.pojo.bo.signal.Acknowledge) kind_;
+    public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder getUserFriendRequestsWithVersionOrBuilder() {
+      if (kindCase_ == 11) {
+         return (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
     }
 
     public static final int USER_RELATIONSHIP_GROUPS_WITH_VERSION_FIELD_NUMBER = 12;
@@ -1658,27 +1183,24 @@ public final class TurmsNotification extends
     public boolean hasUserRelationshipGroupsWithVersion() {
       return kindCase_ == 12;
     }
-
     /**
-     * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+     * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
+     * @return The userRelationshipGroupsWithVersion.
      */
-    public im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder getAcknowledgeOrBuilder() {
-      if (kindCase_ == 4) {
-        return (im.turms.turms.pojo.bo.signal.Acknowledge) kind_;
+    public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion getUserRelationshipGroupsWithVersion() {
+      if (kindCase_ == 12) {
+         return (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.Session session = 5;</code>
-     *
-     * @return The session.
+     * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
      */
-    public im.turms.turms.pojo.bo.signal.Session getSession() {
-      if (kindCase_ == 5) {
-        return (im.turms.turms.pojo.bo.signal.Session) kind_;
+    public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder getUserRelationshipGroupsWithVersionOrBuilder() {
+      if (kindCase_ == 12) {
+         return (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
     }
 
     public static final int USER_RELATIONSHIPS_WITH_VERSION_FIELD_NUMBER = 13;
@@ -1689,27 +1211,24 @@ public final class TurmsNotification extends
     public boolean hasUserRelationshipsWithVersion() {
       return kindCase_ == 13;
     }
-
     /**
-     * <code>.im.turms.proto.Session session = 5;</code>
+     * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
+     * @return The userRelationshipsWithVersion.
      */
-    public im.turms.turms.pojo.bo.signal.SessionOrBuilder getSessionOrBuilder() {
-      if (kindCase_ == 5) {
-        return (im.turms.turms.pojo.bo.signal.Session) kind_;
+    public im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion getUserRelationshipsWithVersion() {
+      if (kindCase_ == 13) {
+         return (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.Messages messages = 6;</code>
-     *
-     * @return The messages.
+     * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
      */
-    public im.turms.turms.pojo.bo.message.Messages getMessages() {
-      if (kindCase_ == 6) {
-        return (im.turms.turms.pojo.bo.message.Messages) kind_;
+    public im.turms.turms.pojo.bo.user.UserRelationshipsWithVersionOrBuilder getUserRelationshipsWithVersionOrBuilder() {
+      if (kindCase_ == 13) {
+         return (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
+      return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
     }
 
     public static final int GROUP_INVITATIONS_WITH_VERSION_FIELD_NUMBER = 14;
@@ -1720,27 +1239,24 @@ public final class TurmsNotification extends
     public boolean hasGroupInvitationsWithVersion() {
       return kindCase_ == 14;
     }
-
     /**
-     * <code>.im.turms.proto.Messages messages = 6;</code>
+     * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
+     * @return The groupInvitationsWithVersion.
      */
-    public im.turms.turms.pojo.bo.message.MessagesOrBuilder getMessagesOrBuilder() {
-      if (kindCase_ == 6) {
-        return (im.turms.turms.pojo.bo.message.Messages) kind_;
+    public im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion getGroupInvitationsWithVersion() {
+      if (kindCase_ == 14) {
+         return (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
-     *
-     * @return The messageStatuses.
+     * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
      */
-    public im.turms.turms.pojo.bo.message.MessageStatuses getMessageStatuses() {
-      if (kindCase_ == 7) {
-        return (im.turms.turms.pojo.bo.message.MessageStatuses) kind_;
+    public im.turms.turms.pojo.bo.group.GroupInvitationsWithVersionOrBuilder getGroupInvitationsWithVersionOrBuilder() {
+      if (kindCase_ == 14) {
+         return (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
     }
 
     public static final int GROUP_JOIN_QUESTION_ANSWER_RESULT_FIELD_NUMBER = 15;
@@ -1751,27 +1267,24 @@ public final class TurmsNotification extends
     public boolean hasGroupJoinQuestionAnswerResult() {
       return kindCase_ == 15;
     }
-
     /**
-     * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+     * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
+     * @return The groupJoinQuestionAnswerResult.
      */
-    public im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder getMessageStatusesOrBuilder() {
-      if (kindCase_ == 7) {
-        return (im.turms.turms.pojo.bo.message.MessageStatuses) kind_;
+    public im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult getGroupJoinQuestionAnswerResult() {
+      if (kindCase_ == 15) {
+         return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_;
       }
-      return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
-     *
-     * @return The messagesWithTotalList.
+     * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
      */
-    public im.turms.turms.pojo.bo.message.MessagesWithTotalList getMessagesWithTotalList() {
-      if (kindCase_ == 8) {
-        return (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_;
+    public im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResultOrBuilder getGroupJoinQuestionAnswerResultOrBuilder() {
+      if (kindCase_ == 15) {
+         return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_;
       }
-      return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
     }
 
     public static final int GROUP_JOIN_REQUESTS_WITH_VERSION_FIELD_NUMBER = 16;
@@ -1782,27 +1295,24 @@ public final class TurmsNotification extends
     public boolean hasGroupJoinRequestsWithVersion() {
       return kindCase_ == 16;
     }
-
     /**
-     * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+     * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
+     * @return The groupJoinRequestsWithVersion.
      */
-    public im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder getMessagesWithTotalListOrBuilder() {
-      if (kindCase_ == 8) {
-        return (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_;
+    public im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion getGroupJoinRequestsWithVersion() {
+      if (kindCase_ == 16) {
+         return (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
-     *
-     * @return The usersInfosWithVersion.
+     * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
      */
-    public im.turms.turms.pojo.bo.user.UsersInfosWithVersion getUsersInfosWithVersion() {
-      if (kindCase_ == 9) {
-        return (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_;
+    public im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder getGroupJoinRequestsWithVersionOrBuilder() {
+      if (kindCase_ == 16) {
+         return (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance();
     }
 
     public static final int GROUP_JOIN_QUESTIONS_WITH_VERSION_FIELD_NUMBER = 17;
@@ -1813,27 +1323,24 @@ public final class TurmsNotification extends
     public boolean hasGroupJoinQuestionsWithVersion() {
       return kindCase_ == 17;
     }
-
     /**
-     * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+     * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
+     * @return The groupJoinQuestionsWithVersion.
      */
-    public im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder getUsersInfosWithVersionOrBuilder() {
-      if (kindCase_ == 9) {
-        return (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_;
+    public im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion getGroupJoinQuestionsWithVersion() {
+      if (kindCase_ == 17) {
+         return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
-     *
-     * @return The usersOnlineStatuses.
+     * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
      */
-    public im.turms.turms.pojo.bo.user.UsersOnlineStatuses getUsersOnlineStatuses() {
-      if (kindCase_ == 10) {
-        return (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_;
+    public im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersionOrBuilder getGroupJoinQuestionsWithVersionOrBuilder() {
+      if (kindCase_ == 17) {
+         return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance();
     }
 
     public static final int GROUP_MEMBERS_WITH_VERSION_FIELD_NUMBER = 18;
@@ -1844,64 +1351,55 @@ public final class TurmsNotification extends
     public boolean hasGroupMembersWithVersion() {
       return kindCase_ == 18;
     }
-
     /**
-     * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+     * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
+     * @return The groupMembersWithVersion.
      */
-    public im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder getUsersOnlineStatusesOrBuilder() {
-      if (kindCase_ == 10) {
-        return (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_;
+    public im.turms.turms.pojo.bo.group.GroupMembersWithVersion getGroupMembersWithVersion() {
+      if (kindCase_ == 18) {
+         return (im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
-     *
-     * @return The userFriendRequestsWithVersion.
+     * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
      */
-    public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getUserFriendRequestsWithVersion() {
-      if (kindCase_ == 11) {
-        return (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_;
+    public im.turms.turms.pojo.bo.group.GroupMembersWithVersionOrBuilder getGroupMembersWithVersionOrBuilder() {
+      if (kindCase_ == 18) {
+         return (im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance();
     }
 
     public static final int GROUPS_WITH_VERSION_FIELD_NUMBER = 19;
-
     /**
      * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
-     *
      * @return Whether the groupsWithVersion field is set.
      */
     public boolean hasGroupsWithVersion() {
       return kindCase_ == 19;
     }
-
     /**
-     * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
+     * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
+     * @return The groupsWithVersion.
      */
-    public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder getUserFriendRequestsWithVersionOrBuilder() {
-      if (kindCase_ == 11) {
-        return (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_;
+    public im.turms.turms.pojo.bo.group.GroupsWithVersion getGroupsWithVersion() {
+      if (kindCase_ == 19) {
+         return (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance();
     }
-
     /**
-     * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-     *
-     * @return The userRelationshipGroupsWithVersion.
+     * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
      */
-    public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion getUserRelationshipGroupsWithVersion() {
-      if (kindCase_ == 12) {
-        return (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_;
+    public im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder getGroupsWithVersionOrBuilder() {
+      if (kindCase_ == 19) {
+         return (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_;
       }
-      return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
+      return im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance();
     }
 
     private byte memoizedIsInitialized = -1;
-
     @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1912,36 +1410,249 @@ public final class TurmsNotification extends
       return true;
     }
 
-    /**
-     * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-     */
-    public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder getUserRelationshipGroupsWithVersionOrBuilder() {
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (kindCase_ == 1) {
+        output.writeMessage(1, (im.turms.turms.pojo.bo.common.Int64Values) kind_);
+      }
+      if (kindCase_ == 2) {
+        output.writeMessage(2, (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_);
+      }
+      if (kindCase_ == 3) {
+        output.writeMessage(3, (com.google.protobuf.BoolValue) kind_);
+      }
+      if (kindCase_ == 4) {
+        output.writeMessage(4, (im.turms.turms.pojo.bo.signal.Acknowledge) kind_);
+      }
+      if (kindCase_ == 5) {
+        output.writeMessage(5, (im.turms.turms.pojo.bo.signal.Session) kind_);
+      }
+      if (kindCase_ == 6) {
+        output.writeMessage(6, (im.turms.turms.pojo.bo.message.Messages) kind_);
+      }
+      if (kindCase_ == 7) {
+        output.writeMessage(7, (im.turms.turms.pojo.bo.message.MessageStatuses) kind_);
+      }
+      if (kindCase_ == 8) {
+        output.writeMessage(8, (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_);
+      }
+      if (kindCase_ == 9) {
+        output.writeMessage(9, (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_);
+      }
+      if (kindCase_ == 10) {
+        output.writeMessage(10, (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_);
+      }
+      if (kindCase_ == 11) {
+        output.writeMessage(11, (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_);
+      }
       if (kindCase_ == 12) {
-        return (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_;
+        output.writeMessage(12, (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_);
       }
-      return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
+      if (kindCase_ == 13) {
+        output.writeMessage(13, (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_);
+      }
+      if (kindCase_ == 14) {
+        output.writeMessage(14, (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_);
+      }
+      if (kindCase_ == 15) {
+        output.writeMessage(15, (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_);
+      }
+      if (kindCase_ == 16) {
+        output.writeMessage(16, (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_);
+      }
+      if (kindCase_ == 17) {
+        output.writeMessage(17, (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_);
+      }
+      if (kindCase_ == 18) {
+        output.writeMessage(18, (im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_);
+      }
+      if (kindCase_ == 19) {
+        output.writeMessage(19, (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_);
+      }
+      unknownFields.writeTo(output);
     }
 
-    /**
-     * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-     *
-     * @return The userRelationshipsWithVersion.
-     */
-    public im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion getUserRelationshipsWithVersion() {
-      if (kindCase_ == 13) {
-        return (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_;
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (kindCase_ == 1) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, (im.turms.turms.pojo.bo.common.Int64Values) kind_);
       }
-      return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
+      if (kindCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_);
+      }
+      if (kindCase_ == 3) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, (com.google.protobuf.BoolValue) kind_);
+      }
+      if (kindCase_ == 4) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, (im.turms.turms.pojo.bo.signal.Acknowledge) kind_);
+      }
+      if (kindCase_ == 5) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, (im.turms.turms.pojo.bo.signal.Session) kind_);
+      }
+      if (kindCase_ == 6) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(6, (im.turms.turms.pojo.bo.message.Messages) kind_);
+      }
+      if (kindCase_ == 7) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(7, (im.turms.turms.pojo.bo.message.MessageStatuses) kind_);
+      }
+      if (kindCase_ == 8) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(8, (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_);
+      }
+      if (kindCase_ == 9) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_);
+      }
+      if (kindCase_ == 10) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(10, (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_);
+      }
+      if (kindCase_ == 11) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(11, (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_);
+      }
+      if (kindCase_ == 12) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(12, (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_);
+      }
+      if (kindCase_ == 13) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(13, (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_);
+      }
+      if (kindCase_ == 14) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(14, (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_);
+      }
+      if (kindCase_ == 15) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(15, (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_);
+      }
+      if (kindCase_ == 16) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_);
+      }
+      if (kindCase_ == 17) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(17, (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_);
+      }
+      if (kindCase_ == 18) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(18, (im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_);
+      }
+      if (kindCase_ == 19) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
     }
 
-    /**
-     * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-     */
-    public im.turms.turms.pojo.bo.user.UserRelationshipsWithVersionOrBuilder getUserRelationshipsWithVersionOrBuilder() {
-      if (kindCase_ == 13) {
-        return (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_;
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
       }
-      return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
+      if (!(obj instanceof im.turms.turms.pojo.notification.TurmsNotification.Data)) {
+        return super.equals(obj);
+      }
+      im.turms.turms.pojo.notification.TurmsNotification.Data other = (im.turms.turms.pojo.notification.TurmsNotification.Data) obj;
+
+      if (!getKindCase().equals(other.getKindCase())) return false;
+      switch (kindCase_) {
+        case 1:
+          if (!getIds()
+              .equals(other.getIds())) return false;
+          break;
+        case 2:
+          if (!getIdsWithVersion()
+              .equals(other.getIdsWithVersion())) return false;
+          break;
+        case 3:
+          if (!getSuccess()
+              .equals(other.getSuccess())) return false;
+          break;
+        case 4:
+          if (!getAcknowledge()
+              .equals(other.getAcknowledge())) return false;
+          break;
+        case 5:
+          if (!getSession()
+              .equals(other.getSession())) return false;
+          break;
+        case 6:
+          if (!getMessages()
+              .equals(other.getMessages())) return false;
+          break;
+        case 7:
+          if (!getMessageStatuses()
+              .equals(other.getMessageStatuses())) return false;
+          break;
+        case 8:
+          if (!getMessagesWithTotalList()
+              .equals(other.getMessagesWithTotalList())) return false;
+          break;
+        case 9:
+          if (!getUsersInfosWithVersion()
+              .equals(other.getUsersInfosWithVersion())) return false;
+          break;
+        case 10:
+          if (!getUsersOnlineStatuses()
+              .equals(other.getUsersOnlineStatuses())) return false;
+          break;
+        case 11:
+          if (!getUserFriendRequestsWithVersion()
+              .equals(other.getUserFriendRequestsWithVersion())) return false;
+          break;
+        case 12:
+          if (!getUserRelationshipGroupsWithVersion()
+              .equals(other.getUserRelationshipGroupsWithVersion())) return false;
+          break;
+        case 13:
+          if (!getUserRelationshipsWithVersion()
+              .equals(other.getUserRelationshipsWithVersion())) return false;
+          break;
+        case 14:
+          if (!getGroupInvitationsWithVersion()
+              .equals(other.getGroupInvitationsWithVersion())) return false;
+          break;
+        case 15:
+          if (!getGroupJoinQuestionAnswerResult()
+              .equals(other.getGroupJoinQuestionAnswerResult())) return false;
+          break;
+        case 16:
+          if (!getGroupJoinRequestsWithVersion()
+              .equals(other.getGroupJoinRequestsWithVersion())) return false;
+          break;
+        case 17:
+          if (!getGroupJoinQuestionsWithVersion()
+              .equals(other.getGroupJoinQuestionsWithVersion())) return false;
+          break;
+        case 18:
+          if (!getGroupMembersWithVersion()
+              .equals(other.getGroupMembersWithVersion())) return false;
+          break;
+        case 19:
+          if (!getGroupsWithVersion()
+              .equals(other.getGroupsWithVersion())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2036,208 +1747,84 @@ public final class TurmsNotification extends
       return hash;
     }
 
-    /**
-     * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
-     *
-     * @return The groupInvitationsWithVersion.
-     */
-    public im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion getGroupInvitationsWithVersion() {
-      if (kindCase_ == 14) {
-        return (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
-     */
-    public im.turms.turms.pojo.bo.group.GroupInvitationsWithVersionOrBuilder getGroupInvitationsWithVersionOrBuilder() {
-      if (kindCase_ == 14) {
-        return (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
-     *
-     * @return The groupJoinQuestionAnswerResult.
-     */
-    public im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult getGroupJoinQuestionAnswerResult() {
-      if (kindCase_ == 15) {
-        return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
-     */
-    public im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResultOrBuilder getGroupJoinQuestionAnswerResultOrBuilder() {
-      if (kindCase_ == 15) {
-        return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
-     *
-     * @return The groupJoinRequestsWithVersion.
-     */
-    public im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion getGroupJoinRequestsWithVersion() {
-      if (kindCase_ == 16) {
-        return (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
-     */
-    public im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder getGroupJoinRequestsWithVersionOrBuilder() {
-      if (kindCase_ == 16) {
-        return (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
-     *
-     * @return The groupJoinQuestionsWithVersion.
-     */
-    public im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion getGroupJoinQuestionsWithVersion() {
-      if (kindCase_ == 17) {
-        return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
-     */
-    public im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersionOrBuilder getGroupJoinQuestionsWithVersionOrBuilder() {
-      if (kindCase_ == 17) {
-        return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
-     *
-     * @return The groupMembersWithVersion.
-     */
-    public im.turms.turms.pojo.bo.group.GroupMembersWithVersion getGroupMembersWithVersion() {
-      if (kindCase_ == 18) {
-        return (im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
-     */
-    public im.turms.turms.pojo.bo.group.GroupMembersWithVersionOrBuilder getGroupMembersWithVersionOrBuilder() {
-      if (kindCase_ == 18) {
-        return (im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
-     * @return The groupsWithVersion.
-     */
-    public im.turms.turms.pojo.bo.group.GroupsWithVersion getGroupsWithVersion() {
-      if (kindCase_ == 19) {
-        return (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
-
-    /**
-     * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
-     */
-    public im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder getGroupsWithVersionOrBuilder() {
-      if (kindCase_ == 19) {
-        return (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_;
-      }
-      return im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance();
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
     @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder();
-    }
-
+    public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-            throws java.io.IOException {
-      if (kindCase_ == 1) {
-        output.writeMessage(1, (im.turms.turms.pojo.bo.common.Int64Values) kind_);
-      }
-      if (kindCase_ == 2) {
-        output.writeMessage(2, (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_);
-      }
-      if (kindCase_ == 3) {
-        output.writeMessage(3, (com.google.protobuf.BoolValue) kind_);
-      }
-      if (kindCase_ == 4) {
-        output.writeMessage(4, (im.turms.turms.pojo.bo.signal.Acknowledge) kind_);
-      }
-      if (kindCase_ == 5) {
-        output.writeMessage(5, (im.turms.turms.pojo.bo.signal.Session) kind_);
-      }
-      if (kindCase_ == 6) {
-        output.writeMessage(6, (im.turms.turms.pojo.bo.message.Messages) kind_);
-      }
-      if (kindCase_ == 7) {
-        output.writeMessage(7, (im.turms.turms.pojo.bo.message.MessageStatuses) kind_);
-      }
-      if (kindCase_ == 8) {
-        output.writeMessage(8, (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_);
-      }
-      if (kindCase_ == 9) {
-        output.writeMessage(9, (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_);
-      }
-      if (kindCase_ == 10) {
-        output.writeMessage(10, (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_);
-      }
-      if (kindCase_ == 11) {
-        output.writeMessage(11, (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_);
-      }
-      if (kindCase_ == 12) {
-        output.writeMessage(12, (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_);
-      }
-      if (kindCase_ == 13) {
-        output.writeMessage(13, (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_);
-      }
-      if (kindCase_ == 14) {
-        output.writeMessage(14, (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_);
-      }
-      if (kindCase_ == 15) {
-        output.writeMessage(15, (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_);
-      }
-      if (kindCase_ == 16) {
-        output.writeMessage(16, (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_);
-      }
-      if (kindCase_ == 17) {
-        output.writeMessage(17, (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_);
-      }
-      if (kindCase_ == 18) {
-        output.writeMessage(18, (im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_);
-      }
-      if (kindCase_ == 19) {
-        output.writeMessage(19, (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_);
-      }
-      unknownFields.writeTo(output);
+    public static Builder newBuilder(im.turms.turms.pojo.notification.TurmsNotification.Data prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-
     @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
@@ -2246,334 +1833,45 @@ public final class TurmsNotification extends
 
     @java.lang.Override
     protected Builder newBuilderForType(
-            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (kindCase_ == 1) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(1, (im.turms.turms.pojo.bo.common.Int64Values) kind_);
-      }
-      if (kindCase_ == 2) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(2, (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_);
-      }
-      if (kindCase_ == 3) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(3, (com.google.protobuf.BoolValue) kind_);
-      }
-      if (kindCase_ == 4) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(4, (im.turms.turms.pojo.bo.signal.Acknowledge) kind_);
-      }
-      if (kindCase_ == 5) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(5, (im.turms.turms.pojo.bo.signal.Session) kind_);
-      }
-      if (kindCase_ == 6) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(6, (im.turms.turms.pojo.bo.message.Messages) kind_);
-      }
-      if (kindCase_ == 7) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, (im.turms.turms.pojo.bo.message.MessageStatuses) kind_);
-      }
-      if (kindCase_ == 8) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_);
-      }
-      if (kindCase_ == 9) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(9, (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_);
-      }
-      if (kindCase_ == 10) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(10, (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_);
-      }
-      if (kindCase_ == 11) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(11, (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_);
-      }
-      if (kindCase_ == 12) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(12, (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_);
-      }
-      if (kindCase_ == 13) {
-        size += com.google.protobuf.CodedOutputStream
-                .computeMessageSize(13, (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_);
-      }
-      if (kindCase_ == 14) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(14, (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_);
-      }
-      if (kindCase_ == 15) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(15, (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_);
-      }
-      if (kindCase_ == 16) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(16, (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_);
-      }
-      if (kindCase_ == 17) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(17, (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_);
-      }
-      if (kindCase_ == 18) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(18, (im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_);
-      }
-      if (kindCase_ == 19) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(19, (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof im.turms.turms.pojo.notification.TurmsNotification.Data)) {
-        return super.equals(obj);
-      }
-      im.turms.turms.pojo.notification.TurmsNotification.Data other = (im.turms.turms.pojo.notification.TurmsNotification.Data) obj;
-
-      if (!getKindCase().equals(other.getKindCase())) return false;
-      switch (kindCase_) {
-        case 1:
-          if (!getIds()
-              .equals(other.getIds())) return false;
-          break;
-        case 2:
-          if (!getIdsWithVersion()
-              .equals(other.getIdsWithVersion())) return false;
-          break;
-        case 3:
-          if (!getSuccess()
-              .equals(other.getSuccess())) return false;
-          break;
-        case 4:
-          if (!getAcknowledge()
-              .equals(other.getAcknowledge())) return false;
-          break;
-        case 5:
-          if (!getSession()
-              .equals(other.getSession())) return false;
-          break;
-        case 6:
-          if (!getMessages()
-              .equals(other.getMessages())) return false;
-          break;
-        case 7:
-          if (!getMessageStatuses()
-              .equals(other.getMessageStatuses())) return false;
-          break;
-        case 8:
-          if (!getMessagesWithTotalList()
-              .equals(other.getMessagesWithTotalList())) return false;
-          break;
-        case 9:
-          if (!getUsersInfosWithVersion()
-                  .equals(other.getUsersInfosWithVersion())) return false;
-          break;
-        case 10:
-          if (!getUsersOnlineStatuses()
-                  .equals(other.getUsersOnlineStatuses())) return false;
-          break;
-        case 11:
-          if (!getUserFriendRequestsWithVersion()
-                  .equals(other.getUserFriendRequestsWithVersion())) return false;
-          break;
-        case 12:
-          if (!getUserRelationshipGroupsWithVersion()
-                  .equals(other.getUserRelationshipGroupsWithVersion())) return false;
-          break;
-        case 13:
-          if (!getUserRelationshipsWithVersion()
-                  .equals(other.getUserRelationshipsWithVersion())) return false;
-          break;
-        case 14:
-          if (!getGroupInvitationsWithVersion()
-                  .equals(other.getGroupInvitationsWithVersion())) return false;
-          break;
-        case 15:
-          if (!getGroupJoinQuestionAnswerResult()
-                  .equals(other.getGroupJoinQuestionAnswerResult())) return false;
-          break;
-        case 16:
-          if (!getGroupJoinRequestsWithVersion()
-                  .equals(other.getGroupJoinRequestsWithVersion())) return false;
-          break;
-        case 17:
-          if (!getGroupJoinQuestionsWithVersion()
-                  .equals(other.getGroupJoinQuestionsWithVersion())) return false;
-          break;
-        case 18:
-          if (!getGroupMembersWithVersion()
-                  .equals(other.getGroupMembersWithVersion())) return false;
-          break;
-        case 19:
-          if (!getGroupsWithVersion()
-                  .equals(other.getGroupsWithVersion())) return false;
-          break;
-        case 0:
-        default:
-      }
-      return unknownFields.equals(other.unknownFields);
-    }
-
-    @java.lang.Override
-    public im.turms.turms.pojo.notification.TurmsNotification.Data getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-    public enum KindCase
-            implements com.google.protobuf.Internal.EnumLite,
-            com.google.protobuf.AbstractMessage.InternalOneOfEnum {
-      IDS(1),
-      IDS_WITH_VERSION(2),
-      SUCCESS(3),
-      ACKNOWLEDGE(4),
-      SESSION(5),
-      MESSAGES(6),
-      MESSAGE_STATUSES(7),
-      MESSAGES_WITH_TOTAL_LIST(8),
-      USERS_INFOS_WITH_VERSION(9),
-      USERS_ONLINE_STATUSES(10),
-      USER_FRIEND_REQUESTS_WITH_VERSION(11),
-      USER_RELATIONSHIP_GROUPS_WITH_VERSION(12),
-      USER_RELATIONSHIPS_WITH_VERSION(13),
-      GROUP_INVITATIONS_WITH_VERSION(14),
-      GROUP_JOIN_QUESTION_ANSWER_RESULT(15),
-      GROUP_JOIN_REQUESTS_WITH_VERSION(16),
-      GROUP_JOIN_QUESTIONS_WITH_VERSION(17),
-      GROUP_MEMBERS_WITH_VERSION(18),
-      GROUPS_WITH_VERSION(19),
-      KIND_NOT_SET(0);
-      private final int value;
-
-      KindCase(int value) {
-        this.value = value;
-      }
-
-      /**
-       * @param value The number of the enum to look for.
-       * @return The enum associated with the given number.
-       * @deprecated Use {@link #forNumber(int)} instead.
-       */
-      @java.lang.Deprecated
-      public static KindCase valueOf(int value) {
-        return forNumber(value);
-      }
-
-      public static KindCase forNumber(int value) {
-        switch (value) {
-          case 1:
-            return IDS;
-          case 2:
-            return IDS_WITH_VERSION;
-          case 3:
-            return SUCCESS;
-          case 4:
-            return ACKNOWLEDGE;
-          case 5:
-            return SESSION;
-          case 6:
-            return MESSAGES;
-          case 7:
-            return MESSAGE_STATUSES;
-          case 8:
-            return MESSAGES_WITH_TOTAL_LIST;
-          case 9:
-            return USERS_INFOS_WITH_VERSION;
-          case 10:
-            return USERS_ONLINE_STATUSES;
-          case 11:
-            return USER_FRIEND_REQUESTS_WITH_VERSION;
-          case 12:
-            return USER_RELATIONSHIP_GROUPS_WITH_VERSION;
-          case 13:
-            return USER_RELATIONSHIPS_WITH_VERSION;
-          case 14:
-            return GROUP_INVITATIONS_WITH_VERSION;
-          case 15:
-            return GROUP_JOIN_QUESTION_ANSWER_RESULT;
-          case 16:
-            return GROUP_JOIN_REQUESTS_WITH_VERSION;
-          case 17:
-            return GROUP_JOIN_QUESTIONS_WITH_VERSION;
-          case 18:
-            return GROUP_MEMBERS_WITH_VERSION;
-          case 19:
-            return GROUPS_WITH_VERSION;
-          case 0:
-            return KIND_NOT_SET;
-          default:
-            return null;
-        }
-      }
-
-      public int getNumber() {
-        return this.value;
-      }
-    }
-
-    private static final com.google.protobuf.Parser<Data>
-            PARSER = new com.google.protobuf.AbstractParser<Data>() {
-      @java.lang.Override
-      public Data parsePartialFrom(
-              com.google.protobuf.CodedInputStream input,
-              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-              throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Data(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<Data> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Data> getParserForType() {
-      return PARSER;
-    }
-
     /**
      * Protobuf type {@code im.turms.proto.TurmsNotification.Data}
      */
     public static final class Builder extends
-            com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-            // @@protoc_insertion_point(builder_implements:im.turms.proto.TurmsNotification.Data)
-            im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder {
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.common.Int64Values, im.turms.turms.pojo.bo.common.Int64Values.Builder, im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder> idsBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.common.Int64ValuesWithVersion, im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder, im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder> idsWithVersionBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.signal.Acknowledge, im.turms.turms.pojo.bo.signal.Acknowledge.Builder, im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder> acknowledgeBuilder_;
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:im.turms.proto.TurmsNotification.Data)
+        im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_descriptor;
+      }
 
-      private Builder(
-              com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                im.turms.turms.pojo.notification.TurmsNotification.Data.class, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder.class);
+      }
+
+      // Construct using im.turms.turms.pojo.notification.TurmsNotification.Data.newBuilder()
+      private Builder() {
         maybeForceBuilderInitialization();
       }
 
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
         }
       }
-
       @java.lang.Override
       public Builder clear() {
         super.clear();
@@ -2582,182 +1880,15 @@ public final class TurmsNotification extends
         return this;
       }
 
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.signal.Session, im.turms.turms.pojo.bo.signal.Session.Builder, im.turms.turms.pojo.bo.signal.SessionOrBuilder> sessionBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.message.Messages, im.turms.turms.pojo.bo.message.Messages.Builder, im.turms.turms.pojo.bo.message.MessagesOrBuilder> messagesBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.message.MessageStatuses, im.turms.turms.pojo.bo.message.MessageStatuses.Builder, im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder> messageStatusesBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.message.MessagesWithTotalList, im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder, im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder> messagesWithTotalListBuilder_;
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-              com.google.protobuf.Descriptors.FieldDescriptor field,
-              java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(
-              com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(
-              com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-              com.google.protobuf.Descriptors.FieldDescriptor field,
-              int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-              com.google.protobuf.Descriptors.FieldDescriptor field,
-              java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UsersInfosWithVersion, im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder, im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder> usersInfosWithVersionBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UsersOnlineStatuses, im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder, im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder> usersOnlineStatusesBuilder_;
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder> userFriendRequestsWithVersionBuilder_;
-      private int kindCase_ = 0;
-      private java.lang.Object kind_;
-
-      public KindCase
-      getKindCase() {
-        return KindCase.forNumber(
-                kindCase_);
-      }
-
-      public Builder clearKind() {
-        kindCase_ = 0;
-        kind_ = null;
-        onChanged();
-        return this;
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder> userRelationshipGroupsWithVersionBuilder_;
-
-      /**
-       * <code>.im.turms.proto.Int64Values ids = 1;</code>
-       * @return Whether the ids field is set.
-       */
-      public boolean hasIds() {
-        return kindCase_ == 1;
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersionOrBuilder> userRelationshipsWithVersionBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersionOrBuilder> groupInvitationsWithVersionBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResultOrBuilder> groupJoinQuestionAnswerResultBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder> groupJoinRequestsWithVersionBuilder_;
-
-      /**
-       * <code>.im.turms.proto.Int64Values ids = 1;</code>
-       */
-      public Builder clearIds() {
-        if (idsBuilder_ == null) {
-          if (kindCase_ == 1) {
-            kindCase_ = 0;
-            kind_ = null;
-            onChanged();
-          }
-        } else {
-          if (kindCase_ == 1) {
-            kindCase_ = 0;
-            kind_ = null;
-          }
-          idsBuilder_.clear();
-        }
-        return this;
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersionOrBuilder> groupJoinQuestionsWithVersionBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupMembersWithVersion, im.turms.turms.pojo.bo.group.GroupMembersWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupMembersWithVersionOrBuilder> groupMembersWithVersionBuilder_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupsWithVersion, im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder> groupsWithVersionBuilder_;
-
-      // Construct using im.turms.turms.pojo.notification.TurmsNotification.Data.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
-       * @return Whether the idsWithVersion field is set.
-       */
-      public boolean hasIdsWithVersion() {
-        return kindCase_ == 2;
-      }
-
-      public static final com.google.protobuf.Descriptors.Descriptor
-      getDescriptor() {
-        return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internalGetFieldAccessorTable() {
-        return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_fieldAccessorTable
-                .ensureFieldAccessorsInitialized(
-                        im.turms.turms.pojo.notification.TurmsNotification.Data.class, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder.class);
-      }
-
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
-      getDescriptorForType() {
+          getDescriptorForType() {
         return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_Data_descriptor;
       }
 
       @java.lang.Override
       public im.turms.turms.pojo.notification.TurmsNotification.Data getDefaultInstanceForType() {
         return im.turms.turms.pojo.notification.TurmsNotification.Data.getDefaultInstance();
-      }
-      /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
-       */
-      public Builder clearIdsWithVersion() {
-        if (idsWithVersionBuilder_ == null) {
-          if (kindCase_ == 2) {
-            kindCase_ = 0;
-            kind_ = null;
-            onChanged();
-          }
-        } else {
-          if (kindCase_ == 2) {
-            kindCase_ = 0;
-            kind_ = null;
-          }
-          idsWithVersionBuilder_.clear();
-        }
-        return this;
       }
 
       @java.lang.Override
@@ -2911,136 +2042,44 @@ public final class TurmsNotification extends
       }
 
       @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof im.turms.turms.pojo.notification.TurmsNotification.Data) {
-          return mergeFrom((im.turms.turms.pojo.notification.TurmsNotification.Data) other);
+          return mergeFrom((im.turms.turms.pojo.notification.TurmsNotification.Data)other);
         } else {
           super.mergeFrom(other);
           return this;
-        }
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-              com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> successBuilder_;
-
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       *
-       * @return Whether the success field is set.
-       */
-      public boolean hasSuccess() {
-        return kindCase_ == 3;
-      }
-
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       *
-       * @return The success.
-       */
-      public com.google.protobuf.BoolValue getSuccess() {
-        if (successBuilder_ == null) {
-          if (kindCase_ == 3) {
-            return (com.google.protobuf.BoolValue) kind_;
-          }
-          return com.google.protobuf.BoolValue.getDefaultInstance();
-        } else {
-          if (kindCase_ == 3) {
-            return successBuilder_.getMessage();
-          }
-          return com.google.protobuf.BoolValue.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       */
-      public Builder setSuccess(com.google.protobuf.BoolValue value) {
-        if (successBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          kind_ = value;
-          onChanged();
-        } else {
-          successBuilder_.setMessage(value);
-        }
-        kindCase_ = 3;
-        return this;
-      }
-
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       */
-      public Builder setSuccess(
-              com.google.protobuf.BoolValue.Builder builderForValue) {
-        if (successBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          successBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 3;
-        return this;
-      }
-
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       */
-      public Builder mergeSuccess(com.google.protobuf.BoolValue value) {
-        if (successBuilder_ == null) {
-          if (kindCase_ == 3 &&
-                  kind_ != com.google.protobuf.BoolValue.getDefaultInstance()) {
-            kind_ = com.google.protobuf.BoolValue.newBuilder((com.google.protobuf.BoolValue) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 3) {
-            successBuilder_.mergeFrom(value);
-          }
-          successBuilder_.setMessage(value);
-        }
-        kindCase_ = 3;
-        return this;
-      }
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       */
-      public Builder clearSuccess() {
-        if (successBuilder_ == null) {
-          if (kindCase_ == 3) {
-            kindCase_ = 0;
-            kind_ = null;
-            onChanged();
-          }
-        } else {
-          if (kindCase_ == 3) {
-            kindCase_ = 0;
-            kind_ = null;
-          }
-          successBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       */
-      public com.google.protobuf.BoolValue.Builder getSuccessBuilder() {
-        return getSuccessFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       */
-      public com.google.protobuf.BoolValueOrBuilder getSuccessOrBuilder() {
-        if ((kindCase_ == 3) && (successBuilder_ != null)) {
-          return successBuilder_.getMessageOrBuilder();
-        } else {
-          if (kindCase_ == 3) {
-            return (com.google.protobuf.BoolValue) kind_;
-          }
-          return com.google.protobuf.BoolValue.getDefaultInstance();
         }
       }
 
@@ -3133,10 +2172,15 @@ public final class TurmsNotification extends
       }
 
       @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
       public Builder mergeFrom(
-              com.google.protobuf.CodedInputStream input,
-              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-              throws java.io.IOException {
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
         im.turms.turms.pojo.notification.TurmsNotification.Data parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -3150,19 +2194,33 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
-       *
-       * @return Whether the acknowledge field is set.
-       */
-      public boolean hasAcknowledge() {
-        return kindCase_ == 4;
+      private int kindCase_ = 0;
+      private java.lang.Object kind_;
+      public KindCase
+          getKindCase() {
+        return KindCase.forNumber(
+            kindCase_);
       }
 
+      public Builder clearKind() {
+        kindCase_ = 0;
+        kind_ = null;
+        onChanged();
+        return this;
+      }
+
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.common.Int64Values, im.turms.turms.pojo.bo.common.Int64Values.Builder, im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder> idsBuilder_;
       /**
        * <code>.im.turms.proto.Int64Values ids = 1;</code>
-       *
+       * @return Whether the ids field is set.
+       */
+      public boolean hasIds() {
+        return kindCase_ == 1;
+      }
+      /**
+       * <code>.im.turms.proto.Int64Values ids = 1;</code>
        * @return The ids.
        */
       public im.turms.turms.pojo.bo.common.Int64Values getIds() {
@@ -3178,7 +2236,6 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.Int64Values ids = 1;</code>
        */
@@ -3195,12 +2252,11 @@ public final class TurmsNotification extends
         kindCase_ = 1;
         return this;
       }
-
       /**
        * <code>.im.turms.proto.Int64Values ids = 1;</code>
        */
       public Builder setIds(
-              im.turms.turms.pojo.bo.common.Int64Values.Builder builderForValue) {
+          im.turms.turms.pojo.bo.common.Int64Values.Builder builderForValue) {
         if (idsBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
@@ -3210,7 +2266,6 @@ public final class TurmsNotification extends
         kindCase_ = 1;
         return this;
       }
-
       /**
        * <code>.im.turms.proto.Int64Values ids = 1;</code>
        */
@@ -3233,7 +2288,420 @@ public final class TurmsNotification extends
         kindCase_ = 1;
         return this;
       }
+      /**
+       * <code>.im.turms.proto.Int64Values ids = 1;</code>
+       */
+      public Builder clearIds() {
+        if (idsBuilder_ == null) {
+          if (kindCase_ == 1) {
+            kindCase_ = 0;
+            kind_ = null;
+            onChanged();
+          }
+        } else {
+          if (kindCase_ == 1) {
+            kindCase_ = 0;
+            kind_ = null;
+          }
+          idsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.Int64Values ids = 1;</code>
+       */
+      public im.turms.turms.pojo.bo.common.Int64Values.Builder getIdsBuilder() {
+        return getIdsFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.im.turms.proto.Int64Values ids = 1;</code>
+       */
+      public im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder getIdsOrBuilder() {
+        if ((kindCase_ == 1) && (idsBuilder_ != null)) {
+          return idsBuilder_.getMessageOrBuilder();
+        } else {
+          if (kindCase_ == 1) {
+            return (im.turms.turms.pojo.bo.common.Int64Values) kind_;
+          }
+          return im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.Int64Values ids = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.common.Int64Values, im.turms.turms.pojo.bo.common.Int64Values.Builder, im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder> 
+          getIdsFieldBuilder() {
+        if (idsBuilder_ == null) {
+          if (!(kindCase_ == 1)) {
+            kind_ = im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
+          }
+          idsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.common.Int64Values, im.turms.turms.pojo.bo.common.Int64Values.Builder, im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder>(
+                  (im.turms.turms.pojo.bo.common.Int64Values) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 1;
+        onChanged();;
+        return idsBuilder_;
+      }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.common.Int64ValuesWithVersion, im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder, im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder> idsWithVersionBuilder_;
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       * @return Whether the idsWithVersion field is set.
+       */
+      public boolean hasIdsWithVersion() {
+        return kindCase_ == 2;
+      }
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       * @return The idsWithVersion.
+       */
+      public im.turms.turms.pojo.bo.common.Int64ValuesWithVersion getIdsWithVersion() {
+        if (idsWithVersionBuilder_ == null) {
+          if (kindCase_ == 2) {
+            return (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_;
+          }
+          return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
+        } else {
+          if (kindCase_ == 2) {
+            return idsWithVersionBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       */
+      public Builder setIdsWithVersion(im.turms.turms.pojo.bo.common.Int64ValuesWithVersion value) {
+        if (idsWithVersionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          kind_ = value;
+          onChanged();
+        } else {
+          idsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       */
+      public Builder setIdsWithVersion(
+          im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder builderForValue) {
+        if (idsWithVersionBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          idsWithVersionBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       */
+      public Builder mergeIdsWithVersion(im.turms.turms.pojo.bo.common.Int64ValuesWithVersion value) {
+        if (idsWithVersionBuilder_ == null) {
+          if (kindCase_ == 2 &&
+              kind_ != im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.newBuilder((im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 2) {
+            idsWithVersionBuilder_.mergeFrom(value);
+          }
+          idsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       */
+      public Builder clearIdsWithVersion() {
+        if (idsWithVersionBuilder_ == null) {
+          if (kindCase_ == 2) {
+            kindCase_ = 0;
+            kind_ = null;
+            onChanged();
+          }
+        } else {
+          if (kindCase_ == 2) {
+            kindCase_ = 0;
+            kind_ = null;
+          }
+          idsWithVersionBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       */
+      public im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder getIdsWithVersionBuilder() {
+        return getIdsWithVersionFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       */
+      public im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder getIdsWithVersionOrBuilder() {
+        if ((kindCase_ == 2) && (idsWithVersionBuilder_ != null)) {
+          return idsWithVersionBuilder_.getMessageOrBuilder();
+        } else {
+          if (kindCase_ == 2) {
+            return (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_;
+          }
+          return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.common.Int64ValuesWithVersion, im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder, im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder> 
+          getIdsWithVersionFieldBuilder() {
+        if (idsWithVersionBuilder_ == null) {
+          if (!(kindCase_ == 2)) {
+            kind_ = im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
+          }
+          idsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.common.Int64ValuesWithVersion, im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder, im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder>(
+                  (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 2;
+        onChanged();;
+        return idsWithVersionBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> successBuilder_;
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       * @return Whether the success field is set.
+       */
+      public boolean hasSuccess() {
+        return kindCase_ == 3;
+      }
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       * @return The success.
+       */
+      public com.google.protobuf.BoolValue getSuccess() {
+        if (successBuilder_ == null) {
+          if (kindCase_ == 3) {
+            return (com.google.protobuf.BoolValue) kind_;
+          }
+          return com.google.protobuf.BoolValue.getDefaultInstance();
+        } else {
+          if (kindCase_ == 3) {
+            return successBuilder_.getMessage();
+          }
+          return com.google.protobuf.BoolValue.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       */
+      public Builder setSuccess(com.google.protobuf.BoolValue value) {
+        if (successBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          kind_ = value;
+          onChanged();
+        } else {
+          successBuilder_.setMessage(value);
+        }
+        kindCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       */
+      public Builder setSuccess(
+          com.google.protobuf.BoolValue.Builder builderForValue) {
+        if (successBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          successBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       */
+      public Builder mergeSuccess(com.google.protobuf.BoolValue value) {
+        if (successBuilder_ == null) {
+          if (kindCase_ == 3 &&
+              kind_ != com.google.protobuf.BoolValue.getDefaultInstance()) {
+            kind_ = com.google.protobuf.BoolValue.newBuilder((com.google.protobuf.BoolValue) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 3) {
+            successBuilder_.mergeFrom(value);
+          }
+          successBuilder_.setMessage(value);
+        }
+        kindCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       */
+      public Builder clearSuccess() {
+        if (successBuilder_ == null) {
+          if (kindCase_ == 3) {
+            kindCase_ = 0;
+            kind_ = null;
+            onChanged();
+          }
+        } else {
+          if (kindCase_ == 3) {
+            kindCase_ = 0;
+            kind_ = null;
+          }
+          successBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       */
+      public com.google.protobuf.BoolValue.Builder getSuccessBuilder() {
+        return getSuccessFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       */
+      public com.google.protobuf.BoolValueOrBuilder getSuccessOrBuilder() {
+        if ((kindCase_ == 3) && (successBuilder_ != null)) {
+          return successBuilder_.getMessageOrBuilder();
+        } else {
+          if (kindCase_ == 3) {
+            return (com.google.protobuf.BoolValue) kind_;
+          }
+          return com.google.protobuf.BoolValue.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.google.protobuf.BoolValue success = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
+          getSuccessFieldBuilder() {
+        if (successBuilder_ == null) {
+          if (!(kindCase_ == 3)) {
+            kind_ = com.google.protobuf.BoolValue.getDefaultInstance();
+          }
+          successBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>(
+                  (com.google.protobuf.BoolValue) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 3;
+        onChanged();;
+        return successBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.signal.Acknowledge, im.turms.turms.pojo.bo.signal.Acknowledge.Builder, im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder> acknowledgeBuilder_;
+      /**
+       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       * @return Whether the acknowledge field is set.
+       */
+      public boolean hasAcknowledge() {
+        return kindCase_ == 4;
+      }
+      /**
+       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       * @return The acknowledge.
+       */
+      public im.turms.turms.pojo.bo.signal.Acknowledge getAcknowledge() {
+        if (acknowledgeBuilder_ == null) {
+          if (kindCase_ == 4) {
+            return (im.turms.turms.pojo.bo.signal.Acknowledge) kind_;
+          }
+          return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
+        } else {
+          if (kindCase_ == 4) {
+            return acknowledgeBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       */
+      public Builder setAcknowledge(im.turms.turms.pojo.bo.signal.Acknowledge value) {
+        if (acknowledgeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          kind_ = value;
+          onChanged();
+        } else {
+          acknowledgeBuilder_.setMessage(value);
+        }
+        kindCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       */
+      public Builder setAcknowledge(
+          im.turms.turms.pojo.bo.signal.Acknowledge.Builder builderForValue) {
+        if (acknowledgeBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          acknowledgeBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       */
+      public Builder mergeAcknowledge(im.turms.turms.pojo.bo.signal.Acknowledge value) {
+        if (acknowledgeBuilder_ == null) {
+          if (kindCase_ == 4 &&
+              kind_ != im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.signal.Acknowledge.newBuilder((im.turms.turms.pojo.bo.signal.Acknowledge) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 4) {
+            acknowledgeBuilder_.mergeFrom(value);
+          }
+          acknowledgeBuilder_.setMessage(value);
+        }
+        kindCase_ = 4;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
        */
@@ -3253,67 +2721,49 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Int64Values ids = 1;</code>
+       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
        */
-      public im.turms.turms.pojo.bo.common.Int64Values.Builder getIdsBuilder() {
-        return getIdsFieldBuilder().getBuilder();
+      public im.turms.turms.pojo.bo.signal.Acknowledge.Builder getAcknowledgeBuilder() {
+        return getAcknowledgeFieldBuilder().getBuilder();
       }
-
       /**
-       * <code>.im.turms.proto.Int64Values ids = 1;</code>
+       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
        */
-      public im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder getIdsOrBuilder() {
-        if ((kindCase_ == 1) && (idsBuilder_ != null)) {
-          return idsBuilder_.getMessageOrBuilder();
+      public im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder getAcknowledgeOrBuilder() {
+        if ((kindCase_ == 4) && (acknowledgeBuilder_ != null)) {
+          return acknowledgeBuilder_.getMessageOrBuilder();
         } else {
-          if (kindCase_ == 1) {
-            return (im.turms.turms.pojo.bo.common.Int64Values) kind_;
+          if (kindCase_ == 4) {
+            return (im.turms.turms.pojo.bo.signal.Acknowledge) kind_;
           }
-          return im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
+          return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.Int64Values ids = 1;</code>
+       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.common.Int64Values, im.turms.turms.pojo.bo.common.Int64Values.Builder, im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder>
-      getIdsFieldBuilder() {
-        if (idsBuilder_ == null) {
-          if (!(kindCase_ == 1)) {
-            kind_ = im.turms.turms.pojo.bo.common.Int64Values.getDefaultInstance();
+          im.turms.turms.pojo.bo.signal.Acknowledge, im.turms.turms.pojo.bo.signal.Acknowledge.Builder, im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder> 
+          getAcknowledgeFieldBuilder() {
+        if (acknowledgeBuilder_ == null) {
+          if (!(kindCase_ == 4)) {
+            kind_ = im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
           }
-          idsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.common.Int64Values, im.turms.turms.pojo.bo.common.Int64Values.Builder, im.turms.turms.pojo.bo.common.Int64ValuesOrBuilder>(
-                  (im.turms.turms.pojo.bo.common.Int64Values) kind_,
+          acknowledgeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.signal.Acknowledge, im.turms.turms.pojo.bo.signal.Acknowledge.Builder, im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder>(
+                  (im.turms.turms.pojo.bo.signal.Acknowledge) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
-        kindCase_ = 1;
-        onChanged();
-        return idsBuilder_;
+        kindCase_ = 4;
+        onChanged();;
+        return acknowledgeBuilder_;
       }
 
-      /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
-       * @return The idsWithVersion.
-       */
-      public im.turms.turms.pojo.bo.common.Int64ValuesWithVersion getIdsWithVersion() {
-        if (idsWithVersionBuilder_ == null) {
-          if (kindCase_ == 2) {
-            return (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_;
-          }
-          return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
-        } else {
-          if (kindCase_ == 2) {
-            return idsWithVersionBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
-        }
-      }
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.signal.Session, im.turms.turms.pojo.bo.signal.Session.Builder, im.turms.turms.pojo.bo.signal.SessionOrBuilder> sessionBuilder_;
       /**
        * <code>.im.turms.proto.Session session = 5;</code>
        * @return Whether the session field is set.
@@ -3321,69 +2771,75 @@ public final class TurmsNotification extends
       public boolean hasSession() {
         return kindCase_ == 5;
       }
-
       /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       * <code>.im.turms.proto.Session session = 5;</code>
+       * @return The session.
        */
-      public Builder setIdsWithVersion(im.turms.turms.pojo.bo.common.Int64ValuesWithVersion value) {
-        if (idsWithVersionBuilder_ == null) {
+      public im.turms.turms.pojo.bo.signal.Session getSession() {
+        if (sessionBuilder_ == null) {
+          if (kindCase_ == 5) {
+            return (im.turms.turms.pojo.bo.signal.Session) kind_;
+          }
+          return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
+        } else {
+          if (kindCase_ == 5) {
+            return sessionBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.Session session = 5;</code>
+       */
+      public Builder setSession(im.turms.turms.pojo.bo.signal.Session value) {
+        if (sessionBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           kind_ = value;
           onChanged();
         } else {
-          idsWithVersionBuilder_.setMessage(value);
+          sessionBuilder_.setMessage(value);
         }
-        kindCase_ = 2;
+        kindCase_ = 5;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       * <code>.im.turms.proto.Session session = 5;</code>
        */
-      public Builder setIdsWithVersion(
-              im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder builderForValue) {
-        if (idsWithVersionBuilder_ == null) {
+      public Builder setSession(
+          im.turms.turms.pojo.bo.signal.Session.Builder builderForValue) {
+        if (sessionBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
         } else {
-          idsWithVersionBuilder_.setMessage(builderForValue.build());
+          sessionBuilder_.setMessage(builderForValue.build());
         }
-        kindCase_ = 2;
+        kindCase_ = 5;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       * <code>.im.turms.proto.Session session = 5;</code>
        */
-      public Builder mergeIdsWithVersion(im.turms.turms.pojo.bo.common.Int64ValuesWithVersion value) {
-        if (idsWithVersionBuilder_ == null) {
-          if (kindCase_ == 2 &&
-                  kind_ != im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.newBuilder((im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
+      public Builder mergeSession(im.turms.turms.pojo.bo.signal.Session value) {
+        if (sessionBuilder_ == null) {
+          if (kindCase_ == 5 &&
+              kind_ != im.turms.turms.pojo.bo.signal.Session.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.signal.Session.newBuilder((im.turms.turms.pojo.bo.signal.Session) kind_)
+                .mergeFrom(value).buildPartial();
           } else {
             kind_ = value;
           }
           onChanged();
         } else {
-          if (kindCase_ == 2) {
-            idsWithVersionBuilder_.mergeFrom(value);
+          if (kindCase_ == 5) {
+            sessionBuilder_.mergeFrom(value);
           }
-          idsWithVersionBuilder_.setMessage(value);
+          sessionBuilder_.setMessage(value);
         }
-        kindCase_ = 2;
+        kindCase_ = 5;
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
-       */
-      public im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder getIdsWithVersionBuilder() {
-        return getIdsWithVersionFieldBuilder().getBuilder();
-      }
-
       /**
        * <code>.im.turms.proto.Session session = 5;</code>
        */
@@ -3403,155 +2859,125 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       * <code>.im.turms.proto.Session session = 5;</code>
        */
-      public im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder getIdsWithVersionOrBuilder() {
-        if ((kindCase_ == 2) && (idsWithVersionBuilder_ != null)) {
-          return idsWithVersionBuilder_.getMessageOrBuilder();
+      public im.turms.turms.pojo.bo.signal.Session.Builder getSessionBuilder() {
+        return getSessionFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.im.turms.proto.Session session = 5;</code>
+       */
+      public im.turms.turms.pojo.bo.signal.SessionOrBuilder getSessionOrBuilder() {
+        if ((kindCase_ == 5) && (sessionBuilder_ != null)) {
+          return sessionBuilder_.getMessageOrBuilder();
         } else {
-          if (kindCase_ == 2) {
-            return (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_;
+          if (kindCase_ == 5) {
+            return (im.turms.turms.pojo.bo.signal.Session) kind_;
           }
-          return im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
+          return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.Int64ValuesWithVersion ids_with_version = 2;</code>
+       * <code>.im.turms.proto.Session session = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.common.Int64ValuesWithVersion, im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder, im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder>
-      getIdsWithVersionFieldBuilder() {
-        if (idsWithVersionBuilder_ == null) {
-          if (!(kindCase_ == 2)) {
-            kind_ = im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.getDefaultInstance();
+          im.turms.turms.pojo.bo.signal.Session, im.turms.turms.pojo.bo.signal.Session.Builder, im.turms.turms.pojo.bo.signal.SessionOrBuilder> 
+          getSessionFieldBuilder() {
+        if (sessionBuilder_ == null) {
+          if (!(kindCase_ == 5)) {
+            kind_ = im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
           }
-          idsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.common.Int64ValuesWithVersion, im.turms.turms.pojo.bo.common.Int64ValuesWithVersion.Builder, im.turms.turms.pojo.bo.common.Int64ValuesWithVersionOrBuilder>(
-                  (im.turms.turms.pojo.bo.common.Int64ValuesWithVersion) kind_,
+          sessionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.signal.Session, im.turms.turms.pojo.bo.signal.Session.Builder, im.turms.turms.pojo.bo.signal.SessionOrBuilder>(
+                  (im.turms.turms.pojo.bo.signal.Session) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
-        kindCase_ = 2;
-        onChanged();
-        return idsWithVersionBuilder_;
+        kindCase_ = 5;
+        onChanged();;
+        return sessionBuilder_;
       }
 
-      /**
-       * <code>.google.protobuf.BoolValue success = 3;</code>
-       */
       private com.google.protobuf.SingleFieldBuilderV3<
-              com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>
-      getSuccessFieldBuilder() {
-        if (successBuilder_ == null) {
-          if (!(kindCase_ == 3)) {
-            kind_ = com.google.protobuf.BoolValue.getDefaultInstance();
-          }
-          successBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>(
-                  (com.google.protobuf.BoolValue) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 3;
-        onChanged();
-        return successBuilder_;
-      }
-
-      /**
-       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
-       *
-       * @return The acknowledge.
-       */
-      public im.turms.turms.pojo.bo.signal.Acknowledge getAcknowledge() {
-        if (acknowledgeBuilder_ == null) {
-          if (kindCase_ == 4) {
-            return (im.turms.turms.pojo.bo.signal.Acknowledge) kind_;
-          }
-          return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
-        } else {
-          if (kindCase_ == 4) {
-            return acknowledgeBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
-        }
-      }
-
+          im.turms.turms.pojo.bo.message.Messages, im.turms.turms.pojo.bo.message.Messages.Builder, im.turms.turms.pojo.bo.message.MessagesOrBuilder> messagesBuilder_;
       /**
        * <code>.im.turms.proto.Messages messages = 6;</code>
-       *
        * @return Whether the messages field is set.
        */
       public boolean hasMessages() {
         return kindCase_ == 6;
       }
-
       /**
-       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       * <code>.im.turms.proto.Messages messages = 6;</code>
+       * @return The messages.
        */
-      public Builder setAcknowledge(im.turms.turms.pojo.bo.signal.Acknowledge value) {
-        if (acknowledgeBuilder_ == null) {
+      public im.turms.turms.pojo.bo.message.Messages getMessages() {
+        if (messagesBuilder_ == null) {
+          if (kindCase_ == 6) {
+            return (im.turms.turms.pojo.bo.message.Messages) kind_;
+          }
+          return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
+        } else {
+          if (kindCase_ == 6) {
+            return messagesBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.Messages messages = 6;</code>
+       */
+      public Builder setMessages(im.turms.turms.pojo.bo.message.Messages value) {
+        if (messagesBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           kind_ = value;
           onChanged();
         } else {
-          acknowledgeBuilder_.setMessage(value);
+          messagesBuilder_.setMessage(value);
         }
-        kindCase_ = 4;
+        kindCase_ = 6;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       * <code>.im.turms.proto.Messages messages = 6;</code>
        */
-      public Builder setAcknowledge(
-              im.turms.turms.pojo.bo.signal.Acknowledge.Builder builderForValue) {
-        if (acknowledgeBuilder_ == null) {
+      public Builder setMessages(
+          im.turms.turms.pojo.bo.message.Messages.Builder builderForValue) {
+        if (messagesBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
         } else {
-          acknowledgeBuilder_.setMessage(builderForValue.build());
+          messagesBuilder_.setMessage(builderForValue.build());
         }
-        kindCase_ = 4;
+        kindCase_ = 6;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       * <code>.im.turms.proto.Messages messages = 6;</code>
        */
-      public Builder mergeAcknowledge(im.turms.turms.pojo.bo.signal.Acknowledge value) {
-        if (acknowledgeBuilder_ == null) {
-          if (kindCase_ == 4 &&
-                  kind_ != im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.signal.Acknowledge.newBuilder((im.turms.turms.pojo.bo.signal.Acknowledge) kind_)
-                    .mergeFrom(value).buildPartial();
+      public Builder mergeMessages(im.turms.turms.pojo.bo.message.Messages value) {
+        if (messagesBuilder_ == null) {
+          if (kindCase_ == 6 &&
+              kind_ != im.turms.turms.pojo.bo.message.Messages.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.message.Messages.newBuilder((im.turms.turms.pojo.bo.message.Messages) kind_)
+                .mergeFrom(value).buildPartial();
           } else {
             kind_ = value;
           }
           onChanged();
         } else {
-          if (kindCase_ == 4) {
-            acknowledgeBuilder_.mergeFrom(value);
+          if (kindCase_ == 6) {
+            messagesBuilder_.mergeFrom(value);
           }
-          acknowledgeBuilder_.setMessage(value);
+          messagesBuilder_.setMessage(value);
         }
-        kindCase_ = 4;
+        kindCase_ = 6;
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
-       */
-      public im.turms.turms.pojo.bo.signal.Acknowledge.Builder getAcknowledgeBuilder() {
-        return getAcknowledgeFieldBuilder().getBuilder();
-      }
-
       /**
        * <code>.im.turms.proto.Messages messages = 6;</code>
        */
@@ -3571,147 +2997,125 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       * <code>.im.turms.proto.Messages messages = 6;</code>
        */
-      public im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder getAcknowledgeOrBuilder() {
-        if ((kindCase_ == 4) && (acknowledgeBuilder_ != null)) {
-          return acknowledgeBuilder_.getMessageOrBuilder();
+      public im.turms.turms.pojo.bo.message.Messages.Builder getMessagesBuilder() {
+        return getMessagesFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.im.turms.proto.Messages messages = 6;</code>
+       */
+      public im.turms.turms.pojo.bo.message.MessagesOrBuilder getMessagesOrBuilder() {
+        if ((kindCase_ == 6) && (messagesBuilder_ != null)) {
+          return messagesBuilder_.getMessageOrBuilder();
         } else {
-          if (kindCase_ == 4) {
-            return (im.turms.turms.pojo.bo.signal.Acknowledge) kind_;
+          if (kindCase_ == 6) {
+            return (im.turms.turms.pojo.bo.message.Messages) kind_;
           }
-          return im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
+          return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.Acknowledge acknowledge = 4;</code>
+       * <code>.im.turms.proto.Messages messages = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.signal.Acknowledge, im.turms.turms.pojo.bo.signal.Acknowledge.Builder, im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder>
-      getAcknowledgeFieldBuilder() {
-        if (acknowledgeBuilder_ == null) {
-          if (!(kindCase_ == 4)) {
-            kind_ = im.turms.turms.pojo.bo.signal.Acknowledge.getDefaultInstance();
+          im.turms.turms.pojo.bo.message.Messages, im.turms.turms.pojo.bo.message.Messages.Builder, im.turms.turms.pojo.bo.message.MessagesOrBuilder> 
+          getMessagesFieldBuilder() {
+        if (messagesBuilder_ == null) {
+          if (!(kindCase_ == 6)) {
+            kind_ = im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
           }
-          acknowledgeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.signal.Acknowledge, im.turms.turms.pojo.bo.signal.Acknowledge.Builder, im.turms.turms.pojo.bo.signal.AcknowledgeOrBuilder>(
-                  (im.turms.turms.pojo.bo.signal.Acknowledge) kind_,
+          messagesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.message.Messages, im.turms.turms.pojo.bo.message.Messages.Builder, im.turms.turms.pojo.bo.message.MessagesOrBuilder>(
+                  (im.turms.turms.pojo.bo.message.Messages) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
-        kindCase_ = 4;
-        onChanged();
-        return acknowledgeBuilder_;
+        kindCase_ = 6;
+        onChanged();;
+        return messagesBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.message.MessageStatuses, im.turms.turms.pojo.bo.message.MessageStatuses.Builder, im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder> messageStatusesBuilder_;
       /**
-       * <code>.im.turms.proto.Session session = 5;</code>
-       *
-       * @return The session.
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+       * @return Whether the messageStatuses field is set.
        */
-      public im.turms.turms.pojo.bo.signal.Session getSession() {
-        if (sessionBuilder_ == null) {
-          if (kindCase_ == 5) {
-            return (im.turms.turms.pojo.bo.signal.Session) kind_;
+      public boolean hasMessageStatuses() {
+        return kindCase_ == 7;
+      }
+      /**
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+       * @return The messageStatuses.
+       */
+      public im.turms.turms.pojo.bo.message.MessageStatuses getMessageStatuses() {
+        if (messageStatusesBuilder_ == null) {
+          if (kindCase_ == 7) {
+            return (im.turms.turms.pojo.bo.message.MessageStatuses) kind_;
           }
-          return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
+          return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
         } else {
-          if (kindCase_ == 5) {
-            return sessionBuilder_.getMessage();
+          if (kindCase_ == 7) {
+            return messageStatusesBuilder_.getMessage();
           }
-          return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
+          return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.Session session = 5;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
        */
-      public Builder setSession(im.turms.turms.pojo.bo.signal.Session value) {
-        if (sessionBuilder_ == null) {
+      public Builder setMessageStatuses(im.turms.turms.pojo.bo.message.MessageStatuses value) {
+        if (messageStatusesBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           kind_ = value;
           onChanged();
         } else {
-          sessionBuilder_.setMessage(value);
+          messageStatusesBuilder_.setMessage(value);
         }
-        kindCase_ = 5;
+        kindCase_ = 7;
         return this;
       }
-
       /**
        * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
-       *
-       * @return Whether the messageStatuses field is set.
        */
-      public boolean hasMessageStatuses() {
-        return kindCase_ == 7;
-      }
-
-      /**
-       * <code>.im.turms.proto.Session session = 5;</code>
-       */
-      public Builder setSession(
-              im.turms.turms.pojo.bo.signal.Session.Builder builderForValue) {
-        if (sessionBuilder_ == null) {
+      public Builder setMessageStatuses(
+          im.turms.turms.pojo.bo.message.MessageStatuses.Builder builderForValue) {
+        if (messageStatusesBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
         } else {
-          sessionBuilder_.setMessage(builderForValue.build());
+          messageStatusesBuilder_.setMessage(builderForValue.build());
         }
-        kindCase_ = 5;
+        kindCase_ = 7;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Session session = 5;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
        */
-      public Builder mergeSession(im.turms.turms.pojo.bo.signal.Session value) {
-        if (sessionBuilder_ == null) {
-          if (kindCase_ == 5 &&
-                  kind_ != im.turms.turms.pojo.bo.signal.Session.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.signal.Session.newBuilder((im.turms.turms.pojo.bo.signal.Session) kind_)
-                    .mergeFrom(value).buildPartial();
+      public Builder mergeMessageStatuses(im.turms.turms.pojo.bo.message.MessageStatuses value) {
+        if (messageStatusesBuilder_ == null) {
+          if (kindCase_ == 7 &&
+              kind_ != im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.message.MessageStatuses.newBuilder((im.turms.turms.pojo.bo.message.MessageStatuses) kind_)
+                .mergeFrom(value).buildPartial();
           } else {
             kind_ = value;
           }
           onChanged();
         } else {
-          if (kindCase_ == 5) {
-            sessionBuilder_.mergeFrom(value);
+          if (kindCase_ == 7) {
+            messageStatusesBuilder_.mergeFrom(value);
           }
-          sessionBuilder_.setMessage(value);
+          messageStatusesBuilder_.setMessage(value);
         }
-        kindCase_ = 5;
+        kindCase_ = 7;
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.Session session = 5;</code>
-       */
-      public im.turms.turms.pojo.bo.signal.Session.Builder getSessionBuilder() {
-        return getSessionFieldBuilder().getBuilder();
-      }
-
-      /**
-       * <code>.im.turms.proto.Session session = 5;</code>
-       */
-      public im.turms.turms.pojo.bo.signal.SessionOrBuilder getSessionOrBuilder() {
-        if ((kindCase_ == 5) && (sessionBuilder_ != null)) {
-          return sessionBuilder_.getMessageOrBuilder();
-        } else {
-          if (kindCase_ == 5) {
-            return (im.turms.turms.pojo.bo.signal.Session) kind_;
-          }
-          return im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
-        }
-      }
-
       /**
        * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
        */
@@ -3731,79 +3135,49 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.Session session = 5;</code>
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+       */
+      public im.turms.turms.pojo.bo.message.MessageStatuses.Builder getMessageStatusesBuilder() {
+        return getMessageStatusesFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+       */
+      public im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder getMessageStatusesOrBuilder() {
+        if ((kindCase_ == 7) && (messageStatusesBuilder_ != null)) {
+          return messageStatusesBuilder_.getMessageOrBuilder();
+        } else {
+          if (kindCase_ == 7) {
+            return (im.turms.turms.pojo.bo.message.MessageStatuses) kind_;
+          }
+          return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.signal.Session, im.turms.turms.pojo.bo.signal.Session.Builder, im.turms.turms.pojo.bo.signal.SessionOrBuilder>
-      getSessionFieldBuilder() {
-        if (sessionBuilder_ == null) {
-          if (!(kindCase_ == 5)) {
-            kind_ = im.turms.turms.pojo.bo.signal.Session.getDefaultInstance();
+          im.turms.turms.pojo.bo.message.MessageStatuses, im.turms.turms.pojo.bo.message.MessageStatuses.Builder, im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder> 
+          getMessageStatusesFieldBuilder() {
+        if (messageStatusesBuilder_ == null) {
+          if (!(kindCase_ == 7)) {
+            kind_ = im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
           }
-          sessionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.signal.Session, im.turms.turms.pojo.bo.signal.Session.Builder, im.turms.turms.pojo.bo.signal.SessionOrBuilder>(
-                  (im.turms.turms.pojo.bo.signal.Session) kind_,
+          messageStatusesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.message.MessageStatuses, im.turms.turms.pojo.bo.message.MessageStatuses.Builder, im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder>(
+                  (im.turms.turms.pojo.bo.message.MessageStatuses) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
-        kindCase_ = 5;
-        onChanged();
-        return sessionBuilder_;
+        kindCase_ = 7;
+        onChanged();;
+        return messageStatusesBuilder_;
       }
 
-      /**
-       * <code>.im.turms.proto.Messages messages = 6;</code>
-       *
-       * @return The messages.
-       */
-      public im.turms.turms.pojo.bo.message.Messages getMessages() {
-        if (messagesBuilder_ == null) {
-          if (kindCase_ == 6) {
-            return (im.turms.turms.pojo.bo.message.Messages) kind_;
-          }
-          return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
-        } else {
-          if (kindCase_ == 6) {
-            return messagesBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.Messages messages = 6;</code>
-       */
-      public Builder setMessages(im.turms.turms.pojo.bo.message.Messages value) {
-        if (messagesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          kind_ = value;
-          onChanged();
-        } else {
-          messagesBuilder_.setMessage(value);
-        }
-        kindCase_ = 6;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.Messages messages = 6;</code>
-       */
-      public Builder setMessages(
-              im.turms.turms.pojo.bo.message.Messages.Builder builderForValue) {
-        if (messagesBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          messagesBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 6;
-        return this;
-      }
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.message.MessagesWithTotalList, im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder, im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder> messagesWithTotalListBuilder_;
       /**
        * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
        * @return Whether the messagesWithTotalList field is set.
@@ -3811,73 +3185,75 @@ public final class TurmsNotification extends
       public boolean hasMessagesWithTotalList() {
         return kindCase_ == 8;
       }
-
       /**
-       * <code>.im.turms.proto.Messages messages = 6;</code>
+       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       * @return The messagesWithTotalList.
        */
-      public Builder mergeMessages(im.turms.turms.pojo.bo.message.Messages value) {
-        if (messagesBuilder_ == null) {
-          if (kindCase_ == 6 &&
-                  kind_ != im.turms.turms.pojo.bo.message.Messages.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.message.Messages.newBuilder((im.turms.turms.pojo.bo.message.Messages) kind_)
-                    .mergeFrom(value).buildPartial();
+      public im.turms.turms.pojo.bo.message.MessagesWithTotalList getMessagesWithTotalList() {
+        if (messagesWithTotalListBuilder_ == null) {
+          if (kindCase_ == 8) {
+            return (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_;
+          }
+          return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
+        } else {
+          if (kindCase_ == 8) {
+            return messagesWithTotalListBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       */
+      public Builder setMessagesWithTotalList(im.turms.turms.pojo.bo.message.MessagesWithTotalList value) {
+        if (messagesWithTotalListBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          kind_ = value;
+          onChanged();
+        } else {
+          messagesWithTotalListBuilder_.setMessage(value);
+        }
+        kindCase_ = 8;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       */
+      public Builder setMessagesWithTotalList(
+          im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder builderForValue) {
+        if (messagesWithTotalListBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          messagesWithTotalListBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 8;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       */
+      public Builder mergeMessagesWithTotalList(im.turms.turms.pojo.bo.message.MessagesWithTotalList value) {
+        if (messagesWithTotalListBuilder_ == null) {
+          if (kindCase_ == 8 &&
+              kind_ != im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.message.MessagesWithTotalList.newBuilder((im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_)
+                .mergeFrom(value).buildPartial();
           } else {
             kind_ = value;
           }
           onChanged();
         } else {
-          if (kindCase_ == 6) {
-            messagesBuilder_.mergeFrom(value);
+          if (kindCase_ == 8) {
+            messagesWithTotalListBuilder_.mergeFrom(value);
           }
-          messagesBuilder_.setMessage(value);
+          messagesWithTotalListBuilder_.setMessage(value);
         }
-        kindCase_ = 6;
+        kindCase_ = 8;
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.Messages messages = 6;</code>
-       */
-      public im.turms.turms.pojo.bo.message.Messages.Builder getMessagesBuilder() {
-        return getMessagesFieldBuilder().getBuilder();
-      }
-
-      /**
-       * <code>.im.turms.proto.Messages messages = 6;</code>
-       */
-      public im.turms.turms.pojo.bo.message.MessagesOrBuilder getMessagesOrBuilder() {
-        if ((kindCase_ == 6) && (messagesBuilder_ != null)) {
-          return messagesBuilder_.getMessageOrBuilder();
-        } else {
-          if (kindCase_ == 6) {
-            return (im.turms.turms.pojo.bo.message.Messages) kind_;
-          }
-          return im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.Messages messages = 6;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.message.Messages, im.turms.turms.pojo.bo.message.Messages.Builder, im.turms.turms.pojo.bo.message.MessagesOrBuilder>
-      getMessagesFieldBuilder() {
-        if (messagesBuilder_ == null) {
-          if (!(kindCase_ == 6)) {
-            kind_ = im.turms.turms.pojo.bo.message.Messages.getDefaultInstance();
-          }
-          messagesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.message.Messages, im.turms.turms.pojo.bo.message.Messages.Builder, im.turms.turms.pojo.bo.message.MessagesOrBuilder>(
-                  (im.turms.turms.pojo.bo.message.Messages) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 6;
-        onChanged();
-        return messagesBuilder_;
-      }
-
       /**
        * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
        */
@@ -3897,152 +3273,125 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
-       *
-       * @return The messageStatuses.
+       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
        */
-      public im.turms.turms.pojo.bo.message.MessageStatuses getMessageStatuses() {
-        if (messageStatusesBuilder_ == null) {
-          if (kindCase_ == 7) {
-            return (im.turms.turms.pojo.bo.message.MessageStatuses) kind_;
-          }
-          return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
+      public im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder getMessagesWithTotalListBuilder() {
+        return getMessagesWithTotalListFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       */
+      public im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder getMessagesWithTotalListOrBuilder() {
+        if ((kindCase_ == 8) && (messagesWithTotalListBuilder_ != null)) {
+          return messagesWithTotalListBuilder_.getMessageOrBuilder();
         } else {
-          if (kindCase_ == 7) {
-            return messageStatusesBuilder_.getMessage();
+          if (kindCase_ == 8) {
+            return (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_;
           }
-          return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
+          return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
        */
-      public Builder setMessageStatuses(im.turms.turms.pojo.bo.message.MessageStatuses value) {
-        if (messageStatusesBuilder_ == null) {
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.message.MessagesWithTotalList, im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder, im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder> 
+          getMessagesWithTotalListFieldBuilder() {
+        if (messagesWithTotalListBuilder_ == null) {
+          if (!(kindCase_ == 8)) {
+            kind_ = im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
+          }
+          messagesWithTotalListBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.message.MessagesWithTotalList, im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder, im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder>(
+                  (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 8;
+        onChanged();;
+        return messagesWithTotalListBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UsersInfosWithVersion, im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder, im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder> usersInfosWithVersionBuilder_;
+      /**
+       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+       * @return Whether the usersInfosWithVersion field is set.
+       */
+      public boolean hasUsersInfosWithVersion() {
+        return kindCase_ == 9;
+      }
+      /**
+       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+       * @return The usersInfosWithVersion.
+       */
+      public im.turms.turms.pojo.bo.user.UsersInfosWithVersion getUsersInfosWithVersion() {
+        if (usersInfosWithVersionBuilder_ == null) {
+          if (kindCase_ == 9) {
+            return (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_;
+          }
+          return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
+        } else {
+          if (kindCase_ == 9) {
+            return usersInfosWithVersionBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+       */
+      public Builder setUsersInfosWithVersion(im.turms.turms.pojo.bo.user.UsersInfosWithVersion value) {
+        if (usersInfosWithVersionBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           kind_ = value;
           onChanged();
         } else {
-          messageStatusesBuilder_.setMessage(value);
+          usersInfosWithVersionBuilder_.setMessage(value);
         }
-        kindCase_ = 7;
+        kindCase_ = 9;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
        */
-      public Builder setMessageStatuses(
-          im.turms.turms.pojo.bo.message.MessageStatuses.Builder builderForValue) {
-        if (messageStatusesBuilder_ == null) {
+      public Builder setUsersInfosWithVersion(
+          im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder builderForValue) {
+        if (usersInfosWithVersionBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
         } else {
-          messageStatusesBuilder_.setMessage(builderForValue.build());
+          usersInfosWithVersionBuilder_.setMessage(builderForValue.build());
         }
-        kindCase_ = 7;
+        kindCase_ = 9;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
+       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
        */
-      public Builder mergeMessageStatuses(im.turms.turms.pojo.bo.message.MessageStatuses value) {
-        if (messageStatusesBuilder_ == null) {
-          if (kindCase_ == 7 &&
-                  kind_ != im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.message.MessageStatuses.newBuilder((im.turms.turms.pojo.bo.message.MessageStatuses) kind_)
-                    .mergeFrom(value).buildPartial();
+      public Builder mergeUsersInfosWithVersion(im.turms.turms.pojo.bo.user.UsersInfosWithVersion value) {
+        if (usersInfosWithVersionBuilder_ == null) {
+          if (kindCase_ == 9 &&
+              kind_ != im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.user.UsersInfosWithVersion.newBuilder((im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
           } else {
             kind_ = value;
           }
           onChanged();
         } else {
-          if (kindCase_ == 7) {
-            messageStatusesBuilder_.mergeFrom(value);
+          if (kindCase_ == 9) {
+            usersInfosWithVersionBuilder_.mergeFrom(value);
           }
-          messageStatusesBuilder_.setMessage(value);
+          usersInfosWithVersionBuilder_.setMessage(value);
         }
-        kindCase_ = 7;
+        kindCase_ = 9;
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
-       *
-       * @return Whether the usersInfosWithVersion field is set.
-       */
-      public boolean hasUsersInfosWithVersion() {
-        return kindCase_ == 9;
-      }
-
-      /**
-       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
-       */
-      public im.turms.turms.pojo.bo.message.MessageStatuses.Builder getMessageStatusesBuilder() {
-        return getMessageStatusesFieldBuilder().getBuilder();
-      }
-
-      /**
-       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
-       */
-      public im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder getMessageStatusesOrBuilder() {
-        if ((kindCase_ == 7) && (messageStatusesBuilder_ != null)) {
-          return messageStatusesBuilder_.getMessageOrBuilder();
-        } else {
-          if (kindCase_ == 7) {
-            return (im.turms.turms.pojo.bo.message.MessageStatuses) kind_;
-          }
-          return im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.MessageStatuses message_statuses = 7;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.message.MessageStatuses, im.turms.turms.pojo.bo.message.MessageStatuses.Builder, im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder>
-      getMessageStatusesFieldBuilder() {
-        if (messageStatusesBuilder_ == null) {
-          if (!(kindCase_ == 7)) {
-            kind_ = im.turms.turms.pojo.bo.message.MessageStatuses.getDefaultInstance();
-          }
-          messageStatusesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.message.MessageStatuses, im.turms.turms.pojo.bo.message.MessageStatuses.Builder, im.turms.turms.pojo.bo.message.MessageStatusesOrBuilder>(
-                  (im.turms.turms.pojo.bo.message.MessageStatuses) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 7;
-        onChanged();
-        return messageStatusesBuilder_;
-      }
-
-      /**
-       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
-       *
-       * @return The messagesWithTotalList.
-       */
-      public im.turms.turms.pojo.bo.message.MessagesWithTotalList getMessagesWithTotalList() {
-        if (messagesWithTotalListBuilder_ == null) {
-          if (kindCase_ == 8) {
-            return (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_;
-          }
-          return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
-        } else {
-          if (kindCase_ == 8) {
-            return messagesWithTotalListBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
-        }
-      }
-
       /**
        * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
        */
@@ -4062,150 +3411,125 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
        */
-      public Builder setMessagesWithTotalList(im.turms.turms.pojo.bo.message.MessagesWithTotalList value) {
-        if (messagesWithTotalListBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          kind_ = value;
-          onChanged();
+      public im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder getUsersInfosWithVersionBuilder() {
+        return getUsersInfosWithVersionFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+       */
+      public im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder getUsersInfosWithVersionOrBuilder() {
+        if ((kindCase_ == 9) && (usersInfosWithVersionBuilder_ != null)) {
+          return usersInfosWithVersionBuilder_.getMessageOrBuilder();
         } else {
-          messagesWithTotalListBuilder_.setMessage(value);
-        }
-        kindCase_ = 8;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
-       */
-      public Builder setMessagesWithTotalList(
-          im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder builderForValue) {
-        if (messagesWithTotalListBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          messagesWithTotalListBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 8;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
-       */
-      public Builder mergeMessagesWithTotalList(im.turms.turms.pojo.bo.message.MessagesWithTotalList value) {
-        if (messagesWithTotalListBuilder_ == null) {
-          if (kindCase_ == 8 &&
-                  kind_ != im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.message.MessagesWithTotalList.newBuilder((im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
+          if (kindCase_ == 9) {
+            return (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_;
           }
-          onChanged();
-        } else {
-          if (kindCase_ == 8) {
-            messagesWithTotalListBuilder_.mergeFrom(value);
-          }
-          messagesWithTotalListBuilder_.setMessage(value);
+          return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
         }
-        kindCase_ = 8;
-        return this;
       }
-
       /**
-       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
        */
-      public im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder getMessagesWithTotalListBuilder() {
-        return getMessagesWithTotalListFieldBuilder().getBuilder();
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UsersInfosWithVersion, im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder, im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder> 
+          getUsersInfosWithVersionFieldBuilder() {
+        if (usersInfosWithVersionBuilder_ == null) {
+          if (!(kindCase_ == 9)) {
+            kind_ = im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
+          }
+          usersInfosWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.user.UsersInfosWithVersion, im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder, im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder>(
+                  (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 9;
+        onChanged();;
+        return usersInfosWithVersionBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UsersOnlineStatuses, im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder, im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder> usersOnlineStatusesBuilder_;
       /**
        * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
-       *
        * @return Whether the usersOnlineStatuses field is set.
        */
       public boolean hasUsersOnlineStatuses() {
         return kindCase_ == 10;
       }
-
       /**
-       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       * @return The usersOnlineStatuses.
        */
-      public im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder getMessagesWithTotalListOrBuilder() {
-        if ((kindCase_ == 8) && (messagesWithTotalListBuilder_ != null)) {
-          return messagesWithTotalListBuilder_.getMessageOrBuilder();
+      public im.turms.turms.pojo.bo.user.UsersOnlineStatuses getUsersOnlineStatuses() {
+        if (usersOnlineStatusesBuilder_ == null) {
+          if (kindCase_ == 10) {
+            return (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_;
+          }
+          return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
         } else {
-          if (kindCase_ == 8) {
-            return (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_;
+          if (kindCase_ == 10) {
+            return usersOnlineStatusesBuilder_.getMessage();
           }
-          return im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
+          return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.MessagesWithTotalList messages_with_total_list = 8;</code>
+       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
        */
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.message.MessagesWithTotalList, im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder, im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder>
-      getMessagesWithTotalListFieldBuilder() {
-        if (messagesWithTotalListBuilder_ == null) {
-          if (!(kindCase_ == 8)) {
-            kind_ = im.turms.turms.pojo.bo.message.MessagesWithTotalList.getDefaultInstance();
-          }
-          messagesWithTotalListBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.message.MessagesWithTotalList, im.turms.turms.pojo.bo.message.MessagesWithTotalList.Builder, im.turms.turms.pojo.bo.message.MessagesWithTotalListOrBuilder>(
-                  (im.turms.turms.pojo.bo.message.MessagesWithTotalList) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 8;
-        onChanged();
-        return messagesWithTotalListBuilder_;
-      }
-
-      /**
-       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
-       *
-       * @return The usersInfosWithVersion.
-       */
-      public im.turms.turms.pojo.bo.user.UsersInfosWithVersion getUsersInfosWithVersion() {
-        if (usersInfosWithVersionBuilder_ == null) {
-          if (kindCase_ == 9) {
-            return (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_;
-          }
-          return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
-        } else {
-          if (kindCase_ == 9) {
-            return usersInfosWithVersionBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
-       */
-      public Builder setUsersInfosWithVersion(im.turms.turms.pojo.bo.user.UsersInfosWithVersion value) {
-        if (usersInfosWithVersionBuilder_ == null) {
+      public Builder setUsersOnlineStatuses(im.turms.turms.pojo.bo.user.UsersOnlineStatuses value) {
+        if (usersOnlineStatusesBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           kind_ = value;
           onChanged();
         } else {
-          usersInfosWithVersionBuilder_.setMessage(value);
+          usersOnlineStatusesBuilder_.setMessage(value);
         }
-        kindCase_ = 9;
+        kindCase_ = 10;
         return this;
       }
-
+      /**
+       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       */
+      public Builder setUsersOnlineStatuses(
+          im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder builderForValue) {
+        if (usersOnlineStatusesBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          usersOnlineStatusesBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 10;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       */
+      public Builder mergeUsersOnlineStatuses(im.turms.turms.pojo.bo.user.UsersOnlineStatuses value) {
+        if (usersOnlineStatusesBuilder_ == null) {
+          if (kindCase_ == 10 &&
+              kind_ != im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.user.UsersOnlineStatuses.newBuilder((im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 10) {
+            usersOnlineStatusesBuilder_.mergeFrom(value);
+          }
+          usersOnlineStatusesBuilder_.setMessage(value);
+        }
+        kindCase_ = 10;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
        */
@@ -4225,65 +3549,49 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
        */
-      public Builder setUsersInfosWithVersion(
-              im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder builderForValue) {
-        if (usersInfosWithVersionBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          usersInfosWithVersionBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 9;
-        return this;
+      public im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder getUsersOnlineStatusesBuilder() {
+        return getUsersOnlineStatusesFieldBuilder().getBuilder();
       }
-
       /**
-       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
        */
-      public Builder mergeUsersInfosWithVersion(im.turms.turms.pojo.bo.user.UsersInfosWithVersion value) {
-        if (usersInfosWithVersionBuilder_ == null) {
-          if (kindCase_ == 9 &&
-                  kind_ != im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.user.UsersInfosWithVersion.newBuilder((im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_)
-                .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
+      public im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder getUsersOnlineStatusesOrBuilder() {
+        if ((kindCase_ == 10) && (usersOnlineStatusesBuilder_ != null)) {
+          return usersOnlineStatusesBuilder_.getMessageOrBuilder();
         } else {
-          if (kindCase_ == 9) {
-            usersInfosWithVersionBuilder_.mergeFrom(value);
+          if (kindCase_ == 10) {
+            return (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_;
           }
-          usersInfosWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 9;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
-       */
-      public im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder getUsersInfosWithVersionBuilder() {
-        return getUsersInfosWithVersionFieldBuilder().getBuilder();
-      }
-
-      /**
-       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
-       */
-      public im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder getUsersInfosWithVersionOrBuilder() {
-        if ((kindCase_ == 9) && (usersInfosWithVersionBuilder_ != null)) {
-          return usersInfosWithVersionBuilder_.getMessageOrBuilder();
-        } else {
-          if (kindCase_ == 9) {
-            return (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_;
-          }
-          return im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
+          return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
         }
       }
+      /**
+       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UsersOnlineStatuses, im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder, im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder> 
+          getUsersOnlineStatusesFieldBuilder() {
+        if (usersOnlineStatusesBuilder_ == null) {
+          if (!(kindCase_ == 10)) {
+            kind_ = im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
+          }
+          usersOnlineStatusesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.user.UsersOnlineStatuses, im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder, im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder>(
+                  (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 10;
+        onChanged();;
+        return usersOnlineStatusesBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder> userFriendRequestsWithVersionBuilder_;
       /**
        * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
        * @return Whether the userFriendRequestsWithVersion field is set.
@@ -4291,80 +3599,75 @@ public final class TurmsNotification extends
       public boolean hasUserFriendRequestsWithVersion() {
         return kindCase_ == 11;
       }
-
       /**
-       * <code>.im.turms.proto.UsersInfosWithVersion users_infos_with_version = 9;</code>
+       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
+       * @return The userFriendRequestsWithVersion.
        */
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UsersInfosWithVersion, im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder, im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder>
-      getUsersInfosWithVersionFieldBuilder() {
-        if (usersInfosWithVersionBuilder_ == null) {
-          if (!(kindCase_ == 9)) {
-            kind_ = im.turms.turms.pojo.bo.user.UsersInfosWithVersion.getDefaultInstance();
+      public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getUserFriendRequestsWithVersion() {
+        if (userFriendRequestsWithVersionBuilder_ == null) {
+          if (kindCase_ == 11) {
+            return (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_;
           }
-          usersInfosWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.user.UsersInfosWithVersion, im.turms.turms.pojo.bo.user.UsersInfosWithVersion.Builder, im.turms.turms.pojo.bo.user.UsersInfosWithVersionOrBuilder>(
-                  (im.turms.turms.pojo.bo.user.UsersInfosWithVersion) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 9;
-        onChanged();
-        return usersInfosWithVersionBuilder_;
-      }
-
-      /**
-       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
-       *
-       * @return The usersOnlineStatuses.
-       */
-      public im.turms.turms.pojo.bo.user.UsersOnlineStatuses getUsersOnlineStatuses() {
-        if (usersOnlineStatusesBuilder_ == null) {
-          if (kindCase_ == 10) {
-            return (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_;
-          }
-          return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
+          return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
         } else {
-          if (kindCase_ == 10) {
-            return usersOnlineStatusesBuilder_.getMessage();
+          if (kindCase_ == 11) {
+            return userFriendRequestsWithVersionBuilder_.getMessage();
           }
-          return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
+          return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
        */
-      public Builder setUsersOnlineStatuses(im.turms.turms.pojo.bo.user.UsersOnlineStatuses value) {
-        if (usersOnlineStatusesBuilder_ == null) {
+      public Builder setUserFriendRequestsWithVersion(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion value) {
+        if (userFriendRequestsWithVersionBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           kind_ = value;
           onChanged();
         } else {
-          usersOnlineStatusesBuilder_.setMessage(value);
+          userFriendRequestsWithVersionBuilder_.setMessage(value);
         }
-        kindCase_ = 10;
+        kindCase_ = 11;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
        */
-      public Builder setUsersOnlineStatuses(
-              im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder builderForValue) {
-        if (usersOnlineStatusesBuilder_ == null) {
+      public Builder setUserFriendRequestsWithVersion(
+          im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder builderForValue) {
+        if (userFriendRequestsWithVersionBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
         } else {
-          usersOnlineStatusesBuilder_.setMessage(builderForValue.build());
+          userFriendRequestsWithVersionBuilder_.setMessage(builderForValue.build());
         }
-        kindCase_ = 10;
+        kindCase_ = 11;
         return this;
       }
-
+      /**
+       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
+       */
+      public Builder mergeUserFriendRequestsWithVersion(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion value) {
+        if (userFriendRequestsWithVersionBuilder_ == null) {
+          if (kindCase_ == 11 &&
+              kind_ != im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.newBuilder((im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 11) {
+            userFriendRequestsWithVersionBuilder_.mergeFrom(value);
+          }
+          userFriendRequestsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 11;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
        */
@@ -4384,153 +3687,123 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
        */
-      public Builder mergeUsersOnlineStatuses(im.turms.turms.pojo.bo.user.UsersOnlineStatuses value) {
-        if (usersOnlineStatusesBuilder_ == null) {
-          if (kindCase_ == 10 &&
-                  kind_ != im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.user.UsersOnlineStatuses.newBuilder((im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 10) {
-            usersOnlineStatusesBuilder_.mergeFrom(value);
-          }
-          usersOnlineStatusesBuilder_.setMessage(value);
-        }
-        kindCase_ = 10;
-        return this;
+      public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder getUserFriendRequestsWithVersionBuilder() {
+        return getUserFriendRequestsWithVersionFieldBuilder().getBuilder();
       }
-
       /**
-       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
        */
-      public im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder getUsersOnlineStatusesBuilder() {
-        return getUsersOnlineStatusesFieldBuilder().getBuilder();
-      }
-
-      /**
-       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
-       */
-      public im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder getUsersOnlineStatusesOrBuilder() {
-        if ((kindCase_ == 10) && (usersOnlineStatusesBuilder_ != null)) {
-          return usersOnlineStatusesBuilder_.getMessageOrBuilder();
+      public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder getUserFriendRequestsWithVersionOrBuilder() {
+        if ((kindCase_ == 11) && (userFriendRequestsWithVersionBuilder_ != null)) {
+          return userFriendRequestsWithVersionBuilder_.getMessageOrBuilder();
         } else {
-          if (kindCase_ == 10) {
-            return (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_;
+          if (kindCase_ == 11) {
+            return (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_;
           }
-          return im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
+          return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.UsersOnlineStatuses users_online_statuses = 10;</code>
+       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UsersOnlineStatuses, im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder, im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder>
-      getUsersOnlineStatusesFieldBuilder() {
-        if (usersOnlineStatusesBuilder_ == null) {
-          if (!(kindCase_ == 10)) {
-            kind_ = im.turms.turms.pojo.bo.user.UsersOnlineStatuses.getDefaultInstance();
+          im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder> 
+          getUserFriendRequestsWithVersionFieldBuilder() {
+        if (userFriendRequestsWithVersionBuilder_ == null) {
+          if (!(kindCase_ == 11)) {
+            kind_ = im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
           }
-          usersOnlineStatusesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.user.UsersOnlineStatuses, im.turms.turms.pojo.bo.user.UsersOnlineStatuses.Builder, im.turms.turms.pojo.bo.user.UsersOnlineStatusesOrBuilder>(
-                  (im.turms.turms.pojo.bo.user.UsersOnlineStatuses) kind_,
+          userFriendRequestsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder>(
+                  (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
-        kindCase_ = 10;
-        onChanged();
-        return usersOnlineStatusesBuilder_;
+        kindCase_ = 11;
+        onChanged();;
+        return userFriendRequestsWithVersionBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder> userRelationshipGroupsWithVersionBuilder_;
       /**
        * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-       *
        * @return Whether the userRelationshipGroupsWithVersion field is set.
        */
       public boolean hasUserRelationshipGroupsWithVersion() {
         return kindCase_ == 12;
       }
-
       /**
-       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
-       *
-       * @return The userFriendRequestsWithVersion.
+       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
+       * @return The userRelationshipGroupsWithVersion.
        */
-      public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion getUserFriendRequestsWithVersion() {
-        if (userFriendRequestsWithVersionBuilder_ == null) {
-          if (kindCase_ == 11) {
-            return (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_;
+      public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion getUserRelationshipGroupsWithVersion() {
+        if (userRelationshipGroupsWithVersionBuilder_ == null) {
+          if (kindCase_ == 12) {
+            return (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_;
           }
-          return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
+          return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
         } else {
-          if (kindCase_ == 11) {
-            return userFriendRequestsWithVersionBuilder_.getMessage();
+          if (kindCase_ == 12) {
+            return userRelationshipGroupsWithVersionBuilder_.getMessage();
           }
-          return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
+          return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
         }
       }
-
       /**
-       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
+       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
        */
-      public Builder setUserFriendRequestsWithVersion(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion value) {
-        if (userFriendRequestsWithVersionBuilder_ == null) {
+      public Builder setUserRelationshipGroupsWithVersion(im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion value) {
+        if (userRelationshipGroupsWithVersionBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           kind_ = value;
           onChanged();
         } else {
-          userFriendRequestsWithVersionBuilder_.setMessage(value);
+          userRelationshipGroupsWithVersionBuilder_.setMessage(value);
         }
-        kindCase_ = 11;
+        kindCase_ = 12;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
+       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
        */
-      public Builder setUserFriendRequestsWithVersion(
-              im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder builderForValue) {
-        if (userFriendRequestsWithVersionBuilder_ == null) {
+      public Builder setUserRelationshipGroupsWithVersion(
+          im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder builderForValue) {
+        if (userRelationshipGroupsWithVersionBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
         } else {
-          userFriendRequestsWithVersionBuilder_.setMessage(builderForValue.build());
+          userRelationshipGroupsWithVersionBuilder_.setMessage(builderForValue.build());
         }
-        kindCase_ = 11;
+        kindCase_ = 12;
         return this;
       }
-
       /**
-       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
+       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
        */
-      public Builder mergeUserFriendRequestsWithVersion(im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion value) {
-        if (userFriendRequestsWithVersionBuilder_ == null) {
-          if (kindCase_ == 11 &&
-                  kind_ != im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.newBuilder((im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
+      public Builder mergeUserRelationshipGroupsWithVersion(im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion value) {
+        if (userRelationshipGroupsWithVersionBuilder_ == null) {
+          if (kindCase_ == 12 &&
+              kind_ != im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.newBuilder((im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
           } else {
             kind_ = value;
           }
           onChanged();
         } else {
-          if (kindCase_ == 11) {
-            userFriendRequestsWithVersionBuilder_.mergeFrom(value);
+          if (kindCase_ == 12) {
+            userRelationshipGroupsWithVersionBuilder_.mergeFrom(value);
           }
-          userFriendRequestsWithVersionBuilder_.setMessage(value);
+          userRelationshipGroupsWithVersionBuilder_.setMessage(value);
         }
-        kindCase_ = 11;
+        kindCase_ = 12;
         return this;
       }
       /**
@@ -4552,140 +3825,125 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
-       */
-      public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder getUserFriendRequestsWithVersionBuilder() {
-        return getUserFriendRequestsWithVersionFieldBuilder().getBuilder();
-      }
-
-      /**
-       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
-       */
-      public im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder getUserFriendRequestsWithVersionOrBuilder() {
-        if ((kindCase_ == 11) && (userFriendRequestsWithVersionBuilder_ != null)) {
-          return userFriendRequestsWithVersionBuilder_.getMessageOrBuilder();
-        } else {
-          if (kindCase_ == 11) {
-            return (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_;
-          }
-          return im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.UserFriendRequestsWithVersion user_friend_requests_with_version = 11;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder>
-      getUserFriendRequestsWithVersionFieldBuilder() {
-        if (userFriendRequestsWithVersionBuilder_ == null) {
-          if (!(kindCase_ == 11)) {
-            kind_ = im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.getDefaultInstance();
-          }
-          userFriendRequestsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersionOrBuilder>(
-                  (im.turms.turms.pojo.bo.user.UserFriendRequestsWithVersion) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 11;
-        onChanged();
-        return userFriendRequestsWithVersionBuilder_;
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-       *
-       * @return The userRelationshipGroupsWithVersion.
-       */
-      public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion getUserRelationshipGroupsWithVersion() {
-        if (userRelationshipGroupsWithVersionBuilder_ == null) {
-          if (kindCase_ == 12) {
-            return (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_;
-          }
-          return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
-        } else {
-          if (kindCase_ == 12) {
-            return userRelationshipGroupsWithVersionBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-       *
-       * @return Whether the userRelationshipsWithVersion field is set.
-       */
-      public boolean hasUserRelationshipsWithVersion() {
-        return kindCase_ == 13;
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-       */
-      public Builder setUserRelationshipGroupsWithVersion(im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion value) {
-        if (userRelationshipGroupsWithVersionBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          kind_ = value;
-          onChanged();
-        } else {
-          userRelationshipGroupsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 12;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-       */
-      public Builder setUserRelationshipGroupsWithVersion(
-              im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder builderForValue) {
-        if (userRelationshipGroupsWithVersionBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          userRelationshipGroupsWithVersionBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 12;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-       */
-      public Builder mergeUserRelationshipGroupsWithVersion(im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion value) {
-        if (userRelationshipGroupsWithVersionBuilder_ == null) {
-          if (kindCase_ == 12 &&
-                  kind_ != im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.newBuilder((im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 12) {
-            userRelationshipGroupsWithVersionBuilder_.mergeFrom(value);
-          }
-          userRelationshipGroupsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 12;
-        return this;
-      }
-
       /**
        * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
        */
       public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder getUserRelationshipGroupsWithVersionBuilder() {
         return getUserRelationshipGroupsWithVersionFieldBuilder().getBuilder();
       }
+      /**
+       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
+       */
+      public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder getUserRelationshipGroupsWithVersionOrBuilder() {
+        if ((kindCase_ == 12) && (userRelationshipGroupsWithVersionBuilder_ != null)) {
+          return userRelationshipGroupsWithVersionBuilder_.getMessageOrBuilder();
+        } else {
+          if (kindCase_ == 12) {
+            return (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_;
+          }
+          return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder> 
+          getUserRelationshipGroupsWithVersionFieldBuilder() {
+        if (userRelationshipGroupsWithVersionBuilder_ == null) {
+          if (!(kindCase_ == 12)) {
+            kind_ = im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
+          }
+          userRelationshipGroupsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder>(
+                  (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 12;
+        onChanged();;
+        return userRelationshipGroupsWithVersionBuilder_;
+      }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersionOrBuilder> userRelationshipsWithVersionBuilder_;
+      /**
+       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
+       * @return Whether the userRelationshipsWithVersion field is set.
+       */
+      public boolean hasUserRelationshipsWithVersion() {
+        return kindCase_ == 13;
+      }
+      /**
+       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
+       * @return The userRelationshipsWithVersion.
+       */
+      public im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion getUserRelationshipsWithVersion() {
+        if (userRelationshipsWithVersionBuilder_ == null) {
+          if (kindCase_ == 13) {
+            return (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_;
+          }
+          return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
+        } else {
+          if (kindCase_ == 13) {
+            return userRelationshipsWithVersionBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
+       */
+      public Builder setUserRelationshipsWithVersion(im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion value) {
+        if (userRelationshipsWithVersionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          kind_ = value;
+          onChanged();
+        } else {
+          userRelationshipsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 13;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
+       */
+      public Builder setUserRelationshipsWithVersion(
+          im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder builderForValue) {
+        if (userRelationshipsWithVersionBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          userRelationshipsWithVersionBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 13;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
+       */
+      public Builder mergeUserRelationshipsWithVersion(im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion value) {
+        if (userRelationshipsWithVersionBuilder_ == null) {
+          if (kindCase_ == 13 &&
+              kind_ != im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.newBuilder((im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 13) {
+            userRelationshipsWithVersionBuilder_.mergeFrom(value);
+          }
+          userRelationshipsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 13;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
        */
@@ -4705,133 +3963,12 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-       */
-      public im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder getUserRelationshipGroupsWithVersionOrBuilder() {
-        if ((kindCase_ == 12) && (userRelationshipGroupsWithVersionBuilder_ != null)) {
-          return userRelationshipGroupsWithVersionBuilder_.getMessageOrBuilder();
-        } else {
-          if (kindCase_ == 12) {
-            return (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_;
-          }
-          return im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder>
-      getUserRelationshipGroupsWithVersionFieldBuilder() {
-        if (userRelationshipGroupsWithVersionBuilder_ == null) {
-          if (!(kindCase_ == 12)) {
-            kind_ = im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.getDefaultInstance();
-          }
-          userRelationshipGroupsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersionOrBuilder>(
-                  (im.turms.turms.pojo.bo.user.UserRelationshipGroupsWithVersion) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 12;
-        onChanged();
-        return userRelationshipGroupsWithVersionBuilder_;
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-       *
-       * @return The userRelationshipsWithVersion.
-       */
-      public im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion getUserRelationshipsWithVersion() {
-        if (userRelationshipsWithVersionBuilder_ == null) {
-          if (kindCase_ == 13) {
-            return (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_;
-          }
-          return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
-        } else {
-          if (kindCase_ == 13) {
-            return userRelationshipsWithVersionBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-       */
-      public Builder setUserRelationshipsWithVersion(im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion value) {
-        if (userRelationshipsWithVersionBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          kind_ = value;
-          onChanged();
-        } else {
-          userRelationshipsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 13;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
-       *
-       * @return Whether the groupInvitationsWithVersion field is set.
-       */
-      public boolean hasGroupInvitationsWithVersion() {
-        return kindCase_ == 14;
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-       */
-      public Builder setUserRelationshipsWithVersion(
-          im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder builderForValue) {
-        if (userRelationshipsWithVersionBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          userRelationshipsWithVersionBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 13;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-       */
-      public Builder mergeUserRelationshipsWithVersion(im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion value) {
-        if (userRelationshipsWithVersionBuilder_ == null) {
-          if (kindCase_ == 13 &&
-                  kind_ != im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.newBuilder((im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 13) {
-            userRelationshipsWithVersionBuilder_.mergeFrom(value);
-          }
-          userRelationshipsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 13;
-        return this;
-      }
-
       /**
        * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
        */
       public im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder getUserRelationshipsWithVersionBuilder() {
         return getUserRelationshipsWithVersionFieldBuilder().getBuilder();
       }
-
       /**
        * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
        */
@@ -4845,7 +3982,106 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
         }
       }
+      /**
+       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersionOrBuilder> 
+          getUserRelationshipsWithVersionFieldBuilder() {
+        if (userRelationshipsWithVersionBuilder_ == null) {
+          if (!(kindCase_ == 13)) {
+            kind_ = im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
+          }
+          userRelationshipsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersionOrBuilder>(
+                  (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 13;
+        onChanged();;
+        return userRelationshipsWithVersionBuilder_;
+      }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersionOrBuilder> groupInvitationsWithVersionBuilder_;
+      /**
+       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
+       * @return Whether the groupInvitationsWithVersion field is set.
+       */
+      public boolean hasGroupInvitationsWithVersion() {
+        return kindCase_ == 14;
+      }
+      /**
+       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
+       * @return The groupInvitationsWithVersion.
+       */
+      public im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion getGroupInvitationsWithVersion() {
+        if (groupInvitationsWithVersionBuilder_ == null) {
+          if (kindCase_ == 14) {
+            return (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_;
+          }
+          return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
+        } else {
+          if (kindCase_ == 14) {
+            return groupInvitationsWithVersionBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
+       */
+      public Builder setGroupInvitationsWithVersion(im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion value) {
+        if (groupInvitationsWithVersionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          kind_ = value;
+          onChanged();
+        } else {
+          groupInvitationsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 14;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
+       */
+      public Builder setGroupInvitationsWithVersion(
+          im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder builderForValue) {
+        if (groupInvitationsWithVersionBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          groupInvitationsWithVersionBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 14;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
+       */
+      public Builder mergeGroupInvitationsWithVersion(im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion value) {
+        if (groupInvitationsWithVersionBuilder_ == null) {
+          if (kindCase_ == 14 &&
+              kind_ != im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 14) {
+            groupInvitationsWithVersionBuilder_.mergeFrom(value);
+          }
+          groupInvitationsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 14;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
        */
@@ -4865,118 +4101,12 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.UserRelationshipsWithVersion user_relationships_with_version = 13;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersionOrBuilder>
-      getUserRelationshipsWithVersionFieldBuilder() {
-        if (userRelationshipsWithVersionBuilder_ == null) {
-          if (!(kindCase_ == 13)) {
-            kind_ = im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.getDefaultInstance();
-          }
-          userRelationshipsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion.Builder, im.turms.turms.pojo.bo.user.UserRelationshipsWithVersionOrBuilder>(
-                  (im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 13;
-        onChanged();
-        return userRelationshipsWithVersionBuilder_;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
-       * @return The groupInvitationsWithVersion.
-       */
-      public im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion getGroupInvitationsWithVersion() {
-        if (groupInvitationsWithVersionBuilder_ == null) {
-          if (kindCase_ == 14) {
-            return (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_;
-          }
-          return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
-        } else {
-          if (kindCase_ == 14) {
-            return groupInvitationsWithVersionBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
-       */
-      public Builder setGroupInvitationsWithVersion(im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion value) {
-        if (groupInvitationsWithVersionBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          kind_ = value;
-          onChanged();
-        } else {
-          groupInvitationsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 14;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
-       */
-      public Builder setGroupInvitationsWithVersion(
-              im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder builderForValue) {
-        if (groupInvitationsWithVersionBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          groupInvitationsWithVersionBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 14;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
-       *
-       * @return Whether the groupJoinQuestionAnswerResult field is set.
-       */
-      public boolean hasGroupJoinQuestionAnswerResult() {
-        return kindCase_ == 15;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
-       */
-      public Builder mergeGroupInvitationsWithVersion(im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion value) {
-        if (groupInvitationsWithVersionBuilder_ == null) {
-          if (kindCase_ == 14 &&
-                  kind_ != im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 14) {
-            groupInvitationsWithVersionBuilder_.mergeFrom(value);
-          }
-          groupInvitationsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 14;
-        return this;
-      }
-
       /**
        * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
        */
       public im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder getGroupInvitationsWithVersionBuilder() {
         return getGroupInvitationsWithVersionFieldBuilder().getBuilder();
       }
-
       /**
        * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
        */
@@ -4990,29 +4120,106 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.GroupInvitationsWithVersion group_invitations_with_version = 14;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersionOrBuilder>
-      getGroupInvitationsWithVersionFieldBuilder() {
+          im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersionOrBuilder> 
+          getGroupInvitationsWithVersionFieldBuilder() {
         if (groupInvitationsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 14)) {
             kind_ = im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.getDefaultInstance();
           }
           groupInvitationsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersionOrBuilder>(
+              im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupInvitationsWithVersionOrBuilder>(
                   (im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
         kindCase_ = 14;
-        onChanged();
+        onChanged();;
         return groupInvitationsWithVersionBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResultOrBuilder> groupJoinQuestionAnswerResultBuilder_;
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
+       * @return Whether the groupJoinQuestionAnswerResult field is set.
+       */
+      public boolean hasGroupJoinQuestionAnswerResult() {
+        return kindCase_ == 15;
+      }
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
+       * @return The groupJoinQuestionAnswerResult.
+       */
+      public im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult getGroupJoinQuestionAnswerResult() {
+        if (groupJoinQuestionAnswerResultBuilder_ == null) {
+          if (kindCase_ == 15) {
+            return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_;
+          }
+          return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
+        } else {
+          if (kindCase_ == 15) {
+            return groupJoinQuestionAnswerResultBuilder_.getMessage();
+          }
+          return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
+       */
+      public Builder setGroupJoinQuestionAnswerResult(im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult value) {
+        if (groupJoinQuestionAnswerResultBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          kind_ = value;
+          onChanged();
+        } else {
+          groupJoinQuestionAnswerResultBuilder_.setMessage(value);
+        }
+        kindCase_ = 15;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
+       */
+      public Builder setGroupJoinQuestionAnswerResult(
+          im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder builderForValue) {
+        if (groupJoinQuestionAnswerResultBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          groupJoinQuestionAnswerResultBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 15;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
+       */
+      public Builder mergeGroupJoinQuestionAnswerResult(im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult value) {
+        if (groupJoinQuestionAnswerResultBuilder_ == null) {
+          if (kindCase_ == 15 &&
+              kind_ != im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.newBuilder((im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 15) {
+            groupJoinQuestionAnswerResultBuilder_.mergeFrom(value);
+          }
+          groupJoinQuestionAnswerResultBuilder_.setMessage(value);
+        }
+        kindCase_ = 15;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
        */
@@ -5032,97 +4239,12 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
-       *
-       * @return The groupJoinQuestionAnswerResult.
-       */
-      public im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult getGroupJoinQuestionAnswerResult() {
-        if (groupJoinQuestionAnswerResultBuilder_ == null) {
-          if (kindCase_ == 15) {
-            return (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_;
-          }
-          return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
-        } else {
-          if (kindCase_ == 15) {
-            return groupJoinQuestionAnswerResultBuilder_.getMessage();
-          }
-          return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
-        }
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
-       */
-      public Builder setGroupJoinQuestionAnswerResult(im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult value) {
-        if (groupJoinQuestionAnswerResultBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          kind_ = value;
-          onChanged();
-        } else {
-          groupJoinQuestionAnswerResultBuilder_.setMessage(value);
-        }
-        kindCase_ = 15;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
-       */
-      public Builder setGroupJoinQuestionAnswerResult(
-              im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder builderForValue) {
-        if (groupJoinQuestionAnswerResultBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          groupJoinQuestionAnswerResultBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 15;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
-       */
-      public Builder mergeGroupJoinQuestionAnswerResult(im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult value) {
-        if (groupJoinQuestionAnswerResultBuilder_ == null) {
-          if (kindCase_ == 15 &&
-                  kind_ != im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.newBuilder((im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 15) {
-            groupJoinQuestionAnswerResultBuilder_.mergeFrom(value);
-          }
-          groupJoinQuestionAnswerResultBuilder_.setMessage(value);
-        }
-        kindCase_ = 15;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
-       *
-       * @return Whether the groupJoinRequestsWithVersion field is set.
-       */
-      public boolean hasGroupJoinRequestsWithVersion() {
-        return kindCase_ == 16;
-      }
-
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
        */
       public im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder getGroupJoinQuestionAnswerResultBuilder() {
         return getGroupJoinQuestionAnswerResultFieldBuilder().getBuilder();
       }
-
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
        */
@@ -5136,29 +4258,37 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResultOrBuilder>
-      getGroupJoinQuestionAnswerResultFieldBuilder() {
+          im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResultOrBuilder> 
+          getGroupJoinQuestionAnswerResultFieldBuilder() {
         if (groupJoinQuestionAnswerResultBuilder_ == null) {
           if (!(kindCase_ == 15)) {
             kind_ = im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.getDefaultInstance();
           }
           groupJoinQuestionAnswerResultBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResultOrBuilder>(
+              im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResultOrBuilder>(
                   (im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
         kindCase_ = 15;
-        onChanged();
+        onChanged();;
         return groupJoinQuestionAnswerResultBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder> groupJoinRequestsWithVersionBuilder_;
+      /**
+       * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
+       * @return Whether the groupJoinRequestsWithVersion field is set.
+       */
+      public boolean hasGroupJoinRequestsWithVersion() {
+        return kindCase_ == 16;
+      }
       /**
        * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
        * @return The groupJoinRequestsWithVersion.
@@ -5176,7 +4306,58 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance();
         }
       }
-
+      /**
+       * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
+       */
+      public Builder setGroupJoinRequestsWithVersion(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion value) {
+        if (groupJoinRequestsWithVersionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          kind_ = value;
+          onChanged();
+        } else {
+          groupJoinRequestsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 16;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
+       */
+      public Builder setGroupJoinRequestsWithVersion(
+          im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder builderForValue) {
+        if (groupJoinRequestsWithVersionBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          groupJoinRequestsWithVersionBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 16;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
+       */
+      public Builder mergeGroupJoinRequestsWithVersion(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion value) {
+        if (groupJoinRequestsWithVersionBuilder_ == null) {
+          if (kindCase_ == 16 &&
+              kind_ != im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 16) {
+            groupJoinRequestsWithVersionBuilder_.mergeFrom(value);
+          }
+          groupJoinRequestsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 16;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
        */
@@ -5196,78 +4377,12 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
-       */
-      public Builder setGroupJoinRequestsWithVersion(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion value) {
-        if (groupJoinRequestsWithVersionBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          kind_ = value;
-          onChanged();
-        } else {
-          groupJoinRequestsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 16;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
-       */
-      public Builder setGroupJoinRequestsWithVersion(
-              im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder builderForValue) {
-        if (groupJoinRequestsWithVersionBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          groupJoinRequestsWithVersionBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 16;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
-       */
-      public Builder mergeGroupJoinRequestsWithVersion(im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion value) {
-        if (groupJoinRequestsWithVersionBuilder_ == null) {
-          if (kindCase_ == 16 &&
-                  kind_ != im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 16) {
-            groupJoinRequestsWithVersionBuilder_.mergeFrom(value);
-          }
-          groupJoinRequestsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 16;
-        return this;
-      }
-
       /**
        * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
        */
       public im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder getGroupJoinRequestsWithVersionBuilder() {
         return getGroupJoinRequestsWithVersionFieldBuilder().getBuilder();
       }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
-       *
-       * @return Whether the groupJoinQuestionsWithVersion field is set.
-       */
-      public boolean hasGroupJoinQuestionsWithVersion() {
-        return kindCase_ == 17;
-      }
-
       /**
        * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
        */
@@ -5281,29 +4396,37 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.GroupJoinRequestsWithVersion group_join_requests_with_version = 16;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder>
-      getGroupJoinRequestsWithVersionFieldBuilder() {
+          im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder> 
+          getGroupJoinRequestsWithVersionFieldBuilder() {
         if (groupJoinRequestsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 16)) {
             kind_ = im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.getDefaultInstance();
           }
           groupJoinRequestsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder>(
+              im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersionOrBuilder>(
                   (im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
         kindCase_ = 16;
-        onChanged();
+        onChanged();;
         return groupJoinRequestsWithVersionBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersionOrBuilder> groupJoinQuestionsWithVersionBuilder_;
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
+       * @return Whether the groupJoinQuestionsWithVersion field is set.
+       */
+      public boolean hasGroupJoinQuestionsWithVersion() {
+        return kindCase_ == 17;
+      }
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
        * @return The groupJoinQuestionsWithVersion.
@@ -5321,7 +4444,6 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
        */
@@ -5338,7 +4460,42 @@ public final class TurmsNotification extends
         kindCase_ = 17;
         return this;
       }
-
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
+       */
+      public Builder setGroupJoinQuestionsWithVersion(
+          im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder builderForValue) {
+        if (groupJoinQuestionsWithVersionBuilder_ == null) {
+          kind_ = builderForValue.build();
+          onChanged();
+        } else {
+          groupJoinQuestionsWithVersionBuilder_.setMessage(builderForValue.build());
+        }
+        kindCase_ = 17;
+        return this;
+      }
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
+       */
+      public Builder mergeGroupJoinQuestionsWithVersion(im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion value) {
+        if (groupJoinQuestionsWithVersionBuilder_ == null) {
+          if (kindCase_ == 17 &&
+              kind_ != im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 17) {
+            groupJoinQuestionsWithVersionBuilder_.mergeFrom(value);
+          }
+          groupJoinQuestionsWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 17;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
        */
@@ -5358,52 +4515,12 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
-       */
-      public Builder setGroupJoinQuestionsWithVersion(
-              im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder builderForValue) {
-        if (groupJoinQuestionsWithVersionBuilder_ == null) {
-          kind_ = builderForValue.build();
-          onChanged();
-        } else {
-          groupJoinQuestionsWithVersionBuilder_.setMessage(builderForValue.build());
-        }
-        kindCase_ = 17;
-        return this;
-      }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
-       */
-      public Builder mergeGroupJoinQuestionsWithVersion(im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion value) {
-        if (groupJoinQuestionsWithVersionBuilder_ == null) {
-          if (kindCase_ == 17 &&
-                  kind_ != im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 17) {
-            groupJoinQuestionsWithVersionBuilder_.mergeFrom(value);
-          }
-          groupJoinQuestionsWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 17;
-        return this;
-      }
-
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
        */
       public im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder getGroupJoinQuestionsWithVersionBuilder() {
         return getGroupJoinQuestionsWithVersionFieldBuilder().getBuilder();
       }
-
       /**
        * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
        */
@@ -5417,7 +4534,30 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance();
         }
       }
+      /**
+       * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersionOrBuilder> 
+          getGroupJoinQuestionsWithVersionFieldBuilder() {
+        if (groupJoinQuestionsWithVersionBuilder_ == null) {
+          if (!(kindCase_ == 17)) {
+            kind_ = im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance();
+          }
+          groupJoinQuestionsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersionOrBuilder>(
+                  (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_,
+                  getParentForChildren(),
+                  isClean());
+          kind_ = null;
+        }
+        kindCase_ = 17;
+        onChanged();;
+        return groupJoinQuestionsWithVersionBuilder_;
+      }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.group.GroupMembersWithVersion, im.turms.turms.pojo.bo.group.GroupMembersWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupMembersWithVersionOrBuilder> groupMembersWithVersionBuilder_;
       /**
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
        * @return Whether the groupMembersWithVersion field is set.
@@ -5425,32 +4565,8 @@ public final class TurmsNotification extends
       public boolean hasGroupMembersWithVersion() {
         return kindCase_ == 18;
       }
-
-      /**
-       * <code>.im.turms.proto.GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersionOrBuilder>
-      getGroupJoinQuestionsWithVersionFieldBuilder() {
-        if (groupJoinQuestionsWithVersionBuilder_ == null) {
-          if (!(kindCase_ == 17)) {
-            kind_ = im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.getDefaultInstance();
-          }
-          groupJoinQuestionsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersionOrBuilder>(
-                  (im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion) kind_,
-                  getParentForChildren(),
-                  isClean());
-          kind_ = null;
-        }
-        kindCase_ = 17;
-        onChanged();
-        return groupJoinQuestionsWithVersionBuilder_;
-      }
-
       /**
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
-       *
        * @return The groupMembersWithVersion.
        */
       public im.turms.turms.pojo.bo.group.GroupMembersWithVersion getGroupMembersWithVersion() {
@@ -5466,7 +4582,6 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
        */
@@ -5483,12 +4598,11 @@ public final class TurmsNotification extends
         kindCase_ = 18;
         return this;
       }
-
       /**
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
        */
       public Builder setGroupMembersWithVersion(
-              im.turms.turms.pojo.bo.group.GroupMembersWithVersion.Builder builderForValue) {
+          im.turms.turms.pojo.bo.group.GroupMembersWithVersion.Builder builderForValue) {
         if (groupMembersWithVersionBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
@@ -5498,7 +4612,28 @@ public final class TurmsNotification extends
         kindCase_ = 18;
         return this;
       }
-
+      /**
+       * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
+       */
+      public Builder mergeGroupMembersWithVersion(im.turms.turms.pojo.bo.group.GroupMembersWithVersion value) {
+        if (groupMembersWithVersionBuilder_ == null) {
+          if (kindCase_ == 18 &&
+              kind_ != im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance()) {
+            kind_ = im.turms.turms.pojo.bo.group.GroupMembersWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            kind_ = value;
+          }
+          onChanged();
+        } else {
+          if (kindCase_ == 18) {
+            groupMembersWithVersionBuilder_.mergeFrom(value);
+          }
+          groupMembersWithVersionBuilder_.setMessage(value);
+        }
+        kindCase_ = 18;
+        return this;
+      }
       /**
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
        */
@@ -5518,37 +4653,12 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
-      /**
-       * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
-       */
-      public Builder mergeGroupMembersWithVersion(im.turms.turms.pojo.bo.group.GroupMembersWithVersion value) {
-        if (groupMembersWithVersionBuilder_ == null) {
-          if (kindCase_ == 18 &&
-                  kind_ != im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance()) {
-            kind_ = im.turms.turms.pojo.bo.group.GroupMembersWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupMembersWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
-          } else {
-            kind_ = value;
-          }
-          onChanged();
-        } else {
-          if (kindCase_ == 18) {
-            groupMembersWithVersionBuilder_.mergeFrom(value);
-          }
-          groupMembersWithVersionBuilder_.setMessage(value);
-        }
-        kindCase_ = 18;
-        return this;
-      }
-
       /**
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
        */
       public im.turms.turms.pojo.bo.group.GroupMembersWithVersion.Builder getGroupMembersWithVersionBuilder() {
         return getGroupMembersWithVersionFieldBuilder().getBuilder();
       }
-
       /**
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
        */
@@ -5562,13 +4672,12 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.GroupMembersWithVersion group_members_with_version = 18;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupMembersWithVersion, im.turms.turms.pojo.bo.group.GroupMembersWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupMembersWithVersionOrBuilder>
-      getGroupMembersWithVersionFieldBuilder() {
+          im.turms.turms.pojo.bo.group.GroupMembersWithVersion, im.turms.turms.pojo.bo.group.GroupMembersWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupMembersWithVersionOrBuilder> 
+          getGroupMembersWithVersionFieldBuilder() {
         if (groupMembersWithVersionBuilder_ == null) {
           if (!(kindCase_ == 18)) {
             kind_ = im.turms.turms.pojo.bo.group.GroupMembersWithVersion.getDefaultInstance();
@@ -5581,22 +4690,21 @@ public final class TurmsNotification extends
           kind_ = null;
         }
         kindCase_ = 18;
-        onChanged();
+        onChanged();;
         return groupMembersWithVersionBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          im.turms.turms.pojo.bo.group.GroupsWithVersion, im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder> groupsWithVersionBuilder_;
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
-       *
        * @return Whether the groupsWithVersion field is set.
        */
       public boolean hasGroupsWithVersion() {
         return kindCase_ == 19;
       }
-
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
-       *
        * @return The groupsWithVersion.
        */
       public im.turms.turms.pojo.bo.group.GroupsWithVersion getGroupsWithVersion() {
@@ -5612,7 +4720,6 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
        */
@@ -5629,12 +4736,11 @@ public final class TurmsNotification extends
         kindCase_ = 19;
         return this;
       }
-
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
        */
       public Builder setGroupsWithVersion(
-              im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder builderForValue) {
+          im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder builderForValue) {
         if (groupsWithVersionBuilder_ == null) {
           kind_ = builderForValue.build();
           onChanged();
@@ -5644,16 +4750,15 @@ public final class TurmsNotification extends
         kindCase_ = 19;
         return this;
       }
-
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
        */
       public Builder mergeGroupsWithVersion(im.turms.turms.pojo.bo.group.GroupsWithVersion value) {
         if (groupsWithVersionBuilder_ == null) {
           if (kindCase_ == 19 &&
-                  kind_ != im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance()) {
+              kind_ != im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance()) {
             kind_ = im.turms.turms.pojo.bo.group.GroupsWithVersion.newBuilder((im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_)
-                    .mergeFrom(value).buildPartial();
+                .mergeFrom(value).buildPartial();
           } else {
             kind_ = value;
           }
@@ -5667,7 +4772,6 @@ public final class TurmsNotification extends
         kindCase_ = 19;
         return this;
       }
-
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
        */
@@ -5687,14 +4791,12 @@ public final class TurmsNotification extends
         }
         return this;
       }
-
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
        */
       public im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder getGroupsWithVersionBuilder() {
         return getGroupsWithVersionFieldBuilder().getBuilder();
       }
-
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
        */
@@ -5708,38 +4810,36 @@ public final class TurmsNotification extends
           return im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance();
         }
       }
-
       /**
        * <code>.im.turms.proto.GroupsWithVersion groups_with_version = 19;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-              im.turms.turms.pojo.bo.group.GroupsWithVersion, im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder>
-      getGroupsWithVersionFieldBuilder() {
+          im.turms.turms.pojo.bo.group.GroupsWithVersion, im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder> 
+          getGroupsWithVersionFieldBuilder() {
         if (groupsWithVersionBuilder_ == null) {
           if (!(kindCase_ == 19)) {
             kind_ = im.turms.turms.pojo.bo.group.GroupsWithVersion.getDefaultInstance();
           }
           groupsWithVersionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  im.turms.turms.pojo.bo.group.GroupsWithVersion, im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder>(
+              im.turms.turms.pojo.bo.group.GroupsWithVersion, im.turms.turms.pojo.bo.group.GroupsWithVersion.Builder, im.turms.turms.pojo.bo.group.GroupsWithVersionOrBuilder>(
                   (im.turms.turms.pojo.bo.group.GroupsWithVersion) kind_,
                   getParentForChildren(),
                   isClean());
           kind_ = null;
         }
         kindCase_ = 19;
-        onChanged();
+        onChanged();;
         return groupsWithVersionBuilder_;
       }
-
       @java.lang.Override
       public final Builder setUnknownFields(
-              final com.google.protobuf.UnknownFieldSet unknownFields) {
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
       @java.lang.Override
       public final Builder mergeUnknownFields(
-              final com.google.protobuf.UnknownFieldSet unknownFields) {
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
       }
 
@@ -5747,77 +4847,472 @@ public final class TurmsNotification extends
       // @@protoc_insertion_point(builder_scope:im.turms.proto.TurmsNotification.Data)
     }
 
+    // @@protoc_insertion_point(class_scope:im.turms.proto.TurmsNotification.Data)
+    private static final im.turms.turms.pojo.notification.TurmsNotification.Data DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new im.turms.turms.pojo.notification.TurmsNotification.Data();
+    }
+
+    public static im.turms.turms.pojo.notification.TurmsNotification.Data getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Data>
+        PARSER = new com.google.protobuf.AbstractParser<Data>() {
+      @java.lang.Override
+      public Data parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Data(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Data> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Data> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public im.turms.turms.pojo.notification.TurmsNotification.Data getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
+  public static final int REQUEST_ID_FIELD_NUMBER = 1;
+  private com.google.protobuf.Int64Value requestId_;
+  /**
+   * <pre>
+   * Note: request_id is allowed to be duplicated because
+   * it is used for clients to identify the response of the same request id in a session
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value request_id = 1;</code>
+   * @return Whether the requestId field is set.
+   */
+  public boolean hasRequestId() {
+    return requestId_ != null;
+  }
+  /**
+   * <pre>
+   * Note: request_id is allowed to be duplicated because
+   * it is used for clients to identify the response of the same request id in a session
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value request_id = 1;</code>
+   * @return The requestId.
+   */
+  public com.google.protobuf.Int64Value getRequestId() {
+    return requestId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : requestId_;
+  }
+  /**
+   * <pre>
+   * Note: request_id is allowed to be duplicated because
+   * it is used for clients to identify the response of the same request id in a session
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value request_id = 1;</code>
+   */
+  public com.google.protobuf.Int64ValueOrBuilder getRequestIdOrBuilder() {
+    return getRequestId();
+  }
+
+  public static final int CODE_FIELD_NUMBER = 2;
+  private com.google.protobuf.Int32Value code_;
+  /**
+   * <code>.google.protobuf.Int32Value code = 2;</code>
+   * @return Whether the code field is set.
+   */
+  public boolean hasCode() {
+    return code_ != null;
+  }
+  /**
+   * <code>.google.protobuf.Int32Value code = 2;</code>
+   * @return The code.
+   */
+  public com.google.protobuf.Int32Value getCode() {
+    return code_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : code_;
+  }
+  /**
+   * <code>.google.protobuf.Int32Value code = 2;</code>
+   */
+  public com.google.protobuf.Int32ValueOrBuilder getCodeOrBuilder() {
+    return getCode();
+  }
+
+  public static final int REASON_FIELD_NUMBER = 3;
+  private com.google.protobuf.StringValue reason_;
+  /**
+   * <code>.google.protobuf.StringValue reason = 3;</code>
+   * @return Whether the reason field is set.
+   */
+  public boolean hasReason() {
+    return reason_ != null;
+  }
+  /**
+   * <code>.google.protobuf.StringValue reason = 3;</code>
+   * @return The reason.
+   */
+  public com.google.protobuf.StringValue getReason() {
+    return reason_ == null ? com.google.protobuf.StringValue.getDefaultInstance() : reason_;
+  }
+  /**
+   * <code>.google.protobuf.StringValue reason = 3;</code>
+   */
+  public com.google.protobuf.StringValueOrBuilder getReasonOrBuilder() {
+    return getReason();
+  }
+
+  public static final int DATA_FIELD_NUMBER = 4;
+  private im.turms.turms.pojo.notification.TurmsNotification.Data data_;
+  /**
+   * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
+   * @return Whether the data field is set.
+   */
+  public boolean hasData() {
+    return data_ != null;
+  }
+  /**
+   * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
+   * @return The data.
+   */
+  public im.turms.turms.pojo.notification.TurmsNotification.Data getData() {
+    return data_ == null ? im.turms.turms.pojo.notification.TurmsNotification.Data.getDefaultInstance() : data_;
+  }
+  /**
+   * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
+   */
+  public im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder getDataOrBuilder() {
+    return getData();
+  }
+
+  public static final int RELAYED_REQUEST_FIELD_NUMBER = 5;
+  private im.turms.turms.pojo.request.TurmsRequest relayedRequest_;
+  /**
+   * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
+   * @return Whether the relayedRequest field is set.
+   */
+  public boolean hasRelayedRequest() {
+    return relayedRequest_ != null;
+  }
+  /**
+   * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
+   * @return The relayedRequest.
+   */
+  public im.turms.turms.pojo.request.TurmsRequest getRelayedRequest() {
+    return relayedRequest_ == null ? im.turms.turms.pojo.request.TurmsRequest.getDefaultInstance() : relayedRequest_;
+  }
+  /**
+   * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
+   */
+  public im.turms.turms.pojo.request.TurmsRequestOrBuilder getRelayedRequestOrBuilder() {
+    return getRelayedRequest();
+  }
+
+  public static final int REQUESTER_ID_FIELD_NUMBER = 6;
+  private com.google.protobuf.Int64Value requesterId_;
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsNotification
+   * when recipients need the requester_id.
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   * @return Whether the requesterId field is set.
+   */
+  public boolean hasRequesterId() {
+    return requesterId_ != null;
+  }
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsNotification
+   * when recipients need the requester_id.
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   * @return The requesterId.
+   */
+  public com.google.protobuf.Int64Value getRequesterId() {
+    return requesterId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : requesterId_;
+  }
+  /**
+   * <pre>
+   * requester_id only exists when a requester trigger a notification to its recipients
+   * Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsNotification
+   * when recipients need the requester_id.
+   * </pre>
+   *
+   * <code>.google.protobuf.Int64Value requester_id = 6;</code>
+   */
+  public com.google.protobuf.Int64ValueOrBuilder getRequesterIdOrBuilder() {
+    return getRequesterId();
+  }
+
+  private byte memoizedIsInitialized = -1;
+  @java.lang.Override
+  public final boolean isInitialized() {
+    byte isInitialized = memoizedIsInitialized;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
+
+    memoizedIsInitialized = 1;
+    return true;
+  }
+
+  @java.lang.Override
+  public void writeTo(com.google.protobuf.CodedOutputStream output)
+                      throws java.io.IOException {
+    if (requestId_ != null) {
+      output.writeMessage(1, getRequestId());
+    }
+    if (code_ != null) {
+      output.writeMessage(2, getCode());
+    }
+    if (reason_ != null) {
+      output.writeMessage(3, getReason());
+    }
+    if (data_ != null) {
+      output.writeMessage(4, getData());
+    }
+    if (relayedRequest_ != null) {
+      output.writeMessage(5, getRelayedRequest());
+    }
+    if (requesterId_ != null) {
+      output.writeMessage(6, getRequesterId());
+    }
+    unknownFields.writeTo(output);
+  }
+
+  @java.lang.Override
+  public int getSerializedSize() {
+    int size = memoizedSize;
+    if (size != -1) return size;
+
+    size = 0;
+    if (requestId_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getRequestId());
+    }
+    if (code_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(2, getCode());
+    }
+    if (reason_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, getReason());
+    }
+    if (data_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(4, getData());
+    }
+    if (relayedRequest_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(5, getRelayedRequest());
+    }
+    if (requesterId_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(6, getRequesterId());
+    }
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
+    return size;
+  }
+
+  @java.lang.Override
+  public boolean equals(final java.lang.Object obj) {
+    if (obj == this) {
+     return true;
+    }
+    if (!(obj instanceof im.turms.turms.pojo.notification.TurmsNotification)) {
+      return super.equals(obj);
+    }
+    im.turms.turms.pojo.notification.TurmsNotification other = (im.turms.turms.pojo.notification.TurmsNotification) obj;
+
+    if (hasRequestId() != other.hasRequestId()) return false;
+    if (hasRequestId()) {
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+    }
+    if (hasCode() != other.hasCode()) return false;
+    if (hasCode()) {
+      if (!getCode()
+          .equals(other.getCode())) return false;
+    }
+    if (hasReason() != other.hasReason()) return false;
+    if (hasReason()) {
+      if (!getReason()
+          .equals(other.getReason())) return false;
+    }
+    if (hasData() != other.hasData()) return false;
+    if (hasData()) {
+      if (!getData()
+          .equals(other.getData())) return false;
+    }
+    if (hasRelayedRequest() != other.hasRelayedRequest()) return false;
+    if (hasRelayedRequest()) {
+      if (!getRelayedRequest()
+          .equals(other.getRelayedRequest())) return false;
+    }
+    if (hasRequesterId() != other.hasRequesterId()) return false;
+    if (hasRequesterId()) {
+      if (!getRequesterId()
+          .equals(other.getRequesterId())) return false;
+    }
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
+  }
+
+  @java.lang.Override
+  public int hashCode() {
+    if (memoizedHashCode != 0) {
+      return memoizedHashCode;
+    }
+    int hash = 41;
+    hash = (19 * hash) + getDescriptor().hashCode();
+    if (hasRequestId()) {
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+    }
+    if (hasCode()) {
+      hash = (37 * hash) + CODE_FIELD_NUMBER;
+      hash = (53 * hash) + getCode().hashCode();
+    }
+    if (hasReason()) {
+      hash = (37 * hash) + REASON_FIELD_NUMBER;
+      hash = (53 * hash) + getReason().hashCode();
+    }
+    if (hasData()) {
+      hash = (37 * hash) + DATA_FIELD_NUMBER;
+      hash = (53 * hash) + getData().hashCode();
+    }
+    if (hasRelayedRequest()) {
+      hash = (37 * hash) + RELAYED_REQUEST_FIELD_NUMBER;
+      hash = (53 * hash) + getRelayedRequest().hashCode();
+    }
+    if (hasRequesterId()) {
+      hash = (37 * hash) + REQUESTER_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequesterId().hashCode();
+    }
+    hash = (29 * hash) + unknownFields.hashCode();
+    memoizedHashCode = hash;
+    return hash;
+  }
+
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
+      java.nio.ByteBuffer data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
+      java.nio.ByteBuffer data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
+      com.google.protobuf.ByteString data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
+      com.google.protobuf.ByteString data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(byte[] data)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
+      byte[] data,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    return PARSER.parseFrom(data, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(java.io.InputStream input)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseWithIOException(PARSER, input);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseWithIOException(PARSER, input, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseDelimitedFrom(java.io.InputStream input)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseDelimitedWithIOException(PARSER, input);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseDelimitedFrom(
+      java.io.InputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
+      com.google.protobuf.CodedInputStream input)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseWithIOException(PARSER, input);
+  }
+  public static im.turms.turms.pojo.notification.TurmsNotification parseFrom(
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
+    return com.google.protobuf.GeneratedMessageV3
+        .parseWithIOException(PARSER, input, extensionRegistry);
+  }
+
+  @java.lang.Override
+  public Builder newBuilderForType() { return newBuilder(); }
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
+  }
+  public static Builder newBuilder(im.turms.turms.pojo.notification.TurmsNotification prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  @java.lang.Override
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
+
+  @java.lang.Override
+  protected Builder newBuilderForType(
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+    Builder builder = new Builder(parent);
+    return builder;
+  }
   /**
    * Protobuf type {@code im.turms.proto.TurmsNotification}
    */
   public static final class Builder extends
-          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-          // @@protoc_insertion_point(builder_implements:im.turms.proto.TurmsNotification)
-          im.turms.turms.pojo.notification.TurmsNotificationOrBuilder {
-    private com.google.protobuf.Int64Value requestId_;
-    private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> requestIdBuilder_;
-    private com.google.protobuf.Int32Value code_;
-
-    private Builder(
-            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      super(parent);
-      maybeForceBuilderInitialization();
-    }
-
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
-    }
-
-    private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> codeBuilder_;
-    private im.turms.turms.pojo.notification.TurmsNotification.Data data_;
-    private com.google.protobuf.SingleFieldBuilderV3<
-            im.turms.turms.pojo.notification.TurmsNotification.Data, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder, im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder> dataBuilder_;
-    private im.turms.turms.pojo.request.TurmsRequest relayedRequest_;
-    private com.google.protobuf.SingleFieldBuilderV3<
-            im.turms.turms.pojo.request.TurmsRequest, im.turms.turms.pojo.request.TurmsRequest.Builder, im.turms.turms.pojo.request.TurmsRequestOrBuilder> relayedRequestBuilder_;
-
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
+      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:im.turms.proto.TurmsNotification)
+      im.turms.turms.pojo.notification.TurmsNotificationOrBuilder {
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_descriptor;
     }
 
     @java.lang.Override
-    public Builder setField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            java.lang.Object value) {
-      return super.setField(field, value);
-    }
-
-    @java.lang.Override
-    public Builder clearField(
-            com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-
-    @java.lang.Override
-    public Builder clearOneof(
-            com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-
-    @java.lang.Override
-    public Builder setRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-
-    @java.lang.Override
-    public Builder addRepeatedField(
-            com.google.protobuf.Descriptors.FieldDescriptor field,
-            java.lang.Object value) {
-      return super.addRepeatedField(field, value);
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              im.turms.turms.pojo.notification.TurmsNotification.class, im.turms.turms.pojo.notification.TurmsNotification.Builder.class);
     }
 
     // Construct using im.turms.turms.pojo.notification.TurmsNotification.newBuilder()
@@ -5825,24 +5320,16 @@ public final class TurmsNotification extends
       maybeForceBuilderInitialization();
     }
 
-    public static final com.google.protobuf.Descriptors.Descriptor
-    getDescriptor() {
-      return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_descriptor;
+    private Builder(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      super(parent);
+      maybeForceBuilderInitialization();
     }
-
-    @java.lang.Override
-    public final boolean isInitialized() {
-      return true;
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+      }
     }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-    internalGetFieldAccessorTable() {
-      return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                      im.turms.turms.pojo.notification.TurmsNotification.class, im.turms.turms.pojo.notification.TurmsNotification.Builder.class);
-    }
-
     @java.lang.Override
     public Builder clear() {
       super.clear();
@@ -5887,7 +5374,7 @@ public final class TurmsNotification extends
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
-    getDescriptorForType() {
+        getDescriptorForType() {
       return im.turms.turms.pojo.notification.TurmsNotificationOuterClass.internal_static_im_turms_proto_TurmsNotification_descriptor;
     }
 
@@ -5943,9 +5430,41 @@ public final class TurmsNotification extends
     }
 
     @java.lang.Override
+    public Builder clone() {
+      return super.clone();
+    }
+    @java.lang.Override
+    public Builder setField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.setField(field, value);
+    }
+    @java.lang.Override
+    public Builder clearField(
+        com.google.protobuf.Descriptors.FieldDescriptor field) {
+      return super.clearField(field);
+    }
+    @java.lang.Override
+    public Builder clearOneof(
+        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+      return super.clearOneof(oneof);
+    }
+    @java.lang.Override
+    public Builder setRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        int index, java.lang.Object value) {
+      return super.setRepeatedField(field, index, value);
+    }
+    @java.lang.Override
+    public Builder addRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.addRepeatedField(field, value);
+    }
+    @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof im.turms.turms.pojo.notification.TurmsNotification) {
-        return mergeFrom((im.turms.turms.pojo.notification.TurmsNotification) other);
+        return mergeFrom((im.turms.turms.pojo.notification.TurmsNotification)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -5978,10 +5497,15 @@ public final class TurmsNotification extends
     }
 
     @java.lang.Override
+    public final boolean isInitialized() {
+      return true;
+    }
+
+    @java.lang.Override
     public Builder mergeFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
       im.turms.turms.pojo.notification.TurmsNotification parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -5996,6 +5520,9 @@ public final class TurmsNotification extends
       return this;
     }
 
+    private com.google.protobuf.Int64Value requestId_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> requestIdBuilder_;
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6003,13 +5530,11 @@ public final class TurmsNotification extends
      * </pre>
      *
      * <code>.google.protobuf.Int64Value request_id = 1;</code>
-     *
      * @return Whether the requestId field is set.
      */
     public boolean hasRequestId() {
       return requestIdBuilder_ != null || requestId_ != null;
     }
-
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6017,7 +5542,6 @@ public final class TurmsNotification extends
      * </pre>
      *
      * <code>.google.protobuf.Int64Value request_id = 1;</code>
-     *
      * @return The requestId.
      */
     public com.google.protobuf.Int64Value getRequestId() {
@@ -6027,7 +5551,6 @@ public final class TurmsNotification extends
         return requestIdBuilder_.getMessage();
       }
     }
-
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6049,7 +5572,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6059,7 +5581,7 @@ public final class TurmsNotification extends
      * <code>.google.protobuf.Int64Value request_id = 1;</code>
      */
     public Builder setRequestId(
-            com.google.protobuf.Int64Value.Builder builderForValue) {
+        com.google.protobuf.Int64Value.Builder builderForValue) {
       if (requestIdBuilder_ == null) {
         requestId_ = builderForValue.build();
         onChanged();
@@ -6069,7 +5591,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6082,7 +5603,7 @@ public final class TurmsNotification extends
       if (requestIdBuilder_ == null) {
         if (requestId_ != null) {
           requestId_ =
-                  com.google.protobuf.Int64Value.newBuilder(requestId_).mergeFrom(value).buildPartial();
+            com.google.protobuf.Int64Value.newBuilder(requestId_).mergeFrom(value).buildPartial();
         } else {
           requestId_ = value;
         }
@@ -6093,7 +5614,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6113,7 +5633,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6123,11 +5642,10 @@ public final class TurmsNotification extends
      * <code>.google.protobuf.Int64Value request_id = 1;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRequestIdBuilder() {
-
+      
       onChanged();
       return getRequestIdFieldBuilder().getBuilder();
     }
-
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6141,10 +5659,9 @@ public final class TurmsNotification extends
         return requestIdBuilder_.getMessageOrBuilder();
       } else {
         return requestId_ == null ?
-                com.google.protobuf.Int64Value.getDefaultInstance() : requestId_;
+            com.google.protobuf.Int64Value.getDefaultInstance() : requestId_;
       }
     }
-
     /**
      * <pre>
      * Note: request_id is allowed to be duplicated because
@@ -6154,11 +5671,11 @@ public final class TurmsNotification extends
      * <code>.google.protobuf.Int64Value request_id = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
-    getRequestIdFieldBuilder() {
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
+        getRequestIdFieldBuilder() {
       if (requestIdBuilder_ == null) {
         requestIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
+            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
                 getRequestId(),
                 getParentForChildren(),
                 isClean());
@@ -6167,6 +5684,9 @@ public final class TurmsNotification extends
       return requestIdBuilder_;
     }
 
+    private com.google.protobuf.Int32Value code_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> codeBuilder_;
     /**
      * <code>.google.protobuf.Int32Value code = 2;</code>
      * @return Whether the code field is set.
@@ -6174,7 +5694,6 @@ public final class TurmsNotification extends
     public boolean hasCode() {
       return codeBuilder_ != null || code_ != null;
     }
-
     /**
      * <code>.google.protobuf.Int32Value code = 2;</code>
      * @return The code.
@@ -6186,7 +5705,6 @@ public final class TurmsNotification extends
         return codeBuilder_.getMessage();
       }
     }
-
     /**
      * <code>.google.protobuf.Int32Value code = 2;</code>
      */
@@ -6203,12 +5721,11 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.google.protobuf.Int32Value code = 2;</code>
      */
     public Builder setCode(
-            com.google.protobuf.Int32Value.Builder builderForValue) {
+        com.google.protobuf.Int32Value.Builder builderForValue) {
       if (codeBuilder_ == null) {
         code_ = builderForValue.build();
         onChanged();
@@ -6218,7 +5735,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.google.protobuf.Int32Value code = 2;</code>
      */
@@ -6226,7 +5742,7 @@ public final class TurmsNotification extends
       if (codeBuilder_ == null) {
         if (code_ != null) {
           code_ =
-                  com.google.protobuf.Int32Value.newBuilder(code_).mergeFrom(value).buildPartial();
+            com.google.protobuf.Int32Value.newBuilder(code_).mergeFrom(value).buildPartial();
         } else {
           code_ = value;
         }
@@ -6237,23 +5753,68 @@ public final class TurmsNotification extends
 
       return this;
     }
+    /**
+     * <code>.google.protobuf.Int32Value code = 2;</code>
+     */
+    public Builder clearCode() {
+      if (codeBuilder_ == null) {
+        code_ = null;
+        onChanged();
+      } else {
+        code_ = null;
+        codeBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Int32Value code = 2;</code>
+     */
+    public com.google.protobuf.Int32Value.Builder getCodeBuilder() {
+      
+      onChanged();
+      return getCodeFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.Int32Value code = 2;</code>
+     */
+    public com.google.protobuf.Int32ValueOrBuilder getCodeOrBuilder() {
+      if (codeBuilder_ != null) {
+        return codeBuilder_.getMessageOrBuilder();
+      } else {
+        return code_ == null ?
+            com.google.protobuf.Int32Value.getDefaultInstance() : code_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.Int32Value code = 2;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
+        getCodeFieldBuilder() {
+      if (codeBuilder_ == null) {
+        codeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>(
+                getCode(),
+                getParentForChildren(),
+                isClean());
+        code_ = null;
+      }
+      return codeBuilder_;
+    }
 
     private com.google.protobuf.StringValue reason_;
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> reasonBuilder_;
-
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> reasonBuilder_;
     /**
      * <code>.google.protobuf.StringValue reason = 3;</code>
-     *
      * @return Whether the reason field is set.
      */
     public boolean hasReason() {
       return reasonBuilder_ != null || reason_ != null;
     }
-
     /**
      * <code>.google.protobuf.StringValue reason = 3;</code>
-     *
      * @return The reason.
      */
     public com.google.protobuf.StringValue getReason() {
@@ -6263,7 +5824,6 @@ public final class TurmsNotification extends
         return reasonBuilder_.getMessage();
       }
     }
-
     /**
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
@@ -6284,7 +5844,7 @@ public final class TurmsNotification extends
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
     public Builder setReason(
-            com.google.protobuf.StringValue.Builder builderForValue) {
+        com.google.protobuf.StringValue.Builder builderForValue) {
       if (reasonBuilder_ == null) {
         reason_ = builderForValue.build();
         onChanged();
@@ -6294,7 +5854,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
@@ -6302,7 +5861,7 @@ public final class TurmsNotification extends
       if (reasonBuilder_ == null) {
         if (reason_ != null) {
           reason_ =
-                  com.google.protobuf.StringValue.newBuilder(reason_).mergeFrom(value).buildPartial();
+            com.google.protobuf.StringValue.newBuilder(reason_).mergeFrom(value).buildPartial();
         } else {
           reason_ = value;
         }
@@ -6313,7 +5872,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
@@ -6328,22 +5886,14 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
-     * <code>.google.protobuf.Int32Value code = 2;</code>
+     * <code>.google.protobuf.StringValue reason = 3;</code>
      */
-    public Builder clearCode() {
-      if (codeBuilder_ == null) {
-        code_ = null;
-        onChanged();
-      } else {
-        code_ = null;
-        codeBuilder_ = null;
-      }
-
-      return this;
+    public com.google.protobuf.StringValue.Builder getReasonBuilder() {
+      
+      onChanged();
+      return getReasonFieldBuilder().getBuilder();
     }
-
     /**
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
@@ -6352,66 +5902,18 @@ public final class TurmsNotification extends
         return reasonBuilder_.getMessageOrBuilder();
       } else {
         return reason_ == null ?
-                com.google.protobuf.StringValue.getDefaultInstance() : reason_;
+            com.google.protobuf.StringValue.getDefaultInstance() : reason_;
       }
     }
-
-    /**
-     * <code>.google.protobuf.Int32Value code = 2;</code>
-     */
-    public com.google.protobuf.Int32Value.Builder getCodeBuilder() {
-
-      onChanged();
-      return getCodeFieldBuilder().getBuilder();
-    }
-
-    /**
-     * <code>.google.protobuf.Int32Value code = 2;</code>
-     */
-    public com.google.protobuf.Int32ValueOrBuilder getCodeOrBuilder() {
-      if (codeBuilder_ != null) {
-        return codeBuilder_.getMessageOrBuilder();
-      } else {
-        return code_ == null ?
-                com.google.protobuf.Int32Value.getDefaultInstance() : code_;
-      }
-    }
-
-    /**
-     * <code>.google.protobuf.Int32Value code = 2;</code>
-     */
-    private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
-    getCodeFieldBuilder() {
-      if (codeBuilder_ == null) {
-        codeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>(
-                getCode(),
-                getParentForChildren(),
-                isClean());
-        code_ = null;
-      }
-      return codeBuilder_;
-    }
-
-    /**
-     * <code>.google.protobuf.StringValue reason = 3;</code>
-     */
-    public com.google.protobuf.StringValue.Builder getReasonBuilder() {
-
-      onChanged();
-      return getReasonFieldBuilder().getBuilder();
-    }
-
     /**
      * <code>.google.protobuf.StringValue reason = 3;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>
-    getReasonFieldBuilder() {
+        com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder> 
+        getReasonFieldBuilder() {
       if (reasonBuilder_ == null) {
         reasonBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>(
+            com.google.protobuf.StringValue, com.google.protobuf.StringValue.Builder, com.google.protobuf.StringValueOrBuilder>(
                 getReason(),
                 getParentForChildren(),
                 isClean());
@@ -6420,18 +5922,18 @@ public final class TurmsNotification extends
       return reasonBuilder_;
     }
 
+    private im.turms.turms.pojo.notification.TurmsNotification.Data data_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        im.turms.turms.pojo.notification.TurmsNotification.Data, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder, im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder> dataBuilder_;
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
-     *
      * @return Whether the data field is set.
      */
     public boolean hasData() {
       return dataBuilder_ != null || data_ != null;
     }
-
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
-     *
      * @return The data.
      */
     public im.turms.turms.pojo.notification.TurmsNotification.Data getData() {
@@ -6441,7 +5943,6 @@ public final class TurmsNotification extends
         return dataBuilder_.getMessage();
       }
     }
-
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
      */
@@ -6458,12 +5959,11 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
      */
     public Builder setData(
-            im.turms.turms.pojo.notification.TurmsNotification.Data.Builder builderForValue) {
+        im.turms.turms.pojo.notification.TurmsNotification.Data.Builder builderForValue) {
       if (dataBuilder_ == null) {
         data_ = builderForValue.build();
         onChanged();
@@ -6473,7 +5973,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
      */
@@ -6481,7 +5980,7 @@ public final class TurmsNotification extends
       if (dataBuilder_ == null) {
         if (data_ != null) {
           data_ =
-                  im.turms.turms.pojo.notification.TurmsNotification.Data.newBuilder(data_).mergeFrom(value).buildPartial();
+            im.turms.turms.pojo.notification.TurmsNotification.Data.newBuilder(data_).mergeFrom(value).buildPartial();
         } else {
           data_ = value;
         }
@@ -6492,7 +5991,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
      */
@@ -6507,16 +6005,14 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
      */
     public im.turms.turms.pojo.notification.TurmsNotification.Data.Builder getDataBuilder() {
-
+      
       onChanged();
       return getDataFieldBuilder().getBuilder();
     }
-
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
      */
@@ -6525,19 +6021,18 @@ public final class TurmsNotification extends
         return dataBuilder_.getMessageOrBuilder();
       } else {
         return data_ == null ?
-                im.turms.turms.pojo.notification.TurmsNotification.Data.getDefaultInstance() : data_;
+            im.turms.turms.pojo.notification.TurmsNotification.Data.getDefaultInstance() : data_;
       }
     }
-
     /**
      * <code>.im.turms.proto.TurmsNotification.Data data = 4;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            im.turms.turms.pojo.notification.TurmsNotification.Data, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder, im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder>
-    getDataFieldBuilder() {
+        im.turms.turms.pojo.notification.TurmsNotification.Data, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder, im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder> 
+        getDataFieldBuilder() {
       if (dataBuilder_ == null) {
         dataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                im.turms.turms.pojo.notification.TurmsNotification.Data, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder, im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder>(
+            im.turms.turms.pojo.notification.TurmsNotification.Data, im.turms.turms.pojo.notification.TurmsNotification.Data.Builder, im.turms.turms.pojo.notification.TurmsNotification.DataOrBuilder>(
                 getData(),
                 getParentForChildren(),
                 isClean());
@@ -6546,6 +6041,9 @@ public final class TurmsNotification extends
       return dataBuilder_;
     }
 
+    private im.turms.turms.pojo.request.TurmsRequest relayedRequest_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        im.turms.turms.pojo.request.TurmsRequest, im.turms.turms.pojo.request.TurmsRequest.Builder, im.turms.turms.pojo.request.TurmsRequestOrBuilder> relayedRequestBuilder_;
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
      * @return Whether the relayedRequest field is set.
@@ -6553,10 +6051,8 @@ public final class TurmsNotification extends
     public boolean hasRelayedRequest() {
       return relayedRequestBuilder_ != null || relayedRequest_ != null;
     }
-
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
-     *
      * @return The relayedRequest.
      */
     public im.turms.turms.pojo.request.TurmsRequest getRelayedRequest() {
@@ -6566,7 +6062,6 @@ public final class TurmsNotification extends
         return relayedRequestBuilder_.getMessage();
       }
     }
-
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
      */
@@ -6583,12 +6078,11 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
      */
     public Builder setRelayedRequest(
-            im.turms.turms.pojo.request.TurmsRequest.Builder builderForValue) {
+        im.turms.turms.pojo.request.TurmsRequest.Builder builderForValue) {
       if (relayedRequestBuilder_ == null) {
         relayedRequest_ = builderForValue.build();
         onChanged();
@@ -6598,7 +6092,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
      */
@@ -6606,7 +6099,7 @@ public final class TurmsNotification extends
       if (relayedRequestBuilder_ == null) {
         if (relayedRequest_ != null) {
           relayedRequest_ =
-                  im.turms.turms.pojo.request.TurmsRequest.newBuilder(relayedRequest_).mergeFrom(value).buildPartial();
+            im.turms.turms.pojo.request.TurmsRequest.newBuilder(relayedRequest_).mergeFrom(value).buildPartial();
         } else {
           relayedRequest_ = value;
         }
@@ -6617,7 +6110,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
      */
@@ -6632,16 +6124,14 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
      */
     public im.turms.turms.pojo.request.TurmsRequest.Builder getRelayedRequestBuilder() {
-
+      
       onChanged();
       return getRelayedRequestFieldBuilder().getBuilder();
     }
-
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
      */
@@ -6650,19 +6140,18 @@ public final class TurmsNotification extends
         return relayedRequestBuilder_.getMessageOrBuilder();
       } else {
         return relayedRequest_ == null ?
-                im.turms.turms.pojo.request.TurmsRequest.getDefaultInstance() : relayedRequest_;
+            im.turms.turms.pojo.request.TurmsRequest.getDefaultInstance() : relayedRequest_;
       }
     }
-
     /**
      * <code>.im.turms.proto.TurmsRequest relayed_request = 5;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-            im.turms.turms.pojo.request.TurmsRequest, im.turms.turms.pojo.request.TurmsRequest.Builder, im.turms.turms.pojo.request.TurmsRequestOrBuilder>
-    getRelayedRequestFieldBuilder() {
+        im.turms.turms.pojo.request.TurmsRequest, im.turms.turms.pojo.request.TurmsRequest.Builder, im.turms.turms.pojo.request.TurmsRequestOrBuilder> 
+        getRelayedRequestFieldBuilder() {
       if (relayedRequestBuilder_ == null) {
         relayedRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                im.turms.turms.pojo.request.TurmsRequest, im.turms.turms.pojo.request.TurmsRequest.Builder, im.turms.turms.pojo.request.TurmsRequestOrBuilder>(
+            im.turms.turms.pojo.request.TurmsRequest, im.turms.turms.pojo.request.TurmsRequest.Builder, im.turms.turms.pojo.request.TurmsRequestOrBuilder>(
                 getRelayedRequest(),
                 getParentForChildren(),
                 isClean());
@@ -6673,8 +6162,7 @@ public final class TurmsNotification extends
 
     private com.google.protobuf.Int64Value requesterId_;
     private com.google.protobuf.SingleFieldBuilderV3<
-            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> requesterIdBuilder_;
-
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> requesterIdBuilder_;
     /**
      * <pre>
      * requester_id only exists when a requester trigger a notification to its recipients
@@ -6688,7 +6176,6 @@ public final class TurmsNotification extends
     public boolean hasRequesterId() {
       return requesterIdBuilder_ != null || requesterId_ != null;
     }
-
     /**
      * <pre>
      * requester_id only exists when a requester trigger a notification to its recipients
@@ -6706,7 +6193,6 @@ public final class TurmsNotification extends
         return requesterIdBuilder_.getMessage();
       }
     }
-
     /**
      * <pre>
      * requester_id only exists when a requester trigger a notification to its recipients
@@ -6729,7 +6215,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <pre>
      * requester_id only exists when a requester trigger a notification to its recipients
@@ -6774,7 +6259,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <pre>
      * requester_id only exists when a requester trigger a notification to its recipients
@@ -6795,7 +6279,6 @@ public final class TurmsNotification extends
 
       return this;
     }
-
     /**
      * <pre>
      * requester_id only exists when a requester trigger a notification to its recipients
@@ -6806,11 +6289,10 @@ public final class TurmsNotification extends
      * <code>.google.protobuf.Int64Value requester_id = 6;</code>
      */
     public com.google.protobuf.Int64Value.Builder getRequesterIdBuilder() {
-
+      
       onChanged();
       return getRequesterIdFieldBuilder().getBuilder();
     }
-
     /**
      * <pre>
      * requester_id only exists when a requester trigger a notification to its recipients
@@ -6838,11 +6320,11 @@ public final class TurmsNotification extends
      * <code>.google.protobuf.Int64Value requester_id = 6;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
         getRequesterIdFieldBuilder() {
       if (requesterIdBuilder_ == null) {
         requesterIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
+            com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>(
                 getRequesterId(),
                 getParentForChildren(),
                 isClean());
@@ -6864,6 +6346,41 @@ public final class TurmsNotification extends
 
 
     // @@protoc_insertion_point(builder_scope:im.turms.proto.TurmsNotification)
+  }
+
+  // @@protoc_insertion_point(class_scope:im.turms.proto.TurmsNotification)
+  private static final im.turms.turms.pojo.notification.TurmsNotification DEFAULT_INSTANCE;
+  static {
+    DEFAULT_INSTANCE = new im.turms.turms.pojo.notification.TurmsNotification();
+  }
+
+  public static im.turms.turms.pojo.notification.TurmsNotification getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  private static final com.google.protobuf.Parser<TurmsNotification>
+      PARSER = new com.google.protobuf.AbstractParser<TurmsNotification>() {
+    @java.lang.Override
+    public TurmsNotification parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return new TurmsNotification(input, extensionRegistry);
+    }
+  };
+
+  public static com.google.protobuf.Parser<TurmsNotification> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<TurmsNotification> getParserForType() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public im.turms.turms.pojo.notification.TurmsNotification getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
   }
 
 }

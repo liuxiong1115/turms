@@ -7,33 +7,29 @@ public interface GroupJoinQuestionsWithVersionOrBuilder extends
     // @@protoc_insertion_point(interface_extends:im.turms.proto.GroupJoinQuestionsWithVersion)
     com.google.protobuf.MessageOrBuilder {
 
-    /**
-     * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
-     */
-    java.util.List<im.turms.turms.pojo.bo.group.GroupJoinQuestion>
-    getGroupJoinQuestionsList();
-
-    /**
-     * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
-     */
-    im.turms.turms.pojo.bo.group.GroupJoinQuestion getGroupJoinQuestions(int index);
-
-    /**
-     * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
-     */
-    int getGroupJoinQuestionsCount();
-
-    /**
-     * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
-     */
-    java.util.List<? extends im.turms.turms.pojo.bo.group.GroupJoinQuestionOrBuilder>
-    getGroupJoinQuestionsOrBuilderList();
-
-    /**
-     * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
-     */
-    im.turms.turms.pojo.bo.group.GroupJoinQuestionOrBuilder getGroupJoinQuestionsOrBuilder(
-            int index);
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
+   */
+  java.util.List<im.turms.turms.pojo.bo.group.GroupJoinQuestion> 
+      getGroupJoinQuestionsList();
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
+   */
+  im.turms.turms.pojo.bo.group.GroupJoinQuestion getGroupJoinQuestions(int index);
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
+   */
+  int getGroupJoinQuestionsCount();
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
+   */
+  java.util.List<? extends im.turms.turms.pojo.bo.group.GroupJoinQuestionOrBuilder> 
+      getGroupJoinQuestionsOrBuilderList();
+  /**
+   * <code>repeated .im.turms.proto.GroupJoinQuestion group_join_questions = 1;</code>
+   */
+  im.turms.turms.pojo.bo.group.GroupJoinQuestionOrBuilder getGroupJoinQuestionsOrBuilder(
+      int index);
 
   /**
    * <code>.google.protobuf.Int64Value last_updated_date = 2;</code>

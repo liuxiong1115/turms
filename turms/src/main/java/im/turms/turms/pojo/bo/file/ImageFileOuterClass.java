@@ -16,12 +16,12 @@ public final class ImageFileOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_ImageFile_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_ImageFile_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_ImageFile_Description_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_ImageFile_Description_fieldAccessorTable;
 
@@ -33,17 +33,17 @@ public final class ImageFileOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n\033model/file/image_file.proto\022\016im.turms." +
-                    "proto\032\036google/protobuf/wrappers.proto\"\236\002" +
-                    "\n\tImageFile\022:\n\013description\030\001 \001(\0132%.im.tu" +
-                    "rms.proto.ImageFile.Description\022)\n\004data\030" +
-                    "\002 \001(\0132\033.google.protobuf.BytesValue\032\251\001\n\013D" +
-                    "escription\022\013\n\003url\030\001 \001(\t\022,\n\010original\030\002 \001(" +
-                    "\0132\032.google.protobuf.BoolValue\022/\n\nimage_s" +
-                    "ize\030\003 \001(\0132\033.google.protobuf.Int32Value\022." +
-                    "\n\tfile_size\030\004 \001(\0132\033.google.protobuf.Int3" +
-                    "2ValueB\037\n\033im.turms.turms.pojo.bo.fileP\001b" +
-                    "\006proto3"
+      "\n\033model/file/image_file.proto\022\016im.turms." +
+      "proto\032\036google/protobuf/wrappers.proto\"\236\002" +
+      "\n\tImageFile\022:\n\013description\030\001 \001(\0132%.im.tu" +
+      "rms.proto.ImageFile.Description\022)\n\004data\030" +
+      "\002 \001(\0132\033.google.protobuf.BytesValue\032\251\001\n\013D" +
+      "escription\022\013\n\003url\030\001 \001(\t\022,\n\010original\030\002 \001(" +
+      "\0132\032.google.protobuf.BoolValue\022/\n\nimage_s" +
+      "ize\030\003 \001(\0132\033.google.protobuf.Int32Value\022." +
+      "\n\tfile_size\030\004 \001(\0132\033.google.protobuf.Int3" +
+      "2ValueB\037\n\033im.turms.turms.pojo.bo.fileP\001b" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

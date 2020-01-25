@@ -16,7 +16,7 @@ public final class UpdateRelationshipRequestOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_im_turms_proto_UpdateRelationshipRequest_descriptor;
-  static final
+  static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_im_turms_proto_UpdateRelationshipRequest_fieldAccessorTable;
 
@@ -28,16 +28,16 @@ public final class UpdateRelationshipRequestOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-            "\n;request/user/relationship/update_relat" +
-                    "ionship_request.proto\022\016im.turms.proto\032\036g" +
-                    "oogle/protobuf/wrappers.proto\"\320\001\n\031Update" +
-                    "RelationshipRequest\022\027\n\017related_user_id\030\001" +
-                    " \001(\003\022+\n\007blocked\030\002 \001(\0132\032.google.protobuf." +
-                    "BoolValue\0224\n\017new_group_index\030\003 \001(\0132\033.goo" +
-                    "gle.protobuf.Int32Value\0227\n\022delete_group_" +
-                    "index\030\004 \001(\0132\033.google.protobuf.Int32Value" +
-                    "B1\n-im.turms.turms.pojo.request.user.rel" +
-                    "ationshipP\001b\006proto3"
+      "\n;request/user/relationship/update_relat" +
+      "ionship_request.proto\022\016im.turms.proto\032\036g" +
+      "oogle/protobuf/wrappers.proto\"\320\001\n\031Update" +
+      "RelationshipRequest\022\027\n\017related_user_id\030\001" +
+      " \001(\003\022+\n\007blocked\030\002 \001(\0132\032.google.protobuf." +
+      "BoolValue\0224\n\017new_group_index\030\003 \001(\0132\033.goo" +
+      "gle.protobuf.Int32Value\0227\n\022delete_group_" +
+      "index\030\004 \001(\0132\033.google.protobuf.Int32Value" +
+      "B1\n-im.turms.turms.pojo.request.user.rel" +
+      "ationshipP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

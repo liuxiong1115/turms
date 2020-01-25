@@ -7,24 +7,20 @@ public interface AudioFileOrBuilder extends
     // @@protoc_insertion_point(interface_extends:im.turms.proto.AudioFile)
     com.google.protobuf.MessageOrBuilder {
 
-    /**
-     * <code>.im.turms.proto.AudioFile.Description description = 1;</code>
-     *
-     * @return Whether the description field is set.
-     */
-    boolean hasDescription();
-
-    /**
-     * <code>.im.turms.proto.AudioFile.Description description = 1;</code>
-     *
-     * @return The description.
-     */
-    im.turms.turms.pojo.bo.file.AudioFile.Description getDescription();
-
-    /**
-     * <code>.im.turms.proto.AudioFile.Description description = 1;</code>
-     */
-    im.turms.turms.pojo.bo.file.AudioFile.DescriptionOrBuilder getDescriptionOrBuilder();
+  /**
+   * <code>.im.turms.proto.AudioFile.Description description = 1;</code>
+   * @return Whether the description field is set.
+   */
+  boolean hasDescription();
+  /**
+   * <code>.im.turms.proto.AudioFile.Description description = 1;</code>
+   * @return The description.
+   */
+  im.turms.turms.pojo.bo.file.AudioFile.Description getDescription();
+  /**
+   * <code>.im.turms.proto.AudioFile.Description description = 1;</code>
+   */
+  im.turms.turms.pojo.bo.file.AudioFile.DescriptionOrBuilder getDescriptionOrBuilder();
 
   /**
    * <code>.google.protobuf.BytesValue data = 2;</code>

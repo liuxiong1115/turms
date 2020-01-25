@@ -7,24 +7,20 @@ public interface VideoFileOrBuilder extends
     // @@protoc_insertion_point(interface_extends:im.turms.proto.VideoFile)
     com.google.protobuf.MessageOrBuilder {
 
-    /**
-     * <code>.im.turms.proto.VideoFile.Description description = 1;</code>
-     *
-     * @return Whether the description field is set.
-     */
-    boolean hasDescription();
-
-    /**
-     * <code>.im.turms.proto.VideoFile.Description description = 1;</code>
-     *
-     * @return The description.
-     */
-    im.turms.turms.pojo.bo.file.VideoFile.Description getDescription();
-
-    /**
-     * <code>.im.turms.proto.VideoFile.Description description = 1;</code>
-     */
-    im.turms.turms.pojo.bo.file.VideoFile.DescriptionOrBuilder getDescriptionOrBuilder();
+  /**
+   * <code>.im.turms.proto.VideoFile.Description description = 1;</code>
+   * @return Whether the description field is set.
+   */
+  boolean hasDescription();
+  /**
+   * <code>.im.turms.proto.VideoFile.Description description = 1;</code>
+   * @return The description.
+   */
+  im.turms.turms.pojo.bo.file.VideoFile.Description getDescription();
+  /**
+   * <code>.im.turms.proto.VideoFile.Description description = 1;</code>
+   */
+  im.turms.turms.pojo.bo.file.VideoFile.DescriptionOrBuilder getDescriptionOrBuilder();
 
   /**
    * <code>.google.protobuf.BytesValue data = 2;</code>
