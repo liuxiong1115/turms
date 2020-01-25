@@ -17,18 +17,27 @@
 
 package im.turms.turms.pojo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.primitives.Longs;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @FieldNameConstants
 @NoArgsConstructor
-public class UserPermissionGroup {
+public class UserPermissionGroup implements IdentifiedDataSerializable {
     @Id
     private Long id;
 
@@ -46,5 +55,37 @@ public class UserPermissionGroup {
         this.ownedGroupLimit = ownedGroupLimit;
         this.ownedGroupLimitForEachGroupType = ownedGroupLimitForEachGroupType;
         this.groupTypeLimits = groupTypeLimits;
+    }
+
+    @JsonIgnore
+    @Override
+    public int getFactoryId() {
+        return IdentifiedDataFactory.FACTORY_ID;
+    }
+
+    @JsonIgnore
+    @Override
+    public int getClassId() {
+        return IdentifiedDataFactory.Type.DOMAIN_USER_PERMISSION_GROUP.getValue();
+    }
+
+    @Override
+    public void writeData(ObjectDataOutput out) throws IOException {
+        out.writeLong(id);
+        out.writeLongArray(Longs.toArray(creatableGroupTypeIds));
+        out.writeInt(ownedGroupLimit);
+        out.writeInt(ownedGroupLimitForEachGroupType);
+        IdentifiedDataFactory.writeMap(groupTypeLimits, out);
+    }
+
+    @Override
+    public void readData(ObjectDataInput in) throws IOException {
+        id = in.readLong();
+        creatableGroupTypeIds = Arrays.stream(in.readLongArray())
+                .boxed()
+                .collect(Collectors.toSet());
+        ownedGroupLimit = in.readInt();
+        ownedGroupLimitForEachGroupType = in.readInt();
+        groupTypeLimits = IdentifiedDataFactory.readMaps(in);
     }
 }

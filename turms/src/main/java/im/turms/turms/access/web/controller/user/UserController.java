@@ -63,6 +63,7 @@ public class UserController {
                 addUserDTO.getIntro(),
                 addUserDTO.getProfilePictureUrl(),
                 addUserDTO.getProfileAccess(),
+                addUserDTO.getPermissionGroupId(),
                 addUserDTO.getRegistrationDate(),
                 addUserDTO.getIsActive());
         return ResponseFactory.okIfTruthy(addUser);

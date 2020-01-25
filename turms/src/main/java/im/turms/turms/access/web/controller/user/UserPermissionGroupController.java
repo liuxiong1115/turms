@@ -29,6 +29,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import static im.turms.turms.constant.AdminPermission.*;
@@ -47,12 +49,16 @@ public class UserPermissionGroupController {
     @PostMapping
     @RequiredPermission(USER_PERMISSION_GROUP_CREATE)
     public Mono<ResponseEntity<ResponseDTO<UserPermissionGroup>>> addUserPermissionGroup(@RequestBody AddUserPermissionGroupDTO addUserPermissionGroupDTO) {
+        Set<Long> creatableGroupTypesIds = addUserPermissionGroupDTO.getCreatableGroupTypeIds();
+        creatableGroupTypesIds = creatableGroupTypesIds != null ? creatableGroupTypesIds : Collections.emptySet();
+        Map<Long, Integer> groupTypeLimits = addUserPermissionGroupDTO.getGroupTypeLimits();
+        groupTypeLimits = groupTypeLimits != null ? groupTypeLimits : Collections.emptyMap();
         Mono<UserPermissionGroup> userPermissionGroupMono = userPermissionGroupService.addUserPermissionGroup(
                 addUserPermissionGroupDTO.getId(),
-                addUserPermissionGroupDTO.getCreatableGroupTypeIds(),
+                creatableGroupTypesIds,
                 addUserPermissionGroupDTO.getOwnedGroupLimit(),
                 addUserPermissionGroupDTO.getOwnedGroupLimitForEachGroupType(),
-                addUserPermissionGroupDTO.getGroupTypeLimits());
+                groupTypeLimits);
         return ResponseFactory.okIfTruthy(userPermissionGroupMono);
     }
 

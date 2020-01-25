@@ -40,6 +40,8 @@ public class AddUserDTO {
 
     private ProfileAccessStrategy profileAccess;
 
+    private Long permissionGroupId;
+
     private Date registrationDate;
 
     private Boolean isActive;
