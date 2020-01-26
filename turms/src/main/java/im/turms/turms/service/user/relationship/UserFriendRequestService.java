@@ -173,7 +173,7 @@ public class UserFriendRequestService {
                             if (requestExists != null && !requestExists) {
                                 return createFriendRequest(null, requesterId, recipientId, content, RequestStatus.PENDING, creationDate, null, null, null);
                             } else {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED));
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FRIEND_REQUEST_HAS_EXISTED));
                             }
                         });
                     } else {
