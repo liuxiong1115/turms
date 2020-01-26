@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 @Component
-public class TrivialTimerService {
+public class TrivialTaskService {
 
     Map<String, ScheduledFuture<?>> scheduledFutureMap;
 
     TaskScheduler taskScheduler;
 
-    public TrivialTimerService() {
+    public TrivialTaskService() {
         scheduledFutureMap = new HashMap<>();
         taskScheduler = new ConcurrentTaskScheduler();
     }
