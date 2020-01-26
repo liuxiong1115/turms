@@ -379,7 +379,6 @@ public class OnlineUserService {
         return userLoginLogService.save(userId, ip, usingDeviceType, deviceDetails, locationId);
     }
 
-    // TODO: Provide a threshold to avoid setting users offline when the servers are unstable instantaneously.
     public Mono<TurmsStatusCode> addOnlineUser(
             @NotNull Long userId,
             @NotNull UserStatus userStatus,
