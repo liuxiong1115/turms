@@ -701,7 +701,10 @@ public class GroupMemberService {
                         GroupMember member = members.get(i);
                         UserOnlineInfo info = (UserOnlineInfo) results[i];
                         im.turms.turms.pojo.bo.group.GroupMember groupMember = ProtoUtil
-                                .userOnlineInfo2groupMember(member.getKey().getUserId(), info)
+                                .userOnlineInfo2groupMember(
+                                        member.getKey().getUserId(),
+                                        info,
+                                        turmsClusterManager.getTurmsProperties().getUser().isShouldRespondOfflineIfInvisible())
                                 .build();
                         builder.addGroupMembers(groupMember);
                     }

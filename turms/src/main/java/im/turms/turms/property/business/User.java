@@ -49,6 +49,9 @@ public class User implements IdentifiedDataSerializable {
     @Description("Whether to use the operating system class as the device type instead of the agent class")
     private boolean shouldUseOsAsDefaultDeviceType = true;
     @JsonView(MutablePropertiesView.class)
+    @Description("Whether to respond to client with the OFFLINE status if a user is in INVISIBLE status")
+    private boolean shouldRespondOfflineIfInvisible = false;
+    @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete the two-sided relationships when a user requests to delete a relationship")
     private boolean shouldDeleteTwoSidedRelationships = false;
     //TODO

@@ -178,7 +178,10 @@ public class WsUserController {
                     .map(infos -> {
                         for (int i = 0; i < usersIds.size(); i++) {
                             statusesBuilder.addUserStatuses(ProtoUtil
-                                    .userOnlineInfo2userStatus(usersIds.get(i), (UserOnlineInfo) infos[i])
+                                    .userOnlineInfo2userStatus(
+                                            usersIds.get(i),
+                                            (UserOnlineInfo) infos[i],
+                                            turmsClusterManager.getTurmsProperties().getUser().isShouldRespondOfflineIfInvisible())
                                     .build());
                         }
                         return RequestResult.responseData(TurmsNotification.Data.newBuilder()
