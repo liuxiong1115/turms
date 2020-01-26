@@ -42,7 +42,7 @@ public class GroupService {
             @Nullable String profilePictureUrl,
             @Nullable Integer minimumScore,
             @Nullable Date muteEndDate,
-            @Nullable Integer groupTypeId) {
+            @Nullable Long groupTypeId) {
         Validator.throwIfAnyFalsy(name);
         return this.turmsClient.getDriver()
                 .send(CreateGroupRequest.newBuilder(), MapUtil.of(
@@ -157,7 +157,7 @@ public class GroupService {
             @Nullable String question,
             @Nullable List<String> answers,
             @Nullable Integer score) {
-        if (Validator.areAllFalsy(question, answers, score)) {
+        if (Validator.areAllNull(question, answers, score)) {
             return CompletableFuture.completedFuture(null);
         }
         return turmsClient.getDriver()
@@ -329,7 +329,7 @@ public class GroupService {
             @Nullable String name,
             @Nullable GroupMemberRole role,
             @Nullable Date muteEndDate) {
-        if (Validator.areAllFalsy(name, role, muteEndDate)) {
+        if (Validator.areAllNull(name, role, muteEndDate)) {
             return CompletableFuture.completedFuture(null);
         }
         return turmsClient.getDriver()
@@ -346,7 +346,7 @@ public class GroupService {
             long groupId,
             long memberId,
             @NotNull Date muteEndDate) {
-        Validator.throwIfAnyFalsy(groupId, memberId, muteEndDate);
+        Validator.throwIfAnyFalsy(muteEndDate);
         return this.updateGroupMemberInfo(groupId, memberId, null, null, muteEndDate);
     }
 

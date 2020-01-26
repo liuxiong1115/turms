@@ -331,21 +331,23 @@ public class WsMessageController {
         return messageService.isMessageSentToUser(messageId, userId)
                 .flatMap(authenticated -> {
                     if (authenticated != null && authenticated) {
-                        Date date;
-                        if (turmsClusterManager.getTurmsProperties().getMessage()
-                                .getReadReceipt().isUseServerTime()) {
-                            date = new Date();
-                        } else {
-                            date = readDate;
+                        Date date = null;
+                        if (readDate != null) {
+                            if (turmsClusterManager.getTurmsProperties().getMessage()
+                                    .getReadReceipt().isUseServerTime()) {
+                                date = new Date();
+                            } else {
+                                date = readDate;
+                            }
                         }
-                        if (turmsClusterManager.getTurmsProperties().getMessage()
-                                .isShouldDeletePrivateMessageAfterAcknowledged()) {
-                            return messageService.deleteMessage(messageId, true, false);
-                        } else {
-                            return messageStatusService.updateMessagesReadDate(
-                                    messageId,
-                                    date);
-                        }
+//                        if (turmsClusterManager.getTurmsProperties().getMessage()
+//                                .isShouldDeletePrivateMessageAfterAcknowledged()) { //TODO: bug
+//                            return messageService.deleteMessage(messageId, true, false);
+//                        } else {
+                        return messageStatusService.updateMessagesReadDate(
+                                messageId,
+                                date);
+//                        }
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
