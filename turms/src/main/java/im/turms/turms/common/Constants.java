@@ -55,7 +55,6 @@ public class Constants {
     public static final String EXPIRED_GROUP_INVITATIONS_CLEANER_CRON = "0 15 2 * * ?";
     public static final String EXPIRED_GROUP_JOIN_REQUESTS_CLEANER_CRON = "0 30 2 * * ?";
     public static final String EXPIRED_MESSAGES_CLEANER_CRON = "0 45 2 * * ?";
-    public static final String ONLINE_USERS_NUMBER_PERSISTER_CRON = "0 0/5 * * * ?";
 
     public static final String ACCOUNT = "account";
     public static final String PASSWORD = "password";

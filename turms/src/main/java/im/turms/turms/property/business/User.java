@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import im.turms.turms.annotation.constraint.CronConstraint;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
@@ -40,11 +41,10 @@ public class User implements IdentifiedDataSerializable {
     private SimultaneousLogin simultaneousLogin = new SimultaneousLogin();
     @Valid
     private FriendRequest friendRequest = new FriendRequest();
-    //TODO
     @JsonView(MutablePropertiesView.class)
-    @Description("The inverval to log online users' number")
-    @Min(1)
-    private int logOnlineUsersNumberIntervalSeconds = 60 * 5;
+    @Description("The cron expression to specify the time to log online users' number")
+    @CronConstraint
+    public String onlineUsersNumberPersisterCron = "0 0/5 * * * ?";
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to use the operating system class as the device type instead of the agent class")
     private boolean shouldUseOsAsDefaultDeviceType = true;
@@ -76,7 +76,7 @@ public class User implements IdentifiedDataSerializable {
         location.writeData(out);
         simultaneousLogin.writeData(out);
         friendRequest.writeData(out);
-        out.writeInt(logOnlineUsersNumberIntervalSeconds);
+        out.writeUTF(onlineUsersNumberPersisterCron);
         out.writeBoolean(shouldUseOsAsDefaultDeviceType);
         out.writeBoolean(shouldDeleteTwoSidedRelationships);
         out.writeBoolean(shouldDeleteUserLogically);
@@ -87,7 +87,7 @@ public class User implements IdentifiedDataSerializable {
         location.readData(in);
         simultaneousLogin.readData(in);
         friendRequest.readData(in);
-        logOnlineUsersNumberIntervalSeconds = in.readInt();
+        onlineUsersNumberPersisterCron = in.readUTF();
         shouldUseOsAsDefaultDeviceType = in.readBoolean();
         shouldDeleteTwoSidedRelationships = in.readBoolean();
         shouldDeleteUserLogically = in.readBoolean();

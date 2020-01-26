@@ -24,6 +24,7 @@ import com.hazelcast.cluster.Member;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
+import im.turms.turms.common.TrivialTaskService;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
@@ -34,6 +35,7 @@ import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
 import im.turms.turms.pojo.domain.UserLoginLog;
 import im.turms.turms.pojo.domain.UserOnlineUserNumber;
+import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserLocationService;
 import im.turms.turms.service.user.UserLoginLogService;
 import im.turms.turms.task.*;
@@ -41,7 +43,6 @@ import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.socket.CloseStatus;
@@ -64,12 +65,12 @@ import java.util.stream.Collectors;
 
 import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
 import static im.turms.turms.common.Constants.ALL_DEVICE_TYPES;
-import static im.turms.turms.common.Constants.ONLINE_USERS_NUMBER_PERSISTER_CRON;
 
 @Service
 @Validated
 public class OnlineUserService {
     private static final int DEFAULT_ONLINE_USERS_MANAGER_CAPACITY = 1024;
+    private static final String LOG_ONLINE_USERS_NUMBER_TASK = "loun";
     private static final UserLocation EMPTY_USER_LOCATION = new UserLocation();
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
@@ -77,7 +78,8 @@ public class OnlineUserService {
     private final UsersNearbyService usersNearbyService;
     private final UserLoginLogService userLoginLogService;
     private final UserLocationService userLocationService;
-    private final HashedWheelTimer timer;
+    private final HashedWheelTimer heartbeatTimer;
+    private final TrivialTaskService onlineUsersNumberPersisterTimer;
     private final TurmsTaskExecutor turmsTaskExecutor;
     /**
      * Integer(Slot) -> Long(userId) -> OnlineUserManager
@@ -94,7 +96,9 @@ public class OnlineUserService {
             ReactiveMongoTemplate mongoTemplate,
             UserLoginLogService userLoginLogService,
             UserLocationService userLocationService,
-            TurmsTaskExecutor turmsTaskExecutor, TurmsPluginManager turmsPluginManager) {
+            TurmsTaskExecutor turmsTaskExecutor,
+            TurmsPluginManager turmsPluginManager,
+            TrivialTaskService trivialTaskService) {
         this.turmsClusterManager = turmsClusterManager;
         this.usersNearbyService = usersNearbyService;
         turmsClusterManager.addListenerOnMembersChange(
@@ -107,21 +111,24 @@ public class OnlineUserService {
         this.userLocationService = userLocationService;
         this.turmsTaskExecutor = turmsTaskExecutor;
         this.turmsPluginManager = turmsPluginManager;
-        this.timer = new HashedWheelTimer();
+        this.heartbeatTimer = new HashedWheelTimer();
+        this.onlineUsersNumberPersisterTimer = trivialTaskService;
         this.disconnectionReasonCache = Caffeine
                 .newBuilder()
                 .expireAfterWrite(Duration.ofMinutes(10))
                 .build();
         this.onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
+        rescheduleOnlineUsersNumberPersister();
+        TurmsProperties.addListeners(turmsProperties -> {
+            rescheduleOnlineUsersNumberPersister();
+            return null;
+        });
     }
 
-    @Scheduled(cron = ONLINE_USERS_NUMBER_PERSISTER_CRON)
-    public void onlineUsersNumberPersister() {
-        if (turmsClusterManager.isCurrentMemberMaster()) {
-            countOnlineUsers()
-                    .flatMap(this::saveOnlineUsersNumber)
-                    .subscribe();
-        }
+    private void rescheduleOnlineUsersNumberPersister() {
+        onlineUsersNumberPersisterTimer.reschedule(LOG_ONLINE_USERS_NUMBER_TASK,
+                turmsClusterManager.getTurmsProperties().getUser().getOnlineUsersNumberPersisterCron(),
+                this::checkAndSaveOnlineUsersNumber);
     }
 
     public void setAllLocalUsersOffline(@NotNull CloseStatus closeStatus) {
@@ -342,10 +349,18 @@ public class OnlineUserService {
     }
 
     private Timeout newHeartbeatTimeout(@NotNull Long userId, @NotNull @DeviceTypeConstraint DeviceType deviceType) {
-        return timer.newTimeout(
+        return heartbeatTimer.newTimeout(
                 timeout -> setLocalUserDeviceOffline(userId, deviceType, CloseStatus.GOING_AWAY),
                 turmsClusterManager.getTurmsProperties().getSession().getRequestHeartbeatTimeoutSeconds(),
                 TimeUnit.SECONDS);
+    }
+
+    public void checkAndSaveOnlineUsersNumber() {
+        if (turmsClusterManager.isCurrentMemberMaster()) {
+            countOnlineUsers()
+                    .flatMap(this::saveOnlineUsersNumber)
+                    .subscribe();
+        }
     }
 
     public Mono<UserOnlineUserNumber> saveOnlineUsersNumber(@NotNull Integer onlineUsersNumber) {
