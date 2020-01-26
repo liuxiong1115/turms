@@ -277,6 +277,7 @@ public class MessageService {
             @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Long senderId,
             @NotNull Long targetId,
+            @Nullable Set<Long> auxiliaryMemberIds,
             @Nullable ReactiveMongoOperations operations) {
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         switch (chatType) {
@@ -290,11 +291,16 @@ public class MessageService {
                         MessageDeliveryStatus.READY);
                 return mongoOperations.save(messageStatus).thenReturn(true);
             case GROUP:
-                return groupMemberService
-                        .queryGroupMembersIds(targetId)
-                        .collect(Collectors.toSet())
+                Mono<Set<Long>> memberIdsMono;
+                if (auxiliaryMemberIds != null) {
+                    memberIdsMono = Mono.just(auxiliaryMemberIds);
+                } else {
+                    memberIdsMono = groupMemberService
+                            .queryGroupMembersIds(targetId)
+                            .collect(Collectors.toSet());
+                }
+                return memberIdsMono
                         .flatMap(membersIds -> {
-                            //TODO: duplicated query for membersIds
                             if (membersIds.isEmpty()) {
                                 return Mono.just(true);
                             }
@@ -325,7 +331,8 @@ public class MessageService {
             @Nullable List<byte[]> records,
             @Nullable @Min(0) Integer burnAfter,
             @Nullable @PastOrPresent Date deliveryDate,
-            @Nullable Long referenceId) {
+            @Nullable Long referenceId,
+            @Nullable Set<Long> auxiliaryMemberIds) {
         Validator.throwIfAllFalsy(text, records);
         if (turmsClusterManager.getTurmsProperties().getMessage().getTimeType()
                 != im.turms.turms.property.business.Message.TimeType.CLIENT_TIME
@@ -356,6 +363,7 @@ public class MessageService {
                                 chatType,
                                 senderId,
                                 targetId,
+                                auxiliaryMemberIds,
                                 operations))
                         .map(Tuple2::getT1))
                 .retryWhen(TRANSACTION_RETRY)
@@ -773,7 +781,7 @@ public class MessageService {
                             Mono<Message> saveMono;
                             if (messageStatusPersistent) {
                                 saveMono = saveMessageAndMessagesStatus(messageId, senderId, targetId, chatType,
-                                        isSystemMessage, text, records, burnAfter, deliveryDate, referenceId);
+                                        isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, recipientsIds);
                             } else {
                                 saveMono = saveMessage(null, senderId, targetId, chatType,
                                         isSystemMessage, text, records, burnAfter, deliveryDate,
@@ -811,7 +819,7 @@ public class MessageService {
     }
 
     public Mono<Boolean> sendMessage(
-            boolean shouldSent,
+            boolean shouldSend,
             @Nullable Long messageId,
             @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Boolean isSystemMessage,
@@ -841,7 +849,7 @@ public class MessageService {
         message.setTargetId(targetId);
         message.setBurnAfter(burnAfter);
         message.setReferenceId(referenceId);
-        if (shouldSent) {
+        if (shouldSend) {
             return authAndSendMessage(
                     messageId,
                     senderId,
@@ -873,7 +881,7 @@ public class MessageService {
         } else {
             if (turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent()) {
                 return saveMessageAndMessagesStatus(messageId, senderId, targetId, chatType,
-                        isSystemMessage, text, records, burnAfter, deliveryDate, null)
+                        isSystemMessage, text, records, burnAfter, deliveryDate, null, null)
                         .thenReturn(true);
             } else {
                 return saveMessage(null, senderId, targetId, chatType,

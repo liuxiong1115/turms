@@ -46,7 +46,6 @@ public class OutboundMessageService {
         this.turmsClusterManager = turmsClusterManager;
     }
 
-    //TODO: separate the logic
     public Mono<Boolean> relayClientMessageToClient(
             @Nullable WebSocketMessage clientMessage,
             @Nullable byte[] clientMessageBytes,
@@ -57,32 +56,48 @@ public class OutboundMessageService {
         }
         boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(recipientId);
         if (responsible) {
-            OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(recipientId);
-            if (onlineUserManager != null) {
-                if (clientMessage == null) {
-                    List<WebSocketSession> sessions = onlineUserManager.getWebSocketSessions();
-                    if (!sessions.isEmpty()) {
-                        WebSocketSession session = sessions.get(0);
-                        clientMessage = session.binaryMessage(dataBufferFactory ->
-                                dataBufferFactory.wrap(clientMessageBytes));
-                    } else {
-                        return Mono.just(true);
-                    }
-                }
-                List<FluxSink<WebSocketMessage>> outputSinks = onlineUserManager.getOutputSinks();
-                for (FluxSink<WebSocketMessage> recipientSink : outputSinks) {
-                    recipientSink.next(clientMessage);
-                }
-                return Mono.just(true);
-            }
+            return relayClientMessageToLocalClient(clientMessage, clientMessageBytes, recipientId);
         } else if (isRelayable) {
-            Member member = turmsClusterManager.getMemberByUserId(recipientId);
-            if (member != null) {
-                DeliveryUserMessageTask task = new DeliveryUserMessageTask(clientMessageBytes, recipientId);
-                Future<Boolean> future = turmsClusterManager.getExecutor()
-                        .submitToMember(task, member);
-                return ReactorUtil.future2Mono(future);
+            return relayClientMessageToRemoteClient(clientMessageBytes, recipientId);
+        }
+        return Mono.just(false);
+    }
+
+
+    public Mono<Boolean> relayClientMessageToLocalClient(
+            @Nullable WebSocketMessage clientMessage,
+            @Nullable byte[] clientMessageBytes,
+            @NotNull Long recipientId) {
+        OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(recipientId);
+        if (onlineUserManager != null) {
+            if (clientMessage == null) {
+                List<WebSocketSession> sessions = onlineUserManager.getWebSocketSessions();
+                if (!sessions.isEmpty()) {
+                    WebSocketSession session = sessions.get(0);
+                    clientMessage = session.binaryMessage(dataBufferFactory ->
+                            dataBufferFactory.wrap(clientMessageBytes));
+                } else {
+                    return Mono.just(true);
+                }
             }
+            List<FluxSink<WebSocketMessage>> outputSinks = onlineUserManager.getOutputSinks();
+            for (FluxSink<WebSocketMessage> recipientSink : outputSinks) {
+                recipientSink.next(clientMessage);
+            }
+            return Mono.just(true);
+        }
+        return Mono.just(false);
+    }
+
+    public Mono<Boolean> relayClientMessageToRemoteClient(
+            @Nullable byte[] clientMessageBytes,
+            @NotNull Long recipientId) {
+        Member member = turmsClusterManager.getMemberByUserId(recipientId);
+        if (member != null) {
+            DeliveryUserMessageTask task = new DeliveryUserMessageTask(clientMessageBytes, recipientId);
+            Future<Boolean> future = turmsClusterManager.getExecutor()
+                    .submitToMember(task, member);
+            return ReactorUtil.future2Mono(future);
         }
         return Mono.just(false);
     }
