@@ -122,7 +122,7 @@ public class InboundMessageDispatcher {
                         if (requesterId != null) {
                             builder.setRequesterId(Int64Value.newBuilder().setValue(requesterId).build());
                         }
-                        dataInBytes[0] = builder.buildPartial().toByteArray();
+                        dataInBytes[0] = builder.build().toByteArray();
                         return dataBufferFactory.wrap(dataInBytes[0]);
                     });
             boolean onlyOneRecipient = requestResult.getRecipients().size() == 1;
@@ -136,6 +136,7 @@ public class InboundMessageDispatcher {
             } else {
                 List<Mono<Boolean>> monos = new LinkedList<>();
                 for (Long recipientId : requestResult.getRecipients()) {
+                    messagesForRecipients.retain();
                     Mono<Boolean> mono = outboundMessageService.relayClientMessageToClient(
                             messagesForRecipients,
                             dataInBytes[0],
@@ -145,6 +146,7 @@ public class InboundMessageDispatcher {
                 }
                 return Mono.zip(monos, results -> results)
                         .map(results -> {
+                            messagesForRecipients.retain();
                             for (Object result : results) {
                                 if (!(boolean) result) {
                                     return false;

@@ -187,8 +187,6 @@ public class TurmsDriver {
                                         } else {
                                             future.complete(notification);
                                         }
-                                    } else {
-                                        TurmsLogger.logger.log(Level.WARNING, "Unknown request ID: {}", requestId);
                                     }
                                     if (onMessage != null) {
                                         onMessage.apply(notification);
@@ -201,9 +199,7 @@ public class TurmsDriver {
                         @Override
                         public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
                             webSocket.request(1);
-                            if (statusCode == WebSocket.NORMAL_CLOSURE) {
-                                onWebsocketClose(statusCode, reason);
-                            }
+                            onWebsocketClose(statusCode, reason);
                             return null;
                         }
 

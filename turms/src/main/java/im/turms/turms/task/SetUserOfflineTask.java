@@ -26,7 +26,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.reactive.socket.CloseStatus;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Set;

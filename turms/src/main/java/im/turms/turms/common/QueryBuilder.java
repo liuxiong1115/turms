@@ -24,6 +24,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Date;
@@ -127,25 +128,21 @@ public class QueryBuilder {
         }
     }
 
-    public Query paginateIfNotNull(@Nullable Integer page, @Nullable Integer size, @Nullable Sort.Direction direction) {
-        if (direction == null) {
-            return paginateIfNotNull(page, size);
-        } else {
-            if (size != null) {
-                buildReadyCriteria();
-                Query query;
-                if (finalCriteria != null) {
-                    query = new Query(finalCriteria);
-                } else {
-                    query = new Query();
-                }
-                if (page == null) {
-                    page = 0;
-                }
-                return query.with(PageRequest.of(page, size, direction));
+    public Query paginateIfNotNull(@Nullable Integer page, @Nullable Integer size, @NotNull Sort.Direction direction, @NotEmpty String... properties) {
+        if (size != null) {
+            buildReadyCriteria();
+            Query query;
+            if (finalCriteria != null) {
+                query = new Query(finalCriteria);
             } else {
-                return buildQuery();
+                query = new Query();
             }
+            if (page == null) {
+                page = 0;
+            }
+            return query.with(PageRequest.of(page, size, direction, properties));
+        } else {
+            return buildQuery();
         }
     }
 
