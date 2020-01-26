@@ -24,8 +24,6 @@ import im.turms.turms.constant.DeviceType;
 import im.turms.turms.exception.TurmsBusinessException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler;
 import reactor.core.publisher.Mono;
 import reactor.retry.Retry;
 
@@ -44,7 +42,6 @@ public class Constants {
     public static final String ID_OWNER_ID = "_id.ownerId";
     public static final String ID_RELATED_USER_ID = "_id.relatedUserId";
     public static final String ID_GROUP_INDEX = "_id.groupIndex";
-    public static final String ID_GROUP_TYPE_ID = "_id.groupTypeId";
     public static final String ID_INDEX = "_id.index";
     public static final String ID_MESSAGE_ID = "_id.messageId";
     public static final String ID_RECIPIENT_ID = "_id.recipientId";
@@ -90,7 +87,6 @@ public class Constants {
             .retryMax(MONGO_TRANSACTION_RETRIES_NUMBER)
             .fixedBackoff(MONGO_TRANSACTION_BACKOFF);
 
-    public static final TaskScheduler TASK_SCHEDULER = new DefaultManagedTaskScheduler();
     public static final ObjectMapper MAPPER = new ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     public static final TypeReference<HashMap<String, Object>> TYPE_REF_MAP = new TypeReference<>() {
