@@ -23,6 +23,7 @@ import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
+import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.property.business.User;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -57,6 +58,10 @@ public class UserSimultaneousLoginService {
                 .getUser()
                 .getSimultaneousLogin()
                 .getStrategy());
+        TurmsProperties.addListeners(turmsProperties -> {
+            applyStrategy(turmsProperties.getUser().getSimultaneousLogin().getStrategy());
+            return null;
+        });
     }
 
     public Mono<Boolean> setConflictedDevicesOffline(
