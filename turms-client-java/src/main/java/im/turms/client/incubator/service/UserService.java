@@ -71,7 +71,7 @@ public class UserService {
         return turmsClient.getDriver().disconnect();
     }
 
-    public CompletableFuture<Void> updateUserOnlineStatus(UserStatus onlineStatus) {
+    public CompletableFuture<Void> updateUserOnlineStatus(@NotNull UserStatus onlineStatus) {
         Validator.throwIfAnyFalsy(onlineStatus);
         if (onlineStatus == UserStatus.OFFLINE) {
             return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
@@ -95,7 +95,7 @@ public class UserService {
             @Nullable String intro,
             @Nullable String profilePictureUrl,
             @Nullable ProfileAccessStrategy profileAccessStrategy) {
-        if (Validator.areAllFalsy(name, intro, profilePictureUrl, profileAccessStrategy)) {
+        if (Validator.areAllNull(name, intro, profilePictureUrl, profileAccessStrategy)) {
             return CompletableFuture.completedFuture(null);
         }
         return turmsClient.getDriver()
@@ -117,7 +117,6 @@ public class UserService {
     public CompletableFuture<UserInfoWithVersion> queryUserProfile(
             long userId,
             @Nullable Date lastUpdatedDate) {
-        Validator.throwIfAnyFalsy(userId);
         return turmsClient.getDriver()
                 .send(QueryUserProfileRequest.newBuilder(), MapUtil.of(
                         "user_id", userId,
@@ -144,7 +143,6 @@ public class UserService {
             float longitude,
             @Nullable Integer distance,
             @Nullable Integer maxNumber) {
-        Validator.throwIfAnyFalsy(latitude, longitude);
         return turmsClient.getDriver()
                 .send(QueryUsersInfosNearbyRequest.newBuilder(), MapUtil.of(
                         "latitude", latitude,

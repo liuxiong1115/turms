@@ -198,13 +198,23 @@ public class MessageService {
                         if (messageIds != null) {
                             ids.retainAll(messageIds);
                         }
-                        Query query = builder.add(Criteria.where(ID).in(ids))
-                                .paginateIfNotNull(page, size, finalDirection);
+                        builder.add(Criteria.where(ID).in(ids));
+                        Query query;
+                        if (finalDirection != null) {
+                            query = builder.paginateIfNotNull(page, size, finalDirection, Message.Fields.deliveryDate);
+                        } else {
+                            query = builder.paginateIfNotNull(page, size);
+                        }
                         return mongoTemplate.find(query, Message.class);
                     });
         } else {
             builder.addInIfNotNull(ID, messageIds);
-            Query query = builder.paginateIfNotNull(page, size, direction);
+            Query query;
+            if (direction != null) {
+                query = builder.paginateIfNotNull(page, size, direction, Message.Fields.deliveryDate);
+            } else {
+                query = builder.paginateIfNotNull(page, size);
+            }
             return mongoTemplate.find(query, Message.class);
         }
     }
@@ -396,7 +406,7 @@ public class MessageService {
                                 return mongoTemplate.inTransaction()
                                         .execute(operations -> operations.remove(messagesQuery, Message.class)
                                                 .then(operations.remove(messagesStatusesQuery, MessageStatus.class)
-                                                .thenReturn(true)))
+                                                        .thenReturn(true)))
                                         .retryWhen(TRANSACTION_RETRY)
                                         .singleOrEmpty();
                             } else {
@@ -782,13 +792,14 @@ public class MessageService {
      */
     public Mono<Pair<Long, Set<Long>>> authAndCloneAndSendMessage(
             @NotNull Long requesterId,
-            @NotNull Long messageId,
+            @NotNull Long referenceId,
             @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Boolean isSystemMessage,
             @NotNull Long targetId) {
-        return queryMessage(messageId)
+        return queryMessage(referenceId)
                 .flatMap(message -> authAndSendMessage(
-                        messageId, requesterId,
+                        turmsClusterManager.generateRandomId(),
+                        requesterId,
                         targetId,
                         chatType,
                         isSystemMessage,
@@ -796,7 +807,7 @@ public class MessageService {
                         message.getRecords(),
                         message.getBurnAfter(),
                         message.getDeliveryDate(),
-                        messageId));
+                        referenceId));
     }
 
     public Mono<Boolean> sendMessage(
