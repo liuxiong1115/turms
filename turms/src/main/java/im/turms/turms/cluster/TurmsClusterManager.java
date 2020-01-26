@@ -217,6 +217,7 @@ public class TurmsClusterManager {
 
     public void updateProperties(@NotNull TurmsProperties properties) {
         sharedProperties.put(SharedPropertiesKey.TURMS_PROPERTIES, properties);
+        TurmsProperties.notifyListeners(properties);
     }
 
     private EntryAdapter<SharedPropertiesKey, Object> sharedPropertiesEntryListener() {

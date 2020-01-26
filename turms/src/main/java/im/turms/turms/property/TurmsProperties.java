@@ -45,8 +45,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ConfigurationProperties(prefix = "turms")
@@ -58,7 +60,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
             .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
             .writerWithView(MutablePropertiesView.class);
-
+    public static final List<Function<TurmsProperties, Void>> propertiesChangeListeners = new LinkedList<>();
     // Env
 
     @JsonView(MutablePropertiesView.class)
@@ -162,6 +164,16 @@ public class TurmsProperties implements IdentifiedDataSerializable {
             @NotNull Map<String, Object> metadata) {
         properties = MapUtil.addValueKeyToAllLeaves(properties);
         return MapUtil.deepMerge(properties, metadata);
+    }
+
+    public static void addListeners(Function<TurmsProperties, Void> listener) {
+        propertiesChangeListeners.add(listener);
+    }
+
+    public static void notifyListeners(TurmsProperties properties) {
+        for (Function<TurmsProperties, Void> listener : propertiesChangeListeners) {
+            listener.apply(properties);
+        }
     }
 
     public static Map<String, Object> getPropertiesMap(TurmsProperties turmsProperties, boolean mutable) throws IOException {

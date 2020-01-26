@@ -24,7 +24,6 @@ import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.exception.TurmsBusinessException;
 import im.turms.turms.pojo.dto.ResponseDTO;
 import im.turms.turms.property.TurmsProperties;
-import im.turms.turms.service.user.UserSimultaneousLoginService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,11 +37,9 @@ import static im.turms.turms.constant.AdminPermission.*;
 @RequestMapping("/cluster")
 public class ClusterController {
     private final TurmsClusterManager turmsClusterManager;
-    private final UserSimultaneousLoginService userSimultaneousLoginService;
 
-    public ClusterController(TurmsClusterManager turmsClusterManager, UserSimultaneousLoginService userSimultaneousLoginService) {
+    public ClusterController(TurmsClusterManager turmsClusterManager) {
         this.turmsClusterManager = turmsClusterManager;
-        this.userSimultaneousLoginService = userSimultaneousLoginService;
     }
 
     @GetMapping("/hazelcast-info")
@@ -105,8 +102,6 @@ public class ClusterController {
                         turmsClusterManager.getTurmsProperties(),
                         turmsProperties);
                 turmsClusterManager.updateProperties(mergedProperties);
-                userSimultaneousLoginService.applyStrategy(
-                        mergedProperties.getUser().getSimultaneousLogin().getStrategy());
                 return ResponseFactory.okIfTruthy(mergedProperties);
             } else {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
