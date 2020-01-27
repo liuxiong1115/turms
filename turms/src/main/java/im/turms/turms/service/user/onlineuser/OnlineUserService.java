@@ -598,7 +598,7 @@ public class OnlineUserService {
         if (onlineUserManager != null) {
             Date now = new Date();
             UserLocation location = new UserLocation(
-                    null,
+                    turmsClusterManager.generateRandomId(),
                     userId,
                     longitude,
                     latitude,

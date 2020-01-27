@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
@@ -106,7 +107,7 @@ public class UsersNearbyService {
             tree.delete(userId, deletePoint);
         }
         tree = tree.add(userId, point);
-        this.userLocations.put(userId, new UserLocation(userId, longitude, latitude, date));
+        this.userLocations.put(userId, new UserLocation(turmsClusterManager.generateRandomId(), userId, longitude, latitude, date));
     }
 
     /**
@@ -159,7 +160,13 @@ public class UsersNearbyService {
             @Nullable Double maxDistance) {
         return queryUsersIdsNearby(userId, deviceType, maxPeopleNumber, maxDistance)
                 .collect(Collectors.toSet())
-                .flatMapMany(ids -> userService.queryUsersProfiles(ids, false));
+                .flatMapMany(ids -> {
+                    if (ids.isEmpty()) {
+                        return Mono.empty();
+                    } else {
+                        return userService.queryUsersProfiles(ids, false);
+                    }
+                });
     }
 
     public Flux<Long> queryUsersIdsNearby(
@@ -184,20 +191,17 @@ public class UsersNearbyService {
             }
             Double finalMaxDistance = maxDistance;
             Integer finalMaxPeopleNumber = maxNumber;
-            PointFloat currentUserPosition = PointFloat.create(longitude, latitude);
             return turmsTaskExecutor.callAll(new QueryNearestUsersTask(
-                    currentUserPosition,
+                    longitude,
+                    latitude,
                     maxDistance,
                     maxNumber), Duration.ofSeconds(30))
                     .collectList()
-                    .flatMapMany(entries -> {
-                        Iterable<Entry<Long, PointFloat>> result = getNearestPoints(
-                                currentUserPosition,
-                                entries,
-                                finalMaxDistance,
-                                finalMaxPeopleNumber);
-                        return Flux.fromIterable(result);
-                    })
+                    .flatMapMany(entries -> Flux.fromIterable(getNearestPoints(
+                            PointFloat.create(longitude, latitude),
+                            entries,
+                            finalMaxDistance,
+                            finalMaxPeopleNumber)))
                     .map(Entry::value);
         } else {
             return Flux.empty();

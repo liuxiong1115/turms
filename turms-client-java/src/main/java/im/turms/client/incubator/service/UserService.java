@@ -164,7 +164,6 @@ public class UserService {
 
     public CompletableFuture<UserRelationshipsWithVersion> queryRelationships(
             @Nullable List<Long> relatedUsersIds,
-            @Nullable Boolean isRelatedUsers,
             @Nullable Boolean isBlocked,
             @Nullable Integer groupIndex,
             @Nullable Date lastUpdatedDate) {
@@ -192,13 +191,13 @@ public class UserService {
     public CompletableFuture<UserRelationshipsWithVersion> queryFriends(
             @Nullable Integer groupIndex,
             @Nullable Date lastUpdatedDate) {
-        return this.queryRelationships(null, true, false, groupIndex, lastUpdatedDate);
+        return this.queryRelationships(null, false, groupIndex, lastUpdatedDate);
     }
 
     public CompletableFuture<UserRelationshipsWithVersion> queryBlacklistedUsers(
             @Nullable Integer groupIndex,
             @Nullable Date lastUpdatedDate) {
-        return this.queryRelationships(null, true, true, groupIndex, lastUpdatedDate);
+        return this.queryRelationships(null, true, groupIndex, lastUpdatedDate);
     }
 
     public CompletableFuture<Void> createRelationship(
@@ -252,7 +251,7 @@ public class UserService {
                 .thenApply(notification -> null);
     }
 
-    public CompletableFuture<Void> sendFriendRequest(
+    public CompletableFuture<Long> sendFriendRequest(
             long recipientId,
             @NotNull String content) {
         Validator.throwIfAnyFalsy(content);
@@ -260,7 +259,7 @@ public class UserService {
                 .send(CreateFriendRequestRequest.newBuilder(), MapUtil.of(
                         "recipient_id", recipientId,
                         "content", content))
-                .thenApply(notification -> null);
+                .thenApply(notification -> notification.getData().getIds().getValues(0));
     }
 
     public CompletableFuture<Void> replyFriendRequest(
@@ -283,12 +282,12 @@ public class UserService {
                 .thenApply(notification -> notification.getData().getUserFriendRequestsWithVersion());
     }
 
-    public CompletableFuture<Void> createRelationshipGroup(@NotNull String name) {
+    public CompletableFuture<Integer> createRelationshipGroup(@NotNull String name) {
         Validator.throwIfAnyFalsy(name);
         return turmsClient.getDriver()
                 .send(CreateRelationshipGroupRequest.newBuilder(), MapUtil.of(
                         "name", name))
-                .thenApply(notification -> null);
+                .thenApply(notification -> (int) notification.getData().getIds().getValues(0));
     }
 
     public CompletableFuture<Void> deleteRelationshipGroups(
@@ -335,8 +334,8 @@ public class UserService {
      * sendMessage() with records of location sends user's location to both server and its recipients.
      */
     public CompletableFuture<Void> updateLocation(
-            long latitude,
-            long longitude,
+            float latitude,
+            float longitude,
             @Nullable String name,
             @Nullable String address) {
         return turmsClient.getDriver()

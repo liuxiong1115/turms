@@ -256,8 +256,8 @@ public class UserRelationshipGroupService {
             @NotNull Long ownerId,
             @NotNull Long relatedUserId,
             @Nullable ReactiveMongoOperations operations,
-            boolean updateVersion) {
-        return deleteRelatedUsersFromAllRelationshipGroups(Set.of(ownerId), Set.of(relatedUserId), operations, updateVersion);
+            boolean updateRelationshipGroupsMembersVersion) {
+        return deleteRelatedUsersFromAllRelationshipGroups(Set.of(ownerId), Set.of(relatedUserId), operations, updateRelationshipGroupsMembersVersion);
     }
 
     public Mono<Boolean> deleteRelatedUsersFromAllRelationshipGroups(

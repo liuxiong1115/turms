@@ -19,10 +19,10 @@ package im.turms.turms.access.websocket.dispatcher;
 
 import com.google.protobuf.Int32Value;
 import com.google.protobuf.Int64Value;
+import com.google.protobuf.StringValue;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
-import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.exception.TurmsBusinessException;
@@ -47,7 +47,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Function;
-
 
 @Service
 public class InboundMessageDispatcher {
@@ -107,7 +106,7 @@ public class InboundMessageDispatcher {
         }
     }
 
-    private Mono<Boolean> handleResultsForRecipients(
+    private Mono<Boolean> notifyRelatedUsersOfAction(
             @NotNull RequestResult requestResult,
             @NotNull WebSocketSession session,
             @Nullable Long requesterId) {
@@ -161,11 +160,11 @@ public class InboundMessageDispatcher {
     }
 
     /**
-     * Transfers RequestResult to WebSocketMessage.
-     * Scenario 1: Mono<RequestResult> return a RequestResult object -> TurmsStatusCode.getCode()
-     * Scenario 2: Mono<RequestResult> is Mono.empty() -> TurmsStatusCode.NO_CONTENT
-     * Scenario 3: Mono<RequestResult> throw a TurmsBusinessException -> TurmsStatusCode.getCode()
-     * Scenario 3: Mono<RequestResult> throw an exception of other types -> TurmsStatusCode.SERVER_INTERNAL_ERROR
+     * Convert RequestResult to WebSocketMessage.
+     * Scenario 1: If Mono<RequestResult> returns a RequestResult object -> TurmsStatusCode.getCode()
+     * Scenario 2: If Mono<RequestResult> is Mono.empty() -> TurmsStatusCode.NO_CONTENT
+     * Scenario 3: If Mono<RequestResult> throws a TurmsBusinessException -> TurmsStatusCode.getCode()
+     * Scenario 4: If Mono<RequestResult> throws an exception of other types -> TurmsStatusCode.FAILED and throwable.getMessage()
      */
     private Mono<WebSocketMessage> handleResult(
             @NotNull WebSocketSession session,
@@ -173,50 +172,25 @@ public class InboundMessageDispatcher {
             @Nullable Long requestId,
             @Nullable Long requesterId) {
         return result
-                .defaultIfEmpty(RequestResult.NOT_FOUND)
+                .defaultIfEmpty(RequestResult.NO_CONTENT)
                 .onErrorResume(throwable -> {
                     if (throwable instanceof TurmsBusinessException) {
-                        TurmsStatusCode code = ((TurmsBusinessException) throwable).getCode();
-                        RequestResult requestResult = RequestResult.status(code);
-                        return Mono.just(requestResult);
+                        return Mono.just(RequestResult.status(((TurmsBusinessException) throwable).getCode()));
                     } else {
-                        TurmsLogger.logThrowable(throwable);
-                        return Mono.just(RequestResult.status(TurmsStatusCode.SERVER_INTERNAL_ERROR));
+                        String message;
+                        if (turmsClusterManager.getTurmsProperties().getSecurity().isRespondStackTraceIfException()) {
+                            message = throwable.getMessage().concat(Arrays.toString(throwable.getStackTrace()));
+                        } else {
+                            message = throwable.getMessage();
+                        }
+                        return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.FAILED, message));
                     }
                 })
                 .flatMap(requestResult -> {
-                    if (requestResult == RequestResult.NOT_FOUND) {
-                        if (requestId != null) {
-                            TurmsNotification response = TurmsNotification.newBuilder()
-                                    .setCode(Int32Value.newBuilder()
-                                            .setValue(TurmsStatusCode.NO_CONTENT.getBusinessCode()).build())
-                                    .setRequestId(Int64Value.newBuilder().setValue(requestId).build())
-                                    .build();
-                            return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory
-                                    .wrap(response.toByteArray())));
-                        } else {
-                            return Mono.empty();
-                        }
+                    if (requestResult.getCode() == TurmsStatusCode.OK) {
+                        return handleSuccessResult(requestResult, session, requestId, requesterId);
                     } else {
-                        return handleResultsForRecipients(requestResult, session, requesterId)
-                                .flatMap(success -> {
-                                    if (requestId != null) {
-                                        if (success == null || !success) {
-                                            requestResult.setCode(TurmsStatusCode.RECIPIENTS_OFFLINE);
-                                        }
-                                        TurmsNotification.Builder builder = TurmsNotification.newBuilder()
-                                                .setCode(Int32Value.newBuilder()
-                                                        .setValue(requestResult.getCode().getBusinessCode()).build())
-                                                .setRequestId(Int64Value.newBuilder().setValue(requestId).build());
-                                        if (requestResult.getDataForRequester() != null) {
-                                            builder.setData(requestResult.getDataForRequester());
-                                        }
-                                        TurmsNotification response = builder.build();
-                                        return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory.wrap(response.toByteArray())));
-                                    } else {
-                                        return Mono.empty();
-                                    }
-                                });
+                        return handleFailResult(requestResult, session, requestId);
                     }
                 });
     }
@@ -265,5 +239,49 @@ public class InboundMessageDispatcher {
             onlineUserService.getLocalOnlineUserManager(userId).setOfflineByDeviceType(deviceType, CloseStatus.BAD_DATA);
         }
         return Mono.empty();
+    }
+
+    private TurmsNotification.Builder generateNotificationBuilder(RequestResult requestResult, TurmsStatusCode code, long requestId) {
+        TurmsNotification.Builder builder = TurmsNotification.newBuilder();
+        String reason = requestResult.getReason();
+        TurmsNotification.Data dataForRequester = requestResult.getDataForRequester();
+        if (reason != null) {
+            builder.setReason(StringValue.newBuilder().setValue(reason).build());
+        }
+        if (dataForRequester != null) {
+            builder.setData(dataForRequester);
+        }
+        Int32Value businessCode = Int32Value.newBuilder()
+                .setValue(code.getBusinessCode()).build();
+        return builder
+                .setCode(businessCode)
+                .setRequestId(Int64Value.newBuilder().setValue(requestId).build());
+    }
+
+    private Mono<WebSocketMessage> handleSuccessResult(RequestResult requestResult, WebSocketSession session, Long requestId, Long requesterId) {
+        return notifyRelatedUsersOfAction(requestResult, session, requesterId)
+                .flatMap(success -> {
+                    if (requestId != null) {
+                        if (success == null || !success) {
+                            requestResult.setCode(TurmsStatusCode.RECIPIENTS_OFFLINE);
+                        }
+                        TurmsNotification notification = generateNotificationBuilder(requestResult, requestResult.getCode(), requestId)
+                                .build();
+                        return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory.wrap(notification.toByteArray())));
+                    } else {
+                        return Mono.empty();
+                    }
+                });
+    }
+
+    private Mono<WebSocketMessage> handleFailResult(RequestResult requestResult, WebSocketSession session, Long requestId) {
+        if (requestId != null) {
+            TurmsNotification notification = generateNotificationBuilder(requestResult, requestResult.getCode(), requestId)
+                    .build();
+            return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory
+                    .wrap(notification.toByteArray())));
+        } else {
+            return Mono.empty();
+        }
     }
 }
