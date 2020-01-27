@@ -177,7 +177,12 @@ public class TurmsDriver {
                                             if (TurmsStatusCode.isSuccess(code)) {
                                                 future.complete(notification);
                                             } else {
-                                                TurmsBusinessException exception = TurmsBusinessException.get(code);
+                                                TurmsBusinessException exception;
+                                                if (code == TurmsStatusCode.FAILED.getBusinessCode()) {
+                                                    exception = TurmsBusinessException.get(code, notification.getReason().getValue());
+                                                } else {
+                                                    exception = TurmsBusinessException.get(code);
+                                                }
                                                 if (exception != null) {
                                                     future.completeExceptionally(exception);
                                                 } else {

@@ -5,11 +5,9 @@ import com.google.protobuf.*;
 import im.turms.client.incubator.common.TurmsLogger;
 import im.turms.turms.pojo.request.group.enrollment.CheckGroupJoinQuestionsAnswersRequest;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class ProtoUtil {
 
@@ -66,6 +64,9 @@ public class ProtoUtil {
                                 TurmsLogger.logger.log(Level.WARNING, "", new IllegalArgumentException(reason));
                             }
                         } else {
+                            if (value instanceof Set) {
+                                value = new ArrayList<>(((Set<?>) value));
+                            }
                             builder.setField(fieldDescriptor, value);
                         }
                     }

@@ -70,7 +70,7 @@ public class WsUserRelationshipController {
                                     request.getRecipientId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
-                        return RequestResult.ok();
+                        return RequestResult.responseId(friendRequest.getId());
                     });
         };
     }

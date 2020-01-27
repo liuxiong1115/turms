@@ -34,31 +34,29 @@ import java.util.Set;
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestResult {
-    public static final RequestResult NOT_FOUND = new RequestResult(
+    public static final RequestResult NO_CONTENT = new RequestResult(
             null,
             null,
             null,
-            TurmsStatusCode.NO_CONTENT);
+            TurmsStatusCode.NO_CONTENT,
+            null);
 
     private TurmsNotification.Data dataForRequester;
     private Set<Long> recipients;
     private TurmsRequest dataForRecipients;
     private TurmsStatusCode code;
+    private String reason;
 
     public static RequestResult fail() {
         return status(TurmsStatusCode.FAILED);
     }
 
     public static RequestResult status(@NotNull TurmsStatusCode code) {
-        return new RequestResult(null, Collections.emptySet(), null, code);
+        return new RequestResult(null, Collections.emptySet(), null, code, null);
     }
 
-    public static RequestResult responseIdIfTrue(@NotNull Long id, @Nullable Boolean acknowledged) {
-        if (acknowledged != null && acknowledged) {
-            return responseId(id);
-        } else {
-            return fail();
-        }
+    public static RequestResult statusAndReason(@NotNull TurmsStatusCode code, @NotNull String reason) {
+        return new RequestResult(null, Collections.emptySet(), null, code, reason);
     }
 
     public static RequestResult responseId(@NotNull Long id) {
@@ -70,19 +68,8 @@ public class RequestResult {
                 data,
                 Collections.emptySet(),
                 null,
-                TurmsStatusCode.OK);
-    }
-
-    public static RequestResult responseIds(@NotEmpty Set<Long> ids) {
-        TurmsNotification.Data data = TurmsNotification.Data
-                .newBuilder()
-                .setIds(Int64Values.newBuilder().addAllValues(ids).build())
-                .build();
-        return new RequestResult(
-                data,
-                Collections.emptySet(),
-                null,
-                TurmsStatusCode.OK);
+                TurmsStatusCode.OK,
+                null);
     }
 
     public static RequestResult responseIdAndRecipientData(
@@ -93,7 +80,7 @@ public class RequestResult {
                 .newBuilder()
                 .setIds(Int64Values.newBuilder().addValues(id).build())
                 .build();
-        return new RequestResult(data, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK);
+        return new RequestResult(data, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK, null);
     }
 
     public static RequestResult responseIdAndRecipientData(
@@ -111,38 +98,32 @@ public class RequestResult {
                     data,
                     recipients,
                     dataForRecipients,
-                    TurmsStatusCode.OK);
+                    TurmsStatusCode.OK,
+                    null);
         }
     }
 
     public static RequestResult responseData(@NotNull TurmsNotification.Data data) {
-        return new RequestResult(data, Collections.emptySet(), null, TurmsStatusCode.OK);
+        return new RequestResult(data, Collections.emptySet(), null, TurmsStatusCode.OK, null);
     }
 
     public static RequestResult recipientData(
             @NotNull Long recipientId,
             @NotNull TurmsRequest dataForRecipient) {
-        return new RequestResult(null, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK);
+        return new RequestResult(null, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK, null);
     }
 
     public static RequestResult recipientData(
             @NotEmpty Set<Long> recipientsIds,
             @NotNull TurmsRequest dataForRecipient) {
-        return new RequestResult(null, recipientsIds, dataForRecipient, TurmsStatusCode.OK);
+        return new RequestResult(null, recipientsIds, dataForRecipient, TurmsStatusCode.OK, null);
     }
 
     public static RequestResult recipientData(
             @NotNull Long recipientId,
             @NotNull TurmsRequest dataForRecipient,
             @NotNull TurmsStatusCode code) {
-        return new RequestResult(null, Collections.singleton(recipientId), dataForRecipient, code);
-    }
-
-    public static RequestResult recipientData(
-            @NotEmpty Set<Long> recipientsIds,
-            @NotNull TurmsRequest dataForRecipient,
-            @NotNull TurmsStatusCode code) {
-        return new RequestResult(null, recipientsIds, dataForRecipient, code);
+        return new RequestResult(null, Collections.singleton(recipientId), dataForRecipient, code, null);
     }
 
     public static RequestResult okIfTrue(@Nullable Boolean acknowledged) {

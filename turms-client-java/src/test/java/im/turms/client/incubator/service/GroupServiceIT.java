@@ -30,7 +30,6 @@ public class GroupServiceIT {
     private static final long GROUP_SUCCESSOR = 1;
     private static final long GROUP_BLACKLISTED_USER_ID = 4;
     private static TurmsClient turmsClient;
-    private static GroupService groupService;
     private static Long groupId;
     private static Long groupJoinQuestionId;
     private static Long groupJoinRequestId;
@@ -39,7 +38,6 @@ public class GroupServiceIT {
     @BeforeAll
     static void setup() throws ExecutionException, InterruptedException, TimeoutException {
         turmsClient = new TurmsClient(WS_URL, null, null);
-        groupService = new GroupService(turmsClient);
         CompletableFuture<Void> future = turmsClient.getDriver().connect(1, "123", 10, null, UserStatus.BUSY, DeviceType.ANDROID);
         future.get(5, TimeUnit.SECONDS);
     }
@@ -56,7 +54,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_FIRST)
     public void constructor_shouldReturnNotNullGroupServiceInstance() {
-        assertNotNull(groupService);
+        assertNotNull(turmsClient.getGroupService());
     }
 
     // Create
@@ -64,7 +62,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
     public void createGroup_shouldReturnGroupId() throws ExecutionException, InterruptedException, TimeoutException {
-        groupId = groupService.createGroup("name", "intro", "announcement", null, 10, null, null)
+        groupId = turmsClient.getGroupService().createGroup("name", "intro", "announcement", null, 10, null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(groupId);
     }
@@ -72,7 +70,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void addGroupJoinQuestion_shouldReturnQuestionId() throws ExecutionException, InterruptedException {
-        CompletableFuture<Long> future = groupService.addGroupJoinQuestion(groupId, "question", List.of("answer1", "answer2"), 10);
+        CompletableFuture<Long> future = turmsClient.getGroupService().addGroupJoinQuestion(groupId, "question", List.of("answer1", "answer2"), 10);
         groupJoinQuestionId = future.get();
         assertNotNull(groupJoinQuestionId);
     }
@@ -80,7 +78,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void createJoinRequest_shouldReturnJoinRequestId() throws ExecutionException, InterruptedException {
-        CompletableFuture<Long> future = groupService.createJoinRequest(groupId, "content");
+        CompletableFuture<Long> future = turmsClient.getGroupService().createJoinRequest(groupId, "content");
         groupJoinRequestId = future.get();
         assertNotNull(groupJoinRequestId);
     }
@@ -88,14 +86,14 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void addGroupMember_shouldSucceed() throws ExecutionException, InterruptedException {
-        CompletableFuture<Void> future = groupService.addGroupMember(groupId, GROUP_MEMBER_ID, "name", GroupMemberRole.MEMBER, null);
+        CompletableFuture<Void> future = turmsClient.getGroupService().addGroupMember(groupId, GROUP_MEMBER_ID, "name", GroupMemberRole.MEMBER, null);
         assertNull(future.get());
     }
 
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void blacklistUser_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.blacklistUser(groupId, GROUP_BLACKLISTED_USER_ID)
+        Void result = turmsClient.getGroupService().blacklistUser(groupId, GROUP_BLACKLISTED_USER_ID)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -103,7 +101,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void createInvitation_shouldReturnInvitationId() throws ExecutionException, InterruptedException {
-        CompletableFuture<Long> future = groupService.createInvitation(groupId, GROUP_INVITATION_INVITEE, "content");
+        CompletableFuture<Long> future = turmsClient.getGroupService().createInvitation(groupId, GROUP_INVITATION_INVITEE, "content");
         groupInvitationId = future.get();
         assertNotNull(groupInvitationId);
     }
@@ -113,7 +111,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void updateGroup_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.updateGroup(groupId, "name", "intro", "announcement", null, 10, null, null, null, null)
+        Void result = turmsClient.getGroupService().updateGroup(groupId, "name", "intro", "announcement", null, 10, null, null, null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -121,7 +119,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_LOWEST_PRIORITY)
     public void transferOwnership_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.transferOwnership(groupId, GROUP_SUCCESSOR, true)
+        Void result = turmsClient.getGroupService().transferOwnership(groupId, GROUP_SUCCESSOR, true)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -129,7 +127,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void muteGroup_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.muteGroup(groupId, new Date())
+        Void result = turmsClient.getGroupService().muteGroup(groupId, new Date())
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -137,7 +135,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void unmuteGroup_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.unmuteGroup(groupId)
+        Void result = turmsClient.getGroupService().unmuteGroup(groupId)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -145,7 +143,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void updateGroupJoinQuestion_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.updateGroupJoinQuestion(groupId, "new-question", List.of("answer"), null)
+        Void result = turmsClient.getGroupService().updateGroupJoinQuestion(groupId, "new-question", List.of("answer"), null)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -153,7 +151,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void updateGroupMemberInfo_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.updateGroupMemberInfo(groupId, GROUP_MEMBER_ID, "myname", null, null)
+        Void result = turmsClient.getGroupService().updateGroupMemberInfo(groupId, GROUP_MEMBER_ID, "myname", null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -161,7 +159,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void muteGroupMember_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.muteGroupMember(groupId, GROUP_MEMBER_ID, new Date(System.currentTimeMillis() + 100000))
+        Void result = turmsClient.getGroupService().muteGroupMember(groupId, GROUP_MEMBER_ID, new Date(System.currentTimeMillis() + 100000))
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -169,7 +167,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void unmuteGroupMember_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.unmuteGroupMember(groupId, GROUP_MEMBER_ID)
+        Void result = turmsClient.getGroupService().unmuteGroupMember(groupId, GROUP_MEMBER_ID)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -179,7 +177,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryGroup_shouldGroupWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupWithVersion groupWithVersion = groupService.queryGroup(groupId, null)
+        GroupWithVersion groupWithVersion = turmsClient.getGroupService().queryGroup(groupId, null)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(groupId, groupWithVersion.getGroup().getId().getValue());
     }
@@ -188,7 +186,7 @@ public class GroupServiceIT {
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryJoinedGroupsIds_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
         boolean found = false;
-        Int64ValuesWithVersion joinedGroupsIdsWithVersion = groupService.queryJoinedGroupsIds(null)
+        Int64ValuesWithVersion joinedGroupsIdsWithVersion = turmsClient.getGroupService().queryJoinedGroupsIds(null)
                 .get(5, TimeUnit.SECONDS);
         for (Long joinedGroupId : joinedGroupsIdsWithVersion.getValuesList()) {
             if (groupId.equals(joinedGroupId)) {
@@ -203,7 +201,7 @@ public class GroupServiceIT {
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryJoinedGroupsInfos_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
         boolean found = false;
-        GroupsWithVersion groupWithVersion = groupService.queryJoinedGroupsInfos(null)
+        GroupsWithVersion groupWithVersion = turmsClient.getGroupService().queryJoinedGroupsInfos(null)
                 .get(5, TimeUnit.SECONDS);
         List<Group> groupsList = groupWithVersion.getGroupsList();
         for (Group group : groupsList) {
@@ -218,7 +216,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryBlacklistedUsersIds_shouldEqualBlacklistedUserId() throws ExecutionException, InterruptedException, TimeoutException {
-        Int64ValuesWithVersion blacklistedUsersIdsWithVersion = groupService.queryBlacklistedUsersIds(groupId, null)
+        Int64ValuesWithVersion blacklistedUsersIdsWithVersion = turmsClient.getGroupService().queryBlacklistedUsersIds(groupId, null)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(GROUP_BLACKLISTED_USER_ID, blacklistedUsersIdsWithVersion.getValues(0));
     }
@@ -226,7 +224,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryBlacklistedUsersInfos_shouldEqualBlacklistedUserId() throws ExecutionException, InterruptedException, TimeoutException {
-        UsersInfosWithVersion usersInfosWithVersion = groupService.queryBlacklistedUsersInfos(groupId, null)
+        UsersInfosWithVersion usersInfosWithVersion = turmsClient.getGroupService().queryBlacklistedUsersInfos(groupId, null)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(GROUP_BLACKLISTED_USER_ID, usersInfosWithVersion.getUserInfos(0).getId().getValue());
     }
@@ -234,7 +232,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryInvitations_shouldEqualNewInvitationId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupInvitationsWithVersion groupInvitationsWithVersion = groupService.queryInvitations(groupId, null)
+        GroupInvitationsWithVersion groupInvitationsWithVersion = turmsClient.getGroupService().queryInvitations(groupId, null)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(groupInvitationId, groupInvitationsWithVersion.getGroupInvitations(0).getId().getValue());
     }
@@ -242,7 +240,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryJoinRequests_shouldEqualNewJoinRequestId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupJoinRequestsWithVersion groupJoinRequestsWithVersion = groupService.queryJoinRequests(groupId, null)
+        GroupJoinRequestsWithVersion groupJoinRequestsWithVersion = turmsClient.getGroupService().queryJoinRequests(groupId, null)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(groupJoinRequestId, groupJoinRequestsWithVersion.getGroupJoinRequests(0).getId().getValue());
     }
@@ -250,7 +248,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryGroupJoinQuestionsRequest_shouldEqualNewGroupQuestionId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupJoinQuestionsWithVersion groupJoinQuestionsWithVersion = groupService.queryGroupJoinQuestionsRequest(groupId, true, null)
+        GroupJoinQuestionsWithVersion groupJoinQuestionsWithVersion = turmsClient.getGroupService().queryGroupJoinQuestionsRequest(groupId, true, null)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(groupJoinQuestionId, groupJoinQuestionsWithVersion.getGroupJoinQuestions(0).getId().getValue());
     }
@@ -258,7 +256,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryGroupMembers_shouldEqualNewMemberId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupMembersWithVersion groupMembersWithVersion = groupService.queryGroupMembers(groupId, true, null)
+        GroupMembersWithVersion groupMembersWithVersion = turmsClient.getGroupService().queryGroupMembers(groupId, true, null)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(GROUP_MEMBER_ID, groupMembersWithVersion.getGroupMembers(1).getUserId().getValue());
     }
@@ -266,7 +264,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryGroupMembersByMembersIds_shouldEqualNewMemberId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupMembersWithVersion groupMembersWithVersion = groupService.queryGroupMembersByMembersIds(groupId, List.of(GROUP_MEMBER_ID), true)
+        GroupMembersWithVersion groupMembersWithVersion = turmsClient.getGroupService().queryGroupMembersByMembersIds(groupId, List.of(GROUP_MEMBER_ID), true)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(GROUP_MEMBER_ID, groupMembersWithVersion.getGroupMembers(0).getUserId().getValue());
     }
@@ -276,9 +274,9 @@ public class GroupServiceIT {
     public void answerGroupQuestions_shouldEqualNewQuestionId() throws ExecutionException, InterruptedException, TimeoutException {
         HashMap<Long, String> map = new HashMap<>();
         map.put(groupJoinQuestionId, "answer");
-        boolean isSuccess = false;
+        boolean isSuccess;
         try {
-            isSuccess = groupService.answerGroupQuestions(map)
+            isSuccess = turmsClient.getGroupService().answerGroupQuestions(map)
                     .get(5, TimeUnit.SECONDS);
         } catch (ExecutionException e) {
             isSuccess = ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.ALREADY_GROUP_MEMBER);
@@ -291,7 +289,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_LOW_PRIORITY)
     public void removeGroupMember_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.removeGroupMember(groupId, GROUP_MEMBER_ID)
+        Void result = turmsClient.getGroupService().removeGroupMember(groupId, GROUP_MEMBER_ID)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -299,7 +297,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_LOWEST_PRIORITY)
     public void deleteGroupJoinQuestion_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.deleteGroupJoinQuestion(groupId)
+        Void result = turmsClient.getGroupService().deleteGroupJoinQuestion(groupId)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -307,7 +305,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_LOWEST_PRIORITY)
     public void unblacklistUser_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.unblacklistUser(groupId, GROUP_BLACKLISTED_USER_ID)
+        Void result = turmsClient.getGroupService().unblacklistUser(groupId, GROUP_BLACKLISTED_USER_ID)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -317,7 +315,7 @@ public class GroupServiceIT {
     public void deleteInvitation_shouldSucceedOrThrowDisabledFunction() throws InterruptedException, TimeoutException {
         boolean isSuccess;
         try {
-            groupService.deleteInvitation(groupInvitationId)
+            turmsClient.getGroupService().deleteInvitation(groupInvitationId)
                     .get(5, TimeUnit.SECONDS);
             isSuccess = true;
         } catch (ExecutionException e) {
@@ -331,7 +329,7 @@ public class GroupServiceIT {
     public void deleteJoinRequest_shouldSucceedOrThrowDisabledFunction() throws InterruptedException, TimeoutException {
         boolean isSuccess;
         try {
-            groupService.deleteJoinRequest(groupJoinRequestId)
+            turmsClient.getGroupService().deleteJoinRequest(groupJoinRequestId)
                     .get(5, TimeUnit.SECONDS);
             isSuccess = true;
         } catch (ExecutionException e) {
@@ -343,7 +341,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_LOWEST_PRIORITY)
     public void quitGroup_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = groupService.quitGroup(groupId, null, false)
+        Void result = turmsClient.getGroupService().quitGroup(groupId, null, false)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -351,9 +349,9 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_LAST)
     public void deleteGroup_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        CompletableFuture<Long> readyToDeleteGroup = groupService.createGroup("readyToDelete", null, null, null, null, null, null);
+        CompletableFuture<Long> readyToDeleteGroup = turmsClient.getGroupService().createGroup("readyToDelete", null, null, null, null, null, null);
         Long readyToDeleteGroupId = readyToDeleteGroup.get();
-        Void result = groupService.deleteGroup(readyToDeleteGroupId)
+        Void result = turmsClient.getGroupService().deleteGroup(readyToDeleteGroupId)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }

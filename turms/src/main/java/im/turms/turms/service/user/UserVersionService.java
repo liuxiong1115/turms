@@ -92,48 +92,52 @@ public class UserVersionService {
     }
 
     public Mono<Boolean> updateRelationshipsVersion(@NotNull Long userId, @Nullable ReactiveMongoOperations operations) {
-        return updateSpecificVersion(userId, UserVersion.Fields.relationships, operations);
+        return updateSpecificVersion(userId, operations, UserVersion.Fields.relationships);
     }
 
     public Mono<Boolean> updateRelationshipsVersion(@NotEmpty Set<Long> userIds, @Nullable ReactiveMongoOperations operations) {
-        return updateSpecificVersion(userIds, UserVersion.Fields.relationships, operations);
+        return updateSpecificVersion(userIds, operations, UserVersion.Fields.relationships);
     }
 
     public Mono<Boolean> updateFriendRequestsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.friendRequests, null);
+        return updateSpecificVersion(userId, null, UserVersion.Fields.friendRequests);
     }
 
     public Mono<Boolean> updateRelationshipGroupsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.relationshipGroups, null);
+        return updateSpecificVersion(userId, null, UserVersion.Fields.relationshipGroups);
     }
 
     public Mono<Boolean> updateRelationshipGroupsVersion(@NotEmpty Set<Long> userIds) {
-        return updateSpecificVersion(userIds, UserVersion.Fields.relationshipGroups, null);
+        return updateSpecificVersion(userIds, null, UserVersion.Fields.relationshipGroups);
     }
 
     public Mono<Boolean> updateRelationshipGroupsMembersVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.relationshipGroupsMembers, null);
+        return updateSpecificVersion(userId, null, UserVersion.Fields.relationshipGroupsMembers);
     }
 
     public Mono<Boolean> updateRelationshipGroupsMembersVersion(@NotEmpty Set<Long> userIds) {
-        return updateSpecificVersion(userIds, UserVersion.Fields.relationshipGroupsMembers, null);
+        return updateSpecificVersion(userIds, null, UserVersion.Fields.relationshipGroupsMembers);
     }
 
     public Mono<Boolean> updateGroupInvitationsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.groupInvitations, null);
+        return updateSpecificVersion(userId, null, UserVersion.Fields.groupInvitations);
     }
 
     public Mono<Boolean> updateJoinedGroupsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, UserVersion.Fields.joinedGroups, null);
+        return updateSpecificVersion(userId, null, UserVersion.Fields.joinedGroups);
     }
 
-    public Mono<Boolean> updateSpecificVersion(@NotNull Long userId, @NotNull String field, @Nullable ReactiveMongoOperations operations) {
-        return updateSpecificVersion(Collections.singleton(userId), field, operations);
+    public Mono<Boolean> updateSpecificVersion(@NotNull Long userId, @Nullable ReactiveMongoOperations operations, @NotEmpty String... fields) {
+        return updateSpecificVersion(Collections.singleton(userId), operations, fields);
     }
 
-    public Mono<Boolean> updateSpecificVersion(@NotEmpty Set<Long> userIds, @NotNull String field, @Nullable ReactiveMongoOperations operations) {
+    public Mono<Boolean> updateSpecificVersion(@NotEmpty Set<Long> userIds, @Nullable ReactiveMongoOperations operations, @NotEmpty String... fields) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
-        Update update = new Update().set(field, new Date());
+        Update update = new Update();
+        Date now = new Date();
+        for (String field : fields) {
+            update.set(field, now);
+        }
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.updateMulti(query, update, UserVersion.class)
                 .map(UpdateResult::wasAcknowledged);
