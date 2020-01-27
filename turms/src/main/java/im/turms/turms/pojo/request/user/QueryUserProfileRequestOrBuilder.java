@@ -8,7 +8,7 @@ public interface QueryUserProfileRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>int64 userId = 1;</code>
+   * <code>int64 user_id = 1;</code>
    * @return The userId.
    */
   long getUserId();

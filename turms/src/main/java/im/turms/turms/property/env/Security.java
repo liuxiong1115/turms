@@ -77,6 +77,9 @@ public class Security implements IdentifiedDataSerializable {
     @Description("The minimum allowed interval between client requests")
     @Min(0)
     private int minClientRequestsIntervalMillis = 0;
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to respond the stack trace information to client if an exception has been thrown")
+    private boolean respondStackTraceIfException = true;
 
     @JsonIgnore
     @Override
@@ -102,6 +105,7 @@ public class Security implements IdentifiedDataSerializable {
         out.writeInt(maxAvailableOnlineUsersStatusPerRequest);
         out.writeInt(defaultAvailableRecordsPerRequest);
         out.writeInt(minClientRequestsIntervalMillis);
+        out.writeBoolean(respondStackTraceIfException);
     }
 
     @Override
@@ -116,6 +120,7 @@ public class Security implements IdentifiedDataSerializable {
         maxAvailableOnlineUsersStatusPerRequest = in.readInt();
         defaultAvailableRecordsPerRequest = in.readInt();
         minClientRequestsIntervalMillis = in.readInt();
+        respondStackTraceIfException = in.readBoolean();
     }
 
     public enum PasswordEncodingAlgorithm {

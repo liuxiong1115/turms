@@ -21,6 +21,7 @@ import im.turms.turms.common.TurmsStatusCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.EnumMap;
 import java.util.Map;
@@ -30,19 +31,38 @@ import java.util.Map;
 public class TurmsBusinessException extends NoStackTraceException {
     private static final Map<TurmsStatusCode, TurmsBusinessException> EXCEPTION_POOL = new EnumMap<>(TurmsStatusCode.class);
     private final TurmsStatusCode code;
+    private final String reason;
 
-    private TurmsBusinessException(@NotNull TurmsStatusCode code) {
+    private TurmsBusinessException(@NotNull TurmsStatusCode code, @Nullable String reason) {
         this.code = code;
+        this.reason = reason;
     }
 
     public static TurmsBusinessException get(@NotNull TurmsStatusCode code) {
-        return EXCEPTION_POOL.computeIfAbsent(code, key -> new TurmsBusinessException(code));
+        return EXCEPTION_POOL.computeIfAbsent(code, key -> new TurmsBusinessException(code, code.getReason()));
     }
 
     public static TurmsBusinessException get(int statusCode) {
         for (TurmsStatusCode value : TurmsStatusCode.values()) {
             if (value.getBusinessCode() == statusCode) {
                 return get(value);
+            }
+        }
+        return null;
+    }
+
+    public static TurmsBusinessException get(@NotNull TurmsStatusCode code, @Nullable String reason) {
+        if (reason != null && !reason.isBlank()) {
+            return new TurmsBusinessException(code, reason);
+        } else {
+            return get(code);
+        }
+    }
+
+    public static TurmsBusinessException get(int statusCode, @Nullable String reason) {
+        for (TurmsStatusCode value : TurmsStatusCode.values()) {
+            if (value.getBusinessCode() == statusCode) {
+                return get(value, reason);
             }
         }
         return null;

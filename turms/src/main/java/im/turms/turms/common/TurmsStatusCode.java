@@ -55,6 +55,7 @@ public enum TurmsStatusCode {
     REDUNDANT_REQUEST(4020, "The request is redundant", 406),
     ALREADY_GROUP_MEMBER(4021, "The user is already a member of the group", 406),
     FRIEND_REQUEST_HAS_EXISTED(4022, "A friend request has already existed", 406),
+    RELATIONSHIP_HAS_ESTABLISHED(4023, "The relationship has already established", 406),
 
     LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500),
 

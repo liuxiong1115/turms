@@ -27,7 +27,9 @@ import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
 import im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion;
 import im.turms.turms.pojo.domain.UserRelationship;
 import im.turms.turms.pojo.domain.UserRelationshipGroupMember;
+import im.turms.turms.pojo.domain.UserVersion;
 import im.turms.turms.service.user.UserVersionService;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -136,22 +138,22 @@ public class UserRelationshipService {
             @NotNull Long ownerId,
             @NotNull Long relatedUserId,
             @Nullable ReactiveMongoOperations operations) {
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
-                .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId));
         if (operations != null) {
+            Query query = new Query()
+                    .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
+                    .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId));
             return operations.remove(query, UserRelationship.class)
                     .then(userRelationshipGroupService.deleteRelatedUserFromAllRelationshipGroups(
-                            ownerId, relatedUserId, operations, true))
-                    .then(userVersionService.updateRelationshipsVersion(ownerId, operations))
+                            ownerId, relatedUserId, operations, false))
+                    .then(userVersionService.updateSpecificVersion(
+                            ownerId,
+                            operations,
+                            UserVersion.Fields.relationshipGroupsMembers,
+                            UserVersion.Fields.relationships))
                     .thenReturn(true);
         } else {
             return mongoTemplate.inTransaction()
-                    .execute(newOperations -> newOperations.remove(query, UserRelationship.class)
-                            .then(userRelationshipGroupService.deleteRelatedUserFromAllRelationshipGroups(
-                                    ownerId, relatedUserId, newOperations, true))
-                            .then(userVersionService.updateRelationshipsVersion(ownerId, newOperations))
-                            .thenReturn(true))
+                    .execute(newOperations -> deleteOneSidedRelationship(ownerId, relatedUserId, newOperations))
                     .retryWhen(TRANSACTION_RETRY)
                     .singleOrEmpty();
         }
@@ -186,7 +188,7 @@ public class UserRelationshipService {
     public Mono<Int64ValuesWithVersion> queryRelatedUsersIdsWithVersion(
             @NotNull Long ownerId,
             @NotNull Integer groupIndex,
-            @NotNull Boolean isBlocked,
+            @Nullable Boolean isBlocked,
             @Nullable Date lastUpdatedDate) {
         return userVersionService.queryRelationshipsLastUpdatedDate(ownerId)
                 .defaultIfEmpty(MAX_DATE)
@@ -431,12 +433,7 @@ public class UserRelationshipService {
             monos.add(mongoOperations.insert(userRelationship));
         }
         if (newGroupIndex != null && deleteGroupIndex != null && !newGroupIndex.equals(deleteGroupIndex)) {
-            Query query = new Query()
-                    .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
-                    .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId))
-                    .addCriteria(Criteria.where(ID_GROUP_INDEX).is(deleteGroupIndex));
-            Update update = new Update().set(ID_GROUP_INDEX, newGroupIndex);
-            monos.add(mongoTemplate.findAndModify(query, update, UserRelationshipGroupMember.class));
+            monos.add(moveToNewGroup(ownerId, relatedUserId, deleteGroupIndex, newGroupIndex));
         } else {
             if (newGroupIndex != null) {
                 Mono<Boolean> add = userRelationshipGroupService.addRelatedUserToRelationshipGroups(
@@ -451,8 +448,28 @@ public class UserRelationshipService {
             }
         }
         return Mono.zip(monos, objects -> objects)
-                .onErrorReturn(EMPTY_ARRAY)
-                .map(objects -> EMPTY_ARRAY != objects);
+                .map(objects -> {
+                    for (Object object : objects) {
+                        if (object instanceof Boolean && !((Boolean) object)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .onErrorMap(DuplicateKeyException.class, e -> TurmsBusinessException.get(TurmsStatusCode.RELATIONSHIP_HAS_ESTABLISHED));
+    }
+
+    public Mono<UserRelationshipGroupMember> moveToNewGroup(
+            @NotNull Long ownerId,
+            @NotNull Long relatedUserId,
+            @NotNull Integer deleteGroupIndex,
+            @NotNull Integer newGroupIndex) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
+                .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId))
+                .addCriteria(Criteria.where(ID_GROUP_INDEX).is(deleteGroupIndex));
+        Update update = new Update().set(ID_GROUP_INDEX, newGroupIndex);
+        return mongoTemplate.findAndModify(query, update, UserRelationshipGroupMember.class);
     }
 
     public Mono<Boolean> isBlocked(@NotNull Long ownerId, @NotNull Long relatedUserId) {

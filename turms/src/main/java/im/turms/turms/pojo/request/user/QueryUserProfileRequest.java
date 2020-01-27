@@ -98,10 +98,10 @@ private static final long serialVersionUID = 0L;
             im.turms.turms.pojo.request.user.QueryUserProfileRequest.class, im.turms.turms.pojo.request.user.QueryUserProfileRequest.Builder.class);
   }
 
-  public static final int USERID_FIELD_NUMBER = 1;
+  public static final int USER_ID_FIELD_NUMBER = 1;
   private long userId_;
   /**
-   * <code>int64 userId = 1;</code>
+   * <code>int64 user_id = 1;</code>
    * @return The userId.
    */
   public long getUserId() {
@@ -201,7 +201,7 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + USERID_FIELD_NUMBER;
+    hash = (37 * hash) + USER_ID_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getUserId());
     if (hasLastUpdatedDate()) {
@@ -466,14 +466,14 @@ private static final long serialVersionUID = 0L;
 
     private long userId_ ;
     /**
-     * <code>int64 userId = 1;</code>
+     * <code>int64 user_id = 1;</code>
      * @return The userId.
      */
     public long getUserId() {
       return userId_;
     }
     /**
-     * <code>int64 userId = 1;</code>
+     * <code>int64 user_id = 1;</code>
      * @param value The userId to set.
      * @return This builder for chaining.
      */
@@ -484,7 +484,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>int64 userId = 1;</code>
+     * <code>int64 user_id = 1;</code>
      * @return This builder for chaining.
      */
     public Builder clearUserId() {

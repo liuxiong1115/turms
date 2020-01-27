@@ -30,10 +30,11 @@ public final class QueryUserProfileRequestOuterClass {
     java.lang.String[] descriptorData = {
       "\n-request/user/query_user_profile_reques" +
       "t.proto\022\016im.turms.proto\032\036google/protobuf" +
-      "/wrappers.proto\"a\n\027QueryUserProfileReque" +
-      "st\022\016\n\006userId\030\001 \001(\003\0226\n\021last_updated_date\030" +
-      "\002 \001(\0132\033.google.protobuf.Int64ValueB$\n im" +
-      ".turms.turms.pojo.request.userP\001b\006proto3"
+      "/wrappers.proto\"b\n\027QueryUserProfileReque" +
+      "st\022\017\n\007user_id\030\001 \001(\003\0226\n\021last_updated_date" +
+      "\030\002 \001(\0132\033.google.protobuf.Int64ValueB$\n i" +
+      "m.turms.turms.pojo.request.userP\001b\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

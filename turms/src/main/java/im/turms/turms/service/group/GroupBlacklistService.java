@@ -226,13 +226,13 @@ public class GroupBlacklistService {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                         return queryGroupBlacklistedUsersIds(groupId)
                                 .collect(Collectors.toSet())
-                                .map(ids -> {
+                                .flatMapMany(ids -> {
                                     if (ids.isEmpty()) {
                                         throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
+                                    } else {
+                                        return userService.queryUsersProfiles(ids, false);
                                     }
-                                    return ids;
                                 })
-                                .flatMapMany(ids -> userService.queryUsersProfiles(ids, false))
                                 .collect(Collectors.toSet())
                                 .map(users -> {
                                     if (users.isEmpty()) {

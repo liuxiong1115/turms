@@ -33,24 +33,27 @@ import java.util.concurrent.Callable;
 @SpringAware
 public class QueryNearestUsersTask implements Callable<Iterable<Entry<Long, PointFloat>>>, Serializable, ApplicationContextAware {
     private static final long serialVersionUID = 3220885919318177439L;
-    private final PointFloat pointFloat;
+    private final Float longitude;
+    private final Float latitude;
     private final Double maxDistance;
     private final Integer maxNumber;
     private transient ApplicationContext context;
     private transient UsersNearbyService usersNearbyService;
 
     public QueryNearestUsersTask(
-            @NotNull PointFloat pointFloat,
+            @NotNull Float longitude,
+            @NotNull Float latitude,
             @NotNull Double maxDistance,
             @NotNull Integer maxNumber) {
-        this.pointFloat = pointFloat;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.maxDistance = maxDistance;
         this.maxNumber = maxNumber;
     }
 
     @Override
     public Iterable<Entry<Long, PointFloat>> call() {
-        return usersNearbyService.getNearestPoints(pointFloat, maxDistance, maxNumber);
+        return usersNearbyService.getNearestPoints(PointFloat.create(longitude, latitude), maxDistance, maxNumber);
     }
 
     @Override

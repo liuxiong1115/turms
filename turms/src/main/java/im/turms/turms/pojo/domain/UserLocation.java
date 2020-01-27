@@ -59,7 +59,8 @@ public class UserLocation implements Serializable {
     @Transient
     private PointFloat point;
 
-    public UserLocation(Long userId, Float longitude, Float latitude, Date timestamp) {
+    public UserLocation(Long id, Long userId, Float longitude, Float latitude, Date timestamp) {
+        this.id = id;
         this.userId = userId;
         this.longitude = longitude;
         this.latitude = latitude;
