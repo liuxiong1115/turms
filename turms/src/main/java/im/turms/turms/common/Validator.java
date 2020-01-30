@@ -36,10 +36,8 @@ public class Validator {
                     if (((String) o).isBlank()) {
                         throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
                     }
-                } else if (o instanceof Collection) {
-                    if (((Collection) o).isEmpty()) {
-                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-                    }
+                } else if (o instanceof Collection && ((Collection<?>) o).isEmpty()) {
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
                 }
             }
         }
@@ -67,7 +65,7 @@ public class Validator {
                         return false;
                     }
                 } else if (o instanceof Collection) {
-                    if (!((Collection) o).isEmpty()) {
+                    if (!((Collection<?>) o).isEmpty()) {
                         return false;
                     }
                 } else {
@@ -99,13 +97,11 @@ public class Validator {
 
     public static void throwIfEmpty(Object object) {
         if (object instanceof Map) {
-            if (((Map) object).isEmpty()) {
+            if (((Map<?, ?>) object).isEmpty()) {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
             }
-        } else if (object instanceof Collection) {
-            if (((Collection) object).isEmpty()) {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
-            }
+        } else if (object instanceof Collection && ((Collection<?>) object).isEmpty()) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
     }
 }

@@ -24,7 +24,6 @@ import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
 import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.pojo.request.signal.AckRequest;
-import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.message.MessageStatusService;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
@@ -34,11 +33,9 @@ import java.util.function.Function;
 
 @Controller
 public class WsSignalController {
-    private final MessageService messageService;
     private final MessageStatusService messageStatusService;
 
-    public WsSignalController(MessageService messageService, MessageStatusService messageStatusService) {
-        this.messageService = messageService;
+    public WsSignalController(MessageStatusService messageStatusService) {
         this.messageStatusService = messageStatusService;
     }
 
