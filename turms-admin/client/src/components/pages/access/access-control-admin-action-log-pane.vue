@@ -1,5 +1,6 @@
 <template>
     <content-template
+        :name="name"
         :url="url"
         :filters="filters"
         :table="table"
@@ -17,6 +18,7 @@ export default {
     },
     data() {
         return {
+            name: 'admin-action-log',
             url: this.$rs.apis.adminActionLog,
             filters: [
                 {
