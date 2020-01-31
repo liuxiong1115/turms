@@ -1,5 +1,6 @@
 <template>
     <content-template
+        :name="name"
         :url="url"
         :record-key="recordKey"
         :query-key="queryKey"
@@ -20,6 +21,7 @@ export default {
     },
     data() {
         return {
+            name: 'message-status',
             url: this.$rs.apis.messageStatus,
             recordKey: 'key',
             queryKey: 'keys',

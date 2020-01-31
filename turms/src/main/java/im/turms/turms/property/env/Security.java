@@ -58,7 +58,7 @@ public class Security implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum available records for each query request")
     @Min(0)
-    private int maxAvailableRecordsPerRequest = 100;
+    private int maxAvailableRecordsPerRequest = 1000;
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum available online users' status for each query request")
     @Min(0)
