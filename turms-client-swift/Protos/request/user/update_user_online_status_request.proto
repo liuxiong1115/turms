@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package im.turms.proto;
+
+option java_package = "im.turms.turms.pojo.request.user";
+option java_multiple_files = true;
+option swift_prefix = "";
+
+import "constant/user_status.proto";
+
+message UpdateUserOnlineStatusRequest {
+    UserStatus user_status = 1;
+}
