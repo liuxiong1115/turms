@@ -556,7 +556,6 @@ public class GroupMemberService {
         return mongoTemplate.find(query, GroupMember.class);
     }
 
-    //TODO: the method may fail and wait to test again after hazelcast provides the serializer for map.
     public Mono<GroupMembersWithVersion> authAndQueryGroupMembers(
             @NotNull Long requesterId,
             @NotNull Long groupId,
