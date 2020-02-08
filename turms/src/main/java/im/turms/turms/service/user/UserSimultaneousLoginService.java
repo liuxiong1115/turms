@@ -82,16 +82,20 @@ public class UserSimultaneousLoginService {
                 .isAllowUnknownDeviceCoexistsWithKnownDevice();
         // Every device type conflicts with itself
         for (DeviceType deviceType : DeviceType.values()) {
-            exclusiveDeviceTypes.put(deviceType, deviceType);
-            if (!allowUnknownDevice) {
-                addConflictedDeviceTypes(DeviceType.UNKNOWN, deviceType);
-                addConflictedDeviceTypes(DeviceType.OTHERS, deviceType);
+            if (deviceType != DeviceType.UNRECOGNIZED) {
+                exclusiveDeviceTypes.put(deviceType, deviceType);
+                if (!allowUnknownDevice) {
+                    addConflictedDeviceTypes(DeviceType.UNKNOWN, deviceType);
+                    addConflictedDeviceTypes(DeviceType.OTHERS, deviceType);
+                }
             }
         }
         switch (strategy) {
             case ALLOW_ONE_DEVICE_OF_ONE_DEVICE_TYPE_ONLINE:
                 for (DeviceType type : DeviceType.values()) {
-                    addDeviceTypeConflictedWithAllTypes(type);
+                    if (type != DeviceType.UNRECOGNIZED) {
+                        addDeviceTypeConflictedWithAllTypes(type);
+                    }
                 }
                 break;
             case ALLOW_ONE_DEVICE_OF_EVERY_DEVICE_TYPE_ONLINE:
@@ -128,7 +132,9 @@ public class UserSimultaneousLoginService {
 
     private void addDeviceTypeConflictedWithAllTypes(@NotNull @DeviceTypeConstraint DeviceType deviceType) {
         for (DeviceType type : DeviceType.values()) {
-            addConflictedDeviceTypes(deviceType, type);
+            if (type != DeviceType.UNRECOGNIZED) {
+                addConflictedDeviceTypes(deviceType, type);
+            }
         }
     }
 

@@ -75,7 +75,9 @@ public class Constants {
     public static final Mono EMPTY_SET_MONO = Mono.just(Collections.emptySet());
     public static final Date EPOCH = new Date(0);
     public static final Date MAX_DATE = new Date(Long.MAX_VALUE);
-    public static final Set<DeviceType> ALL_DEVICE_TYPES = Arrays.stream(DeviceType.values()).collect(Collectors.toSet());
+    public static final Set<DeviceType> ALL_DEVICE_TYPES = Arrays.stream(DeviceType.values())
+            .filter(deviceType -> deviceType != DeviceType.UNRECOGNIZED)
+            .collect(Collectors.toSet());
 
     public static final int MONGO_TRANSACTION_RETRIES_NUMBER = 3;
     public static final Duration MONGO_TRANSACTION_BACKOFF = Duration.ofMillis(1500);
