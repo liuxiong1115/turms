@@ -77,6 +77,8 @@ public class TurmsClusterManager {
     private FlakeIdGenerator idGenerator;
     private Cache<UUID, String> memberAddressCache;
     private final TurmsTaskExecutor turmsTaskExecutor;
+    @Getter
+    private String localTurmsServerAddress;
 
     public TurmsClusterManager(
             TurmsProperties localTurmsProperties,
@@ -108,8 +110,11 @@ public class TurmsClusterManager {
                         throw new RuntimeException("The members of cluster should be not more than " + HASH_SLOTS_NUMBER);
                     }
                     localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
+                    localTurmsServerAddress = String.format("%s:%d",
+                            localMembersSnapshot.getAddress().getHost(),
+                            port);
                     if (!hasJoinedCluster) {
-                        getEnvAfterJoinedCluster();
+                        initEnvAfterJoinedCluster();
                     }
                     hasJoinedCluster = true;
                     if (isCurrentMemberMaster()) {
@@ -143,13 +148,9 @@ public class TurmsClusterManager {
     }
 
     public boolean isWorkable() {
-        if (hazelcastInstance != null) {
-            return hasJoinedCluster
-                    && sharedTurmsProperties.getCluster().getMinimumQuorumToServe()
-                    <= membersSnapshot.size();
-        } else {
-            return false;
-        }
+        return hazelcastInstance != null &&
+                hasJoinedCluster &&
+                sharedTurmsProperties.getCluster().getMinimumQuorumToServe() <= membersSnapshot.size();
     }
 
     public boolean isCurrentMemberMaster() {
@@ -178,7 +179,7 @@ public class TurmsClusterManager {
         TurmsLogger.logJson("Working Ranges for Slot Indexes", result);
     }
 
-    private void getEnvAfterJoinedCluster() {
+    private void initEnvAfterJoinedCluster() {
         if (hazelcastInstance != null) {
             idGenerator = hazelcastInstance.getFlakeIdGenerator(HAZELCAST_KEY_DEFAULT);
             sharedProperties = hazelcastInstance.getReplicatedMap(HAZELCAST_KEY_SHARED_PROPERTIES);
@@ -356,13 +357,6 @@ public class TurmsClusterManager {
         int slotIndex = getSlotIndexByUserId(userId);
         Member member = getClusterMemberBySlotIndex(slotIndex);
         return member != null && member == getLocalMember() ? slotIndex : null;
-    }
-
-    public String getLocalTurmsServerAddress() {
-        //TODO: cache
-        return String.format("%s:%d",
-                getLocalMember().getAddress().getHost(),
-                port);
     }
 
     public Mono<String> getResponsibleTurmsServerAddress(@NotNull Long userId) {
