@@ -3,7 +3,6 @@ package im.turms.client.incubator.service;
 import com.google.protobuf.*;
 import im.turms.client.incubator.TurmsClient;
 import im.turms.client.incubator.util.MapUtil;
-import im.turms.client.incubator.util.NotificationUtil;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
@@ -47,7 +46,7 @@ public class MessageService {
                         "text", text,
                         "records", records,
                         "burn_after", burnAfter))
-                .thenApply(NotificationUtil::getFirstIdFromIds);
+                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
     }
 
     public CompletableFuture<Long> forwardMessage(
@@ -60,7 +59,7 @@ public class MessageService {
                         "message_id", messageId,
                         "chat_type", chatType,
                         "to_id", targetId))
-                .thenApply(NotificationUtil::getFirstIdFromIds);
+                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
     }
 
     public CompletableFuture<Void> updateSentMessage(
