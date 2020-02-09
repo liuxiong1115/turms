@@ -22,7 +22,7 @@ import static helper.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UserServiceIT {
+public class UserServiceST {
     private static TurmsClient turmsClient;
     private static UserStatus userStatus = UserStatus.AWAY;
     private static Integer relationshipGroupIndex;

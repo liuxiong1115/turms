@@ -3,7 +3,6 @@ package im.turms.client.incubator.service;
 import im.turms.client.incubator.TurmsClient;
 import im.turms.client.incubator.model.GroupWithVersion;
 import im.turms.client.incubator.util.MapUtil;
-import im.turms.client.incubator.util.NotificationUtil;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
@@ -53,7 +52,7 @@ public class GroupService {
                         "mute_end_date", muteEndDate,
                         "profile_picture_url", profilePictureUrl,
                         "group_type_id", groupTypeId))
-                .thenApply(NotificationUtil::getFirstIdFromIds);
+                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
     }
 
     public CompletableFuture<Void> deleteGroup(long groupId) {
@@ -142,7 +141,7 @@ public class GroupService {
                         "question", question,
                         "answers", answers,
                         "score", score))
-                .thenApply(NotificationUtil::getFirstIdFromIds);
+                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
     }
 
     public CompletableFuture<Void> deleteGroupJoinQuestion(long questionId) {
@@ -217,7 +216,7 @@ public class GroupService {
                         "group_id", groupId,
                         "invitee_id", inviteeId,
                         "content", content))
-                .thenApply(NotificationUtil::getFirstIdFromIds);
+                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
     }
 
     public CompletableFuture<Void> deleteInvitation(long invitationId) {
@@ -241,7 +240,7 @@ public class GroupService {
                 .send(CreateGroupJoinRequestRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "content", content))
-                .thenApply(NotificationUtil::getFirstIdFromIds);
+                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
     }
 
     public CompletableFuture<Void> deleteJoinRequest(long requestId) {

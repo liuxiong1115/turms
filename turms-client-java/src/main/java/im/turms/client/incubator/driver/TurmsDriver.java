@@ -63,6 +63,17 @@ public class TurmsDriver {
     private UserStatus userOnlineStatus;
     private DeviceType deviceType;
 
+    private String address;
+    private String sessionId;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
     public void setOnMessage(Function<TurmsNotification, Void> onMessage) {
         this.onMessage = onMessage;
     }
@@ -167,7 +178,10 @@ public class TurmsDriver {
                             }
                             if (notification != null) {
                                 boolean isSessionInfo = notification.hasData() && notification.getData().hasSession();
-                                if (!isSessionInfo) {
+                                if (isSessionInfo) {
+                                    address = notification.getData().getSession().getAddress();
+                                    sessionId = notification.getData().getSession().getSessionId();
+                                } else if (notification.hasRequestId()) {
                                     long requestId = notification.getRequestId().getValue();
                                     Pair<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.get(requestId);
                                     if (pair != null) {
@@ -193,9 +207,9 @@ public class TurmsDriver {
                                             future.complete(notification);
                                         }
                                     }
-                                    if (onMessage != null) {
-                                        onMessage.apply(notification);
-                                    }
+                                }
+                                if (onMessage != null) {
+                                    onMessage.apply(notification);
                                 }
                             }
                             return CompletableFuture.completedStage(notification);
