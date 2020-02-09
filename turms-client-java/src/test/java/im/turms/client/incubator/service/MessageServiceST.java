@@ -19,7 +19,7 @@ import static helper.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class MessageServiceIT {
+public class MessageServiceST {
     private static TurmsClient senderClient;
     private static TurmsClient recipientClient;
     private static final long SENDER_ID = 1L;
