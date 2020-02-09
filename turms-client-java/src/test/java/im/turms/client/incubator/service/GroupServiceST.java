@@ -13,18 +13,20 @@ import im.turms.turms.pojo.bo.user.UsersInfosWithVersion;
 import org.junit.jupiter.api.*;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import static helper.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class GroupServiceIT {
+public class GroupServiceST {
     private static final long GROUP_MEMBER_ID = 3;
     private static final long GROUP_INVITATION_INVITEE = 4;
     private static final long GROUP_SUCCESSOR = 1;
@@ -117,7 +119,7 @@ public class GroupServiceIT {
     }
 
     @Test
-    @Order(ORDER_LOWEST_PRIORITY)
+    @Order(ORDER_LAST - 1)
     public void transferOwnership_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = turmsClient.getGroupService().transferOwnership(groupId, GROUP_SUCCESSOR, true)
                 .get(5, TimeUnit.SECONDS);
@@ -185,32 +187,20 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryJoinedGroupsIds_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
-        boolean found = false;
         Int64ValuesWithVersion joinedGroupsIdsWithVersion = turmsClient.getGroupService().queryJoinedGroupsIds(null)
                 .get(5, TimeUnit.SECONDS);
-        for (Long joinedGroupId : joinedGroupsIdsWithVersion.getValuesList()) {
-            if (groupId.equals(joinedGroupId)) {
-                found = true;
-                break;
-            }
-        }
-        assertTrue(found);
+        assertTrue(joinedGroupsIdsWithVersion.getValuesList().contains(groupId));
     }
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryJoinedGroupsInfos_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
-        boolean found = false;
         GroupsWithVersion groupWithVersion = turmsClient.getGroupService().queryJoinedGroupsInfos(null)
                 .get(5, TimeUnit.SECONDS);
-        List<Group> groupsList = groupWithVersion.getGroupsList();
-        for (Group group : groupsList) {
-            if (groupId.equals(group.getId().getValue())) {
-                found = true;
-                break;
-            }
-        }
-        assertTrue(found);
+        Set<Long> groupIds = groupWithVersion.getGroupsList().stream()
+                .map(group -> group.getId().getValue())
+                .collect(Collectors.toSet());
+        assertTrue(groupIds.contains(groupId));
     }
 
     @Test
@@ -272,8 +262,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void answerGroupQuestions_shouldEqualNewQuestionId() throws ExecutionException, InterruptedException, TimeoutException {
-        HashMap<Long, String> map = new HashMap<>();
-        map.put(groupJoinQuestionId, "answer");
+        Map<Long, String> map = Map.of(groupJoinQuestionId, "answer");
         boolean isSuccess;
         try {
             isSuccess = turmsClient.getGroupService().answerGroupQuestions(map)
@@ -297,7 +286,7 @@ public class GroupServiceIT {
     @Test
     @Order(ORDER_LOWEST_PRIORITY)
     public void deleteGroupJoinQuestion_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = turmsClient.getGroupService().deleteGroupJoinQuestion(groupId)
+        Void result = turmsClient.getGroupService().deleteGroupJoinQuestion(groupJoinQuestionId)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
