@@ -51,7 +51,7 @@ public class UserServiceST {
 
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
-    public void login_shouldReturnGroupId() throws ExecutionException, InterruptedException, TimeoutException {
+    public void login_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = turmsClient.getUserService().login(1, "123", null, UserStatus.BUSY, DeviceType.ANDROID)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
@@ -59,7 +59,7 @@ public class UserServiceST {
 
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
-    public void relogin_shouldReturnGroupId() throws ExecutionException, InterruptedException, TimeoutException {
+    public void relogin_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         turmsClient.getUserService().logout()
                 .get(5, TimeUnit.SECONDS);
         Void result = turmsClient.getUserService().relogin()
@@ -139,7 +139,7 @@ public class UserServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void updateUserOnlineStatus_shouldReturnGroupId() throws ExecutionException, InterruptedException, TimeoutException {
+    public void updateUserOnlineStatus_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = turmsClient.getUserService().updateUserOnlineStatus(userStatus)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);

@@ -120,7 +120,7 @@ public class MessageServiceST {
     }
 
     @Test
-    @Order(ORDER_MIDDLE_PRIORITY)
+    @Order(ORDER_MIDDLE_PRIORITY - 1)
     public void markMessageUnread_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = recipientClient.getMessageService().markMessageUnread(privateMessageId)
                 .get(5, TimeUnit.SECONDS);
