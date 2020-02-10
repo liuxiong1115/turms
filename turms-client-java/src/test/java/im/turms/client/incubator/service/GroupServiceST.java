@@ -30,7 +30,7 @@ public class GroupServiceST {
     private static final long GROUP_MEMBER_ID = 3;
     private static final long GROUP_INVITATION_INVITEE = 4;
     private static final long GROUP_SUCCESSOR = 1;
-    private static final long GROUP_BLACKLISTED_USER_ID = 4;
+    private static final long GROUP_BLACKLISTED_USER_ID = 5;
     private static TurmsClient turmsClient;
     private static Long groupId;
     private static Long groupJoinQuestionId;
