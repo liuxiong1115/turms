@@ -157,11 +157,10 @@ public class MessageStatusService {
     public Mono<Boolean> updateMessagesReadDate(
             @NotNull Long messageId,
             @Nullable @PastOrPresent Date readDate) {
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
-                .addCriteria(Criteria.where(MessageStatus.Fields.readDate).is(null));
+        Query query = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId));
         Update update;
         if (readDate != null) {
+            query.addCriteria(Criteria.where(MessageStatus.Fields.readDate).is(null));
             update = new Update().set(MessageStatus.Fields.readDate, readDate);
         } else {
             update = new Update().unset(MessageStatus.Fields.readDate);
