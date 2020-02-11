@@ -21,7 +21,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -35,7 +38,6 @@ import java.util.concurrent.ConcurrentMap;
 // Warning: Always to add Serializable to DeviceType & UserStatus after recompiling proto files
 public class UserOnlineInfo implements Serializable {
     private Long userId;
-    @Getter(AccessLevel.NONE)
     private UserStatus userStatus;
     private ConcurrentMap<DeviceType, OnlineUserManager.Session> sessionMap;
 
