@@ -176,7 +176,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         }
     }
 
-    public static Map<String, Object> getPropertiesMap(TurmsProperties turmsProperties, boolean mutable) throws IOException {
+    public static Map<String, Object> getPropertyValueMap(TurmsProperties turmsProperties, boolean mutable) throws IOException {
         if (mutable) {
             return Constants.MAPPER.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(turmsProperties), Constants.TYPE_REF_MAP);
         } else {
