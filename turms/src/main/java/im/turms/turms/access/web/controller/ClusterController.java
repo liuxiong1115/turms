@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static im.turms.turms.constant.AdminPermission.*;
 
@@ -53,7 +54,7 @@ public class ClusterController {
     @RequiredPermission(CLUSTER_CONFIG_QUERY)
     public ResponseEntity<ResponseDTO<Map<String, Object>>> queryClusterConfig(@RequestParam(defaultValue = "false") Boolean onlyMutable) {
         try {
-            return ResponseFactory.okIfTruthy(TurmsProperties.getPropertiesMap(turmsClusterManager.getTurmsProperties(), onlyMutable));
+            return ResponseFactory.okIfTruthy(TurmsProperties.getPropertyValueMap(turmsClusterManager.getTurmsProperties(), onlyMutable));
         } catch (IOException e) {
             throw TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR);
         }
@@ -68,8 +69,12 @@ public class ClusterController {
         Map<String, Object> metadata = TurmsProperties.getMetadata(new HashMap<>(), TurmsProperties.class, onlyMutable, withMutableFlag);
         if (withValue) {
             try {
-                Map<String, Object> propertiesMap = TurmsProperties.getPropertiesMap(turmsClusterManager.getTurmsProperties(), onlyMutable);
-                Map<String, Object> propertiesWithMetadata = TurmsProperties.mergePropertiesWithMetadata(propertiesMap, metadata);
+                Map<String, Object> propertyValueMap = TurmsProperties.getPropertyValueMap(turmsClusterManager.getTurmsProperties(), onlyMutable);
+                propertyValueMap = propertyValueMap.entrySet()
+                        .stream()
+                        .filter(entry -> metadata.containsKey(entry.getKey()))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                Map<String, Object> propertiesWithMetadata = TurmsProperties.mergePropertiesWithMetadata(propertyValueMap, metadata);
                 return ResponseFactory.okIfTruthy(propertiesWithMetadata);
             } catch (IOException e) {
                 throw TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR);

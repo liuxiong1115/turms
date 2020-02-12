@@ -30,14 +30,14 @@ import "model/user/users_infos_with_version.proto";
 import "model/user/users_online_statuses.proto";
 
 message TurmsNotification {
-    // Note: request_id is allowed to be duplicated because
+    // Note: request_id is allowed to be duplicate because
     // it is used for clients to identify the response of the same request id in a session
     google.protobuf.Int64Value request_id = 1;
     google.protobuf.Int32Value code = 2;
     google.protobuf.StringValue reason = 3;
     Data data = 4;
     TurmsRequest relayed_request = 5;
-    // requester_id only exists when a requester trigger a notification to its recipients
+    // requester_id only exists when a requester triggers a notification to its recipients
     // Note: Do not move requester_id to TurmsRequest because it needs to rebuild a whole TurmsNotification
     // when recipients need the requester_id.
     google.protobuf.Int64Value requester_id = 6;
