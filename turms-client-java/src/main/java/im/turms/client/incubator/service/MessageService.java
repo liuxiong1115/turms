@@ -14,6 +14,7 @@ import im.turms.turms.pojo.bo.message.Message;
 import im.turms.turms.pojo.bo.message.MessageStatus;
 import im.turms.turms.pojo.bo.message.MessagesWithTotal;
 import im.turms.turms.pojo.bo.user.UserLocation;
+import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.message.*;
 
 import javax.annotation.Nullable;
@@ -21,12 +22,27 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class MessageService {
     private TurmsClient turmsClient;
+    public Function<Message, Void> onMessage;
 
     public MessageService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;
+        this.turmsClient.getDriver()
+                .getOnNotificationListeners()
+                .add(notification -> {
+                    if (onMessage != null && notification.hasData()) {
+                        TurmsNotification.Data data = notification.getData();
+                        if (data.hasMessages()) {
+                            for (Message message : data.getMessages().getMessagesList()) {
+                                onMessage.apply(message);
+                            }
+                        }
+                    }
+                    return null;
+                });
     }
 
     public CompletableFuture<Long> sendMessage(

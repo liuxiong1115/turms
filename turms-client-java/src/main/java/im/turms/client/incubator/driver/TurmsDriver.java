@@ -16,6 +16,7 @@ import im.turms.turms.pojo.bo.user.UserLocation;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.data.domain.PageRequest;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -24,9 +25,7 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -50,7 +49,7 @@ public class TurmsDriver {
     private ScheduledFuture<?> heartbeatFuture;
     private final HashMap<Long, Pair<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
-    private Function<TurmsNotification, Void> onMessage;
+    private List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
     private Function5<Boolean, TurmsStatusCode, Throwable, Integer, String, Void> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
@@ -66,16 +65,16 @@ public class TurmsDriver {
     private String address;
     private String sessionId;
 
+    public List<Function<TurmsNotification, Void>> getOnNotificationListeners() {
+        return onNotificationListeners;
+    }
+
     public String getAddress() {
         return address;
     }
 
     public String getSessionId() {
         return sessionId;
-    }
-
-    public void setOnMessage(Function<TurmsNotification, Void> onMessage) {
-        this.onMessage = onMessage;
     }
 
     public void setOnClose(Function5<Boolean, TurmsStatusCode, Throwable, Integer, String, Void> onClose) {
@@ -208,8 +207,12 @@ public class TurmsDriver {
                                         }
                                     }
                                 }
-                                if (onMessage != null) {
-                                    onMessage.apply(notification);
+                                for (Function<TurmsNotification, Void> listener : onNotificationListeners) {
+                                    try {
+                                        listener.apply(notification);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
                             return CompletableFuture.completedStage(notification);
