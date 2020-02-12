@@ -3,6 +3,7 @@ package im.turms.client.incubator;
 import im.turms.client.incubator.driver.TurmsDriver;
 import im.turms.client.incubator.service.GroupService;
 import im.turms.client.incubator.service.MessageService;
+import im.turms.client.incubator.service.NotificationService;
 import im.turms.client.incubator.service.UserService;
 
 import javax.annotation.Nullable;
@@ -14,6 +15,8 @@ public class TurmsClient {
     private GroupService groupService;
     private MessageService messageService;
 
+    private NotificationService notificationService;
+
     public TurmsClient(
             @NotNull String url,
             @Nullable Integer connectionTimeout,
@@ -22,6 +25,7 @@ public class TurmsClient {
         userService = new UserService(this);
         groupService = new GroupService(this);
         messageService = new MessageService(this);
+        notificationService = new NotificationService(this);
     }
 
     public TurmsDriver getDriver() {
@@ -38,5 +42,9 @@ public class TurmsClient {
 
     public MessageService getMessageService() {
         return messageService;
+    }
+
+    public NotificationService getNotificationService() {
+        return notificationService;
     }
 }

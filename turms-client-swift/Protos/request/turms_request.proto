@@ -70,7 +70,7 @@ import "request/message/update_typing_status_request.proto";
 
 // Client -> Server -> Client
 message TurmsRequest {
-    // Note: request_id is allowed to be duplicated because
+    // Note: request_id is allowed to be duplicate because
     // it is used for clients to identify the response of the same request id in a session
     google.protobuf.Int64Value request_id = 1;
 
