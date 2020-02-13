@@ -2,6 +2,7 @@ package im.turms.client.incubator.service;
 
 import com.google.protobuf.*;
 import im.turms.client.incubator.TurmsClient;
+import im.turms.client.incubator.model.MessageAddition;
 import im.turms.client.incubator.util.MapUtil;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.ChatType;
@@ -19,14 +20,40 @@ import im.turms.turms.pojo.request.message.*;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MessageService {
+    /**
+     * Format: "@{userId}"
+     * Example: "@{123}", "I need to talk with @{123} and @{321}"
+     */
+    private static final Function<Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<>() {
+        private final Pattern regex = Pattern.compile("@\\{(\\d+?)}");
+
+        @Override
+        public Set<Long> apply(Message message) {
+            if (message.hasText()) {
+                String text = message.getText().getValue();
+                Matcher matcher = regex.matcher(text);
+                Set<Long> userIds = new LinkedHashSet<>();
+                while (matcher.find()) {
+                    String group = matcher.group(1);
+                    userIds.add(Long.parseLong(group));
+                }
+                return userIds;
+            }
+            return Collections.emptySet();
+        }
+    };
+
     private TurmsClient turmsClient;
-    public Function<Message, Void> onMessage;
+    private Function<Message, Set<Long>> mentionedUserIdsParser;
+    public BiFunction<Message, MessageAddition, Void> onMessage;
 
     public MessageService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;
@@ -37,7 +64,8 @@ public class MessageService {
                         TurmsNotification.Data data = notification.getData();
                         if (data.hasMessages()) {
                             for (Message message : data.getMessages().getMessagesList()) {
-                                onMessage.apply(message);
+                                MessageAddition addition = parseMessageAddition(message);
+                                onMessage.apply(message, addition);
                             }
                         }
                     }
@@ -170,6 +198,23 @@ public class MessageService {
                         "chat_type", chatType,
                         "to_id", targetId))
                 .thenApply(notification -> null);
+    }
+
+    public boolean isMentionEnabled() {
+        return mentionedUserIdsParser != null;
+    }
+
+    public void enableMention() {
+        if (mentionedUserIdsParser == null) {
+            mentionedUserIdsParser = DEFAULT_MENTIONED_USER_IDS_PARSER;
+        }
+    }
+
+    public void enableMention(@NotNull Function<Message, Set<Long>> mentionedUserIdsParser) {
+        if (mentionedUserIdsParser == null) {
+            throw new IllegalArgumentException("mentionedUserIdsParser must not be null");
+        }
+        this.mentionedUserIdsParser = mentionedUserIdsParser;
     }
 
     public static byte[] generateLocationRecord(
@@ -318,5 +363,16 @@ public class MessageService {
                 .setDescription(builder)
                 .build()
                 .toByteArray();
+    }
+
+    private MessageAddition parseMessageAddition(Message message) {
+        Set<Long> mentionedUserIds;
+        if (mentionedUserIdsParser != null) {
+            mentionedUserIds = mentionedUserIdsParser.apply(message);
+        } else {
+            mentionedUserIds = Collections.emptySet();
+        }
+        boolean isMentioned = mentionedUserIds.contains(turmsClient.getUserService().getUserId());
+        return new MessageAddition(isMentioned, mentionedUserIds);
     }
 }
