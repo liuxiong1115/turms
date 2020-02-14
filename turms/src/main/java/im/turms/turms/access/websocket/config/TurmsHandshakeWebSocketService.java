@@ -80,7 +80,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
      */
     @Override
     public Mono<Void> handleRequest(ServerWebExchange exchange, WebSocketHandler handler) {
-        if (!turmsClusterManager.isWorkable()) {
+        if (!turmsClusterManager.isServing()) {
             return Mono.error(new ResponseStatusException(HttpStatus.GONE));
         }
         ServerHttpRequest request = exchange.getRequest();

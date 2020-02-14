@@ -86,7 +86,7 @@ public class InboundMessageDispatcher {
         Long userId = SessionUtil.getUserIdFromSession(session);
         DeviceType deviceType = SessionUtil.getDeviceTypeFromSession(session);
         if (userId != null) {
-            if (!turmsClusterManager.isWorkable()) {
+            if (!turmsClusterManager.isServing()) {
                 onlineUserService.setLocalUserOffline(userId, CloseStatus.NOT_ACCEPTABLE);
                 return Mono.empty();
             }
