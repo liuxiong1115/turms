@@ -17,6 +17,7 @@
 
 package im.turms.turms.config;
 
+import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -28,10 +29,12 @@ import org.springframework.web.reactive.socket.CloseStatus;
 
 @Component
 public class ApplicationContextConfig {
+    private final TurmsClusterManager turmsClusterManager;
     private final OnlineUserService onlineUserService;
 
-    public ApplicationContextConfig(OnlineUserService onlineUserService) {
+    public ApplicationContextConfig(OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager) {
         this.onlineUserService = onlineUserService;
+        this.turmsClusterManager = turmsClusterManager;
     }
 
     @EventListener(classes = ContextRefreshedEvent.class)
@@ -43,6 +46,7 @@ public class ApplicationContextConfig {
 
     @EventListener(classes = ContextClosedEvent.class)
     public void handleContextClosedEvent() {
+        turmsClusterManager.shutdown();
         onlineUserService.setAllLocalUsersOffline(CloseStatus.SERVICE_RESTARTED);
     }
 }

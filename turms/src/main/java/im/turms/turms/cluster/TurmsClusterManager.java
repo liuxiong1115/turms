@@ -106,7 +106,7 @@ public class TurmsClusterManager {
                     membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
                     memberAddressCache.invalidateAll();
                     if (membersSnapshot.size() > HASH_SLOTS_NUMBER) {
-                        hazelcastInstance.shutdown();
+                        shutdown();
                         throw new RuntimeException("The members of cluster should be not more than " + HASH_SLOTS_NUMBER);
                     }
                     localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
@@ -147,8 +147,8 @@ public class TurmsClusterManager {
         };
     }
 
-    public boolean isWorkable() {
-        return hazelcastInstance != null &&
+    public boolean isServing() {
+        return hazelcastInstance.getLifecycleService().isRunning() &&
                 hasJoinedCluster &&
                 sharedTurmsProperties.getCluster().getMinimumQuorumToServe() <= membersSnapshot.size();
     }
@@ -378,6 +378,12 @@ public class TurmsClusterManager {
                                     member.getUuid(), addr));
                 }
             }
+        }
+    }
+
+    public void shutdown() {
+        if (hazelcastInstance != null && hazelcastInstance.getLifecycleService().isRunning()) {
+            hazelcastInstance.shutdown();
         }
     }
 
