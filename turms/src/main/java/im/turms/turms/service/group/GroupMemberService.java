@@ -411,7 +411,7 @@ public class GroupMemberService {
                                                                         return isBlacklisted(groupId, senderId)
                                                                                 .map(isBlacklisted -> {
                                                                                     if (isBlacklisted) {
-                                                                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED))
+                                                                                        throw TurmsBusinessException.get(TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED);
                                                                                     } else {
                                                                                         return true;
                                                                                     }
