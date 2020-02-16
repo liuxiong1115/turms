@@ -58,7 +58,7 @@ public class UserServiceST {
     }
 
     @Test
-    @Order(ORDER_HIGHEST_PRIORITY)
+    @Order(ORDER_HIGHEST_PRIORITY + 1)
     public void relogin_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         turmsClient.getUserService().logout()
                 .get(5, TimeUnit.SECONDS);

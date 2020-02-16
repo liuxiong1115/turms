@@ -343,9 +343,15 @@ public class GroupMemberService {
                 .flatMap(isGroupMember -> {
                     if (isGroupMember == null || !isGroupMember) {
                         return isBlacklisted(groupId, inviteeId)
-                                .map(isBlacklisted -> !isBlacklisted);
+                                .map(isBlacklisted -> {
+                                    if (isBlacklisted) {
+                                        throw TurmsBusinessException.get(TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED);
+                                    } else {
+                                        return true;
+                                    }
+                                });
                     } else {
-                        return Mono.just(false);
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_NOT_GROUP_MEMBER));
                     }
                 });
     }
@@ -358,7 +364,7 @@ public class GroupMemberService {
                         return groupService.isGroupMuted(groupId)
                                 .flatMap(isGroupMuted -> {
                                     if (isGroupMuted) {
-                                        return Mono.just(false);
+                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_HAS_BEEN_MUTED));
                                     } else {
                                         if (turmsClusterManager.getTurmsProperties().getMessage()
                                                 .isCheckIfTargetActiveAndNotDeleted()) {
@@ -366,14 +372,26 @@ public class GroupMemberService {
                                                     .flatMap(isGroupActiveAndNotDeleted -> {
                                                         if (isGroupActiveAndNotDeleted) {
                                                             return isMemberMuted(groupId, senderId)
-                                                                    .map(muted -> !muted);
+                                                                    .map(muted -> {
+                                                                        if (muted) {
+                                                                            throw TurmsBusinessException.get(TurmsStatusCode.MEMBER_HAS_BEEN_MUTED);
+                                                                        } else {
+                                                                            return true;
+                                                                        }
+                                                                    });
                                                         } else {
-                                                            return Mono.just(false);
+                                                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_ACTIVE));
                                                         }
                                                     });
                                         } else {
                                             return isMemberMuted(groupId, senderId)
-                                                    .map(muted -> !muted);
+                                                    .map(muted -> {
+                                                        if (muted) {
+                                                            throw TurmsBusinessException.get(TurmsStatusCode.GROUP_HAS_BEEN_MUTED);
+                                                        } else {
+                                                            return true;
+                                                        }
+                                                    });
                                         }
                                     }
                                 });
@@ -385,24 +403,30 @@ public class GroupMemberService {
                                         return groupService.isGroupMuted(groupId)
                                                 .flatMap(isGroupMuted -> {
                                                     if (isGroupMuted) {
-                                                        return Mono.just(false);
+                                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_HAS_BEEN_MUTED));
                                                     } else {
                                                         return groupService.isGroupActiveAndNotDeleted(groupId)
-                                                                .flatMap(isGroupActiveAndNoteDeleted -> {
-                                                                    if (isGroupActiveAndNoteDeleted) {
+                                                                .flatMap(isGroupActiveAndNotDeleted -> {
+                                                                    if (isGroupActiveAndNotDeleted) {
                                                                         return isBlacklisted(groupId, senderId)
-                                                                                .map(isBlacklisted -> !isBlacklisted);
+                                                                                .map(isBlacklisted -> {
+                                                                                    if (isBlacklisted) {
+                                                                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED))
+                                                                                    } else {
+                                                                                        return true;
+                                                                                    }
+                                                                                });
                                                                     } else {
-                                                                        return Mono.just(false);
+                                                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_ACTIVE));
                                                                     }
                                                                 });
                                                     }
                                                 });
                                     } else {
-                                        return Mono.just(false);
+                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.GUESTS_HAVE_BEEN_MUTED));
                                     }
                                 })
-                                .defaultIfEmpty(false);
+                                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.TYPE_NOT_EXISTS)));
                     }
                 });
     }
