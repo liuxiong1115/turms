@@ -90,15 +90,14 @@ public class AdminRoleService {
             @NotNull @NoWhitespaceConstraint @Length(min = MIN_ROLE_NAME_LIMIT, max = MAX_ROLE_NAME_LIMIT) String name,
             @NotEmpty Set<AdminPermission> permissions,
             @NotNull Integer rank) {
-        return isAdminHigherThanRole(requesterAccount, roleId)
+        return isAdminHigherThanRank(requesterAccount, rank)
                 .flatMap(isHigher -> {
                     if (isHigher) {
                         return addAdminRole(roleId, name, permissions, rank);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
-                })
-                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
+                });
     }
 
     public Mono<AdminRole> addAdminRole(
@@ -132,8 +131,7 @@ public class AdminRoleService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
-                })
-                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
+                });
     }
 
     public Mono<Boolean> deleteAdminRoles(@NotEmpty Set<Long> roleIds) {
@@ -173,8 +171,7 @@ public class AdminRoleService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
-                })
-                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
+                });
     }
 
     public Mono<Boolean> updateAdminRole(
@@ -294,9 +291,17 @@ public class AdminRoleService {
     public Mono<Boolean> isAdminHigherThanRole(
             @NotNull String account,
             @NotNull Long roleId) {
+        return Mono.zip(queryRankByAccount(account), queryRankByRole(roleId))
+                .map(tuple -> tuple.getT1() > tuple.getT2())
+                .defaultIfEmpty(false);
+    }
+
+    public Mono<Boolean> isAdminHigherThanRank(
+            @NotNull String account,
+            @NotNull Integer rank) {
         return queryRankByAccount(account)
-                .flatMap(rank -> queryRankByRole(roleId)
-                        .map(roleRank -> rank > roleRank));
+                .map(adminRank -> adminRank > rank)
+                .defaultIfEmpty(false);
     }
 
     /**
