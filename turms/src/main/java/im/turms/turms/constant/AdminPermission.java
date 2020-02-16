@@ -219,4 +219,51 @@ public enum AdminPermission {
         permissions.add(CLUSTER_CONFIG_UPDATE);
         return permissions;
     }
+
+    public static Set<AdminPermission> allCreate() {
+        Set<AdminPermission> permissions = new HashSet<>();
+        permissions.add(USER_CREATE);
+        permissions.add(USER_RELATIONSHIP_CREATE);
+        permissions.add(USER_RELATIONSHIP_GROUP_CREATE);
+        permissions.add(USER_FRIEND_REQUEST_CREATE);
+        permissions.add(USER_PERMISSION_GROUP_CREATE);
+        permissions.add(GROUP_CREATE);
+        permissions.add(GROUP_BLACKLIST_CREATE);
+        permissions.add(GROUP_INVITATION_CREATE);
+        permissions.add(GROUP_QUESTION_CREATE);
+        permissions.add(GROUP_JOIN_REQUEST_CREATE);
+        permissions.add(GROUP_MEMBER_CREATE);
+        permissions.add(GROUP_TYPE_CREATE);
+        permissions.add(MESSAGE_CREATE);
+        permissions.add(ADMIN_CREATE);
+        permissions.add(ADMIN_ROLE_CREATE);
+        return permissions;
+    }
+
+    public static Set<AdminPermission> allQuery() {
+        Set<AdminPermission> permissions = new HashSet<>();
+        permissions.add(STATISTICS_USER_QUERY);
+        permissions.add(STATISTICS_GROUP_QUERY);
+        permissions.add(STATISTICS_MESSAGE_QUERY);
+        permissions.add(USER_QUERY);
+        permissions.add(USER_RELATIONSHIP_QUERY);
+        permissions.add(USER_RELATIONSHIP_GROUP_QUERY);
+        permissions.add(USER_FRIEND_REQUEST_QUERY);
+        permissions.add(USER_PERMISSION_GROUP_QUERY);
+        permissions.add(USER_ONLINE_INFO_QUERY);
+        permissions.add(GROUP_QUERY);
+        permissions.add(GROUP_BLACKLIST_QUERY);
+        permissions.add(GROUP_INVITATION_QUERY);
+        permissions.add(GROUP_QUESTION_QUERY);
+        permissions.add(GROUP_JOIN_REQUEST_QUERY);
+        permissions.add(GROUP_MEMBER_QUERY);
+        permissions.add(GROUP_TYPE_QUERY);
+        permissions.add(MESSAGE_QUERY);
+        permissions.add(MESSAGE_STATUS_QUERY);
+        permissions.add(ADMIN_QUERY);
+        permissions.add(ADMIN_ROLE_QUERY);
+        permissions.add(ADMIN_ACTION_LOG_QUERY);
+        permissions.add(CLUSTER_CONFIG_QUERY);
+        return permissions;
+    }
 }

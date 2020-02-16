@@ -7,6 +7,7 @@ import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.*;
 import im.turms.turms.pojo.domain.*;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -107,6 +108,14 @@ public class MongoDataGenerator {
             final int USER_COUNT = 500;
             final Date now = new Date();
             List<Object> objects = new LinkedList<>();
+            long GUEST_ROLE_ID = 2L;
+            Admin guest = new Admin(
+                    "guest",
+                    passwordUtil.encodeAdminPassword("guest"),
+                    "guest",
+                    GUEST_ROLE_ID,
+                    now);
+            objects.add(guest);
             for (int i = 1; i <= ADMIN_COUNT; i++) {
                 Admin admin = new Admin(
                         "account" + i,
@@ -132,7 +141,13 @@ public class MongoDataGenerator {
                     "ADMIN",
                     AdminPermission.all(),
                     0);
+            AdminRole guestRole = new AdminRole(
+                    GUEST_ROLE_ID,
+                    "GUEST",
+                    SetUtils.union(AdminPermission.allQuery(), AdminPermission.allCreate()),
+                    0);
             objects.add(adminRole);
+            objects.add(guestRole);
             // Group
             Group group = new Group(
                     1L,
