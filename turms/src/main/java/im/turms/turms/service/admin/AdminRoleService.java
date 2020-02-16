@@ -93,7 +93,14 @@ public class AdminRoleService {
         return isAdminHigherThanRank(requesterAccount, rank)
                 .flatMap(isHigher -> {
                     if (isHigher) {
-                        return addAdminRole(roleId, name, permissions, rank);
+                        return adminHasPermissions(requesterAccount, permissions)
+                                .flatMap(hasPermissions -> {
+                                    if (hasPermissions) {
+                                        return addAdminRole(roleId, name, permissions, rank);
+                                    } else {
+                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                                    }
+                                });
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -167,7 +174,18 @@ public class AdminRoleService {
         return isAdminHigherThanRole(requesterAccount, highestRoleId)
                 .flatMap(isHigher -> {
                     if (isHigher) {
-                        return updateAdminRole(roleIds, newName, permissions, rank);
+                        if (permissions != null) {
+                            return adminHasPermissions(requesterAccount, permissions)
+                                    .flatMap(hasPermissions -> {
+                                        if (hasPermissions) {
+                                            return updateAdminRole(roleIds, newName, permissions, rank);
+                                        } else {
+                                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                                        }
+                                    });
+                        } else {
+                            return updateAdminRole(roleIds, newName, null, rank);
+                        }
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -304,6 +322,16 @@ public class AdminRoleService {
                 .defaultIfEmpty(false);
     }
 
+    private Mono<Boolean> adminHasPermissions(@NotNull String account, @NotNull Set<AdminPermission> permissions) {
+        if (permissions.isEmpty()) {
+            return Mono.just(true);
+        } else {
+            return queryPermissions(account)
+                    .map(adminPermissions -> adminPermissions.containsAll(permissions))
+                    .defaultIfEmpty(false);
+        }
+    }
+
     /**
      * @return isAdminHigherThanAdmins, admin rank, admins ranks
      */
@@ -333,6 +361,11 @@ public class AdminRoleService {
                         return role;
                     });
         }
+    }
+
+    public Mono<Set<AdminPermission>> queryPermissions(@NotNull String account) {
+        return adminService.queryRoleId(account)
+                .flatMap(this::queryPermissions);
     }
 
     public Mono<Set<AdminPermission>> queryPermissions(@NotNull Long roleId) {
