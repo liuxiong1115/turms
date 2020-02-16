@@ -147,7 +147,7 @@ public class GroupQuestionService {
                                                 null)
                                                 .thenReturn(true);
                                     } else {
-                                        return Mono.just(false);
+                                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.GUESTS_HAVE_BEEN_MUTED));
                                     }
                                 })
                                 .map(joined -> GroupJoinQuestionsAnswerResult

@@ -394,10 +394,8 @@ public class MessageService {
                                     .collectList()
                                     .flatMap(messages -> {
                                         Mono<Boolean> mono = Mono.just(true);
-                                        for (ExpiredMessageAutoDeletionNotificationHandler handler : turmsPluginManager
-                                                .getExpiredMessageAutoDeletionNotificationHandlerList()) {
-                                            mono = mono
-                                                    .defaultIfEmpty(true)
+                                        for (ExpiredMessageAutoDeletionNotificationHandler handler : turmsPluginManager.getExpiredMessageAutoDeletionNotificationHandlerList()) {
+                                            mono = mono.defaultIfEmpty(true)
                                                     .flatMap(allowed -> {
                                                         if (allowed) {
                                                             return handler.allowDeleting(messages);

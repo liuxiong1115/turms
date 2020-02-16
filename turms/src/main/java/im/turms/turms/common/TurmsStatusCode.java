@@ -47,7 +47,7 @@ public enum TurmsStatusCode {
     SESSION_SIMULTANEOUS_CONFLICTS_DECLINE(4012, "A different device has logged into your account", 409),
     SESSION_SIMULTANEOUS_CONFLICTS_NOTIFY(4013, "Someone attempted to log into your account", 409),
     SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE(4014, "A different device has logged into your account", 409),
-    SUCCESSOR_NOT_GROUP_MEMBER(4015, "The successor is not the group member", 406),
+    SUCCESSOR_NOT_GROUP_MEMBER(4015, "The successor is not a member of the group", 406),
     TARGET_USERS_UNAUTHORIZED(4016, "The target users are unauthorized", 406),
     TARGET_USERS_NOT_EXIST(4017, "The target users do not exist", 404),
     TYPE_NOT_EXISTS(4018, "The resource type does not exist", 404),
@@ -56,6 +56,11 @@ public enum TurmsStatusCode {
     ALREADY_GROUP_MEMBER(4021, "The user is already a member of the group", 406),
     FRIEND_REQUEST_HAS_EXISTED(4022, "A friend request has already existed", 406),
     RELATIONSHIP_HAS_ESTABLISHED(4023, "The relationship has already established", 406),
+    USER_NOT_GROUP_MEMBER(4024, "The user is not a member of the group", 406),
+    USER_HAS_BEEN_BLACKLISTED(4025, "The user has been blacklisted", 406),
+    GROUP_HAS_BEEN_MUTED(4026, "The group has been muted", 406),
+    MEMBER_HAS_BEEN_MUTED(4027, "The group member has been muted", 406),
+    GUESTS_HAVE_BEEN_MUTED(4028, "The guests of the group have been muted", 406),
 
     LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500),
 
