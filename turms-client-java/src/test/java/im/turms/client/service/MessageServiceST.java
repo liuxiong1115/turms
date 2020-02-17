@@ -1,6 +1,6 @@
-package im.turms.client.incubator.service;
+package im.turms.client.service;
 
-import im.turms.client.incubator.TurmsClient;
+import im.turms.client.TurmsClient;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;

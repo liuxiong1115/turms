@@ -1,10 +1,10 @@
-package im.turms.client.incubator;
+package im.turms.client;
 
-import im.turms.client.incubator.driver.TurmsDriver;
-import im.turms.client.incubator.service.GroupService;
-import im.turms.client.incubator.service.MessageService;
-import im.turms.client.incubator.service.NotificationService;
-import im.turms.client.incubator.service.UserService;
+import im.turms.client.driver.TurmsDriver;
+import im.turms.client.service.GroupService;
+import im.turms.client.service.MessageService;
+import im.turms.client.service.NotificationService;
+import im.turms.client.service.UserService;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;

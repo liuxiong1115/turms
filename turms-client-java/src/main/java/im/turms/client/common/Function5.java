@@ -1,4 +1,4 @@
-package im.turms.client.incubator.common;
+package im.turms.client.common;
 
 @FunctionalInterface
 public interface Function5<T1, T2, T3, T4, T5, R> {

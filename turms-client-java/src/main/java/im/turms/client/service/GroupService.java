@@ -1,8 +1,8 @@
-package im.turms.client.incubator.service;
+package im.turms.client.service;
 
-import im.turms.client.incubator.TurmsClient;
-import im.turms.client.incubator.model.GroupWithVersion;
-import im.turms.client.incubator.util.MapUtil;
+import im.turms.client.TurmsClient;
+import im.turms.client.model.GroupWithVersion;
+import im.turms.client.util.MapUtil;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.GroupMemberRole;
 import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;

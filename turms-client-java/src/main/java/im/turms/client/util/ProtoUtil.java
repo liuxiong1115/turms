@@ -1,13 +1,12 @@
-package im.turms.client.incubator.util;
+package im.turms.client.util;
 
 
 import com.google.protobuf.*;
-import im.turms.client.incubator.common.TurmsLogger;
+import im.turms.client.common.TurmsLogger;
 import im.turms.turms.pojo.request.group.enrollment.CheckGroupJoinQuestionsAnswersRequest;
 
 import java.util.*;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class ProtoUtil {
 

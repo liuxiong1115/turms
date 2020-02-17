@@ -1,9 +1,9 @@
-package im.turms.client.incubator.service;
+package im.turms.client.service;
 
 import com.google.protobuf.*;
-import im.turms.client.incubator.TurmsClient;
-import im.turms.client.incubator.model.MessageAddition;
-import im.turms.client.incubator.util.MapUtil;
+import im.turms.client.TurmsClient;
+import im.turms.client.model.MessageAddition;
+import im.turms.client.util.MapUtil;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.ChatType;
 import im.turms.turms.constant.MessageDeliveryStatus;
