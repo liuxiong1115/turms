@@ -1,4 +1,4 @@
-package im.turms.client.incubator.common;
+package im.turms.client.common;
 
 import java.util.logging.Logger;
 

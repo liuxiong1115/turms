@@ -1,13 +1,13 @@
-package im.turms.client.incubator.driver;
+package im.turms.client.driver;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import im.turms.client.incubator.common.Function5;
-import im.turms.client.incubator.common.StringUtil;
-import im.turms.client.incubator.common.TurmsLogger;
-import im.turms.client.incubator.util.ProtoUtil;
+import im.turms.client.common.Function5;
+import im.turms.client.common.StringUtil;
+import im.turms.client.common.TurmsLogger;
+import im.turms.client.util.ProtoUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;
@@ -16,7 +16,6 @@ import im.turms.turms.pojo.bo.user.UserLocation;
 import im.turms.turms.pojo.notification.TurmsNotification;
 import im.turms.turms.pojo.request.TurmsRequest;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.data.domain.PageRequest;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;

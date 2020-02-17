@@ -1,8 +1,8 @@
-package im.turms.client.incubator.service;
+package im.turms.client.service;
 
 import helper.ExceptionUtil;
-import im.turms.client.incubator.TurmsClient;
-import im.turms.client.incubator.model.GroupWithVersion;
+import im.turms.client.TurmsClient;
+import im.turms.client.model.GroupWithVersion;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.GroupMemberRole;

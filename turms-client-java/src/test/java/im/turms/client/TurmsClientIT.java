@@ -1,4 +1,4 @@
-package im.turms.client.incubator;
+package im.turms.client;
 
 import org.junit.jupiter.api.Test;
 

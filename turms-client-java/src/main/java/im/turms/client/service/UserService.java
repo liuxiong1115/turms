@@ -1,9 +1,9 @@
-package im.turms.client.incubator.service;
+package im.turms.client.service;
 
-import im.turms.client.incubator.TurmsClient;
-import im.turms.client.incubator.driver.TurmsDriver;
-import im.turms.client.incubator.model.UserInfoWithVersion;
-import im.turms.client.incubator.util.MapUtil;
+import im.turms.client.driver.TurmsDriver;
+import im.turms.client.TurmsClient;
+import im.turms.client.model.UserInfoWithVersion;
+import im.turms.client.util.MapUtil;
 import im.turms.turms.common.TurmsStatusCode;
 import im.turms.turms.common.Validator;
 import im.turms.turms.constant.DeviceType;

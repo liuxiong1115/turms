@@ -1,4 +1,4 @@
-package im.turms.client.incubator.model;
+package im.turms.client.model;
 
 import com.google.protobuf.Int64Value;
 import im.turms.turms.pojo.bo.group.Group;

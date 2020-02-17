@@ -1,4 +1,4 @@
-package im.turms.client.incubator.model;
+package im.turms.client.model;
 
 import java.util.Set;
 

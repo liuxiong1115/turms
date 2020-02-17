@@ -1,4 +1,4 @@
-package im.turms.client.incubator.driver;
+package im.turms.client.driver;
 
 import im.turms.turms.constant.DeviceType;
 import im.turms.turms.constant.UserStatus;

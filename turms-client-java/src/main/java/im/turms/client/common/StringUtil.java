@@ -1,4 +1,4 @@
-package im.turms.client.incubator.common;
+package im.turms.client.common;
 
 public class StringUtil {
     private StringUtil() {}
