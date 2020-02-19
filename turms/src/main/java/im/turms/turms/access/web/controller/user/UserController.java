@@ -17,14 +17,14 @@
 
 package im.turms.turms.access.web.controller.user;
 
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.DivideBy;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.DateTimeUtil;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.constant.DivideBy;
-import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.pojo.bo.common.DateRange;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.message.MessageService;

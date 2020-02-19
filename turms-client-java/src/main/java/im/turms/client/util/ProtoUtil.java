@@ -3,7 +3,7 @@ package im.turms.client.util;
 
 import com.google.protobuf.*;
 import im.turms.client.common.TurmsLogger;
-import im.turms.turms.pojo.request.group.enrollment.CheckGroupJoinQuestionsAnswersRequest;
+import im.turms.common.model.dto.request.group.enrollment.CheckGroupJoinQuestionsAnswersRequest;
 
 import java.util.*;
 import java.util.logging.Level;

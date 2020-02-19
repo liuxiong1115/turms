@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.dto;
 
-import im.turms.turms.constant.GroupMemberRole;
+import im.turms.common.constant.GroupMemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

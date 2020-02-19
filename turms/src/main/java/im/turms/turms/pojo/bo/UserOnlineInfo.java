@@ -18,8 +18,8 @@
 package im.turms.turms.pojo.bo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.UserStatus;
+import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.UserStatus;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

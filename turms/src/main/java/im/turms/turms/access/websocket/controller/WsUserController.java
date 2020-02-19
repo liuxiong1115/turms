@@ -17,22 +17,22 @@
 
 package im.turms.turms.access.websocket.controller;
 
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.ProfileAccessStrategy;
+import im.turms.common.constant.UserStatus;
+import im.turms.common.model.bo.common.Int64Values;
+import im.turms.common.model.bo.user.UsersInfosWithVersion;
+import im.turms.common.model.bo.user.UsersOnlineStatuses;
+import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
+import im.turms.common.model.dto.request.user.*;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.constant.ProfileAccessStrategy;
-import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
-import im.turms.turms.pojo.bo.common.Int64Values;
-import im.turms.turms.pojo.bo.user.UsersInfosWithVersion;
-import im.turms.turms.pojo.bo.user.UsersOnlineStatuses;
 import im.turms.turms.pojo.domain.User;
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.request.user.*;
 import im.turms.turms.service.group.GroupInvitationService;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;

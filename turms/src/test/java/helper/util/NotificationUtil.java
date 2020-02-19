@@ -17,8 +17,8 @@
 
 package helper.util;
 
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
 
 import javax.validation.constraints.NotNull;
 

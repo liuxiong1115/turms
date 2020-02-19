@@ -107,6 +107,7 @@ public class AdminController {
         Flux<Admin> admins = adminService.queryAdmins(accounts, roleIds, withPassword, page, size);
         return ResponseFactory.page(count, admins);
     }
+
     @PutMapping
     @RequiredPermission(ADMIN_UPDATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateAdmins(

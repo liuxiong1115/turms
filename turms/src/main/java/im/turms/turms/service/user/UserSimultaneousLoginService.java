@@ -19,9 +19,9 @@ package im.turms.turms.service.user;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import im.turms.common.constant.DeviceType;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.constant.DeviceType;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.property.business.User;

@@ -1,7 +1,7 @@
 package helper;
 
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.exception.TurmsBusinessException;
 
 import java.util.concurrent.ExecutionException;
 

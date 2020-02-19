@@ -19,12 +19,17 @@ package im.turms.turms.service.user.relationship;
 
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.bo.common.Int64ValuesWithVersion;
+import im.turms.common.model.bo.user.UserRelationshipsWithVersion;
+import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.UserRelationshipKeyConstraint;
-import im.turms.turms.common.*;
-import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.pojo.bo.common.DateRange;
-import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
-import im.turms.turms.pojo.bo.user.UserRelationshipsWithVersion;
+import im.turms.turms.common.MapUtil;
+import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.domain.UserRelationship;
 import im.turms.turms.pojo.domain.UserRelationshipGroupMember;
 import im.turms.turms.pojo.domain.UserVersion;
@@ -229,7 +234,7 @@ public class UserRelationshipService {
                                     UserRelationshipsWithVersion.Builder builder = UserRelationshipsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(date.getTime()).build());
                                     for (UserRelationship relationship : relationships) {
-                                        im.turms.turms.pojo.bo.user.UserRelationship userRelationship = ProtoUtil.relationship2proto(relationship).build();
+                                        im.turms.common.model.bo.user.UserRelationship userRelationship = ProtoUtil.relationship2proto(relationship).build();
                                         builder.addUserRelationships(userRelationship);
                                     }
                                     return builder.build();

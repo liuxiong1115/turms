@@ -1,12 +1,12 @@
 package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
-import im.turms.turms.constant.ChatType;
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.UserStatus;
-import im.turms.turms.pojo.bo.message.Message;
-import im.turms.turms.pojo.bo.message.MessageStatus;
-import im.turms.turms.pojo.bo.message.MessagesWithTotal;
+import im.turms.common.constant.ChatType;
+import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.UserStatus;
+import im.turms.common.model.bo.message.Message;
+import im.turms.common.model.bo.message.MessageStatus;
+import im.turms.common.model.bo.message.MessagesWithTotal;
 import org.junit.jupiter.api.*;
 
 import java.util.Date;

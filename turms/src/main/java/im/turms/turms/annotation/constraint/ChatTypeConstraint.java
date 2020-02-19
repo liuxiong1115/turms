@@ -1,6 +1,6 @@
 package im.turms.turms.annotation.constraint;
 
-import im.turms.turms.constant.ChatType;
+import im.turms.common.constant.ChatType;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

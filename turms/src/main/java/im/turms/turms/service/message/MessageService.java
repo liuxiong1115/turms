@@ -20,19 +20,24 @@ package im.turms.turms.service.message;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.ChatType;
+import im.turms.common.constant.MessageDeliveryStatus;
+import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
+import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.ChatTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.*;
-import im.turms.turms.constant.ChatType;
-import im.turms.turms.constant.MessageDeliveryStatus;
-import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.common.AggregationUtil;
+import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.plugin.ExpiredMessageAutoDeletionNotificationHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
-import im.turms.turms.pojo.bo.common.DateRange;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -60,8 +65,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static im.turms.common.TurmsStatusCode.*;
 import static im.turms.turms.common.Constants.*;
-import static im.turms.turms.common.TurmsStatusCode.*;
 
 @Service
 @Validated

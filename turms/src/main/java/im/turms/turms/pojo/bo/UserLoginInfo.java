@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.bo;
 
-import im.turms.turms.constant.DeviceType;
+import im.turms.common.constant.DeviceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

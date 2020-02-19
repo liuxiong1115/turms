@@ -1,6 +1,6 @@
 package im.turms.turms.annotation.constraint;
 
-import im.turms.turms.constant.GroupMemberRole;
+import im.turms.common.constant.GroupMemberRole;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

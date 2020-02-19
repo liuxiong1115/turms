@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.domain;
 
-import im.turms.turms.constant.MessageDeliveryStatus;
+import im.turms.common.constant.MessageDeliveryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

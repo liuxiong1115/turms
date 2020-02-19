@@ -8,14 +8,13 @@ import im.turms.client.common.Function5;
 import im.turms.client.common.StringUtil;
 import im.turms.client.common.TurmsLogger;
 import im.turms.client.util.ProtoUtil;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.UserStatus;
-import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.pojo.bo.user.UserLocation;
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
-import org.apache.commons.lang3.tuple.Pair;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.UserStatus;
+import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.bo.user.UserLocation;
+import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -28,6 +27,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.logging.Level;
+
+import static java.util.AbstractMap.SimpleEntry;
 
 public class TurmsDriver {
     private static final Integer HEARTBEAT_INTERVAL = 20 * 1000;
@@ -46,7 +47,7 @@ public class TurmsDriver {
     private boolean isSessionEstablished;
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> heartbeatFuture;
-    private final HashMap<Long, Pair<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
+    private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
     private List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
     private Function5<Boolean, TurmsStatusCode, Throwable, Integer, String, Void> onClose;
@@ -120,7 +121,7 @@ public class TurmsDriver {
     }
 
     public CompletableFuture<Void> connect(
-            @NotNull long userId,
+            long userId,
             @NotNull String password,
             @Nullable Integer connectionTimeout,
             @Nullable UserLocation userLocation,
@@ -181,7 +182,7 @@ public class TurmsDriver {
                                     sessionId = notification.getData().getSession().getSessionId();
                                 } else if (notification.hasRequestId()) {
                                     long requestId = notification.getRequestId().getValue();
-                                    Pair<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.get(requestId);
+                                    SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.get(requestId);
                                     if (pair != null) {
                                         CompletableFuture<TurmsNotification> future = pair.getValue();
                                         if (notification.hasCode()) {
@@ -261,7 +262,7 @@ public class TurmsDriver {
                 TurmsRequest request = requestBuilder.build();
                 ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
                 CompletableFuture<TurmsNotification> future = new CompletableFuture<>();
-                requestMap.put(requestId, Pair.of(request, future));
+                requestMap.put(requestId, new SimpleEntry<>(request, future));
                 websocket.sendBinary(data, true).whenComplete((webSocket, throwable) -> {
                     if (throwable != null) {
                         future.completeExceptionally(throwable);

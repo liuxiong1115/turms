@@ -19,9 +19,9 @@ package im.turms.turms.access.websocket.config;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import im.turms.common.constant.DeviceType;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
-import im.turms.turms.constant.DeviceType;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.plugin.UserAuthenticator;
 import im.turms.turms.pojo.bo.UserLoginInfo;

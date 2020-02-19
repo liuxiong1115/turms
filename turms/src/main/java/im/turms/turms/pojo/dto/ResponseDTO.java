@@ -2,7 +2,7 @@ package im.turms.turms.pojo.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import im.turms.turms.common.TurmsStatusCode;
+import im.turms.common.TurmsStatusCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

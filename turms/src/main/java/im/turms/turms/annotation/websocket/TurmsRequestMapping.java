@@ -17,7 +17,7 @@
 
 package im.turms.turms.annotation.websocket;
 
-import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.common.model.dto.request.TurmsRequest;
 import org.springframework.context.annotation.Bean;
 
 import java.lang.annotation.ElementType;

@@ -18,17 +18,22 @@
 package im.turms.turms.service.group;
 
 import com.google.protobuf.Int64Value;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.GroupInvitationStrategy;
+import im.turms.common.constant.GroupMemberRole;
+import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.bo.group.GroupMembersWithVersion;
+import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.GroupMemberKeyConstraint;
 import im.turms.turms.annotation.constraint.GroupMemberRoleConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.*;
-import im.turms.turms.constant.GroupInvitationStrategy;
-import im.turms.turms.constant.GroupMemberRole;
-import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.turms.common.MapUtil;
+import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.bo.InvitableAndInvitationStrategy;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
-import im.turms.turms.pojo.bo.common.DateRange;
-import im.turms.turms.pojo.bo.group.GroupMembersWithVersion;
 import im.turms.turms.pojo.domain.GroupBlacklistedUser;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -601,7 +606,7 @@ public class GroupMemberService {
                         return fillMembersBuilderWithStatus(members, builder);
                     } else {
                         for (GroupMember member : members) {
-                            im.turms.turms.pojo.bo.group.GroupMember groupMember = ProtoUtil
+                            im.turms.common.model.bo.group.GroupMember groupMember = ProtoUtil
                                     .groupMember2proto(member).build();
                             builder.addGroupMembers(groupMember);
                         }
@@ -637,7 +642,7 @@ public class GroupMemberService {
                                         return fillMembersBuilderWithStatus(members, builder);
                                     } else {
                                         for (GroupMember member : members) {
-                                            im.turms.turms.pojo.bo.group.GroupMember groupMember = ProtoUtil
+                                            im.turms.common.model.bo.group.GroupMember groupMember = ProtoUtil
                                                     .groupMember2proto(member).build();
                                             builder.addGroupMembers(groupMember);
                                         }
@@ -723,7 +728,7 @@ public class GroupMemberService {
                     for (int i = 0; i < members.size(); i++) {
                         GroupMember member = members.get(i);
                         UserOnlineInfo info = (UserOnlineInfo) results[i];
-                        im.turms.turms.pojo.bo.group.GroupMember groupMember = ProtoUtil
+                        im.turms.common.model.bo.group.GroupMember groupMember = ProtoUtil
                                 .userOnlineInfo2groupMember(
                                         member.getKey().getUserId(),
                                         info,

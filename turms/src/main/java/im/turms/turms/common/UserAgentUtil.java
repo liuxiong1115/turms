@@ -17,7 +17,7 @@
 
 package im.turms.turms.common;
 
-import im.turms.turms.constant.DeviceType;
+import im.turms.common.constant.DeviceType;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 

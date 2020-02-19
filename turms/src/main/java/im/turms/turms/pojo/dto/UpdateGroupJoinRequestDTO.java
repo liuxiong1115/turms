@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.dto;
 
-import im.turms.turms.constant.RequestStatus;
+import im.turms.common.constant.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -19,8 +19,8 @@ package helper.client;
 
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
 import lombok.Setter;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.http.HttpHeaders;

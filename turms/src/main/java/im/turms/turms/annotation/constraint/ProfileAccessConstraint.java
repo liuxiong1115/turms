@@ -1,6 +1,6 @@
 package im.turms.turms.annotation.constraint;
 
-import im.turms.turms.constant.ProfileAccessStrategy;
+import im.turms.common.constant.ProfileAccessStrategy;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

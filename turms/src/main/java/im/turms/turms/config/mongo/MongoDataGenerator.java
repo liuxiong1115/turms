@@ -1,11 +1,12 @@
 package im.turms.turms.config.mongo;
 
 import com.google.common.net.InetAddresses;
+import im.turms.common.constant.*;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.compiler.CompilerOptions;
-import im.turms.turms.constant.*;
+import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.*;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;

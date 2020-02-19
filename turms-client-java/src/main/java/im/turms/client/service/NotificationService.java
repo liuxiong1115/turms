@@ -1,7 +1,7 @@
 package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
-import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.common.model.dto.request.TurmsRequest;
 
 import java.util.function.BiFunction;
 

@@ -17,7 +17,7 @@
 
 package im.turms.turms.plugin;
 
-import im.turms.turms.constant.DeviceType;
+import im.turms.common.constant.DeviceType;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
 import org.pf4j.ExtensionPoint;
 import org.springframework.web.reactive.socket.CloseStatus;
@@ -30,5 +30,6 @@ import javax.validation.constraints.NotNull;
  */
 public interface UserOnlineStatusChangeHandler extends ExtensionPoint {
     Mono<Void> goOnline(@NotNull OnlineUserManager onlineUserManager, @NotNull DeviceType loggingInDeviceType);
+
     Mono<Void> goOffline(@NotNull OnlineUserManager onlineUserManager, @NotNull CloseStatus closeStatus);
 }

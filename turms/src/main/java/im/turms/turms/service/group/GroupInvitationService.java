@@ -20,13 +20,18 @@ package im.turms.turms.service.group;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.RequestStatus;
+import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
+import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.RequestStatusConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.*;
-import im.turms.turms.constant.RequestStatus;
-import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.pojo.bo.common.DateRange;
-import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
+import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.RequestStatusUtil;
+import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.domain.GroupInvitation;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserVersionService;
@@ -307,7 +312,7 @@ public class GroupInvitationService {
                                                 GroupInvitationsWithVersion.Builder builder = GroupInvitationsWithVersion.newBuilder();
                                                 builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                                 for (GroupInvitation invitation : groupInvitations) {
-                                                    im.turms.turms.pojo.bo.group.GroupInvitation groupInvitation = ProtoUtil.groupInvitation2proto(invitation).build();
+                                                    im.turms.common.model.bo.group.GroupInvitation groupInvitation = ProtoUtil.groupInvitation2proto(invitation).build();
                                                     builder.addGroupInvitations(groupInvitation);
                                                 }
                                                 return builder.build();

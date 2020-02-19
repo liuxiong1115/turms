@@ -17,10 +17,10 @@
 
 package im.turms.turms.common;
 
+import im.turms.common.constant.ChatType;
+import im.turms.common.constant.DivideBy;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.constant.ChatType;
-import im.turms.turms.constant.DivideBy;
-import im.turms.turms.pojo.bo.common.DateRange;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.dto.StatisticsRecordDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
