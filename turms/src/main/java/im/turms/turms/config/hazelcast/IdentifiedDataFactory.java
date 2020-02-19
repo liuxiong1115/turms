@@ -21,7 +21,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.DataSerializableFactory;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import im.turms.turms.pojo.bo.admin.AdminInfo;
+import im.turms.turms.pojo.bo.AdminInfo;
 import im.turms.turms.pojo.domain.Admin;
 import im.turms.turms.pojo.domain.AdminRole;
 import im.turms.turms.pojo.domain.GroupType;

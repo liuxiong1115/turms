@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.domain;
 
-import im.turms.turms.constant.ProfileAccessStrategy;
+import im.turms.common.constant.ProfileAccessStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

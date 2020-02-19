@@ -1,6 +1,6 @@
 package im.turms.turms.annotation.constraint;
 
-import im.turms.turms.constant.RequestStatus;
+import im.turms.common.constant.RequestStatus;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

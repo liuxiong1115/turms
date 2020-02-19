@@ -17,10 +17,10 @@
 
 package im.turms.turms.pojo.bo;
 
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.pojo.bo.common.Int64Values;
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.model.bo.common.Int64Values;
+import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

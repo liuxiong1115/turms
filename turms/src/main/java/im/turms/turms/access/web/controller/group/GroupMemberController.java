@@ -17,11 +17,11 @@
 
 package im.turms.turms.access.web.controller.group;
 
+import im.turms.common.constant.GroupMemberRole;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.constant.GroupMemberRole;
-import im.turms.turms.pojo.bo.common.DateRange;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.group.GroupMemberService;

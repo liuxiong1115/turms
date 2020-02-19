@@ -18,9 +18,9 @@
 package im.turms.turms.service.user;
 
 import com.mongodb.client.result.UpdateResult;
+import im.turms.common.constant.DeviceType;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.constant.DeviceType;
 import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.UserLoginLog;

@@ -1,11 +1,11 @@
 package im.turms.turms.access.web.controller.user;
 
+import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.UserStatus;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLocation;

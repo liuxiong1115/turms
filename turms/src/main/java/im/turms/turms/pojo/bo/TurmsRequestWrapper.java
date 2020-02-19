@@ -17,8 +17,8 @@
 
 package im.turms.turms.pojo.bo;
 
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.pojo.request.TurmsRequest;
+import im.turms.common.constant.DeviceType;
+import im.turms.common.model.dto.request.TurmsRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.web.reactive.socket.WebSocketMessage;

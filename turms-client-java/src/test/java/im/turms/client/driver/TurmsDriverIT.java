@@ -1,11 +1,11 @@
 package im.turms.client.driver;
 
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.UserStatus;
-import im.turms.turms.pojo.bo.user.UserLocation;
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.request.user.QueryUserProfileRequest;
+import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.UserStatus;
+import im.turms.common.model.bo.user.UserLocation;
+import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
+import im.turms.common.model.dto.request.user.QueryUserProfileRequest;
 import org.junit.jupiter.api.*;
 
 import java.util.concurrent.CompletableFuture;

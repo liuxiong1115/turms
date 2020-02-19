@@ -26,7 +26,7 @@ import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
-import im.turms.turms.pojo.bo.common.DateRange;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.domain.AdminActionLog;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;

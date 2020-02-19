@@ -1,6 +1,6 @@
 package im.turms.turms.annotation.constraint;
 
-import im.turms.turms.constant.DeviceType;
+import im.turms.common.constant.DeviceType;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

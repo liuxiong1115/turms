@@ -3,7 +3,7 @@ package im.turms.client;
 import org.junit.jupiter.api.Test;
 
 import static helper.Constants.WS_URL;
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TurmsClientIT {
 

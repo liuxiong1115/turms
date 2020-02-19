@@ -17,14 +17,14 @@
 
 package im.turms.turms.access.websocket.controller;
 
+import im.turms.common.constant.ResponseAction;
+import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
+import im.turms.common.model.dto.request.user.relationship.*;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.constant.ResponseAction;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
-import im.turms.turms.pojo.notification.TurmsNotification;
-import im.turms.turms.pojo.request.TurmsRequest;
-import im.turms.turms.pojo.request.user.relationship.*;
 import im.turms.turms.service.user.relationship.UserFriendRequestService;
 import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;

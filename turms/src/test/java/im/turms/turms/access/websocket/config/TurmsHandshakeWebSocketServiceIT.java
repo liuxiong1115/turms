@@ -17,8 +17,8 @@
 
 package im.turms.turms.access.websocket.config;
 
+import im.turms.common.constant.ProfileAccessStrategy;
 import im.turms.turms.common.TurmsPasswordUtil;
-import im.turms.turms.constant.ProfileAccessStrategy;
 import im.turms.turms.pojo.domain.User;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

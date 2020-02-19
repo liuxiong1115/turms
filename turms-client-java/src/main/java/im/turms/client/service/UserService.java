@@ -1,21 +1,21 @@
 package im.turms.client.service;
 
-import im.turms.client.driver.TurmsDriver;
 import im.turms.client.TurmsClient;
+import im.turms.client.driver.TurmsDriver;
 import im.turms.client.model.UserInfoWithVersion;
 import im.turms.client.util.MapUtil;
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.common.Validator;
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.ProfileAccessStrategy;
-import im.turms.turms.constant.ResponseAction;
-import im.turms.turms.constant.UserStatus;
-import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.pojo.bo.common.Int64ValuesWithVersion;
-import im.turms.turms.pojo.bo.group.GroupInvitationsWithVersion;
-import im.turms.turms.pojo.bo.user.*;
-import im.turms.turms.pojo.request.user.*;
-import im.turms.turms.pojo.request.user.relationship.*;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.ProfileAccessStrategy;
+import im.turms.common.constant.ResponseAction;
+import im.turms.common.constant.UserStatus;
+import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.bo.common.Int64ValuesWithVersion;
+import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
+import im.turms.common.model.bo.user.*;
+import im.turms.common.model.dto.request.user.*;
+import im.turms.common.model.dto.request.user.relationship.*;
+import im.turms.common.util.Validator;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;

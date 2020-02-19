@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.domain;
 
-import im.turms.turms.constant.DeviceType;
+import im.turms.common.constant.DeviceType;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;

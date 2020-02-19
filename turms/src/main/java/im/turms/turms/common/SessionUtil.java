@@ -19,8 +19,8 @@ package im.turms.turms.common;
 
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.google.common.base.Enums;
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.UserStatus;
+import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.UserStatus;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpCookie;

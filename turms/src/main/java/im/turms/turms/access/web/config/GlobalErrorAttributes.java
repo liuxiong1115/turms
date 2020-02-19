@@ -17,8 +17,8 @@
 
 package im.turms.turms.access.web.config;
 
-import im.turms.turms.common.TurmsStatusCode;
-import im.turms.turms.exception.TurmsBusinessException;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.pojo.dto.ResponseDTO;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.dao.DuplicateKeyException;

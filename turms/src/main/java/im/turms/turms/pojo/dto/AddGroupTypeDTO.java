@@ -17,9 +17,9 @@
 
 package im.turms.turms.pojo.dto;
 
-import im.turms.turms.constant.GroupInvitationStrategy;
-import im.turms.turms.constant.GroupJoinStrategy;
-import im.turms.turms.constant.GroupUpdateStrategy;
+import im.turms.common.constant.GroupInvitationStrategy;
+import im.turms.common.constant.GroupJoinStrategy;
+import im.turms.common.constant.GroupUpdateStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -20,7 +20,7 @@ package im.turms.turms.access.web.controller.admin;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.PageUtil;
-import im.turms.turms.pojo.bo.common.DateRange;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.dto.AcknowledgedDTO;
 import im.turms.turms.pojo.dto.AdminActionLogDTO;
 import im.turms.turms.pojo.dto.PaginationDTO;

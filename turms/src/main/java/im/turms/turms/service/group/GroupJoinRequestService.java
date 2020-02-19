@@ -20,13 +20,18 @@ package im.turms.turms.service.group;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.RequestStatus;
+import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.bo.group.GroupJoinRequestsWithVersion;
+import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.RequestStatusConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.*;
-import im.turms.turms.constant.RequestStatus;
-import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.pojo.bo.common.DateRange;
-import im.turms.turms.pojo.bo.group.GroupJoinRequestsWithVersion;
+import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.RequestStatusUtil;
+import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.domain.GroupJoinRequest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -234,7 +239,7 @@ public class GroupJoinRequestService {
                                     GroupJoinRequestsWithVersion.Builder builder = GroupJoinRequestsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                     for (GroupJoinRequest groupJoinRequest : groupJoinRequests) {
-                                        im.turms.turms.pojo.bo.group.GroupJoinRequest request = ProtoUtil.groupJoinRequest2proto(groupJoinRequest).build();
+                                        im.turms.common.model.bo.group.GroupJoinRequest request = ProtoUtil.groupJoinRequest2proto(groupJoinRequest).build();
                                         builder.addGroupJoinRequests(request);
                                     }
                                     return builder.build();

@@ -17,7 +17,7 @@
 
 package im.turms.turms.pojo.domain;
 
-import im.turms.turms.constant.ChatType;
+import im.turms.common.constant.ChatType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

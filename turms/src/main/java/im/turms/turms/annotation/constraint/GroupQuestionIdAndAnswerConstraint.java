@@ -1,6 +1,6 @@
 package im.turms.turms.annotation.constraint;
 
-import im.turms.turms.pojo.bo.group.GroupQuestionIdAndAnswer;
+import im.turms.turms.pojo.bo.GroupQuestionIdAndAnswer;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

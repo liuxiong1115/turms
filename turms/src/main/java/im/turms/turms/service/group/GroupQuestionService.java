@@ -20,14 +20,18 @@ package im.turms.turms.service.group;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.GroupMemberRole;
+import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.bo.group.GroupJoinQuestionsAnswerResult;
+import im.turms.common.model.bo.group.GroupJoinQuestionsWithVersion;
+import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.GroupQuestionIdAndAnswerConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.*;
-import im.turms.turms.constant.GroupMemberRole;
-import im.turms.turms.exception.TurmsBusinessException;
-import im.turms.turms.pojo.bo.group.GroupJoinQuestionsAnswerResult;
-import im.turms.turms.pojo.bo.group.GroupJoinQuestionsWithVersion;
-import im.turms.turms.pojo.bo.group.GroupQuestionIdAndAnswer;
+import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.pojo.bo.GroupQuestionIdAndAnswer;
 import im.turms.turms.pojo.domain.GroupJoinQuestion;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -289,7 +293,7 @@ public class GroupQuestionService {
                                     GroupJoinQuestionsWithVersion.Builder builder = GroupJoinQuestionsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                     for (GroupJoinQuestion question : groupJoinQuestions) {
-                                        im.turms.turms.pojo.bo.group.GroupJoinQuestion.Builder questionBuilder = ProtoUtil.groupJoinQuestion2proto(question);
+                                        im.turms.common.model.bo.group.GroupJoinQuestion.Builder questionBuilder = ProtoUtil.groupJoinQuestion2proto(question);
                                         builder.addGroupJoinQuestions(questionBuilder.build());
                                     }
                                     return builder.build();

@@ -1,9 +1,9 @@
 package im.turms.client.model;
 
 import com.google.protobuf.Int64Value;
-import im.turms.turms.pojo.bo.user.UserInfo;
-import im.turms.turms.pojo.bo.user.UsersInfosWithVersion;
-import im.turms.turms.pojo.notification.TurmsNotification;
+import im.turms.common.model.bo.user.UserInfo;
+import im.turms.common.model.bo.user.UsersInfosWithVersion;
+import im.turms.common.model.dto.notification.TurmsNotification;
 
 public class UserInfoWithVersion {
     private UserInfo userInfo;

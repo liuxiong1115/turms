@@ -1,9 +1,9 @@
 package im.turms.client.model;
 
 import com.google.protobuf.Int64Value;
-import im.turms.turms.pojo.bo.group.Group;
-import im.turms.turms.pojo.bo.group.GroupsWithVersion;
-import im.turms.turms.pojo.notification.TurmsNotification;
+import im.turms.common.model.bo.group.Group;
+import im.turms.common.model.bo.group.GroupsWithVersion;
+import im.turms.common.model.dto.notification.TurmsNotification;
 
 public class GroupWithVersion {
     private Group group;

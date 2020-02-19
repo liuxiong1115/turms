@@ -18,9 +18,9 @@
 package im.turms.turms.service.user.onlineuser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.UserStatus;
 import im.turms.turms.common.Constants;
-import im.turms.turms.constant.DeviceType;
-import im.turms.turms.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
 import io.netty.util.Timeout;
