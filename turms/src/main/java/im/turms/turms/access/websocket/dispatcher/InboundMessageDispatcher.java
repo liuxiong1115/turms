@@ -20,6 +20,7 @@ package im.turms.turms.access.websocket.dispatcher;
 import com.google.protobuf.Int32Value;
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.StringValue;
+import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.exception.TurmsBusinessException;
@@ -28,6 +29,7 @@ import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
+import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.plugin.ClientRequestHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.bo.RequestResult;
@@ -38,7 +40,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
@@ -87,7 +88,7 @@ public class InboundMessageDispatcher {
         DeviceType deviceType = SessionUtil.getDeviceTypeFromSession(session);
         if (userId != null) {
             if (!turmsClusterManager.isServing()) {
-                onlineUserService.setLocalUserOffline(userId, CloseStatus.NOT_ACCEPTABLE);
+                onlineUserService.setLocalUserOffline(userId, CloseStatusFactory.get(TurmsCloseStatus.SERVER_UNAVAILABLE));
                 return Mono.empty();
             }
             onlineUserService.resetHeartbeatTimeout(userId, deviceType);
@@ -101,7 +102,7 @@ public class InboundMessageDispatcher {
                     return Mono.just(session.pongMessage(DataBufferFactory::allocateBuffer));
             }
         } else {
-            session.close(CloseStatus.SERVER_ERROR).subscribe();
+            session.close(CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "The user ID is missing")).subscribe();
             throw new NoSuchElementException("UserId is missing in session");
         }
     }
@@ -230,13 +231,16 @@ public class InboundMessageDispatcher {
                     Long requestId = request.hasRequestId() ? request.getRequestId().getValue() : null;
                     return handleResult(session, result, requestId, userId);
                 } else {
-                    onlineUserService.getLocalOnlineUserManager(userId).setOfflineByDeviceType(deviceType, CloseStatus.NOT_ACCEPTABLE);
+                    onlineUserService.getLocalOnlineUserManager(userId)
+                            .setOfflineByDeviceType(deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, "No handler for the request"));
                 }
             } else {
-                onlineUserService.getLocalOnlineUserManager(userId).setOfflineByDeviceType(deviceType, CloseStatus.BAD_DATA);
+                onlineUserService.getLocalOnlineUserManager(userId)
+                        .setOfflineByDeviceType(deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST));
             }
         } catch (Exception e) {
-            onlineUserService.getLocalOnlineUserManager(userId).setOfflineByDeviceType(deviceType, CloseStatus.BAD_DATA);
+            onlineUserService.getLocalOnlineUserManager(userId)
+                    .setOfflineByDeviceType(deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, e.getMessage()));
         }
         return Mono.empty();
     }

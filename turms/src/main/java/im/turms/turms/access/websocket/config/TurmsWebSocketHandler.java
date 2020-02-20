@@ -19,6 +19,7 @@ package im.turms.turms.access.websocket.config;
 
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.google.common.net.InetAddresses;
+import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
@@ -28,18 +29,19 @@ import im.turms.turms.access.websocket.dispatcher.InboundMessageDispatcher;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
 import im.turms.turms.common.UserAgentUtil;
+import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SignalType;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -103,13 +105,13 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
                             .doOnError(throwable -> onlineUserService.setLocalUserDevicesOffline(
                                     userId,
                                     Collections.singleton(finalDeviceType),
-                                    CloseStatus.SERVER_ERROR))
+                                    CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, throwable.getMessage())))
                             .doOnSuccess(code -> {
                                 if (code != TurmsStatusCode.OK) {
                                     onlineUserService.setLocalUserDevicesOffline(
                                             userId,
                                             Collections.singleton(finalDeviceType),
-                                            CloseStatus.SERVER_ERROR);
+                                            CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, String.valueOf(code.getBusinessCode())));
                                 } else if (turmsClusterManager.getTurmsProperties().getSession()
                                         .isShouldNotifyClientsOfSessionInfoAfterConnected()) {
                                     String address = turmsClusterManager.getLocalTurmsServerAddress();
@@ -126,11 +128,16 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
                         .sample(Duration.ofMillis(requestInterval));
             }
             responseOutput = responseOutput
-                    .doFinally(signalType -> onlineUserService.setLocalUserDeviceOffline(userId, finalDeviceType, CloseStatus.NORMAL))
+                    .doFinally(signalType -> {
+                        TurmsCloseStatus status = signalType == SignalType.ON_COMPLETE ?
+                                TurmsCloseStatus.DISCONNECTED_BY_CLIENT :
+                                TurmsCloseStatus.UNKNOWN_ERROR;
+                        onlineUserService.setLocalUserDeviceOffline(userId, finalDeviceType, CloseStatusFactory.get(status));
+                    })
                     .flatMap(inboundMessage -> inboundMessageDispatcher.dispatch(session, inboundMessage));
             return session.send(notificationOutput.mergeWith(responseOutput));
         } else {
-            return session.close(CloseStatus.SERVER_ERROR);
+            return session.close(CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "The user ID or IP is missing"));
         }
     }
 

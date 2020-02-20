@@ -4,10 +4,11 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import im.turms.client.common.Function5;
+import im.turms.client.common.Function4;
 import im.turms.client.common.StringUtil;
 import im.turms.client.common.TurmsLogger;
 import im.turms.client.util.ProtoUtil;
+import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
@@ -21,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
+import java.net.http.WebSocketHandshakeException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.*;
@@ -50,7 +52,7 @@ public class TurmsDriver {
     private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
     private List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
-    private Function5<Boolean, TurmsStatusCode, Throwable, Integer, String, Void> onClose;
+    private Function4<Boolean, TurmsCloseStatus, String, Throwable, Void> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
     private int connectionTimeout = 10 * 1000;
@@ -77,7 +79,7 @@ public class TurmsDriver {
         return sessionId;
     }
 
-    public void setOnClose(Function5<Boolean, TurmsStatusCode, Throwable, Integer, String, Void> onClose) {
+    public void setOnClose(Function4<Boolean, TurmsCloseStatus, String, Throwable, Void> onClose) {
         this.onClose = onClose;
     }
 
@@ -231,7 +233,19 @@ public class TurmsDriver {
                         }
                     })
                     .whenComplete((webSocket, throwable) -> {
-                        if (webSocket != null) {
+                        if (throwable != null) {
+                            Throwable cause = throwable.getCause();
+                            // Note that the WebSocketHandshakeException cannot be caught by onError
+                            if (cause instanceof WebSocketHandshakeException) {
+                                WebSocketHandshakeException handshakeException = (WebSocketHandshakeException) cause;
+                                int statusCode = handshakeException.getResponse().statusCode();
+                                if (statusCode == 307) {
+                                    String address = handshakeException.getResponse()
+                                            .headers().firstValue("reason").get();
+                                    reconnect(address);
+                                }
+                            }
+                        } else if (webSocket != null) {
                             this.websocket = webSocket;
                         }
                     })
@@ -280,7 +294,7 @@ public class TurmsDriver {
     private long generateRandomId() {
         long id;
         do {
-            id = (long) Math.floor(Math.random() * 9007199254740991L);
+            id = (long) Math.floor(Math.random() * Long.MAX_VALUE);
         } while (requestMap.containsKey(id));
         return id;
     }
@@ -301,14 +315,18 @@ public class TurmsDriver {
         }
     }
 
-    private void onWebsocketClose(int statusCode, String reason) {
+    private void onWebsocketClose(int code, String reason) {
         boolean wasLogged = isSessionEstablished;
         isSessionEstablished = false;
         cancelHeartbeatFuture();
-        if (statusCode == 307) {
-            this.connect(userId, password, connectionTimeout, userLocation, userOnlineStatus, deviceType);
+        TurmsCloseStatus status = TurmsCloseStatus.get(code);
+        if (status == TurmsCloseStatus.REDIRECT) {
+            reconnect(reason);
         } else if (onClose != null) {
-            onClose.apply(wasLogged, TurmsStatusCode.CLIENT_SESSION_ALREADY_ESTABLISHED, null, statusCode, reason);
+            if (status == TurmsCloseStatus.WEBSOCKET_ERROR) {
+                reason = String.valueOf(code);
+            }
+            onClose.apply(wasLogged, status, reason, null);
         }
     }
 
@@ -316,7 +334,13 @@ public class TurmsDriver {
         boolean wasLogged = isSessionEstablished;
         isSessionEstablished = false;
         cancelHeartbeatFuture();
-        onClose.apply(wasLogged, null, error, null, null);
+        onClose.apply(wasLogged, null, null, error);
+    }
+
+    private void reconnect(String address) {
+        boolean isSecure = websocketUrl.startsWith("wss://");
+        websocketUrl = (isSecure ? "wss://" : "ws://") + address;
+        this.connect(userId, password, connectionTimeout, userLocation, userOnlineStatus, deviceType);
     }
 
     private void cancelHeartbeatFuture() {

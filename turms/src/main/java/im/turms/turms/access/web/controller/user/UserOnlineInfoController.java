@@ -1,11 +1,13 @@
 package im.turms.turms.access.web.controller.user;
 
+import im.turms.common.TurmsCloseStatus;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.PageUtil;
+import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLocation;
@@ -19,7 +21,6 @@ import im.turms.turms.service.user.onlineuser.UsersNearbyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -120,9 +121,9 @@ public class UserOnlineInfoController {
         UserStatus onlineStatus = updateOnlineStatusDTO.getOnlineStatus();
         if (onlineStatus == UserStatus.OFFLINE) {
             if (deviceTypes != null) {
-                updated = onlineUserService.setUsersDevicesOffline(userIds, deviceTypes, CloseStatus.NORMAL);
+                updated = onlineUserService.setUsersDevicesOffline(userIds, deviceTypes, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_ADMIN));
             } else {
-                updated = onlineUserService.setUsersOffline(userIds, CloseStatus.NORMAL);
+                updated = onlineUserService.setUsersOffline(userIds, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_ADMIN));
             }
         } else {
             updated = onlineUserService.updateOnlineUsersStatus(userIds, onlineStatus);

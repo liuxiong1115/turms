@@ -73,7 +73,7 @@ public class TurmsClusterManager {
     private Member localMembersSnapshot;
     private boolean isMaster = false;
     private boolean hasJoinedCluster = false;
-    private List<Function<MembershipEvent, Void>> listenersOnMembersChange;
+    private List<Function<MembershipEvent, Void>> onMembersChangeListeners;
     private FlakeIdGenerator idGenerator;
     private Cache<UUID, String> memberAddressCache;
     private final TurmsTaskExecutor turmsTaskExecutor;
@@ -85,7 +85,7 @@ public class TurmsClusterManager {
             @Lazy HazelcastInstance hazelcastInstance,
             @Lazy TurmsTaskExecutor turmsTaskExecutor) {
         sharedTurmsProperties = localTurmsProperties;
-        listenersOnMembersChange = new LinkedList<>();
+        onMembersChangeListeners = new LinkedList<>();
         this.hazelcastInstance = hazelcastInstance;
         memberAddressCache = Caffeine
                 .newBuilder()
@@ -246,11 +246,11 @@ public class TurmsClusterManager {
     }
 
     public void addListenerOnMembersChange(Function<MembershipEvent, Void> listener) {
-        listenersOnMembersChange.add(listener);
+        onMembersChangeListeners.add(listener);
     }
 
     private void notifyMembersChangeListeners(MembershipEvent membershipEvent) {
-        for (Function<MembershipEvent, Void> function : listenersOnMembersChange) {
+        for (Function<MembershipEvent, Void> function : onMembersChangeListeners) {
             function.apply(membershipEvent);
         }
     }

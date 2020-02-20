@@ -18,6 +18,7 @@
 package im.turms.turms.config.hazelcast;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.MemberAttributeConfig;
 import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.config.YamlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
@@ -25,6 +26,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.spring.context.SpringManagedContext;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.hazelcast.HazelcastProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +42,8 @@ import java.util.function.Function;
 
 @Configuration
 public class HazelcastConfig {
+    @Value("${server.port}")
+    Integer port;
 
     private final ApplicationContext applicationContext;
     private final TurmsClusterManager turmsClusterManager;
@@ -79,8 +83,7 @@ public class HazelcastConfig {
         Config config = createConfig(configUrl);
         if (ResourceUtils.isFileURL(configUrl)) {
             config.setConfigurationFile(configLocation.getFile());
-        }
-        else {
+        } else {
             config.setConfigurationUrl(configUrl);
         }
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(im.turms.turms.annotation.cluster.HazelcastConfig.class);
@@ -93,6 +96,11 @@ public class HazelcastConfig {
         SpringManagedContext springManagedContext = new SpringManagedContext();
         springManagedContext.setApplicationContext(applicationContext);
         config.setManagedContext(springManagedContext);
+
+        MemberAttributeConfig attributeConfig = new MemberAttributeConfig();
+        attributeConfig.setAttribute("PORT", String.valueOf(port));
+        config.setMemberAttributeConfig(attributeConfig);
+
         return config;
     }
 
