@@ -21,6 +21,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.hazelcast.cluster.Member;
+import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
@@ -29,6 +30,7 @@ import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ReactorUtil;
 import im.turms.turms.common.TrivialTaskService;
+import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.plugin.UserOnlineStatusChangeHandler;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
@@ -102,7 +104,7 @@ public class OnlineUserService {
         this.turmsClusterManager = turmsClusterManager;
         this.usersNearbyService = usersNearbyService;
         turmsClusterManager.addListenerOnMembersChange(
-                membershipEventAndDifference -> {
+                membershipEvent -> {
                     onClusterMembersChange();
                     return null;
                 });
@@ -141,10 +143,17 @@ public class OnlineUserService {
         onlineUsersManagerAtSlots.clear();
     }
 
-    public void setIrresponsibleUsersOffline() {
+    public void setIrresponsibleUsersOffline(boolean isServerClosing) {
         for (int index = 0; index < HASH_SLOTS_NUMBER; index++) {
-            if (!turmsClusterManager.isCurrentNodeResponsibleBySlotIndex(index)) {
-                setUsersOfflineBySlotIndex(index, CloseStatus.GOING_AWAY);
+            Member member = turmsClusterManager.getClusterMemberBySlotIndex(index);
+            if (member != null) {
+                if (!member.equals(turmsClusterManager.getLocalMember())) {
+                    String host = String.format("%s:%s", member.getAddress().getHost(), member.getAttribute("PORT"));
+                    TurmsCloseStatus status = isServerClosing ? TurmsCloseStatus.SERVER_CLOSED : TurmsCloseStatus.REDIRECT;
+                    setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(status, host));
+                }
+            } else {
+                setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "Cannot find a server responsible for the user"));
             }
         }
     }
@@ -350,7 +359,7 @@ public class OnlineUserService {
 
     private Timeout newHeartbeatTimeout(@NotNull Long userId, @NotNull @DeviceTypeConstraint DeviceType deviceType) {
         return heartbeatTimer.newTimeout(
-                timeout -> setLocalUserDeviceOffline(userId, deviceType, CloseStatus.GOING_AWAY),
+                timeout -> setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.HEARTBEAT_TIMEOUT)),
                 turmsClusterManager.getTurmsProperties().getSession().getRequestHeartbeatTimeoutSeconds(),
                 TimeUnit.SECONDS);
     }
@@ -580,7 +589,7 @@ public class OnlineUserService {
     }
 
     private void onClusterMembersChange() {
-        setIrresponsibleUsersOffline();
+        setIrresponsibleUsersOffline(false);
     }
 
     public SortedSet<UserLocation> getUserLocations(@NotNull Long userId) {

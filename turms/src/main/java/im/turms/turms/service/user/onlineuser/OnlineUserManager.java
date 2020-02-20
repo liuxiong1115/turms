@@ -18,9 +18,11 @@
 package im.turms.turms.service.user.onlineuser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import im.turms.common.TurmsCloseStatus;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 import im.turms.turms.common.Constants;
+import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
 import io.netty.util.Timeout;
@@ -77,7 +79,7 @@ public class OnlineUserManager {
             @NotNull FluxSink<WebSocketMessage> notificationSink,
             @NotNull Timeout heartbeatTimeout,
             @Nullable Long logId) {
-        setOfflineByDeviceType(deviceType, CloseStatus.POLICY_VIOLATION);
+        setOfflineByDeviceType(deviceType, CloseStatusFactory.get(TurmsCloseStatus.LOGIN_CONFLICT, deviceType.name()));
         Session session = new Session(
                 deviceType,
                 new Date(),

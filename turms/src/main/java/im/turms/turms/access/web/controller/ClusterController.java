@@ -17,6 +17,7 @@
 
 package im.turms.turms.access.web.controller;
 
+import com.hazelcast.cluster.Member;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.access.web.util.ResponseFactory;
@@ -87,8 +88,9 @@ public class ClusterController {
     @GetMapping("/server")
     @RequiredPermission(NONE)
     public ResponseEntity<String> queryServerHost(@RequestParam Long userId) {
-        String host = turmsClusterManager.getMemberByUserId(userId).getAddress().getHost();
-        return ResponseFactory.raw(host);
+        Member member = turmsClusterManager.getMemberByUserId(userId);
+        String hostPort = String.format("%s:%s", member.getAddress().getHost(), member.getAttribute("PORT"));
+        return ResponseFactory.raw(hostPort);
     }
 
     /**

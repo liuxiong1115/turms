@@ -31,6 +31,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -87,20 +88,20 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         Long userId = SessionUtil.getUserIdFromRequest(request);
         Long requestId = SessionUtil.getRequestIdFromRequest(request);
         if (userId == null) {
-            return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
+            return cacheAndReturnError(exchange, HttpStatus.UNAUTHORIZED, userId, requestId);
         } else if (!turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
-            return cacheAndReturnError(HttpStatus.TEMPORARY_REDIRECT, userId, requestId);
+            return cacheAndReturnError(exchange, HttpStatus.TEMPORARY_REDIRECT, userId, requestId);
         } else {
             return userService.isActiveAndNotDeleted(userId)
                     .flatMap(isActiveAndNotDeleted -> {
                         if (isActiveAndNotDeleted == null || !isActiveAndNotDeleted) {
-                            return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
+                            return cacheAndReturnError(exchange, HttpStatus.UNAUTHORIZED, userId, requestId);
                         }
                         Pair<String, DeviceType> loggingInDeviceType = SessionUtil.parseDeviceTypeFromRequest(
                                 request,
                                 turmsClusterManager.getTurmsProperties().getUser().isShouldUseOsAsDefaultDeviceType());
                         if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, loggingInDeviceType.getRight())) {
-                            return cacheAndReturnError(HttpStatus.CONFLICT, userId, requestId);
+                            return cacheAndReturnError(exchange, HttpStatus.CONFLICT, userId, requestId);
                         } else {
                             String password = SessionUtil.getPasswordFromRequest(request);
                             Mono<Boolean> authenticate = Mono.empty();
@@ -127,14 +128,14 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                                                             if (password != null && !password.isBlank()) {
                                                                 return super.handleRequest(exchange, handler);
                                                             } else {
-                                                                return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
+                                                                return cacheAndReturnError(exchange, HttpStatus.UNAUTHORIZED, userId, requestId);
                                                             }
                                                         } else {
-                                                            return cacheAndReturnError(HttpStatus.INTERNAL_SERVER_ERROR, userId, requestId);
+                                                            return cacheAndReturnError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, userId, requestId);
                                                         }
                                                     });
                                         } else {
-                                            return cacheAndReturnError(HttpStatus.UNAUTHORIZED, userId, requestId);
+                                            return cacheAndReturnError(exchange, HttpStatus.UNAUTHORIZED, userId, requestId);
                                         }
                                     });
                         }
@@ -143,6 +144,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
     }
 
     private Mono<Void> cacheAndReturnError(
+            @NotNull ServerWebExchange exchange,
             @NotNull HttpStatus httpStatus,
             @Nullable Long userId,
             @Nullable Long requestId) {
@@ -151,7 +153,10 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                 loginFailedReasonCache.put(Pair.of(userId, requestId), httpStatus.value());
             } else {
                 return turmsClusterManager.getResponsibleTurmsServerAddress(userId)
-                        .doOnNext(address -> loginFailedReasonCache.put(Pair.of(userId, requestId), address))
+                        .doOnNext(address -> {
+                            exchange.getResponse().getHeaders().put("reason", List.of(address));
+                            loginFailedReasonCache.put(Pair.of(userId, requestId), address);
+                        })
                         .then(Mono.error(new ResponseStatusException(httpStatus)));
             }
         }

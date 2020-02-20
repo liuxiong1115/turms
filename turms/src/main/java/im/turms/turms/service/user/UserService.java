@@ -19,6 +19,7 @@ package im.turms.turms.service.user;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.ProfileAccessStrategy;
@@ -30,6 +31,7 @@ import im.turms.turms.common.AggregationUtil;
 import im.turms.turms.common.QueryBuilder;
 import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.pojo.DateRange;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLoginLog;
@@ -295,7 +297,8 @@ public class UserService {
         }
         return deleteOrUpdateMono.flatMap(success -> {
             if (success) {
-                return onlineUserService.setUsersOffline(userIds, CloseStatus.NOT_ACCEPTABLE).then(Mono.just(true));
+                return onlineUserService.setUsersOffline(userIds, CloseStatusFactory.get(TurmsCloseStatus.USER_IS_DELETED_OR_INACTIVATED))
+                        .then(Mono.just(true));
             } else {
                 return Mono.just(false);
             }
@@ -447,7 +450,8 @@ public class UserService {
                 .flatMap(result -> {
                     if (result.wasAcknowledged()) {
                         if (isActive != null && !isActive) {
-                            return Mono.just(onlineUserService.setUsersOffline(userIds, CloseStatus.NOT_ACCEPTABLE))
+                            return Mono.just(onlineUserService
+                                    .setUsersOffline(userIds, CloseStatusFactory.get(TurmsCloseStatus.USER_IS_DELETED_OR_INACTIVATED)))
                                     .thenReturn(true);
                         } else {
                             return Mono.just(true);
