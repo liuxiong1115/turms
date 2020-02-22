@@ -139,7 +139,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    public void queryMessages_shouldGroupWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
+    public void queryMessages_shouldReturnNotEmptyMessages() throws ExecutionException, InterruptedException, TimeoutException {
         List<Message> messages = recipientClient.getMessageService().queryMessages(null, ChatType.PRIVATE, null, SENDER_ID, null, null, null, 10)
                 .get(5, TimeUnit.SECONDS);
         assertFalse(messages.isEmpty());
@@ -147,7 +147,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    public void queryPendingMessagesWithTotal_shouldGroupWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
+    public void queryPendingMessagesWithTotal_shouldReturnNotEmptyPendingMessagesWithTotal() throws ExecutionException, InterruptedException, TimeoutException {
         List<MessagesWithTotal> messagesWithTotals = senderClient.getMessageService().queryPendingMessagesWithTotal(10)
                 .get(5, TimeUnit.SECONDS);
         assertFalse(messagesWithTotals.isEmpty());
@@ -155,7 +155,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    public void queryMessageStatus_shouldGroupWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
+    public void queryMessageStatus_shouldReturnNotEmptyMessageStatus() throws ExecutionException, InterruptedException, TimeoutException {
         List<MessageStatus> messageStatuses = senderClient.getMessageService().queryMessageStatus(groupMessageId)
                 .get(5, TimeUnit.SECONDS);
         assertFalse(messageStatuses.isEmpty());
