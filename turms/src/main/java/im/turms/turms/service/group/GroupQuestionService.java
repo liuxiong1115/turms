@@ -119,7 +119,7 @@ public class GroupQuestionService {
                 .flatMap(groupId -> groupMemberService.isBlacklisted(groupId, requesterId)
                         .flatMap(isBlacklisted -> {
                             if (isBlacklisted != null && isBlacklisted) {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED));
                             } else {
                                 return groupMemberService.exists(groupId, requesterId);
                             }
