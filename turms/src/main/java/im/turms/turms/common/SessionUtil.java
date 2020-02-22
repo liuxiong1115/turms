@@ -85,8 +85,9 @@ public class SessionUtil {
             return null;
         }
         return Arrays.stream(cookie.split(";\\s*"))
-                .map(s -> s.split("="))
-                .collect(Collectors.toMap(s -> s[0], s -> s[1]));
+                .map(pair -> pair.split("="))
+                .filter(array -> array.length == 2)
+                .collect(Collectors.toMap(entry -> entry[0], entry -> entry[1]));
     }
 
     public static Long getUserIdFromSession(WebSocketSession session) {

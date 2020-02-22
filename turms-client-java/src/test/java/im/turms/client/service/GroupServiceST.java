@@ -178,7 +178,7 @@ public class GroupServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void queryGroup_shouldGroupWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
+    public void queryGroup_shouldReturnGroupWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
         GroupWithVersion groupWithVersion = turmsClient.getGroupService().queryGroup(groupId, null)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(groupId, groupWithVersion.getGroup().getId().getValue());
