@@ -23,6 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
+
 @Component
 public class TurmsPasswordUtil {
     private static BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
@@ -47,14 +49,22 @@ public class TurmsPasswordUtil {
         }
     }
 
-    public String encodeAdminPassword(String rawPassword) {
-        return encodePassword(turmsProperties.getSecurity().getAdminPasswordEncodingAlgorithm(),
-                rawPassword);
+    public String encodeAdminPassword(@NotNull String rawPassword) {
+        if (rawPassword != null) {
+            return encodePassword(turmsProperties.getSecurity().getAdminPasswordEncodingAlgorithm(),
+                    rawPassword);
+        } else {
+            throw new IllegalArgumentException("rawPassword must be not null");
+        }
     }
 
-    public String encodeUserPassword(String rawPassword) {
-        return encodePassword(turmsProperties.getSecurity().getUserPasswordEncodingAlgorithm(),
-                rawPassword);
+    public String encodeUserPassword(@NotNull String rawPassword) {
+        if (rawPassword != null) {
+            return encodePassword(turmsProperties.getSecurity().getUserPasswordEncodingAlgorithm(),
+                    rawPassword);
+        } else {
+            throw new IllegalArgumentException("rawPassword must be not null");
+        }
     }
 
     public boolean matchesAdminPassword(String rawPassword, String encodedPassword) {

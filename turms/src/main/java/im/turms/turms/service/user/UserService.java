@@ -417,7 +417,7 @@ public class UserService {
 
     public Mono<Boolean> updateUsers(
             @NotEmpty Set<Long> userIds,
-            @Nullable String password,
+            @Nullable String rawPassword,
             @Nullable String name,
             @Nullable String intro,
             @Nullable @URL String profilePictureUrl,
@@ -425,7 +425,7 @@ public class UserService {
             @Nullable Long permissionGroupId,
             @Nullable @PastOrPresent Date registrationDate,
             @Nullable Boolean isActive) {
-        if (Validator.areAllFalsy(password,
+        if (Validator.areAllFalsy(rawPassword,
                 name,
                 intro,
                 profilePictureUrl,
@@ -433,6 +433,10 @@ public class UserService {
                 registrationDate,
                 isActive)) {
             return Mono.just(true);
+        }
+        String password = null;
+        if (rawPassword != null && !rawPassword.isEmpty()) {
+            password = turmsPasswordUtil.encodeUserPassword(rawPassword);
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         Update update = UpdateBuilder.newBuilder()
