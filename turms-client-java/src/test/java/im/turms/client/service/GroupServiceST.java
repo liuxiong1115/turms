@@ -261,16 +261,17 @@ public class GroupServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void answerGroupQuestions_shouldEqualNewQuestionId() throws ExecutionException, InterruptedException, TimeoutException {
+    public void answerGroupQuestions_shouldReturnAnswerResult() throws InterruptedException, TimeoutException {
         Map<Long, String> map = Map.of(groupJoinQuestionId, "answer");
-        boolean isSuccess;
         try {
-            isSuccess = turmsClient.getGroupService().answerGroupQuestions(map)
+            GroupJoinQuestionsAnswerResult answerResult = turmsClient.getGroupService()
+                    .answerGroupQuestions(map)
                     .get(5, TimeUnit.SECONDS);
+            boolean isCorrect = answerResult.getQuestionsIdsList().contains(groupJoinQuestionId);
+            assertTrue(isCorrect);
         } catch (ExecutionException e) {
-            isSuccess = ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.ALREADY_GROUP_MEMBER);
+            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.ALREADY_GROUP_MEMBER));
         }
-        assertTrue(isSuccess);
     }
 
     // Delete

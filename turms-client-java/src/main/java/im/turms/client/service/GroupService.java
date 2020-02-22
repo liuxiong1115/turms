@@ -274,12 +274,12 @@ public class GroupService {
                 .thenApply(notification -> notification.getData().getGroupJoinQuestionsWithVersion());
     }
 
-    public CompletableFuture<Boolean> answerGroupQuestions(@NotEmpty Map<Long, String> questionIdAndAnswerMap) {
+    public CompletableFuture<GroupJoinQuestionsAnswerResult> answerGroupQuestions(@NotEmpty Map<Long, String> questionIdAndAnswerMap) {
         Validator.throwIfEmpty(questionIdAndAnswerMap);
         return turmsClient.getDriver()
                 .send(CheckGroupJoinQuestionsAnswersRequest.newBuilder(), MapUtil.of(
                         "question_id_and_answer", questionIdAndAnswerMap))
-                .thenApply(notification -> notification.getData().getSuccess().getValue());
+                .thenApply(notification -> notification.getData().getGroupJoinQuestionAnswerResult());
     }
 
     // Group Member
