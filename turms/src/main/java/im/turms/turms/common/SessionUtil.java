@@ -32,6 +32,8 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -199,7 +201,11 @@ public class SessionUtil {
     }
 
     public static String getPasswordFromRequest(ServerHttpRequest request) {
-        return getFirstValue(request, PASSWORD_FIELD);
+        String password = getFirstValue(request, PASSWORD_FIELD);
+        if (password != null) {
+            password = URLDecoder.decode(password, StandardCharsets.UTF_8);
+        }
+        return password;
     }
 
     public static String getLocationFromRequest(ServerHttpRequest request) {
