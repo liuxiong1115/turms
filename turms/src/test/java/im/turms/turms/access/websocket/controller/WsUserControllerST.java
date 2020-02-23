@@ -18,9 +18,10 @@
 package im.turms.turms.access.websocket.controller;
 
 import com.google.protobuf.Int64Value;
-import helper.client.SimpleTurmsClient;
+import helper.Constants;
+import im.turms.client.TurmsClient;
 import im.turms.common.constant.ProfileAccessStrategy;
-import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.user.QueryUserGroupInvitationsRequest;
 import im.turms.turms.common.TurmsPasswordUtil;
@@ -34,13 +35,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.Date;
-import java.util.function.Function;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import static im.turms.common.model.dto.notification.TurmsNotification.Data.KindCase.GROUP_INVITATIONS_WITH_VERSION;
 import static im.turms.turms.common.Constants.DEFAULT_USER_PERMISSION_GROUP_ID;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class WsUserControllerIT extends BaseControllerIT {
+public class WsUserControllerST extends BaseController {
     @LocalServerPort
     Integer port;
 
@@ -58,12 +60,8 @@ public class WsUserControllerIT extends BaseControllerIT {
     }
 
     @Test
-    public void queryUserGroupInvitations_shouldReturn() throws InterruptedException {
-        SimpleTurmsClient simpleTurmsClient = new SimpleTurmsClient(
-                port,
-                1L,
-                "123",
-                null);
+    public void queryUserGroupInvitations_shouldReturn() throws InterruptedException, TimeoutException, ExecutionException {
+        TurmsClient client = new TurmsClient(Constants.WS_URL, null, null);
         TurmsRequest.Builder builder = TurmsRequest
                 .newBuilder()
                 .setRequestId(Int64Value.newBuilder().setValue(1).build())
@@ -71,9 +69,8 @@ public class WsUserControllerIT extends BaseControllerIT {
                         QueryUserGroupInvitationsRequest
                                 .newBuilder()
                                 .build());
-        Function<TurmsNotification, Void> callback = mock(Function.class);
-        simpleTurmsClient.send(builder, callback);
-        verify(callback, timeout(5000)).apply(argThat(argument ->
-                argument.hasData() && argument.getData().getKindCase() == GROUP_INVITATIONS_WITH_VERSION));
+        GroupInvitationsWithVersion version = client.getUserService().queryUserGroupInvitations(null)
+                .get(5, TimeUnit.SECONDS);
+        assertNotNull(version);
     }
 }

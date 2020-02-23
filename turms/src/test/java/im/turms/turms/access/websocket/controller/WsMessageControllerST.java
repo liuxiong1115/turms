@@ -17,14 +17,10 @@
 
 package im.turms.turms.access.websocket.controller;
 
-import com.google.protobuf.Int64Value;
-import com.google.protobuf.StringValue;
-import helper.client.SimpleTurmsClient;
+import helper.Constants;
+import im.turms.client.TurmsClient;
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.ProfileAccessStrategy;
-import im.turms.common.model.dto.notification.TurmsNotification;
-import im.turms.common.model.dto.request.TurmsRequest;
-import im.turms.common.model.dto.request.message.CreateMessageRequest;
 import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserRelationship;
@@ -37,12 +33,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.Date;
-import java.util.function.Function;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static im.turms.turms.common.Constants.DEFAULT_USER_PERMISSION_GROUP_ID;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class WsMessageControllerIT extends BaseControllerIT {
+public class WsMessageControllerST extends BaseController {
 
     @LocalServerPort
     private Integer port;
@@ -71,23 +69,24 @@ public class WsMessageControllerIT extends BaseControllerIT {
     }
 
     @Test
-    public void handleCreateMessageRequest_shouldRelayMessageImmediately() throws InterruptedException {
-        Function<TurmsNotification, Void> callback = mock(Function.class);
-        SimpleTurmsClient clientOne = new SimpleTurmsClient(port, 1L, "123", null);
-        SimpleTurmsClient clientTwo = new SimpleTurmsClient(port, 2L, "123", callback);
-        clientTwo.returnAfterConnectedOrFailed();
-        TurmsRequest.Builder builder = TurmsRequest
-                .newBuilder()
-                .setRequestId(Int64Value.newBuilder().setValue(1).build())
-                .setCreateMessageRequest(
-                        CreateMessageRequest
-                                .newBuilder()
-                                .setChatType(ChatType.PRIVATE)
-                                .setToId(2L)
-                                .setText(StringValue.newBuilder().setValue("test").build())
-                                .build());
-        clientOne.send(builder, null);
-        verify(callback, timeout(5000)).apply(argThat(argument -> argument.hasRelayedRequest()
-                && argument.getRelayedRequest().getKindCase() == TurmsRequest.KindCase.CREATE_MESSAGE_REQUEST));
+    public void handleCreateMessageRequest_shouldRelayMessageImmediately() throws InterruptedException, TimeoutException, ExecutionException {
+        TurmsClient clientOne = new TurmsClient(Constants.WS_URL, null, null);
+        clientOne.getUserService()
+                .login(1L, "123", null, null, null)
+                .get(5, TimeUnit.SECONDS);
+        TurmsClient clientTwo = new TurmsClient(Constants.WS_URL, null, null);
+        clientTwo.getUserService()
+                .login(2L, "123", null, null, null)
+                .get(5, TimeUnit.SECONDS);
+        Long sentMessageId = clientOne.getMessageService()
+                .sendMessage(ChatType.PRIVATE, 2L, null, "test", null, null)
+                .get(5, TimeUnit.SECONDS);
+        long receivedMessageId = clientTwo.getMessageService()
+                .queryMessages(null, null, null, 1L, null, null, null, null)
+                .get(5, TimeUnit.SECONDS)
+                .get(0)
+                .getId()
+                .getValue();
+        assertEquals(sentMessageId, receivedMessageId);
     }
 }
