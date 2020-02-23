@@ -108,7 +108,7 @@ public class ClusterController {
                 TurmsProperties mergedProperties = TurmsProperties.merge(
                         turmsClusterManager.getTurmsProperties(),
                         turmsProperties);
-                turmsClusterManager.updateProperties(mergedProperties);
+                turmsClusterManager.updatePropertiesAndNotify(mergedProperties);
                 return ResponseFactory.okIfTruthy(mergedProperties);
             } else {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);

@@ -24,7 +24,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TurmsApplicationIT {
+public class TurmsApplicationST {
     @Autowired private MongoTemplate mongoTemplate;
 
     @Test

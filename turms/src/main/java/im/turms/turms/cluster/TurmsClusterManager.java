@@ -216,7 +216,7 @@ public class TurmsClusterManager {
         sharedProperties.put(SharedPropertiesKey.TURMS_PROPERTIES, sharedTurmsProperties);
     }
 
-    public void updateProperties(@NotNull TurmsProperties properties) {
+    public void updatePropertiesAndNotify(@NotNull TurmsProperties properties) {
         sharedProperties.put(SharedPropertiesKey.TURMS_PROPERTIES, properties);
         TurmsProperties.notifyListeners(properties);
     }
@@ -295,15 +295,8 @@ public class TurmsClusterManager {
 
     public Integer getLocalMemberIndex() {
         Member localMember = getLocalMember();
-        Set<Member> members = getMembers();
-        int index = -1;
-        for (Member member : members) {
-            index++;
-            if (member == localMember) {
-                return index;
-            }
-        }
-        return null;
+        int index = membersSnapshot.indexOf(localMember);
+        return index != -1 ? index : null;
     }
 
     public Set<Member> getMembers() {
