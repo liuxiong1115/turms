@@ -188,13 +188,7 @@ public class TurmsClusterManager {
     }
 
     private boolean hasJoinedCluster() {
-        Set<Member> members = hazelcastInstance.getCluster().getMembers();
-        for (Member member : members) {
-            if (hazelcastInstance.getCluster().getLocalMember().getUuid().equals(member.getUuid())) {
-                return true;
-            }
-        }
-        return false;
+        return membersSnapshot.indexOf(localMembersSnapshot) != -1;
     }
 
     public IScheduledExecutorService getScheduledExecutor() {
@@ -378,6 +372,10 @@ public class TurmsClusterManager {
         if (hazelcastInstance != null && hazelcastInstance.getLifecycleService().isRunning()) {
             hazelcastInstance.shutdown();
         }
+    }
+
+    public boolean isSingleton() {
+        return membersSnapshot.size() == 1;
     }
 
     private enum SharedPropertiesKey {

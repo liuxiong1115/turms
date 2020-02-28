@@ -19,19 +19,18 @@ package im.turms.turms.plugin;
 
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
-import org.pf4j.ExtensionPoint;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 
-public interface ClientRequestHandler extends ExtensionPoint {
+public abstract class ClientRequestHandler extends TurmsExtension {
     /**
      * @return the returned {@link TurmsRequestWrapper} will be passed to downstream.
      */
-    Mono<TurmsRequestWrapper> transform(@NotNull TurmsRequestWrapper turmsRequestWrapper);
+    public abstract Mono<TurmsRequestWrapper> transform(@NotNull TurmsRequestWrapper turmsRequestWrapper);
 
     /**
      * @return returning Mono.empty() will pass the request to downstream to handle.
      */
-    Mono<RequestResult> handleTurmsRequest(@NotNull TurmsRequestWrapper turmsRequestWrapper);
+    public abstract Mono<RequestResult> handleTurmsRequest(@NotNull TurmsRequestWrapper turmsRequestWrapper);
 }

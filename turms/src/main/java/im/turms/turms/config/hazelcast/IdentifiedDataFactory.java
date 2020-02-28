@@ -79,6 +79,8 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
                 return new Security();
             case PROPERTY_SESSION:
                 return new Session();
+            case PROPERTY_STORAGE:
+                return new Storage();
             case PROPERTY_USER:
                 return new User();
             case PROPERTY_USER_LOCATION:
@@ -113,6 +115,7 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
         PROPERTY_PLUGIN,
         PROPERTY_SECURITY,
         PROPERTY_SESSION,
+        PROPERTY_STORAGE,
         PROPERTY_USER,
         PROPERTY_USER_FRIEND_REQUEST,
         PROPERTY_USER_LOCATION,

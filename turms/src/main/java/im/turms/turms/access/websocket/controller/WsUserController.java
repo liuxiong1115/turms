@@ -24,7 +24,6 @@ import im.turms.common.model.bo.common.Int64Values;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
 import im.turms.common.model.bo.user.UsersOnlineStatuses;
 import im.turms.common.model.dto.notification.TurmsNotification;
-import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.user.*;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
@@ -46,6 +45,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static im.turms.common.model.dto.request.TurmsRequest.KindCase.*;
+
 @Controller
 public class WsUserController {
     private final UserService userService;
@@ -66,7 +67,7 @@ public class WsUserController {
         this.groupInvitationService = groupInvitationService;
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_USER_GROUP_INVITATIONS_REQUEST)
+    @TurmsRequestMapping(QUERY_USER_GROUP_INVITATIONS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryUserGroupInvitationsRequest() {
         return turmsRequestWrapper -> {
             QueryUserGroupInvitationsRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUserGroupInvitationsRequest();
@@ -81,7 +82,7 @@ public class WsUserController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_USER_PROFILE_REQUEST)
+    @TurmsRequestMapping(QUERY_USER_PROFILE_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryUserProfileRequest() {
         return turmsRequestWrapper -> {
             QueryUserProfileRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUserProfileRequest();
@@ -101,7 +102,7 @@ public class WsUserController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_USERS_IDS_NEARBY_REQUEST)
+    @TurmsRequestMapping(QUERY_USERS_IDS_NEARBY_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryUsersIdsNearbyRequest() {
         return turmsRequestWrapper -> {
             QueryUsersIdsNearbyRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUsersIdsNearbyRequest();
@@ -126,7 +127,7 @@ public class WsUserController {
     }
 
     //TODO: query specific fields
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_USERS_INFOS_NEARBY_REQUEST)
+    @TurmsRequestMapping(QUERY_USERS_INFOS_NEARBY_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryUsersInfosNearbyRequest() {
         return turmsRequestWrapper -> {
             QueryUsersInfosNearbyRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUsersInfosNearbyRequest();
@@ -160,7 +161,7 @@ public class WsUserController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_USERS_ONLINE_STATUS_REQUEST)
+    @TurmsRequestMapping(QUERY_USERS_ONLINE_STATUS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryUsersOnlineStatusRequest() {
         return turmsRequestWrapper -> {
             QueryUsersOnlineStatusRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUsersOnlineStatusRequest();
@@ -191,7 +192,7 @@ public class WsUserController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_USER_LOCATION_REQUEST)
+    @TurmsRequestMapping(UPDATE_USER_LOCATION_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateUserLocationRequest() {
         return turmsRequestWrapper -> {
             UpdateUserLocationRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateUserLocationRequest();
@@ -213,7 +214,7 @@ public class WsUserController {
      * The client itself should query whether there is any user status changes according to your own
      * business scenarios.
      */
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_USER_ONLINE_STATUS_REQUEST)
+    @TurmsRequestMapping(UPDATE_USER_ONLINE_STATUS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateUserOnlineStatusRequest() {
         return turmsRequestWrapper -> {
             UpdateUserOnlineStatusRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateUserOnlineStatusRequest();
@@ -255,7 +256,7 @@ public class WsUserController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_USER_REQUEST)
+    @TurmsRequestMapping(UPDATE_USER_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateUserRequest() {
         return turmsRequestWrapper -> {
             UpdateUserRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateUserRequest();

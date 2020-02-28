@@ -37,6 +37,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -52,6 +53,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ConfigurationProperties(prefix = "turms")
+@Component
 @Data
 @NoArgsConstructor
 @Validated
@@ -61,6 +63,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
             .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
             .writerWithView(MutablePropertiesView.class);
     public static final List<Function<TurmsProperties, Void>> propertiesChangeListeners = new LinkedList<>();
+
     // Env
 
     @JsonView(MutablePropertiesView.class)
@@ -81,6 +84,9 @@ public class TurmsProperties implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Valid
     private Security security = new Security();
+    @JsonView(MutablePropertiesView.class)
+    @Valid
+    private Storage storage = new Storage();
     @JsonView(MutablePropertiesView.class)
     @Valid
     private Plugin plugin = new Plugin();
@@ -120,6 +126,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         log.writeData(out);
         session.writeData(out);
         security.writeData(out);
+        storage.writeData(out);
         plugin.writeData(out);
 
         message.writeData(out);
@@ -136,6 +143,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         log.readData(in);
         session.readData(in);
         security.readData(in);
+        storage.readData(in);
         plugin.readData(in);
 
         message.readData(in);

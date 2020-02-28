@@ -17,42 +17,84 @@
 
 package im.turms.turms.plugin;
 
+import im.turms.turms.property.TurmsProperties;
 import lombok.Data;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.PluginManager;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.nio.file.Paths;
+import javax.annotation.PreDestroy;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
 @Component
 @Data
+@DependsOn("turmsProperties")
 public class TurmsPluginManager {
+    private ApplicationContext context;
+    private TurmsProperties turmsProperties;
+    private PluginManager pluginManager;
+
     private List<ClientRequestHandler> clientRequestHandlerList;
     private List<ExpiredMessageAutoDeletionNotificationHandler> expiredMessageAutoDeletionNotificationHandlerList;
     private List<LogHandler> logHandlerList;
     private List<UserAuthenticator> userAuthenticatorList;
     private List<UserOnlineStatusChangeHandler> userOnlineStatusChangeHandlerList;
+    private StorageServiceProvider storageServiceProvider;
 
-    public TurmsPluginManager() {
+    public TurmsPluginManager(ApplicationContext context, TurmsProperties turmsProperties) {
+        this.context = context;
+        this.turmsProperties = turmsProperties;
         clientRequestHandlerList = Collections.emptyList();
         expiredMessageAutoDeletionNotificationHandlerList = Collections.emptyList();
         logHandlerList = Collections.emptyList();
         userAuthenticatorList = Collections.emptyList();
         userOnlineStatusChangeHandlerList = Collections.emptyList();
+        init();
     }
 
-    @PostConstruct
     public void init() {
-        PluginManager pluginManager = new DefaultPluginManager(Paths.get("../plugins"));
+        Path dir = Path.of(turmsProperties.getPlugin().getDir());
+        pluginManager = new DefaultPluginManager(dir);
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
+
         clientRequestHandlerList = pluginManager.getExtensions(ClientRequestHandler.class);
         expiredMessageAutoDeletionNotificationHandlerList = pluginManager.getExtensions(ExpiredMessageAutoDeletionNotificationHandler.class);
         logHandlerList = pluginManager.getExtensions(LogHandler.class);
         userAuthenticatorList = pluginManager.getExtensions(UserAuthenticator.class);
         userOnlineStatusChangeHandlerList = pluginManager.getExtensions(UserOnlineStatusChangeHandler.class);
+        List<StorageServiceProvider> storageServiceProviders = pluginManager.getExtensions(StorageServiceProvider.class);
+        if (!storageServiceProviders.isEmpty()) {
+            this.storageServiceProvider = storageServiceProviders.get(0);
+        }
+        initExtensions(clientRequestHandlerList);
+        initExtensions(expiredMessageAutoDeletionNotificationHandlerList);
+        initExtensions(logHandlerList);
+        initExtensions(userAuthenticatorList);
+        initExtensions(userOnlineStatusChangeHandlerList);
+        initExtension(storageServiceProvider);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        pluginManager.stopPlugins();
+    }
+
+    private void initExtension(TurmsExtension extension) {
+        try {
+            extension.setContext(context);
+        } catch (Exception ignored) {
+
+        }
+    }
+
+    private void initExtensions(List<? extends TurmsExtension> extensions) {
+        for (TurmsExtension extension : extensions) {
+            initExtension(extension);
+        }
     }
 }

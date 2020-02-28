@@ -4,6 +4,7 @@ package im.turms.proto;
 
 option java_package = "im.turms.common.model.dto.notification";
 option java_multiple_files = true;
+option swift_prefix = "";
 
 import "google/protobuf/wrappers.proto";
 
@@ -46,7 +47,7 @@ message TurmsNotification {
         oneof kind {
             Int64Values ids = 1;
             Int64ValuesWithVersion ids_with_version = 2;
-            google.protobuf.BoolValue success = 3;
+            google.protobuf.StringValue url = 3;
 
             Acknowledge acknowledge = 4;
             Session session = 5;

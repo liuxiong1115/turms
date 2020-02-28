@@ -36,7 +36,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Note: UserMessage refers to WebSocketMessage, not the message in business.
+ * Note: UserMessage refers to WebSocketMessage, not the message model in business.
  */
 @SpringAware
 public class DeliveryUserMessageTask implements Callable<Boolean>, Serializable, ApplicationContextAware {

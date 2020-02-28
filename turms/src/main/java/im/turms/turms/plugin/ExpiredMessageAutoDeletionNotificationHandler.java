@@ -18,7 +18,6 @@
 package im.turms.turms.plugin;
 
 import im.turms.turms.pojo.domain.Message;
-import org.pf4j.ExtensionPoint;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotEmpty;
@@ -28,6 +27,6 @@ import java.util.List;
  * The plugin is useful when developers needing to persist messages in other places
  * while deleting them in the databases for turms servers.
  */
-public interface ExpiredMessageAutoDeletionNotificationHandler extends ExtensionPoint {
-    Mono<Boolean> allowDeleting(@NotEmpty List<Message> message);
+public abstract class ExpiredMessageAutoDeletionNotificationHandler extends TurmsExtension {
+    public abstract Mono<Boolean> allowDeleting(@NotEmpty List<Message> message);
 }

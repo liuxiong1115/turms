@@ -174,7 +174,7 @@ public class UsersNearbyService {
             @NotNull Float latitude,
             @Nullable Integer maxNumber,
             @Nullable Double maxDistance) {
-        if (tree.size() > 0) {
+        if (tree.size() > 0 || !turmsClusterManager.isSingleton()) {
             if (maxNumber == null) {
                 maxNumber = turmsClusterManager
                         .getTurmsProperties()

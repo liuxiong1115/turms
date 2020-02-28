@@ -19,7 +19,6 @@ package im.turms.turms.access.websocket.controller;
 
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.MessageDeliveryStatus;
-import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.signal.AckRequest;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.pojo.bo.RequestResult;
@@ -31,6 +30,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Function;
 
+import static im.turms.common.model.dto.request.TurmsRequest.KindCase.ACK_REQUEST;
+
 @Controller
 public class WsSignalController {
     private final MessageStatusService messageStatusService;
@@ -39,7 +40,7 @@ public class WsSignalController {
         this.messageStatusService = messageStatusService;
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.ACK_REQUEST)
+    @TurmsRequestMapping(ACK_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleAckRequest() {
         return turmsRequestWrapper -> {
             AckRequest ackRequest = turmsRequestWrapper.getTurmsRequest().getAckRequest();
