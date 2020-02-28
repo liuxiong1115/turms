@@ -19,7 +19,6 @@ package im.turms.turms.plugin;
 
 import im.turms.common.constant.DeviceType;
 import im.turms.turms.service.user.onlineuser.OnlineUserManager;
-import org.pf4j.ExtensionPoint;
 import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Mono;
 
@@ -28,8 +27,8 @@ import javax.validation.constraints.NotNull;
 /**
  * UserOnlineStatusChangeHandler notifies when user goes online or offline.
  */
-public interface UserOnlineStatusChangeHandler extends ExtensionPoint {
-    Mono<Void> goOnline(@NotNull OnlineUserManager onlineUserManager, @NotNull DeviceType loggingInDeviceType);
+public abstract class UserOnlineStatusChangeHandler extends TurmsExtension {
+    public abstract Mono<Void> goOnline(@NotNull OnlineUserManager onlineUserManager, @NotNull DeviceType loggingInDeviceType);
 
-    Mono<Void> goOffline(@NotNull OnlineUserManager onlineUserManager, @NotNull CloseStatus closeStatus);
+    public abstract Mono<Void> goOffline(@NotNull OnlineUserManager onlineUserManager, @NotNull CloseStatus closeStatus);
 }

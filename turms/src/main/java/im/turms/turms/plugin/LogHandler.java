@@ -19,13 +19,13 @@ package im.turms.turms.plugin;
 
 import im.turms.turms.pojo.domain.AdminActionLog;
 import im.turms.turms.pojo.domain.UserLoginLog;
-import org.pf4j.ExtensionPoint;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 
-public interface LogHandler extends ExtensionPoint {
-    Mono<Void> handleAdminActionLog(@NotNull ServerWebExchange exchange, @NotNull AdminActionLog adminActionLog);
-    Mono<Void> handleUserLoginLog(@NotNull UserLoginLog userLoginLog);
+public abstract class LogHandler extends TurmsExtension {
+    public abstract Mono<Void> handleAdminActionLog(@NotNull ServerWebExchange exchange, @NotNull AdminActionLog adminActionLog);
+
+    public abstract Mono<Void> handleUserLoginLog(@NotNull UserLoginLog userLoginLog);
 }

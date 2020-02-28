@@ -19,7 +19,6 @@ package im.turms.turms.access.websocket.controller;
 
 import im.turms.common.constant.ResponseAction;
 import im.turms.common.model.dto.notification.TurmsNotification;
-import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.user.relationship.*;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
@@ -37,6 +36,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static im.turms.common.model.dto.request.TurmsRequest.KindCase.*;
 import static im.turms.turms.common.Constants.DEFAULT_RELATIONSHIP_GROUP_INDEX;
 
 @Controller
@@ -53,7 +53,7 @@ public class WsUserRelationshipController {
         this.turmsClusterManager = turmsClusterManager;
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_FRIEND_REQUEST_REQUEST)
+    @TurmsRequestMapping(CREATE_FRIEND_REQUEST_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateFriendRequestRequest() {
         return turmsRequestWrapper -> {
             CreateFriendRequestRequest request = turmsRequestWrapper.getTurmsRequest().getCreateFriendRequestRequest();
@@ -75,7 +75,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_RELATIONSHIP_GROUP_REQUEST)
+    @TurmsRequestMapping(CREATE_RELATIONSHIP_GROUP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateRelationshipGroupRequest() {
         return turmsRequestWrapper -> {
             CreateRelationshipGroupRequest request = turmsRequestWrapper.getTurmsRequest().getCreateRelationshipGroupRequest();
@@ -89,7 +89,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_RELATIONSHIP_REQUEST)
+    @TurmsRequestMapping(CREATE_RELATIONSHIP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateRelationshipRequest() {
         return turmsRequestWrapper -> {
             CreateRelationshipRequest request = turmsRequestWrapper.getTurmsRequest().getCreateRelationshipRequest();
@@ -119,7 +119,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.DELETE_RELATIONSHIP_GROUP_REQUEST)
+    @TurmsRequestMapping(DELETE_RELATIONSHIP_GROUP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteRelationshipGroupRequest() {
         return turmsRequestWrapper -> {
             DeleteRelationshipGroupRequest request = turmsRequestWrapper.getTurmsRequest().getDeleteRelationshipGroupRequest();
@@ -152,7 +152,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.DELETE_RELATIONSHIP_REQUEST)
+    @TurmsRequestMapping(DELETE_RELATIONSHIP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteRelationshipRequest() {
         return turmsRequestWrapper -> {
             DeleteRelationshipRequest request = turmsRequestWrapper.getTurmsRequest().getDeleteRelationshipRequest();
@@ -181,7 +181,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_FRIEND_REQUESTS_REQUEST)
+    @TurmsRequestMapping(QUERY_FRIEND_REQUESTS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryFriendRequestsRequest() {
         return turmsRequestWrapper -> {
             QueryFriendRequestsRequest request = turmsRequestWrapper.getTurmsRequest().getQueryFriendRequestsRequest();
@@ -197,7 +197,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_RELATED_USERS_IDS_REQUEST)
+    @TurmsRequestMapping(QUERY_RELATED_USERS_IDS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryRelatedUsersIdsRequest() {
         return turmsRequestWrapper -> {
             QueryRelatedUsersIdsRequest request = turmsRequestWrapper.getTurmsRequest().getQueryRelatedUsersIdsRequest();
@@ -217,7 +217,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_RELATIONSHIP_GROUPS_REQUEST)
+    @TurmsRequestMapping(QUERY_RELATIONSHIP_GROUPS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryRelationshipGroupsRequest() {
         return turmsRequestWrapper -> {
             QueryRelationshipGroupsRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -235,7 +235,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_RELATIONSHIPS_REQUEST)
+    @TurmsRequestMapping(QUERY_RELATIONSHIPS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryRelationshipsRequest() {
         return turmsRequestWrapper -> {
             QueryRelationshipsRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -261,7 +261,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_FRIEND_REQUEST_REQUEST)
+    @TurmsRequestMapping(UPDATE_FRIEND_REQUEST_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateFriendRequestRequest() {
         return turmsRequestWrapper -> {
             UpdateFriendRequestRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateFriendRequestRequest();
@@ -285,7 +285,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_RELATIONSHIP_GROUP_REQUEST)
+    @TurmsRequestMapping(UPDATE_RELATIONSHIP_GROUP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateRelationshipGroupRequest() {
         return turmsRequestWrapper -> {
             UpdateRelationshipGroupRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateRelationshipGroupRequest();
@@ -297,7 +297,7 @@ public class WsUserRelationshipController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_RELATIONSHIP_REQUEST)
+    @TurmsRequestMapping(UPDATE_RELATIONSHIP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateRelationshipRequest() {
         return turmsRequestWrapper -> {
             UpdateRelationshipRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateRelationshipRequest();

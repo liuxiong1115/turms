@@ -4,10 +4,15 @@ package im.turms.proto;
 
 option java_package = "im.turms.common.model.dto.request";
 option java_multiple_files = true;
+option swift_prefix = "";
 
 import "google/protobuf/wrappers.proto";
 
 import "request/signal/ack_request.proto";
+
+import "request/storage/delete_resource_request.proto";
+import "request/storage/query_signed_get_url_request.proto";
+import "request/storage/query_signed_put_url_request.proto";
 
 import "request/user/query_user_group_invitations_request.proto";
 import "request/user/query_user_profile_request.proto";
@@ -77,13 +82,18 @@ message TurmsRequest {
         // Signal
         AckRequest ack_request = 2;
 
+        // Storage
+        DeleteResourceRequest delete_resource_request = 3;
+        QuerySignedGetUrlRequest query_signed_get_url_request = 4;
+        QuerySignedPutUrlRequest query_signed_put_url_request = 5;
+
         // Message
-        CreateMessageRequest create_message_request = 5;
-        QueryMessageStatusesRequest query_message_statuses_request = 6;
-        QueryMessagesRequest query_messages_request = 7;
-        QueryPendingMessagesWithTotalRequest query_pending_messages_with_total_request = 8;
-        UpdateMessageRequest update_message_request = 9;
-        UpdateTypingStatusRequest update_typing_status_request = 10;
+        CreateMessageRequest create_message_request = 6;
+        QueryMessageStatusesRequest query_message_statuses_request = 7;
+        QueryMessagesRequest query_messages_request = 8;
+        QueryPendingMessagesWithTotalRequest query_pending_messages_with_total_request = 9;
+        UpdateMessageRequest update_message_request = 10;
+        UpdateTypingStatusRequest update_typing_status_request = 11;
 
         // User
         QueryUserGroupInvitationsRequest query_user_group_invitations_request = 100;

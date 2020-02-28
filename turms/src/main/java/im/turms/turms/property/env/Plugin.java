@@ -28,15 +28,20 @@ import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Convention over configuration
  */
 @Data
 public class Plugin implements IdentifiedDataSerializable {
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to enable plugins")
     private boolean enabled = true;
+
+    @Description("The path of plugins")
+    private String dir = "plugins";
 
     @JsonIgnore
     @Override

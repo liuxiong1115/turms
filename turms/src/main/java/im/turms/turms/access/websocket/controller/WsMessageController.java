@@ -29,7 +29,6 @@ import im.turms.common.model.bo.message.Messages;
 import im.turms.common.model.bo.message.MessagesWithTotal;
 import im.turms.common.model.bo.message.MessagesWithTotalList;
 import im.turms.common.model.dto.notification.TurmsNotification;
-import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.message.*;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
@@ -52,6 +51,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static im.turms.common.model.dto.request.TurmsRequest.KindCase.*;
+
 @Controller
 public class WsMessageController {
     private final TurmsClusterManager turmsClusterManager;
@@ -66,7 +67,7 @@ public class WsMessageController {
         this.messageStatusService = messageStatusService;
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_MESSAGE_REQUEST)
+    @TurmsRequestMapping(CREATE_MESSAGE_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateMessageRequest() {
         return turmsRequestWrapper -> {
             CreateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getCreateMessageRequest();
@@ -122,7 +123,7 @@ public class WsMessageController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_MESSAGE_STATUSES_REQUEST)
+    @TurmsRequestMapping(QUERY_MESSAGE_STATUSES_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryMessageStatusRequest() {
         return turmsRequestWrapper -> {
             QueryMessageStatusesRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessageStatusesRequest();
@@ -139,7 +140,7 @@ public class WsMessageController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_PENDING_MESSAGES_WITH_TOTAL_REQUEST)
+    @TurmsRequestMapping(QUERY_PENDING_MESSAGES_WITH_TOTAL_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryPendingMessagesWithTotalRequest() {
         return turmsRequestWrapper -> {
             QueryPendingMessagesWithTotalRequest request = turmsRequestWrapper.getTurmsRequest().getQueryPendingMessagesWithTotalRequest();
@@ -192,7 +193,7 @@ public class WsMessageController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_MESSAGES_REQUEST)
+    @TurmsRequestMapping(QUERY_MESSAGES_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryMessagesRequest() {
         return turmsRequestWrapper -> {
             QueryMessagesRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessagesRequest();
@@ -246,7 +247,7 @@ public class WsMessageController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_MESSAGE_REQUEST)
+    @TurmsRequestMapping(UPDATE_MESSAGE_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateMessageRequest() {
         return turmsRequestWrapper -> {
             UpdateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateMessageRequest();
@@ -308,7 +309,7 @@ public class WsMessageController {
     /**
      * To save a lot of resources, allow sending typing status to recipients without checking their relationships.
      */
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_TYPING_STATUS_REQUEST)
+    @TurmsRequestMapping(UPDATE_TYPING_STATUS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateTypingStatusRequest() {
         return turmsRequestWrapper -> {
             if (turmsClusterManager.getTurmsProperties().getMessage().getTypingStatus().isEnabled()) {

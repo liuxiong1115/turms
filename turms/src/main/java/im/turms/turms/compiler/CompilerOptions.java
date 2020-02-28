@@ -28,8 +28,7 @@ public class CompilerOptions {
         public static final String PROD_ENV = "PROD";
     }
 
-    public static final String env = "DEV";
-//    public static final String env = "@env@";
+    public static final String env = "@env@";
 
     private CompilerOptions() {}
 }

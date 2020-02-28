@@ -20,7 +20,6 @@ package im.turms.turms.access.websocket.controller;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.GroupMemberRole;
 import im.turms.common.model.dto.notification.TurmsNotification;
-import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.group.*;
 import im.turms.common.model.dto.request.group.blacklist.CreateGroupBlacklistedUserRequest;
 import im.turms.common.model.dto.request.group.blacklist.DeleteGroupBlacklistedUserRequest;
@@ -47,6 +46,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static im.turms.common.model.dto.request.TurmsRequest.KindCase.*;
+
 @Controller
 public class WsGroupController {
     private final GroupService groupService;
@@ -67,7 +68,7 @@ public class WsGroupController {
         this.turmsClusterManager = turmsClusterManager;
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_GROUP_REQUEST)
+    @TurmsRequestMapping(CREATE_GROUP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateGroupRequest() {
         return turmsRequestWrapper -> {
             CreateGroupRequest request = turmsRequestWrapper.getTurmsRequest().getCreateGroupRequest();
@@ -94,7 +95,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.DELETE_GROUP_REQUEST)
+    @TurmsRequestMapping(DELETE_GROUP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteGroupRequest() {
         return turmsRequestWrapper -> {
             DeleteGroupRequest request = turmsRequestWrapper.getTurmsRequest().getDeleteGroupRequest();
@@ -130,7 +131,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_GROUP_REQUEST)
+    @TurmsRequestMapping(QUERY_GROUP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryGroupRequest() {
         return turmsRequestWrapper -> {
             QueryGroupRequest request = turmsRequestWrapper.getTurmsRequest().getQueryGroupRequest();
@@ -143,7 +144,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_JOINED_GROUPS_IDS_REQUEST)
+    @TurmsRequestMapping(QUERY_JOINED_GROUPS_IDS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryJoinedGroupsIdsRequest() {
         return turmsRequestWrapper -> {
             QueryJoinedGroupsIdsRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -159,7 +160,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_JOINED_GROUPS_INFOS_REQUEST)
+    @TurmsRequestMapping(QUERY_JOINED_GROUPS_INFOS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryJoinedGroupsRequest() {
         return turmsRequestWrapper -> {
             QueryJoinedGroupsInfosRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -175,7 +176,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_GROUP_REQUEST)
+    @TurmsRequestMapping(UPDATE_GROUP_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateGroupRequest() {
         return turmsRequestWrapper -> {
             UpdateGroupRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateGroupRequest();
@@ -223,7 +224,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_GROUP_BLACKLISTED_USER_REQUEST)
+    @TurmsRequestMapping(CREATE_GROUP_BLACKLISTED_USER_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateGroupBlacklistedUserRequest() {
         return turmsRequestWrapper -> {
             CreateGroupBlacklistedUserRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -245,7 +246,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.DELETE_GROUP_BLACKLISTED_USER_REQUEST)
+    @TurmsRequestMapping(DELETE_GROUP_BLACKLISTED_USER_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteGroupBlacklistedUserRequest() {
         return turmsRequestWrapper -> {
             DeleteGroupBlacklistedUserRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -268,7 +269,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_GROUP_BLACKLISTED_USERS_IDS_REQUEST)
+    @TurmsRequestMapping(QUERY_GROUP_BLACKLISTED_USERS_IDS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryGroupBlacklistedUsersIdsRequest() {
         return turmsRequestWrapper -> {
             QueryGroupBlacklistedUsersIdsRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -285,7 +286,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_GROUP_BLACKLISTED_USERS_INFOS_REQUEST)
+    @TurmsRequestMapping(QUERY_GROUP_BLACKLISTED_USERS_INFOS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryGroupBlacklistedUsersInfosRequest() {
         return turmsRequestWrapper -> {
             QueryGroupBlacklistedUsersInfosRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -301,7 +302,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CHECK_GROUP_JOIN_QUESTIONS_ANSWERS_REQUEST)
+    @TurmsRequestMapping(CHECK_GROUP_JOIN_QUESTIONS_ANSWERS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCheckGroupQuestionAnswerRequest() {
         return turmsRequestWrapper -> {
             CheckGroupJoinQuestionsAnswersRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -316,7 +317,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_GROUP_INVITATION_REQUEST)
+    @TurmsRequestMapping(CREATE_GROUP_INVITATION_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateGroupInvitationRequestRequest() {
         return turmsRequestWrapper -> {
             CreateGroupInvitationRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -338,7 +339,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_GROUP_JOIN_REQUEST_REQUEST)
+    @TurmsRequestMapping(CREATE_GROUP_JOIN_REQUEST_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateGroupJoinRequestRequest() {
         return turmsRequestWrapper -> {
             CreateGroupJoinRequestRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -367,7 +368,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_GROUP_JOIN_QUESTION_REQUEST)
+    @TurmsRequestMapping(CREATE_GROUP_JOIN_QUESTION_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateGroupQuestionRequest() {
         return turmsRequestWrapper -> {
             CreateGroupJoinQuestionRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -392,7 +393,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.DELETE_GROUP_INVITATION_REQUEST)
+    @TurmsRequestMapping(DELETE_GROUP_INVITATION_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteGroupInvitationRequest() {
         return turmsRequestWrapper -> {
             DeleteGroupInvitationRequest request = turmsRequestWrapper.getTurmsRequest().getDeleteGroupInvitationRequest();
@@ -413,7 +414,7 @@ public class WsGroupController {
     }
 
     //TODO
-    @TurmsRequestMapping(TurmsRequest.KindCase.DELETE_GROUP_JOIN_REQUEST_REQUEST)
+    @TurmsRequestMapping(DELETE_GROUP_JOIN_REQUEST_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteGroupJoinRequestRequest() {
         return turmsRequestWrapper -> {
             DeleteGroupJoinRequestRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -442,7 +443,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.DELETE_GROUP_JOIN_QUESTION_REQUEST)
+    @TurmsRequestMapping(DELETE_GROUP_JOIN_QUESTION_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteGroupJoinQuestionRequest() {
         return turmsRequestWrapper -> {
             DeleteGroupJoinQuestionRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -455,7 +456,7 @@ public class WsGroupController {
     }
 
     //TODO: by to user
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_GROUP_INVITATIONS_REQUEST)
+    @TurmsRequestMapping(QUERY_GROUP_INVITATIONS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryGroupInvitationsRequest() {
         return turmsRequestWrapper -> {
             QueryGroupInvitationsRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -474,7 +475,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_GROUP_JOIN_REQUESTS_REQUEST)
+    @TurmsRequestMapping(QUERY_GROUP_JOIN_REQUESTS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryGroupJoinRequestsRequest() {
         return turmsRequestWrapper -> {
             QueryGroupJoinRequestsRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -491,7 +492,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_GROUP_JOIN_QUESTIONS_REQUEST)
+    @TurmsRequestMapping(QUERY_GROUP_JOIN_QUESTIONS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryGroupJoinQuestionsRequest() {
         return turmsRequestWrapper -> {
             QueryGroupJoinQuestionsRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -508,7 +509,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_GROUP_JOIN_QUESTION_REQUEST)
+    @TurmsRequestMapping(UPDATE_GROUP_JOIN_QUESTION_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateGroupJoinQuestionRequest() {
         return turmsRequestWrapper -> {
             UpdateGroupJoinQuestionRequest request = turmsRequestWrapper.getTurmsRequest()
@@ -527,7 +528,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.CREATE_GROUP_MEMBER_REQUEST)
+    @TurmsRequestMapping(CREATE_GROUP_MEMBER_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleCreateGroupMemberRequest() {
         return turmsRequestWrapper -> {
             CreateGroupMemberRequest request = turmsRequestWrapper.getTurmsRequest().getCreateGroupMemberRequest();
@@ -558,7 +559,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.DELETE_GROUP_MEMBER_REQUEST)
+    @TurmsRequestMapping(DELETE_GROUP_MEMBER_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteGroupMemberRequest() {
         return turmsRequestWrapper -> {
             DeleteGroupMemberRequest request = turmsRequestWrapper.getTurmsRequest().getDeleteGroupMemberRequest();
@@ -583,7 +584,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.QUERY_GROUP_MEMBERS_REQUEST)
+    @TurmsRequestMapping(QUERY_GROUP_MEMBERS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryGroupMembersRequest() {
         return turmsRequestWrapper -> {
             QueryGroupMembersRequest request = turmsRequestWrapper.getTurmsRequest().getQueryGroupMembersRequest();
@@ -615,7 +616,7 @@ public class WsGroupController {
         };
     }
 
-    @TurmsRequestMapping(TurmsRequest.KindCase.UPDATE_GROUP_MEMBER_REQUEST)
+    @TurmsRequestMapping(UPDATE_GROUP_MEMBER_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleUpdateGroupMemberRequest() {
         return turmsRequestWrapper -> {
             UpdateGroupMemberRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateGroupMemberRequest();

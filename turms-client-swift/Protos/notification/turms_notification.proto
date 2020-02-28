@@ -47,7 +47,7 @@ message TurmsNotification {
         oneof kind {
             Int64Values ids = 1;
             Int64ValuesWithVersion ids_with_version = 2;
-            google.protobuf.BoolValue success = 3;
+            google.protobuf.StringValue url = 3;
 
             Acknowledge acknowledge = 4;
             Session session = 5;

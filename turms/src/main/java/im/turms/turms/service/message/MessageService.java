@@ -108,8 +108,7 @@ public class MessageService {
     }
 
     public Mono<Boolean> isMessageSentToUser(@NotNull Long messageId, @NotNull Long recipientId) {
-        // Warning: Do not check whether a user is the recipient of a message
-        // according to the Message collection because a message can be sent to user or group.
+        // Warning: Do not check whether a user is the recipient of a message because a message can be sent to user or group.
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
                 .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId));

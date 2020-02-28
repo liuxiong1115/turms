@@ -18,16 +18,15 @@
 package im.turms.turms.plugin;
 
 import im.turms.turms.pojo.bo.UserLoginInfo;
-import org.pf4j.ExtensionPoint;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 
-public interface UserAuthenticator extends ExtensionPoint {
+public abstract class UserAuthenticator extends TurmsExtension {
     /**
      * @return 1. Return Mono.just(true) if the user is authenticated.<br/>
      * 2. Return Mono.just(false) if the user is unauthenticated.<br/>
      * 3. Return Mono.empty() if the authentication should be passed.
      */
-    Mono<Boolean> authenticate(@NotNull UserLoginInfo userLoginInfo);
+    public abstract Mono<Boolean> authenticate(@NotNull UserLoginInfo userLoginInfo);
 }
