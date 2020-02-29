@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class UserService {
-    private TurmsClient turmsClient;
+    private final TurmsClient turmsClient;
     private Long userId;
     private String password;
     private UserLocation location;

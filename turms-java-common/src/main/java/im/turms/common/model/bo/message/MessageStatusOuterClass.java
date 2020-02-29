@@ -39,8 +39,8 @@ public final class MessageStatusOuterClass {
       "te\030\004 \001(\0132\033.google.protobuf.Int64Value\022.\n" +
       "\tread_date\030\005 \001(\0132\033.google.protobuf.Int64" +
       "Value\0220\n\013recall_date\030\006 \001(\0132\033.google.prot" +
-      "obuf.Int64ValueB$\n im.turms.common.model" +
-      ".bo.messageP\001b\006proto3"
+      "obuf.Int64ValueB\'\n im.turms.common.model" +
+      ".bo.messageP\001\272\002\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

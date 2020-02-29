@@ -6,7 +6,7 @@ import im.turms.common.model.dto.request.TurmsRequest;
 import java.util.function.BiFunction;
 
 public class NotificationService {
-    private TurmsClient turmsClient;
+    private final TurmsClient turmsClient;
     public BiFunction<TurmsRequest, Long, Void> onNotification;
 
     public NotificationService(TurmsClient turmsClient) {

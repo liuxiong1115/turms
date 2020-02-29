@@ -2,6 +2,7 @@ package helper;
 
 public class Constants {
     public static final String WS_URL = "ws://localhost:9510";
+    public static final String STORAGE_SERVER_URL = "http://localhost:9000";
     public static final int ORDER_FIRST = Integer.MIN_VALUE;
     public static final int ORDER_HIGHEST_PRIORITY = 0;
     public static final int ORDER_HIGH_PRIORITY = 100;

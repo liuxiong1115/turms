@@ -70,11 +70,11 @@ public class WsMessageControllerST extends BaseController {
 
     @Test
     public void handleCreateMessageRequest_shouldRelayMessageImmediately() throws InterruptedException, TimeoutException, ExecutionException {
-        TurmsClient clientOne = new TurmsClient(Constants.WS_URL, null, null);
+        TurmsClient clientOne = new TurmsClient(Constants.WS_URL, null, null, null);
         clientOne.getUserService()
                 .login(1L, "123", null, null, null)
                 .get(5, TimeUnit.SECONDS);
-        TurmsClient clientTwo = new TurmsClient(Constants.WS_URL, null, null);
+        TurmsClient clientTwo = new TurmsClient(Constants.WS_URL, null, null, null);
         clientTwo.getUserService()
                 .login(2L, "123", null, null, null)
                 .get(5, TimeUnit.SECONDS);

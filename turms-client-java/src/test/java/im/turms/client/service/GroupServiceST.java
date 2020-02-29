@@ -39,7 +39,7 @@ public class GroupServiceST {
 
     @BeforeAll
     static void setup() throws ExecutionException, InterruptedException, TimeoutException {
-        turmsClient = new TurmsClient(WS_URL, null, null);
+        turmsClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
         CompletableFuture<Void> future = turmsClient.getDriver().connect(1, "123", 10, null, UserStatus.BUSY, DeviceType.ANDROID);
         future.get(5, TimeUnit.SECONDS);
     }

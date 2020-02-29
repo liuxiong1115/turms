@@ -51,7 +51,7 @@ public class MessageService {
         }
     };
 
-    private TurmsClient turmsClient;
+    private final TurmsClient turmsClient;
     private Function<Message, Set<Long>> mentionedUserIdsParser;
     public BiFunction<Message, MessageAddition, Void> onMessage;
 
@@ -76,12 +76,15 @@ public class MessageService {
     public CompletableFuture<Long> sendMessage(
             @NotNull ChatType chatType,
             long toId,
-            @NotNull Date deliveryDate,
+            @Nullable Date deliveryDate,
             @Nullable String text,
             @Nullable byte[] records,
             @Nullable Integer burnAfter) {
-        Validator.throwIfAnyFalsy(chatType, deliveryDate);
+        Validator.throwIfAnyFalsy(chatType);
         Validator.throwIfAllFalsy(text, records);
+        if (deliveryDate == null) {
+            deliveryDate = new Date();
+        }
         return turmsClient.getDriver()
                 .send(CreateMessageRequest.newBuilder(), MapUtil.of(
                         "chat_type", chatType,

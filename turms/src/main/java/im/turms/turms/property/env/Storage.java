@@ -42,12 +42,12 @@ public class Storage implements IdentifiedDataSerializable {
     //    private int storageExpiration = 30;
     @Min(0)
     private int attachmentExpiration = 30;
-    private String profileContentType = MimeTypeUtils.IMAGE_JPEG_VALUE;
+    private String profileContentType = MimeTypeUtils.ALL_VALUE;
     //    private String storageContentType = MimeTypeUtils.ALL_VALUE;
     private String attachmentContentType = MimeTypeUtils.ALL_VALUE;
-    private int profileSizeLimit = 1024;
-    //    private int storageSizeLimit = 10 * 1024;
-    private int attachmentSizeLimit = 10 * 1024;
+    private int profileSizeLimit = 1 * 1024 * 1024;
+    //    private int storageSizeLimit = 10 * 1024 * 1024;
+    private int attachmentSizeLimit = 10 * 1024 * 1024;
     private Duration signatureDurationForGet = Duration.ofMinutes(5);
     private Duration signatureDurationForPut = Duration.ofMinutes(5);
 
