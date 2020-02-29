@@ -14,13 +14,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static helper.Constants.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StorageServiceST {
 
     private static TurmsClient turmsClient;
     private static final long USER_ID = 1L;
+    private static final long GROUP_ID = 1;
     private static byte[] PROFILE_PICTURE;
     private static byte[] ATTACHMENT;
     private static long messageId;
@@ -46,17 +48,27 @@ public class StorageServiceST {
 
     @Test
     @Order(ORDER_HIGH_PRIORITY)
-    public void uploadProfilePicture_should() throws InterruptedException, ExecutionException, TimeoutException {
-        String url = turmsClient.getStorageService().uploadProfilePicture(PROFILE_PICTURE).get(10, TimeUnit.SECONDS);
+    public void uploadProfilePicture_shouldReturnUrl() throws InterruptedException, ExecutionException, TimeoutException {
+        String url = turmsClient.getStorageService().uploadProfilePicture(PROFILE_PICTURE)
+                .get(5, TimeUnit.SECONDS);
         assertNotNull(url);
     }
 
     @Test
     @Order(ORDER_HIGH_PRIORITY)
-    public void uploadAttachment_should() throws InterruptedException, ExecutionException, TimeoutException {
+    public void uploadGroupProfilePicture_shouldReturnUrl() throws InterruptedException, ExecutionException, TimeoutException {
+        String url = turmsClient.getStorageService().uploadGroupProfilePicture(PROFILE_PICTURE, GROUP_ID)
+                .get(5, TimeUnit.SECONDS);
+        assertNotNull(url);
+    }
+
+    @Test
+    @Order(ORDER_HIGH_PRIORITY)
+    public void uploadAttachment_shouldReturnUrl() throws InterruptedException, ExecutionException, TimeoutException {
         messageId = turmsClient.getMessageService().sendMessage(ChatType.PRIVATE, 2L, null, "I've attached a picture", null, null)
                 .get(5, TimeUnit.SECONDS);
-        String url = turmsClient.getStorageService().uploadAttachment(messageId, ATTACHMENT).get(10, TimeUnit.SECONDS);
+        String url = turmsClient.getStorageService().uploadAttachment(messageId, ATTACHMENT)
+                .get(5, TimeUnit.SECONDS);
         assertNotNull(url);
     }
 
@@ -64,7 +76,7 @@ public class StorageServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void queryProfilePicture() throws InterruptedException, ExecutionException, TimeoutException {
+    public void queryProfilePicture_shouldEqualUploadedPicture() throws InterruptedException, ExecutionException, TimeoutException {
         byte[] bytes = turmsClient.getStorageService().queryProfilePicture(USER_ID)
                 .get(5, TimeUnit.SECONDS);
         assertArrayEquals(PROFILE_PICTURE, bytes);
@@ -72,7 +84,15 @@ public class StorageServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void queryAttachment() throws InterruptedException, ExecutionException, TimeoutException {
+    public void queryGroupProfilePicture_shouldEqualUploadedPicture() throws InterruptedException, ExecutionException, TimeoutException {
+        byte[] bytes = turmsClient.getStorageService().queryGroupProfilePicture(GROUP_ID)
+                .get(5, TimeUnit.SECONDS);
+        assertArrayEquals(PROFILE_PICTURE, bytes);
+    }
+
+    @Test
+    @Order(ORDER_MIDDLE_PRIORITY)
+    public void queryAttachment_shouldEqualUploadedAttachment() throws InterruptedException, ExecutionException, TimeoutException {
         byte[] bytes = turmsClient.getStorageService().queryAttachment(messageId, null)
                 .get(5, TimeUnit.SECONDS);
         assertArrayEquals(PROFILE_PICTURE, bytes);
