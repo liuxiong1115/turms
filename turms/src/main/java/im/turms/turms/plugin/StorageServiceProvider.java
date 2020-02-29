@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 public abstract class StorageServiceProvider extends TurmsExtension {
-    public abstract Mono<Boolean> deleteResource(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum);
+    public abstract Mono<Void> deleteResource(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum);
 
     public abstract Mono<String> queryPresignedGetUrl(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum);
 
