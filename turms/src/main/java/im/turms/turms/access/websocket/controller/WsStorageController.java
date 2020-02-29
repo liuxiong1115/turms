@@ -51,7 +51,7 @@ public class WsStorageController {
             if (contentType != ContentType.UNRECOGNIZED) {
                 String keyStr = querySignedGetUrlRequest.hasKeyStr() ? querySignedGetUrlRequest.getKeyStr().getValue() : null;
                 Long keyNum = querySignedGetUrlRequest.hasKeyNum() ? querySignedGetUrlRequest.getKeyNum().getValue() : null;
-                return storageService.queryPreSignedGetUrl(turmsRequestWrapper.getUserId(), contentType, keyStr, keyNum)
+                return storageService.queryPresignedGetUrl(turmsRequestWrapper.getUserId(), contentType, keyStr, keyNum)
                         .map(url -> RequestResult.responseData(TurmsNotification.Data.newBuilder()
                                 .setUrl(StringValue.newBuilder().setValue(url).build())
                                 .build()));

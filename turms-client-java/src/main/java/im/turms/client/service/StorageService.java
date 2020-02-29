@@ -39,12 +39,12 @@ public class StorageService {
 
     // Profile picture
 
-    public CompletableFuture<String> queryProfilePictureUrlForAccess(@NotNull Long userId) {
-        String url = String.format("%s/%s/%d", serverUrl, ContentType.PROFILE.name().toLowerCase(), userId);
+    public CompletableFuture<String> queryProfilePictureUrlForAccess(long userId) {
+        String url = String.format("%s/%s/%d", serverUrl, getBucketName(ContentType.PROFILE), userId);
         return CompletableFuture.completedFuture(url);
     }
 
-    public CompletableFuture<byte[]> queryProfilePicture(@NotNull Long userId) {
+    public CompletableFuture<byte[]> queryProfilePicture(long userId) {
         return queryProfilePictureUrlForAccess(userId).thenCompose(this::getBytesFromGetUrl);
     }
 
@@ -59,6 +59,26 @@ public class StorageService {
 
     public CompletableFuture<String> uploadProfilePicture(byte[] bytes) {
         return queryProfilePictureUrlForUpload(bytes.length)
+                .thenCompose(url -> upload(url, bytes));
+    }
+
+    // Group Profile picture
+
+    public CompletableFuture<String> queryGroupProfilePictureUrlForAccess(long groupId) {
+        String url = String.format("%s/%s/%d", serverUrl, getBucketName(ContentType.GROUP_PROFILE), groupId);
+        return CompletableFuture.completedFuture(url);
+    }
+
+    public CompletableFuture<byte[]> queryGroupProfilePicture(long groupId) {
+        return queryGroupProfilePictureUrlForAccess(groupId).thenCompose(this::getBytesFromGetUrl);
+    }
+
+    public CompletableFuture<String> queryGroupProfilePictureUrlForUpload(long pictureSize, long groupId) {
+        return getSignedPutUrl(ContentType.GROUP_PROFILE, pictureSize, null, groupId);
+    }
+
+    public CompletableFuture<String> uploadGroupProfilePicture(byte[] bytes, long groupId) {
+        return queryGroupProfilePictureUrlForUpload(bytes.length, groupId)
                 .thenCompose(url -> upload(url, bytes));
     }
 
@@ -80,6 +100,8 @@ public class StorageService {
         return queryAttachmentUrlForUpload(messageId, bytes.length)
                 .thenCompose(url -> upload(url, bytes));
     }
+
+    // Base
 
     private CompletableFuture<String> getSignedGetUrl(@NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum) {
         QuerySignedGetUrlRequest.Builder urlBuilder = QuerySignedGetUrlRequest.newBuilder()
@@ -143,5 +165,9 @@ public class StorageService {
                         throw new RuntimeException(response.toString());
                     }
                 });
+    }
+
+    private String getBucketName(ContentType contentType) {
+        return contentType.name().toLowerCase().replace("_", "-");
     }
 }

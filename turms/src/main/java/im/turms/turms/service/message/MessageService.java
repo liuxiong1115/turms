@@ -115,6 +115,17 @@ public class MessageService {
         return mongoTemplate.exists(query, MessageStatus.class);
     }
 
+    public Mono<Boolean> isMessageSentToUserOrByUser(@NotNull Long messageId, @NotNull Long userId) {
+        return isMessageSentToUser(messageId, userId)
+                .flatMap(isSentToUser -> {
+                    if (isSentToUser) {
+                        return Mono.just(true);
+                    } else {
+                        return isMessageSentByUser(messageId, userId);
+                    }
+                });
+    }
+
     public Mono<Boolean> isMessageRecallable(@NotNull Long messageId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
         query.fields().include(Message.Fields.deliveryDate);
