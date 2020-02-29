@@ -17,6 +17,7 @@
 
 package im.turms.turms.plugin;
 
+import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.property.TurmsProperties;
 import lombok.Data;
 import org.pf4j.DefaultPluginManager;
@@ -87,8 +88,8 @@ public class TurmsPluginManager {
     private void initExtension(TurmsExtension extension) {
         try {
             extension.setContext(context);
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            TurmsLogger.logThrowable(e);
         }
     }
 

@@ -32,8 +32,8 @@ public final class MessageStatusesOuterClass {
       "im.turms.proto\032\"model/message/message_st" +
       "atus.proto\"J\n\017MessageStatuses\0227\n\020message" +
       "_statuses\030\001 \003(\0132\035.im.turms.proto.Message" +
-      "StatusB$\n im.turms.common.model.bo.messa" +
-      "geP\001b\006proto3"
+      "StatusB\'\n im.turms.common.model.bo.messa" +
+      "geP\001\272\002\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

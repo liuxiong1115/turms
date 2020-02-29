@@ -29,7 +29,7 @@ public class UserServiceST {
 
     @BeforeAll
     static void setup() {
-        turmsClient = new TurmsClient(WS_URL, null, null);
+        turmsClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
     }
 
     @AfterAll

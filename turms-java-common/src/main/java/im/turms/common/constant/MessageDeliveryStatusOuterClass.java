@@ -26,8 +26,8 @@ public final class MessageDeliveryStatusOuterClass {
       "\n&constant/message_delivery_status.proto" +
       "\022\016im.turms.proto*Z\n\025MessageDeliveryStatu" +
       "s\022\t\n\005READY\020\000\022\013\n\007SENDING\020\001\022\014\n\010RECEIVED\020\002\022" +
-      "\r\n\tRECALLING\020\003\022\014\n\010RECALLED\020\004B\034\n\030im.turms" +
-      ".common.constantP\001b\006proto3"
+      "\r\n\tRECALLING\020\003\022\014\n\010RECALLED\020\004B\037\n\030im.turms" +
+      ".common.constantP\001\272\002\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

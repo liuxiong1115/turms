@@ -30,8 +30,8 @@ public class MessageServiceST {
 
     @BeforeAll
     static void setup() throws ExecutionException, InterruptedException, TimeoutException {
-        senderClient = new TurmsClient(WS_URL, null, null);
-        recipientClient = new TurmsClient(WS_URL, null, null);
+        senderClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
+        recipientClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
         senderClient.getDriver()
                 .connect(SENDER_ID, "123", 10, null, UserStatus.BUSY, DeviceType.ANDROID)
                 .get(5, TimeUnit.SECONDS);

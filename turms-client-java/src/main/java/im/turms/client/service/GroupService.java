@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class GroupService {
-    private TurmsClient turmsClient;
+    private final TurmsClient turmsClient;
 
     public GroupService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;

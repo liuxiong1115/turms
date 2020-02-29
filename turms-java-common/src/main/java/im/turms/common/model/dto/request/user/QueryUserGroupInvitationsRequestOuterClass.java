@@ -32,9 +32,9 @@ public final class QueryUserGroupInvitationsRequestOuterClass {
       "ons_request.proto\022\016im.turms.proto\032\036googl" +
       "e/protobuf/wrappers.proto\"Z\n QueryUserGr" +
       "oupInvitationsRequest\0226\n\021last_updated_da" +
-      "te\030\001 \001(\0132\033.google.protobuf.Int64ValueB*\n" +
+      "te\030\001 \001(\0132\033.google.protobuf.Int64ValueB-\n" +
       "&im.turms.common.model.dto.request.userP" +
-      "\001b\006proto3"
+      "\001\272\002\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
