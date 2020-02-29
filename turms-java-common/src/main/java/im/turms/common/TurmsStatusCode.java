@@ -59,8 +59,10 @@ public enum TurmsStatusCode {
     GROUP_HAS_BEEN_MUTED(4026, "The group has been muted", 406),
     MEMBER_HAS_BEEN_MUTED(4027, "The group member has been muted", 406),
     GUESTS_HAVE_BEEN_MUTED(4028, "The guests of the group have been muted", 406),
+    FILE_TOO_LARGE(4029, "The file is too large to upload", 413),
 
     LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500),
+    NOT_IMPLEMENTED(5002, "Not implemented", 501),
 
     CLIENT_USER_ID_AND_PASSWORD_MUST_NOT_NULL(6000, "The user ID and password must be not null", 0),
     CLIENT_SESSION_HAS_BEEN_CLOSED(6001, "The session has been closed", 0),
