@@ -14,8 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static helper.Constants.*;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StorageServiceST {
@@ -96,5 +95,23 @@ public class StorageServiceST {
         byte[] bytes = turmsClient.getStorageService().queryAttachment(messageId, null)
                 .get(5, TimeUnit.SECONDS);
         assertArrayEquals(PROFILE_PICTURE, bytes);
+    }
+
+    // Delete
+
+    @Test
+    @Order(ORDER_LOW_PRIORITY)
+    public void deleteProfile_shouldSucceed() throws InterruptedException, ExecutionException, TimeoutException {
+        turmsClient.getStorageService().deleteProfile()
+                .get(5, TimeUnit.SECONDS);
+        assertTrue(true);
+    }
+
+    @Test
+    @Order(ORDER_LOW_PRIORITY)
+    public void deleteGroupProfile_shouldSucceed() throws InterruptedException, ExecutionException, TimeoutException {
+        turmsClient.getStorageService().deleteGroupProfile(GROUP_ID)
+                .get(5, TimeUnit.SECONDS);
+        assertTrue(true);
     }
 }

@@ -7,6 +7,7 @@ import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.ContentType;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.request.TurmsRequest;
+import im.turms.common.model.dto.request.storage.DeleteResourceRequest;
 import im.turms.common.model.dto.request.storage.QuerySignedGetUrlRequest;
 import im.turms.common.model.dto.request.storage.QuerySignedPutUrlRequest;
 
@@ -62,6 +63,10 @@ public class StorageService {
                 .thenCompose(url -> upload(url, bytes));
     }
 
+    public CompletableFuture<Void> deleteProfile() {
+        return deleteResource(ContentType.PROFILE, null, null);
+    }
+
     // Group Profile picture
 
     public CompletableFuture<String> queryGroupProfilePictureUrlForAccess(long groupId) {
@@ -80,6 +85,10 @@ public class StorageService {
     public CompletableFuture<String> uploadGroupProfilePicture(byte[] bytes, long groupId) {
         return queryGroupProfilePictureUrlForUpload(bytes.length, groupId)
                 .thenCompose(url -> upload(url, bytes));
+    }
+
+    public CompletableFuture<Void> deleteGroupProfile(long groupId) {
+        return deleteResource(ContentType.GROUP_PROFILE, null, groupId);
     }
 
     // Message Attachment
@@ -136,6 +145,23 @@ public class StorageService {
         return turmsClient.getDriver()
                 .send(builder)
                 .thenApply(notification -> notification.getData().getUrl().getValue());
+    }
+
+    private CompletableFuture<Void> deleteResource(@NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum) {
+        DeleteResourceRequest.Builder requestBuilder = DeleteResourceRequest.newBuilder()
+                .setContentType(contentType);
+        if (keyStr != null) {
+            requestBuilder.setKeyStr(StringValue.newBuilder().setValue(keyStr).build());
+        }
+        if (keyNum != null) {
+            requestBuilder.setKeyNum(Int64Value.newBuilder().setValue(keyNum).build());
+        }
+        DeleteResourceRequest request = requestBuilder.build();
+        TurmsRequest.Builder builder = TurmsRequest.newBuilder()
+                .setDeleteResourceRequest(request);
+        return turmsClient.getDriver()
+                .send(builder)
+                .thenApply(notification -> null);
     }
 
     private CompletableFuture<byte[]> getBytesFromGetUrl(@NotNull String url) {

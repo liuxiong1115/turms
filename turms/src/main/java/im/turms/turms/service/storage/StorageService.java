@@ -78,7 +78,7 @@ public class StorageService {
         }
     }
 
-    public Mono<Boolean> deleteResource(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum) {
+    public Mono<Void> deleteResource(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum) {
         if (provider != null) {
             return hasPermissionToDelete(requesterId, contentType, keyStr, keyNum)
                     .flatMap(hasPermission -> {
