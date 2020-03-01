@@ -89,7 +89,7 @@ public class WsStorageController {
                 String keyStr = deleteResourceRequest.hasKeyStr() ? deleteResourceRequest.getKeyStr().getValue() : null;
                 Long keyNum = deleteResourceRequest.hasKeyNum() ? deleteResourceRequest.getKeyNum().getValue() : null;
                 return storageService.deleteResource(turmsRequestWrapper.getUserId(), contentType, keyStr, keyNum)
-                        .map(RequestResult::okIfTrue);
+                        .thenReturn(RequestResult.ok());
             } else {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
             }
