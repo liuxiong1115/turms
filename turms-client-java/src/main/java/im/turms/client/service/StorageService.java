@@ -23,7 +23,6 @@ public class StorageService {
 
     private final TurmsClient turmsClient;
     private final HttpClient httpClient;
-
     private String serverUrl = "http://localhost:9000";
 
     public StorageService(TurmsClient turmsClient, String storageServerUrl) {
@@ -67,7 +66,7 @@ public class StorageService {
         return deleteResource(ContentType.PROFILE, null, null);
     }
 
-    // Group Profile picture
+    // Group profile picture
 
     public CompletableFuture<String> queryGroupProfilePictureUrlForAccess(long groupId) {
         String url = String.format("%s/%s/%d", serverUrl, getBucketName(ContentType.GROUP_PROFILE), groupId);
@@ -91,7 +90,7 @@ public class StorageService {
         return deleteResource(ContentType.GROUP_PROFILE, null, groupId);
     }
 
-    // Message Attachment
+    // Message attachment
 
     public CompletableFuture<String> queryAttachmentUrlForAccess(long messageId, @Nullable String name) {
         return getSignedGetUrl(ContentType.ATTACHMENT, name, messageId);
