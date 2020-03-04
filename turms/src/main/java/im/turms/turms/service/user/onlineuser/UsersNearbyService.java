@@ -51,8 +51,6 @@ import java.util.stream.Collectors;
 /**
  * The accuracy is within 1.7m
  */
-// TODO: compared with plokhotnyuk/rtree2d
-// Main Check point: Pay attention to the memory usage
 @Experimental
 @Service
 @Validated
