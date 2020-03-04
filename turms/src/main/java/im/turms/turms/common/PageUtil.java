@@ -30,7 +30,6 @@ public class PageUtil {
         this.turmsClusterManager = turmsClusterManager;
     }
 
-    // TODO: more options
     public int getSize(@Nullable Integer size) {
         if (size == null || size <= 0) {
             return turmsClusterManager.getTurmsProperties().getSecurity().getDefaultAvailableRecordsPerRequest();

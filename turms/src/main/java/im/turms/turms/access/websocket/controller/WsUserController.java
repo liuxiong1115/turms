@@ -126,7 +126,6 @@ public class WsUserController {
         };
     }
 
-    //TODO: query specific fields
     @TurmsRequestMapping(QUERY_USERS_INFOS_NEARBY_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryUsersInfosNearbyRequest() {
         return turmsRequestWrapper -> {
