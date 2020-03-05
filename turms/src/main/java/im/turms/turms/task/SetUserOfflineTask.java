@@ -28,9 +28,9 @@ import org.springframework.web.reactive.socket.CloseStatus;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 @SpringAware
 public class SetUserOfflineTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
@@ -53,10 +53,11 @@ public class SetUserOfflineTask implements Callable<Boolean>, Serializable, Appl
     public Boolean call() {
         CloseStatus closeStatus = new CloseStatus(this.closeStatus);
         if (deviceTypes != null) {
-            Set<DeviceType> types = deviceTypes
-                    .stream()
-                    .map(integer -> DeviceType.values()[integer])
-                    .collect(Collectors.toSet());
+            Set<DeviceType> types = new HashSet<>(deviceTypes.size());
+            DeviceType[] values = DeviceType.values();
+            for (Integer deviceType : deviceTypes) {
+                types.add(values[deviceType]);
+            }
             return onlineUserService.setLocalUserDevicesOffline(userId, types, closeStatus);
         } else {
             return onlineUserService.setLocalUserOffline(userId, closeStatus);

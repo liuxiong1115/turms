@@ -83,11 +83,13 @@ public class WsMessageController {
                         false,
                         request.getToId());
             } else {
-                List<byte[]> records = request.getRecordsCount() != 0 ? request.getRecordsList()
-                        .stream()
-                        .map(ByteString::toByteArray)
-                        .collect(Collectors.toList())
-                        : null;
+                List<byte[]> records = null;
+                if (request.getRecordsCount() != 0) {
+                    records = new ArrayList<>(request.getRecordsCount());
+                    for (ByteString byteString : request.getRecordsList()) {
+                        records.add(byteString.toByteArray());
+                    }
+                }
                 Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
                 Date deliveryDate = new Date(request.getDeliveryDate());
                 pairMono = messageService.authAndSendMessage(
@@ -237,9 +239,10 @@ public class WsMessageController {
                         TurmsNotification.Data data = TurmsNotification.Data.newBuilder()
                                 .setMessages(messagesList)
                                 .build();
-                        Set<Long> messagesIds = messages.stream()
-                                .mapToLong(Message::getId).boxed()
-                                .collect(Collectors.toSet());
+                        Set<Long> messagesIds = new HashSet<>(messages.size());
+                        for (Message message : messages) {
+                            messagesIds.add(message.getId());
+                        }
                         return Mono.just(RequestResult.responseData(data))
                                 .flatMap(response -> messageStatusService.acknowledge(messagesIds)
                                         .thenReturn(response));
@@ -283,12 +286,13 @@ public class WsMessageController {
                         });
             }
             String text = request.hasText() ? request.getText().getValue() : null;
-            List<byte[]> records = request.getRecordsCount() != 0 ?
-                    request.getRecordsList()
-                            .stream()
-                            .map(ByteString::toByteArray)
-                            .collect(Collectors.toList())
-                    : null;
+            List<byte[]> records = null;
+            if (request.getRecordsCount() != 0) {
+                records = new ArrayList<>(request.getRecordsCount());
+                for (ByteString byteString : request.getRecordsList()) {
+                    records.add(byteString.toByteArray());
+                }
+            }
             Date recallDate = request.hasRecallDate() ? new Date(request.getRecallDate().getValue()) : null;
             return messageService.authAndUpdateMessageAndMessageStatus(
                     turmsRequestWrapper.getUserId(),
