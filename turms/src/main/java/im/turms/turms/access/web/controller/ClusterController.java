@@ -70,8 +70,8 @@ public class ClusterController {
         Map<String, Object> metadata = TurmsProperties.getMetadata(new HashMap<>(), TurmsProperties.class, onlyMutable, withMutableFlag);
         if (withValue) {
             try {
-                Map<String, Object> propertyValueMap = TurmsProperties.getPropertyValueMap(turmsClusterManager.getTurmsProperties(), onlyMutable);
-                propertyValueMap = propertyValueMap.entrySet()
+                Map<String, Object> propertyValueMap = TurmsProperties.getPropertyValueMap(turmsClusterManager.getTurmsProperties(), onlyMutable)
+                        .entrySet()
                         .stream()
                         .filter(entry -> metadata.containsKey(entry.getKey()))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

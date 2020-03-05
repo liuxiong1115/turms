@@ -73,9 +73,9 @@ public class TurmsClusterManager {
     private Member localMembersSnapshot;
     private boolean isMaster = false;
     private boolean hasJoinedCluster = false;
-    private List<Function<MembershipEvent, Void>> onMembersChangeListeners;
     private FlakeIdGenerator idGenerator;
-    private Cache<UUID, String> memberAddressCache;
+    private final List<Function<MembershipEvent, Void>> onMembersChangeListeners;
+    private final Cache<UUID, String> memberAddressCache;
     private final TurmsTaskExecutor turmsTaskExecutor;
     @Getter
     private String localTurmsServerAddress;

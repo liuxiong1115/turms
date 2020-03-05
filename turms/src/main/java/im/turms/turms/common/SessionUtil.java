@@ -34,9 +34,8 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -84,10 +83,15 @@ public class SessionUtil {
         if (cookie == null) {
             return null;
         }
-        return Arrays.stream(cookie.split(";\\s*"))
-                .map(pair -> pair.split("="))
-                .filter(array -> array.length == 2)
-                .collect(Collectors.toMap(entry -> entry[0], entry -> entry[1]));
+        String[] pairs = cookie.split(";\\s*");
+        Map<String, String> keyAndValueMap = new HashMap<>(pairs.length);
+        for (String pair : pairs) {
+            String[] entry = pair.split("=");
+            if (entry.length == 2) {
+                keyAndValueMap.put(entry[0], entry[1]);
+            }
+        }
+        return keyAndValueMap;
     }
 
     public static Long getUserIdFromSession(WebSocketSession session) {

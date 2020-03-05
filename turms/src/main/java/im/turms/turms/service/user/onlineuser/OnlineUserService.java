@@ -306,10 +306,10 @@ public class OnlineUserService {
         } else {
             Member member = turmsClusterManager.getMemberByUserId(userId);
             if (member != null) {
-                Set<Integer> types = deviceTypes
-                        .stream()
-                        .map(Enum::ordinal)
-                        .collect(Collectors.toSet());
+                Set<Integer> types = new HashSet<>(deviceTypes.size());
+                for (DeviceType deviceType : deviceTypes) {
+                    types.add(deviceType.ordinal());
+                }
                 Future<Boolean> future = turmsClusterManager
                         .getExecutor()
                         .submitToMember(new SetUserOfflineTask(userId, types, closeStatus.getCode()), member);

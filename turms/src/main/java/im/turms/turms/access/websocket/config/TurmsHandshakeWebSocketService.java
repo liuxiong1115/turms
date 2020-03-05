@@ -58,7 +58,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
      * 2. String: redirect address
      * <p>
      * Note:
-     * 1. The reason to cache both user ID and request ID is to
+     * 1. The reason to cache both user ID and request ID (as a token) is to
      * prevent others from being able to query others' login failed reason.
      * 2. To keep it simple, don't define/use a new model
      */

@@ -38,13 +38,9 @@ import reactor.core.publisher.FluxSink;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 public class OnlineUserManager {
     private UserOnlineInfo userOnlineInfo;
@@ -142,20 +138,23 @@ public class OnlineUserManager {
     }
 
     public List<WebSocketSession> getWebSocketSessions() {
-        return userOnlineInfo.getSessionMap()
-                .values()
-                .stream()
-                .map(session -> session.webSocketSession)
-                .collect(Collectors.toList());
+        Collection<Session> values = userOnlineInfo.getSessionMap().values();
+        List<WebSocketSession> sessions = new ArrayList<>(values.size());
+        for (Session session : values) {
+            sessions.add(session.webSocketSession);
+        }
+        return sessions;
     }
 
     public List<WebSocketSession> getWebSocketSessions(@NotEmpty Set<DeviceType> deviceTypes) {
-        return userOnlineInfo.getSessionMap()
-                .values()
-                .stream()
-                .filter(session -> session != null && deviceTypes.contains(session.deviceType))
-                .map(session -> session.webSocketSession)
-                .collect(Collectors.toList());
+        Collection<Session> values = userOnlineInfo.getSessionMap().values();
+        List<WebSocketSession> sessions = new ArrayList<>(values.size());
+        for (Session session : values) {
+            if (session != null && deviceTypes.contains(session.deviceType)) {
+                sessions.add(session.webSocketSession);
+            }
+        }
+        return sessions;
     }
 
     public WebSocketSession getWebSocketSession(@NotNull DeviceType deviceType) {
@@ -163,11 +162,12 @@ public class OnlineUserManager {
     }
 
     public List<FluxSink<WebSocketMessage>> getOutputSinks() {
-        return userOnlineInfo.getSessionMap()
-                .values()
-                .stream()
-                .map(OnlineUserManager.Session::getNotificationSink)
-                .collect(Collectors.toList());
+        Collection<Session> sessions = userOnlineInfo.getSessionMap().values();
+        List<FluxSink<WebSocketMessage>> sinks = new ArrayList<>(sessions.size());
+        for (Session session : sessions) {
+            sinks.add(session.getNotificationSink());
+        }
+        return sinks;
     }
 
     @Data
