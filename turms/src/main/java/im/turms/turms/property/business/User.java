@@ -107,11 +107,11 @@ public class User implements IdentifiedDataSerializable {
         @Min(0)
         private int maxAvailableUsersNearbyNumberPerQuery = 20;
         @JsonView(MutablePropertiesView.class)
-        @Description("The maximum distance per query")
+        @Description("The maximum distance per query request")
         @DecimalMin("0")
         private double maxDistancePerQuery = 0.1;
 
-        @Description("Whether to treat the pair of user ID and device type as an unique user when querying users nearby")
+        @Description("Whether to treat the pair of user ID and device type as an unique user when querying users nearby. If false, only the user ID is used to identify an unique user")
         private boolean treatUserIdAndDeviceTypeAsUniqueUser = false;
 
         @JsonIgnore
