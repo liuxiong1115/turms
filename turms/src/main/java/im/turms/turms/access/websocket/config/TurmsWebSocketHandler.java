@@ -31,6 +31,7 @@ import im.turms.turms.common.SessionUtil;
 import im.turms.turms.common.UserAgentUtil;
 import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import im.turms.turms.service.user.onlineuser.UsersNearbyService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
@@ -55,11 +56,13 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
     private final TurmsClusterManager turmsClusterManager;
     private final InboundMessageDispatcher inboundMessageDispatcher;
     private final OnlineUserService onlineUserService;
+    private final UsersNearbyService usersNearbyService;
 
-    public TurmsWebSocketHandler(InboundMessageDispatcher inboundMessageDispatcher, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager) {
+    public TurmsWebSocketHandler(InboundMessageDispatcher inboundMessageDispatcher, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, UsersNearbyService usersNearbyService) {
         this.inboundMessageDispatcher = inboundMessageDispatcher;
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
+        this.usersNearbyService = usersNearbyService;
     }
 
     @PostConstruct
@@ -102,10 +105,13 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
                             userLocation,
                             session,
                             notificationSink)
-                            .doOnError(throwable -> onlineUserService.setLocalUserDevicesOffline(
-                                    userId,
-                                    Collections.singleton(finalDeviceType),
-                                    CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, throwable.getMessage())))
+                            .doOnError(throwable -> {
+                                notificationSink.error(throwable);
+                                onlineUserService.setLocalUserDevicesOffline(
+                                        userId,
+                                        Collections.singleton(finalDeviceType),
+                                        CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, throwable.getMessage()));
+                            })
                             .doOnSuccess(code -> {
                                 if (code != TurmsStatusCode.OK) {
                                     onlineUserService.setLocalUserDevicesOffline(
