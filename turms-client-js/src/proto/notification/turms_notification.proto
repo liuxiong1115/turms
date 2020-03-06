@@ -27,6 +27,7 @@ import "model/message/messages_with_total_list.proto";
 import "model/user/user_friend_requests_with_version.proto";
 import "model/user/user_relationship_groups_with_version.proto";
 import "model/user/user_relationships_with_version.proto";
+import "model/user/user_session_ids.proto";
 import "model/user/users_infos_with_version.proto";
 import "model/user/users_online_statuses.proto";
 
@@ -61,13 +62,14 @@ message TurmsNotification {
             UserFriendRequestsWithVersion user_friend_requests_with_version = 11;
             UserRelationshipGroupsWithVersion user_relationship_groups_with_version = 12;
             UserRelationshipsWithVersion user_relationships_with_version = 13;
+            UserSessionIds user_session_ids = 14;
 
-            GroupInvitationsWithVersion group_invitations_with_version = 14;
-            GroupJoinQuestionsAnswerResult group_join_question_answer_result = 15;
-            GroupJoinRequestsWithVersion group_join_requests_with_version = 16;
-            GroupJoinQuestionsWithVersion group_join_questions_with_version = 17;
-            GroupMembersWithVersion group_members_with_version = 18;
-            GroupsWithVersion groups_with_version = 19;
+            GroupInvitationsWithVersion group_invitations_with_version = 15;
+            GroupJoinQuestionsAnswerResult group_join_question_answer_result = 16;
+            GroupJoinRequestsWithVersion group_join_requests_with_version = 17;
+            GroupJoinQuestionsWithVersion group_join_questions_with_version = 18;
+            GroupMembersWithVersion group_members_with_version = 19;
+            GroupsWithVersion groups_with_version = 20;
         }
     }
 }

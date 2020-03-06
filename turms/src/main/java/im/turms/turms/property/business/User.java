@@ -103,15 +103,16 @@ public class User implements IdentifiedDataSerializable {
         @Description("Whether to persist users' location")
         private boolean persistent = true;
         @JsonView(MutablePropertiesView.class)
-        @Description("The maximum available number of users nearby records for query")
+        @Description("The maximum available number of users nearby records per query request")
         @Min(0)
-        private int maxAvailableUsersNearbyNumberForQuery = 20;
+        private int maxAvailableUsersNearbyNumberPerQuery = 20;
         @JsonView(MutablePropertiesView.class)
-        @Description("The maximum distance for query")
+        @Description("The maximum distance per query")
         @DecimalMin("0")
-        private double maxDistanceForQuery = 0.1;
-        @Description("The cron to remove users' locations")
-        private String removeLocationsCron = ""; //TODO
+        private double maxDistancePerQuery = 0.1;
+
+        @Description("Whether to treat the pair of user ID and device type as an unique user when querying users nearby")
+        private boolean treatUserIdAndDeviceTypeAsUniqueUser = false;
 
         @JsonIgnore
         @Override
@@ -129,18 +130,16 @@ public class User implements IdentifiedDataSerializable {
         public void writeData(ObjectDataOutput out) throws IOException {
             out.writeBoolean(enabled);
             out.writeBoolean(persistent);
-            out.writeInt(maxAvailableUsersNearbyNumberForQuery);
-            out.writeDouble(maxDistanceForQuery);
-            out.writeUTF(removeLocationsCron);
+            out.writeInt(maxAvailableUsersNearbyNumberPerQuery);
+            out.writeDouble(maxDistancePerQuery);
         }
 
         @Override
         public void readData(ObjectDataInput in) throws IOException {
             enabled = in.readBoolean();
             persistent = in.readBoolean();
-            maxAvailableUsersNearbyNumberForQuery = in.readInt();
-            maxDistanceForQuery = in.readDouble();
-            removeLocationsCron = in.readUTF();
+            maxAvailableUsersNearbyNumberPerQuery = in.readInt();
+            maxDistancePerQuery = in.readDouble();
         }
     }
 
@@ -241,7 +240,7 @@ public class User implements IdentifiedDataSerializable {
 
         public enum ConflictStrategy {
             FORCE_LOGGED_IN_DEVICES_OFFLINE,
-            //            ACQUIRE_LOGGED_IN_DEVICES_PERMISSION,
+            // ACQUIRE_LOGGED_IN_DEVICES_PERMISSION,
             LOGGING_IN_DEVICE_OFFLINE
         }
     }

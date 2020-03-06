@@ -18,9 +18,12 @@
 package im.turms.turms.access.websocket.controller;
 
 import im.turms.common.TurmsStatusCode;
+import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.ProfileAccessStrategy;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.model.bo.common.Int64Values;
+import im.turms.common.model.bo.user.UserSessionId;
+import im.turms.common.model.bo.user.UserSessionIds;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
 import im.turms.common.model.bo.user.UsersOnlineStatuses;
 import im.turms.common.model.dto.notification.TurmsNotification;
@@ -38,6 +41,7 @@ import im.turms.turms.service.user.UserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.onlineuser.UsersNearbyService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
@@ -110,19 +114,43 @@ public class WsUserController {
             Integer maxNumber = request.hasMaxNumber() ? request.getMaxNumber().getValue() : null;
             usersNearbyService.upsertUserLocation(
                     turmsRequestWrapper.getUserId(),
+                    turmsRequestWrapper.getDeviceType(),
                     request.getLongitude(),
                     request.getLatitude(),
                     new Date());
-            return usersNearbyService.queryUsersIdsNearby(
-                    turmsRequestWrapper.getUserId(),
-                    turmsRequestWrapper.getDeviceType(),
-                    maxNumber,
-                    distance)
-                    .collectList()
-                    .map(ids -> RequestResult.responseData(TurmsNotification.Data
-                            .newBuilder()
-                            .setIds(Int64Values.newBuilder().addAllValues(ids))
-                            .build()));
+            if (usersNearbyService.isTreatUserIdAndDeviceTypeAsUniqueUser()) {
+                return usersNearbyService.queryNearestUserSessionIds(
+                        turmsRequestWrapper.getUserId(),
+                        turmsRequestWrapper.getDeviceType(),
+                        maxNumber,
+                        distance)
+                        .collectList()
+                        .map(ids -> {
+                            UserSessionIds.Builder builder = UserSessionIds.newBuilder();
+                            for (Pair<Long, DeviceType> id : ids) {
+                                UserSessionId sessionId = UserSessionId.newBuilder()
+                                        .setUserId(id.getLeft())
+                                        .setDeviceType(id.getRight())
+                                        .build();
+                                builder.addUserSessionIds(sessionId);
+                            }
+                            return RequestResult.responseData(TurmsNotification.Data
+                                    .newBuilder()
+                                    .setUserSessionIds(builder.build())
+                                    .build());
+                        });
+            } else {
+                return usersNearbyService.queryNearestUserIds(
+                        turmsRequestWrapper.getUserId(),
+                        turmsRequestWrapper.getDeviceType(),
+                        maxNumber,
+                        distance)
+                        .collectList()
+                        .map(ids -> RequestResult.responseData(TurmsNotification.Data
+                                .newBuilder()
+                                .setIds(Int64Values.newBuilder().addAllValues(ids))
+                                .build()));
+            }
         };
     }
 
@@ -134,6 +162,7 @@ public class WsUserController {
             Integer maxNumber = request.hasMaxNumber() ? request.getMaxNumber().getValue() : null;
             usersNearbyService.upsertUserLocation(
                     turmsRequestWrapper.getUserId(),
+                    turmsRequestWrapper.getDeviceType(),
                     request.getLongitude(),
                     request.getLatitude(),
                     new Date());
@@ -275,20 +304,19 @@ public class WsUserController {
                     null,
                     null)
                     .flatMap(updated -> {
-                        if (updated != null && updated) {
-                            if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyRelatedUsersAfterOtherRelatedUserInfoUpdated()) {
-                                return userRelationshipService.queryRelatedUsersIds(Set.of(turmsRequestWrapper.getUserId()), false)
-                                        .collect(Collectors.toSet())
-                                        .map(relatedUsersIds -> {
-                                            if (relatedUsersIds.isEmpty()) {
-                                                return RequestResult.ok();
-                                            } else {
-                                                return RequestResult.recipientData(
-                                                        relatedUsersIds,
-                                                        turmsRequestWrapper.getTurmsRequest());
-                                            }
-                                        });
-                            }
+                        if (updated != null && updated
+                                && turmsClusterManager.getTurmsProperties().getNotification().isNotifyRelatedUsersAfterOtherRelatedUserInfoUpdated()) {
+                            return userRelationshipService.queryRelatedUsersIds(Set.of(turmsRequestWrapper.getUserId()), false)
+                                    .collect(Collectors.toSet())
+                                    .map(relatedUsersIds -> {
+                                        if (relatedUsersIds.isEmpty()) {
+                                            return RequestResult.ok();
+                                        } else {
+                                            return RequestResult.recipientData(
+                                                    relatedUsersIds,
+                                                    turmsRequestWrapper.getTurmsRequest());
+                                        }
+                                    });
                         }
                         return Mono.just(RequestResult.okIfTrue(updated));
                     });

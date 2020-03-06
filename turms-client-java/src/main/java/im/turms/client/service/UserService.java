@@ -124,7 +124,7 @@ public class UserService {
                 .thenApply(UserInfoWithVersion::from);
     }
 
-    public CompletableFuture<Int64ValuesWithVersion> queryUsersIdsNearby(
+    public CompletableFuture<List<Long>> queryUserIdsNearby(
             float latitude,
             float longitude,
             @Nullable Integer distance,
@@ -135,7 +135,21 @@ public class UserService {
                         "longitude", longitude,
                         "distance", distance,
                         "max_number", maxNumber))
-                .thenApply(notification -> notification.getData().getIdsWithVersion());
+                .thenApply(notification -> notification.getData().getIdsWithVersion().getValuesList());
+    }
+
+    public CompletableFuture<List<UserSessionId>> queryUserSessionIdsNearby(
+            float latitude,
+            float longitude,
+            @Nullable Integer distance,
+            @Nullable Integer maxNumber) {
+        return turmsClient.getDriver()
+                .send(QueryUsersIdsNearbyRequest.newBuilder(), MapUtil.of(
+                        "latitude", latitude,
+                        "longitude", longitude,
+                        "distance", distance,
+                        "max_number", maxNumber))
+                .thenApply(notification -> notification.getData().getUserSessionIds().getUserSessionIdsList());
     }
 
     public CompletableFuture<List<UserInfo>> queryUsersInfosNearby(

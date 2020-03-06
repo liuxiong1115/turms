@@ -106,8 +106,8 @@ public class UserOnlineInfoController {
 
     @GetMapping("/locations")
     @RequiredPermission(USER_ONLINE_INFO_QUERY)
-    public ResponseEntity<ResponseDTO<Collection<UserLocation>>> queryUserLocations(@RequestParam Long userId) {
-        SortedSet<UserLocation> userLocations = onlineUserService.getUserLocations(userId);
+    public ResponseEntity<ResponseDTO<Collection<UserLocation>>> queryUserLocations(@RequestParam Long userId, @RequestParam(required = false) DeviceType deviceType) {
+        SortedSet<UserLocation> userLocations = onlineUserService.getUserLocations(userId, deviceType);
         return ResponseFactory.okIfTruthy(userLocations);
     }
 

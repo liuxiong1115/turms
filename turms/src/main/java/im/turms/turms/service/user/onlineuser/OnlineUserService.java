@@ -63,7 +63,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
 import static im.turms.turms.common.Constants.ALL_DEVICE_TYPES;
@@ -177,14 +176,7 @@ public class OnlineUserService {
             for (DeviceType deviceType : deviceTypes) {
                 OnlineUserManager.Session session = manager.getSession(deviceType);
                 if (session != null) {
-                    Long logId = session.getLogId();
-                    if (logId != null) {
-                        userLoginLogService
-                                .updateLogoutDate(logId, now)
-                                .subscribe();
-                    }
-                    disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
-                            closeStatus.getCode());
+                    clearSession(userId, session, now, closeStatus);
                 }
             }
             manager.setSpecificDevicesOffline(deviceTypes, closeStatus);
@@ -205,6 +197,19 @@ public class OnlineUserService {
         }
     }
 
+    private void clearSession(Long userId, OnlineUserManager.Session session, Date date, CloseStatus closeStatus) {
+        Long logId = session.getLogId();
+        if (logId != null) {
+            userLoginLogService
+                    .updateLogoutDate(logId, date)
+                    .subscribe();
+        }
+        session.getNotificationSink().complete();
+        usersNearbyService.removeUserLocation(userId, session.getDeviceType());
+        disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
+                closeStatus.getCode());
+    }
+
     private void setManagersOffline(@NotNull CloseStatus closeStatus, @NotNull Collection<OnlineUserManager> managers) {
         for (OnlineUserManager manager : managers) {
             if (manager != null) {
@@ -212,14 +217,7 @@ public class OnlineUserService {
                 Date now = new Date();
                 Long userId = manager.getOnlineUserInfo().getUserId();
                 for (OnlineUserManager.Session session : sessionMap.values()) {
-                    Long logId = session.getLogId();
-                    if (logId != null) {
-                        userLoginLogService
-                                .updateLogoutDate(logId, now)
-                                .subscribe();
-                    }
-                    disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
-                            closeStatus.getCode());
+                    clearSession(userId, session, now, closeStatus);
                 }
                 manager.setAllDevicesOffline(closeStatus);
                 if (manager.getSessionsNumber() == 0) {
@@ -258,9 +256,10 @@ public class OnlineUserService {
     public Mono<Boolean> setUsersOffline(
             @NotEmpty Set<Long> userIds,
             @NotNull CloseStatus closeStatus) {
-        List<Mono<Boolean>> list = userIds.stream()
-                .map(userId -> setUserOffline(userId, closeStatus))
-                .collect(Collectors.toList());
+        List<Mono<Boolean>> list = new ArrayList<>(userIds.size());
+        for (Long userId : userIds) {
+            list.add(setUserOffline(userId, closeStatus));
+        }
         return Flux.merge(list).all(value -> value);
     }
 
@@ -400,7 +399,7 @@ public class OnlineUserService {
         Mono<UserLocation> locationIdMono;
         if (userLocation != null) {
             locationIdMono = userLocationService
-                    .saveUserLocation(null, userId, userLocation.xFloat(), userLocation.yFloat(), new Date());
+                    .saveUserLocation(null, userId, loggingInDeviceType, userLocation.xFloat(), userLocation.yFloat(), new Date());
         } else {
             locationIdMono = Mono.empty();
         }
@@ -592,8 +591,16 @@ public class OnlineUserService {
         setIrresponsibleUsersOffline(false);
     }
 
-    public SortedSet<UserLocation> getUserLocations(@NotNull Long userId) {
-        return usersNearbyService.getUserLocations().get(userId);
+    public SortedSet<UserLocation> getUserLocations(@NotNull Long userId, @DeviceTypeConstraint DeviceType deviceType) {
+        if (usersNearbyService.isTreatUserIdAndDeviceTypeAsUniqueUser()) {
+            if (deviceType != null) {
+                return usersNearbyService.getUserSessionLocations().get(Pair.of(userId, deviceType));
+            } else {
+                throw new IllegalArgumentException("deviceType must not null if treatUserIdAndDeviceTypeAsUniqueUser is true");
+            }
+        } else {
+            return usersNearbyService.getUserLocations().get(userId);
+        }
     }
 
     public boolean updateUserLocation(
@@ -609,6 +616,7 @@ public class OnlineUserService {
             UserLocation location = new UserLocation(
                     turmsClusterManager.generateRandomId(),
                     userId,
+                    deviceType,
                     longitude,
                     latitude,
                     now,

@@ -1,5 +1,6 @@
 package im.turms.turms.service.user;
 
+import im.turms.common.constant.DeviceType;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.pojo.domain.UserLocation;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -30,6 +31,7 @@ public class UserLocationService {
     public Mono<UserLocation> saveUserLocation(
             @Nullable Long id,
             @NotNull Long userId,
+            @NotNull DeviceType deviceType,
             float longitude,
             float latitude,
             @NotNull @PastOrPresent Date timestamp) {
@@ -39,6 +41,7 @@ public class UserLocationService {
         UserLocation location = new UserLocation();
         location.setId(id);
         location.setUserId(userId);
+        location.setDeviceType(deviceType);
         location.setLongitude(longitude);
         location.setLatitude(latitude);
         location.setTimestamp(timestamp);

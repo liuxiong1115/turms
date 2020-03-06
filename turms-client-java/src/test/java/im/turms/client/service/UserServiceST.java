@@ -224,10 +224,12 @@ public class UserServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    public void queryUsersIdsNearby_shouldReturnUsersIds() throws ExecutionException, InterruptedException, TimeoutException {
-        Int64ValuesWithVersion result = turmsClient.getUserService().queryUsersIdsNearby(1f, 1f, null, null)
+    public void queryUsersNearby_shouldReturnUserIdsOrSessionIds() throws ExecutionException, InterruptedException, TimeoutException {
+        List<Long> userIds = turmsClient.getUserService().queryUserIdsNearby(1f, 1f, null, null)
                 .get(5, TimeUnit.SECONDS);
-        assertNotNull(result);
+        List<UserSessionId> sessionIds = turmsClient.getUserService().queryUserSessionIdsNearby(1f, 1f, null, null)
+                .get(5, TimeUnit.SECONDS);
+        assertTrue(userIds != null || sessionIds != null);
     }
 
     @Test

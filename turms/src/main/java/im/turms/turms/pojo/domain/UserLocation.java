@@ -18,6 +18,7 @@
 package im.turms.turms.pojo.domain;
 
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
+import im.turms.common.constant.DeviceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,6 +45,9 @@ public class UserLocation implements Serializable {
     private Long userId;
 
     @Indexed
+    private DeviceType deviceType;
+
+    @Indexed
     private Float longitude;
 
     @Indexed
@@ -59,9 +63,10 @@ public class UserLocation implements Serializable {
     @Transient
     private PointFloat point;
 
-    public UserLocation(Long id, Long userId, Float longitude, Float latitude, Date timestamp) {
+    public UserLocation(Long id, Long userId, DeviceType deviceType, Float longitude, Float latitude, Date timestamp) {
         this.id = id;
         this.userId = userId;
+        this.deviceType = deviceType;
         this.longitude = longitude;
         this.latitude = latitude;
         this.timestamp = timestamp;
