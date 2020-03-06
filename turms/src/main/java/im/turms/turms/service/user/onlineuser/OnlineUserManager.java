@@ -38,12 +38,12 @@ import reactor.core.publisher.FluxSink;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class OnlineUserManager {
-    private UserOnlineInfo userOnlineInfo;
+    private final UserOnlineInfo userOnlineInfo;
 
     public OnlineUserManager(
             @NonNull Long userId,
@@ -63,7 +63,7 @@ public class OnlineUserManager {
                 timeout,
                 logId,
                 System.currentTimeMillis());
-        ConcurrentMap<DeviceType, Session> sessionMap = new ConcurrentHashMap<>(DeviceType.values().length);
+        ConcurrentHashMap<DeviceType, Session> sessionMap = new ConcurrentHashMap<>(DeviceType.values().length);
         sessionMap.putIfAbsent(usingDeviceType, session);
         this.userOnlineInfo = new UserOnlineInfo(userId, userStatus, sessionMap);
     }
@@ -172,19 +172,19 @@ public class OnlineUserManager {
 
     @Data
     @AllArgsConstructor
-    public static class Session {
+    public static class Session implements Serializable {
         private DeviceType deviceType;
         private Date loginDate;
         private UserLocation location;
         @JsonIgnore
         @Transient
-        private WebSocketSession webSocketSession;
+        private transient WebSocketSession webSocketSession;
         @JsonIgnore
         @Transient
-        private FluxSink<WebSocketMessage> notificationSink;
+        private transient FluxSink<WebSocketMessage> notificationSink;
         @JsonIgnore
         @Transient
-        private Timeout heartbeatTimeout;
+        private transient Timeout heartbeatTimeout;
         @JsonIgnore
         @Transient
         private Long logId;

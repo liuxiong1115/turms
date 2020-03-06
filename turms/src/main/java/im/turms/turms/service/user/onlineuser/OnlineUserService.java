@@ -596,7 +596,7 @@ public class OnlineUserService {
             if (deviceType != null) {
                 return usersNearbyService.getUserSessionLocations().get(Pair.of(userId, deviceType));
             } else {
-                throw new IllegalArgumentException("deviceType must not null if treatUserIdAndDeviceTypeAsUniqueUser is true");
+                throw new IllegalArgumentException("deviceType must be not null if treatUserIdAndDeviceTypeAsUniqueUser is true");
             }
         } else {
             return usersNearbyService.getUserLocations().get(userId);
