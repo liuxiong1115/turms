@@ -21,6 +21,7 @@ import im.turms.common.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.pojo.dto.ResponseDTO;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
+import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -67,6 +68,8 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
             return TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         } else if (throwable instanceof DuplicateKeyException) {
             return TurmsBusinessException.get(TurmsStatusCode.DUPLICATE_KEY);
+        } else if (throwable instanceof DataBufferLimitException) {
+            return TurmsBusinessException.get(TurmsStatusCode.FILE_TOO_LARGE);
         } else {
             return throwable;
         }

@@ -33,7 +33,7 @@ import java.util.Date;
 @FieldNameConstants
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public final class GroupInvitation implements Cloneable {
+public final class GroupInvitation {
     @Id
     private final Long id;
 
