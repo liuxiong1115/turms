@@ -60,6 +60,7 @@ public enum TurmsStatusCode {
     MEMBER_HAS_BEEN_MUTED(4027, "The group member has been muted", 406),
     GUESTS_HAVE_BEEN_MUTED(4028, "The guests of the group have been muted", 406),
     FILE_TOO_LARGE(4029, "The file is too large to upload", 413),
+    REQUEST_TOO_LARGE(4030, "The request is too large", 413),
 
     LOGGED_DEVICES_CANNOT_OFFLINE(5001, "Cannot set logged in devices offline", 500),
     NOT_IMPLEMENTED(5002, "Not implemented", 501),
