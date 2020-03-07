@@ -19,16 +19,14 @@ package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class AddGroupJoinQuestionDTO {
-    private Long groupId;
-    private String question;
-    private Set<String> answers;
-    private Integer score;
+public final class AddGroupJoinQuestionDTO {
+    private final Long groupId;
+    private final String question;
+    private final Set<String> answers;
+    private final Integer score;
 }

@@ -20,81 +20,54 @@ package im.turms.turms.pojo.domain;
 import im.turms.common.constant.ChatType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Document
 @FieldNameConstants
-public class Message {
+public final class Message {
     @Id
-    private Long id;
+    private final Long id;
 
     @Indexed
-    private ChatType chatType;
+    private final ChatType chatType;
 
     @Indexed
-    private Boolean isSystemMessage;
+    private final Boolean isSystemMessage;
 
     @Indexed
-    private Date deliveryDate;
+    private final Date deliveryDate;
 
     @Indexed
-    private Date deletionDate;
+    private final Date deletionDate;
 
-    private String text;
+    private final String text;
 
     @Indexed
-    private Long senderId;
+    private final Long senderId;
 
     /**
      * Use "target" rather than "recipient" because the target may be a recipient or a group.
      */
     @Indexed
-    private Long targetId;
+    private final Long targetId;
 
     /**
      * Use list to keep order
      */
-    private List<byte[]> records;
+    private final List<byte[]> records;
 
-    private Integer burnAfter;
+    private final Integer burnAfter;
 
     @Indexed
-    private Long referenceId;
-
-    public Message(
-            @NotNull Long id,
-            @NotNull ChatType chatType,
-            @NotNull Boolean isSystemMessage,
-            @NotNull Date deliveryDate,
-            @NotNull String text,
-            @NotNull Long senderId,
-            @NotNull Long targetId,
-            @Nullable List<byte[]> records,
-            @Nullable Integer burnAfter,
-            @Nullable Long referenceId) {
-        this.id = id;
-        this.text = text;
-        this.chatType = chatType;
-        this.isSystemMessage = isSystemMessage;
-        this.senderId = senderId;
-        this.targetId = targetId;
-        this.deliveryDate = deliveryDate;
-        this.records = records;
-        this.burnAfter = burnAfter;
-        this.referenceId = referenceId;
-    }
+    private final Long referenceId;
 
     public Long groupId() {
         return chatType == ChatType.GROUP ? targetId : null;

@@ -19,16 +19,14 @@ package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class AddGroupBlacklistedUserDTO {
-    private Long groupId;
-    private Long userId;
-    private Date blockDate;
-    private Long requesterId;
+public final class AddGroupBlacklistedUserDTO {
+    private final Long groupId;
+    private final Long userId;
+    private final Date blockDate;
+    private final Long requesterId;
 }

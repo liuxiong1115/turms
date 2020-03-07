@@ -20,7 +20,6 @@ package im.turms.turms.pojo.domain;
 import im.turms.common.constant.ProfileAccessStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -32,33 +31,32 @@ import java.util.Date;
 @Document
 @FieldNameConstants
 @AllArgsConstructor
-@NoArgsConstructor
-public class User {
+public final class User {
     @Id
-    private Long id;
+    private final Long id;
 
-    private String password;
+    private final String password;
 
-    private String name;
+    private final String name;
 
-    private String intro;
+    private final String intro;
 
-    private String profilePictureUrl;
+    private final String profilePictureUrl;
 
-    private ProfileAccessStrategy profileAccess;
-
-    @Indexed
-    private Long permissionGroupId;
+    private final ProfileAccessStrategy profileAccess;
 
     @Indexed
-    private Date registrationDate;
+    private final Long permissionGroupId;
 
     @Indexed
-    private Date deletionDate;
+    private final Date registrationDate;
 
     @Indexed
-    private Boolean active;
+    private final Date deletionDate;
 
     @Indexed
-    private Date lastUpdateDate;
+    private final Boolean active;
+
+    @Indexed
+    private final Date lastUpdateDate;
 }

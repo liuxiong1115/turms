@@ -20,9 +20,9 @@ package im.turms.turms.pojo.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -32,17 +32,16 @@ import java.util.List;
 @Data
 @Document
 @FieldNameConstants
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserRelationship {
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+public final class UserRelationship {
     @Id
-    private Key key;
+    private final Key key;
 
     @Indexed
-    private Boolean isBlocked;
+    private final Boolean isBlocked;
 
     @Indexed
-    private Date establishmentDate;
+    private final Date establishmentDate;
 
     public UserRelationship(Long ownerId, Long relatedUserId, Boolean isBlocked, Date establishmentDate) {
         this.key = new Key(ownerId, relatedUserId);
@@ -52,20 +51,18 @@ public class UserRelationship {
 
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
     @EqualsAndHashCode
-    public static class Key {
+    public static final class Key {
         @Indexed
-        private Long ownerId;
+        private final Long ownerId;
 
         @Indexed
-        private Long relatedUserId;
+        private final Long relatedUserId;
     }
 
     @Data
-    @NoArgsConstructor
     @AllArgsConstructor
-    public static class KeyList {
-        List<Key> keys;
+    public static final class KeyList {
+        private final List<Key> keys;
     }
 }

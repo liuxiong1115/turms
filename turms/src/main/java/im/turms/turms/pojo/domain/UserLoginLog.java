@@ -30,26 +30,26 @@ import java.util.Map;
 @Data
 @Document
 @FieldNameConstants
-public class UserLoginLog {
+public final class UserLoginLog {
     @Id
-    private Long id;
+    private final Long id;
 
     @Indexed
-    private Long userId;
+    private final Long userId;
 
     @Indexed(expireAfter = "90d")
-    private Date loginDate;
+    private final Date loginDate;
 
     @Indexed
-    private Date logoutDate;
+    private final Date logoutDate;
 
     @Indexed
-    private Long locationId;
+    private final Long locationId;
 
-    private Integer ip;
+    private final Integer ip;
 
     @Indexed
-    private DeviceType deviceType;
+    private final DeviceType deviceType;
 
-    private Map<String, String> deviceDetails;
+    private final Map<String, String> deviceDetails;
 }

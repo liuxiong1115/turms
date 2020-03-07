@@ -19,14 +19,12 @@ package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class AddAdminDTO {
-    private String account;
-    private String password;
-    private String name;
-    private Long roleId;
+public final class AddAdminDTO {
+    private final String account;
+    private final String password;
+    private final String name;
+    private final Long roleId;
 }

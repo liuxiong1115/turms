@@ -23,9 +23,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserLoginInfo {
-    private Long userId;
-    private String password;
-    private DeviceType loggingDeviceType;
-    private String userAgent;
+public final class UserLoginInfo {
+    private final Long userId;
+    private final String password;
+    private final DeviceType loggingDeviceType;
+    private final String userAgent;
 }

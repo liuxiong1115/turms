@@ -17,7 +17,6 @@
 
 package im.turms.turms.common;
 
-import im.turms.turms.pojo.domain.Message;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -25,7 +24,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
-
 import java.util.NoSuchElementException;
 
 import static im.turms.turms.common.Constants.TOTAL;

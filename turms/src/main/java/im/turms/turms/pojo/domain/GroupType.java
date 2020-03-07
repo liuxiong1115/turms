@@ -43,7 +43,7 @@ import java.io.IOException;
  *     name: "DEFAULT"
  * } always exists in Turms
  */
-public class GroupType implements IdentifiedDataSerializable {
+public final class GroupType implements IdentifiedDataSerializable {
     @Id
     @Setter(AccessLevel.NONE)
     private Long id;

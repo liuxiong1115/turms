@@ -276,6 +276,7 @@ public class MessageService {
                 chatType,
                 isSystemMessage,
                 deliveryDate,
+                null,
                 text,
                 senderId,
                 targetId,
@@ -303,7 +304,10 @@ public class MessageService {
                         isSystemMessage,
                         senderId,
                         targetId,
-                        MessageDeliveryStatus.READY);
+                        MessageDeliveryStatus.READY,
+                        null,
+                        null,
+                        null);
                 return mongoOperations.save(messageStatus).thenReturn(true);
             case GROUP:
                 Mono<Set<Long>> memberIdsMono;
@@ -327,7 +331,10 @@ public class MessageService {
                                         isSystemMessage,
                                         senderId,
                                         memberId,
-                                        MessageDeliveryStatus.READY));
+                                        MessageDeliveryStatus.READY,
+                                        null,
+                                        null,
+                                        null));
                             }
                             return mongoOperations.insertAll(messageStatuses).then(Mono.just(true));
                         });
@@ -851,17 +858,8 @@ public class MessageService {
             }
         }
         Date deliveryDate = new Date();
-        Message message = new Message();
-        message.setId(messageId);
-        message.setChatType(chatType);
-        message.setDeliveryDate(deliveryDate);
-        message.setIsSystemMessage(isSystemMessage);
-        message.setText(text);
-        message.setRecords(records);
-        message.setSenderId(senderId);
-        message.setTargetId(targetId);
-        message.setBurnAfter(burnAfter);
-        message.setReferenceId(referenceId);
+        Message message = new Message(messageId, chatType, isSystemMessage, deliveryDate, null,
+                text, senderId, targetId, records, burnAfter, referenceId);
         if (shouldSend) {
             return authAndSendMessage(
                     messageId,

@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AddressDTO {
-    private String address;
+public final class AddressDTO {
+    private final String address;
 }

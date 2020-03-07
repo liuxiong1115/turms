@@ -20,15 +20,13 @@ package im.turms.turms.pojo.dto;
 import im.turms.turms.constant.AdminPermission;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateAdminRoleDTO {
-    private String name;
-    private Set<AdminPermission> permissions;
-    private Integer rank;
+public final class UpdateAdminRoleDTO {
+    private final String name;
+    private final Set<AdminPermission> permissions;
+    private final Integer rank;
 }

@@ -19,15 +19,13 @@ package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateMessageStatusDTO {
-    private Date receptionDate;
-    private Date readDate;
-    private Date recallDate;
+public final class UpdateMessageStatusDTO {
+    private final Date receptionDate;
+    private final Date readDate;
+    private final Date recallDate;
 }

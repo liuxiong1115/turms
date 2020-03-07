@@ -26,10 +26,10 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 
 @Data
 @AllArgsConstructor
-public class TurmsRequestWrapper {
+public final class TurmsRequestWrapper {
     private TurmsRequest turmsRequest;
-    private Long userId;
-    private DeviceType deviceType;
-    private WebSocketMessage message;
-    private WebSocketSession session;
+    private final Long userId;
+    private final DeviceType deviceType;
+    private final WebSocketMessage message;
+    private final WebSocketSession session;
 }

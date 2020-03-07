@@ -19,7 +19,6 @@ package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -31,39 +30,38 @@ import java.util.Date;
 @Document
 @FieldNameConstants
 @AllArgsConstructor
-@NoArgsConstructor
-public class Group {
+public final class Group {
     @Id
-    private Long id;
+    private final Long id;
 
     @Indexed
-    private Long typeId;
+    private final Long typeId;
 
     @Indexed
-    private Long creatorId;
+    private final Long creatorId;
 
     @Indexed
-    private Long ownerId;
+    private final Long ownerId;
 
-    private String name;
+    private final String name;
 
-    private String intro;
+    private final String intro;
 
-    private String announcement;
+    private final String announcement;
 
-    private String profilePictureUrl;
+    private final String profilePictureUrl;
 
-    private Integer minimumScore;
-
-    @Indexed
-    private Date creationDate;
+    private final Integer minimumScore;
 
     @Indexed
-    private Date deletionDate;
+    private final Date creationDate;
 
     @Indexed
-    private Date muteEndDate;
+    private final Date deletionDate;
 
     @Indexed
-    private Boolean active;
+    private final Date muteEndDate;
+
+    @Indexed
+    private final Boolean active;
 }

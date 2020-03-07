@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldNameConstants
-public class MessageStatisticsDTO {
+public final class MessageStatisticsDTO {
     private Long sentMessagesOnAverage;
     private Long acknowledgedMessages;
     private Long acknowledgedMessagesOnAverage;

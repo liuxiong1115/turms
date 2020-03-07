@@ -7,7 +7,7 @@ import java.util.Collection;
 
 @Data
 @AllArgsConstructor
-public class PaginationDTO<T> {
-    private Long total;
-    private Collection<T> records;
+public final class PaginationDTO<T> {
+    private final Long total;
+    private final Collection<T> records;
 }

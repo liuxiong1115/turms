@@ -20,11 +20,9 @@ package im.turms.turms.pojo.dto;
 import im.turms.common.constant.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateOnlineStatusDTO {
-    private UserStatus onlineStatus;
+public final class UpdateOnlineStatusDTO {
+    private final UserStatus onlineStatus;
 }

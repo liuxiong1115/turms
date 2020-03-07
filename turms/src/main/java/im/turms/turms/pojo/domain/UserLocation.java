@@ -17,18 +17,14 @@
 
 package im.turms.turms.pojo.domain;
 
-import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import im.turms.common.constant.DeviceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -36,53 +32,26 @@ import java.util.Date;
 @Document
 @FieldNameConstants
 @AllArgsConstructor
-@NoArgsConstructor
-public class UserLocation implements Serializable {
+public final class UserLocation implements Serializable {
     @Id
-    private Long id;
+    private final Long id;
 
     @Indexed
-    private Long userId;
+    private final Long userId;
 
     @Indexed
-    private DeviceType deviceType;
+    private final DeviceType deviceType;
 
     @Indexed
-    private Float longitude;
+    private final Float longitude;
 
     @Indexed
-    private Float latitude;
+    private final Float latitude;
+
+    private final String name;
+
+    private final String address;
 
     @Indexed
-    private Date timestamp;
-
-    private String name;
-
-    private String address;
-
-    @Transient
-    private PointFloat point;
-
-    public UserLocation(Long id, Long userId, DeviceType deviceType, Float longitude, Float latitude, Date timestamp) {
-        this.id = id;
-        this.userId = userId;
-        this.deviceType = deviceType;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.timestamp = timestamp;
-    }
-
-    public PointFloat getPoint() {
-        if (point == null) {
-            point = PointFloat.create(this.longitude, this.latitude);
-        }
-        return point;
-    }
-
-    public PointFloat setPoint(@NotNull Float longitude, @NotNull Float latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
-        point = PointFloat.create(this.longitude, this.latitude);
-        return point;
-    }
+    private final Date timestamp;
 }

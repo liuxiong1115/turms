@@ -20,20 +20,18 @@ package im.turms.turms.pojo.dto;
 import im.turms.common.constant.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateGroupInvitationDTO {
-    private String content;
-    private RequestStatus status;
-    private Date creationDate;
-    private Date responseDate;
-    private Date expirationDate;
-    private Long groupId;
-    private Long inviterId;
-    private Long inviteeId;
+public final class UpdateGroupInvitationDTO {
+    private final String content;
+    private final RequestStatus status;
+    private final Date creationDate;
+    private final Date responseDate;
+    private final Date expirationDate;
+    private final Long groupId;
+    private final Long inviterId;
+    private final Long inviteeId;
 }

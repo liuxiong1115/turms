@@ -22,29 +22,27 @@ import im.turms.common.constant.GroupJoinStrategy;
 import im.turms.common.constant.GroupUpdateStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateGroupTypeDTO {
-    private String name;
+public final class UpdateGroupTypeDTO {
+    private final String name;
 
-    private Integer groupSizeLimit;
+    private final Integer groupSizeLimit;
 
-    private GroupInvitationStrategy invitationStrategy;
+    private final GroupInvitationStrategy invitationStrategy;
 
-    private GroupJoinStrategy joinStrategy;
+    private final GroupJoinStrategy joinStrategy;
 
-    private GroupUpdateStrategy groupInfoUpdateStrategy;
+    private final GroupUpdateStrategy groupInfoUpdateStrategy;
 
-    private GroupUpdateStrategy memberInfoUpdateStrategy;
+    private final GroupUpdateStrategy memberInfoUpdateStrategy;
 
-    private Boolean guestSpeakable;
+    private final Boolean guestSpeakable;
 
-    private Boolean selfInfoUpdatable;
+    private final Boolean selfInfoUpdatable;
 
-    private Boolean enableReadReceipt;
+    private final Boolean enableReadReceipt;
 
-    private Boolean messageEditable;
+    private final Boolean messageEditable;
 }

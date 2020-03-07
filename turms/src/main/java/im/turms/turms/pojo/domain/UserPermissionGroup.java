@@ -23,6 +23,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
@@ -37,7 +38,8 @@ import java.util.stream.Collectors;
 @Data
 @FieldNameConstants
 @NoArgsConstructor
-public class UserPermissionGroup implements IdentifiedDataSerializable {
+@AllArgsConstructor
+public final class UserPermissionGroup implements IdentifiedDataSerializable {
     @Id
     private Long id;
 
@@ -48,14 +50,6 @@ public class UserPermissionGroup implements IdentifiedDataSerializable {
     private Integer ownedGroupLimitForEachGroupType;
     // group type id -> limit
     private Map<Long, Integer> groupTypeLimits;
-
-    public UserPermissionGroup(Long id, Set<Long> creatableGroupTypeIds, Integer ownedGroupLimit, Integer ownedGroupLimitForEachGroupType, Map<Long, Integer> groupTypeLimits) {
-        this.id = id;
-        this.creatableGroupTypeIds = creatableGroupTypeIds;
-        this.ownedGroupLimit = ownedGroupLimit;
-        this.ownedGroupLimitForEachGroupType = ownedGroupLimitForEachGroupType;
-        this.groupTypeLimits = groupTypeLimits;
-    }
 
     @JsonIgnore
     @Override

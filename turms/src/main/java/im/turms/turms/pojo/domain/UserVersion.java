@@ -19,7 +19,6 @@ package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 
@@ -28,14 +27,13 @@ import java.util.Date;
 @Data
 @FieldNameConstants
 @AllArgsConstructor
-@NoArgsConstructor
-public class UserVersion {
+public final class UserVersion {
     @Id
-    private Long userId;
-    private Date friendRequests;
-    private Date relationships;
-    private Date relationshipGroups;
-    private Date relationshipGroupsMembers;
-    private Date groupInvitations;
-    private Date joinedGroups;
+    private final Long userId;
+    private final Date friendRequests;
+    private final Date relationships;
+    private final Date relationshipGroups;
+    private final Date relationshipGroupsMembers;
+    private final Date groupInvitations;
+    private final Date joinedGroups;
 }

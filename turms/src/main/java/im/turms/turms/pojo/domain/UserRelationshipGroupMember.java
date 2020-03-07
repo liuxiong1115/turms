@@ -19,9 +19,9 @@ package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -31,14 +31,13 @@ import java.util.Date;
 @Data
 @Document
 @FieldNameConstants
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserRelationshipGroupMember {
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+public final class UserRelationshipGroupMember {
     @Id
-    private Key key;
+    private final Key key;
 
     @Indexed
-    private Date joinDate;
+    private final Date joinDate;
 
     public UserRelationshipGroupMember(
             @NotNull Long ownerId,
@@ -51,15 +50,14 @@ public class UserRelationshipGroupMember {
 
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Key {
+    public static final class Key {
         @Indexed
-        private Long ownerId;
+        private final Long ownerId;
 
         @Indexed
-        private Integer groupIndex;
+        private final Integer groupIndex;
 
         @Indexed
-        private Long relatedUserId;
+        private final Long relatedUserId;
     }
 }

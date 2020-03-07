@@ -7,9 +7,9 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class DateRange {
-    private Date start;
-    private Date end;
+public final class DateRange {
+    private final Date start;
+    private final Date end;
 
     public DateRange(Date start, Date end) {
         if (start != null && end != null && end.before(start)) {

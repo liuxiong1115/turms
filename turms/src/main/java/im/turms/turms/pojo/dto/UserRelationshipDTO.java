@@ -3,7 +3,6 @@ package im.turms.turms.pojo.dto;
 import im.turms.turms.pojo.domain.UserRelationship;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -11,11 +10,11 @@ import java.util.Date;
 import java.util.Set;
 
 @Data
-public class UserRelationshipDTO {
-    private Key key;
-    private Boolean isBlocked;
-    private Date establishmentDate;
-    private Set<Integer> groupIndexes;
+public final class UserRelationshipDTO {
+    private final Key key;
+    private final Boolean isBlocked;
+    private final Date establishmentDate;
+    private final Set<Integer> groupIndexes;
 
     public UserRelationshipDTO(Long ownerId, Long relatedUserId, Boolean isBlocked, Date establishmentDate, Set<Integer> groupIndexes) {
         this.key = new Key(ownerId, relatedUserId);
@@ -39,9 +38,8 @@ public class UserRelationshipDTO {
 
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Key {
-        private Long ownerId;
-        private Long relatedUserId;
+    public static final class Key {
+        private final Long ownerId;
+        private final Long relatedUserId;
     }
 }

@@ -19,16 +19,14 @@ package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class AddRelationshipGroupDTO {
-    private Long ownerId;
-    private Integer index;
-    private String name;
-    private Date creationDate;
+public final class AddRelationshipGroupDTO {
+    private final Long ownerId;
+    private final Integer index;
+    private final String name;
+    private final Date creationDate;
 }

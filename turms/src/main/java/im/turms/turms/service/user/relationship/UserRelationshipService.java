@@ -426,10 +426,9 @@ public class UserRelationshipService {
         if (ownerId.equals(relatedUserId)) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
-        UserRelationship userRelationship = new UserRelationship();
-        userRelationship.setKey(new UserRelationship.Key(ownerId, relatedUserId));
-        userRelationship.setIsBlocked(isBlocked != null && isBlocked);
-        userRelationship.setEstablishmentDate(establishmentDate != null ? establishmentDate : new Date());
+        isBlocked = isBlocked != null && isBlocked;
+        establishmentDate = establishmentDate != null ? establishmentDate : new Date();
+        UserRelationship userRelationship = new UserRelationship(ownerId, relatedUserId, isBlocked, establishmentDate);
         List<Mono<?>> monos = new LinkedList<>();
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         if (upsert) {

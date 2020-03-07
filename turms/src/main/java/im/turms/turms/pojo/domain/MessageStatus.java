@@ -21,80 +21,78 @@ import im.turms.common.constant.MessageDeliveryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Document
 @FieldNameConstants
-public class MessageStatus {
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+public final class MessageStatus {
     @Id
-    private Key key;
+    private final Key key;
 
     @Indexed
-    private Long groupId;
+    private final Long groupId;
 
     @Indexed
-    private Boolean isSystemMessage;
+    private final Boolean isSystemMessage;
 
     @Indexed
-    private Long senderId;
+    private final Long senderId;
 
     @Indexed
-    private MessageDeliveryStatus deliveryStatus;
+    private final MessageDeliveryStatus deliveryStatus;
 
     @Indexed
-    private Date receptionDate;
+    private final Date receptionDate;
 
     @Indexed
-    private Date readDate;
+    private final Date readDate;
 
     @Indexed
-    private Date recallDate;
+    private final Date recallDate;
 
     public MessageStatus(
-            long id,
-            @Nullable Long groupId,
-            boolean isSystemMessage,
-            long senderId,
-            long recipientId,
-            @NotNull MessageDeliveryStatus status) {
-        if (status == null) {
-            throw new IllegalArgumentException();
-        }
+            Long id,
+            Long groupId,
+            Boolean isSystemMessage,
+            Long senderId,
+            Long recipientId,
+            MessageDeliveryStatus status,
+            Date receptionDate,
+            Date readDate,
+            Date recallDate) {
         this.key = new Key(id, recipientId);
         this.groupId = groupId;
         this.isSystemMessage = isSystemMessage;
         this.senderId = senderId;
         this.deliveryStatus = status;
+        this.receptionDate = receptionDate;
+        this.readDate = readDate;
+        this.recallDate = recallDate;
     }
 
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
     @EqualsAndHashCode
-    public static class Key {
+    public static final class Key {
         @Indexed
-        private Long messageId;
+        private final Long messageId;
 
         @Indexed
-        private Long recipientId;
+        private final Long recipientId;
     }
 
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
-    public static class KeyList {
-        private List<Key> keys;
+    public static final class KeyList {
+        private final List<Key> keys;
     }
 }

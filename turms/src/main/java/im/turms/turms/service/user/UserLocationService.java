@@ -38,13 +38,7 @@ public class UserLocationService {
         if (id == null) {
             id = turmsClusterManager.generateRandomId();
         }
-        UserLocation location = new UserLocation();
-        location.setId(id);
-        location.setUserId(userId);
-        location.setDeviceType(deviceType);
-        location.setLongitude(longitude);
-        location.setLatitude(latitude);
-        location.setTimestamp(timestamp);
+        UserLocation location = new UserLocation(id, userId, deviceType, longitude, latitude, null, null, timestamp);
         return mongoTemplate.save(location);
     }
 }

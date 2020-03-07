@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldNameConstants
-public class UserStatisticsDTO {
+public final class UserStatisticsDTO {
     private Long deletedUsers;
     private Long usersWhoSentMessages;
     private Long loggedInUsers;

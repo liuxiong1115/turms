@@ -20,16 +20,14 @@ package im.turms.turms.pojo.dto;
 import im.turms.common.constant.GroupMemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateGroupMemberDTO {
-    private String name;
-    private GroupMemberRole role;
-    private Date joinDate;
-    private Date muteEndDate;
+public final class UpdateGroupMemberDTO {
+    private final String name;
+    private final GroupMemberRole role;
+    private final Date joinDate;
+    private final Date muteEndDate;
 }

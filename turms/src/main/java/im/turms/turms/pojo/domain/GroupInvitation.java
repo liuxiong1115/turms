@@ -19,8 +19,8 @@ package im.turms.turms.pojo.domain;
 
 import im.turms.common.constant.RequestStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -32,31 +32,31 @@ import java.util.Date;
 @Document
 @FieldNameConstants
 @AllArgsConstructor
-@NoArgsConstructor
-public class GroupInvitation {
+@Builder(toBuilder = true)
+public final class GroupInvitation implements Cloneable {
     @Id
-    private Long id;
+    private final Long id;
 
     @Indexed
-    private Long groupId;
+    private final Long groupId;
 
     @Indexed
-    private Long inviterId;
+    private final Long inviterId;
 
     @Indexed
-    private Long inviteeId;
+    private final Long inviteeId;
 
-    private String content;
-
-    @Indexed
-    private RequestStatus status;
+    private final String content;
 
     @Indexed
-    private Date creationDate;
+    private final RequestStatus status;
 
     @Indexed
-    private Date responseDate;
+    private final Date creationDate;
 
     @Indexed
-    private Date expirationDate;
+    private final Date responseDate;
+
+    @Indexed
+    private final Date expirationDate;
 }

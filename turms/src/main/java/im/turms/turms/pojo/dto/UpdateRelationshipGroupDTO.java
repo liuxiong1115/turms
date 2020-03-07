@@ -19,14 +19,12 @@ package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateRelationshipGroupDTO {
-    private String name;
-    private Date creationDate;
+public final class UpdateRelationshipGroupDTO {
+    private final String name;
+    private final Date creationDate;
 }
