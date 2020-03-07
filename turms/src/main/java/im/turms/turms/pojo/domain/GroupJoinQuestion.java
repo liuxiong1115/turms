@@ -19,7 +19,6 @@ package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -29,20 +28,19 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Document
 @FieldNameConstants
-public class GroupJoinQuestion {
+public final class GroupJoinQuestion {
     @Id
-    private Long id;
+    private final Long id;
 
     @Indexed
-    private Long groupId;
+    private final Long groupId;
 
-    private String question;
+    private final String question;
 
-    private Set<String> answers;
+    private final Set<String> answers;
 
     // Note that score can be a negative number
-    private Integer score;
+    private final Integer score;
 }

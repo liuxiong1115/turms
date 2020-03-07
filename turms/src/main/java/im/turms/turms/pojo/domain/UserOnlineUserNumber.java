@@ -29,10 +29,10 @@ import java.util.Date;
 @Data
 @Document
 @FieldNameConstants
-public class UserOnlineUserNumber {
+public final class UserOnlineUserNumber {
     @MongoId(FieldType.DATE_TIME)
-    private Date timestamp;
+    private final Date timestamp;
 
     @Indexed
-    private Integer number;
+    private final Integer number;
 }

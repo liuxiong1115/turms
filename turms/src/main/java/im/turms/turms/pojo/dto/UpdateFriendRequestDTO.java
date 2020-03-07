@@ -20,20 +20,18 @@ package im.turms.turms.pojo.dto;
 import im.turms.common.constant.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateFriendRequestDTO {
-    private Long requesterId;
-    private Long recipientId;
-    private String content;
-    private RequestStatus status;
-    private String reason;
-    private Date creationDate;
-    private Date responseDate;
-    private Date expirationDate;
+public final class UpdateFriendRequestDTO {
+    private final Long requesterId;
+    private final Long recipientId;
+    private final String content;
+    private final RequestStatus status;
+    private final String reason;
+    private final Date creationDate;
+    private final Date responseDate;
+    private final Date expirationDate;
 }

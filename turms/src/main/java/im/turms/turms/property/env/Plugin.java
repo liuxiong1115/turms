@@ -28,7 +28,6 @@ import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Convention over configuration

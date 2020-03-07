@@ -21,9 +21,9 @@ import im.turms.common.constant.GroupMemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -35,22 +35,21 @@ import java.util.List;
 @Data
 @Document
 @FieldNameConstants
-@AllArgsConstructor
-@NoArgsConstructor
-public class GroupMember {
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+public final class GroupMember {
     @Id
-    private Key key;
+    private final Key key;
 
-    private String name;
-
-    @Indexed
-    private GroupMemberRole role;
+    private final String name;
 
     @Indexed
-    private Date joinDate;
+    private final GroupMemberRole role;
 
     @Indexed
-    private Date muteEndDate;
+    private final Date joinDate;
+
+    @Indexed
+    private final Date muteEndDate;
 
     public GroupMember(
             @NotNull Long groupId,
@@ -68,20 +67,18 @@ public class GroupMember {
 
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
     @EqualsAndHashCode
-    public static class Key {
+    public static final class Key {
         @Indexed
-        private Long groupId;
+        private final Long groupId;
 
         @Indexed
-        private Long userId;
+        private final Long userId;
     }
 
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
-    public static class KeyList {
-        private List<Key> keys;
+    public static final class KeyList {
+        private final List<Key> keys;
     }
 }

@@ -38,7 +38,7 @@ import java.util.Date;
 @FieldNameConstants
 @AllArgsConstructor
 @NoArgsConstructor
-public class Admin implements IdentifiedDataSerializable, Cloneable {
+public final class Admin implements IdentifiedDataSerializable, Cloneable {
     @Id
     private String account;
 

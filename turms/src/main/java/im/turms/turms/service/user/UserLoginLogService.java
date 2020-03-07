@@ -60,14 +60,7 @@ public class UserLoginLogService {
             @Nullable Map<String, String> deviceDetails,
             @Nullable Long locationId) {
         Long id = turmsClusterManager.generateRandomId();
-        UserLoginLog userLoginLog = new UserLoginLog();
-        userLoginLog.setId(id);
-        userLoginLog.setUserId(userId);
-        userLoginLog.setLoginDate(new Date());
-        userLoginLog.setLocationId(locationId);
-        userLoginLog.setIp(ip);
-        userLoginLog.setDeviceType(deviceType);
-        userLoginLog.setDeviceDetails(deviceDetails);
+        UserLoginLog userLoginLog = new UserLoginLog(id, userId, new Date(), null, locationId, ip, deviceType, deviceDetails);
         return mongoTemplate.save(userLoginLog);
     }
 
@@ -93,13 +86,8 @@ public class UserLoginLogService {
             @Nullable Map<String, String> deviceDetails,
             @Nullable Long locationId) {
         if (!turmsPluginManager.getLogHandlerList().isEmpty()) {
-            UserLoginLog userLoginLog = new UserLoginLog();
-            userLoginLog.setUserId(userId);
-            userLoginLog.setLoginDate(new Date());
-            userLoginLog.setLocationId(locationId);
-            userLoginLog.setIp(ip);
-            userLoginLog.setDeviceType(loggingInDeviceType);
-            userLoginLog.setDeviceDetails(deviceDetails);
+            UserLoginLog userLoginLog = new UserLoginLog(null, userId, new Date(), null,
+                    locationId, ip, loggingInDeviceType, deviceDetails);
             triggerLogHandlers(userLoginLog);
         }
     }

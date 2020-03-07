@@ -45,7 +45,7 @@ public class UserRelationshipGroupService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final UserVersionService userVersionService;
     private final UserRelationshipService userRelationshipService;
-    private static final UserRelationshipGroup EMPTY_RELATIONSHIP_GROUP = new UserRelationshipGroup();
+    private static final UserRelationshipGroup EMPTY_RELATIONSHIP_GROUP = new UserRelationshipGroup(null, null, null, null);
 
     public UserRelationshipGroupService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, @Lazy UserRelationshipService userRelationshipService) {
         this.mongoTemplate = mongoTemplate;

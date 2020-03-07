@@ -103,20 +103,8 @@ public class GroupService {
             @Nullable Date muteEndDate,
             @Nullable Boolean isActive) {
         Long groupId = turmsClusterManager.generateRandomId();
-        Group group = new Group();
-        group.setId(groupId);
-        group.setCreatorId(creatorId);
-        group.setOwnerId(ownerId);
-        group.setName(groupName);
-        group.setIntro(intro);
-        group.setAnnouncement(announcement);
-        group.setProfilePictureUrl(profilePictureUrl);
-        group.setMinimumScore(minimumScore);
-        group.setTypeId(groupTypeId);
-        group.setCreationDate(creationDate);
-        group.setDeletionDate(deletionDate);
-        group.setMuteEndDate(muteEndDate);
-        group.setActive(isActive);
+        Group group = new Group(groupId, groupTypeId, creatorId, ownerId, groupName, intro,
+                announcement, profilePictureUrl, minimumScore, creationDate, deletionDate, muteEndDate, isActive);
         return mongoTemplate
                 .inTransaction()
                 .execute(operations -> operations.insert(group)

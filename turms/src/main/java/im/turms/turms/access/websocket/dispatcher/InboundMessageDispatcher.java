@@ -266,9 +266,6 @@ public class InboundMessageDispatcher {
         return notifyRelatedUsersOfAction(requestResult, session, requesterId)
                 .flatMap(success -> {
                     if (requestId != null) {
-                        if (success == null || !success) {
-                            requestResult.setCode(TurmsStatusCode.RECIPIENTS_OFFLINE);
-                        }
                         TurmsNotification notification = generateNotificationBuilder(requestResult, requestResult.getCode(), requestId)
                                 .build();
                         return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory.wrap(notification.toByteArray())));

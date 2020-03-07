@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldNameConstants
-public class GroupStatisticsDTO {
+public final class GroupStatisticsDTO {
     private Long deletedGroups;
     private Long groupsThatSentMessages;
     private Long createdGroups;

@@ -167,9 +167,10 @@ public class GroupJoinRequestService {
                     if (expirationDate != null
                             && groupJoinRequest.getStatus() == RequestStatus.PENDING
                             && expirationDate.getTime() < System.currentTimeMillis()) {
-                        groupJoinRequest.setStatus(RequestStatus.EXPIRED);
+                        return groupJoinRequest.toBuilder().status(RequestStatus.EXPIRED).build();
+                    } else {
+                        return groupJoinRequest;
                     }
-                    return groupJoinRequest;
                 });
     }
 
@@ -209,9 +210,10 @@ public class GroupJoinRequestService {
                     if (expirationDate != null
                             && groupJoinRequest.getStatus() == RequestStatus.PENDING
                             && expirationDate.getTime() < System.currentTimeMillis()) {
-                        groupJoinRequest.setStatus(RequestStatus.EXPIRED);
+                        return groupJoinRequest.toBuilder().status(RequestStatus.EXPIRED).build();
+                    } else {
+                        return groupJoinRequest;
                     }
-                    return groupJoinRequest;
                 });
     }
 
@@ -353,9 +355,7 @@ public class GroupJoinRequestService {
             @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
         Date now = new Date();
-        GroupJoinRequest groupJoinRequest = new GroupJoinRequest();
-        groupJoinRequest.setId(id != null ? id : turmsClusterManager.generateRandomId());
-        groupJoinRequest.setContent(content);
+        id = id != null ? id : turmsClusterManager.generateRandomId();
         if (creationDate == null) {
             creationDate = now;
         }
@@ -363,21 +363,15 @@ public class GroupJoinRequestService {
             int timeToLiveHours = turmsClusterManager.getTurmsProperties().getGroup()
                     .getGroupJoinRequestTimeToLiveHours();
             if (timeToLiveHours == 0) {
-                expirationDate = Date.from(Instant.now()
-                        .plus(timeToLiveHours, ChronoUnit.HOURS));
-                groupJoinRequest.setExpirationDate(expirationDate);
+                expirationDate = Date.from(Instant.now().plus(timeToLiveHours, ChronoUnit.HOURS));
             }
         }
-        groupJoinRequest.setGroupId(groupId);
-        groupJoinRequest.setRequesterId(requesterId);
-        groupJoinRequest.setResponderId(responderId);
-        groupJoinRequest.setCreationDate(creationDate);
         if (status == null) {
             status = RequestStatus.PENDING;
         }
         responseDate = RequestStatusUtil.getResponseDateBasedOnStatus(status, responseDate, now);
-        groupJoinRequest.setResponseDate(responseDate);
-        groupJoinRequest.setStatus(status);
+        GroupJoinRequest groupJoinRequest = new GroupJoinRequest(id, content, status, creationDate, responseDate,
+                expirationDate, groupId, requesterId, responderId);
         return Mono.zip(mongoTemplate.insert(groupJoinRequest),
                 groupVersionService.updateJoinRequestsVersion(groupId),
                 userVersionService.updateJoinRequestsVersion(responderId))

@@ -20,21 +20,19 @@ package im.turms.turms.pojo.dto;
 import im.turms.common.constant.ChatType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class CreateMessageDTO {
-    private Long id;
-    private ChatType chatType;
-    private Boolean isSystemMessage;
-    private String text;
-    private List<byte[]> records;
-    private Long senderId;
-    private Long targetId;
-    private Integer burnAfter;
-    private Long referenceId;
+public final class CreateMessageDTO {
+    private final Long id;
+    private final ChatType chatType;
+    private final Boolean isSystemMessage;
+    private final String text;
+    private final List<byte[]> records;
+    private final Long senderId;
+    private final Long targetId;
+    private final Integer burnAfter;
+    private final Long referenceId;
 }

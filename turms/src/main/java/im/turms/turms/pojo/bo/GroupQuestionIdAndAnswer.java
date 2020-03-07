@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class GroupQuestionIdAndAnswer {
-    private Long id;
-    private String answer;
+public final class GroupQuestionIdAndAnswer {
+    private final Long id;
+    private final String answer;
 }

@@ -20,29 +20,27 @@ package im.turms.turms.pojo.dto;
 import im.turms.common.constant.ProfileAccessStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class AddUserDTO {
-    private Long id;
+public final class AddUserDTO {
+    private final Long id;
 
-    private String password;
+    private final String password;
 
-    private String name;
+    private final String name;
 
-    private String intro;
+    private final String intro;
 
-    private String profilePictureUrl;
+    private final String profilePictureUrl;
 
-    private ProfileAccessStrategy profileAccess;
+    private final ProfileAccessStrategy profileAccess;
 
-    private Long permissionGroupId;
+    private final Long permissionGroupId;
 
-    private Date registrationDate;
+    private final Date registrationDate;
 
-    private Boolean isActive;
+    private final Boolean isActive;
 }

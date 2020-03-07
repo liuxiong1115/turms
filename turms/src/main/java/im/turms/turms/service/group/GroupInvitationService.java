@@ -154,12 +154,9 @@ public class GroupInvitationService {
             @Nullable @PastOrPresent Date creationDate,
             @Nullable @PastOrPresent Date responseDate,
             @Nullable Date expirationDate) {
-        Date now = new Date();
-        GroupInvitation groupInvitation = new GroupInvitation();
-        groupInvitation.setId(id != null ? id : turmsClusterManager.generateRandomId());
-        groupInvitation.setContent(content);
+        id = id != null ? id : turmsClusterManager.generateRandomId();
         if (creationDate == null) {
-            creationDate = now;
+            creationDate = new Date();
         }
         if (expirationDate == null) {
             int groupInvitationTimeToLiveHours = turmsProperties.getGroup()
@@ -167,18 +164,12 @@ public class GroupInvitationService {
             if (groupInvitationTimeToLiveHours == 0) {
                 expirationDate = Date.from(Instant.now()
                         .plus(groupInvitationTimeToLiveHours, ChronoUnit.HOURS));
-                groupInvitation.setExpirationDate(expirationDate);
             }
         }
-        groupInvitation.setGroupId(groupId);
-        groupInvitation.setInviterId(inviterId);
-        groupInvitation.setInviteeId(inviteeId);
-        groupInvitation.setCreationDate(creationDate);
-        groupInvitation.setResponseDate(responseDate);
         if (status == null) {
             status = RequestStatus.PENDING;
         }
-        groupInvitation.setStatus(status);
+        GroupInvitation groupInvitation = new GroupInvitation(id, groupId, inviterId, inviteeId, content, status, creationDate, responseDate, expirationDate);
         return Mono.zip(mongoTemplate.insert(groupInvitation),
                 groupVersionService.updateGroupInvitationsVersion(groupId),
                 userVersionService.updateGroupInvitationsVersion(inviteeId))
@@ -186,7 +177,7 @@ public class GroupInvitationService {
     }
 
     public Mono<GroupInvitation> queryGroupIdAndStatus(@NotNull Long invitationId) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(invitationId));
+        Query query = new Query().addCriteria(where(ID).is(invitationId));
         query.fields()
                 .include(GroupInvitation.Fields.groupId)
                 .include(GroupInvitation.Fields.status);
@@ -196,9 +187,10 @@ public class GroupInvitationService {
                     if (expirationDate != null
                             && groupInvitation.getStatus() == RequestStatus.PENDING
                             && expirationDate.getTime() < System.currentTimeMillis()) {
-                        groupInvitation.setStatus(RequestStatus.EXPIRED);
+                        return groupInvitation.toBuilder().status(RequestStatus.EXPIRED).build();
+                    } else {
+                        return groupInvitation;
                     }
-                    return groupInvitation;
                 });
     }
 
@@ -245,9 +237,10 @@ public class GroupInvitationService {
                     if (expirationDate != null
                             && groupInvitation.getStatus() == RequestStatus.PENDING
                             && expirationDate.getTime() < System.currentTimeMillis()) {
-                        groupInvitation.setStatus(RequestStatus.EXPIRED);
+                        return groupInvitation.toBuilder().status(RequestStatus.EXPIRED).build();
+                    } else {
+                        return groupInvitation;
                     }
-                    return groupInvitation;
                 });
     }
 
@@ -260,9 +253,10 @@ public class GroupInvitationService {
                     if (expirationDate != null
                             && groupInvitation.getStatus() == RequestStatus.PENDING
                             && expirationDate.getTime() < System.currentTimeMillis()) {
-                        groupInvitation.setStatus(RequestStatus.EXPIRED);
+                        return groupInvitation.toBuilder().status(RequestStatus.EXPIRED).build();
+                    } else {
+                        return groupInvitation;
                     }
-                    return groupInvitation;
                 });
     }
 

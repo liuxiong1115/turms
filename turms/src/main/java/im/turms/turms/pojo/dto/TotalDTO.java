@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class TotalDTO {
-    private Integer total;
+public final class TotalDTO {
+    private final Integer total;
 }

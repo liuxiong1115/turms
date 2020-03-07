@@ -117,34 +117,29 @@ public class UserFriendRequestService {
         if (status == RequestStatus.UNRECOGNIZED || requesterId.equals(recipientId)) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
         }
-        UserFriendRequest userFriendRequest = new UserFriendRequest();
-        userFriendRequest.setId(id != null ? id : turmsClusterManager.generateRandomId());
-        userFriendRequest.setContent(content);
+        id = id != null ? id : turmsClusterManager.generateRandomId();
         Date now = new Date();
         if (creationDate == null) {
             creationDate = now;
-        }
-        userFriendRequest.setCreationDate(creationDate.before(now) ? creationDate : now);
-        userFriendRequest.setResponseDate(RequestStatusUtil.getResponseDateBasedOnStatus(status, responseDate, now));
-        if (expirationDate != null) {
-            userFriendRequest.setExpirationDate(expirationDate);
         } else {
+            creationDate = creationDate.before(now) ? creationDate : now;
+        }
+        responseDate = RequestStatusUtil.getResponseDateBasedOnStatus(status, responseDate, now);
+        if (expirationDate == null) {
             int timeToLiveHours = turmsClusterManager.getTurmsProperties()
                     .getUser().getFriendRequest().getFriendRequestTimeToLiveHours();
             if (timeToLiveHours != 0) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.add(Calendar.HOUR, turmsClusterManager.getTurmsProperties()
                         .getUser().getFriendRequest().getFriendRequestTimeToLiveHours());
-                userFriendRequest.setExpirationDate(calendar.getTime());
+                expirationDate = calendar.getTime();
             }
         }
-        userFriendRequest.setReason(reason);
-        userFriendRequest.setRequesterId(requesterId);
-        userFriendRequest.setRecipientId(recipientId);
         if (status == null) {
             status = RequestStatus.PENDING;
         }
-        userFriendRequest.setStatus(status);
+        UserFriendRequest userFriendRequest = new UserFriendRequest(id, content, status, reason, creationDate,
+                expirationDate, responseDate, requesterId, recipientId);
         return mongoTemplate.insert(userFriendRequest)
                 .zipWith(userVersionService.updateFriendRequestsVersion(recipientId))
                 .map(Tuple2::getT1);
@@ -324,7 +319,8 @@ public class UserFriendRequestService {
                                             if (expirationDate != null
                                                     && request.getStatus() == RequestStatus.PENDING
                                                     && expirationDate.getTime() < System.currentTimeMillis()) {
-                                                request.setStatus(RequestStatus.EXPIRED);
+                                                builder.addUserFriendRequests(ProtoUtil.friendRequest2proto(request));
+                                                request = request.toBuilder().status(RequestStatus.EXPIRED).build();
                                             }
                                             builder.addUserFriendRequests(ProtoUtil.friendRequest2proto(request));
                                         }

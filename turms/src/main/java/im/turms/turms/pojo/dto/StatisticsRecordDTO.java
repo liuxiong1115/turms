@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
-public class StatisticsRecordDTO {
-    private Date date;
-    private Long total;
+public final class StatisticsRecordDTO {
+    private final Date date;
+    private final Long total;
 }

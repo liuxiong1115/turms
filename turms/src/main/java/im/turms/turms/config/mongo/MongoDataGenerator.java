@@ -227,6 +227,7 @@ public class MongoDataGenerator {
                         ChatType.PRIVATE,
                         false,
                         DateUtils.addHours(now, -i),
+                        null,
                         "private-message-text" + RandomStringUtils.randomAlphanumeric(16),
                         1L,
                         (long) 2 + (i % 9),
@@ -239,7 +240,10 @@ public class MongoDataGenerator {
                         false,
                         1L,
                         (long) 2 + (i % 9),
-                        MessageDeliveryStatus.READY);
+                        MessageDeliveryStatus.READY,
+                        null,
+                        null,
+                        null);
                 objects.add(privateMessageStatus);
                 id = turmsClusterManager.generateRandomId();
                 Message groupMessage = new Message(
@@ -247,20 +251,24 @@ public class MongoDataGenerator {
                         ChatType.GROUP,
                         false,
                         now,
+                        null,
                         "group-message-text" + RandomStringUtils.randomAlphanumeric(16),
                         1L,
                         1L,
                         null,
                         30,
                         null);
-                for (int j = 2; j <= USER_COUNT / 10; j++) {
+                for (long j = 2; j <= USER_COUNT / 10; j++) {
                     MessageStatus groupMessageStatus = new MessageStatus(
                             id,
                             1L,
                             false,
                             1L,
                             j,
-                            MessageDeliveryStatus.READY);
+                            MessageDeliveryStatus.READY,
+                            null,
+                            null,
+                            null);
                     objects.add(groupMessageStatus);
                 }
                 objects.add(privateMessage);

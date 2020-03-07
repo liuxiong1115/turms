@@ -32,7 +32,6 @@ import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotEmpty;

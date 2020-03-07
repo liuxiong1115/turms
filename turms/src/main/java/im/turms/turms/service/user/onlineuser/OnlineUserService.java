@@ -72,7 +72,7 @@ import static im.turms.turms.common.Constants.ALL_DEVICE_TYPES;
 public class OnlineUserService {
     private static final int DEFAULT_ONLINE_USERS_MANAGER_CAPACITY = 1024;
     private static final String LOG_ONLINE_USERS_NUMBER_TASK = "loun";
-    private static final UserLocation EMPTY_USER_LOCATION = new UserLocation();
+    private static final UserLocation EMPTY_USER_LOCATION = new UserLocation(null, null, null, null, null, null, null, null);
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
@@ -85,11 +85,11 @@ public class OnlineUserService {
     /**
      * Integer(Slot) -> Long(userId) -> OnlineUserManager
      */
-    private List<Map<Long, OnlineUserManager>> onlineUsersManagerAtSlots;
+    private final List<Map<Long, OnlineUserManager>> onlineUsersManagerAtSlots;
     /**
      * Pair<user ID, session ID> -> CloseStatus
      */
-    private Cache<Pair<Long, String>, Integer> disconnectionReasonCache;
+    private final Cache<Pair<Long, String>, Integer> disconnectionReasonCache;
 
     public OnlineUserService(
             TurmsClusterManager turmsClusterManager,
@@ -372,9 +372,7 @@ public class OnlineUserService {
     }
 
     public Mono<UserOnlineUserNumber> saveOnlineUsersNumber(@NotNull Integer onlineUsersNumber) {
-        UserOnlineUserNumber userOnlineUserNumber = new UserOnlineUserNumber();
-        userOnlineUserNumber.setTimestamp(new Date());
-        userOnlineUserNumber.setNumber(onlineUsersNumber);
+        UserOnlineUserNumber userOnlineUserNumber = new UserOnlineUserNumber(new Date(), onlineUsersNumber);
         return mongoTemplate.save(userOnlineUserNumber);
     }
 
@@ -619,10 +617,9 @@ public class OnlineUserService {
                     deviceType,
                     longitude,
                     latitude,
-                    now,
                     name,
                     address,
-                    null);
+                    now);
             OnlineUserManager.Session session = onlineUserManager.getSession(deviceType);
             if (session != null) {
                 session.setLocation(location);

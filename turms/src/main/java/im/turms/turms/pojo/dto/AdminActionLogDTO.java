@@ -25,26 +25,23 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class AdminActionLogDTO {
-    private Long id;
-    private String account;
-    private Date logDate;
-    private String ip;
-    private String action;
-    private DBObject params;
-    private DBObject body;
+public final class AdminActionLogDTO {
+    private final Long id;
+    private final String account;
+    private final Date logDate;
+    private final String ip;
+    private final String action;
+    private final DBObject params;
+    private final DBObject body;
 
     public static AdminActionLogDTO from(AdminActionLog log) {
-        AdminActionLogDTO dto = new AdminActionLogDTO();
-        dto.id = log.getId();
-        dto.account = log.getAccount();
-        dto.logDate = log.getLogDate();
-        if (log.getIp() != null) {
-            dto.ip = InetAddresses.fromInteger(log.getIp()).getHostAddress();
-        }
-        dto.action = log.getAction();
-        dto.params = log.getParams();
-        dto.body = log.getBody();
-        return dto;
+        return new AdminActionLogDTO(
+                log.getId(),
+                log.getAccount(),
+                log.getLogDate(),
+                log.getIp() != null ? InetAddresses.fromInteger(log.getIp()).getHostAddress() : null,
+                log.getAction(),
+                log.getParams(),
+                log.getBody());
     }
 }

@@ -20,9 +20,9 @@ package im.turms.turms.pojo.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -32,17 +32,16 @@ import java.util.List;
 @Data
 @Document
 @FieldNameConstants
-@AllArgsConstructor
-@NoArgsConstructor
-public class GroupBlacklistedUser {
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+public final class GroupBlacklistedUser {
     @Id
-    private Key key;
+    private final Key key;
 
     @Indexed
-    private Date blockDate;
+    private final Date blockDate;
 
     @Indexed
-    private Long requesterId;
+    private final Long requesterId;
 
     public GroupBlacklistedUser(Long groupId, Long userId, Date blockDate, Long requesterId) {
         this.key = new Key(groupId, userId);
@@ -51,21 +50,19 @@ public class GroupBlacklistedUser {
     }
 
     @Data
-    @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
-    public static class Key {
+    public static final class Key {
         @Indexed
-        private Long groupId;
+        private final Long groupId;
 
         @Indexed
-        private Long userId;
+        private final Long userId;
     }
 
     @Data
-    @NoArgsConstructor
     @AllArgsConstructor
-    public static class KeyList {
-        private List<Key> keys;
+    public static final class KeyList {
+        private final List<Key> keys;
     }
 }

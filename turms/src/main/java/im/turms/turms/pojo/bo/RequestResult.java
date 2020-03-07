@@ -33,7 +33,7 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RequestResult {
+public final class RequestResult {
     public static final RequestResult NO_CONTENT = new RequestResult(
             null,
             null,
@@ -41,11 +41,11 @@ public class RequestResult {
             TurmsStatusCode.NO_CONTENT,
             null);
 
-    private TurmsNotification.Data dataForRequester;
-    private Set<Long> recipients;
-    private TurmsRequest dataForRecipients;
-    private TurmsStatusCode code;
-    private String reason;
+    private final TurmsNotification.Data dataForRequester;
+    private final Set<Long> recipients;
+    private final TurmsRequest dataForRecipients;
+    private final TurmsStatusCode code;
+    private final String reason;
 
     public static RequestResult fail() {
         return status(TurmsStatusCode.FAILED);

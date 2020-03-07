@@ -128,7 +128,7 @@ public class UsersNearbyService {
                 sessionIdTree.delete(key, deletePoint);
             }
             sessionIdTree = sessionIdTree.add(key, point);
-            this.userSessionLocations.put(key, new UserLocation(turmsClusterManager.generateRandomId(), userId, deviceType, longitude, latitude, date));
+            this.userSessionLocations.put(key, new UserLocation(turmsClusterManager.generateRandomId(), userId, deviceType, longitude, latitude, null, null, date));
         } else {
             SortedSet<UserLocation> locations = this.userLocations.get(userId);
             if (locations != null && !locations.isEmpty()) {
@@ -137,7 +137,7 @@ public class UsersNearbyService {
                 userIdTree.delete(userId, deletePoint);
             }
             userIdTree = userIdTree.add(userId, point);
-            this.userLocations.put(userId, new UserLocation(turmsClusterManager.generateRandomId(), userId, deviceType, longitude, latitude, date));
+            this.userLocations.put(userId, new UserLocation(turmsClusterManager.generateRandomId(), userId, deviceType, longitude, latitude, null, null, date));
         }
     }
 
@@ -146,12 +146,14 @@ public class UsersNearbyService {
             Pair<Long, DeviceType> key = Pair.of(userId, deviceType);
             SortedSet<UserLocation> deletedUserLocations = userSessionLocations.removeAll(key);
             for (UserLocation deletedUserLocation : deletedUserLocations) {
-                sessionIdTree.delete(key, deletedUserLocation.getPoint());
+                PointFloat point = PointFloat.create(deletedUserLocation.getLongitude(), deletedUserLocation.getLatitude());
+                sessionIdTree.delete(key, point);
             }
         } else {
             SortedSet<UserLocation> deletedUserLocations = userLocations.removeAll(userId);
             for (UserLocation deletedUserLocation : deletedUserLocations) {
-                userIdTree.delete(userId, deletedUserLocation.getPoint());
+                PointFloat point = PointFloat.create(deletedUserLocation.getLongitude(), deletedUserLocation.getLatitude());
+                userIdTree.delete(userId, point);
             }
         }
     }
@@ -176,8 +178,8 @@ public class UsersNearbyService {
                     UserLocation location = onlineUserManager.getSession(deviceType).getLocation();
                     if (location != null) {
                         return queryNearestUserIds(
-                                location.getPoint().xFloat(),
-                                location.getPoint().yFloat(),
+                                location.getLongitude(),
+                                location.getLatitude(),
                                 maxPeopleNumber,
                                 maxDistance);
                     }
@@ -207,8 +209,8 @@ public class UsersNearbyService {
                     UserLocation location = onlineUserManager.getSession(deviceType).getLocation();
                     if (location != null) {
                         return queryUserSessionIdsNearby(
-                                location.getPoint().xFloat(),
-                                location.getPoint().yFloat(),
+                                location.getLongitude(),
+                                location.getLatitude(),
                                 maxPeopleNumber,
                                 maxDistance);
                     }

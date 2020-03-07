@@ -19,8 +19,8 @@ package im.turms.turms.pojo.domain;
 
 import im.turms.common.constant.RequestStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -32,30 +32,30 @@ import java.util.Date;
 @Document
 @FieldNameConstants
 @AllArgsConstructor
-@NoArgsConstructor
-public class UserFriendRequest {
+@Builder(toBuilder = true)
+public final class UserFriendRequest {
     @Id
-    private Long id;
+    private final Long id;
 
-    private String content;
-
-    @Indexed
-    private RequestStatus status;
-
-    private String reason;
+    private final String content;
 
     @Indexed
-    private Date creationDate;
+    private final RequestStatus status;
+
+    private final String reason;
 
     @Indexed
-    private Date expirationDate;
+    private final Date creationDate;
 
     @Indexed
-    private Date responseDate;
+    private final Date expirationDate;
 
     @Indexed
-    private Long requesterId;
+    private final Date responseDate;
 
     @Indexed
-    private Long recipientId;
+    private final Long requesterId;
+
+    @Indexed
+    private final Long recipientId;
 }

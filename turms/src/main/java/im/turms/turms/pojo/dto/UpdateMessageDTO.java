@@ -19,16 +19,14 @@ package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateMessageDTO {
-    private Boolean isSystemMessage;
-    private String text;
-    private List<byte[]> records;
-    private Integer burnAfter;
+public final class UpdateMessageDTO {
+    private final Boolean isSystemMessage;
+    private final String text;
+    private final List<byte[]> records;
+    private final Integer burnAfter;
 }

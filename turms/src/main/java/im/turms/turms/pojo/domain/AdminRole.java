@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  *     rank: Integer.MAX_VALUE
  * } always exists in Turms
  */
-public class AdminRole implements IdentifiedDataSerializable {
+public final class AdminRole implements IdentifiedDataSerializable {
     @Id
     @Setter(AccessLevel.NONE)
     private Long id;

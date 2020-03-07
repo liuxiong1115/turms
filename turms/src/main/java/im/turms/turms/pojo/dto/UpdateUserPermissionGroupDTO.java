@@ -19,17 +19,15 @@ package im.turms.turms.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Map;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UpdateUserPermissionGroupDTO {
-    private Set<Long> creatableGroupTypeIds;
-    private Integer ownedGroupLimit;
-    private Integer ownedGroupLimitForEachGroupType;
-    private Map<Long, Integer> groupTypeLimits;
+public final class UpdateUserPermissionGroupDTO {
+    private final Set<Long> creatableGroupTypeIds;
+    private final Integer ownedGroupLimit;
+    private final Integer ownedGroupLimitForEachGroupType;
+    private final Map<Long, Integer> groupTypeLimits;
 }

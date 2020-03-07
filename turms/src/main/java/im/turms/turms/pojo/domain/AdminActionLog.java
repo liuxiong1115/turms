@@ -20,7 +20,6 @@ package im.turms.turms.pojo.domain;
 import com.mongodb.DBObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -32,27 +31,26 @@ import java.util.Date;
 @Document
 @FieldNameConstants
 @AllArgsConstructor
-@NoArgsConstructor
 /**
  * Note: This is not the final model and will certainly change in the future
  */
-public class AdminActionLog {
+public final class AdminActionLog {
     @Id
-    private Long id;
+    private final Long id;
 
     @Indexed
-    private String account;
+    private final String account;
 
     @Indexed(expireAfter = "90d")
-    private Date logDate;
+    private final Date logDate;
 
     @Indexed
-    private Integer ip;
+    private final Integer ip;
 
     @Indexed
-    private String action;
+    private final String action;
 
-    private DBObject params;
+    private final DBObject params;
 
-    private DBObject body;
+    private final DBObject body;
 }

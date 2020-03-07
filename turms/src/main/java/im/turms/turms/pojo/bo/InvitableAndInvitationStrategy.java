@@ -23,7 +23,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class InvitableAndInvitationStrategy {
-    boolean invitable;
-    GroupInvitationStrategy groupInvitationStrategy;
+public final class InvitableAndInvitationStrategy {
+    private final boolean invitable;
+    private final GroupInvitationStrategy groupInvitationStrategy;
 }

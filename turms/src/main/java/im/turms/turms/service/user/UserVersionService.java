@@ -85,8 +85,7 @@ public class UserVersionService {
     public Mono<UserVersion> upsertEmptyUserVersion(
             @NotNull Long userId,
             @Nullable ReactiveMongoOperations operations) {
-        UserVersion userVersion = new UserVersion();
-        userVersion.setUserId(userId);
+        UserVersion userVersion = new UserVersion(userId, null, null, null, null, null, null);
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.save(userVersion);
     }

@@ -20,7 +20,6 @@ package im.turms.turms.pojo.domain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 
@@ -30,20 +29,19 @@ import java.util.Date;
 @FieldNameConstants
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
-public class GroupVersion {
+public final class GroupVersion {
     @Id
-    private Long groupId;
+    private final Long groupId;
 
-    private Date info;
+    private final Date info;
 
-    private Date members;
+    private final Date members;
 
-    private Date blacklist;
+    private final Date blacklist;
 
-    private Date joinRequests;
+    private final Date joinRequests;
 
-    private Date joinQuestions;
+    private final Date joinQuestions;
 
-    private Date invitations;
+    private final Date invitations;
 }

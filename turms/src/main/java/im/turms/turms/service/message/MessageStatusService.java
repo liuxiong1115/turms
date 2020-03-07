@@ -38,7 +38,7 @@ import static im.turms.turms.common.Constants.*;
 @Service
 @Validated
 public class MessageStatusService {
-    private static final MessageStatus EMPTY_MESSAGE_STATUS = new MessageStatus();
+    private static final MessageStatus EMPTY_MESSAGE_STATUS = new MessageStatus(null, null, null, null, null, null, null, null);
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
 

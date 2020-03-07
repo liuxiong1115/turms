@@ -14,7 +14,7 @@ import java.io.IOException;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminInfo implements IdentifiedDataSerializable {
+public final class AdminInfo implements IdentifiedDataSerializable {
     private Admin admin;
     private String rawPassword;
 
