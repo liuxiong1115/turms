@@ -31,7 +31,6 @@ import im.turms.turms.common.SessionUtil;
 import im.turms.turms.common.UserAgentUtil;
 import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
-import im.turms.turms.service.user.onlineuser.UsersNearbyService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
@@ -56,13 +55,13 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
     private final TurmsClusterManager turmsClusterManager;
     private final InboundMessageDispatcher inboundMessageDispatcher;
     private final OnlineUserService onlineUserService;
-    private final UsersNearbyService usersNearbyService;
+    private final boolean locationEnabled;
 
-    public TurmsWebSocketHandler(InboundMessageDispatcher inboundMessageDispatcher, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, UsersNearbyService usersNearbyService) {
+    public TurmsWebSocketHandler(InboundMessageDispatcher inboundMessageDispatcher, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager) {
         this.inboundMessageDispatcher = inboundMessageDispatcher;
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
-        this.usersNearbyService = usersNearbyService;
+        this.locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
     }
 
     @PostConstruct
@@ -77,7 +76,12 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
         Long userId = SessionUtil.getUserIdFromCookiesOrHeaders(cookies, headers);
         DeviceType deviceType = SessionUtil.getDeviceTypeFromCookies(cookies, headers);
         UserStatus userStatus = SessionUtil.getUserStatusFromCookies(cookies, headers);
-        PointFloat userLocation = SessionUtil.getLocationFromCookies(cookies, headers);
+        PointFloat userLocation;
+        if (locationEnabled) {
+            userLocation = SessionUtil.getLocationFromCookies(cookies, headers);
+        } else {
+            userLocation = null;
+        }
         String agent = session.getHandshakeInfo().getHeaders().getFirst("User-Agent");
         Map<String, String> deviceDetails = UserAgentUtil.parse(agent);
         deviceType = UserAgentUtil.detectDeviceTypeIfUnset(
