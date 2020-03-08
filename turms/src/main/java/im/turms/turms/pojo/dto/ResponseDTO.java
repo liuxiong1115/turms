@@ -13,9 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @FieldNameConstants
 public final class ResponseDTO<T> {
-    /**
-     * For now, "code" and "reason" are
-     */
+
     private final Integer code;
     private final String reason;
     private final Date timestamp;

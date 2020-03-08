@@ -28,6 +28,7 @@ import im.turms.turms.service.admin.AdminActionLogService;
 import im.turms.turms.service.admin.AdminService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
 
@@ -50,6 +52,7 @@ import static im.turms.turms.common.Constants.PASSWORD;
 
 @Component
 public class ControllerFilter implements WebFilter {
+    private static final BasicDBObject EMPTY_DBOJBECT = new BasicDBObject();
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final AdminService adminService;
     private final AdminActionLogService adminActionLogService;
@@ -147,70 +150,97 @@ public class ControllerFilter implements WebFilter {
                 request.getHeaders().getFirst(PASSWORD));
     }
 
-    /**
-     * TODO: Persist the resolved params when Spring
-     * 1. Provides a "filter"(or something like this) after getMethodArgumentValues() and before invoking custom handlers
-     * 2. (Best) Or allows developers to catch resolved params and body in exchange.getResponse().beforeCommit()
-     * https://github.com/spring-projects/spring-framework/issues/24004
-     */
-    @Deprecated
     private Mono<Void> tryPersistingAndPass(
             @NotNull String account,
             @NotNull ServerWebExchange exchange,
             @NotNull WebFilterChain chain,
             @NotNull HandlerMethod handlerMethod) {
         boolean logAdminAction = turmsClusterManager.getTurmsProperties().getLog().isLogAdminAction();
-        boolean callHandlers = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()
+        boolean invokeHandlers = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()
                 && !turmsPluginManager.getLogHandlerList().isEmpty();
-        if (logAdminAction || callHandlers) {
-            String action = handlerMethod.getMethod().getName();
-            MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
+        Mono<Void> additionalMono;
+        if (logAdminAction || invokeHandlers) {
             ServerHttpRequest request = exchange.getRequest();
-            MultiValueMap<String, String> queryParams = request.getQueryParams();
+            String action = handlerMethod.getMethod().getName();
+            String host = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
             DBObject params = null;
-            if (methodParameters.length > 0 && !queryParams.isEmpty()) {
-                params = new BasicDBObject(methodParameters.length);
-                for (MethodParameter methodParameter : methodParameters) {
-                    String parameterName = methodParameter.getParameterName();
-                    if (parameterName != null) {
-                        String value = queryParams.getFirst(parameterName);
-                        if (value != null) {
-                            params.put(parameterName, value);
-                        }
+            Mono<DBObject> bodyMono;
+            if (turmsClusterManager.getTurmsProperties().getLog().isLogRequestParams()) {
+                params = parseValidParams(request, handlerMethod);
+            }
+            if (turmsClusterManager.getTurmsProperties().getLog().isLogRequestBody()) {
+                bodyMono = parseValidBody(request);
+            } else {
+                bodyMono = Mono.empty();
+            }
+            DBObject finalParams = params;
+            additionalMono = bodyMono.defaultIfEmpty(EMPTY_DBOJBECT).flatMap(dbObject -> {
+                DBObject body = dbObject != EMPTY_DBOJBECT ? dbObject : null;
+                if (logAdminAction) {
+                    return adminActionLogService.saveAdminActionLog(
+                            account,
+                            new Date(),
+                            host,
+                            action,
+                            finalParams,
+                            body)
+                            .doOnSuccess(log -> {
+                                if (invokeHandlers) {
+                                    adminActionLogService.triggerLogHandlers(exchange, log);
+                                }
+                            });
+                } else {
+                    adminActionLogService.triggerLogHandlers(
+                            exchange,
+                            null,
+                            account,
+                            new Date(),
+                            host,
+                            action,
+                            finalParams,
+                            body);
+                    return Mono.empty();
+                }
+            }).then();
+        } else {
+            additionalMono = Mono.empty();
+        }
+        return additionalMono.then(chain.filter(exchange));
+    }
+
+    private DBObject parseValidParams(ServerHttpRequest request, HandlerMethod handlerMethod) {
+        MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
+        MultiValueMap<String, String> queryParams = request.getQueryParams();
+        BasicDBObject params = null;
+        if (methodParameters.length > 0 && !queryParams.isEmpty()) {
+            params = new BasicDBObject(queryParams.size());
+            for (MethodParameter methodParameter : methodParameters) {
+                String parameterName = methodParameter.getParameterName();
+                if (parameterName != null) {
+                    String value = queryParams.getFirst(parameterName);
+                    if (value != null) {
+                        params.put(parameterName, value);
                     }
                 }
             }
-            String host = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
-            if (callHandlers) {
-                adminActionLogService.triggerLogHandlers(
-                        exchange,
-                        null,
-                        account,
-                        new Date(),
-                        host,
-                        action,
-                        params,
-                        null);
-            }
-            if (logAdminAction) {
-                return chain.filter(exchange)
-                        .mergeWith(adminActionLogService.saveAdminActionLog(
-                                account,
-                                new Date(),
-                                host,
-                                action,
-                                params,
-                                null)
-                                .doOnNext(log -> {
-                                    if (callHandlers) {
-                                        adminActionLogService.triggerLogHandlers(exchange, log);
-                                    }
-                                })
-                                .then())
-                        .then();
+            if (params.isEmpty()) {
+                params = EMPTY_DBOJBECT;
             }
         }
-        return chain.filter(exchange);
+        return params;
+    }
+
+    private Mono<DBObject> parseValidBody(ServerHttpRequest request) {
+        return DataBufferUtils.join(request.getBody()).map(dataBuffer -> {
+            DataBufferUtils.retain(dataBuffer);
+            String json = dataBuffer.toString(StandardCharsets.UTF_8);
+            BasicDBObject dbObject = BasicDBObject.parse(json);
+            if (dbObject.isEmpty()) {
+                return EMPTY_DBOJBECT;
+            } else {
+                return dbObject;
+            }
+        });
     }
 
     private boolean isHandshakeRequest(@NotNull ServerWebExchange exchange) {
