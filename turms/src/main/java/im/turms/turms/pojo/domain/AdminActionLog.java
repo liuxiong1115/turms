@@ -31,9 +31,7 @@ import java.util.Date;
 @Document
 @FieldNameConstants
 @AllArgsConstructor
-/**
- * Note: This is not the final model and will certainly change in the future
- */
+
 public final class AdminActionLog {
     @Id
     private final Long id;

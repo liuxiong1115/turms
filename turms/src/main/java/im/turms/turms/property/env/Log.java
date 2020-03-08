@@ -40,6 +40,14 @@ public class Log implements IdentifiedDataSerializable {
     @Description("Whether to log users' login actions")
     private boolean logUserLogin = true;
 
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to log the parameters of requests")
+    private boolean logRequestParams = true;
+
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to log the body of requests. Better log the body of requests by monitor systems (e.g. Nginx, AWS)")
+    private boolean logRequestBody = true;
+
     @JsonIgnore
     @Override
     public int getFactoryId() {
@@ -56,11 +64,15 @@ public class Log implements IdentifiedDataSerializable {
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeBoolean(logAdminAction);
         out.writeBoolean(logUserLogin);
+        out.writeBoolean(logRequestParams);
+        out.writeBoolean(logRequestBody);
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         logAdminAction = in.readBoolean();
         logUserLogin = in.readBoolean();
+        logRequestParams = in.readBoolean();
+        logRequestBody = in.readBoolean();
     }
 }
