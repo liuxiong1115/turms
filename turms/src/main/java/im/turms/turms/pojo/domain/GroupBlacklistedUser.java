@@ -53,7 +53,6 @@ public final class GroupBlacklistedUser {
     @AllArgsConstructor
     @EqualsAndHashCode
     public static final class Key {
-        @Indexed
         private final Long groupId;
 
         @Indexed

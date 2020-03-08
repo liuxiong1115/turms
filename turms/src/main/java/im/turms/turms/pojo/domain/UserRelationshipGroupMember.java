@@ -51,7 +51,6 @@ public final class UserRelationshipGroupMember {
     @Data
     @AllArgsConstructor
     public static final class Key {
-        @Indexed
         private final Long ownerId;
 
         @Indexed

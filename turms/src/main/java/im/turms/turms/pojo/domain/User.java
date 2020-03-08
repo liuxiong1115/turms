@@ -54,7 +54,6 @@ public final class User {
     @Indexed
     private final Date deletionDate;
 
-    @Indexed
     private final Boolean active;
 
     @Indexed

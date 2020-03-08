@@ -32,12 +32,8 @@ import java.io.IOException;
 
 @Data
 public class Session implements IdentifiedDataSerializable {
-    /**
-     * ,
-     * the session will be closed.
-     */
     @JsonView(MutablePropertiesView.class)
-    @Description("A websocket connection will be closed if the turms server don't receive any request (including heartbeat request) from the client during requestHeartbeatTimeoutSeconds")
+    @Description("A websocket connection will be closed if the turms server doesn't receive any request (including heartbeat request) from the client during requestHeartbeatTimeoutSeconds")
     @Min(0)
     private int requestHeartbeatTimeoutSeconds = 50;
     @JsonView(MutablePropertiesView.class)

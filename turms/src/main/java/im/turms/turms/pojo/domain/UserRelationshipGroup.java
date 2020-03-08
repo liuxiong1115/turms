@@ -58,7 +58,6 @@ public final class UserRelationshipGroup {
     @AllArgsConstructor
     @EqualsAndHashCode
     public static final class Key {
-        @Indexed
         private final Long ownerId;
 
         @Indexed

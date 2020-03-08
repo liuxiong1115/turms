@@ -39,7 +39,6 @@ public final class GroupJoinRequest {
 
     private final String content;
 
-    @Indexed
     private final RequestStatus status;
 
     @Indexed
