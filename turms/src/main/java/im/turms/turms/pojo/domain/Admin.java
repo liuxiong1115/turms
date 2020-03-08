@@ -46,7 +46,6 @@ public final class Admin implements IdentifiedDataSerializable, Cloneable {
 
     private String name;
 
-    @Indexed
     private Long roleId;
 
     @Indexed

@@ -39,7 +39,6 @@ public final class UserFriendRequest {
 
     private final String content;
 
-    @Indexed
     private final RequestStatus status;
 
     private final String reason;

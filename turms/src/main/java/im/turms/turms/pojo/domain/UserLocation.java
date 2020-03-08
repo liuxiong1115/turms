@@ -39,7 +39,6 @@ public final class UserLocation implements Serializable {
     @Indexed
     private final Long userId;
 
-    @Indexed
     private final DeviceType deviceType;
 
     @Indexed

@@ -42,7 +42,6 @@ public final class GroupMember {
 
     private final String name;
 
-    @Indexed
     private final GroupMemberRole role;
 
     @Indexed
@@ -69,7 +68,6 @@ public final class GroupMember {
     @AllArgsConstructor
     @EqualsAndHashCode
     public static final class Key {
-        @Indexed
         private final Long groupId;
 
         @Indexed

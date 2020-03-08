@@ -34,7 +34,6 @@ public final class Group {
     @Id
     private final Long id;
 
-    @Indexed
     private final Long typeId;
 
     @Indexed
@@ -62,6 +61,5 @@ public final class Group {
     @Indexed
     private final Date muteEndDate;
 
-    @Indexed
     private final Boolean active;
 }

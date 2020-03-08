@@ -37,7 +37,6 @@ public final class UserRelationship {
     @Id
     private final Key key;
 
-    @Indexed
     private final Boolean isBlocked;
 
     @Indexed
@@ -53,7 +52,6 @@ public final class UserRelationship {
     @AllArgsConstructor
     @EqualsAndHashCode
     public static final class Key {
-        @Indexed
         private final Long ownerId;
 
         @Indexed

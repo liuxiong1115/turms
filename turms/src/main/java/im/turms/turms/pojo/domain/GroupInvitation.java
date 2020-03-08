@@ -48,7 +48,6 @@ public final class GroupInvitation {
 
     private final String content;
 
-    @Indexed
     private final RequestStatus status;
 
     @Indexed

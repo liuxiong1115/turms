@@ -41,13 +41,11 @@ public final class MessageStatus {
     @Indexed
     private final Long groupId;
 
-    @Indexed
     private final Boolean isSystemMessage;
 
     @Indexed
     private final Long senderId;
 
-    @Indexed
     private final MessageDeliveryStatus deliveryStatus;
 
     @Indexed
@@ -83,7 +81,6 @@ public final class MessageStatus {
     @AllArgsConstructor
     @EqualsAndHashCode
     public static final class Key {
-        @Indexed
         private final Long messageId;
 
         @Indexed

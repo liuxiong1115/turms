@@ -48,7 +48,6 @@ public final class UserLoginLog {
 
     private final Integer ip;
 
-    @Indexed
     private final DeviceType deviceType;
 
     private final Map<String, String> deviceDetails;

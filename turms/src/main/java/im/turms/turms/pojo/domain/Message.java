@@ -36,10 +36,8 @@ public final class Message {
     @Id
     private final Long id;
 
-    @Indexed
     private final ChatType chatType;
 
-    @Indexed
     private final Boolean isSystemMessage;
 
     @Indexed
