@@ -66,13 +66,13 @@ import java.util.concurrent.TimeUnit;
 
 import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
 import static im.turms.turms.common.Constants.ALL_DEVICE_TYPES;
+import static im.turms.turms.common.Constants.EMPTY_USER_LOCATION;
 
 @Service
 @Validated
 public class OnlineUserService {
     private static final int DEFAULT_ONLINE_USERS_MANAGER_CAPACITY = 1024;
     private static final String LOG_ONLINE_USERS_NUMBER_TASK = "loun";
-    private static final UserLocation EMPTY_USER_LOCATION = new UserLocation(null, null, null, null, null, null, null, null);
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
@@ -82,6 +82,7 @@ public class OnlineUserService {
     private final HashedWheelTimer heartbeatTimer;
     private final TrivialTaskService onlineUsersNumberPersisterTimer;
     private final TurmsTaskExecutor turmsTaskExecutor;
+    private final boolean locationEnabled;
     /**
      * Integer(Slot) -> Long(userId) -> OnlineUserManager
      */
@@ -119,6 +120,7 @@ public class OnlineUserService {
                 .expireAfterWrite(Duration.ofMinutes(10))
                 .build();
         this.onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
+        this.locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
         rescheduleOnlineUsersNumberPersister();
         TurmsProperties.addListeners(turmsProperties -> {
             rescheduleOnlineUsersNumberPersister();
@@ -130,16 +132,6 @@ public class OnlineUserService {
         onlineUsersNumberPersisterTimer.reschedule(LOG_ONLINE_USERS_NUMBER_TASK,
                 turmsClusterManager.getTurmsProperties().getUser().getOnlineUsersNumberPersisterCron(),
                 this::checkAndSaveOnlineUsersNumber);
-    }
-
-    public void setAllLocalUsersOffline(@NotNull CloseStatus closeStatus) {
-        for (Map<Long, OnlineUserManager> managersMap : onlineUsersManagerAtSlots) {
-            if (managersMap != null) {
-                setManagersOffline(closeStatus, managersMap.values());
-                managersMap.clear();
-            }
-        }
-        onlineUsersManagerAtSlots.clear();
     }
 
     public void setIrresponsibleUsersOffline(boolean isServerClosing) {
@@ -402,6 +394,7 @@ public class OnlineUserService {
             locationIdMono = Mono.empty();
         }
         return locationIdMono
+                .onErrorReturn(EMPTY_USER_LOCATION)
                 .defaultIfEmpty(EMPTY_USER_LOCATION)
                 .flatMap(location -> {
                     Long locationId = null;
@@ -590,14 +583,18 @@ public class OnlineUserService {
     }
 
     public SortedSet<UserLocation> getUserLocations(@NotNull Long userId, @DeviceTypeConstraint DeviceType deviceType) {
-        if (usersNearbyService.isTreatUserIdAndDeviceTypeAsUniqueUser()) {
-            if (deviceType != null) {
-                return usersNearbyService.getUserSessionLocations().get(Pair.of(userId, deviceType));
+        if (locationEnabled) {
+            if (usersNearbyService.isTreatUserIdAndDeviceTypeAsUniqueUser()) {
+                if (deviceType != null) {
+                    return usersNearbyService.getUserSessionLocations().get(Pair.of(userId, deviceType));
+                } else {
+                    throw new IllegalArgumentException("deviceType must be not null if treatUserIdAndDeviceTypeAsUniqueUser is true");
+                }
             } else {
-                throw new IllegalArgumentException("deviceType must be not null if treatUserIdAndDeviceTypeAsUniqueUser is true");
+                return usersNearbyService.getUserLocations().get(userId);
             }
         } else {
-            return usersNearbyService.getUserLocations().get(userId);
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
         }
     }
 
@@ -623,7 +620,9 @@ public class OnlineUserService {
             OnlineUserManager.Session session = onlineUserManager.getSession(deviceType);
             if (session != null) {
                 session.setLocation(location);
-                userLocationService.saveUserLocation(location).subscribe();
+                userLocationService.saveUserLocation(location)
+                        .onErrorReturn(EMPTY_USER_LOCATION)
+                        .subscribe();
                 return true;
             }
         }

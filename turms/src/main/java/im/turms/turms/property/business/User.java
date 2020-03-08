@@ -93,23 +93,29 @@ public class User implements IdentifiedDataSerializable {
         shouldDeleteUserLogically = in.readBoolean();
     }
 
-    //TODO
     @Data
     public static class Location implements IdentifiedDataSerializable {
-        @JsonView(MutablePropertiesView.class)
-        @Description("Whether to handle users' location")
+        @Description("Whether to handle users' locations")
         private boolean enabled = true;
         @JsonView(MutablePropertiesView.class)
-        @Description("Whether to persist users' location")
+        @Description("Whether to persist users' locations")
         private boolean persistent = true;
         @JsonView(MutablePropertiesView.class)
-        @Description("The maximum available number of users nearby records per query request")
+        @Description("The default maximum available number of users nearby records per query request")
         @Min(0)
-        private int maxAvailableUsersNearbyNumberPerQuery = 20;
+        private int defaultMaxAvailableUsersNearbyNumberPerQuery = 20;
         @JsonView(MutablePropertiesView.class)
-        @Description("The maximum distance per query request")
+        @Description("The default maximum distance per query request")
         @DecimalMin("0")
-        private double maxDistancePerQuery = 0.1;
+        private double defaultMaxDistancePerQuery = 0.1;
+        @JsonView(MutablePropertiesView.class)
+        @Description("The maximum allowed available number of users nearby records per query request")
+        @Min(0)
+        private int maxAvailableUsersNearbyNumberLimitPerQuery = Integer.MAX_VALUE;
+        @JsonView(MutablePropertiesView.class)
+        @Description("The maximum allowed distance per query request")
+        @DecimalMin("0")
+        private double maxDistanceLimitPerQuery = Double.MAX_VALUE;
 
         @Description("Whether to treat the pair of user ID and device type as an unique user when querying users nearby. If false, only the user ID is used to identify an unique user")
         private boolean treatUserIdAndDeviceTypeAsUniqueUser = false;
@@ -130,16 +136,20 @@ public class User implements IdentifiedDataSerializable {
         public void writeData(ObjectDataOutput out) throws IOException {
             out.writeBoolean(enabled);
             out.writeBoolean(persistent);
-            out.writeInt(maxAvailableUsersNearbyNumberPerQuery);
-            out.writeDouble(maxDistancePerQuery);
+            out.writeInt(defaultMaxAvailableUsersNearbyNumberPerQuery);
+            out.writeDouble(defaultMaxDistancePerQuery);
+            out.writeInt(maxAvailableUsersNearbyNumberLimitPerQuery);
+            out.writeDouble(maxDistanceLimitPerQuery);
         }
 
         @Override
         public void readData(ObjectDataInput in) throws IOException {
             enabled = in.readBoolean();
             persistent = in.readBoolean();
-            maxAvailableUsersNearbyNumberPerQuery = in.readInt();
-            maxDistancePerQuery = in.readDouble();
+            defaultMaxAvailableUsersNearbyNumberPerQuery = in.readInt();
+            defaultMaxDistancePerQuery = in.readDouble();
+            maxAvailableUsersNearbyNumberLimitPerQuery = in.readInt();
+            maxDistanceLimitPerQuery = in.readDouble();
         }
     }
 

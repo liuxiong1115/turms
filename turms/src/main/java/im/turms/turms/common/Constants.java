@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.exception.TurmsBusinessException;
+import im.turms.turms.pojo.domain.UserLocation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.dao.DuplicateKeyException;
 import reactor.core.publisher.Mono;
@@ -72,6 +73,7 @@ public class Constants {
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final Object EMPTY_OBJECT = new Object();
     public static final Pair EMPTY_PAIR = Pair.of(null, null);
+    public static final UserLocation EMPTY_USER_LOCATION = new UserLocation(null, null, null, null, null, null, null, null);
     public static final Mono EMPTY_SET_MONO = Mono.just(Collections.emptySet());
     public static final Date EPOCH = new Date(0);
     public static final Date MAX_DATE = new Date(Long.MAX_VALUE);

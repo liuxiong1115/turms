@@ -1,6 +1,8 @@
 package im.turms.turms.service.user;
 
+import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.pojo.domain.UserLocation;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -25,7 +27,11 @@ public class UserLocationService {
     }
 
     public Mono<UserLocation> saveUserLocation(@NotNull UserLocation userLocation) {
-        return mongoTemplate.insert(userLocation);
+        if (turmsClusterManager.getTurmsProperties().getUser().getLocation().isPersistent()) {
+            return mongoTemplate.insert(userLocation);
+        } else {
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
+        }
     }
 
     public Mono<UserLocation> saveUserLocation(
@@ -35,10 +41,14 @@ public class UserLocationService {
             float longitude,
             float latitude,
             @NotNull @PastOrPresent Date timestamp) {
-        if (id == null) {
-            id = turmsClusterManager.generateRandomId();
+        if (turmsClusterManager.getTurmsProperties().getUser().getLocation().isPersistent()) {
+            if (id == null) {
+                id = turmsClusterManager.generateRandomId();
+            }
+            UserLocation location = new UserLocation(id, userId, deviceType, longitude, latitude, null, null, timestamp);
+            return mongoTemplate.save(location);
+        } else {
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
         }
-        UserLocation location = new UserLocation(id, userId, deviceType, longitude, latitude, null, null, timestamp);
-        return mongoTemplate.save(location);
     }
 }

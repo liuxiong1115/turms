@@ -24,7 +24,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
+import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.pojo.domain.User;
@@ -41,6 +43,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
@@ -59,6 +62,7 @@ public class UsersNearbyService {
     private final UserService userService;
     private final OnlineUserService onlineUserService;
 
+    private final boolean locationEnabled;
     private final boolean treatUserIdAndDeviceTypeAsUniqueUser;
     /**
      * search is O(log(n)) on average
@@ -76,13 +80,16 @@ public class UsersNearbyService {
         this.turmsClusterManager = turmsClusterManager;
         this.turmsTaskExecutor = turmsTaskExecutor;
         this.userService = userService;
+        locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
         treatUserIdAndDeviceTypeAsUniqueUser = turmsClusterManager.getTurmsProperties().getUser().getLocation().isTreatUserIdAndDeviceTypeAsUniqueUser();
-        if (treatUserIdAndDeviceTypeAsUniqueUser) {
-            sessionIdTree = RTree.create();
-            userSessionLocations = newLocationMap();
-        } else {
-            userIdTree = RTree.create();
-            userLocations = newLocationMap();
+        if (locationEnabled) {
+            if (treatUserIdAndDeviceTypeAsUniqueUser) {
+                sessionIdTree = RTree.create();
+                userSessionLocations = newLocationMap();
+            } else {
+                userIdTree = RTree.create();
+                userLocations = newLocationMap();
+            }
         }
     }
 
@@ -102,11 +109,19 @@ public class UsersNearbyService {
     }
 
     public SortedSetMultimap<Pair<Long, DeviceType>, UserLocation> getUserSessionLocations() {
-        return userSessionLocations;
+        if (locationEnabled) {
+            return userSessionLocations;
+        } else {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
     }
 
     public SortedSetMultimap<Long, UserLocation> getUserLocations() {
-        return userLocations;
+        if (locationEnabled) {
+            return userLocations;
+        } else {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
     }
 
     /**
@@ -118,6 +133,9 @@ public class UsersNearbyService {
             @NotNull Float longitude,
             @NotNull Float latitude,
             @NotNull Date date) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         PointFloat point = PointFloat.create(longitude, latitude);
         if (treatUserIdAndDeviceTypeAsUniqueUser) {
             Pair<Long, DeviceType> key = Pair.of(userId, deviceType);
@@ -142,18 +160,20 @@ public class UsersNearbyService {
     }
 
     public void removeUserLocation(@NotNull Long userId, @NotNull @DeviceTypeConstraint DeviceType deviceType) {
-        if (treatUserIdAndDeviceTypeAsUniqueUser) {
-            Pair<Long, DeviceType> key = Pair.of(userId, deviceType);
-            SortedSet<UserLocation> deletedUserLocations = userSessionLocations.removeAll(key);
-            for (UserLocation deletedUserLocation : deletedUserLocations) {
-                PointFloat point = PointFloat.create(deletedUserLocation.getLongitude(), deletedUserLocation.getLatitude());
-                sessionIdTree.delete(key, point);
-            }
-        } else {
-            SortedSet<UserLocation> deletedUserLocations = userLocations.removeAll(userId);
-            for (UserLocation deletedUserLocation : deletedUserLocations) {
-                PointFloat point = PointFloat.create(deletedUserLocation.getLongitude(), deletedUserLocation.getLatitude());
-                userIdTree.delete(userId, point);
+        if (locationEnabled) {
+            if (treatUserIdAndDeviceTypeAsUniqueUser) {
+                Pair<Long, DeviceType> key = Pair.of(userId, deviceType);
+                SortedSet<UserLocation> deletedUserLocations = userSessionLocations.removeAll(key);
+                for (UserLocation deletedUserLocation : deletedUserLocations) {
+                    PointFloat point = PointFloat.create(deletedUserLocation.getLongitude(), deletedUserLocation.getLatitude());
+                    sessionIdTree.delete(key, point);
+                }
+            } else {
+                SortedSet<UserLocation> deletedUserLocations = userLocations.removeAll(userId);
+                for (UserLocation deletedUserLocation : deletedUserLocations) {
+                    PointFloat point = PointFloat.create(deletedUserLocation.getLongitude(), deletedUserLocation.getLatitude());
+                    userIdTree.delete(userId, point);
+                }
             }
         }
     }
@@ -163,6 +183,9 @@ public class UsersNearbyService {
             @Nullable DeviceType deviceType,
             @Nullable Integer maxPeopleNumber,
             @Nullable Double maxDistance) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(userId);
         if (onlineUserManager != null) {
             OnlineUserManager.Session session;
@@ -194,6 +217,9 @@ public class UsersNearbyService {
             @Nullable DeviceType deviceType,
             @Nullable Integer maxPeopleNumber,
             @Nullable Double maxDistance) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(userId);
         if (onlineUserManager != null) {
             OnlineUserManager.Session session;
@@ -225,6 +251,9 @@ public class UsersNearbyService {
             @Nullable DeviceType deviceType,
             @Nullable Integer maxPeopleNumber,
             @Nullable Double maxDistance) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         if (treatUserIdAndDeviceTypeAsUniqueUser) {
             return queryNearestUserSessionIds(userId, deviceType, maxPeopleNumber, maxDistance)
                     .collect(Collectors.toSet())
@@ -257,20 +286,25 @@ public class UsersNearbyService {
             @NotNull Float latitude,
             @Nullable Integer maxNumber,
             @Nullable Double maxDistance) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         if (userIdTree.size() > 0 || !turmsClusterManager.isSingleton()) {
+            im.turms.turms.property.business.User.@Valid Location location = turmsClusterManager
+                    .getTurmsProperties()
+                    .getUser()
+                    .getLocation();
             if (maxNumber == null) {
-                maxNumber = turmsClusterManager
-                        .getTurmsProperties()
-                        .getUser()
-                        .getLocation()
-                        .getMaxAvailableUsersNearbyNumberPerQuery();
+                maxNumber = location.getDefaultMaxAvailableUsersNearbyNumberPerQuery();
             }
             if (maxDistance == null) {
-                maxDistance = turmsClusterManager
-                        .getTurmsProperties()
-                        .getUser()
-                        .getLocation()
-                        .getMaxDistancePerQuery();
+                maxDistance = location.getDefaultMaxDistancePerQuery();
+            }
+            if (maxNumber > location.getMaxAvailableUsersNearbyNumberLimitPerQuery()) {
+                maxNumber = location.getMaxAvailableUsersNearbyNumberLimitPerQuery();
+            }
+            if (maxDistance > location.getMaxDistanceLimitPerQuery()) {
+                maxDistance = location.getMaxDistanceLimitPerQuery();
             }
             Double finalMaxDistance = maxDistance;
             Integer finalMaxPeopleNumber = maxNumber;
@@ -296,20 +330,23 @@ public class UsersNearbyService {
             @NotNull Float latitude,
             @Nullable Integer maxNumber,
             @Nullable Double maxDistance) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         if (sessionIdTree.size() > 0 || !turmsClusterManager.isSingleton()) {
             if (maxNumber == null) {
                 maxNumber = turmsClusterManager
                         .getTurmsProperties()
                         .getUser()
                         .getLocation()
-                        .getMaxAvailableUsersNearbyNumberPerQuery();
+                        .getDefaultMaxAvailableUsersNearbyNumberPerQuery();
             }
             if (maxDistance == null) {
                 maxDistance = turmsClusterManager
                         .getTurmsProperties()
                         .getUser()
                         .getLocation()
-                        .getMaxDistancePerQuery();
+                        .getDefaultMaxDistancePerQuery();
             }
             Double finalMaxDistance = maxDistance;
             Integer finalMaxPeopleNumber = maxNumber;
@@ -334,6 +371,9 @@ public class UsersNearbyService {
             @NotNull PointFloat point,
             @NotNull Double maxDistance,
             @NotNull Integer maxNumber) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         return userIdTree.nearest(point, maxDistance, maxNumber);
     }
 
@@ -342,6 +382,9 @@ public class UsersNearbyService {
             @NotEmpty List<Iterable<Entry<Long, PointFloat>>> entries,
             @NotNull Double maxDistance,
             @NotNull Integer maxNumber) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         RTree<Long, PointFloat> disposableTree = RTree.create();
         for (Iterable<Entry<Long, PointFloat>> entryList : entries) {
             for (Entry<Long, PointFloat> locationEntry : entryList) {
@@ -355,6 +398,9 @@ public class UsersNearbyService {
             @NotNull PointFloat point,
             @NotNull Double maxDistance,
             @NotNull Integer maxNumber) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         return sessionIdTree.nearest(point, maxDistance, maxNumber);
     }
 
@@ -363,6 +409,9 @@ public class UsersNearbyService {
             @NotEmpty List<Iterable<Entry<Pair<Long, DeviceType>, PointFloat>>> entries,
             @NotNull Double maxDistance,
             @NotNull Integer maxNumber) {
+        if (!locationEnabled) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        }
         RTree<Pair<Long, DeviceType>, PointFloat> disposableTree = RTree.create();
         for (Iterable<Entry<Pair<Long, DeviceType>, PointFloat>> entryList : entries) {
             for (Entry<Pair<Long, DeviceType>, PointFloat> locationEntry : entryList) {
