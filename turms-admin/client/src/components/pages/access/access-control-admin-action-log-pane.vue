@@ -46,20 +46,33 @@ export default {
                 columns: [{
                     title: this.$t('adminActionLogId'),
                     key: 'id',
-                    width: '25%'
+                    width: '15%'
                 },
                 {
                     title: this.$t('adminAccount'),
                     key: 'account',
-                    width: '25%'
+                    width: '12.5%'
                 },
                 {
                     key: 'ip',
-                    width: '25%'
+                    width: '12.5%'
                 },
                 {
                     key: 'logDate',
-                    width: '25%'
+                    width: '15%'
+                },
+                {
+                    key: 'action',
+                    width: '15%'
+                },
+                {
+                    title: this.$t('parameter'),
+                    key: 'params',
+                    width: '15%'
+                },
+                {
+                    key: 'body',
+                    width: '15%'
                 }]
             }
         };
