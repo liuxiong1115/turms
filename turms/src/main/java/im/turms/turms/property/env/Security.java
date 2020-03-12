@@ -40,32 +40,32 @@ public class Security implements IdentifiedDataSerializable {
     private PasswordEncodingAlgorithm adminPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.BCRYPT;
 
     @JsonView(MutablePropertiesView.class)
-    @Description("The maximum day difference for each query request")
+    @Description("The maximum day difference per query request")
     @Min(0)
     private int maxDayDifferencePerRequest = 3 * 30;
     @JsonView(MutablePropertiesView.class)
-    @Description("The maximum hour difference for each count request")
+    @Description("The maximum hour difference per count request")
     @Min(0)
     private int maxHourDifferencePerCountRequest = 24;
     @JsonView(MutablePropertiesView.class)
-    @Description("The maximum day difference for each count request")
+    @Description("The maximum day difference per count request")
     @Min(0)
     private int maxDayDifferencePerCountRequest = 31;
     @JsonView(MutablePropertiesView.class)
-    @Description("The maximum month difference for each count request")
+    @Description("The maximum month difference per count request")
     @Min(0)
     private int maxMonthDifferencePerCountRequest = 12;
     @JsonView(MutablePropertiesView.class)
-    @Description("The maximum available records for each query request")
+    @Description("The maximum available records per query request")
     @Min(0)
     private int maxAvailableRecordsPerRequest = 1000;
     @JsonView(MutablePropertiesView.class)
-    @Description("The maximum available online users' status for each query request")
+    @Description("The maximum available online users' status per query request")
     @Min(0)
     private int maxAvailableOnlineUsersStatusPerRequest = 20;
 
     @JsonView(MutablePropertiesView.class)
-    @Description("The default available records for each query request")
+    @Description("The default available records per query request")
     @Min(0)
     private int defaultAvailableRecordsPerRequest = 10;
 

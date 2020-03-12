@@ -58,6 +58,8 @@ public class User implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete a user logically")
     private boolean shouldDeleteUserLogically = true;
+    @Description("Whether to activate a user when added by default")
+    private boolean shouldActivateUserWhenAdded = true;
 
     @JsonIgnore
     @Override
@@ -80,6 +82,7 @@ public class User implements IdentifiedDataSerializable {
         out.writeBoolean(shouldUseOsAsDefaultDeviceType);
         out.writeBoolean(shouldDeleteTwoSidedRelationships);
         out.writeBoolean(shouldDeleteUserLogically);
+        out.writeBoolean(shouldActivateUserWhenAdded);
     }
 
     @Override
@@ -91,6 +94,7 @@ public class User implements IdentifiedDataSerializable {
         shouldUseOsAsDefaultDeviceType = in.readBoolean();
         shouldDeleteTwoSidedRelationships = in.readBoolean();
         shouldDeleteUserLogically = in.readBoolean();
+        shouldActivateUserWhenAdded = in.readBoolean();
     }
 
     @Data
