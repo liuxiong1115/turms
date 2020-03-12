@@ -22,13 +22,13 @@ package im.turms.turms.compiler;
  */
 public class CompilerOptions {
 
-    public static class Value {
-        private Value() {}
-        public static final String DEV_ENV = "DEV";
-        public static final String PROD_ENV = "PROD";
+    public static class Env {
+        private Env() {}
+        public static final String DEV = "DEV";
+        public static final String PROD = "PROD";
     }
 
-    public static final String env = "@env@";
+    public static final String ENV = "@env@";
 
     private CompilerOptions() {}
 }

@@ -172,7 +172,7 @@ public class TurmsClusterManager {
             int end = index == clusterMembers.length - 1
                     ? HASH_SLOTS_NUMBER
                     : (index + 1) * step;
-            String range = "[" + start + "," + end + ")";
+            String range = String.format("[%d,%d)", start, end);
             boolean isCurrentNodeRange = localMember == clusterMembers[index];
             result.put(index, range + (isCurrentNodeRange ? "*" : ""));
         }
@@ -188,7 +188,7 @@ public class TurmsClusterManager {
     }
 
     private boolean hasJoinedCluster() {
-        return membersSnapshot.indexOf(localMembersSnapshot) != -1;
+        return membersSnapshot.contains(localMembersSnapshot);
     }
 
     public IScheduledExecutorService getScheduledExecutor() {
