@@ -38,7 +38,7 @@ public class ApplicationContextConfig {
 
     @EventListener(classes = ContextRefreshedEvent.class)
     public void handleContextRefreshedEvent() {
-        if (CompilerOptions.env == CompilerOptions.Value.DEV_ENV) {
+        if (CompilerOptions.ENV == CompilerOptions.Env.DEV) {
             TurmsLogger.getLogger().warn("Turms is running in dev mode. Turn it off in pom.xml");
         }
     }

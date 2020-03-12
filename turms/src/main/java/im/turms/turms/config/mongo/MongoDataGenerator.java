@@ -97,7 +97,7 @@ public class MongoDataGenerator {
     }
 
     private boolean isDevEnv() {
-        return CompilerOptions.env == CompilerOptions.Value.DEV_ENV && mongoTemplate.getMongoDatabase().getName().contains("-dev");
+        return CompilerOptions.ENV == CompilerOptions.Env.DEV && mongoTemplate.getMongoDatabase().getName().contains("-dev");
     }
 
     // Note: Better not to remove all mock data after turms closed

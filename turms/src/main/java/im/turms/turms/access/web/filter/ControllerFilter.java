@@ -260,7 +260,7 @@ public class ControllerFilter implements WebFilter {
     }
 
     private boolean isDevAndSwaggerRequest(@NotNull ServerWebExchange exchange) {
-        if (CompilerOptions.env == CompilerOptions.Value.DEV_ENV) {
+        if (CompilerOptions.ENV == CompilerOptions.Env.DEV) {
             String path = exchange.getRequest().getURI().getPath();
             return path.startsWith("/v2/api-docs")
                     || path.startsWith("/swagger-resources")
