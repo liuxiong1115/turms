@@ -102,6 +102,7 @@ public class GroupService {
             @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable Boolean isActive) {
+        isActive = isActive != null ? isActive : turmsClusterManager.getTurmsProperties().getGroup().isShouldActivateGroupWhenCreated();
         Long groupId = turmsClusterManager.generateRandomId();
         Group group = new Group(groupId, groupTypeId, creatorId, ownerId, groupName, intro,
                 announcement, profilePictureUrl, minimumScore, creationDate, deletionDate, muteEndDate, isActive);

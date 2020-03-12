@@ -169,7 +169,7 @@ public class UserService {
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
         permissionGroupId = permissionGroupId != null ? permissionGroupId : DEFAULT_USER_PERMISSION_GROUP_ID;
         registrationDate = registrationDate != null ? registrationDate : now;
-        isActive = isActive != null ? isActive : false;
+        isActive = isActive != null ? isActive : turmsClusterManager.getTurmsProperties().getUser().isShouldActivateUserWhenAdded();
         User user = new User(
                 id,
                 turmsPasswordUtil.encodeUserPassword(rawPassword),

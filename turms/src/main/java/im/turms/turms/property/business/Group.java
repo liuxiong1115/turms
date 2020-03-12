@@ -63,6 +63,8 @@ public class Group implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete expired group join requests automatically")
     private boolean shouldDeleteExpiredGroupJoinRequestsAutomatically = false;
+    @Description("Whether to activate a group when created by default")
+    private boolean shouldActivateGroupWhenCreated = true;
 
     @JsonIgnore
     @Override
@@ -87,6 +89,7 @@ public class Group implements IdentifiedDataSerializable {
         out.writeBoolean(shouldDeleteGroupLogicallyByDefault);
         out.writeBoolean(shouldDeleteExpiredGroupInvitationsAutomatically);
         out.writeBoolean(shouldDeleteExpiredGroupJoinRequestsAutomatically);
+        out.writeBoolean(shouldActivateGroupWhenCreated);
     }
 
     @Override
@@ -100,5 +103,6 @@ public class Group implements IdentifiedDataSerializable {
         shouldDeleteGroupLogicallyByDefault = in.readBoolean();
         shouldDeleteExpiredGroupInvitationsAutomatically = in.readBoolean();
         shouldDeleteExpiredGroupJoinRequestsAutomatically = in.readBoolean();
+        shouldActivateGroupWhenCreated = in.readBoolean();
     }
 }
