@@ -35,8 +35,8 @@ import java.util.List;
 @Data
 @DependsOn("turmsProperties")
 public class TurmsPluginManager {
-    private ApplicationContext context;
-    private TurmsProperties turmsProperties;
+    private final ApplicationContext context;
+    private final TurmsProperties turmsProperties;
     private PluginManager pluginManager;
 
     private List<ClientRequestHandler> clientRequestHandlerList;
@@ -49,12 +49,14 @@ public class TurmsPluginManager {
     public TurmsPluginManager(ApplicationContext context, TurmsProperties turmsProperties) {
         this.context = context;
         this.turmsProperties = turmsProperties;
-        clientRequestHandlerList = Collections.emptyList();
-        expiredMessageAutoDeletionNotificationHandlerList = Collections.emptyList();
-        logHandlerList = Collections.emptyList();
-        userAuthenticatorList = Collections.emptyList();
-        userOnlineStatusChangeHandlerList = Collections.emptyList();
-        init();
+        if (turmsProperties.getPlugin().isEnabled()) {
+            clientRequestHandlerList = Collections.emptyList();
+            expiredMessageAutoDeletionNotificationHandlerList = Collections.emptyList();
+            logHandlerList = Collections.emptyList();
+            userAuthenticatorList = Collections.emptyList();
+            userOnlineStatusChangeHandlerList = Collections.emptyList();
+            init();
+        }
     }
 
     public void init() {

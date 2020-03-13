@@ -83,6 +83,7 @@ public class OnlineUserService {
     private final TrivialTaskService onlineUsersNumberPersisterTimer;
     private final TurmsTaskExecutor turmsTaskExecutor;
     private final boolean locationEnabled;
+    private final boolean pluginEnabled;
     /**
      * Integer(Slot) -> Long(userId) -> OnlineUserManager
      */
@@ -126,6 +127,7 @@ public class OnlineUserService {
             rescheduleOnlineUsersNumberPersister();
             return null;
         });
+        pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
     }
 
     private void rescheduleOnlineUsersNumberPersister() {
@@ -175,7 +177,7 @@ public class OnlineUserService {
             if (manager.getSessionsNumber() == 0) {
                 clearOnlineUserManager(userId);
             }
-            if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+            if (pluginEnabled) {
                 List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
                 if (!handlerList.isEmpty()) {
                     for (UserOnlineStatusChangeHandler handler : handlerList) {
@@ -215,7 +217,7 @@ public class OnlineUserService {
                 if (manager.getSessionsNumber() == 0) {
                     clearOnlineUserManager(userId);
                 }
-                if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                if (pluginEnabled) {
                     List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
                     if (!handlerList.isEmpty()) {
                         for (UserOnlineStatusChangeHandler handler : handlerList) {
@@ -404,14 +406,14 @@ public class OnlineUserService {
                     if (turmsClusterManager.getTurmsProperties().getLog().isLogUserLogin()) {
                         return logUserOnline(userId, ip, loggingInDeviceType, deviceDetails, locationId)
                                 .map(log -> {
-                                    if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                                    if (pluginEnabled) {
                                         userLoginLogService.triggerLogHandlers(log);
                                     }
                                     return setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId());
                                 })
                                 .onErrorReturn(TurmsStatusCode.FAILED);
                     } else {
-                        if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                        if (pluginEnabled) {
                             userLoginLogService.triggerLogHandlers(userId, ip, loggingInDeviceType, deviceDetails, locationId);
                         }
                         return Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, null));
@@ -456,7 +458,7 @@ public class OnlineUserService {
                         logId);
             }
             getOrAddOnlineUsersManager(slotIndex).put(userId, onlineUserManager);
-            if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+            if (pluginEnabled) {
                 List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
                 if (!handlerList.isEmpty()) {
                     for (UserOnlineStatusChangeHandler handler : handlerList) {

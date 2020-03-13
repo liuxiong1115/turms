@@ -18,12 +18,10 @@
 package im.turms.turms.property.env;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
-import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
 
@@ -35,7 +33,6 @@ import java.io.IOException;
 @Data
 public class Plugin implements IdentifiedDataSerializable {
 
-    @JsonView(MutablePropertiesView.class)
     @Description("Whether to enable plugins")
     private boolean enabled = true;
 
@@ -56,11 +53,9 @@ public class Plugin implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeBoolean(enabled);
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        enabled = in.readBoolean();
     }
 }

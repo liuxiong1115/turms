@@ -58,6 +58,7 @@ public class ControllerFilter implements WebFilter {
     private final AdminActionLogService adminActionLogService;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
+    private final boolean pluginEnabled;
 
     public ControllerFilter(RequestMappingHandlerMapping requestMappingHandlerMapping, AdminService adminService, AdminActionLogService adminActionLogService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager) {
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
@@ -65,6 +66,7 @@ public class ControllerFilter implements WebFilter {
         this.adminActionLogService = adminActionLogService;
         this.turmsClusterManager = turmsClusterManager;
         this.turmsPluginManager = turmsPluginManager;
+        pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
     }
 
     @Override
@@ -156,8 +158,7 @@ public class ControllerFilter implements WebFilter {
             @NotNull WebFilterChain chain,
             @NotNull HandlerMethod handlerMethod) {
         boolean logAdminAction = turmsClusterManager.getTurmsProperties().getLog().isLogAdminAction();
-        boolean invokeHandlers = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()
-                && !turmsPluginManager.getLogHandlerList().isEmpty();
+        boolean invokeHandlers = pluginEnabled && !turmsPluginManager.getLogHandlerList().isEmpty();
         Mono<Void> additionalMono;
         if (logAdminAction || invokeHandlers) {
             ServerHttpRequest request = exchange.getRequest();
