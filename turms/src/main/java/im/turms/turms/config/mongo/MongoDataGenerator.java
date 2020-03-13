@@ -76,6 +76,7 @@ public class MongoDataGenerator {
                 createCollectionIfNotExist(Message.class, null),
                 createCollectionIfNotExist(MessageStatus.class, null),
                 createCollectionIfNotExist(User.class, null),
+                createCollectionIfNotExist(UserActionLog.class, null),
                 createCollectionIfNotExist(UserFriendRequest.class, null),
                 createCollectionIfNotExist(UserLocation.class, null),
                 createCollectionIfNotExist(UserLoginLog.class, null),

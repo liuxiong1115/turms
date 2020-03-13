@@ -370,15 +370,6 @@ public class OnlineUserService {
         return mongoTemplate.save(userOnlineUserNumber);
     }
 
-    private Mono<UserLoginLog> logUserOnline(
-            @NotNull Long userId,
-            @NotNull Integer ip,
-            @NotNull @DeviceTypeConstraint DeviceType usingDeviceType,
-            @Nullable Map<String, String> deviceDetails,
-            @Nullable Long locationId) {
-        return userLoginLogService.save(userId, ip, usingDeviceType, deviceDetails, locationId);
-    }
-
     public Mono<TurmsStatusCode> addOnlineUser(
             @NotNull Long userId,
             @NotNull UserStatus userStatus,
@@ -399,24 +390,33 @@ public class OnlineUserService {
                 .onErrorReturn(EMPTY_USER_LOCATION)
                 .defaultIfEmpty(EMPTY_USER_LOCATION)
                 .flatMap(location -> {
-                    Long locationId = null;
+                    Long locationId;
                     if (EMPTY_USER_LOCATION != location) {
                         locationId = location.getId();
-                    }
-                    if (turmsClusterManager.getTurmsProperties().getLog().isLogUserLogin()) {
-                        return logUserOnline(userId, ip, loggingInDeviceType, deviceDetails, locationId)
-                                .map(log -> {
-                                    if (pluginEnabled) {
-                                        userLoginLogService.triggerLogHandlers(log);
-                                    }
-                                    return setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId());
-                                })
-                                .onErrorReturn(TurmsStatusCode.FAILED);
                     } else {
-                        if (pluginEnabled) {
-                            userLoginLogService.triggerLogHandlers(userId, ip, loggingInDeviceType, deviceDetails, locationId);
+                        locationId = null;
+                    }
+                    boolean logUserLogin = turmsClusterManager.getTurmsProperties().getLog().isLogUserLogin();
+                    boolean triggerHandlers = pluginEnabled && !turmsPluginManager.getLogHandlerList().isEmpty();
+                    if (logUserLogin || triggerHandlers) {
+                        UserLoginLog log = new UserLoginLog(turmsClusterManager.generateRandomId(), userId,
+                                new Date(), null, locationId, ip, loggingInDeviceType, deviceDetails);
+                        Mono<TurmsStatusCode> codeMono;
+                        if (logUserLogin) {
+                            codeMono = userLoginLogService.save(log).thenReturn(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId()));
+                        } else {
+                            codeMono = Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId()));
                         }
-                        return Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, null));
+                        if (triggerHandlers) {
+                            codeMono = codeMono.doOnSuccess(turmsStatusCode -> userLoginLogService.triggerLogHandlers(log).subscribe());
+                        }
+                        return codeMono.onErrorReturn(TurmsStatusCode.FAILED);
+                    } else {
+                        Mono<TurmsStatusCode> mono = Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, null));
+                        if (pluginEnabled) {
+                            mono = mono.doOnSuccess(turmsStatusCode -> userLoginLogService.triggerLogHandlers(userId, ip, loggingInDeviceType, deviceDetails, locationId).subscribe());
+                        }
+                        return mono;
                     }
                 });
     }

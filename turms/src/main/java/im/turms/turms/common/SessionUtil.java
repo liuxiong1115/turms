@@ -31,15 +31,15 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class SessionUtil {
+    private SessionUtil() {
+    }
+
     public static final String REQUEST_ID_FIELD = "rid";
     public static final String USER_ID_FIELD = "uid";
     public static final String PASSWORD_FIELD = "pwd";
@@ -47,6 +47,7 @@ public class SessionUtil {
     public static final String USER_ONLINE_STATUS_FIELD = "us";
     public static final String USER_LOCATION_FIELD = "loc";
     public static final String USER_DEVICE_DETAILS = "dd";
+    public static final String IP_FIELD = "ip";
     private static final String LOCATION_SPLIT = ":";
 
     private static String getFirstValue(ServerHttpRequest request, String key) {
@@ -115,7 +116,7 @@ public class SessionUtil {
         }
     }
 
-    public static UserStatus getUserOnlineStatusFromSession(WebSocketSession session) throws IOException {
+    public static UserStatus getUserOnlineStatusFromSession(WebSocketSession session) {
         Object userOnlineStatus = session.getAttributes().get(USER_ONLINE_STATUS_FIELD);
         userOnlineStatus = userOnlineStatus != null ? userOnlineStatus :
                 session.getHandshakeInfo().getHeaders().get(USER_ONLINE_STATUS_FIELD);
@@ -181,8 +182,20 @@ public class SessionUtil {
     }
 
     public static void putDeviceType(@NotNull Map<String, Object> attributes, DeviceType deviceType) {
-        checkNotNull(attributes);
         attributes.put(DEVICE_TYPE_FIELD, deviceType);
+    }
+
+    public static void putIp(@NotNull Map<String, Object> attributes, Integer ip) {
+        attributes.put(IP_FIELD, ip);
+    }
+
+    public static Integer getIp(@NotNull WebSocketSession session) {
+        Object ip = session.getAttributes().get(IP_FIELD);
+        if (ip != null) {
+            return (Integer) ip;
+        } else {
+            return null;
+        }
     }
 
     public static Long getRequestIdFromRequest(ServerHttpRequest request) {

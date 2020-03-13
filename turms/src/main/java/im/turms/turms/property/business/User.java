@@ -60,6 +60,8 @@ public class User implements IdentifiedDataSerializable {
     private boolean shouldDeleteUserLogically = true;
     @Description("Whether to activate a user when added by default")
     private boolean shouldActivateUserWhenAdded = true;
+    @Description("Whether to log the actions of users")
+    private boolean shouldLogUsersActions = true;
 
     @JsonIgnore
     @Override

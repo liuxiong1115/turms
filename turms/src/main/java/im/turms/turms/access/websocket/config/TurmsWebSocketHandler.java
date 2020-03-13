@@ -93,6 +93,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
             Integer ipInNumber;
             try {
                 ipInNumber = InetAddresses.coerceToInteger(InetAddresses.forString(ip.getHostString()));
+                SessionUtil.putIp(session.getAttributes(), ipInNumber);
             } catch (Exception e) {
                 ipInNumber = null;
             }
