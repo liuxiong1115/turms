@@ -18,6 +18,7 @@
 package im.turms.turms.plugin;
 
 import im.turms.turms.pojo.domain.AdminActionLog;
+import im.turms.turms.pojo.domain.UserActionLog;
 import im.turms.turms.pojo.domain.UserLoginLog;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -28,4 +29,6 @@ public abstract class LogHandler extends TurmsExtension {
     public abstract Mono<Void> handleAdminActionLog(@NotNull ServerWebExchange exchange, @NotNull AdminActionLog adminActionLog);
 
     public abstract Mono<Void> handleUserLoginLog(@NotNull UserLoginLog userLoginLog);
+
+    public abstract Mono<Void> handleUserActionLog(@NotNull UserActionLog userActionLog);
 }

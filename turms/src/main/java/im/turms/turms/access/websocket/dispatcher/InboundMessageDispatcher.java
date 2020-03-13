@@ -19,7 +19,9 @@ package im.turms.turms.access.websocket.dispatcher;
 
 import com.google.protobuf.Int32Value;
 import com.google.protobuf.Int64Value;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
+import com.google.protobuf.util.JsonFormat;
 import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
@@ -29,12 +31,15 @@ import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
+import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.plugin.ClientRequestHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.pojo.domain.UserActionLog;
 import im.turms.turms.service.message.OutboundMessageService;
+import im.turms.turms.service.user.UserActionLogService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -53,12 +58,15 @@ import java.util.function.Function;
 public class InboundMessageDispatcher {
     private final OutboundMessageService outboundMessageService;
     private final OnlineUserService onlineUserService;
+    private final UserActionLogService userActionLogService;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
     private final EnumMap<TurmsRequest.KindCase, Function<TurmsRequestWrapper, Mono<RequestResult>>> router;
     private final boolean pluginEnabled;
+    private final boolean logUsersActions;
+    private final JsonFormat.Printer jsonPrinter;
 
-    public InboundMessageDispatcher(ApplicationContext context, OutboundMessageService outboundMessageService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager) {
+    public InboundMessageDispatcher(ApplicationContext context, OutboundMessageService outboundMessageService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager, UserActionLogService userActionLogService) {
         router = new EnumMap<>(TurmsRequest.KindCase.class);
         this.outboundMessageService = outboundMessageService;
         Map<String, Object> beans = context.getBeansWithAnnotation(TurmsRequestMapping.class);
@@ -72,7 +80,14 @@ public class InboundMessageDispatcher {
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
         this.turmsPluginManager = turmsPluginManager;
+        this.userActionLogService = userActionLogService;
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
+        logUsersActions = turmsClusterManager.getTurmsProperties().getUser().isShouldLogUsersActions();
+        if (logUsersActions) {
+            jsonPrinter = JsonFormat.printer();
+        } else {
+            jsonPrinter = null;
+        }
     }
 
     private TurmsRequestMapping getMapping(Function<TurmsRequestWrapper, Mono<RequestResult>> request, String methodName) {
@@ -96,7 +111,7 @@ public class InboundMessageDispatcher {
             onlineUserService.resetHeartbeatTimeout(userId, deviceType);
             switch (webSocketMessage.getType()) {
                 case BINARY:
-                    return handleBinaryMessage(webSocketMessage, session);
+                    return handleBinaryMessage(userId, deviceType, webSocketMessage, session);
                 case TEXT:
                 case PING:
                 case PONG:
@@ -198,10 +213,8 @@ public class InboundMessageDispatcher {
                 });
     }
 
-    public Mono<WebSocketMessage> handleBinaryMessage(@NotNull WebSocketMessage message, @NotNull WebSocketSession
-            session) {
-        Long userId = SessionUtil.getUserIdFromSession(session);
-        DeviceType deviceType = SessionUtil.getDeviceTypeFromSession(session);
+    public Mono<WebSocketMessage> handleBinaryMessage(@NotNull Long userId, @NotNull DeviceType deviceType,
+                                                      @NotNull WebSocketMessage message, @NotNull WebSocketSession session) {
         DataBuffer payload = message.getPayload();
         if (payload.capacity() == 0) {
             return Mono.empty();
@@ -227,6 +240,30 @@ public class InboundMessageDispatcher {
                                 requestResultMono = requestResultMono
                                         .switchIfEmpty(clientRequestHandler.handleTurmsRequest(requestWrapper));
                             }
+                        }
+                        boolean triggerHandlers = pluginEnabled && !turmsPluginManager.getLogHandlerList().isEmpty();
+                        if (logUsersActions || triggerHandlers) {
+                            Integer ip = SessionUtil.getIp(session);
+                            UserActionLog log;
+                            try {
+                                log = new UserActionLog(turmsClusterManager.generateRandomId(), requestWrapper.getUserId(),
+                                        requestWrapper.getDeviceType(), new Date(), ip, request.getKindCase().name(), jsonPrinter.print(request));
+                            } catch (InvalidProtocolBufferException e) {
+                                TurmsLogger.logThrowable(e);
+                                return requestResultMono;
+                            }
+                            Mono<?> mono;
+                            if (logUsersActions) {
+                                if (triggerHandlers) {
+                                    mono = userActionLogService.save(log)
+                                            .doOnTerminate(userActionLogService.triggerLogHandlers(log)::subscribe);
+                                } else {
+                                    mono = userActionLogService.save(log);
+                                }
+                            } else {
+                                mono = userActionLogService.triggerLogHandlers(log);
+                            }
+                            requestResultMono = mono.then(requestResultMono);
                         }
                         return requestResultMono.switchIfEmpty(handler.apply(requestWrapper));
                     });

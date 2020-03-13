@@ -35,7 +35,9 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static im.turms.turms.common.Constants.ID;
@@ -53,14 +55,7 @@ public class UserLoginLogService {
         this.turmsPluginManager = turmsPluginManager;
     }
 
-    public Mono<UserLoginLog> save(
-            @NotNull Long userId,
-            @Nullable Integer ip,
-            @NotNull @DeviceTypeConstraint DeviceType deviceType,
-            @Nullable Map<String, String> deviceDetails,
-            @Nullable Long locationId) {
-        Long id = turmsClusterManager.generateRandomId();
-        UserLoginLog userLoginLog = new UserLoginLog(id, userId, new Date(), null, locationId, ip, deviceType, deviceDetails);
+    public Mono<UserLoginLog> save(UserLoginLog userLoginLog) {
         return mongoTemplate.save(userLoginLog);
     }
 
@@ -73,13 +68,20 @@ public class UserLoginLogService {
                 .map(UpdateResult::wasAcknowledged);
     }
 
-    public void triggerLogHandlers(@NotNull UserLoginLog log) {
-        for (LogHandler handler : turmsPluginManager.getLogHandlerList()) {
-            handler.handleUserLoginLog(log);
+    public Mono<Void> triggerLogHandlers(@NotNull UserLoginLog log) {
+        List<LogHandler> logHandlerList = turmsPluginManager.getLogHandlerList();
+        if (!logHandlerList.isEmpty()) {
+            List<Mono<Void>> monos = new ArrayList<>(logHandlerList.size());
+            for (LogHandler handler : logHandlerList) {
+                monos.add(handler.handleUserLoginLog(log));
+            }
+            return Mono.when(monos);
+        } else {
+            return Mono.empty();
         }
     }
 
-    public void triggerLogHandlers(
+    public Mono<Void> triggerLogHandlers(
             @Nullable Long userId,
             @Nullable Integer ip,
             @Nullable @DeviceTypeConstraint DeviceType loggingInDeviceType,
@@ -88,7 +90,9 @@ public class UserLoginLogService {
         if (!turmsPluginManager.getLogHandlerList().isEmpty()) {
             UserLoginLog userLoginLog = new UserLoginLog(null, userId, new Date(), null,
                     locationId, ip, loggingInDeviceType, deviceDetails);
-            triggerLogHandlers(userLoginLog);
+            return triggerLogHandlers(userLoginLog);
+        } else {
+            return Mono.empty();
         }
     }
 }

@@ -51,6 +51,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
     private final UserService userService;
     private final UserSimultaneousLoginService userSimultaneousLoginService;
     private final TurmsPluginManager turmsPluginManager;
+    private final boolean pluginEnabled;
     /**
      * Pair<user id, login request id> ->
      * 1. Integer: http status code
@@ -73,6 +74,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                 .newBuilder()
                 .expireAfterWrite(Duration.ofMinutes(10L))
                 .build();
+        pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
     }
 
     /**
@@ -104,7 +106,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                         } else {
                             String password = SessionUtil.getPasswordFromRequest(request);
                             Mono<Boolean> authenticate = Mono.empty();
-                            if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                            if (pluginEnabled) {
                                 List<UserAuthenticator> authenticatorList = turmsPluginManager.getUserAuthenticatorList();
                                 if (!authenticatorList.isEmpty()) {
                                     UserLoginInfo userLoginInfo = new UserLoginInfo(
