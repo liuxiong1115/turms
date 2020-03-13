@@ -55,7 +55,8 @@ public class InboundMessageDispatcher {
     private final OnlineUserService onlineUserService;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
-    private EnumMap<TurmsRequest.KindCase, Function<TurmsRequestWrapper, Mono<RequestResult>>> router;
+    private final EnumMap<TurmsRequest.KindCase, Function<TurmsRequestWrapper, Mono<RequestResult>>> router;
+    private final boolean pluginEnabled;
 
     public InboundMessageDispatcher(ApplicationContext context, OutboundMessageService outboundMessageService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager) {
         router = new EnumMap<>(TurmsRequest.KindCase.class);
@@ -71,6 +72,7 @@ public class InboundMessageDispatcher {
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
         this.turmsPluginManager = turmsPluginManager;
+        pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
     }
 
     private TurmsRequestMapping getMapping(Function<TurmsRequestWrapper, Mono<RequestResult>> request, String methodName) {
@@ -211,7 +213,7 @@ public class InboundMessageDispatcher {
                 if (handler != null) {
                     Mono<TurmsRequestWrapper> wrapperMono = Mono.just(new TurmsRequestWrapper(
                             request, userId, deviceType, message, session));
-                    if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                    if (pluginEnabled) {
                         List<ClientRequestHandler> handlerList = turmsPluginManager.getClientRequestHandlerList();
                         for (ClientRequestHandler clientRequestHandler : handlerList) {
                             wrapperMono = wrapperMono.flatMap(clientRequestHandler::transform);
@@ -219,7 +221,7 @@ public class InboundMessageDispatcher {
                     }
                     Mono<RequestResult> result = wrapperMono.flatMap(requestWrapper -> {
                         Mono<RequestResult> requestResultMono = Mono.empty();
-                        if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                        if (pluginEnabled) {
                             List<ClientRequestHandler> handlerList = turmsPluginManager.getClientRequestHandlerList();
                             for (ClientRequestHandler clientRequestHandler : handlerList) {
                                 requestResultMono = requestResultMono

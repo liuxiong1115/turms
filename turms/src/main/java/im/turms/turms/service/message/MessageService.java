@@ -77,16 +77,19 @@ public class MessageService {
     private final OutboundMessageService outboundMessageService;
     private final GroupMemberService groupMemberService;
     private final UserService userService;
-    private TurmsPluginManager turmsPluginManager;
+    private final TurmsPluginManager turmsPluginManager;
+    private final boolean pluginEnabled;
 
     @Autowired
-    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService) {
+    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.messageStatusService = messageStatusService;
         this.groupMemberService = groupMemberService;
         this.userService = userService;
         this.outboundMessageService = outboundMessageService;
+        this.turmsPluginManager = turmsPluginManager;
+        pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
     }
 
     @Scheduled(cron = EXPIRED_MESSAGES_CLEANER_CRON)
@@ -411,7 +414,7 @@ public class MessageService {
                         Query messagesQuery = new Query().addCriteria(Criteria.where(ID).in(messagesIds));
                         Query messagesStatusesQuery = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds));
                         Mono<Boolean> allowedMono = Mono.just(true);
-                        if (turmsClusterManager.getTurmsProperties().getPlugin().isEnabled()) {
+                        if (pluginEnabled) {
                             allowedMono = mongoTemplate.find(messagesQuery, Message.class)
                                     .collectList()
                                     .flatMap(messages -> {
