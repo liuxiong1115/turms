@@ -60,7 +60,6 @@ import java.util.stream.Collectors;
 
 import static im.turms.turms.common.Constants.*;
 
-// TODO: Allow group owners to change the type of their groups
 @Service
 @Validated
 public class GroupService {

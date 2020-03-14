@@ -29,6 +29,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
+                // allow credentials because cookies are used to transfer the credentials of users when connecting on browsers.
+                .allowCredentials(true)
                 .allowedOrigins("*")
                 .allowedMethods("*")
                 .allowedHeaders("*");
