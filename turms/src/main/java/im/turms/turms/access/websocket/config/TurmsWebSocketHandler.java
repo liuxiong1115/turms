@@ -33,12 +33,9 @@ import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
@@ -51,7 +48,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @Component
-public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfigurationSource {
+public class TurmsWebSocketHandler implements WebSocketHandler {
     private final TurmsClusterManager turmsClusterManager;
     private final InboundMessageDispatcher inboundMessageDispatcher;
     private final OnlineUserService onlineUserService;
@@ -150,17 +147,6 @@ public class TurmsWebSocketHandler implements WebSocketHandler, CorsConfiguratio
         } else {
             return session.close(CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "The user ID or IP is missing"));
         }
-    }
-
-    //TODO: check whether this is necessary while there has been a WebConfig
-    @Override
-    public CorsConfiguration getCorsConfiguration(ServerWebExchange exchange) {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.setAllowCredentials(true);
-        return corsConfiguration;
     }
 
     private WebSocketMessage generateSessionNotification(

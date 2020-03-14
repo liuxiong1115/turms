@@ -88,7 +88,7 @@ public class WsGroupController {
                     muteEndDate,
                     null,
                     null,
-                    true)
+                    turmsClusterManager.getTurmsProperties().getGroup().isShouldActivateGroupWhenCreated())
                     .map(group -> RequestResult.responseId(group.getId()));
         };
     }
