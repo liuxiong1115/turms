@@ -291,14 +291,12 @@ public class WsUserController {
             String password = request.hasPassword() ? request.getPassword().getValue() : null;
             String name = request.hasName() ? request.getName().getValue() : null;
             String intro = request.hasIntro() ? request.getIntro().getValue() : null;
-            String profilePictureUrl = request.hasProfilePictureUrl() ? request.getProfilePictureUrl().getValue() : null;
             ProfileAccessStrategy profileAccessStrategy = request.getProfileAccessStrategy();
             return userService.updateUser(
                     turmsRequestWrapper.getUserId(),
                     password,
                     name,
                     intro,
-                    profilePictureUrl,
                     profileAccessStrategy,
                     null,
                     null,

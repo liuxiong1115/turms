@@ -16,9 +16,8 @@ message Group {
     google.protobuf.StringValue name = 5;
     google.protobuf.StringValue intro = 6;
     google.protobuf.StringValue announcement = 7;
-    google.protobuf.StringValue profile_picture_url = 8;
-    google.protobuf.Int64Value creation_date = 9;
-    google.protobuf.Int64Value deletion_date = 10;
-    google.protobuf.Int64Value mute_end_date = 11;
-    google.protobuf.BoolValue active = 12;
+    google.protobuf.Int64Value creation_date = 8;
+    google.protobuf.Int64Value deletion_date = 9;
+    google.protobuf.Int64Value mute_end_date = 10;
+    google.protobuf.BoolValue active = 11;
 }

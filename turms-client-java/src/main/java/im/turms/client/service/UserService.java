@@ -93,16 +93,14 @@ public class UserService {
     public CompletableFuture<Void> updateProfile(
             @Nullable String name,
             @Nullable String intro,
-            @Nullable String profilePictureUrl,
             @Nullable ProfileAccessStrategy profileAccessStrategy) {
-        if (Validator.areAllNull(name, intro, profilePictureUrl, profileAccessStrategy)) {
+        if (Validator.areAllNull(name, intro, profileAccessStrategy)) {
             return CompletableFuture.completedFuture(null);
         }
         return turmsClient.getDriver()
                 .send(UpdateUserRequest.newBuilder(), MapUtil.of(
                         "name", name,
                         "intro", intro,
-                        "profile_picture_url", profilePictureUrl,
                         "profile_access_strategy", profileAccessStrategy))
                 .thenApply(notification -> null);
     }

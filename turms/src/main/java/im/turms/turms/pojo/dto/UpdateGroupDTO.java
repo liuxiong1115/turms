@@ -14,7 +14,6 @@ public final class UpdateGroupDTO {
     private final String name;
     private final String intro;
     private final String announcement;
-    private final String profilePictureUrl;
     private final Integer minimumScore;
     private final Boolean isActive;
     private final Date creationDate;

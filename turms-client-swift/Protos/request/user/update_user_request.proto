@@ -13,6 +13,5 @@ message UpdateUserRequest {
     google.protobuf.StringValue password = 1;
     google.protobuf.StringValue name = 2;
     google.protobuf.StringValue intro = 3;
-    google.protobuf.StringValue profile_picture_url = 4;
-    ProfileAccessStrategy profile_access_strategy = 5;
+    ProfileAccessStrategy profile_access_strategy = 4;
 }

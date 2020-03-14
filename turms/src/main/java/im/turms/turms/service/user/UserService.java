@@ -155,7 +155,6 @@ public class UserService {
             @Nullable String rawPassword,
             @Nullable String name,
             @Nullable String intro,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccess,
             @Nullable Long permissionGroupId,
             @Nullable @PastOrPresent Date registrationDate,
@@ -165,7 +164,6 @@ public class UserService {
         rawPassword = rawPassword != null ? rawPassword : RandomStringUtils.randomAlphanumeric(16);
         name = name != null ? name : "";
         intro = intro != null ? intro : "";
-        profilePictureUrl = profilePictureUrl != null ? profilePictureUrl : "";
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
         permissionGroupId = permissionGroupId != null ? permissionGroupId : DEFAULT_USER_PERMISSION_GROUP_ID;
         registrationDate = registrationDate != null ? registrationDate : now;
@@ -175,7 +173,6 @@ public class UserService {
                 turmsPasswordUtil.encodeUserPassword(rawPassword),
                 name,
                 intro,
-                profilePictureUrl,
                 profileAccess,
                 permissionGroupId,
                 registrationDate,
@@ -250,7 +247,6 @@ public class UserService {
                 .include(ID)
                 .include(User.Fields.name)
                 .include(User.Fields.intro)
-                .include(User.Fields.profilePictureUrl)
                 .include(User.Fields.registrationDate)
                 .include(User.Fields.profileAccess)
                 .include(User.Fields.permissionGroupId)
@@ -318,7 +314,6 @@ public class UserService {
             @Nullable String rawPassword,
             @Nullable String name,
             @Nullable String intro,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccessStrategy,
             @Nullable Long permissionGroupId,
             @Nullable Boolean isActive,
@@ -327,7 +322,6 @@ public class UserService {
                 rawPassword,
                 name,
                 intro,
-                profilePictureUrl,
                 profileAccessStrategy,
                 permissionGroupId,
                 registrationDate,
@@ -419,7 +413,6 @@ public class UserService {
             @Nullable String rawPassword,
             @Nullable String name,
             @Nullable String intro,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @ProfileAccessConstraint ProfileAccessStrategy profileAccessStrategy,
             @Nullable Long permissionGroupId,
             @Nullable @PastOrPresent Date registrationDate,
@@ -427,7 +420,6 @@ public class UserService {
         if (Validator.areAllFalsy(rawPassword,
                 name,
                 intro,
-                profilePictureUrl,
                 profileAccessStrategy,
                 registrationDate,
                 isActive)) {
@@ -442,7 +434,6 @@ public class UserService {
                 .setIfNotNull(User.Fields.password, password)
                 .setIfNotNull(User.Fields.name, name)
                 .setIfNotNull(User.Fields.intro, intro)
-                .setIfNotNull(User.Fields.profilePictureUrl, profilePictureUrl)
                 .setIfNotNull(User.Fields.profileAccess, profileAccessStrategy)
                 .setIfNotNull(User.Fields.permissionGroupId, permissionGroupId)
                 .setIfNotNull(User.Fields.registrationDate, registrationDate)

@@ -31,7 +31,6 @@ public final class AddGroupDTO {
     private final String name;
     private final String intro;
     private final String announcement;
-    private final String profilePictureUrl;
     private final Integer minimumScore;
     private final Date creationDate;
     private final Date deletionDate;

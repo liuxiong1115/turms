@@ -41,8 +41,6 @@ public final class User {
 
     private final String intro;
 
-    private final String profilePictureUrl;
-
     private final ProfileAccessStrategy profileAccess;
 
     @Indexed

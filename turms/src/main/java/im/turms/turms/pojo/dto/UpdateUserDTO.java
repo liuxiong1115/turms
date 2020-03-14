@@ -32,8 +32,6 @@ public final class UpdateUserDTO {
 
     private final String intro;
 
-    private final String profilePictureUrl;
-
     private final ProfileAccessStrategy profileAccess;
 
     private final Long permissionGroupId;
