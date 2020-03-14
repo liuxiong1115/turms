@@ -5,6 +5,7 @@ import ProfileAccessStrategy = im.turms.proto.ProfileAccessStrategy;
 import ResponseAction = im.turms.proto.ResponseAction;
 import GroupMemberRole = im.turms.proto.GroupMemberRole;
 import MessageDeliveryStatus = im.turms.proto.MessageDeliveryStatus;
+import DeviceType = im.turms.proto.DeviceType;
 
 export default class ConstantTransformer {
     static string2ChatType(chatType: string): ChatType {
@@ -98,6 +99,24 @@ export default class ConstantTransformer {
                 return MessageDeliveryStatus.RECALLING;
             case 'RECALLED':
                 return MessageDeliveryStatus.RECALLED;
+            default:
+                throw new Error('illegal params');
+        }
+    }
+
+    static string2DeviceType(deviceType: string): DeviceType {
+        deviceType = deviceType.toUpperCase();
+        switch (deviceType) {
+            case 'ANDROID':
+                return DeviceType.ANDROID;
+            case 'IOS':
+                return DeviceType.IOS;
+            case 'BROWSER':
+                return DeviceType.BROWSER;
+            case 'DESKTOP':
+                return DeviceType.DESKTOP;
+            case 'OTHERS':
+                return DeviceType.OTHERS;
             default:
                 throw new Error('illegal params');
         }

@@ -82,6 +82,15 @@ public class UserService {
                 .thenApply(notification -> null);
     }
 
+    public CompletableFuture<Void> disconnectOnlineDevices(@NotEmpty Set<DeviceType> deviceTypes) {
+        Validator.throwIfAnyFalsy(deviceTypes);
+        return turmsClient.getDriver()
+                .send(UpdateUserOnlineStatusRequest.newBuilder(), MapUtil.of(
+                        "user_status", UserStatus.OFFLINE,
+                        "device_types", deviceTypes))
+                .thenApply(notification -> null);
+    }
+
     public CompletableFuture<Void> updatePassword(@NotNull String password) {
         Validator.throwIfAnyFalsy(password);
         return turmsClient.getDriver()

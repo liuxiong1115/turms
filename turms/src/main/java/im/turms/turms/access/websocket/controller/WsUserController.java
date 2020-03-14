@@ -17,6 +17,8 @@
 
 package im.turms.turms.access.websocket.controller;
 
+import com.google.common.collect.Sets;
+import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.ProfileAccessStrategy;
@@ -31,6 +33,7 @@ import im.turms.common.model.dto.request.user.*;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.ProtoUtil;
+import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
@@ -247,27 +250,40 @@ public class WsUserController {
         return turmsRequestWrapper -> {
             UpdateUserOnlineStatusRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateUserOnlineStatusRequest();
             UserStatus userStatus = request.getUserStatus();
-            if (userStatus == UserStatus.UNRECOGNIZED || userStatus == UserStatus.OFFLINE) {
+            if (userStatus == UserStatus.UNRECOGNIZED) {
                 return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
             }
-            boolean updated = onlineUserService.getLocalOnlineUserManager(turmsRequestWrapper.getUserId())
-                    .setUserOnlineStatus(userStatus);
+            Set<DeviceType> deviceTypes = request.getDeviceTypesCount() > 0 ? Sets.newHashSet(request.getDeviceTypesList()) : null;
+            boolean updated;
+            if (userStatus == UserStatus.OFFLINE) {
+                if (deviceTypes != null) {
+                    updated = onlineUserService.setLocalUserDevicesOffline(turmsRequestWrapper.getUserId(), deviceTypes, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_OTHER_DEVICE));
+                } else {
+                    updated = onlineUserService.setLocalUserOffline(turmsRequestWrapper.getUserId(), CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_OTHER_DEVICE));
+                }
+            } else {
+                updated = onlineUserService.getLocalOnlineUserManager(turmsRequestWrapper.getUserId()).setUserOnlineStatus(userStatus);
+            }
             boolean notifyMembers = turmsClusterManager.getTurmsProperties().getNotification().isNotifyMembersAfterOtherMemberOnlineStatusUpdated();
             boolean notifyRelatedUser = turmsClusterManager.getTurmsProperties().getNotification().isNotifyRelatedUsersAfterOtherRelatedUserOnlineStatusUpdated();
             if (!notifyMembers && !notifyRelatedUser) {
                 return Mono.just(RequestResult.okIfTrue(updated));
             } else {
-                Mono<Set<Long>> queryMembersIds = Mono.just(Collections.emptySet());
-                Mono<Set<Long>> queryRelatedUsersIds = Mono.just(Collections.emptySet());
+                Mono<Set<Long>> queryMembersIds;
+                Mono<Set<Long>> queryRelatedUsersIds;
                 if (notifyMembers) {
                     queryMembersIds = groupMemberService.queryUsersJoinedGroupsMembersIds(
                             Set.of(turmsRequestWrapper.getUserId()));
+                } else {
+                    queryMembersIds = Mono.just(Collections.emptySet());
                 }
                 if (notifyRelatedUser) {
                     queryRelatedUsersIds = userRelationshipService.queryRelatedUsersIds(
                             Set.of(turmsRequestWrapper.getUserId()),
                             false)
                             .collect(Collectors.toSet());
+                } else {
+                    queryRelatedUsersIds = Mono.just(Collections.emptySet());
                 }
                 return queryMembersIds.zipWith(queryRelatedUsersIds)
                         .map(results -> {
