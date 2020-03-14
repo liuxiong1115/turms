@@ -38,7 +38,6 @@ public class GroupService {
             @NotNull String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable String profilePictureUrl,
             @Nullable Integer minimumScore,
             @Nullable Date muteEndDate,
             @Nullable Long groupTypeId) {
@@ -50,7 +49,6 @@ public class GroupService {
                         "announcement", announcement,
                         "minimum_score", minimumScore,
                         "mute_end_date", muteEndDate,
-                        "profile_picture_url", profilePictureUrl,
                         "group_type_id", groupTypeId))
                 .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
     }
@@ -66,13 +64,12 @@ public class GroupService {
             @Nullable String groupName,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable String profilePictureUrl,
             @Nullable Integer minimumScore,
             @Nullable Long groupTypeId,
             @Nullable Date muteEndDate,
             @Nullable Long successorId,
             @Nullable Boolean quitAfterTransfer) {
-        if (Validator.areAllFalsy(groupName, intro, announcement, profilePictureUrl, minimumScore, groupTypeId,
+        if (Validator.areAllFalsy(groupName, intro, announcement, minimumScore, groupTypeId,
                 muteEndDate, successorId)) {
             return CompletableFuture.completedFuture(null);
         }
@@ -82,7 +79,6 @@ public class GroupService {
                         "group_name", groupName,
                         "intro", intro,
                         "announcement", announcement,
-                        "profile_picture_url", profilePictureUrl,
                         "mute_end_date", muteEndDate,
                         "minimum_score", minimumScore,
                         "group_type_id", groupTypeId,
@@ -95,12 +91,12 @@ public class GroupService {
         if (quitAfterTransfer == null) {
             quitAfterTransfer = false;
         }
-        return this.updateGroup(groupId, null, null, null, null, null, null, null, successorId, quitAfterTransfer);
+        return this.updateGroup(groupId, null, null, null, null, null, null, successorId, quitAfterTransfer);
     }
 
     public CompletableFuture<Void> muteGroup(long groupId, @NotNull Date muteEndDate) {
         Validator.throwIfAnyFalsy(muteEndDate);
-        return updateGroup(groupId, null, null, null, null, null, null, muteEndDate, null, null);
+        return updateGroup(groupId, null, null, null, null, null, muteEndDate, null, null);
     }
 
     public CompletableFuture<Void> unmuteGroup(long groupId) {

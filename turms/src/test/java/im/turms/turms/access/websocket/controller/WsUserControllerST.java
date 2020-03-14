@@ -17,13 +17,10 @@
 
 package im.turms.turms.access.websocket.controller;
 
-import com.google.protobuf.Int64Value;
 import helper.Constants;
 import im.turms.client.TurmsClient;
 import im.turms.common.constant.ProfileAccessStrategy;
 import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
-import im.turms.common.model.dto.request.TurmsRequest;
-import im.turms.common.model.dto.request.user.QueryUserGroupInvitationsRequest;
 import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.pojo.domain.User;
 import org.junit.jupiter.api.AfterAll;
@@ -50,7 +47,7 @@ public class WsUserControllerST extends BaseController {
     public static void initUser(@Autowired MongoTemplate mongoTemplate, @Autowired TurmsPasswordUtil passwordUtil) {
         Date now = new Date();
         User user = new User(1L, passwordUtil.encodeUserPassword("123"), "", "",
-                "", ProfileAccessStrategy.ALL, DEFAULT_USER_PERMISSION_GROUP_ID, now, null, true, now);
+                ProfileAccessStrategy.ALL, DEFAULT_USER_PERMISSION_GROUP_ID, now, null, true, now);
         mongoTemplate.save(user);
     }
 

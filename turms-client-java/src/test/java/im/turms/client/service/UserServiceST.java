@@ -156,7 +156,7 @@ public class UserServiceST {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void updateProfile_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = turmsClient.getUserService().updateProfile("123", "123", "http://www.test.com", null)
+        Void result = turmsClient.getUserService().updateProfile("123", "123", null)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }

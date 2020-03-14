@@ -13,9 +13,8 @@ message UserInfo {
     google.protobuf.Int64Value id = 1;
     google.protobuf.StringValue name = 2;
     google.protobuf.StringValue intro = 3;
-    google.protobuf.StringValue profile_picture_url = 4;
-    google.protobuf.Int64Value registration_date = 5;
-    google.protobuf.Int64Value deletion_date = 6;
-    google.protobuf.BoolValue active = 7;
-    ProfileAccessStrategy profile_access_strategy = 8;
+    google.protobuf.Int64Value registration_date = 4;
+    google.protobuf.Int64Value deletion_date = 5;
+    google.protobuf.BoolValue active = 6;
+    ProfileAccessStrategy profile_access_strategy = 7;
 }

@@ -74,7 +74,6 @@ public class WsGroupController {
             CreateGroupRequest request = turmsRequestWrapper.getTurmsRequest().getCreateGroupRequest();
             String intro = request.hasIntro() ? request.getIntro().getValue() : null;
             String announcement = request.hasAnnouncement() ? request.getAnnouncement().getValue() : null;
-            String url = request.hasProfilePictureUrl() ? request.getProfilePictureUrl().getValue() : null;
             Integer minimumScore = request.hasMinimumScore() ? request.getMinimumScore().getValue() : null;
             Long groupTypeId = request.hasGroupTypeId() ? request.getGroupTypeId().getValue() : null;
             Date muteEndDate = request.hasMuteEndDate() ? new Date(request.getMuteEndDate().getValue()) : null;
@@ -84,7 +83,6 @@ public class WsGroupController {
                     request.getName(),
                     intro,
                     announcement,
-                    url,
                     minimumScore,
                     groupTypeId,
                     muteEndDate,
@@ -186,7 +184,6 @@ public class WsGroupController {
             String groupName = request.hasGroupName() ? request.getGroupName().getValue() : null;
             String intro = request.hasIntro() ? request.getIntro().getValue() : null;
             String announcement = request.hasAnnouncement() ? request.getAnnouncement().getValue() : null;
-            String profilePictureUrl = request.hasProfilePictureUrl() ? request.getProfilePictureUrl().getValue() : null;
             Date muteEndDate = request.hasMuteEndDate() ? new Date(request.getMuteEndDate().getValue()) : null;
             boolean quitAfterTransfer = request.hasQuitAfterTransfer() && request.getQuitAfterTransfer().getValue();
             return groupService.authAndUpdateGroup(
@@ -198,7 +195,6 @@ public class WsGroupController {
                     groupName,
                     intro,
                     announcement,
-                    profilePictureUrl,
                     minimumScore,
                     null,
                     null,

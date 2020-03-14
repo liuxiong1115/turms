@@ -64,7 +64,7 @@ public class GroupServiceST {
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
     public void createGroup_shouldReturnGroupId() throws ExecutionException, InterruptedException, TimeoutException {
-        groupId = turmsClient.getGroupService().createGroup("name", "intro", "announcement", null, 10, null, null)
+        groupId = turmsClient.getGroupService().createGroup("name", "intro", "announcement", 10, null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(groupId);
     }
@@ -113,7 +113,7 @@ public class GroupServiceST {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void updateGroup_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = turmsClient.getGroupService().updateGroup(groupId, "name", "intro", "announcement", null, 10, null, null, null, null)
+        Void result = turmsClient.getGroupService().updateGroup(groupId, "name", "intro", "announcement", 10, null, null, null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -339,7 +339,7 @@ public class GroupServiceST {
     @Test
     @Order(ORDER_LAST)
     public void deleteGroup_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        CompletableFuture<Long> readyToDeleteGroup = turmsClient.getGroupService().createGroup("readyToDelete", null, null, null, null, null, null);
+        CompletableFuture<Long> readyToDeleteGroup = turmsClient.getGroupService().createGroup("readyToDelete", null, null, null, null, null);
         Long readyToDeleteGroupId = readyToDeleteGroup.get();
         Void result = turmsClient.getGroupService().deleteGroup(readyToDeleteGroupId)
                 .get(5, TimeUnit.SECONDS);

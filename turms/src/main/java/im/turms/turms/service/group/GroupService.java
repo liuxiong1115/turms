@@ -95,7 +95,6 @@ public class GroupService {
             @Nullable String groupName,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @Min(value = 0) Integer minimumScore,
             @Nullable Long groupTypeId,
             @Nullable @PastOrPresent Date creationDate,
@@ -105,7 +104,7 @@ public class GroupService {
         isActive = isActive != null ? isActive : turmsClusterManager.getTurmsProperties().getGroup().isShouldActivateGroupWhenCreated();
         Long groupId = turmsClusterManager.generateRandomId();
         Group group = new Group(groupId, groupTypeId, creatorId, ownerId, groupName, intro,
-                announcement, profilePictureUrl, minimumScore, creationDate, deletionDate, muteEndDate, isActive);
+                announcement, minimumScore, creationDate, deletionDate, muteEndDate, isActive);
         return mongoTemplate
                 .inTransaction()
                 .execute(operations -> operations.insert(group)
@@ -129,7 +128,6 @@ public class GroupService {
             @Nullable String groupName,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @Min(value = 0) Integer minimumScore,
             @Nullable Long groupTypeId,
             @Nullable @PastOrPresent Date creationDate,
@@ -151,7 +149,6 @@ public class GroupService {
                                 groupName,
                                 intro,
                                 announcement,
-                                profilePictureUrl,
                                 minimumScore,
                                 finalGroupTypeId,
                                 creationDate,
@@ -337,7 +334,6 @@ public class GroupService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @Min(0) Integer minimumScore,
             @Nullable Boolean isActive,
             @Nullable @PastOrPresent Date creationDate,
@@ -345,7 +341,7 @@ public class GroupService {
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
         if (Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
-                profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
+                minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
             return Mono.just(true);
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(groupIds));
@@ -356,7 +352,6 @@ public class GroupService {
                 .setIfNotNull(Group.Fields.name, name)
                 .setIfNotNull(Group.Fields.intro, intro)
                 .setIfNotNull(Group.Fields.announcement, announcement)
-                .setIfNotNull(Group.Fields.profilePictureUrl, profilePictureUrl)
                 .setIfNotNull(Group.Fields.minimumScore, minimumScore)
                 .setIfNotNull(Group.Fields.active, isActive)
                 .setIfNotNull(Group.Fields.creationDate, creationDate)
@@ -387,7 +382,6 @@ public class GroupService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @Min(0) Integer minimumScore,
             @Nullable Boolean isActive,
             @Nullable @PastOrPresent Date creationDate,
@@ -395,7 +389,7 @@ public class GroupService {
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations) {
         if (Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
-                profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
+                minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
             return Mono.just(true);
         }
         return queryGroupType(groupId)
@@ -419,7 +413,7 @@ public class GroupService {
                 .flatMap(authenticated -> {
                     if (authenticated != null && authenticated) {
                         return updateGroupsInformation(Set.of(groupId), typeId, creatorId, ownerId, name, intro,
-                                announcement, profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations);
+                                announcement, minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -530,7 +524,6 @@ public class GroupService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @Min(0) Integer minimumScore,
             @Nullable Boolean isActive,
             @Nullable @PastOrPresent Date creationDate,
@@ -545,7 +538,6 @@ public class GroupService {
                 name,
                 intro,
                 announcement,
-                profilePictureUrl,
                 minimumScore,
                 isActive,
                 creationDate,
@@ -566,9 +558,9 @@ public class GroupService {
                         }
                     }
                     if (!Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
-                            profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
+                            minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
                         monos.add(updateGroupsInformation(
-                                groupIds, typeId, creatorId, ownerId, name, intro, announcement, profilePictureUrl,
+                                groupIds, typeId, creatorId, ownerId, name, intro, announcement,
                                 minimumScore, isActive, creationDate, deletionDate, muteEndDate,
                                 operations));
                     }
@@ -591,7 +583,6 @@ public class GroupService {
             @Nullable String name,
             @Nullable String intro,
             @Nullable String announcement,
-            @Nullable @URL String profilePictureUrl,
             @Nullable @Min(0) Integer minimumScore,
             @Nullable Boolean isActive,
             @Nullable @PastOrPresent Date creationDate,
@@ -624,10 +615,10 @@ public class GroupService {
                                 monos.add(transferMono);
                             }
                             if (!Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
-                                    profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
+                                    minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
                                 Mono<Boolean> updateMono = authAndUpdateGroupInformation(
                                         requesterId, groupId, typeId, creatorId, ownerId, name, intro, announcement,
-                                        profilePictureUrl, minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations);
+                                        minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations);
                                 monos.add(updateMono);
                             }
                             if (monos.isEmpty()) {
