@@ -36,6 +36,7 @@ public class Security implements IdentifiedDataSerializable {
 
     @Description("The password encoding algorithm for users")
     private PasswordEncodingAlgorithm userPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.SALTED_SHA256;
+
     @Description("The password encoding algorithm for admins")
     private PasswordEncodingAlgorithm adminPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.BCRYPT;
 
@@ -43,22 +44,27 @@ public class Security implements IdentifiedDataSerializable {
     @Description("The maximum day difference per query request")
     @Min(0)
     private int maxDayDifferencePerRequest = 3 * 30;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum hour difference per count request")
     @Min(0)
     private int maxHourDifferencePerCountRequest = 24;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum day difference per count request")
     @Min(0)
     private int maxDayDifferencePerCountRequest = 31;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum month difference per count request")
     @Min(0)
     private int maxMonthDifferencePerCountRequest = 12;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum available records per query request")
     @Min(0)
     private int maxAvailableRecordsPerRequest = 1000;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum available online users' status per query request")
     @Min(0)
@@ -77,6 +83,7 @@ public class Security implements IdentifiedDataSerializable {
     @Description("The minimum allowed interval between client requests")
     @Min(0)
     private int minClientRequestsIntervalMillis = 0;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to respond the stack trace information to client if an exception has been thrown")
     private boolean respondStackTraceIfException = true;

@@ -27,6 +27,7 @@ import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
@@ -36,30 +37,42 @@ import java.io.IOException;
 @Data
 public class User implements IdentifiedDataSerializable {
     @Valid
+    @NestedConfigurationProperty
     private Location location = new Location();
+
     @Valid
+    @NestedConfigurationProperty
     private SimultaneousLogin simultaneousLogin = new SimultaneousLogin();
+
     @Valid
+    @NestedConfigurationProperty
     private FriendRequest friendRequest = new FriendRequest();
+
     @JsonView(MutablePropertiesView.class)
     @Description("The cron expression to specify the time to log online users' number")
     @CronConstraint
     public String onlineUsersNumberPersisterCron = "0 0/5 * * * ?";
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to use the operating system class as the device type instead of the agent class")
     private boolean shouldUseOsAsDefaultDeviceType = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to respond to client with the OFFLINE status if a user is in INVISIBLE status")
     private boolean shouldRespondOfflineIfInvisible = false;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete the two-sided relationships when a user requests to delete a relationship")
     private boolean shouldDeleteTwoSidedRelationships = false;
+
     //TODO
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete a user logically")
     private boolean shouldDeleteUserLogically = true;
+
     @Description("Whether to activate a user when added by default")
     private boolean shouldActivateUserWhenAdded = true;
+
     @Description("Whether to log the actions of users")
     private boolean shouldLogUsersActions = true;
 
@@ -103,21 +116,26 @@ public class User implements IdentifiedDataSerializable {
     public static class Location implements IdentifiedDataSerializable {
         @Description("Whether to handle users' locations")
         private boolean enabled = true;
+
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to persist users' locations")
         private boolean persistent = true;
+
         @JsonView(MutablePropertiesView.class)
         @Description("The default maximum available number of users nearby records per query request")
         @Min(0)
         private int defaultMaxAvailableUsersNearbyNumberPerQuery = 20;
+
         @JsonView(MutablePropertiesView.class)
         @Description("The default maximum distance per query request")
         @DecimalMin("0")
         private double defaultMaxDistancePerQuery = 0.1;
+
         @JsonView(MutablePropertiesView.class)
         @Description("The maximum allowed available number of users nearby records per query request")
         @Min(0)
         private int maxAvailableUsersNearbyNumberLimitPerQuery = Integer.MAX_VALUE;
+
         @JsonView(MutablePropertiesView.class)
         @Description("The maximum allowed distance per query request")
         @DecimalMin("0")
@@ -167,12 +185,15 @@ public class User implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         @Description("The maximum allowed length for the text of a friend request")
         private int contentLimit = 200;
+
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to delete expired automatically")
         private boolean shouldDeleteExpiredRequestsAutomatically = false;
+
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to allow resending a friend request after the previous request has been declined, ignored, or expired")
         private boolean allowResendingRequestAfterDeclinedOrIgnoredOrExpired = false;
+
         @JsonView(MutablePropertiesView.class)
         @Description("A friend request will become expired after the TTL has elapsed. 0 means infinite")
         private int friendRequestTimeToLiveHours = 30 * 24;
@@ -211,9 +232,11 @@ public class User implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         @Description("The simultaneous login strategy to control which devices can be online at the same time")
         private SimultaneousLoginStrategy strategy = SimultaneousLoginStrategy.ALLOW_ONE_DEVICE_OF_DESKTOP_AND_ONE_DEVICE_OF_MOBILE_ONLINE;
+
         @JsonView(MutablePropertiesView.class)
         @Description("The conflict strategy handles what should do if a device is ready to be online while its conflicted devices have been online")
         private ConflictStrategy conflictStrategy = ConflictStrategy.FORCE_LOGGED_IN_DEVICES_OFFLINE;
+
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to allow unknown devices coexist with known devices")
         private boolean allowUnknownDeviceCoexistsWithKnownDevice = false;

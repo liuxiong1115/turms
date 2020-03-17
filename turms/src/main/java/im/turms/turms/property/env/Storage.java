@@ -38,21 +38,33 @@ public class Storage implements IdentifiedDataSerializable {
     // private boolean profileVersionEnabled = true;
     @Min(0)
     private int profileExpiration = 30;
+
     @Min(0)
     private int groupProfileExpiration = 30;
+
     //    @Min(0)
     //    private int storageExpiration = 30;
     @Min(0)
     private int attachmentExpiration = 30;
+
     private String profileContentType = MimeTypeUtils.ALL_VALUE;
+
     private String groupProfileContentType = MimeTypeUtils.ALL_VALUE;
+
     //    private String storageContentType = MimeTypeUtils.ALL_VALUE;
+
     private String attachmentContentType = MimeTypeUtils.ALL_VALUE;
+
     private int profileSizeLimit = 1 * 1024 * 1024;
+
     private int groupProfileSizeLimit = 1 * 1024 * 1024;
+
     //    private int storageSizeLimit = 10 * 1024 * 1024;
+
     private int attachmentSizeLimit = 10 * 1024 * 1024;
+
     private Duration signatureDurationForGet = Duration.ofMinutes(5);
+
     private Duration signatureDurationForPut = Duration.ofMinutes(5);
 
     @JsonIgnore

@@ -36,33 +36,42 @@ public class Group implements IdentifiedDataSerializable {
     @Description("The maximum allowed length for the text of a group invitation")
     @Min(0)
     private int groupInvitationContentLimit = 200;
+
     @JsonView(MutablePropertiesView.class)
     @Description("A group invitation will become expired after the TTL has elapsed. 0 means infinite")
     @Min(0)
     private int groupInvitationTimeToLiveHours = 0;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum allowed length for the text of a group join request")
     @Min(0)
     private int groupJoinRequestContentLimit = 200;
+
     @JsonView(MutablePropertiesView.class)
     @Description("A group join request will become expired after the TTL has elapsed. 0 means infinite")
     @Min(0)
     private int groupJoinRequestTimeToLiveHours = 0;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow users to recall the join requests sent by themselves")
     private boolean allowRecallingJoinRequestSentByOneself = false;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow the owner and managers of a group to recall pending group invitations")
     private boolean allowRecallingPendingGroupInvitationByOwnerAndManager = false;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete groups logically by default")
     private boolean shouldDeleteGroupLogicallyByDefault = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete expired group invitations automatically")
     private boolean shouldDeleteExpiredGroupInvitationsAutomatically = false;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete expired group join requests automatically")
     private boolean shouldDeleteExpiredGroupJoinRequestsAutomatically = false;
+
     @Description("Whether to activate a group when created by default")
     private boolean shouldActivateGroupWhenCreated = true;
 
