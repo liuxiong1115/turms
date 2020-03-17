@@ -26,6 +26,7 @@ import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
 import lombok.Data;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -36,67 +37,86 @@ public class Message implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Description("The time type for the delivery time of message")
     private TimeType timeType = TimeType.LOCAL_SERVER_TIME;
+
     @JsonView(MutablePropertiesView.class)
-    @Description("Whether to check if the target(recipient or group) of a message is active and not deleted")
+    @Description("Whether to check if the target (recipient or group) of a message is active and not deleted")
     private boolean checkIfTargetActiveAndNotDeleted = true;
 
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum allowed length for the text of a message")
     @Min(0)
     private int maxTextLimit = 500;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The maximum allowed size for the records of a message")
     @Min(0)
     private int maxRecordsSizeBytes = 15 * 1024 * 1024;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to persist messages in databases.\n" +
             "Note: If false, senders will not get the message ID after the message has sent and cannot edit it")
     private boolean messagePersistent = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to persist the records of messages in databases")
     private boolean recordsPersistent = false;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to persist the status of messages.\n" +
             "If false, users will not receive the messages sent to them when they were offline.\n" +
             "NOTE: This is a major factor that affects performance")
     private boolean messageStatusPersistent = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("A message will become expired after the TTL has elapsed. 0 means infinite")
     @Min(0)
     private int messageTimeToLiveHours = 0;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete messages logically by default")
     private boolean shouldDeleteMessageLogicallyByDefault = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow users to send messages to a stranger")
     private boolean allowSendingMessagesToStranger = false;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow users to send messages to themselves")
     private boolean allowSendingMessagesToOneself = false;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete private messages after acknowledged by the recipient")
     private boolean shouldDeletePrivateMessageAfterAcknowledged = false;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow users to recall messages.\n" +
             "Note: To recall messages, more system resources are needed")
     private boolean allowRecallingMessage = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow the sender of a message to edit the message")
     private boolean allowEditingMessageBySender = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The available recall duration for the sender of a message")
     @Min(0)
     private int availableRecallDurationSeconds = 60 * 5;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The default available messages number with the \"total\" field that users request")
     @Min(0)
     private int defaultAvailableMessagesNumberWithTotal = 1;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to update the read date when users querying messages")
     private boolean shouldUpdateReadDateWhenUserQueryingMessage = true;
+
     @Valid
+    @NestedConfigurationProperty
     private ReadReceipt readReceipt = new ReadReceipt();
+
     @Valid
+    @NestedConfigurationProperty
     private TypingStatus typingStatus = new TypingStatus();
 
     @JsonIgnore
@@ -196,6 +216,7 @@ public class Message implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to allow to update the read date of messages")
         private boolean enabled = true;
+
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to use server time to set the read date of messages")
         private boolean useServerTime = true;

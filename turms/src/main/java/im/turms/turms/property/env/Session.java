@@ -36,19 +36,24 @@ public class Session implements IdentifiedDataSerializable {
     @Description("A websocket connection will be closed if the turms server doesn't receive any request (including heartbeat request) from the client during requestHeartbeatTimeoutSeconds")
     @Min(0)
     private int requestHeartbeatTimeoutSeconds = 50;
+
     @JsonView(MutablePropertiesView.class)
     @Description("The minimum interval between requests from a client to refresh the heartbeat timer")
     @Min(0)
     private int minHeartbeatRefreshIntervalSeconds = 3;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to enable to query the login failed reason")
     private boolean enableQueryLoginFailedReason = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to enable to query the disconnection reason")
     private boolean enableQueryDisconnectionReason = true;
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to notify clients of the session information after connected with a turms server")
     private boolean shouldNotifyClientsOfSessionInfoAfterConnected = true;
+
     /**
      * If the turms server only receives heartbeat requests from the client during maxIdleTime,
      * the session will be closed when the Session Cleaner detects it.

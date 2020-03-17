@@ -37,6 +37,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
@@ -68,45 +69,69 @@ public class TurmsProperties implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Cache cache = new Cache();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Cluster cluster = new Cluster();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Database database = new Database();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Ip ip = new Ip();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Log log = new Log();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Session session = new Session();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Security security = new Security();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Storage storage = new Storage();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Plugin plugin = new Plugin();
 
     // Business
 
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Message message = new Message();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Group group = new Group();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private User user = new User();
+
     @JsonView(MutablePropertiesView.class)
     @Valid
+    @NestedConfigurationProperty
     private Notification notification = new Notification();
 
     @JsonIgnore
