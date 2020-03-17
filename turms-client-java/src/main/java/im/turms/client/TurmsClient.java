@@ -7,13 +7,13 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 public class TurmsClient {
-    private TurmsDriver driver;
-    private UserService userService;
-    private GroupService groupService;
-    private MessageService messageService;
-    private StorageService storageService;
+    private final TurmsDriver driver;
+    private final UserService userService;
+    private final GroupService groupService;
+    private final MessageService messageService;
+    private final StorageService storageService;
 
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
     public TurmsClient(
             @NotNull String turmsServerUrl,

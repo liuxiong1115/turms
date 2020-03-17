@@ -63,6 +63,10 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
                 return new Cluster();
             case PROPERTY_DATABASE:
                 return new Database();
+            case PROPERTY_IP:
+                return new Ip();
+            case PROPERTY_LOG:
+                return new Log();
             case PROPERTY_GROUP:
                 return new Group();
             case PROPERTY_MESSAGE:
@@ -107,6 +111,7 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
         PROPERTY_CLUSTER,
         PROPERTY_DATABASE,
         PROPERTY_GROUP,
+        PROPERTY_IP,
         PROPERTY_LOG,
         PROPERTY_MESSAGE,
         PROPERTY_MESSAGE_READ_RECEIPT,
