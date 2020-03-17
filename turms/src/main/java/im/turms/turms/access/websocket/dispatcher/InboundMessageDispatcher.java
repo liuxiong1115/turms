@@ -82,7 +82,7 @@ public class InboundMessageDispatcher {
         this.turmsPluginManager = turmsPluginManager;
         this.userActionLogService = userActionLogService;
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
-        logUsersActions = turmsClusterManager.getTurmsProperties().getUser().isShouldLogUsersActions();
+        logUsersActions = turmsClusterManager.getTurmsProperties().getUser().isLogUsersActions();
         if (logUsersActions) {
             jsonPrinter = JsonFormat.printer();
         } else {

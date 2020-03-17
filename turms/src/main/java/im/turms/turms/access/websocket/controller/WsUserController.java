@@ -213,7 +213,7 @@ public class WsUserController {
                                     .userOnlineInfo2userStatus(
                                             usersIds.get(i),
                                             (UserOnlineInfo) infos[i],
-                                            turmsClusterManager.getTurmsProperties().getUser().isShouldRespondOfflineIfInvisible())
+                                            turmsClusterManager.getTurmsProperties().getUser().isRespondOfflineIfInvisible())
                                     .build());
                         }
                         return RequestResult.responseData(TurmsNotification.Data.newBuilder()

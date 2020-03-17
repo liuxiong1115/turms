@@ -52,7 +52,7 @@ public class Session implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to notify clients of the session information after connected with a turms server")
-    private boolean shouldNotifyClientsOfSessionInfoAfterConnected = true;
+    private boolean notifyClientsOfSessionInfoAfterConnected = true;
 
     /**
      * If the turms server only receives heartbeat requests from the client during maxIdleTime,
@@ -79,7 +79,7 @@ public class Session implements IdentifiedDataSerializable {
         out.writeInt(minHeartbeatRefreshIntervalSeconds);
         out.writeBoolean(enableQueryLoginFailedReason);
         out.writeBoolean(enableQueryDisconnectionReason);
-        out.writeBoolean(shouldNotifyClientsOfSessionInfoAfterConnected);
+        out.writeBoolean(notifyClientsOfSessionInfoAfterConnected);
 //        out.writeInt(idleHeartbeatTimeoutSeconds);
     }
 
@@ -89,7 +89,7 @@ public class Session implements IdentifiedDataSerializable {
         minHeartbeatRefreshIntervalSeconds = in.readInt();
         enableQueryLoginFailedReason = in.readBoolean();
         enableQueryDisconnectionReason = in.readBoolean();
-        shouldNotifyClientsOfSessionInfoAfterConnected = in.readBoolean();
+        notifyClientsOfSessionInfoAfterConnected = in.readBoolean();
 //        idleHeartbeatTimeoutSeconds = in.readInt();
     }
 }

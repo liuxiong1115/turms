@@ -84,7 +84,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
         deviceType = UserAgentUtil.detectDeviceTypeIfUnset(
                 deviceType,
                 deviceDetails,
-                turmsClusterManager.getTurmsProperties().getUser().isShouldUseOsAsDefaultDeviceType());
+                turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
         InetSocketAddress ip = session.getHandshakeInfo().getRemoteAddress();
         if (userId != null && ip != null) {
             Integer ipInNumber;
@@ -121,7 +121,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                             Collections.singleton(finalDeviceType),
                                             CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, String.valueOf(code.getBusinessCode())));
                                 } else if (turmsClusterManager.getTurmsProperties().getSession()
-                                        .isShouldNotifyClientsOfSessionInfoAfterConnected()) {
+                                        .isNotifyClientsOfSessionInfoAfterConnected()) {
                                     String address = turmsClusterManager.getLocalTurmsServerAddress();
                                     WebSocketMessage message = generateSessionNotification(session, address);
                                     notificationSink.next(message);

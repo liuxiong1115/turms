@@ -732,7 +732,7 @@ public class GroupMemberService {
                                 .userOnlineInfo2groupMember(
                                         member.getKey().getUserId(),
                                         info,
-                                        turmsClusterManager.getTurmsProperties().getUser().isShouldRespondOfflineIfInvisible())
+                                        turmsClusterManager.getTurmsProperties().getUser().isRespondOfflineIfInvisible())
                                 .build();
                         builder.addGroupMembers(groupMember);
                     }

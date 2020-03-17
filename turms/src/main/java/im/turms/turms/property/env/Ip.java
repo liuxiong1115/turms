@@ -41,10 +41,10 @@ public class Ip implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to use the local IP to serve if ip is empty")
-    private boolean shouldUseLocalIp = false;
+    private boolean useLocalIp = false;
 
     @JsonView(MutablePropertiesView.class)
-    @Description("The IP checkers will be used to query the public IP if ip is empty and shouldUseLocalIp is false")
+    @Description("The IP checkers will be used to query the public IP if ip is empty and useLocalIp is false")
     private List<String> ipCheckerAddresses = List.of("http://checkip.amazonaws.com", "http://bot.whatismyipaddress.com", "http://myip.dnsomatic.com");
 
     @JsonIgnore
@@ -62,14 +62,14 @@ public class Ip implements IdentifiedDataSerializable {
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeUTF(ip);
-        out.writeBoolean(shouldUseLocalIp);
+        out.writeBoolean(useLocalIp);
         out.writeUTFArray(ipCheckerAddresses.toArray(new String[0]));
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         ip = in.readUTF();
-        shouldUseLocalIp = in.readBoolean();
+        useLocalIp = in.readBoolean();
         ipCheckerAddresses = Arrays.asList(in.readUTFArray());
     }
 }

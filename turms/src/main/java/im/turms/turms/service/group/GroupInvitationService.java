@@ -83,7 +83,7 @@ public class GroupInvitationService {
     public void groupInvitationsCleaner() {
         if (turmsClusterManager.isCurrentMemberMaster()) {
             if (turmsClusterManager.getTurmsProperties().getGroup()
-                    .isShouldDeleteExpiredGroupInvitationsAutomatically()) {
+                    .isDeleteExpiredGroupInvitationsAutomatically()) {
                 removeAllExpiredGroupInvitations().subscribe();
             } else {
                 updateExpiredRequestsStatus().subscribe();

@@ -81,7 +81,7 @@ public class GroupJoinRequestService {
     public void expiredGroupJoinRequestsCleaner() {
         if (turmsClusterManager.isCurrentMemberMaster()) {
             if (turmsClusterManager.getTurmsProperties().getGroup()
-                    .isShouldDeleteExpiredGroupJoinRequestsAutomatically()) {
+                    .isDeleteExpiredGroupJoinRequestsAutomatically()) {
                 removeAllExpiredGroupJoinRequests().subscribe();
             } else {
                 updateExpiredRequestsStatus().subscribe();

@@ -61,7 +61,7 @@ public class UserFriendRequestService {
     public void userFriendRequestsCleaner() {
         if (turmsClusterManager.isCurrentMemberMaster()) {
             if (turmsClusterManager.getTurmsProperties().getUser()
-                    .getFriendRequest().isShouldDeleteExpiredRequestsAutomatically()) {
+                    .getFriendRequest().isDeleteExpiredRequestsAutomatically()) {
                 removeAllExpiredFriendRequests().subscribe();
             } else {
                 updateExpiredRequestsStatus().subscribe();
