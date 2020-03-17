@@ -77,6 +77,9 @@ public class TurmsProperties implements IdentifiedDataSerializable {
     private Database database = new Database();
     @JsonView(MutablePropertiesView.class)
     @Valid
+    private Ip ip = new Ip();
+    @JsonView(MutablePropertiesView.class)
+    @Valid
     private Log log = new Log();
     @JsonView(MutablePropertiesView.class)
     @Valid
@@ -123,6 +126,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         cache.writeData(out);
         cluster.writeData(out);
         database.writeData(out);
+        ip.writeData(out);
         log.writeData(out);
         session.writeData(out);
         security.writeData(out);
@@ -140,6 +144,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         cache.readData(in);
         cluster.readData(in);
         database.readData(in);
+        ip.readData(in);
         log.readData(in);
         session.readData(in);
         security.readData(in);

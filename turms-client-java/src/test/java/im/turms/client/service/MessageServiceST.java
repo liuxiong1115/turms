@@ -20,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MessageServiceST {
-    private static TurmsClient senderClient;
-    private static TurmsClient recipientClient;
     private static final long SENDER_ID = 1L;
     private static final long RECIPIENT_ID = 2L;
     private static final long TARGET_GROUP_ID = 1L;
+    private static TurmsClient senderClient;
+    private static TurmsClient recipientClient;
     private static Long privateMessageId;
     private static Long groupMessageId;
 
