@@ -39,7 +39,6 @@ import im.turms.turms.pojo.domain.GroupType;
 import im.turms.turms.pojo.domain.UserPermissionGroup;
 import im.turms.turms.service.user.UserPermissionGroupService;
 import im.turms.turms.service.user.UserVersionService;
-import org.hibernate.validator.constraints.URL;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -100,7 +99,7 @@ public class GroupService {
             @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable Boolean isActive) {
-        isActive = isActive != null ? isActive : turmsClusterManager.getTurmsProperties().getGroup().isShouldActivateGroupWhenCreated();
+        isActive = isActive != null ? isActive : turmsClusterManager.getTurmsProperties().getGroup().isActivateGroupWhenCreated();
         Long groupId = turmsClusterManager.generateRandomId();
         Group group = new Group(groupId, groupTypeId, creatorId, ownerId, groupName, intro,
                 announcement, minimumScore, creationDate, deletionDate, muteEndDate, isActive);
@@ -165,7 +164,7 @@ public class GroupService {
             @Nullable Boolean shouldDeleteLogically) {
         if (shouldDeleteLogically == null) {
             shouldDeleteLogically = turmsClusterManager.getTurmsProperties()
-                    .getGroup().isShouldDeleteGroupLogicallyByDefault();
+                    .getGroup().isDeleteGroupLogicallyByDefault();
         }
         boolean finalShouldDeleteLogically = shouldDeleteLogically;
         return mongoTemplate.inTransaction()

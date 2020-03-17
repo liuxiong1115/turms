@@ -40,6 +40,10 @@ public class WsSignalController {
         this.messageStatusService = messageStatusService;
     }
 
+    /**
+     * NOTE: If recipients acknowledged the message sent to them, it DOESN'T mean that the message is read
+     * and only means the message is received
+     */
     @TurmsRequestMapping(ACK_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleAckRequest() {
         return turmsRequestWrapper -> {

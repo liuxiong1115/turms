@@ -55,26 +55,26 @@ public class User implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to use the operating system class as the device type instead of the agent class")
-    private boolean shouldUseOsAsDefaultDeviceType = true;
+    private boolean useOsAsDefaultDeviceType = true;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to respond to client with the OFFLINE status if a user is in INVISIBLE status")
-    private boolean shouldRespondOfflineIfInvisible = false;
+    private boolean respondOfflineIfInvisible = false;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete the two-sided relationships when a user requests to delete a relationship")
-    private boolean shouldDeleteTwoSidedRelationships = false;
+    private boolean deleteTwoSidedRelationships = false;
 
     //TODO
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete a user logically")
-    private boolean shouldDeleteUserLogically = true;
+    private boolean deleteUserLogically = true;
 
     @Description("Whether to activate a user when added by default")
-    private boolean shouldActivateUserWhenAdded = true;
+    private boolean activateUserWhenAdded = true;
 
     @Description("Whether to log the actions of users")
-    private boolean shouldLogUsersActions = true;
+    private boolean logUsersActions = true;
 
     @JsonIgnore
     @Override
@@ -94,10 +94,10 @@ public class User implements IdentifiedDataSerializable {
         simultaneousLogin.writeData(out);
         friendRequest.writeData(out);
         out.writeUTF(onlineUsersNumberPersisterCron);
-        out.writeBoolean(shouldUseOsAsDefaultDeviceType);
-        out.writeBoolean(shouldDeleteTwoSidedRelationships);
-        out.writeBoolean(shouldDeleteUserLogically);
-        out.writeBoolean(shouldActivateUserWhenAdded);
+        out.writeBoolean(useOsAsDefaultDeviceType);
+        out.writeBoolean(deleteTwoSidedRelationships);
+        out.writeBoolean(deleteUserLogically);
+        out.writeBoolean(activateUserWhenAdded);
     }
 
     @Override
@@ -106,10 +106,10 @@ public class User implements IdentifiedDataSerializable {
         simultaneousLogin.readData(in);
         friendRequest.readData(in);
         onlineUsersNumberPersisterCron = in.readUTF();
-        shouldUseOsAsDefaultDeviceType = in.readBoolean();
-        shouldDeleteTwoSidedRelationships = in.readBoolean();
-        shouldDeleteUserLogically = in.readBoolean();
-        shouldActivateUserWhenAdded = in.readBoolean();
+        useOsAsDefaultDeviceType = in.readBoolean();
+        deleteTwoSidedRelationships = in.readBoolean();
+        deleteUserLogically = in.readBoolean();
+        activateUserWhenAdded = in.readBoolean();
     }
 
     @Data
@@ -188,7 +188,7 @@ public class User implements IdentifiedDataSerializable {
 
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to delete expired automatically")
-        private boolean shouldDeleteExpiredRequestsAutomatically = false;
+        private boolean deleteExpiredRequestsAutomatically = false;
 
         @JsonView(MutablePropertiesView.class)
         @Description("Whether to allow resending a friend request after the previous request has been declined, ignored, or expired")
@@ -213,7 +213,7 @@ public class User implements IdentifiedDataSerializable {
         @Override
         public void writeData(ObjectDataOutput out) throws IOException {
             out.writeInt(contentLimit);
-            out.writeBoolean(shouldDeleteExpiredRequestsAutomatically);
+            out.writeBoolean(deleteExpiredRequestsAutomatically);
             out.writeBoolean(allowResendingRequestAfterDeclinedOrIgnoredOrExpired);
             out.writeInt(friendRequestTimeToLiveHours);
         }
@@ -221,7 +221,7 @@ public class User implements IdentifiedDataSerializable {
         @Override
         public void readData(ObjectDataInput in) throws IOException {
             contentLimit = in.readInt();
-            shouldDeleteExpiredRequestsAutomatically = in.readBoolean();
+            deleteExpiredRequestsAutomatically = in.readBoolean();
             allowResendingRequestAfterDeclinedOrIgnoredOrExpired = in.readBoolean();
             friendRequestTimeToLiveHours = in.readInt();
         }

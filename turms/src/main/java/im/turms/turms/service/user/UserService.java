@@ -41,7 +41,6 @@ import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hibernate.validator.constraints.URL;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -167,7 +166,7 @@ public class UserService {
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
         permissionGroupId = permissionGroupId != null ? permissionGroupId : DEFAULT_USER_PERMISSION_GROUP_ID;
         registrationDate = registrationDate != null ? registrationDate : now;
-        isActive = isActive != null ? isActive : turmsClusterManager.getTurmsProperties().getUser().isShouldActivateUserWhenAdded();
+        isActive = isActive != null ? isActive : turmsClusterManager.getTurmsProperties().getUser().isActivateUserWhenAdded();
         User user = new User(
                 id,
                 turmsPasswordUtil.encodeUserPassword(rawPassword),

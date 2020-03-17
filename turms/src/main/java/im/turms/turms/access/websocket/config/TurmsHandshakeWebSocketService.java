@@ -100,7 +100,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                         }
                         Pair<String, DeviceType> loggingInDeviceType = SessionUtil.parseDeviceTypeFromRequest(
                                 request,
-                                turmsClusterManager.getTurmsProperties().getUser().isShouldUseOsAsDefaultDeviceType());
+                                turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
                         if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, loggingInDeviceType.getRight())) {
                             return cacheAndReturnError(exchange, HttpStatus.CONFLICT, userId, requestId);
                         } else {

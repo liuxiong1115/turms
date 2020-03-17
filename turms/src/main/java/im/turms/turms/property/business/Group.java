@@ -62,18 +62,18 @@ public class Group implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete groups logically by default")
-    private boolean shouldDeleteGroupLogicallyByDefault = true;
+    private boolean deleteGroupLogicallyByDefault = true;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete expired group invitations automatically")
-    private boolean shouldDeleteExpiredGroupInvitationsAutomatically = false;
+    private boolean deleteExpiredGroupInvitationsAutomatically = false;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete expired group join requests automatically")
-    private boolean shouldDeleteExpiredGroupJoinRequestsAutomatically = false;
+    private boolean deleteExpiredGroupJoinRequestsAutomatically = false;
 
     @Description("Whether to activate a group when created by default")
-    private boolean shouldActivateGroupWhenCreated = true;
+    private boolean activateGroupWhenCreated = true;
 
     @JsonIgnore
     @Override
@@ -95,10 +95,10 @@ public class Group implements IdentifiedDataSerializable {
         out.writeInt(groupJoinRequestTimeToLiveHours);
         out.writeBoolean(allowRecallingJoinRequestSentByOneself);
         out.writeBoolean(allowRecallingPendingGroupInvitationByOwnerAndManager);
-        out.writeBoolean(shouldDeleteGroupLogicallyByDefault);
-        out.writeBoolean(shouldDeleteExpiredGroupInvitationsAutomatically);
-        out.writeBoolean(shouldDeleteExpiredGroupJoinRequestsAutomatically);
-        out.writeBoolean(shouldActivateGroupWhenCreated);
+        out.writeBoolean(deleteGroupLogicallyByDefault);
+        out.writeBoolean(deleteExpiredGroupInvitationsAutomatically);
+        out.writeBoolean(deleteExpiredGroupJoinRequestsAutomatically);
+        out.writeBoolean(activateGroupWhenCreated);
     }
 
     @Override
@@ -109,9 +109,9 @@ public class Group implements IdentifiedDataSerializable {
         groupJoinRequestTimeToLiveHours = in.readInt();
         allowRecallingJoinRequestSentByOneself = in.readBoolean();
         allowRecallingPendingGroupInvitationByOwnerAndManager = in.readBoolean();
-        shouldDeleteGroupLogicallyByDefault = in.readBoolean();
-        shouldDeleteExpiredGroupInvitationsAutomatically = in.readBoolean();
-        shouldDeleteExpiredGroupJoinRequestsAutomatically = in.readBoolean();
-        shouldActivateGroupWhenCreated = in.readBoolean();
+        deleteGroupLogicallyByDefault = in.readBoolean();
+        deleteExpiredGroupInvitationsAutomatically = in.readBoolean();
+        deleteExpiredGroupJoinRequestsAutomatically = in.readBoolean();
+        activateGroupWhenCreated = in.readBoolean();
     }
 }

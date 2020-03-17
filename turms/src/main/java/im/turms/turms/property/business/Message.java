@@ -74,7 +74,7 @@ public class Message implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete messages logically by default")
-    private boolean shouldDeleteMessageLogicallyByDefault = true;
+    private boolean deleteMessageLogicallyByDefault = true;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow users to send messages to a stranger")
@@ -86,7 +86,7 @@ public class Message implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to delete private messages after acknowledged by the recipient")
-    private boolean shouldDeletePrivateMessageAfterAcknowledged = false;
+    private boolean deletePrivateMessageAfterAcknowledged = false;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to allow users to recall messages.\n" +
@@ -109,7 +109,7 @@ public class Message implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to update the read date when users querying messages")
-    private boolean shouldUpdateReadDateWhenUserQueryingMessage = true;
+    private boolean updateReadDateWhenUserQueryingMessage = true;
 
     @Valid
     @NestedConfigurationProperty
@@ -141,17 +141,17 @@ public class Message implements IdentifiedDataSerializable {
         out.writeBoolean(recordsPersistent);
         out.writeBoolean(messageStatusPersistent);
         out.writeInt(messageTimeToLiveHours);
-        out.writeBoolean(shouldDeleteMessageLogicallyByDefault);
+        out.writeBoolean(deleteMessageLogicallyByDefault);
         readReceipt.writeData(out);
         out.writeBoolean(allowSendingMessagesToStranger);
         out.writeBoolean(allowSendingMessagesToOneself);
-        out.writeBoolean(shouldDeletePrivateMessageAfterAcknowledged);
+        out.writeBoolean(deletePrivateMessageAfterAcknowledged);
         out.writeBoolean(allowRecallingMessage);
         out.writeBoolean(allowEditingMessageBySender);
         out.writeInt(availableRecallDurationSeconds);
         typingStatus.writeData(out);
         out.writeInt(defaultAvailableMessagesNumberWithTotal);
-        out.writeBoolean(shouldUpdateReadDateWhenUserQueryingMessage);
+        out.writeBoolean(updateReadDateWhenUserQueryingMessage);
     }
 
     @Override
@@ -164,17 +164,17 @@ public class Message implements IdentifiedDataSerializable {
         recordsPersistent = in.readBoolean();
         messageStatusPersistent = in.readBoolean();
         messageTimeToLiveHours = in.readInt();
-        shouldDeleteMessageLogicallyByDefault = in.readBoolean();
+        deleteMessageLogicallyByDefault = in.readBoolean();
         readReceipt.readData(in);
         allowSendingMessagesToStranger = in.readBoolean();
         allowSendingMessagesToOneself = in.readBoolean();
-        shouldDeletePrivateMessageAfterAcknowledged = in.readBoolean();
+        deletePrivateMessageAfterAcknowledged = in.readBoolean();
         allowRecallingMessage = in.readBoolean();
         allowEditingMessageBySender = in.readBoolean();
         availableRecallDurationSeconds = in.readInt();
         typingStatus.readData(in);
         defaultAvailableMessagesNumberWithTotal = in.readInt();
-        shouldUpdateReadDateWhenUserQueryingMessage = in.readBoolean();
+        updateReadDateWhenUserQueryingMessage = in.readBoolean();
     }
 
     public enum TimeType {

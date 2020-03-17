@@ -156,7 +156,7 @@ public class WsUserRelationshipController {
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleDeleteRelationshipRequest() {
         return turmsRequestWrapper -> {
             DeleteRelationshipRequest request = turmsRequestWrapper.getTurmsRequest().getDeleteRelationshipRequest();
-            boolean deleteTwoSidedRelationships = turmsClusterManager.getTurmsProperties().getUser().isShouldDeleteTwoSidedRelationships();
+            boolean deleteTwoSidedRelationships = turmsClusterManager.getTurmsProperties().getUser().isDeleteTwoSidedRelationships();
             Mono<Boolean> deleteMono;
             if (deleteTwoSidedRelationships) {
                 deleteMono = userRelationshipService.deleteTwoSidedRelationships(
