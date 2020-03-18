@@ -9,9 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
@@ -38,18 +36,6 @@ public class TurmsClusterManagerST {
     }
 
     @Test
-    public void getMembersPort_shouldReturnUniquePorts() {
-        Set<Integer> ports = new HashSet<>();
-        Set<Member> members = turmsClusterManager.getMembers();
-        for (Member member : members) {
-            String portStr = member.getAttribute("PORT");
-            int port = Integer.parseInt(portStr);
-            ports.add(port);
-        }
-        assertEquals(ports.size(), members.size());
-    }
-
-    @Test
     public void updatePropertiesAndNotify_shouldSucceed() {
         Function<TurmsProperties, Void> callback = mock(Function.class);
         TurmsProperties.addListeners(callback);
@@ -60,7 +46,7 @@ public class TurmsClusterManagerST {
 
         turmsClusterManager.updatePropertiesAndNotify(properties);
 
-        turmsClusterManager.getTurmsPropertiesFromCluster();
+        turmsClusterManager.fetchSharedPropertiesFromCluster();
         TurmsProperties currentProperties = turmsClusterManager.getTurmsProperties();
 
         Mockito.verify(callback, Mockito.times(1)).apply(any());

@@ -122,7 +122,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                             CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, String.valueOf(code.getBusinessCode())));
                                 } else if (turmsClusterManager.getTurmsProperties().getSession()
                                         .isNotifyClientsOfSessionInfoAfterConnected()) {
-                                    String address = turmsClusterManager.getLocalTurmsServerAddress();
+                                    String address = turmsClusterManager.getLocalServerAddress();
                                     WebSocketMessage message = generateSessionNotification(session, address);
                                     notificationSink.next(message);
                                 }

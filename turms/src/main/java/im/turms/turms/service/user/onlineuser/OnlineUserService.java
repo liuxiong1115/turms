@@ -141,9 +141,9 @@ public class OnlineUserService {
             Member member = turmsClusterManager.getClusterMemberBySlotIndex(index);
             if (member != null) {
                 if (!member.equals(turmsClusterManager.getLocalMember())) {
-                    String host = String.format("%s:%s", member.getAddress().getHost(), member.getAttribute("PORT"));
                     TurmsCloseStatus status = isServerClosing ? TurmsCloseStatus.SERVER_CLOSED : TurmsCloseStatus.REDIRECT;
-                    setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(status, host));
+                    String address = turmsClusterManager.getAddress(member);
+                    setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(status, address));
                 }
             } else {
                 setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "Cannot find a server responsible for the user"));

@@ -26,9 +26,12 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.spring.context.SpringManagedContext;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
-import org.springframework.beans.factory.annotation.Value;
+import im.turms.turms.common.AddressUtil;
+import im.turms.turms.common.TurmsLogger;
+import im.turms.turms.property.TurmsProperties;
 import org.springframework.boot.autoconfigure.hazelcast.HazelcastProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -42,23 +45,33 @@ import java.util.function.Function;
 
 @Configuration
 public class HazelcastConfig {
-    @Value("${server.port}")
-    Integer port;
-
+    private final Integer port;
     private final ApplicationContext applicationContext;
     private final TurmsClusterManager turmsClusterManager;
 
     public HazelcastConfig(ApplicationContext applicationContext, TurmsClusterManager turmsClusterManager) {
         this.applicationContext = applicationContext;
         this.turmsClusterManager = turmsClusterManager;
+        String portStr = applicationContext.getEnvironment().getProperty("server.port");
+        Integer tempPort;
+        try {
+            tempPort = portStr != null ? Integer.parseInt(portStr) : null;
+        } catch (NumberFormatException ignored) {
+            tempPort = null;
+        }
+        if (tempPort == null) {
+            TurmsLogger.log("The server is closed because the local port cannot be found");
+            ((ConfigurableApplicationContext) applicationContext).close();
+        }
+        this.port = tempPort;
     }
 
     @Bean
-    HazelcastInstance hazelcastInstance(HazelcastProperties properties) throws IOException {
+    HazelcastInstance hazelcastInstance(HazelcastProperties properties, TurmsProperties turmsProperties) throws IOException {
         Resource configResource = properties.resolveConfigLocation();
         HazelcastInstance instance;
         if (configResource != null) {
-            Config config = getConfig(configResource);
+            Config config = getConfig(configResource, turmsProperties);
             if (StringUtils.hasText(config.getInstanceName())) {
                 instance = Hazelcast.getOrCreateHazelcastInstance(config);
             } else {
@@ -78,7 +91,7 @@ public class HazelcastConfig {
         return instance;
     }
 
-    private Config getConfig(Resource configLocation) throws IOException {
+    private Config getConfig(Resource configLocation, TurmsProperties turmsProperties) throws IOException {
         URL configUrl = configLocation.getURL();
         Config config = createConfig(configUrl);
         if (ResourceUtils.isFileURL(configUrl)) {
@@ -98,8 +111,14 @@ public class HazelcastConfig {
         config.setManagedContext(springManagedContext);
 
         MemberAttributeConfig attributeConfig = new MemberAttributeConfig();
-        attributeConfig.setAttribute("PORT", String.valueOf(port));
+        String ip = AddressUtil.queryIp(turmsProperties);
+        attributeConfig.setAttribute(TurmsClusterManager.ATTRIBUTE_ADDRESS, String.format("%s:%d", ip, port));
         config.setMemberAttributeConfig(attributeConfig);
+
+        AddressUtil.onAddressChangeListeners.add(addressTuple -> {
+            turmsClusterManager.updateAddress(String.format("%s:%d", addressTuple.getIp(), port));
+            return null;
+        });
 
         return config;
     }

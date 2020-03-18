@@ -17,8 +17,6 @@
 
 package im.turms.turms.cluster;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.cluster.MembershipAdapter;
 import com.hazelcast.cluster.MembershipEvent;
@@ -32,13 +30,9 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.flakeidgen.FlakeIdGenerator;
 import com.hazelcast.replicatedmap.ReplicatedMap;
-import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
-import im.turms.common.util.Validator;
 import im.turms.turms.annotation.cluster.HazelcastConfig;
 import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.property.TurmsProperties;
-import im.turms.turms.task.QueryResponsibleTurmsServerAddressTask;
-import im.turms.turms.task.TurmsTaskExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
@@ -55,10 +49,12 @@ import java.util.function.Function;
 @Component
 public class TurmsClusterManager {
     @Value("${server.port}")
-    Integer port;
+    private Integer port;
 
     public static final int HASH_SLOTS_NUMBER = 127;
+    public static final String ATTRIBUTE_ADDRESS = "ADDR";
     private static final String HAZELCAST_KEY_SHARED_PROPERTIES = "sharedProperties";
+    private static final String HAZELCAST_KEY_MEMBER_ADDRESSES = "addresses";
     private static final String HAZELCAST_KEY_DEFAULT = "default";
     private static final String CLUSTER_STATE = "clusterState";
     private static final String CLUSTER_TIME = "clusterTime";
@@ -69,29 +65,20 @@ public class TurmsClusterManager {
     private HazelcastInstance hazelcastInstance;
     private TurmsProperties sharedTurmsProperties;
     private ReplicatedMap<SharedPropertiesKey, Object> sharedProperties;
+    private ReplicatedMap<UUID, String> memberAddresses; // Don't just use MemberAttributeConfig that only supports immutable attributes
     private List<Member> membersSnapshot = Collections.emptyList();
     private Member localMembersSnapshot;
     private boolean isMaster = false;
     private boolean hasJoinedCluster = false;
     private FlakeIdGenerator idGenerator;
     private final List<Function<MembershipEvent, Void>> onMembersChangeListeners;
-    private final Cache<UUID, String> memberAddressCache;
-    private final TurmsTaskExecutor turmsTaskExecutor;
-    @Getter
-    private String localTurmsServerAddress;
 
     public TurmsClusterManager(
             TurmsProperties localTurmsProperties,
-            @Lazy HazelcastInstance hazelcastInstance,
-            @Lazy TurmsTaskExecutor turmsTaskExecutor) {
+            @Lazy HazelcastInstance hazelcastInstance) {
         sharedTurmsProperties = localTurmsProperties;
         onMembersChangeListeners = new LinkedList<>();
         this.hazelcastInstance = hazelcastInstance;
-        memberAddressCache = Caffeine
-                .newBuilder()
-                .maximumSize(HASH_SLOTS_NUMBER)
-                .build();
-        this.turmsTaskExecutor = turmsTaskExecutor;
     }
 
     @HazelcastConfig
@@ -104,15 +91,11 @@ public class TurmsClusterManager {
                 @Override
                 public void memberAdded(MembershipEvent membershipEvent) {
                     membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
-                    memberAddressCache.invalidateAll();
                     if (membersSnapshot.size() > HASH_SLOTS_NUMBER) {
                         shutdown();
                         throw new RuntimeException("The members of cluster should be not more than " + HASH_SLOTS_NUMBER);
                     }
                     localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
-                    localTurmsServerAddress = String.format("%s:%d",
-                            localMembersSnapshot.getAddress().getHost(),
-                            port);
                     if (!hasJoinedCluster) {
                         initEnvAfterJoinedCluster();
                     }
@@ -134,12 +117,12 @@ public class TurmsClusterManager {
                 @Override
                 public void memberRemoved(MembershipEvent membershipEvent) {
                     membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
-                    memberAddressCache.invalidateAll();
                     localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
                     logWorkingRanges(
                             membershipEvent.getCluster().getMembers(),
                             membershipEvent.getCluster().getLocalMember());
                     hasJoinedCluster = hasJoinedCluster();
+                    memberAddresses.remove(membershipEvent.getMember().getUuid());
                     notifyMembersChangeListeners(membershipEvent);
                 }
             }));
@@ -183,7 +166,8 @@ public class TurmsClusterManager {
         if (hazelcastInstance != null) {
             idGenerator = hazelcastInstance.getFlakeIdGenerator(HAZELCAST_KEY_DEFAULT);
             sharedProperties = hazelcastInstance.getReplicatedMap(HAZELCAST_KEY_SHARED_PROPERTIES);
-            getTurmsPropertiesFromCluster();
+            memberAddresses = hazelcastInstance.getReplicatedMap(HAZELCAST_KEY_MEMBER_ADDRESSES);
+            fetchSharedPropertiesFromCluster();
         }
     }
 
@@ -191,15 +175,11 @@ public class TurmsClusterManager {
         return membersSnapshot.contains(localMembersSnapshot);
     }
 
-    public IScheduledExecutorService getScheduledExecutor() {
-        return hazelcastInstance.getScheduledExecutorService(HAZELCAST_KEY_DEFAULT);
-    }
-
     public IExecutorService getExecutor() {
         return hazelcastInstance.getExecutorService(HAZELCAST_KEY_DEFAULT);
     }
 
-    public void getTurmsPropertiesFromCluster() {
+    public void fetchSharedPropertiesFromCluster() {
         Object turmsPropertiesObject = sharedProperties.get(SharedPropertiesKey.TURMS_PROPERTIES);
         if (turmsPropertiesObject instanceof TurmsProperties) {
             sharedTurmsProperties = (TurmsProperties) turmsPropertiesObject;
@@ -347,24 +327,12 @@ public class TurmsClusterManager {
     }
 
     public Mono<String> getResponsibleTurmsServerAddress(@NotNull Long userId) {
-        Validator.throwIfAnyNull(userId);
         Member member = getMemberByUserId(userId);
         if (member == null) {
             return Mono.empty();
         } else {
-            if (member.getUuid().equals(getLocalMember().getUuid())) {
-                return Mono.just(getLocalTurmsServerAddress());
-            } else {
-                String address = memberAddressCache.getIfPresent(member.getUuid());
-                if (address != null) {
-                    return Mono.just(address);
-                } else {
-                    return turmsTaskExecutor.call(member,
-                            new QueryResponsibleTurmsServerAddressTask())
-                            .doOnNext(addr -> memberAddressCache.put(
-                                    member.getUuid(), addr));
-                }
-            }
+            String address = getAddress(member);
+            return address != null ? Mono.just(address) : Mono.empty();
         }
     }
 
@@ -378,7 +346,24 @@ public class TurmsClusterManager {
         return membersSnapshot.size() == 1;
     }
 
+    public void updateAddress(String address) {
+        memberAddresses.put(localMembersSnapshot.getUuid(), address);
+    }
+
+    public String getAddress(Member member) {
+        String address = memberAddresses.get(member.getUuid());
+        if (address != null) {
+            return address;
+        } else {
+            return member.getAttribute(ATTRIBUTE_ADDRESS);
+        }
+    }
+
+    public String getLocalServerAddress() {
+        return getAddress(localMembersSnapshot);
+    }
+
     private enum SharedPropertiesKey {
-        TURMS_PROPERTIES,
+        TURMS_PROPERTIES
     }
 }
