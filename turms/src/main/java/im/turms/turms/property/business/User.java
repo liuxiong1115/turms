@@ -73,9 +73,6 @@ public class User implements IdentifiedDataSerializable {
     @Description("Whether to activate a user when added by default")
     private boolean activateUserWhenAdded = true;
 
-    @Description("Whether to log the actions of users")
-    private boolean logUsersActions = true;
-
     @JsonIgnore
     @Override
     public int getFactoryId() {
