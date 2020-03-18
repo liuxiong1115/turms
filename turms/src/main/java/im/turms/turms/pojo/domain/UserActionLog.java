@@ -17,7 +17,6 @@
 
 package im.turms.turms.pojo.domain;
 
-import com.mongodb.DBObject;
 import im.turms.common.constant.DeviceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;

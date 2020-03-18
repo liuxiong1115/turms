@@ -32,13 +32,11 @@ import java.io.IOException;
 @Data
 public class Log implements IdentifiedDataSerializable {
 
+    // Admin
+
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to log admins' actions")
     private boolean logAdminAction = true;
-
-    @JsonView(MutablePropertiesView.class)
-    @Description("Whether to log users' login actions")
-    private boolean logUserLogin = true;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to log the parameters of requests")
@@ -47,6 +45,15 @@ public class Log implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to log the body of requests. Better log the body of requests by monitor systems (e.g. Nginx, AWS)")
     private boolean logRequestBody = true;
+
+    // User
+    
+    @Description("Whether to log users' actions")
+    private boolean logUserAction = true;
+
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to log users' login actions")
+    private boolean logUserLogin = true;
 
     @JsonIgnore
     @Override

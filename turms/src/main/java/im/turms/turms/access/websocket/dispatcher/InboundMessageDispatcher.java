@@ -63,7 +63,7 @@ public class InboundMessageDispatcher {
     private final TurmsPluginManager turmsPluginManager;
     private final EnumMap<TurmsRequest.KindCase, Function<TurmsRequestWrapper, Mono<RequestResult>>> router;
     private final boolean pluginEnabled;
-    private final boolean logUsersActions;
+    private final boolean logUserAction;
     private final JsonFormat.Printer jsonPrinter;
 
     public InboundMessageDispatcher(ApplicationContext context, OutboundMessageService outboundMessageService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager, UserActionLogService userActionLogService) {
@@ -82,8 +82,8 @@ public class InboundMessageDispatcher {
         this.turmsPluginManager = turmsPluginManager;
         this.userActionLogService = userActionLogService;
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
-        logUsersActions = turmsClusterManager.getTurmsProperties().getUser().isLogUsersActions();
-        if (logUsersActions) {
+        logUserAction = turmsClusterManager.getTurmsProperties().getLog().isLogUserAction();
+        if (logUserAction) {
             jsonPrinter = JsonFormat.printer();
         } else {
             jsonPrinter = null;
@@ -242,7 +242,7 @@ public class InboundMessageDispatcher {
                             }
                         }
                         boolean triggerHandlers = pluginEnabled && !turmsPluginManager.getLogHandlerList().isEmpty();
-                        if (logUsersActions || triggerHandlers) {
+                        if (logUserAction || triggerHandlers) {
                             Integer ip = SessionUtil.getIp(session);
                             UserActionLog log;
                             try {
@@ -253,7 +253,7 @@ public class InboundMessageDispatcher {
                                 return requestResultMono;
                             }
                             Mono<?> mono;
-                            if (logUsersActions) {
+                            if (logUserAction) {
                                 if (triggerHandlers) {
                                     mono = userActionLogService.save(log)
                                             .doOnTerminate(userActionLogService.triggerLogHandlers(log)::subscribe);
