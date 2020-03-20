@@ -86,7 +86,7 @@ public class ClusterController {
     }
 
     /**
-     * Do not call this method frequently because it will cost a lot of resources
+     * Do not call this method frequently because it costs a lot of resources
      */
     @PutMapping("/config")
     @RequiredPermission(CLUSTER_CONFIG_UPDATE)

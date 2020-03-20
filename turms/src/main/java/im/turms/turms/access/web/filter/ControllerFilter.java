@@ -28,11 +28,13 @@ import im.turms.turms.service.admin.AdminActionLogService;
 import im.turms.turms.service.admin.AdminService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.method.HandlerMethod;
@@ -40,6 +42,7 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
@@ -53,6 +56,7 @@ import static im.turms.turms.common.Constants.PASSWORD;
 @Component
 public class ControllerFilter implements WebFilter {
     private static final BasicDBObject EMPTY_DBOJBECT = new BasicDBObject();
+    private static final String ATTR_BODY = "BODY";
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final AdminService adminService;
     private final AdminActionLogService adminActionLogService;
@@ -165,16 +169,18 @@ public class ControllerFilter implements WebFilter {
             String action = handlerMethod.getMethod().getName();
             String host = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
             DBObject params = null;
-            Mono<DBObject> bodyMono;
+            Mono<BasicDBObject> bodyMono;
             if (turmsClusterManager.getTurmsProperties().getLog().isLogRequestParams()) {
                 params = parseValidParams(request, handlerMethod);
             }
             if (turmsClusterManager.getTurmsProperties().getLog().isLogRequestBody()) {
-                bodyMono = parseValidBody(request);
+                bodyMono = parseValidBody(exchange);
+                exchange = replaceRequestBody(exchange);
             } else {
                 bodyMono = Mono.empty();
             }
             DBObject finalParams = params;
+            ServerWebExchange finalExchange = exchange;
             additionalMono = bodyMono.defaultIfEmpty(EMPTY_DBOJBECT).flatMap(dbObject -> {
                 DBObject body = dbObject != EMPTY_DBOJBECT ? dbObject : null;
                 if (logAdminAction) {
@@ -187,12 +193,12 @@ public class ControllerFilter implements WebFilter {
                             body)
                             .doOnSuccess(log -> {
                                 if (invokeHandlers) {
-                                    adminActionLogService.triggerLogHandlers(exchange, log);
+                                    adminActionLogService.triggerLogHandlers(finalExchange, log);
                                 }
                             });
                 } else {
                     adminActionLogService.triggerLogHandlers(
-                            exchange,
+                            finalExchange,
                             null,
                             account,
                             new Date(),
@@ -206,7 +212,9 @@ public class ControllerFilter implements WebFilter {
         } else {
             additionalMono = Mono.empty();
         }
-        return additionalMono.then(chain.filter(exchange));
+        ServerWebExchange finalExchange = exchange;
+        return additionalMono.then(chain.filter(exchange))
+                .doFinally(signalType -> finalExchange.getAttributes().remove(ATTR_BODY));
     }
 
     private DBObject parseValidParams(ServerHttpRequest request, HandlerMethod handlerMethod) {
@@ -231,17 +239,36 @@ public class ControllerFilter implements WebFilter {
         return params;
     }
 
-    private Mono<DBObject> parseValidBody(ServerHttpRequest request) {
-        return DataBufferUtils.join(request.getBody()).map(dataBuffer -> {
-            DataBufferUtils.retain(dataBuffer);
-            String json = dataBuffer.toString(StandardCharsets.UTF_8);
-            BasicDBObject dbObject = BasicDBObject.parse(json);
-            if (dbObject.isEmpty()) {
-                return EMPTY_DBOJBECT;
-            } else {
-                return dbObject;
+    private Mono<BasicDBObject> parseValidBody(@NotNull ServerWebExchange exchange) {
+        return DataBufferUtils.join(exchange.getRequest().getBody())
+                .map(dataBuffer -> {
+                    exchange.getAttributes().put(ATTR_BODY, dataBuffer);
+                    String json = dataBuffer.toString(StandardCharsets.UTF_8);
+                    BasicDBObject dbObject = BasicDBObject.parse(json);
+                    if (dbObject.isEmpty()) {
+                        return EMPTY_DBOJBECT;
+                    } else {
+                        return dbObject;
+                    }
+                });
+    }
+
+    /**
+     * Build a new request with a new body to pass down to RequestBodyMethodArgumentResolver.resolveArgument
+     */
+    private ServerWebExchange replaceRequestBody(ServerWebExchange exchange) {
+        ServerHttpRequest mutatedRequest = new ServerHttpRequestDecorator(exchange.getRequest()) {
+            @Override
+            public Flux<DataBuffer> getBody() {
+                DataBuffer dataBuffer = exchange.getAttribute(ATTR_BODY);
+                if (dataBuffer != null) {
+                    return Flux.just(dataBuffer);
+                } else {
+                    return getDelegate().getBody();
+                }
             }
-        });
+        };
+        return exchange.mutate().request(mutatedRequest).build();
     }
 
     private boolean isHandshakeRequest(@NotNull ServerWebExchange exchange) {
