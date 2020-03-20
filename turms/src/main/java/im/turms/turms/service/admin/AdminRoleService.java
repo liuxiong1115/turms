@@ -76,7 +76,7 @@ public class AdminRoleService {
                     new AdminRole(
                             ADMIN_ROLE_ROOT_ID,
                             ADMIN_ROLE_ROOT_NAME,
-                            AdminPermission.all(),
+                            AdminPermission.ALL,
                             Integer.MAX_VALUE));
             return null;
         };

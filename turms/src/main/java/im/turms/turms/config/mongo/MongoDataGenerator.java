@@ -141,12 +141,12 @@ public class MongoDataGenerator {
             AdminRole adminRole = new AdminRole(
                     1L,
                     "ADMIN",
-                    AdminPermission.all(),
+                    AdminPermission.ALL,
                     0);
             AdminRole guestRole = new AdminRole(
                     GUEST_ROLE_ID,
                     "GUEST",
-                    SetUtils.union(AdminPermission.allQuery(), AdminPermission.allCreate()),
+                    SetUtils.union(AdminPermission.ALL_QUERY, AdminPermission.ALL_CREATE),
                     0);
             objects.add(adminRole);
             objects.add(guestRole);
