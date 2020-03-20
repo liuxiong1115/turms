@@ -421,7 +421,7 @@ public class UserRelationshipService {
             @Nullable Integer newGroupIndex,
             @Nullable Integer deleteGroupIndex,
             @Nullable @PastOrPresent Date establishmentDate,
-            boolean upsert,
+            @NotNull Boolean upsert,
             @Nullable ReactiveMongoOperations operations) {
         if (ownerId.equals(relatedUserId)) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);

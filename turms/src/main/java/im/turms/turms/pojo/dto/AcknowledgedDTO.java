@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public final class AcknowledgedDTO {
-    private final Boolean acknowledged;
+    private final boolean acknowledged;
 }

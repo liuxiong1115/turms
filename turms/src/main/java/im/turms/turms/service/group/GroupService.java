@@ -528,7 +528,7 @@ public class GroupService {
             @Nullable @PastOrPresent Date deletionDate,
             @Nullable Date muteEndDate,
             @Nullable Long successorId,
-            boolean quitAfterTransfer) {
+            @NotNull Boolean quitAfterTransfer) {
         if (Validator.areAllNull(
                 typeId,
                 creatorId,

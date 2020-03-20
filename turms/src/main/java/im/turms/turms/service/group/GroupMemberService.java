@@ -247,7 +247,7 @@ public class GroupMemberService {
             @Nullable @PastOrPresent Date joinDate,
             @Nullable Date muteEndDate,
             @Nullable ReactiveMongoOperations operations,
-            boolean updateGroupMembersVersion) {
+            @NotNull Boolean updateGroupMembersVersion) {
         if (Validator.areAllNull(name, role, joinDate, muteEndDate)) {
             return Mono.just(true);
         }
