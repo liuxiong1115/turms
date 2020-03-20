@@ -44,7 +44,7 @@ public class Log implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to log the body of requests. Better log the body of requests by monitor systems (e.g. Nginx, AWS)")
-    private boolean logRequestBody = true;
+    private boolean logRequestBody = false;
 
     // User
     
