@@ -114,7 +114,7 @@ public enum AdminPermission {
     CLUSTER_CONFIG_QUERY;
 
     public static final Set<AdminPermission> ALL = Set.of(AdminPermission.values());
-    
+
     public static final Set<AdminPermission> ALL_STATISTICS = Set.of(
             STATISTICS_USER_QUERY,
             STATISTICS_GROUP_QUERY,
@@ -144,7 +144,7 @@ public enum AdminPermission {
             USER_ONLINE_INFO_UPDATE,
             USER_ONLINE_INFO_QUERY);
 
-    public static Set<AdminPermission> ALL_CONTENT_GROUP = Set.of(GROUP_CREATE,
+    public static final Set<AdminPermission> ALL_CONTENT_GROUP = Set.of(GROUP_CREATE,
             GROUP_DELETE,
             GROUP_UPDATE,
             GROUP_QUERY,
@@ -173,7 +173,7 @@ public enum AdminPermission {
             GROUP_TYPE_UPDATE,
             GROUP_TYPE_QUERY);
 
-    public static Set<AdminPermission> ALL_CONTENT_MESSAGE = Set.of(
+    public static final Set<AdminPermission> ALL_CONTENT_MESSAGE = Set.of(
             MESSAGE_CREATE,
             MESSAGE_DELETE,
             MESSAGE_UPDATE,
@@ -181,7 +181,7 @@ public enum AdminPermission {
             MESSAGE_STATUS_QUERY,
             MESSAGE_STATUS_UPDATE);
 
-    public static Set<AdminPermission> ALL_CONTENT_ADMIN = Set.of(
+    public static final Set<AdminPermission> ALL_CONTENT_ADMIN = Set.of(
             ADMIN_CREATE,
             ADMIN_DELETE,
             ADMIN_UPDATE,
@@ -193,11 +193,11 @@ public enum AdminPermission {
             ADMIN_ACTION_LOG_QUERY,
             ADMIN_ACTION_LOG_DELETE);
 
-    public static Set<AdminPermission> ALL_CLUSTER = Set.of(
+    public static final Set<AdminPermission> ALL_CLUSTER = Set.of(
             CLUSTER_CONFIG_QUERY,
             CLUSTER_CONFIG_UPDATE);
 
-    public static Set<AdminPermission> ALL_CREATE = Set.of(
+    public static final Set<AdminPermission> ALL_CREATE = Set.of(
             USER_CREATE,
             USER_RELATIONSHIP_CREATE,
             USER_RELATIONSHIP_GROUP_CREATE,
@@ -214,7 +214,7 @@ public enum AdminPermission {
             ADMIN_CREATE,
             ADMIN_ROLE_CREATE);
 
-    public static Set<AdminPermission> ALL_QUERY = Set.of(
+    public static final Set<AdminPermission> ALL_QUERY = Set.of(
             STATISTICS_USER_QUERY,
             STATISTICS_GROUP_QUERY,
             STATISTICS_MESSAGE_QUERY,
