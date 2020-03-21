@@ -152,7 +152,7 @@ public class UserPermissionGroupService {
     public Mono<Boolean> deleteUserPermissionGroups(@Nullable Set<Long> ids) {
         if (ids != null) {
             if (ids.contains(DEFAULT_USER_PERMISSION_GROUP_ID)) {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The default user permission group cannot be deleted");
             }
             for (Long id : ids) {
                 userPermissionGroupMap.remove(id);

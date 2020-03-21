@@ -56,7 +56,7 @@ public class WsStorageController {
                                 .setUrl(StringValue.newBuilder().setValue(url).build())
                                 .build()));
             } else {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The content type must not be UNRECOGNIZED");
             }
         };
     }
@@ -75,7 +75,7 @@ public class WsStorageController {
                                 .setUrl(StringValue.newBuilder().setValue(url).build())
                                 .build()));
             } else {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The content type must not be UNRECOGNIZED");
             }
         };
     }
@@ -91,7 +91,7 @@ public class WsStorageController {
                 return storageService.deleteResource(turmsRequestWrapper.getUserId(), contentType, keyStr, keyNum)
                         .thenReturn(RequestResult.ok());
             } else {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The content type must not be UNRECOGNIZED");
             }
         };
     }

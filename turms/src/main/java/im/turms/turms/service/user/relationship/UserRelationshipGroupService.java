@@ -182,7 +182,7 @@ public class UserRelationshipGroupService {
             @NotNull Long relatedUserId,
             @Nullable ReactiveMongoOperations operations) {
         if (ownerId.equals(relatedUserId)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The owner ID must not equal the related user ID");
         }
         return userRelationshipService.hasOneSidedRelationship(ownerId, relatedUserId)
                 .flatMap(hasRelationship -> {
@@ -206,8 +206,8 @@ public class UserRelationshipGroupService {
             @NotNull Long ownerId,
             @NotNull Integer deleteGroupIndex,
             @NotNull Integer existingUsersToTargetGroupIndex) {
-        if (deleteGroupIndex == DEFAULT_RELATIONSHIP_GROUP_INDEX) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        if (deleteGroupIndex.equals(DEFAULT_RELATIONSHIP_GROUP_INDEX)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The default relationship group cannot be deleted");
         }
         if (deleteGroupIndex.equals(existingUsersToTargetGroupIndex)) {
             return Mono.just(true);

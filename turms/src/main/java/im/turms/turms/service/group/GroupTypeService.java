@@ -185,7 +185,7 @@ public class GroupTypeService {
     public Mono<Boolean> deleteGroupTypes(@Nullable Set<Long> groupTypeIds) {
         if (groupTypeIds != null) {
             if (groupTypeIds.contains(DEFAULT_GROUP_TYPE_ID)) {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The default group type cannot be deleted");
             }
             for (Long id : groupTypeIds) {
                 groupTypeMap.remove(id);

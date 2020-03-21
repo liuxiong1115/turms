@@ -77,6 +77,7 @@ public final class Admin implements IdentifiedDataSerializable, Cloneable {
         try {
             return (Admin) super.clone();
         } catch (CloneNotSupportedException e) {
+            // This should never happen
             e.printStackTrace();
             return null;
         }

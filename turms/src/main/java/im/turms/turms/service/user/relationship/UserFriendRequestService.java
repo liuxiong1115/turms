@@ -115,7 +115,10 @@ public class UserFriendRequestService {
             @Nullable Date expirationDate,
             @Nullable String reason) {
         if (status == RequestStatus.UNRECOGNIZED || requesterId.equals(recipientId)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            String failedReason = status == RequestStatus.UNRECOGNIZED ?
+                    "The request status must not be UNRECOGNIZED" :
+                    "The requester ID must not equal the recipient ID";
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, failedReason);
         }
         id = id != null ? id : turmsClusterManager.generateRandomId();
         Date now = new Date();
@@ -152,9 +155,12 @@ public class UserFriendRequestService {
             @NotNull @PastOrPresent Date creationDate) {
         int contentLimit = turmsClusterManager.getTurmsProperties()
                 .getUser().getFriendRequest().getContentLimit();
-        if ((contentLimit != 0 && content.length() > contentLimit)
-                || requesterId.equals(recipientId)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        boolean hasExceededLimit = contentLimit != 0 && content.length() > contentLimit;
+        if (hasExceededLimit || requesterId.equals(recipientId)) {
+            String reason = hasExceededLimit ?
+                    String.format("The content has exceeded the character limit (%d)", contentLimit) :
+                    "The requester ID must not equal the recipient ID";
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, reason);
         }
         // if requester is stranger for recipient, requester isn't blocked and already a friend.
         return userRelationshipService.isStranger(recipientId, requesterId)
@@ -200,7 +206,10 @@ public class UserFriendRequestService {
             @Nullable String reason,
             @Nullable ReactiveMongoOperations operations) {
         if (requestStatus == RequestStatus.UNRECOGNIZED || requestStatus == RequestStatus.PENDING) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            String failedReason = requestStatus == RequestStatus.UNRECOGNIZED ?
+                    "The request status must not be UNRECOGNIZED" :
+                    "The request status must not be PENDING";
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, failedReason);
         }
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(requestId))
@@ -234,7 +243,7 @@ public class UserFriendRequestService {
             return Mono.just(true);
         }
         if (requesterId != null && requesterId.equals(recipientId)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The requester ID must not equal the recipient ID");
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder
@@ -288,14 +297,14 @@ public class UserFriendRequestService {
                                 case DECLINE:
                                     return updatePendingFriendRequestStatus(friendRequestId, RequestStatus.DECLINED, reason, null);
                                 default:
-                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The response action must not be UNRECOGNIZED"));
                             }
                         } else {
                             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                         }
                     });
         } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The response action must not be UNRECOGNIZED");
         }
     }
 

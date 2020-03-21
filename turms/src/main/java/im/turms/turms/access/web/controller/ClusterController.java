@@ -103,7 +103,7 @@ public class ClusterController {
                 turmsClusterManager.updatePropertiesAndNotify(mergedProperties);
                 return ResponseFactory.okIfTruthy(mergedProperties);
             } else {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The new properties must not be null if shouldReset is false");
             }
         }
     }

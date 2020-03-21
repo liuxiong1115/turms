@@ -169,7 +169,7 @@ public class GroupQuestionService {
             @NotEmpty Set<String> answers,
             @NotNull Integer score) {
         if (score < 0) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The score must be greater than or equal to 0");
         }
         return groupMemberService.isAllowedToCreateJoinQuestion(requesterId, groupId)
                 .flatMap(allowed -> {
@@ -314,7 +314,7 @@ public class GroupQuestionService {
             return Mono.just(true);
         }
         if (score != null && score < 0) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The score must be greater than or equal to 0");
         }
         return queryGroupId(questionId)
                 .flatMap(groupId -> groupMemberService.isOwnerOrManager(requesterId, groupId)

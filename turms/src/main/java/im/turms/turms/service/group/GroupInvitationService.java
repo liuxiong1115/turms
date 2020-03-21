@@ -48,6 +48,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
@@ -119,8 +120,9 @@ public class GroupInvitationService {
             @NotNull Long inviterId,
             @NotNull Long inviteeId,
             @NotNull String content) {
-        if (content.length() > turmsProperties.getGroup().getGroupInvitationContentLimit()) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        int contentLimit = turmsProperties.getGroup().getGroupInvitationContentLimit();
+        if (content.length() > contentLimit) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, String.format("The content has exceeded the character limit (%d)", contentLimit));
         }
         return groupMemberService
                 .isAllowedToInviteOrAdd(groupId, inviterId, null)

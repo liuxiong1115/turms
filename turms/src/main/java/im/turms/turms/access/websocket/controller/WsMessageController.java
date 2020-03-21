@@ -72,7 +72,7 @@ public class WsMessageController {
         return turmsRequestWrapper -> {
             CreateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getCreateMessageRequest();
             if (request.hasIsSystemMessage() && request.getIsSystemMessage().getValue()) {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Users cannot create system messages"));
             }
             Mono<Pair<Long, Set<Long>>> pairMono;
             if (request.hasMessageId()) {
@@ -255,7 +255,7 @@ public class WsMessageController {
         return turmsRequestWrapper -> {
             UpdateMessageRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateMessageRequest();
             if (request.hasIsSystemMessage() && request.getIsSystemMessage().getValue()) {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Users cannot create system messages"));
             }
             long messageId = request.getMessageId();
             if (request.hasReadDate()) {
