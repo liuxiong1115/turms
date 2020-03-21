@@ -43,7 +43,6 @@ public final class User {
 
     private final ProfileAccessStrategy profileAccess;
 
-    @Indexed
     private final Long permissionGroupId;
 
     @Indexed
