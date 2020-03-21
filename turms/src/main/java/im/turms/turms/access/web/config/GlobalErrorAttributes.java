@@ -20,6 +20,7 @@ package im.turms.turms.access.web.config;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.pojo.dto.ResponseDTO;
+import im.turms.turms.property.TurmsProperties;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.dao.DuplicateKeyException;
@@ -34,13 +35,21 @@ import static im.turms.turms.common.Constants.STATUS;
 
 @Component
 public class GlobalErrorAttributes extends DefaultErrorAttributes {
+    private static final String ATTR_MESSAGE = "message";
+    private static final String ATTR_ERROR = "error";
+    private final boolean respondStackTraceIfException;
+
+    public GlobalErrorAttributes(TurmsProperties turmsProperties) {
+        respondStackTraceIfException = turmsProperties.getSecurity().isRespondStackTraceIfException();
+    }
+
     @Override
     public Map<String, Object> getErrorAttributes(
             ServerRequest request,
             boolean includeStackTrace) {
-        Map<String, Object> errorAttributes = super.getErrorAttributes(request, false);
+        Map<String, Object> errorAttributes = super.getErrorAttributes(request, respondStackTraceIfException);
         Throwable throwable = super.getError(request);
-        throwable = translate(throwable);
+        throwable = translate(throwable, errorAttributes);
         if (throwable instanceof TurmsBusinessException) {
             TurmsStatusCode code = ((TurmsBusinessException) throwable).getCode();
             errorAttributes.put(STATUS, code.getHttpStatusCode());
@@ -50,22 +59,18 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
             if (isClientError(errorAttributes)) {
                 errorAttributes.put(STATUS, 400);
             }
-            errorAttributes.computeIfAbsent(
-                    ResponseDTO.Fields.code,
-                    key -> TurmsStatusCode.FAILED.getBusinessCode());
-            errorAttributes.computeIfAbsent(
-                    ResponseDTO.Fields.reason,
-                    key -> TurmsStatusCode.FAILED.getReason());
+            errorAttributes.putIfAbsent(ResponseDTO.Fields.code, TurmsStatusCode.FAILED.getBusinessCode());
+            errorAttributes.putIfAbsent(ResponseDTO.Fields.reason, errorAttributes.get(ATTR_MESSAGE));
         }
-        errorAttributes.remove("error");
-        errorAttributes.remove("message");
+        errorAttributes.remove(ATTR_ERROR);
+        errorAttributes.remove(ATTR_MESSAGE);
         return errorAttributes;
     }
 
-    private Throwable translate(Throwable throwable) {
+    private Throwable translate(Throwable throwable, Map<String, Object> errorAttributes) {
         if (throwable instanceof ConstraintViolationException
                 || throwable instanceof NullPointerException) {
-            return TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            return TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, errorAttributes.get(ATTR_MESSAGE).toString());
         } else if (throwable instanceof DuplicateKeyException) {
             return TurmsBusinessException.get(TurmsStatusCode.DUPLICATE_KEY);
         } else if (throwable instanceof DataBufferLimitException) {
@@ -78,7 +83,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     private boolean isClientError(Map<String, Object> errorAttributes) {
         Integer status = (Integer) errorAttributes.get(STATUS);
         if (status == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-            String message = errorAttributes.get("message").toString();
+            String message = errorAttributes.get(ATTR_MESSAGE).toString();
             return message.contains("WebFlux") || message.contains("cast");
         } else {
             return false;
