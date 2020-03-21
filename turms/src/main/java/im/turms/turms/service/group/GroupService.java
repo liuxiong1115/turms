@@ -133,7 +133,7 @@ public class GroupService {
             @Nullable Date muteEndDate,
             @Nullable Boolean isActive) {
         if (creationDate != null && deletionDate != null && deletionDate.before(creationDate)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The deletion date must not be before the creation date");
         }
         if (groupTypeId == null) {
             groupTypeId = DEFAULT_GROUP_TYPE_ID;
@@ -563,7 +563,7 @@ public class GroupService {
                                 operations));
                     }
                     if (monos.isEmpty()) {
-                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                        return Mono.just(true);
                     } else {
                         return Mono.when(monos).thenReturn(true);
                     }

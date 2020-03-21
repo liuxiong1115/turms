@@ -17,9 +17,7 @@
 
 package im.turms.turms.access.web.controller.group;
 
-import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DivideBy;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.common.DateTimeUtil;
@@ -197,7 +195,7 @@ public class GroupController {
                         .doOnNext(statistics::setCreatedGroupsRecords));
             }
             if (counts.isEmpty()) {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                return Mono.empty();
             }
         }
         return ResponseFactory.okIfTruthy(Flux.merge(counts).then(Mono.just(statistics)));

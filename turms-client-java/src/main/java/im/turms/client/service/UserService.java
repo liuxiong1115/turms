@@ -74,7 +74,7 @@ public class UserService {
     public CompletableFuture<Void> updateUserOnlineStatus(@NotNull UserStatus onlineStatus) {
         Validator.throwIfAnyFalsy(onlineStatus);
         if (onlineStatus == UserStatus.OFFLINE) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The online status must not be OFFLINE"));
         }
         return turmsClient.getDriver()
                 .send(UpdateUserOnlineStatusRequest.newBuilder(), MapUtil.of(

@@ -197,7 +197,7 @@ public class WsUserController {
         return turmsRequestWrapper -> {
             QueryUsersOnlineStatusRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUsersOnlineStatusRequest();
             if (request.getUsersIdsCount() == 0) {
-                return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                return Mono.empty();
             }
             //TODO : Access Control
             List<Long> usersIds = request.getUsersIdsList();
@@ -251,7 +251,7 @@ public class WsUserController {
             UpdateUserOnlineStatusRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateUserOnlineStatusRequest();
             UserStatus userStatus = request.getUserStatus();
             if (userStatus == UserStatus.UNRECOGNIZED) {
-                return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The user status must not be UNRECOGNIZED"));
             }
             Set<DeviceType> deviceTypes = request.getDeviceTypesCount() > 0 ? Sets.newHashSet(request.getDeviceTypesList()) : null;
             boolean updated;

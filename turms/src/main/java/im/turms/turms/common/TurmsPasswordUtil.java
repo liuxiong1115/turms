@@ -54,7 +54,7 @@ public class TurmsPasswordUtil {
             return encodePassword(turmsProperties.getSecurity().getAdminPasswordEncodingAlgorithm(),
                     rawPassword);
         } else {
-            throw new IllegalArgumentException("rawPassword must be not null");
+            throw new IllegalArgumentException("rawPassword must not be null");
         }
     }
 
@@ -63,7 +63,7 @@ public class TurmsPasswordUtil {
             return encodePassword(turmsProperties.getSecurity().getUserPasswordEncodingAlgorithm(),
                     rawPassword);
         } else {
-            throw new IllegalArgumentException("rawPassword must be not null");
+            throw new IllegalArgumentException("rawPassword must not be null");
         }
     }
 

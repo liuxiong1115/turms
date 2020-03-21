@@ -396,7 +396,7 @@ public class UserRelationshipService {
             @NotNull Long userTwoId,
             @Nullable ReactiveMongoOperations operations) {
         if (userOneId.equals(userTwoId)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The ID of user one must not equal the ID of user two");
         }
         Date now = new Date();
         if (operations != null) {
@@ -424,7 +424,7 @@ public class UserRelationshipService {
             @NotNull Boolean upsert,
             @Nullable ReactiveMongoOperations operations) {
         if (ownerId.equals(relatedUserId)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The owner ID must not equal the related user ID");
         }
         isBlocked = isBlocked != null && isBlocked;
         establishmentDate = establishmentDate != null ? establishmentDate : new Date();

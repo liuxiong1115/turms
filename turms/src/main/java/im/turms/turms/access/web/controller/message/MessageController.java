@@ -156,7 +156,7 @@ public class MessageController {
         List<Mono<?>> counts = new LinkedList<>();
         MessageStatisticsDTO statistics = new MessageStatisticsDTO();
         if (chatType == ChatType.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The chat type must not be UNRECOGNIZED");
         }
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             if (sentOnAverageStartDate != null || sentOnAverageEndDate != null) {
@@ -225,7 +225,7 @@ public class MessageController {
                         .doOnNext(statistics::setSentMessagesRecords));
             }
             if (counts.isEmpty()) {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                return Mono.empty();
             }
         }
         return ResponseFactory.okIfTruthy(Flux.merge(counts).then(Mono.just(statistics)));

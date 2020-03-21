@@ -13,7 +13,7 @@ public final class DateRange {
 
     public DateRange(Date start, Date end) {
         if (start != null && end != null && end.before(start)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The end date must not be before the start date");
         }
         this.start = start;
         this.end = end;

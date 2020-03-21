@@ -143,8 +143,7 @@ public class GroupMemberService {
             return isOwner(deleteMemberId, groupId)
                     .flatMap(isOwner -> {
                         if (isOwner != null && isOwner) {
-                            // Because successorId is null
-                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The successor ID must not be null if you are quiting the group"));
                         } else {
                             return deleteGroupMembers(groupId, Set.of(deleteMemberId), null, true);
                         }
@@ -670,7 +669,7 @@ public class GroupMemberService {
         } else if (muteEndDate != null || (name != null && !requesterId.equals(memberId))) {
             authorized = isOwnerOrManager(requesterId, groupId);
         } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            return Mono.just(true);
         }
         return authorized
                 .flatMap(isAuthorized -> {

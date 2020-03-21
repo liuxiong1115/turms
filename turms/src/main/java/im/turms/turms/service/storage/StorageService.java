@@ -102,7 +102,7 @@ public class StorageService {
                 if (keyNum != null) {
                     return messageService.isMessageSentToUserOrByUser(keyNum, requesterId);
                 } else {
-                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The message ID must not be null");
                 }
             default:
                 throw new IllegalStateException("Unexpected value: " + contentType);
@@ -117,13 +117,13 @@ public class StorageService {
                 if (keyNum != null) {
                     return groupMemberService.isOwnerOrManager(requesterId, keyNum);
                 } else {
-                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The group ID must not be null");
                 }
             case ATTACHMENT:
                 if (keyNum != null) {
                     return messageService.isMessageSentToUserOrByUser(keyNum, requesterId);
                 } else {
-                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The message ID must not be null");
                 }
             default:
                 throw new IllegalStateException("Unexpected value: " + contentType);
@@ -138,7 +138,7 @@ public class StorageService {
                 if (keyNum != null) {
                     return groupMemberService.isOwnerOrManager(requesterId, keyNum);
                 } else {
-                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The group ID must not be null");
                 }
             case ATTACHMENT:
                 return Mono.just(false);

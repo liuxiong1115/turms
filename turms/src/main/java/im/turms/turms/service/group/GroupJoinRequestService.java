@@ -116,9 +116,10 @@ public class GroupJoinRequestService {
             @NotNull Long requesterId,
             @NotNull Long groupId,
             @NotNull String content) {
-        if (content.length() > turmsClusterManager.getTurmsProperties()
-                .getGroup().getGroupJoinRequestContentLimit()) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        int contentLimit = turmsClusterManager.getTurmsProperties()
+                .getGroup().getGroupJoinRequestContentLimit();
+        if (content.length() > contentLimit) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, String.format("The content has exceeded the character limit (%d)", contentLimit));
         }
         return groupMemberService.isBlacklisted(groupId, requesterId)
                 .flatMap(isBlacklisted -> {

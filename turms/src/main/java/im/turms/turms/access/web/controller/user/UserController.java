@@ -201,7 +201,7 @@ public class UserController {
                         .doOnNext(statistics::setRegisteredUsersRecords));
             }
             if (counts.isEmpty()) {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+                return Mono.empty();
             }
         }
         return ResponseFactory.okIfTruthy(Flux.merge(counts).then(Mono.just(statistics)));

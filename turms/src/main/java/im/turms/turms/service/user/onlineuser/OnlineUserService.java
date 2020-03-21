@@ -24,6 +24,7 @@ import com.hazelcast.cluster.Member;
 import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.RequestStatus;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
@@ -512,7 +513,10 @@ public class OnlineUserService {
 
     public Mono<Boolean> updateOnlineUserStatus(@NotNull Long userId, @NotNull UserStatus userStatus) {
         if (userStatus == UserStatus.UNRECOGNIZED || userStatus == UserStatus.OFFLINE) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+            String failedReason = userStatus == UserStatus.UNRECOGNIZED ?
+                    "The user status must not be UNRECOGNIZED" :
+                    "The online user status must not be OFFLINE";
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, failedReason);
         }
         if (turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
             OnlineUserManager manager = getLocalOnlineUserManager(userId);
@@ -590,7 +594,7 @@ public class OnlineUserService {
                 if (deviceType != null) {
                     return usersNearbyService.getUserSessionLocations().get(Pair.of(userId, deviceType));
                 } else {
-                    throw new IllegalArgumentException("deviceType must be not null if treatUserIdAndDeviceTypeAsUniqueUser is true");
+                    throw new IllegalArgumentException("deviceType must not be null if treatUserIdAndDeviceTypeAsUniqueUser is true");
                 }
             } else {
                 return usersNearbyService.getUserLocations().get(userId);

@@ -383,7 +383,7 @@ public class WsGroupController {
                             score)
                             .map(question -> RequestResult.responseId(question.getId()));
                 } else {
-                    return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                    return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The score must be greater than or equal to 0"));
                 }
             }
         };
@@ -534,7 +534,7 @@ public class WsGroupController {
             if (role == null || role == GroupMemberRole.UNRECOGNIZED) {
                 role = GroupMemberRole.MEMBER;
             } else if (role == GroupMemberRole.OWNER) {
-                return Mono.just(RequestResult.status(TurmsStatusCode.ILLEGAL_ARGUMENTS));
+                return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The role of the new member must not be OWNER"));
             }
             return groupMemberService.authAndAddGroupMember(
                     turmsRequestWrapper.getUserId(),
