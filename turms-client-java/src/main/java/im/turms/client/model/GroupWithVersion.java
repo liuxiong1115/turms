@@ -12,19 +12,17 @@ public class GroupWithVersion {
     public static GroupWithVersion from(TurmsNotification notification) {
         if (notification != null) {
             TurmsNotification.Data data = notification.getData();
-            if (notification.hasData()) {
+            if (notification.hasData() && data.hasGroupsWithVersion()) {
                 GroupsWithVersion groupsWithVersion = data.getGroupsWithVersion();
-                if (data.hasGroupsWithVersion()) {
-                    GroupWithVersion groupWithVersion = new GroupWithVersion();
-                    if (groupsWithVersion.getGroupsCount() > 0) {
-                        groupWithVersion.setGroup(groupsWithVersion.getGroups(0));
-                    }
-                    Int64Value lastUpdatedDate = groupsWithVersion.getLastUpdatedDate();
-                    if (lastUpdatedDate != null) {
-                        groupWithVersion.setLastUpdatedDate(lastUpdatedDate.getValue());
-                    }
-                    return groupWithVersion;
+                GroupWithVersion groupWithVersion = new GroupWithVersion();
+                if (groupsWithVersion.getGroupsCount() > 0) {
+                    groupWithVersion.setGroup(groupsWithVersion.getGroups(0));
                 }
+                Int64Value lastUpdatedDate = groupsWithVersion.getLastUpdatedDate();
+                if (lastUpdatedDate != null) {
+                    groupWithVersion.setLastUpdatedDate(lastUpdatedDate.getValue());
+                }
+                return groupWithVersion;
             }
         }
         return null;

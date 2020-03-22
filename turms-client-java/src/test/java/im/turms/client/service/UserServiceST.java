@@ -229,7 +229,7 @@ public class UserServiceST {
                 .get(5, TimeUnit.SECONDS);
         List<UserSessionId> sessionIds = turmsClient.getUserService().queryUserSessionIdsNearby(1f, 1f, null, null)
                 .get(5, TimeUnit.SECONDS);
-        assertTrue(userIds != null || sessionIds != null);
+        assertTrue(!userIds.isEmpty() || !sessionIds.isEmpty());
     }
 
     @Test
@@ -237,7 +237,7 @@ public class UserServiceST {
     public void queryUsersInfosNearby_shouldReturnUsersInfos() throws ExecutionException, InterruptedException, TimeoutException {
         List<UserInfo> result = turmsClient.getUserService().queryUsersInfosNearby(1f, 1f, null, null)
                 .get(5, TimeUnit.SECONDS);
-        assertNotNull(result);
+        assertFalse(result.isEmpty());
     }
 
     @Test
@@ -245,7 +245,7 @@ public class UserServiceST {
     public void queryUsersOnlineStatusRequest_shouldUsersOnlineStatus() throws ExecutionException, InterruptedException, TimeoutException {
         List<UserStatusDetail> result = turmsClient.getUserService().queryUsersOnlineStatusRequest(Set.of(1L))
                 .get(5, TimeUnit.SECONDS);
-        assertEquals(result.get(0).getUserStatus(), userStatus);
+        assertEquals(userStatus, result.get(0).getUserStatus());
     }
 
     @Test

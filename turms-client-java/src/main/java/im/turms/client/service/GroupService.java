@@ -4,9 +4,11 @@ import im.turms.client.TurmsClient;
 import im.turms.client.model.GroupWithVersion;
 import im.turms.client.util.MapUtil;
 import im.turms.common.constant.GroupMemberRole;
+import im.turms.common.model.bo.common.Int64Values;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.group.*;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
+import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.group.*;
 import im.turms.common.model.dto.request.group.blacklist.CreateGroupBlacklistedUserRequest;
 import im.turms.common.model.dto.request.group.blacklist.DeleteGroupBlacklistedUserRequest;
@@ -50,7 +52,10 @@ public class GroupService {
                         "minimum_score", minimumScore,
                         "mute_end_date", muteEndDate,
                         "group_type_id", groupTypeId))
-                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
+                .thenApply(notification -> {
+                    Int64Values ids = notification.getData().getIds();
+                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
+                });
     }
 
     public CompletableFuture<Void> deleteGroup(long groupId) {
@@ -115,14 +120,20 @@ public class GroupService {
         return turmsClient.getDriver()
                 .send(QueryJoinedGroupsIdsRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getIdsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasIdsWithVersion() ? data.getIdsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<GroupsWithVersion> queryJoinedGroupsInfos(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryJoinedGroupsInfosRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getGroupsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupsWithVersion() ? data.getGroupsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<Long> addGroupJoinQuestion(
@@ -137,7 +148,10 @@ public class GroupService {
                         "question", question,
                         "answers", answers,
                         "score", score))
-                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
+                .thenApply(notification -> {
+                    Int64Values ids = notification.getData().getIds();
+                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
+                });
     }
 
     public CompletableFuture<Void> deleteGroupJoinQuestion(long questionId) {
@@ -188,7 +202,10 @@ public class GroupService {
                 .send(QueryGroupBlacklistedUsersIdsRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getIdsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasIdsWithVersion() ? data.getIdsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<UsersInfosWithVersion> queryBlacklistedUsersInfos(
@@ -198,7 +215,10 @@ public class GroupService {
                 .send(QueryGroupBlacklistedUsersInfosRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getUsersInfosWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasUsersInfosWithVersion() ? data.getUsersInfosWithVersion() : null;
+                });
     }
 
     // Group Enrollment
@@ -212,7 +232,10 @@ public class GroupService {
                         "group_id", groupId,
                         "invitee_id", inviteeId,
                         "content", content))
-                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
+                .thenApply(notification -> {
+                    Int64Values ids = notification.getData().getIds();
+                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
+                });
     }
 
     public CompletableFuture<Void> deleteInvitation(long invitationId) {
@@ -227,7 +250,10 @@ public class GroupService {
                 .send(QueryGroupInvitationsRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getGroupInvitationsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupInvitationsWithVersion() ? data.getGroupInvitationsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<Long> createJoinRequest(long groupId, @NotNull String content) {
@@ -236,7 +262,10 @@ public class GroupService {
                 .send(CreateGroupJoinRequestRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "content", content))
-                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
+                .thenApply(notification -> {
+                    Int64Values ids = notification.getData().getIds();
+                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
+                });
     }
 
     public CompletableFuture<Void> deleteJoinRequest(long requestId) {
@@ -252,7 +281,10 @@ public class GroupService {
                 .send(QueryGroupJoinRequestsRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getGroupJoinRequestsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupJoinRequestsWithVersion() ? data.getGroupJoinRequestsWithVersion() : null;
+                });
     }
 
     /**
@@ -267,7 +299,10 @@ public class GroupService {
                         "group_id", groupId,
                         "with_answers", withAnswers,
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getGroupJoinQuestionsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupJoinQuestionsWithVersion() ? data.getGroupJoinQuestionsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<GroupJoinQuestionsAnswerResult> answerGroupQuestions(@NotEmpty Map<Long, String> questionIdAndAnswerMap) {
@@ -275,7 +310,10 @@ public class GroupService {
         return turmsClient.getDriver()
                 .send(CheckGroupJoinQuestionsAnswersRequest.newBuilder(), MapUtil.of(
                         "question_id_and_answer", questionIdAndAnswerMap))
-                .thenApply(notification -> notification.getData().getGroupJoinQuestionAnswerResult());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupJoinQuestionAnswerResult() ? data.getGroupJoinQuestionAnswerResult() : null;
+                });
     }
 
     // Group Member
@@ -358,7 +396,10 @@ public class GroupService {
                         "group_id", groupId,
                         "last_updated_date", lastUpdatedDate,
                         "with_status", withStatus))
-                .thenApply(notification -> notification.getData().getGroupMembersWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupMembersWithVersion() ? data.getGroupMembersWithVersion() : null;
+                });
     }
 
     public CompletableFuture<GroupMembersWithVersion> queryGroupMembersByMembersIds(
@@ -371,6 +412,9 @@ public class GroupService {
                         "group_id", groupId,
                         "group_members_ids", membersIds,
                         "with_status", withStatus))
-                .thenApply(notification -> notification.getData().getGroupMembersWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupMembersWithVersion() ? data.getGroupMembersWithVersion() : null;
+                });
     }
 }
