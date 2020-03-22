@@ -27,11 +27,10 @@ import com.hazelcast.spring.context.SpringManagedContext;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.AddressUtil;
-import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.property.TurmsProperties;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.hazelcast.HazelcastProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -40,16 +39,18 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.function.Function;
 
+@Log4j2
 @Configuration
 public class HazelcastConfig {
     private final Integer port;
     private final ApplicationContext applicationContext;
     private final TurmsClusterManager turmsClusterManager;
 
-    public HazelcastConfig(ApplicationContext applicationContext, TurmsClusterManager turmsClusterManager) {
+    public HazelcastConfig(ApplicationContext applicationContext, TurmsClusterManager turmsClusterManager) throws UnknownHostException {
         this.applicationContext = applicationContext;
         this.turmsClusterManager = turmsClusterManager;
         String portStr = applicationContext.getEnvironment().getProperty("server.port");
@@ -60,8 +61,7 @@ public class HazelcastConfig {
             tempPort = null;
         }
         if (tempPort == null) {
-            TurmsLogger.log("The server is closed because the local port cannot be found");
-            ((ConfigurableApplicationContext) applicationContext).close();
+            throw new UnknownHostException("The local port of the current server cannot be found");
         }
         this.port = tempPort;
     }

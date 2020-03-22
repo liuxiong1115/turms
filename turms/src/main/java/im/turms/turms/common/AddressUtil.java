@@ -6,8 +6,8 @@ import im.turms.turms.property.TurmsProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+@Log4j2
 @Component
 public class AddressUtil {
     public static final List<Function<AddressTuple, Void>> onAddressChangeListeners = new LinkedList<>();
@@ -35,11 +36,17 @@ public class AddressUtil {
     @Getter
     private boolean isSslEnabled;
 
-    public AddressUtil(TurmsClusterManager turmsClusterManager, ConfigurableApplicationContext context) {
+    public AddressUtil(TurmsClusterManager turmsClusterManager, ApplicationContext context) {
         this.turmsClusterManager = turmsClusterManager;
         this.context = context;
         TurmsProperties.propertiesChangeListeners.add(properties -> {
-            AddressTuple tuple = queryAddresses();
+            AddressTuple tuple;
+            try {
+                tuple = queryAddresses();
+            } catch (UnknownHostException e) {
+                log.error(e.getMessage(), e);
+                return null;
+            }
             boolean changed = !addressTuple.equals(tuple);
             if (changed) {
                 for (Function<AddressTuple, Void> listener : onAddressChangeListeners) {
@@ -52,14 +59,14 @@ public class AddressUtil {
     }
 
     @PostConstruct
-    private void initAddresses() {
+    private void initAddresses() throws UnknownHostException {
         addressTuple = queryAddresses();
         for (Function<AddressTuple, Void> listener : onAddressChangeListeners) {
             listener.apply(addressTuple);
         }
     }
 
-    private AddressTuple queryAddresses() {
+    private AddressTuple queryAddresses() throws UnknownHostException {
         String ip = queryIp(turmsClusterManager.getTurmsProperties());
         if (ip != null) {
             Environment env = context.getEnvironment();
@@ -68,9 +75,7 @@ public class AddressUtil {
                     String.format("%s://%s", isSslEnabled ? "https" : "http", ip),
                     String.format("%s://%s", isSslEnabled ? "wss" : "ws", ip));
         } else {
-            TurmsLogger.log("Exit because the IP for current server cannot be found");
-            ((ConfigurableApplicationContext) context).close();
-            return null;
+            throw new UnknownHostException("The IP of the current server cannot be found");
         }
     }
 

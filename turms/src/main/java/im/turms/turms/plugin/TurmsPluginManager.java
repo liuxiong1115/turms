@@ -17,9 +17,9 @@
 
 package im.turms.turms.plugin;
 
-import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.property.TurmsProperties;
 import lombok.Data;
+import lombok.extern.log4j.Log4j2;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.PluginManager;
 import org.springframework.context.ApplicationContext;
@@ -34,6 +34,7 @@ import java.util.List;
 @Component
 @Data
 @DependsOn("turmsProperties")
+@Log4j2
 public class TurmsPluginManager {
     private final ApplicationContext context;
     private final TurmsProperties turmsProperties;
@@ -91,7 +92,7 @@ public class TurmsPluginManager {
         try {
             extension.setContext(context);
         } catch (Exception e) {
-            TurmsLogger.logThrowable(e);
+            log.error(e.getMessage(), e);
         }
     }
 

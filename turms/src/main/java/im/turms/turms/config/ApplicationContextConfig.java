@@ -18,14 +18,15 @@
 package im.turms.turms.config;
 
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+@Log4j2
 @Component
 public class ApplicationContextConfig {
     private final TurmsClusterManager turmsClusterManager;
@@ -39,7 +40,7 @@ public class ApplicationContextConfig {
     @EventListener(classes = ContextRefreshedEvent.class)
     public void handleContextRefreshedEvent() {
         if (CompilerOptions.ENV == CompilerOptions.Env.DEV) {
-            TurmsLogger.getLogger().warn("Turms is running in dev mode. Turn it off in pom.xml");
+            log.warn("Turms is running in dev mode. Turn it off in pom.xml");
         }
     }
 

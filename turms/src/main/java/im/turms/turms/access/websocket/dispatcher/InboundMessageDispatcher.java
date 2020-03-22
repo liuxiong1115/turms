@@ -31,7 +31,6 @@ import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
-import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.plugin.ClientRequestHandler;
 import im.turms.turms.plugin.TurmsPluginManager;
@@ -41,6 +40,7 @@ import im.turms.turms.pojo.domain.UserActionLog;
 import im.turms.turms.service.message.OutboundMessageService;
 import im.turms.turms.service.user.UserActionLogService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -54,6 +54,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Function;
 
+@Log4j2
 @Service
 public class InboundMessageDispatcher {
     private final OutboundMessageService outboundMessageService;
@@ -244,24 +245,24 @@ public class InboundMessageDispatcher {
                         boolean triggerHandlers = pluginEnabled && !turmsPluginManager.getLogHandlerList().isEmpty();
                         if (logUserAction || triggerHandlers) {
                             Integer ip = SessionUtil.getIp(session);
-                            UserActionLog log;
+                            UserActionLog actionLog;
                             try {
-                                log = new UserActionLog(turmsClusterManager.generateRandomId(), requestWrapper.getUserId(),
+                                actionLog = new UserActionLog(turmsClusterManager.generateRandomId(), requestWrapper.getUserId(),
                                         requestWrapper.getDeviceType(), new Date(), ip, request.getKindCase().name(), jsonPrinter.print(request));
                             } catch (InvalidProtocolBufferException e) {
-                                TurmsLogger.logThrowable(e);
+                                log.error(e.getMessage(), e);
                                 return requestResultMono;
                             }
                             Mono<?> mono;
                             if (logUserAction) {
                                 if (triggerHandlers) {
-                                    mono = userActionLogService.save(log)
-                                            .doOnTerminate(userActionLogService.triggerLogHandlers(log)::subscribe);
+                                    mono = userActionLogService.save(actionLog)
+                                            .doOnTerminate(userActionLogService.triggerLogHandlers(actionLog)::subscribe);
                                 } else {
-                                    mono = userActionLogService.save(log);
+                                    mono = userActionLogService.save(actionLog);
                                 }
                             } else {
-                                mono = userActionLogService.triggerLogHandlers(log);
+                                mono = userActionLogService.triggerLogHandlers(actionLog);
                             }
                             requestResultMono = mono.then(requestResultMono);
                         }
