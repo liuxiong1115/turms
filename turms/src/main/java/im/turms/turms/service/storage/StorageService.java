@@ -32,14 +32,18 @@ public class StorageService {
 
     public Mono<String> queryPresignedGetUrl(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum) {
         if (provider != null) {
-            return hasPermissionToGet(requesterId, contentType, keyStr, keyNum)
-                    .flatMap(hasPermission -> {
-                        if (hasPermission) {
-                            return provider.queryPresignedGetUrl(requesterId, contentType, keyStr, keyNum);
-                        } else {
-                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                        }
-                    });
+            if (provider.isServing()) {
+                return hasPermissionToGet(requesterId, contentType, keyStr, keyNum)
+                        .flatMap(hasPermission -> {
+                            if (hasPermission) {
+                                return provider.queryPresignedGetUrl(requesterId, contentType, keyStr, keyNum);
+                            } else {
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                            }
+                        });
+            } else {
+                throw TurmsBusinessException.get(TurmsStatusCode.UNAVAILABLE);
+            }
         } else {
             throw TurmsBusinessException.get(TurmsStatusCode.NOT_IMPLEMENTED);
         }
@@ -47,31 +51,35 @@ public class StorageService {
 
     public Mono<String> queryPresignedPutUrl(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum, long contentLength) {
         if (provider != null) {
-            int sizeLimit;
-            switch (contentType) {
-                case PROFILE:
-                    sizeLimit = turmsProperties.getStorage().getProfileSizeLimit();
-                    break;
-                case GROUP_PROFILE:
-                    sizeLimit = turmsProperties.getStorage().getGroupProfileSizeLimit();
-                    break;
-                case ATTACHMENT:
-                    sizeLimit = turmsProperties.getStorage().getAttachmentSizeLimit();
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + contentType);
-            }
-            if (sizeLimit == 0 || contentLength <= sizeLimit) {
-                return hasPermissionToPut(requesterId, contentType, keyStr, keyNum)
-                        .flatMap(hasPermission -> {
-                            if (hasPermission) {
-                                return provider.queryPresignedPutUrl(requesterId, contentType, keyStr, keyNum, contentLength);
-                            } else {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                            }
-                        });
+            if (provider.isServing()) {
+                int sizeLimit;
+                switch (contentType) {
+                    case PROFILE:
+                        sizeLimit = turmsProperties.getStorage().getProfileSizeLimit();
+                        break;
+                    case GROUP_PROFILE:
+                        sizeLimit = turmsProperties.getStorage().getGroupProfileSizeLimit();
+                        break;
+                    case ATTACHMENT:
+                        sizeLimit = turmsProperties.getStorage().getAttachmentSizeLimit();
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + contentType);
+                }
+                if (sizeLimit == 0 || contentLength <= sizeLimit) {
+                    return hasPermissionToPut(requesterId, contentType, keyStr, keyNum)
+                            .flatMap(hasPermission -> {
+                                if (hasPermission) {
+                                    return provider.queryPresignedPutUrl(requesterId, contentType, keyStr, keyNum, contentLength);
+                                } else {
+                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                                }
+                            });
+                } else {
+                    throw TurmsBusinessException.get(TurmsStatusCode.FILE_TOO_LARGE);
+                }
             } else {
-                throw TurmsBusinessException.get(TurmsStatusCode.FILE_TOO_LARGE);
+                throw TurmsBusinessException.get(TurmsStatusCode.UNAVAILABLE);
             }
         } else {
             throw TurmsBusinessException.get(TurmsStatusCode.NOT_IMPLEMENTED);
@@ -80,18 +88,24 @@ public class StorageService {
 
     public Mono<Void> deleteResource(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum) {
         if (provider != null) {
-            return hasPermissionToDelete(requesterId, contentType, keyStr, keyNum)
-                    .flatMap(hasPermission -> {
-                        if (hasPermission) {
-                            return provider.deleteResource(requesterId, contentType, keyStr, keyNum);
-                        } else {
-                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                        }
-                    });
+            if (provider.isServing()) {
+                return hasPermissionToDelete(requesterId, contentType, keyStr, keyNum)
+                        .flatMap(hasPermission -> {
+                            if (hasPermission) {
+                                return provider.deleteResource(requesterId, contentType, keyStr, keyNum);
+                            } else {
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                            }
+                        });
+            } else {
+                throw TurmsBusinessException.get(TurmsStatusCode.UNAVAILABLE);
+            }
         } else {
             throw TurmsBusinessException.get(TurmsStatusCode.NOT_IMPLEMENTED);
         }
     }
+
+    // Permission
 
     private Mono<Boolean> hasPermissionToGet(@NotNull Long requesterId, @NotNull ContentType contentType, @Nullable String keyStr, @Nullable Long keyNum) {
         switch (contentType) {
