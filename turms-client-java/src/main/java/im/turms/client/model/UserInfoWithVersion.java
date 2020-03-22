@@ -10,21 +10,19 @@ public class UserInfoWithVersion {
     private long lastUpdatedDate;
 
     public static UserInfoWithVersion from(TurmsNotification notification) {
-        if (notification != null) {
+        if (notification != null && notification.hasData()) {
             TurmsNotification.Data data = notification.getData();
-            if (notification.hasData()) {
+            if (data.hasUsersInfosWithVersion()) {
                 UsersInfosWithVersion usersInfosWithVersion = data.getUsersInfosWithVersion();
-                if (data.hasUsersInfosWithVersion()) {
-                    UserInfoWithVersion userInfoWithVersion = new UserInfoWithVersion();
-                    if (usersInfosWithVersion.getUserInfosCount() > 0) {
-                        userInfoWithVersion.setUserInfo(usersInfosWithVersion.getUserInfos(0));
-                    }
-                    Int64Value lastUpdatedDate = usersInfosWithVersion.getLastUpdatedDate();
-                    if (lastUpdatedDate != null) {
-                        userInfoWithVersion.setLastUpdatedDate(lastUpdatedDate.getValue());
-                    }
-                    return userInfoWithVersion;
+                UserInfoWithVersion userInfoWithVersion = new UserInfoWithVersion();
+                if (usersInfosWithVersion.getUserInfosCount() > 0) {
+                    userInfoWithVersion.setUserInfo(usersInfosWithVersion.getUserInfos(0));
                 }
+                Int64Value lastUpdatedDate = usersInfosWithVersion.getLastUpdatedDate();
+                if (lastUpdatedDate != null) {
+                    userInfoWithVersion.setLastUpdatedDate(lastUpdatedDate.getValue());
+                }
+                return userInfoWithVersion;
             }
         }
         return null;

@@ -10,9 +10,11 @@ import im.turms.common.constant.ProfileAccessStrategy;
 import im.turms.common.constant.ResponseAction;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.bo.common.Int64Values;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
 import im.turms.common.model.bo.user.*;
+import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.user.*;
 import im.turms.common.model.dto.request.user.relationship.*;
 import im.turms.common.util.Validator;
@@ -118,7 +120,10 @@ public class UserService {
         return turmsClient.getDriver()
                 .send(QueryUserGroupInvitationsRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getGroupInvitationsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupInvitationsWithVersion() ? data.getGroupInvitationsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<UserInfoWithVersion> queryUserProfile(
@@ -194,7 +199,10 @@ public class UserService {
                         "is_blocked", isBlocked,
                         "group_index", groupIndex,
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getUserRelationshipsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasUserRelationshipsWithVersion() ? data.getUserRelationshipsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<Int64ValuesWithVersion> queryRelatedUsersIds(
@@ -206,7 +214,10 @@ public class UserService {
                         "is_blocked", isBlocked,
                         "group_index", groupIndex,
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getIdsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasIdsWithVersion() ? data.getIdsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<UserRelationshipsWithVersion> queryFriends(
@@ -280,7 +291,10 @@ public class UserService {
                 .send(CreateFriendRequestRequest.newBuilder(), MapUtil.of(
                         "recipient_id", recipientId,
                         "content", content))
-                .thenApply(notification -> notification.getData().getIds().getValues(0));
+                .thenApply(notification -> {
+                    Int64Values ids = notification.getData().getIds();
+                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
+                });
     }
 
     public CompletableFuture<Void> replyFriendRequest(
@@ -300,7 +314,10 @@ public class UserService {
         return turmsClient.getDriver()
                 .send(QueryFriendRequestsRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getUserFriendRequestsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasUserFriendRequestsWithVersion() ? data.getUserFriendRequestsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<Integer> createRelationshipGroup(@NotNull String name) {
@@ -308,7 +325,10 @@ public class UserService {
         return turmsClient.getDriver()
                 .send(CreateRelationshipGroupRequest.newBuilder(), MapUtil.of(
                         "name", name))
-                .thenApply(notification -> (int) notification.getData().getIds().getValues(0));
+                .thenApply(notification -> {
+                    Int64Values ids = notification.getData().getIds();
+                    return ids.getValuesCount() > 0 ? (int) ids.getValues(0) : null;
+                });
     }
 
     public CompletableFuture<Void> deleteRelationshipGroups(
@@ -336,7 +356,10 @@ public class UserService {
         return turmsClient.getDriver()
                 .send(QueryRelationshipGroupsRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> notification.getData().getUserRelationshipGroupsWithVersion());
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasUserRelationshipGroupsWithVersion() ? data.getUserRelationshipGroupsWithVersion() : null;
+                });
     }
 
     public CompletableFuture<Void> moveRelatedUserToGroup(

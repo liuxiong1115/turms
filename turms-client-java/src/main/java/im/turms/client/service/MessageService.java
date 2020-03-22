@@ -6,6 +6,7 @@ import im.turms.client.model.MessageAddition;
 import im.turms.client.util.MapUtil;
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
+import im.turms.common.model.bo.common.Int64Values;
 import im.turms.common.model.bo.file.AudioFile;
 import im.turms.common.model.bo.file.File;
 import im.turms.common.model.bo.file.ImageFile;
@@ -37,7 +38,7 @@ public class MessageService {
 
         @Override
         public Set<Long> apply(Message message) {
-            if (message.hasText()) {
+            if (message != null && message.hasText()) {
                 String text = message.getText().getValue();
                 Matcher matcher = regex.matcher(text);
                 Set<Long> userIds = new LinkedHashSet<>();
@@ -93,7 +94,10 @@ public class MessageService {
                         "text", text,
                         "records", records,
                         "burn_after", burnAfter))
-                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
+                .thenApply(notification -> {
+                    Int64Values ids = notification.getData().getIds();
+                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
+                });
     }
 
     public CompletableFuture<Long> forwardMessage(
@@ -106,7 +110,10 @@ public class MessageService {
                         "message_id", messageId,
                         "chat_type", chatType,
                         "to_id", targetId))
-                .thenApply(notification -> notification.getData().getIds().getValuesList().get(0));
+                .thenApply(notification -> {
+                    Int64Values ids = notification.getData().getIds();
+                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
+                });
     }
 
     public CompletableFuture<Void> updateSentMessage(
