@@ -31,10 +31,10 @@ import com.hazelcast.core.IExecutorService;
 import com.hazelcast.flakeidgen.FlakeIdGenerator;
 import com.hazelcast.replicatedmap.ReplicatedMap;
 import im.turms.turms.annotation.cluster.HazelcastConfig;
-import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.property.TurmsProperties;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -46,6 +46,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Function;
 
+@Log4j2
 @Component
 public class TurmsClusterManager {
     @Value("${server.port}")
@@ -159,7 +160,7 @@ public class TurmsClusterManager {
             boolean isCurrentNodeRange = localMember == clusterMembers[index];
             result.put(index, range + (isCurrentNodeRange ? "*" : ""));
         }
-        TurmsLogger.logJson("Working Ranges for Slot Indexes", result);
+        log.info("Working Ranges for Slot Indexes: {}", result);
     }
 
     private void initEnvAfterJoinedCluster() {

@@ -25,12 +25,12 @@ import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.common.UpdateBuilder;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.bo.AdminInfo;
 import im.turms.turms.pojo.domain.Admin;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -56,6 +56,7 @@ import java.util.function.Function;
 
 import static im.turms.turms.common.Constants.*;
 
+@Log4j2
 @Service
 @Validated
 public class AdminService {
@@ -97,7 +98,7 @@ public class AdminService {
                             RandomStringUtils.randomAlphabetic(8),
                             new Date(),
                             false)
-                            .doOnNext(admin -> TurmsLogger.logJson("Root admin", Map.of(
+                            .doOnNext(admin -> log.info("Root admin: {}", Map.of(
                                     "Account", ROOT_ADMIN_ACCOUNT,
                                     "Raw Password", rawPassword)))
                             .subscribe();

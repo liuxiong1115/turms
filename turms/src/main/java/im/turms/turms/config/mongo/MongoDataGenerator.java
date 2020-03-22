@@ -3,11 +3,11 @@ package im.turms.turms.config.mongo;
 import com.google.common.net.InetAddresses;
 import im.turms.common.constant.*;
 import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.TurmsLogger;
 import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.pojo.domain.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -30,6 +30,7 @@ import java.util.Set;
 
 import static im.turms.turms.common.Constants.*;
 
+@Log4j2
 @Component
 public class MongoDataGenerator {
 
@@ -46,7 +47,7 @@ public class MongoDataGenerator {
     @EventListener(classes = ContextRefreshedEvent.class)
     public void createCollectionsIfNotExist() {
         if (isDevEnv()) {
-            TurmsLogger.log("Start clearing collections...");
+            log.info("Start clearing collections...");
             Query queryAll = new Query();
             mongoTemplate.getCollectionNames()
                     .flatMap(name -> {
@@ -59,9 +60,9 @@ public class MongoDataGenerator {
                         }
                     })
                     .blockLast();
-            TurmsLogger.log("All collections are cleared");
+            log.info("All collections are cleared");
         }
-        TurmsLogger.log("Start creating collections...");
+        log.info("Start creating collections...");
         Mono.when(
                 createCollectionIfNotExist(Admin.class, null),
                 createCollectionIfNotExist(AdminActionLog.class, null),
@@ -87,12 +88,8 @@ public class MongoDataGenerator {
                 createCollectionIfNotExist(UserRelationshipGroupMember.class, null),
                 createCollectionIfNotExist(UserVersion.class, null))
                 .doOnTerminate(() -> {
-                    TurmsLogger.log("All collections are created");
-                    try {
-                        mockIfDev();
-                    } catch (UnknownHostException e) {
-                        TurmsLogger.logThrowable(e);
-                    }
+                    log.info("All collections are created");
+                    mockIfDev();
                 })
                 .subscribe();
     }
@@ -102,15 +99,15 @@ public class MongoDataGenerator {
     }
 
     // Note: Better not to remove all mock data after turms closed
-    private void mockIfDev() throws UnknownHostException {
+    private void mockIfDev() {
         if (isDevEnv()) {
-            TurmsLogger.log("Start mocking...");
+            log.info("Start mocking...");
             // Admin
             final int ADMIN_COUNT = 10;
             final int USER_COUNT = 500;
             final Date now = new Date();
             List<Object> objects = new LinkedList<>();
-            long GUEST_ROLE_ID = 2L;
+            final long GUEST_ROLE_ID = 2L;
             Admin guest = new Admin(
                     "guest",
                     passwordUtil.encodeAdminPassword("guest"),
@@ -128,15 +125,21 @@ public class MongoDataGenerator {
                 objects.add(admin);
             }
             for (int i = 1; i <= 100; i++) {
-                AdminActionLog adminActionLog = new AdminActionLog(
-                        turmsClusterManager.generateRandomId(),
-                        "account" + (1 + i % ADMIN_COUNT),
-                        DateUtils.addDays(now, -i),
-                        InetAddresses.coerceToInteger(InetAddress.getLocalHost()),
-                        "testaction",
-                        null,
-                        null);
-                objects.add(adminActionLog);
+                AdminActionLog adminActionLog;
+                try {
+                    adminActionLog = new AdminActionLog(
+                            turmsClusterManager.generateRandomId(),
+                            "account" + (1 + i % ADMIN_COUNT),
+                            DateUtils.addDays(now, -i),
+                            InetAddresses.coerceToInteger(InetAddress.getByName("127.0.0.1")),
+                            "testaction",
+                            null,
+                            null);
+                    objects.add(adminActionLog);
+                } catch (UnknownHostException e) {
+                    // This should never happen
+                    e.printStackTrace();
+                }
             }
             AdminRole adminRole = new AdminRole(
                     1L,
@@ -329,8 +332,8 @@ public class MongoDataGenerator {
             }
             // Execute
             mongoTemplate.insertAll(objects)
-                    .doOnError(error -> TurmsLogger.logObject("Mocking failed", error))
-                    .doOnComplete(() -> TurmsLogger.log("Mocking succeeded"))
+                    .doOnError(error -> log.error("Mocking failed", error))
+                    .doOnComplete(() -> log.info("Mocking succeeded"))
                     .subscribe();
         }
     }
