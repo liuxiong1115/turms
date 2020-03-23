@@ -3,8 +3,10 @@ package im.turms.client.service;
 import im.turms.client.TurmsClient;
 import im.turms.client.model.GroupWithVersion;
 import im.turms.client.util.MapUtil;
+import im.turms.client.util.NotificationUtil;
+import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.GroupMemberRole;
-import im.turms.common.model.bo.common.Int64Values;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.group.*;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
@@ -52,10 +54,7 @@ public class GroupService {
                         "minimum_score", minimumScore,
                         "mute_end_date", muteEndDate,
                         "group_type_id", groupTypeId))
-                .thenApply(notification -> {
-                    Int64Values ids = notification.getData().getIds();
-                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
-                });
+                .thenApply(NotificationUtil::getFirstId);
     }
 
     public CompletableFuture<Void> deleteGroup(long groupId) {
@@ -148,10 +147,7 @@ public class GroupService {
                         "question", question,
                         "answers", answers,
                         "score", score))
-                .thenApply(notification -> {
-                    Int64Values ids = notification.getData().getIds();
-                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
-                });
+                .thenApply(NotificationUtil::getFirstId);
     }
 
     public CompletableFuture<Void> deleteGroupJoinQuestion(long questionId) {
@@ -232,10 +228,7 @@ public class GroupService {
                         "group_id", groupId,
                         "invitee_id", inviteeId,
                         "content", content))
-                .thenApply(notification -> {
-                    Int64Values ids = notification.getData().getIds();
-                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
-                });
+                .thenApply(NotificationUtil::getFirstId);
     }
 
     public CompletableFuture<Void> deleteInvitation(long invitationId) {
@@ -262,10 +255,7 @@ public class GroupService {
                 .send(CreateGroupJoinRequestRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "content", content))
-                .thenApply(notification -> {
-                    Int64Values ids = notification.getData().getIds();
-                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
-                });
+                .thenApply(NotificationUtil::getFirstId);
     }
 
     public CompletableFuture<Void> deleteJoinRequest(long requestId) {
@@ -312,7 +302,11 @@ public class GroupService {
                         "question_id_and_answer", questionIdAndAnswerMap))
                 .thenApply(notification -> {
                     TurmsNotification.Data data = notification.getData();
-                    return data.hasGroupJoinQuestionAnswerResult() ? data.getGroupJoinQuestionAnswerResult() : null;
+                    if (data.hasGroupJoinQuestionAnswerResult()) {
+                        return data.getGroupJoinQuestionAnswerResult();
+                    } else {
+                        throw TurmsBusinessException.get(TurmsStatusCode.MISSING_DATA);
+                    }
                 });
     }
 
