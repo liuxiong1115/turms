@@ -4,7 +4,6 @@ import im.turms.client.driver.TurmsDriver;
 import im.turms.client.service.*;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 
 public class TurmsClient {
     private final TurmsDriver driver;
@@ -16,7 +15,7 @@ public class TurmsClient {
     private final NotificationService notificationService;
 
     public TurmsClient(
-            @NotNull String turmsServerUrl,
+            @Nullable String turmsServerUrl,
             @Nullable Integer connectionTimeout,
             @Nullable Integer minRequestsInterval,
             @Nullable String storageServerUrl) {

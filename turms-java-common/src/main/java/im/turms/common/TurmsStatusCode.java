@@ -69,7 +69,8 @@ public enum TurmsStatusCode {
     CLIENT_USER_ID_AND_PASSWORD_MUST_NOT_NULL(6000, "The user ID and password must not be null", 0),
     CLIENT_SESSION_HAS_BEEN_CLOSED(6001, "The session has been closed", 0),
     CLIENT_SESSION_ALREADY_ESTABLISHED(6002, "The session has been established", 0),
-    CLIENT_REQUESTS_TOO_FREQUENT(6003, "Client requests are too frequent", 0);
+    CLIENT_REQUESTS_TOO_FREQUENT(6003, "Client requests are too frequent", 0),
+    MISSING_DATA(6004, "The data is missing", 0);
 
     private final int businessCode;
     private final String reason;

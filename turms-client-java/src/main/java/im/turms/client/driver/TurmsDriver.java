@@ -52,7 +52,8 @@ public class TurmsDriver {
     private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
     private List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
-    private Function4<Boolean, TurmsCloseStatus, String, Throwable, Void> onClose;
+    // wasLogged, status, reason, error
+    public Function4<Boolean, TurmsCloseStatus, String, Throwable, Void> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
     private int connectionTimeout = 10 * 1000;
@@ -77,10 +78,6 @@ public class TurmsDriver {
 
     public String getSessionId() {
         return sessionId;
-    }
-
-    public void setOnClose(Function4<Boolean, TurmsCloseStatus, String, Throwable, Void> onClose) {
-        this.onClose = onClose;
     }
 
     public TurmsDriver(@Nullable String websocketUrl,

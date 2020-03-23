@@ -4,6 +4,7 @@ import com.google.protobuf.*;
 import im.turms.client.TurmsClient;
 import im.turms.client.model.MessageAddition;
 import im.turms.client.util.MapUtil;
+import im.turms.client.util.NotificationUtil;
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
 import im.turms.common.model.bo.common.Int64Values;
@@ -94,10 +95,7 @@ public class MessageService {
                         "text", text,
                         "records", records,
                         "burn_after", burnAfter))
-                .thenApply(notification -> {
-                    Int64Values ids = notification.getData().getIds();
-                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
-                });
+                .thenApply(NotificationUtil::getFirstId);
     }
 
     public CompletableFuture<Long> forwardMessage(
@@ -110,10 +108,7 @@ public class MessageService {
                         "message_id", messageId,
                         "chat_type", chatType,
                         "to_id", targetId))
-                .thenApply(notification -> {
-                    Int64Values ids = notification.getData().getIds();
-                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
-                });
+                .thenApply(NotificationUtil::getFirstId);
     }
 
     public CompletableFuture<Void> updateSentMessage(

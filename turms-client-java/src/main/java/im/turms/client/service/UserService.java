@@ -4,13 +4,13 @@ import im.turms.client.TurmsClient;
 import im.turms.client.driver.TurmsDriver;
 import im.turms.client.model.UserInfoWithVersion;
 import im.turms.client.util.MapUtil;
+import im.turms.client.util.NotificationUtil;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.ProfileAccessStrategy;
 import im.turms.common.constant.ResponseAction;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.exception.TurmsBusinessException;
-import im.turms.common.model.bo.common.Int64Values;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
 import im.turms.common.model.bo.user.*;
@@ -291,10 +291,7 @@ public class UserService {
                 .send(CreateFriendRequestRequest.newBuilder(), MapUtil.of(
                         "recipient_id", recipientId,
                         "content", content))
-                .thenApply(notification -> {
-                    Int64Values ids = notification.getData().getIds();
-                    return ids.getValuesCount() > 0 ? ids.getValues(0) : null;
-                });
+                .thenApply(NotificationUtil::getFirstId);
     }
 
     public CompletableFuture<Void> replyFriendRequest(
@@ -325,10 +322,7 @@ public class UserService {
         return turmsClient.getDriver()
                 .send(CreateRelationshipGroupRequest.newBuilder(), MapUtil.of(
                         "name", name))
-                .thenApply(notification -> {
-                    Int64Values ids = notification.getData().getIds();
-                    return ids.getValuesCount() > 0 ? (int) ids.getValues(0) : null;
-                });
+                .thenApply(notification -> NotificationUtil.getFirstId(notification).intValue());
     }
 
     public CompletableFuture<Void> deleteRelationshipGroups(
