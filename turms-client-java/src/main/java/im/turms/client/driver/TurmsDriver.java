@@ -52,7 +52,7 @@ public class TurmsDriver {
     private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
     private List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
-    // wasLogged, status, reason, error
+    // wasLogged, close status, reason, error
     public Function4<Boolean, TurmsCloseStatus, String, Throwable, Void> onClose;
 
     private String websocketUrl = "ws://localhost:9510";

@@ -15,7 +15,7 @@ public enum TurmsCloseStatus {
     UNKNOWN_ERROR(4900),
     WEBSOCKET_ERROR(4901);
 
-    private int code;
+    private final int code;
 
     TurmsCloseStatus(int code) {
         this.code = code;
