@@ -43,17 +43,16 @@ public class TurmsDriver {
     public static final String USER_DEVICE_DETAILS = "dd";
     private static final String LOCATION_SPLIT = ":";
 
-    private Integer heartbeatInterval;
+    private final Integer heartbeatInterval;
 
     private WebSocket websocket;
-    private boolean isSessionEstablished;
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> heartbeatFuture;
     private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
     private final List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
-    // wasLogged, close status, reason, error
-    public Function4<Boolean, TurmsCloseStatus, String, Throwable, Void> onClose;
+    // TurmsCloseStatus, WebSocket status code, WebSocket reason, error
+    public Function4<TurmsCloseStatus, Integer, String, Throwable, Void> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
     private int connectionTimeout = 10 * 1000;
@@ -302,7 +301,6 @@ public class TurmsDriver {
     }
 
     private void onWebsocketOpen() {
-        isSessionEstablished = true;
         heartbeatFuture = this.heartbeatTimer.scheduleAtFixedRate(
                 this::checkAndSendHeartbeatTask,
                 heartbeatInterval,
