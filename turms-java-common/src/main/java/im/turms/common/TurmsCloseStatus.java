@@ -17,8 +17,7 @@ public enum TurmsCloseStatus {
     DISCONNECTED_BY_ADMIN(4700),
     USER_IS_DELETED_OR_INACTIVATED(4701),
 
-    UNKNOWN_ERROR(4900),
-    WEBSOCKET_ERROR(4901);
+    UNKNOWN_ERROR(4900);
 
     private final int code;
 
@@ -36,7 +35,7 @@ public enum TurmsCloseStatus {
                 return status;
             }
         }
-        return WEBSOCKET_ERROR;
+        return null;
     }
 
     public boolean is(int code) {
