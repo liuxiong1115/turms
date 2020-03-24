@@ -51,7 +51,7 @@ public class TurmsDriver {
     private ScheduledFuture<?> heartbeatFuture;
     private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
-    private List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
+    private final List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
     // wasLogged, close status, reason, error
     public Function4<Boolean, TurmsCloseStatus, String, Throwable, Void> onClose;
 
@@ -218,9 +218,9 @@ public class TurmsDriver {
                         }
 
                         @Override
-                        public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
+                        public CompletionStage<?> onClose(WebSocket webSocket, int wsStatusCode, String reason) {
                             webSocket.request(1);
-                            onWebsocketClose(statusCode, reason);
+                            onWebsocketClose(wsStatusCode, reason);
                             return null;
                         }
 
@@ -229,24 +229,29 @@ public class TurmsDriver {
                             onWebsocketError(error);
                         }
                     })
-                    .whenComplete((webSocket, throwable) -> {
+                    .handle((webSocket, throwable) -> {
                         if (throwable != null) {
                             Throwable cause = throwable.getCause();
                             // Note that the WebSocketHandshakeException cannot be caught by onError
                             if (cause instanceof WebSocketHandshakeException) {
                                 WebSocketHandshakeException handshakeException = (WebSocketHandshakeException) cause;
-                                int statusCode = handshakeException.getResponse().statusCode();
-                                if (statusCode == 307) {
-                                    String address = handshakeException.getResponse()
-                                            .headers().firstValue("reason").get();
-                                    reconnect(address);
+                                int httpStatusCode = handshakeException.getResponse().statusCode();
+                                if (httpStatusCode == 307) {
+                                    Optional<String> reason = handshakeException.getResponse()
+                                            .headers().firstValue("reason");
+                                    if (reason.isPresent()) {
+                                        return this.reconnect(reason.get());
+                                    }
                                 }
                             }
-                        } else if (webSocket != null) {
+                            return CompletableFuture.failedFuture(throwable);
+                        } else {
                             this.websocket = webSocket;
+                            return CompletableFuture.completedFuture(null);
                         }
                     })
-                    .thenApply(webSocket -> null);
+                    .thenCompose(future -> future)
+                    .thenApply(ignored -> null);
         }
     }
 
@@ -318,12 +323,14 @@ public class TurmsDriver {
         cancelHeartbeatFuture();
         TurmsCloseStatus status = TurmsCloseStatus.get(code);
         if (status == TurmsCloseStatus.REDIRECT) {
-            reconnect(reason);
-        } else if (onClose != null) {
-            if (status == TurmsCloseStatus.WEBSOCKET_ERROR) {
-                reason = String.valueOf(code);
+            try {
+                reconnect(reason).get(10, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                RuntimeException runtimeException = new RuntimeException("Failed to reconnect", e);
+                onClose.apply(wasLogged, status, String.format("%d:%s", code, reason), runtimeException);
             }
-            onClose.apply(wasLogged, status, reason, null);
+        } else if (onClose != null) {
+            onClose.apply(wasLogged, status, String.format("%d:%s", code, reason), null);
         }
     }
 
@@ -334,10 +341,10 @@ public class TurmsDriver {
         onClose.apply(wasLogged, null, null, error);
     }
 
-    private void reconnect(String address) {
+    private CompletableFuture<Void> reconnect(String address) {
         boolean isSecure = websocketUrl.startsWith("wss://");
         websocketUrl = (isSecure ? "wss://" : "ws://") + address;
-        this.connect(userId, password, connectionTimeout, userLocation, userOnlineStatus, deviceType);
+        return this.connect(userId, password, connectionTimeout, userLocation, userOnlineStatus, deviceType);
     }
 
     private void cancelHeartbeatFuture() {

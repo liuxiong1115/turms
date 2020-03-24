@@ -19,15 +19,19 @@ package im.turms.turms.access.websocket.config;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.common.SessionUtil;
 import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.plugin.UserAuthenticator;
 import im.turms.turms.pojo.bo.UserLoginInfo;
+import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserService;
 import im.turms.turms.service.user.UserSimultaneousLoginService;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -43,37 +47,45 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Validated
 public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
+    private static final String RESPONSE_HEADER_REASON = "reason";
+
     private final TurmsClusterManager turmsClusterManager;
     private final UserService userService;
     private final UserSimultaneousLoginService userSimultaneousLoginService;
     private final TurmsPluginManager turmsPluginManager;
+    private final Set<DeviceType> degradedDeviceTypes;
+    private final boolean enableQueryLoginFailedReason;
     private final boolean pluginEnabled;
     /**
-     * Pair<user id, login request id> ->
+     * Triple<user ID, device type, login request ID> -> reason
      * 1. Integer: http status code
      * 2. String: redirect address
      * <p>
      * Note:
      * 1. The reason to cache both user ID and request ID (as a token) is to
-     * prevent others from being able to query others' login failed reason.
+     * prevent others from querying others' login failed reason.
      * 2. To keep it simple, don't define/use a new model
      */
-    private Cache<Pair<Long, Long>, Object> loginFailedReasonCache;
+    private final Cache<Triple<Long, DeviceType, Long>, Object> loginFailedReasonCache;
 
     @Autowired
-    public TurmsHandshakeWebSocketService(UserService userService, TurmsClusterManager turmsClusterManager, UserSimultaneousLoginService userSimultaneousLoginService, TurmsPluginManager turmsPluginManager) {
+    public TurmsHandshakeWebSocketService(UserService userService, TurmsClusterManager turmsClusterManager, UserSimultaneousLoginService userSimultaneousLoginService, TurmsPluginManager turmsPluginManager, TurmsProperties turmsProperties) {
         this.userService = userService;
         this.turmsClusterManager = turmsClusterManager;
         this.userSimultaneousLoginService = userSimultaneousLoginService;
         this.turmsPluginManager = turmsPluginManager;
         this.loginFailedReasonCache = Caffeine
                 .newBuilder()
-                .expireAfterWrite(Duration.ofMinutes(10L))
+                .maximumSize(turmsProperties.getCache().getLoginFailedReasonCacheMaxSize())
+                .expireAfterWrite(Duration.ofSeconds(turmsProperties.getCache().getLoginFailedReasonExpireAfter()))
                 .build();
+        degradedDeviceTypes = turmsProperties.getSession().getDegradedDeviceTypesForLoginFailedReason();
+        enableQueryLoginFailedReason = turmsProperties.getSession().isEnableQueryLoginFailedReason();
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
     }
 
@@ -82,27 +94,28 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
      */
     @Override
     public Mono<Void> handleRequest(ServerWebExchange exchange, WebSocketHandler handler) {
-        if (!turmsClusterManager.isServing()) {
-            return Mono.error(new ResponseStatusException(HttpStatus.GONE));
-        }
         ServerHttpRequest request = exchange.getRequest();
         Long userId = SessionUtil.getUserIdFromRequest(request);
         Long requestId = SessionUtil.getRequestIdFromRequest(request);
+        Pair<String, DeviceType> loggingInDeviceType = SessionUtil.parseDeviceTypeFromRequest(
+                request,
+                turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
+        DeviceType deviceType = loggingInDeviceType.getRight();
+        if (!turmsClusterManager.isServing()) {
+            return tryCacheReasonAndReturnError(exchange, HttpStatus.GONE, deviceType, userId, requestId);
+        }
         if (userId == null) {
-            return cacheAndReturnError(exchange, HttpStatus.UNAUTHORIZED, userId, requestId);
+            return tryCacheReasonAndReturnError(exchange, HttpStatus.UNAUTHORIZED, deviceType, userId, requestId);
         } else if (!turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
-            return cacheAndReturnError(exchange, HttpStatus.TEMPORARY_REDIRECT, userId, requestId);
+            return tryCacheReasonAndReturnError(exchange, HttpStatus.TEMPORARY_REDIRECT, deviceType, userId, requestId);
         } else {
             return userService.isActiveAndNotDeleted(userId)
                     .flatMap(isActiveAndNotDeleted -> {
                         if (isActiveAndNotDeleted == null || !isActiveAndNotDeleted) {
-                            return cacheAndReturnError(exchange, HttpStatus.UNAUTHORIZED, userId, requestId);
+                            return tryCacheReasonAndReturnError(exchange, HttpStatus.UNAUTHORIZED, deviceType, userId, requestId);
                         }
-                        Pair<String, DeviceType> loggingInDeviceType = SessionUtil.parseDeviceTypeFromRequest(
-                                request,
-                                turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
-                        if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, loggingInDeviceType.getRight())) {
-                            return cacheAndReturnError(exchange, HttpStatus.CONFLICT, userId, requestId);
+                        if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, deviceType)) {
+                            return tryCacheReasonAndReturnError(exchange, HttpStatus.CONFLICT, deviceType, userId, requestId);
                         } else {
                             String password = SessionUtil.getPasswordFromRequest(request);
                             Mono<Boolean> authenticate = Mono.empty();
@@ -112,7 +125,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                                     UserLoginInfo userLoginInfo = new UserLoginInfo(
                                             userId,
                                             password,
-                                            loggingInDeviceType.getRight(),
+                                            deviceType,
                                             loggingInDeviceType.getLeft());
                                     for (UserAuthenticator authenticator : authenticatorList) {
                                         Mono<Boolean> authenticateMono = authenticator.authenticate(userLoginInfo);
@@ -123,20 +136,20 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                             return authenticate.switchIfEmpty(userService.authenticate(userId, password))
                                     .flatMap(authenticated -> {
                                         if (authenticated != null && authenticated) {
-                                            return userSimultaneousLoginService.setConflictedDevicesOffline(userId, loggingInDeviceType.getRight())
+                                            return userSimultaneousLoginService.setConflictedDevicesOffline(userId, deviceType)
                                                     .flatMap(success -> {
                                                         if (success) {
                                                             if (password != null && !password.isBlank()) {
                                                                 return super.handleRequest(exchange, handler);
                                                             } else {
-                                                                return cacheAndReturnError(exchange, HttpStatus.UNAUTHORIZED, userId, requestId);
+                                                                return tryCacheReasonAndReturnError(exchange, HttpStatus.UNAUTHORIZED, deviceType, userId, requestId);
                                                             }
                                                         } else {
-                                                            return cacheAndReturnError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, userId, requestId);
+                                                            return tryCacheReasonAndReturnError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, deviceType, userId, requestId);
                                                         }
                                                     });
                                         } else {
-                                            return cacheAndReturnError(exchange, HttpStatus.UNAUTHORIZED, userId, requestId);
+                                            return tryCacheReasonAndReturnError(exchange, HttpStatus.UNAUTHORIZED, deviceType, userId, requestId);
                                         }
                                     });
                         }
@@ -144,31 +157,46 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         }
     }
 
-    private Mono<Void> cacheAndReturnError(
+    private Mono<Void> tryCacheReasonAndReturnError(
             @NotNull ServerWebExchange exchange,
             @NotNull HttpStatus httpStatus,
+            @Nullable DeviceType deviceType,
             @Nullable Long userId,
             @Nullable Long requestId) {
-        if (userId != null && requestId != null) {
-            if (httpStatus != HttpStatus.TEMPORARY_REDIRECT) {
-                loginFailedReasonCache.put(Pair.of(userId, requestId), httpStatus.value());
-            } else {
+        boolean shouldCache = enableQueryLoginFailedReason &&
+                deviceType != null &&
+                degradedDeviceTypes.contains(deviceType) &&
+                userId != null &&
+                requestId != null;
+        if (httpStatus == HttpStatus.TEMPORARY_REDIRECT) {
+            if (userId != null) {
                 return turmsClusterManager.getResponsibleTurmsServerAddress(userId)
                         .doOnNext(address -> {
-                            exchange.getResponse().getHeaders().put("reason", List.of(address));
-                            loginFailedReasonCache.put(Pair.of(userId, requestId), address);
+                            exchange.getResponse().getHeaders().put(RESPONSE_HEADER_REASON, List.of(address));
+                            if (shouldCache) {
+                                loginFailedReasonCache.put(Triple.of(userId, deviceType, requestId), address);
+                            }
                         })
                         .then(Mono.error(new ResponseStatusException(httpStatus)));
+            } else {
+                return Mono.error(new ResponseStatusException(httpStatus));
             }
+        } else {
+            if (shouldCache) {
+                loginFailedReasonCache.put(Triple.of(userId, deviceType, requestId), httpStatus.value());
+            }
+            return Mono.error(new ResponseStatusException(httpStatus));
         }
-        return Mono.error(new ResponseStatusException(httpStatus));
     }
 
-    public Object getFailedReason(@NotNull Long userId, @NotNull Long requestId) {
-        if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryLoginFailedReason()) {
-            return loginFailedReasonCache.getIfPresent(Pair.of(userId, requestId));
+    public Object getLoginFailedReason(@NotNull Long userId, @NotNull DeviceType deviceType, @NotNull Long requestId) {
+        if (!enableQueryLoginFailedReason) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        } else if (!degradedDeviceTypes.contains(deviceType)) {
+            String reason = String.format("The device type %s is not allowed to query login-failed reason", deviceType);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, reason);
         } else {
-            return null;
+            return loginFailedReasonCache.getIfPresent(Triple.of(userId, deviceType, requestId));
         }
     }
 }
