@@ -17,6 +17,7 @@
 
 package im.turms.turms.access.web.controller;
 
+import im.turms.common.constant.DeviceType;
 import im.turms.turms.access.websocket.config.TurmsHandshakeWebSocketService;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -42,16 +43,19 @@ public class ReasonController {
 
     @GetMapping("/login-failed")
     @RequiredPermission(NONE)
-    public Object getLoginFailedReason(
+    public ResponseEntity<Object> getLoginFailedReason(
             @RequestParam Long userId,
+            @RequestParam DeviceType deviceType,
             @RequestParam Long requestId) {
-        Object reason = handshakeService.getFailedReason(userId, requestId);
+        Object reason = handshakeService.getLoginFailedReason(userId, deviceType, requestId);
         if (reason instanceof String) {
             return ResponseEntity
                     .status(HttpStatus.TEMPORARY_REDIRECT)
                     .body(reason);
         } else {
-            return reason;
+            return ResponseEntity
+                    .status((int) reason)
+                    .build();
         }
     }
 
@@ -59,7 +63,8 @@ public class ReasonController {
     @RequiredPermission(NONE)
     public Integer getDisconnectionReason(
             @RequestParam Long userId,
+            @RequestParam DeviceType deviceType,
             @RequestParam String sessionId) {
-        return onlineUserService.getDisconnectionReason(userId, sessionId);
+        return onlineUserService.getDisconnectionReason(userId, deviceType, sessionId);
     }
 }

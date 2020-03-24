@@ -24,7 +24,6 @@ import com.hazelcast.cluster.Member;
 import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
-import im.turms.common.constant.RequestStatus;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
@@ -45,6 +44,7 @@ import im.turms.turms.task.*;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -83,6 +83,8 @@ public class OnlineUserService {
     private final HashedWheelTimer heartbeatTimer;
     private final TrivialTaskService onlineUsersNumberPersisterTimer;
     private final TurmsTaskExecutor turmsTaskExecutor;
+    private final Set<DeviceType> degradedDeviceTypes;
+    private final boolean enableQueryDisconnectionReason;
     private final boolean locationEnabled;
     private final boolean pluginEnabled;
     /**
@@ -90,9 +92,9 @@ public class OnlineUserService {
      */
     private final List<Map<Long, OnlineUserManager>> onlineUsersManagerAtSlots;
     /**
-     * Pair<user ID, session ID> -> CloseStatus
+     * Triple<user ID, device type, session ID> -> Custom CloseStatus (TurmsCloseStatus)
      */
-    private final Cache<Pair<Long, String>, Integer> disconnectionReasonCache;
+    private final Cache<Triple<Long, DeviceType, String>, Integer> disconnectionReasonCache;
 
     public OnlineUserService(
             TurmsClusterManager turmsClusterManager,
@@ -102,7 +104,8 @@ public class OnlineUserService {
             UserLocationService userLocationService,
             TurmsTaskExecutor turmsTaskExecutor,
             TurmsPluginManager turmsPluginManager,
-            TrivialTaskService trivialTaskService) {
+            TrivialTaskService trivialTaskService,
+            TurmsProperties turmsProperties) {
         this.turmsClusterManager = turmsClusterManager;
         this.usersNearbyService = usersNearbyService;
         turmsClusterManager.addListenerOnMembersChange(
@@ -119,12 +122,15 @@ public class OnlineUserService {
         this.onlineUsersNumberPersisterTimer = trivialTaskService;
         this.disconnectionReasonCache = Caffeine
                 .newBuilder()
-                .expireAfterWrite(Duration.ofMinutes(10))
+                .maximumSize(turmsProperties.getCache().getDisconnectionReasonCacheMaxSize())
+                .expireAfterWrite(Duration.ofSeconds(turmsProperties.getCache().getDisconnectionReasonExpireAfter()))
                 .build();
-        this.onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
-        this.locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
+        degradedDeviceTypes = turmsProperties.getSession().getDegradedDeviceTypesForDisconnectionReason();
+        onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
+        enableQueryDisconnectionReason = turmsClusterManager.getTurmsProperties().getSession().isEnableQueryDisconnectionReason();
+        locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
         rescheduleOnlineUsersNumberPersister();
-        TurmsProperties.addListeners(turmsProperties -> {
+        TurmsProperties.addListeners(properties -> {
             rescheduleOnlineUsersNumberPersister();
             return null;
         });
@@ -200,9 +206,12 @@ public class OnlineUserService {
                     .subscribe();
         }
         session.getNotificationSink().complete();
-        usersNearbyService.removeUserLocation(userId, session.getDeviceType());
-        disconnectionReasonCache.put(Pair.of(userId, session.getWebSocketSession().getId()),
-                closeStatus.getCode());
+        DeviceType deviceType = session.getDeviceType();
+        usersNearbyService.removeUserLocation(userId, deviceType);
+        if (degradedDeviceTypes.contains(deviceType)) {
+            disconnectionReasonCache.put(Triple.of(userId, deviceType, session.getWebSocketSession().getId()),
+                    closeStatus.getCode());
+        }
     }
 
     private void setManagersOffline(@NotNull CloseStatus closeStatus, @NotNull Collection<OnlineUserManager> managers) {
@@ -635,11 +644,14 @@ public class OnlineUserService {
         return false;
     }
 
-    public Integer getDisconnectionReason(@NotNull Long userId, @NotNull String sessionId) {
-        if (turmsClusterManager.getTurmsProperties().getSession().isEnableQueryLoginFailedReason()) {
-            return disconnectionReasonCache.getIfPresent(Pair.of(userId, sessionId));
+    public Integer getDisconnectionReason(@NotNull Long userId, @NotNull DeviceType deviceType, @NotNull String sessionId) {
+        if (!enableQueryDisconnectionReason) {
+            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+        } else if (!degradedDeviceTypes.contains(deviceType)) {
+            String reason = String.format("The device type %s is not allowed to query disconnection reason", deviceType);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, reason);
         } else {
-            return null;
+            return disconnectionReasonCache.getIfPresent(Triple.of(userId, deviceType, sessionId));
         }
     }
 }

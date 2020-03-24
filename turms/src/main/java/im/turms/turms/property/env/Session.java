@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import im.turms.common.constant.DeviceType;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
@@ -29,9 +30,12 @@ import lombok.Data;
 
 import javax.validation.constraints.Min;
 import java.io.IOException;
+import java.util.Set;
 
 @Data
 public class Session implements IdentifiedDataSerializable {
+    private static final Set<DeviceType> BROWSER_SET = Set.of(DeviceType.BROWSER);
+    
     @JsonView(MutablePropertiesView.class)
     @Description("A websocket connection will be closed if the turms server doesn't receive any request (including heartbeat request) from the client during requestHeartbeatTimeoutSeconds")
     @Min(0)
@@ -42,13 +46,17 @@ public class Session implements IdentifiedDataSerializable {
     @Min(0)
     private int minHeartbeatRefreshIntervalSeconds = 3;
 
-    @JsonView(MutablePropertiesView.class)
     @Description("Whether to enable to query the login failed reason")
     private boolean enableQueryLoginFailedReason = true;
 
-    @JsonView(MutablePropertiesView.class)
     @Description("Whether to enable to query the disconnection reason")
     private boolean enableQueryDisconnectionReason = true;
+
+    @Description("The degraded device types that need to query the disconnection reason")
+    private Set<DeviceType> degradedDeviceTypesForDisconnectionReason = BROWSER_SET;
+
+    @Description("The degraded device types that need to query the login-failed reason")
+    private Set<DeviceType> degradedDeviceTypesForLoginFailedReason = BROWSER_SET;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to notify clients of the session information after connected with a turms server")
@@ -60,7 +68,6 @@ public class Session implements IdentifiedDataSerializable {
      */
 //    @JsonView(MutablePropertiesView.class)
 //    private int idleHeartbeatTimeoutSeconds = 0;
-
     @JsonIgnore
     @Override
     public int getFactoryId() {
