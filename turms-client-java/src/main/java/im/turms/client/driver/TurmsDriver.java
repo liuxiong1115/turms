@@ -216,6 +216,9 @@ public class TurmsDriver {
                             return CompletableFuture.completedStage(notification);
                         }
 
+                        /**
+                         * This is the last invocation from the specified WebSocket.
+                         */
                         @Override
                         public CompletionStage<?> onClose(WebSocket webSocket, int wsStatusCode, String reason) {
                             webSocket.request(1);
@@ -223,6 +226,9 @@ public class TurmsDriver {
                             return null;
                         }
 
+                        /**
+                         * This is the last invocation from the specified WebSocket.
+                         */
                         @Override
                         public void onError(WebSocket webSocket, Throwable error) {
                             onWebsocketError(error);
@@ -316,8 +322,6 @@ public class TurmsDriver {
     }
 
     private void onWebsocketClose(int code, String reason) {
-        boolean wasLogged = isSessionEstablished;
-        isSessionEstablished = false;
         cancelHeartbeatFuture();
         TurmsCloseStatus status = TurmsCloseStatus.get(code);
         if (status == TurmsCloseStatus.REDIRECT) {
@@ -325,18 +329,16 @@ public class TurmsDriver {
                 reconnect(reason).get(10, TimeUnit.SECONDS);
             } catch (Exception e) {
                 RuntimeException runtimeException = new RuntimeException("Failed to reconnect", e);
-                onClose.apply(wasLogged, status, String.format("%d:%s", code, reason), runtimeException);
+                onClose.apply(status, code, reason, runtimeException);
             }
         } else if (onClose != null) {
-            onClose.apply(wasLogged, status, String.format("%d:%s", code, reason), null);
+            onClose.apply(status, code, reason, null);
         }
     }
 
     private void onWebsocketError(Throwable error) {
-        boolean wasLogged = isSessionEstablished;
-        isSessionEstablished = false;
         cancelHeartbeatFuture();
-        onClose.apply(wasLogged, null, null, error);
+        onClose.apply(null, null, null, error);
     }
 
     private CompletableFuture<Void> reconnect(String address) {
