@@ -52,7 +52,7 @@ public class TurmsDriver {
 
     private final List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
     // TurmsCloseStatus, WebSocket status code, WebSocket reason, error
-    public Function4<TurmsCloseStatus, Integer, String, Throwable, Void> onClose;
+    private Function4<TurmsCloseStatus, Integer, String, Throwable, Void> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
     private int connectionTimeout = 10 * 1000;
@@ -77,6 +77,10 @@ public class TurmsDriver {
 
     public String getSessionId() {
         return sessionId;
+    }
+
+    public void setOnClose(Function4<TurmsCloseStatus, Integer, String, Throwable, Void> onClose) {
+        this.onClose = onClose;
     }
 
     public TurmsDriver(@Nullable String websocketUrl,
