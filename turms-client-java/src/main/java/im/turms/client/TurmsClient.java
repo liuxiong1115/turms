@@ -14,6 +14,21 @@ public class TurmsClient {
 
     private final NotificationService notificationService;
 
+    public TurmsClient() {
+        this(null, null, null, null);
+    }
+
+    public TurmsClient(@Nullable String turmsServerUrl) {
+        this(turmsServerUrl, null, null, null);
+    }
+
+    public TurmsClient(
+            @Nullable String turmsServerUrl,
+            @Nullable Integer connectionTimeout,
+            @Nullable Integer minRequestsInterval) {
+        this(turmsServerUrl, connectionTimeout, minRequestsInterval, null);
+    }
+
     public TurmsClient(
             @Nullable String turmsServerUrl,
             @Nullable Integer connectionTimeout,
