@@ -70,13 +70,13 @@ public class WsMessageControllerST extends BaseController {
 
     @Test
     public void handleCreateMessageRequest_shouldRelayMessageImmediately() throws InterruptedException, TimeoutException, ExecutionException {
-        TurmsClient clientOne = new TurmsClient(Constants.WS_URL, null, null, null);
+        TurmsClient clientOne = new TurmsClient(Constants.WS_URL);
         clientOne.getUserService()
-                .login(1L, "123", null, null, null)
+                .login(1L, "123")
                 .get(5, TimeUnit.SECONDS);
-        TurmsClient clientTwo = new TurmsClient(Constants.WS_URL, null, null, null);
+        TurmsClient clientTwo = new TurmsClient(Constants.WS_URL);
         clientTwo.getUserService()
-                .login(2L, "123", null, null, null)
+                .login(2L, "123")
                 .get(5, TimeUnit.SECONDS);
         Long sentMessageId = clientOne.getMessageService()
                 .sendMessage(ChatType.PRIVATE, 2L, null, "test", null, null)

@@ -61,6 +61,12 @@ public class UserService {
                 .thenApply(webSocket -> null);
     }
 
+    public CompletableFuture<Void> login(
+            long userId,
+            @NotNull String password) {
+        return login(userId, password, null, null, null);
+    }
+
     public CompletableFuture<Void> relogin() {
         if (userId != null && password != null) {
             return this.login(userId, password, location, userOnlineStatus, deviceType);

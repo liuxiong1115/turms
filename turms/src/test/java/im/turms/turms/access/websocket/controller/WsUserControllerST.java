@@ -58,7 +58,7 @@ public class WsUserControllerST extends BaseController {
 
     @Test
     public void queryUserGroupInvitations_shouldReturn() throws InterruptedException, TimeoutException, ExecutionException {
-        TurmsClient client = new TurmsClient(Constants.WS_URL, null, null, null);
+        TurmsClient client = new TurmsClient(Constants.WS_URL);
         GroupInvitationsWithVersion version = client.getUserService().queryUserGroupInvitations(null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(version);
