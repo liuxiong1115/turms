@@ -21,13 +21,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import im.turms.common.constant.DeviceType;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import jdk.jfr.Description;
 import lombok.Data;
 
 import java.io.IOException;
-import java.util.Set;
 
 @Data
 public class Cache implements IdentifiedDataSerializable {

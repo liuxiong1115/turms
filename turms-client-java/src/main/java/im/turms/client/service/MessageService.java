@@ -7,7 +7,6 @@ import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
-import im.turms.common.model.bo.common.Int64Values;
 import im.turms.common.model.bo.file.AudioFile;
 import im.turms.common.model.bo.file.File;
 import im.turms.common.model.bo.file.ImageFile;
@@ -55,7 +54,8 @@ public class MessageService {
 
     private final TurmsClient turmsClient;
     private Function<Message, Set<Long>> mentionedUserIdsParser;
-    public BiFunction<Message, MessageAddition, Void> onMessage;
+
+    private BiFunction<Message, MessageAddition, Void> onMessage;
 
     public MessageService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;
@@ -73,6 +73,10 @@ public class MessageService {
                     }
                     return null;
                 });
+    }
+
+    public void setOnMessage(BiFunction<Message, MessageAddition, Void> onMessage) {
+        this.onMessage = onMessage;
     }
 
     public CompletableFuture<Long> sendMessage(
