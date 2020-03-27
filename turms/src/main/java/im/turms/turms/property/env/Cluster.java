@@ -44,7 +44,6 @@ public class Cluster implements IdentifiedDataSerializable {
      * The recommended value should be evaluated through the formula "floor(totalTurmsNodesNumber / 2) + 1".
      * For example, you need to set the value to 5 when deploying 9 turms nodes,
      * Note: The total number of turms nodes deployed should better be an odd number, or there will be a split brain problem.
-     * The value is also used to enable a node when the number of connected nodes reaching the value if allowSplitBrain is false.
      */
     @JsonView(MutablePropertiesView.class)
     @Description("A turms server can only start to serve when connecting the minimum number of other turms nodes")

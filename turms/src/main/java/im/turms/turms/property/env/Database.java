@@ -70,6 +70,7 @@ public class Database implements IdentifiedDataSerializable {
         private com.mongodb.WriteConcern message = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern messageStatus = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern user = com.mongodb.WriteConcern.ACKNOWLEDGED;
+        private com.mongodb.WriteConcern userActionLog = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userFriendRequest = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userLocation = com.mongodb.WriteConcern.ACKNOWLEDGED;
         private com.mongodb.WriteConcern userLoginLog = com.mongodb.WriteConcern.ACKNOWLEDGED;
