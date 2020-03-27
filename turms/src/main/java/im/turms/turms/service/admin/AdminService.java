@@ -236,13 +236,17 @@ public class AdminService {
             return Mono.just(adminInfo.getAdmin());
         } else {
             return mongoTemplate.findById(account, Admin.class)
-                    .doOnNext(admin -> adminMap.put(account, new AdminInfo(admin, null)));
+                    .doOnNext(admin -> {
+                        adminMap.put(account, new AdminInfo(admin, null));
+                    });
         }
     }
 
     public void loadAllAdmins() {
         mongoTemplate.find(new Query(), Admin.class)
-                .doOnNext(admin -> adminMap.put(admin.getAccount(), new AdminInfo(admin, null)))
+                .doOnNext(admin -> {
+                    adminMap.put(admin.getAccount(), new AdminInfo(admin, null));
+                })
                 .subscribe();
     }
 

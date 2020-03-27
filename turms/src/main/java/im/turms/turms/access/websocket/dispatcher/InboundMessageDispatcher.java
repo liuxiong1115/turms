@@ -109,6 +109,15 @@ public class InboundMessageDispatcher {
                 onlineUserService.setLocalUserOffline(userId, CloseStatusFactory.get(TurmsCloseStatus.SERVER_UNAVAILABLE));
                 return Mono.empty();
             }
+            // The code is to handle the edge case that a user is logging in and ready to become logged status (online)
+            // and the responsibility of cluster members is redistributing, and members are disconnecting online users.
+            // If it's done before the user becomes online status, the user will be connecting to an irresponsible server that cannot realize it.
+            String serverAddress = turmsClusterManager.getAddressIfCurrentNodeIrresponsibleByUserId(userId);
+            if (serverAddress != null) {
+                onlineUserService.setLocalUserOffline(userId, CloseStatusFactory.get(TurmsCloseStatus.REDIRECT, serverAddress));
+                return Mono.empty();
+            }
+
             onlineUserService.resetHeartbeatTimeout(userId, deviceType);
             switch (webSocketMessage.getType()) {
                 case BINARY:
@@ -120,8 +129,9 @@ public class InboundMessageDispatcher {
                     return Mono.just(session.pongMessage(DataBufferFactory::allocateBuffer));
             }
         } else {
-            session.close(CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "The user ID is missing")).subscribe();
-            throw new NoSuchElementException("UserId is missing in session");
+            // This should never happen
+            return session.close(CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "The user ID is missing"))
+                    .then(Mono.error(new NoSuchElementException("The user ID is missing in session")));
         }
     }
 

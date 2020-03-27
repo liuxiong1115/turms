@@ -67,9 +67,9 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
      * 2. String: redirect address
      * <p>
      * Note:
-     * 1. The reason to cache both user ID and request ID (as a token) is to
+     * 1. The reason to cache the request ID (as a token) is to
      * prevent others from querying others' login failed reason.
-     * 2. To keep it simple, don't define/use a new model
+     * 2. To keep it simple, use Object to avoid defining/using a new model
      */
     private final Cache<Triple<Long, DeviceType, Long>, Object> loginFailedReasonCache;
 
@@ -168,26 +168,21 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                 degradedDeviceTypes.contains(deviceType) &&
                 userId != null &&
                 requestId != null;
+        Object value = null;
         if (httpStatus == HttpStatus.TEMPORARY_REDIRECT) {
             if (userId != null) {
-                return turmsClusterManager.getResponsibleTurmsServerAddress(userId)
-                        .doOnNext(address -> {
+                String address = turmsClusterManager.getResponsibleTurmsServerAddress(userId);
                             exchange.getResponse().getHeaders().put(RESPONSE_HEADER_REASON, List.of(address));
-                            if (shouldCache) {
-                                loginFailedReasonCache.put(Triple.of(userId, deviceType, requestId), address);
+                value = address;
                             }
-                        })
-                        .then(Mono.error(new ResponseStatusException(httpStatus)));
             } else {
-                return Mono.error(new ResponseStatusException(httpStatus));
+            value = httpStatus.value();
             }
-        } else {
             if (shouldCache) {
-                loginFailedReasonCache.put(Triple.of(userId, deviceType, requestId), httpStatus.value());
+            loginFailedReasonCache.put(Triple.of(userId, deviceType, requestId), value);
             }
             return Mono.error(new ResponseStatusException(httpStatus));
         }
-    }
 
     public Object getLoginFailedReason(@NotNull Long userId, @NotNull DeviceType deviceType, @NotNull Long requestId) {
         if (!enableQueryLoginFailedReason) {
