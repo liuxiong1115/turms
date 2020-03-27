@@ -60,6 +60,8 @@ public class AddressUtil {
 
     @PostConstruct
     private void initAddresses() throws UnknownHostException {
+        Environment env = context.getEnvironment();
+        isSslEnabled = Boolean.parseBoolean(env.getProperty("server.ssl.enabled", "false"));
         addressTuple = queryAddresses();
         for (Function<AddressTuple, Void> listener : onAddressChangeListeners) {
             listener.apply(addressTuple);
@@ -69,8 +71,6 @@ public class AddressUtil {
     private AddressTuple queryAddresses() throws UnknownHostException {
         String ip = queryIp(turmsClusterManager.getTurmsProperties());
         if (ip != null) {
-            Environment env = context.getEnvironment();
-            isSslEnabled = Boolean.parseBoolean(env.getProperty("server.ssl.enabled", "false"));
             return new AddressTuple(ip,
                     String.format("%s://%s", isSslEnabled ? "https" : "http", ip),
                     String.format("%s://%s", isSslEnabled ? "wss" : "ws", ip));

@@ -40,6 +40,7 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -78,7 +79,7 @@ public class HazelcastConfig {
                 instance = Hazelcast.newHazelcastInstance(config);
             }
         } else {
-            throw new RuntimeException("The config file for Hazelcast is missing");
+            throw new NoSuchFileException("The config file for Hazelcast is missing");
         }
         turmsClusterManager.setHazelcastInstance(instance);
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(PostHazelcastInitialized.class);

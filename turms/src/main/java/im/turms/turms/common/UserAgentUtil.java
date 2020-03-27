@@ -22,7 +22,7 @@ import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -54,20 +54,30 @@ public class UserAgentUtil {
             .withFields(REQUIRED_FIELDS)
             .build();
 
-    public static Map<String, String> parse(@NotNull String agent) {
-        Map<String, String> map = new HashMap<>(REQUIRED_FIELDS.size());
-        UserAgent userAgent = agentAnalyzer.parse(agent);
-        for (String field : REQUIRED_FIELDS) {
-            putIfNotDefault(map, userAgent, field);
+    static {
+        parse("User-Agent,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36");
+    }
+
+    public static Map<String, String> parse(@Nullable String agent) {
+        if (agent != null) {
+            Map<String, String> map = new HashMap<>(REQUIRED_FIELDS.size());
+            UserAgent userAgent = agentAnalyzer.parse(agent);
+            for (String field : REQUIRED_FIELDS) {
+                putIfNotDefault(map, userAgent, field);
+            }
+            return map;
+        } else {
+            return Collections.emptyMap();
         }
-        return map;
     }
 
     public static DeviceType detectDeviceTypeIfUnset(
             @Nullable DeviceType deviceType,
-            @NotNull Map<String, String> deviceDetails,
+            @Nullable Map<String, String> deviceDetails,
             boolean useOsAsDefaultDeviceType) {
-        if (deviceType == null || deviceType == DeviceType.UNKNOWN) {
+        boolean isInvalidDeviceType = deviceType == null || deviceType == DeviceType.UNKNOWN;
+        boolean isValidDeviceDetails = deviceDetails != null && !deviceDetails.isEmpty();
+        if (isInvalidDeviceType && isValidDeviceDetails) {
             if (useOsAsDefaultDeviceType) {
                 String osClass = deviceDetails.get(KEY_MAPPER.get(UserAgent.OPERATING_SYSTEM_CLASS));
                 if (osClass != null) {

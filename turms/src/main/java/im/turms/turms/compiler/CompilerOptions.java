@@ -18,7 +18,7 @@
 package im.turms.turms.compiler;
 
 /**
- * Note that == should be used instead of equals() due to code optimization.
+ * Note that == should be used instead of equals() due to compiler optimization.
  */
 public class CompilerOptions {
 

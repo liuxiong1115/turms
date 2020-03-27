@@ -18,7 +18,6 @@
 package im.turms.turms.access.websocket.config;
 
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
-import com.google.common.net.InetAddresses;
 import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
@@ -40,9 +39,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
@@ -54,16 +51,14 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
     private final OnlineUserService onlineUserService;
     private final boolean locationEnabled;
 
-    public TurmsWebSocketHandler(InboundMessageDispatcher inboundMessageDispatcher, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager) {
+    public TurmsWebSocketHandler(
+            InboundMessageDispatcher inboundMessageDispatcher,
+            OnlineUserService onlineUserService,
+            TurmsClusterManager turmsClusterManager) {
         this.inboundMessageDispatcher = inboundMessageDispatcher;
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
         this.locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
-    }
-
-    @PostConstruct
-    public void warmUp() {
-        UserAgentUtil.parse("User-Agent,Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36");
     }
 
     @Override
@@ -79,23 +74,18 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
         } else {
             userLocation = null;
         }
-        String agent = session.getHandshakeInfo().getHeaders().getFirst("User-Agent");
+        String agent = session.getHandshakeInfo().getHeaders().getFirst(HttpHeaders.USER_AGENT);
         Map<String, String> deviceDetails = UserAgentUtil.parse(agent);
         deviceType = UserAgentUtil.detectDeviceTypeIfUnset(
                 deviceType,
                 deviceDetails,
                 turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
-        InetSocketAddress ip = session.getHandshakeInfo().getRemoteAddress();
-        if (userId != null && ip != null) {
-            Integer ipInNumber;
-            try {
-                ipInNumber = InetAddresses.coerceToInteger(InetAddresses.forString(ip.getHostString()));
-                SessionUtil.putIp(session.getAttributes(), ipInNumber);
-            } catch (Exception e) {
-                ipInNumber = null;
+        if (userId != null) {
+            Integer ip = SessionUtil.parseIp(session);
+            if (ip != null) {
+                SessionUtil.putIp(session.getAttributes(), ip);
             }
             SessionUtil.putOnlineUserInfoToSession(session, userId, userStatus, deviceType, userLocation);
-            Integer finalIpInNumber = ipInNumber;
             DeviceType finalDeviceType = deviceType;
             Flux<WebSocketMessage> notificationOutput = Flux.create(notificationSink ->
                     onlineUserService.addOnlineUser(
@@ -103,7 +93,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                             userStatus,
                             finalDeviceType,
                             deviceDetails,
-                            finalIpInNumber,
+                            ip,
                             userLocation,
                             session,
                             notificationSink)

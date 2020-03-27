@@ -36,7 +36,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -49,8 +48,6 @@ import java.util.function.Function;
 @Log4j2
 @Component
 public class TurmsClusterManager {
-    @Value("${server.port}")
-    private Integer port;
 
     public static final int HASH_SLOTS_NUMBER = 127;
     public static final String ATTRIBUTE_ADDRESS = "ADDR";
@@ -76,7 +73,8 @@ public class TurmsClusterManager {
 
     public TurmsClusterManager(
             TurmsProperties localTurmsProperties,
-            @Lazy HazelcastInstance hazelcastInstance) {
+            @Qualifier("hazelcastInstance") @Lazy HazelcastInstance hazelcastInstance,
+            ApplicationContext context) {
         sharedTurmsProperties = localTurmsProperties;
         onMembersChangeListeners = new LinkedList<>();
         this.hazelcastInstance = hazelcastInstance;
@@ -103,7 +101,7 @@ public class TurmsClusterManager {
                     hasJoinedCluster = true;
                     if (isCurrentMemberMaster()) {
                         if (!isMaster && membersSnapshot.size() > 1) {
-                            uploadPropertiesToAllMembers();
+                            uploadPropertiesToAllMembers(sharedTurmsProperties);
                         }
                         isMaster = true;
                     } else {
@@ -187,13 +185,23 @@ public class TurmsClusterManager {
         }
     }
 
-    public void uploadPropertiesToAllMembers() {
-        sharedProperties.put(SharedPropertiesKey.TURMS_PROPERTIES, sharedTurmsProperties);
+    public boolean uploadPropertiesToAllMembers(@NotNull TurmsProperties properties) {
+        log.info("uploading turms properties to all members");
+        try {
+        sharedProperties.put(SharedPropertiesKey.TURMS_PROPERTIES, properties);
+        } catch (Exception e) {
+            log.error("failed to upload turms properties to all members", e);
+            return false;
+        }
+        log.info("turms properties have been uploaded to all members");
+        return true;
     }
 
     public void updatePropertiesAndNotify(@NotNull TurmsProperties properties) {
-        sharedProperties.put(SharedPropertiesKey.TURMS_PROPERTIES, properties);
+        boolean isUploaded = uploadPropertiesToAllMembers(properties);
+        if (isUploaded) {
         TurmsProperties.notifyListeners(properties);
+    }
     }
 
     private EntryAdapter<SharedPropertiesKey, Object> sharedPropertiesEntryListener() {
@@ -231,7 +239,7 @@ public class TurmsClusterManager {
     }
 
     public Map<String, Object> getHazelcastInfo(boolean withConfigs) {
-        Map<String, Object> map = new HashMap<>(4);
+        Map<String, Object> map = new HashMap<>(withConfigs ? 5 : 4);
         map.put(CLUSTER_STATE, hazelcastInstance.getCluster().getClusterState());
         map.put(CLUSTER_TIME, hazelcastInstance.getCluster().getClusterTime());
         map.put(CLUSTER_VERSION, hazelcastInstance.getCluster().getClusterVersion());

@@ -101,6 +101,7 @@ public class MongoConfig {
             if (entityType == Message.class) return turmsProperties.getDatabase().getWriteConcern().getMessage();
             if (entityType == MessageStatus.class) return turmsProperties.getDatabase().getWriteConcern().getMessageStatus();
             if (entityType == User.class) return turmsProperties.getDatabase().getWriteConcern().getUser();
+            if (entityType == UserActionLog.class) return turmsProperties.getDatabase().getWriteConcern().getUserActionLog();
             if (entityType == UserFriendRequest.class) return turmsProperties.getDatabase().getWriteConcern().getUserFriendRequest();
             if (entityType == UserLocation.class) return turmsProperties.getDatabase().getWriteConcern().getUserLocation();
             if (entityType == UserLoginLog.class) return turmsProperties.getDatabase().getWriteConcern().getUserLoginLog();

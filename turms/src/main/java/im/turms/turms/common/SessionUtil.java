@@ -19,6 +19,7 @@ package im.turms.turms.common;
 
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.google.common.base.Enums;
+import com.google.common.net.InetAddresses;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 import org.apache.commons.lang3.EnumUtils;
@@ -31,10 +32,13 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
 
 public class SessionUtil {
     private SessionUtil() {
@@ -314,5 +318,21 @@ public class SessionUtil {
             }
         }
         return null;
+    }
+
+    public static Integer parseIp(WebSocketSession session) {
+        InetSocketAddress ip = session.getHandshakeInfo().getRemoteAddress();
+        String ipStr = ip != null ?
+                ip.getHostString() :
+                session.getHandshakeInfo().getHeaders().getFirst(X_FORWARDED_FOR);
+        if (ipStr != null) {
+            try {
+                return InetAddresses.coerceToInteger(InetAddresses.forString(ipStr));
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }
