@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import static im.turms.turms.constant.AdminPermission.NONE;
 
@@ -48,8 +47,8 @@ public class RouterController {
 
     @GetMapping
     @RequiredPermission(NONE)
-    public Mono<ResponseEntity<AddressDTO>> queryResponsibleServerAddress(@RequestParam Long userId) {
-        Mono<String> address = turmsClusterManager.getResponsibleTurmsServerAddress(userId);
-        return ResponseFactory.raw(address.map(AddressDTO::new));
+    public ResponseEntity<AddressDTO> queryResponsibleServerAddress(@RequestParam Long userId) {
+        String address = turmsClusterManager.getResponsibleTurmsServerAddress(userId);
+        return ResponseFactory.raw(new AddressDTO(address));
     }
 }

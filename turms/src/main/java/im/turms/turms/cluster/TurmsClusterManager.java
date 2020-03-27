@@ -38,7 +38,6 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -267,6 +266,15 @@ public class TurmsClusterManager {
         return member != null && member.getUuid().equals(localMembersSnapshot.getUuid());
     }
 
+    public String getAddressIfCurrentNodeIrresponsibleByUserId(@NotNull Long userId) {
+        Member member = getMemberByUserId(userId);
+        if (member == null || member == localMembersSnapshot) {
+            return null;
+        } else {
+            return getAddress(member);
+        }
+    }
+
     public boolean isCurrentNodeResponsibleBySlotIndex(@NotNull Integer slotIndex) {
         Member member = getClusterMemberBySlotIndex(slotIndex);
         return member != null && member.getUuid().equals(localMembersSnapshot.getUuid());
@@ -335,13 +343,12 @@ public class TurmsClusterManager {
         return member != null && member == getLocalMember() ? slotIndex : null;
     }
 
-    public Mono<String> getResponsibleTurmsServerAddress(@NotNull Long userId) {
+    public String getResponsibleTurmsServerAddress(@NotNull Long userId) {
         Member member = getMemberByUserId(userId);
         if (member == null) {
-            return Mono.empty();
+            return null;
         } else {
-            String address = getAddress(member);
-            return address != null ? Mono.just(address) : Mono.empty();
+            return getAddress(member);
         }
     }
 
