@@ -37,7 +37,7 @@ public class Session implements IdentifiedDataSerializable {
     private static final Set<DeviceType> BROWSER_SET = Set.of(DeviceType.BROWSER);
 
     @JsonView(MutablePropertiesView.class)
-    @Description("A websocket connection will be closed if the turms server doesn't receive any request (including heartbeat request) from the client during requestHeartbeatTimeoutSeconds")
+    @Description("A websocket connection will be closed if the turms server doesn't receive any request (including heartbeat request) from the client during heartbeatTimeoutSeconds")
     @Min(0)
     private int heartbeatTimeoutSeconds = 60;
 
