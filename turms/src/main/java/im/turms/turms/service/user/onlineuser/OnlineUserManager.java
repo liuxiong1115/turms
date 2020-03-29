@@ -18,25 +18,20 @@
 package im.turms.turms.service.user.onlineuser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import im.turms.common.TurmsCloseStatus;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
-import im.turms.turms.common.Constants;
-import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
 import io.netty.util.Timeout;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Transient;
-import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.FluxSink;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.*;
@@ -46,13 +41,13 @@ public class OnlineUserManager {
     private final UserOnlineInfo userOnlineInfo;
 
     public OnlineUserManager(
-            @NonNull Long userId,
-            @NonNull UserStatus userStatus,
-            @NonNull DeviceType usingDeviceType,
+            @NotNull Long userId,
+            @NotNull UserStatus userStatus,
+            @NotNull DeviceType usingDeviceType,
             @Nullable UserLocation userLocation,
-            @NonNull WebSocketSession webSocketSession,
+            @NotNull WebSocketSession webSocketSession,
             @NotNull FluxSink<WebSocketMessage> outputSink,
-            @NotNull Timeout timeout,
+            @Nullable Timeout heartbeatTimeout,
             @Nullable Long logId) {
         Session session = new Session(
                 usingDeviceType,
@@ -60,7 +55,7 @@ public class OnlineUserManager {
                 userLocation,
                 webSocketSession,
                 outputSink,
-                timeout,
+                heartbeatTimeout,
                 logId,
                 System.currentTimeMillis());
         ConcurrentHashMap<DeviceType, Session> sessionMap = new ConcurrentHashMap<>(DeviceType.values().length);
@@ -73,42 +68,36 @@ public class OnlineUserManager {
             @Nullable UserLocation userLocation,
             @NotNull WebSocketSession webSocketSession,
             @NotNull FluxSink<WebSocketMessage> notificationSink,
-            @NotNull Timeout heartbeatTimeout,
+            @Nullable Timeout heartbeatTimeout,
             @Nullable Long logId) {
-        setOfflineByDeviceType(deviceType, CloseStatusFactory.get(TurmsCloseStatus.LOGIN_CONFLICT, deviceType.name()));
-        Session session = new Session(
-                deviceType,
-                new Date(),
-                userLocation,
-                webSocketSession,
-                notificationSink,
-                heartbeatTimeout,
-                logId,
-                System.currentTimeMillis());
-        userOnlineInfo.getSessionMap().put(deviceType, session);
+        if (!userOnlineInfo.getSessionMap().containsKey(deviceType)) {
+            Session session = new Session(
+                    deviceType,
+                    new Date(),
+                    userLocation,
+                    webSocketSession,
+                    notificationSink,
+                    heartbeatTimeout,
+                    logId,
+                    System.currentTimeMillis());
+            userOnlineInfo.getSessionMap().put(deviceType, session);
+        } else {
+            throw new RuntimeException("The device type has already logged in");
+        }
     }
 
-    public void setAllDevicesOffline(@NotNull CloseStatus closeStatus) {
-        setSpecificDevicesOffline(Constants.ALL_DEVICE_TYPES, closeStatus);
-    }
-
-    public void setOfflineByDeviceType(
+    public void setDeviceOffline(
             @NotNull DeviceType deviceType,
             @NotNull CloseStatus closeStatus) {
-        setSpecificDevicesOffline(Collections.singleton(deviceType), closeStatus);
-    }
-
-    public void setSpecificDevicesOffline(
-            @NotEmpty Set<DeviceType> deviceTypes,
-            @NotNull CloseStatus closeStatus) {
-        for (DeviceType deviceType : deviceTypes) {
-            Session session = userOnlineInfo.getSessionMap().get(deviceType);
-            if (session != null) {
-                session.getNotificationSink().complete();
-                session.getHeartbeatTimeout().cancel();
-                session.getWebSocketSession().close(closeStatus).subscribe();
-                userOnlineInfo.getSessionMap().remove(deviceType);
+        Session session = userOnlineInfo.getSessionMap().get(deviceType);
+        if (session != null) {
+            session.getNotificationSink().complete();
+            Timeout timeout = session.getHeartbeatTimeout();
+            if (timeout != null) {
+                timeout.cancel();
             }
+            session.getWebSocketSession().close(closeStatus).subscribe();
+            userOnlineInfo.getSessionMap().remove(deviceType);
         }
     }
 
@@ -146,21 +135,6 @@ public class OnlineUserManager {
         return sessions;
     }
 
-    public List<WebSocketSession> getWebSocketSessions(@NotEmpty Set<DeviceType> deviceTypes) {
-        Collection<Session> values = userOnlineInfo.getSessionMap().values();
-        List<WebSocketSession> sessions = new ArrayList<>(values.size());
-        for (Session session : values) {
-            if (session != null && deviceTypes.contains(session.deviceType)) {
-                sessions.add(session.webSocketSession);
-            }
-        }
-        return sessions;
-    }
-
-    public WebSocketSession getWebSocketSession(@NotNull DeviceType deviceType) {
-        return userOnlineInfo.getSessionMap().get(deviceType).webSocketSession;
-    }
-
     public List<FluxSink<WebSocketMessage>> getOutputSinks() {
         Collection<Session> sessions = userOnlineInfo.getSessionMap().values();
         List<FluxSink<WebSocketMessage>> sinks = new ArrayList<>(sessions.size());
@@ -173,15 +147,15 @@ public class OnlineUserManager {
     @Data
     @AllArgsConstructor
     public static class Session implements Serializable {
-        private DeviceType deviceType;
-        private Date loginDate;
+        private final DeviceType deviceType;
+        private final Date loginDate;
         private UserLocation location;
         @JsonIgnore
         @Transient
-        private transient WebSocketSession webSocketSession;
+        private final transient WebSocketSession webSocketSession;
         @JsonIgnore
         @Transient
-        private transient FluxSink<WebSocketMessage> notificationSink;
+        private final transient FluxSink<WebSocketMessage> notificationSink;
         @JsonIgnore
         @Transient
         private transient Timeout heartbeatTimeout;
@@ -190,6 +164,6 @@ public class OnlineUserManager {
         private Long logId;
         @JsonIgnore
         @Transient
-        private Long lastHeartbeatTimestamp;
+        private volatile long lastHeartbeatTimestamp;
     }
 }
