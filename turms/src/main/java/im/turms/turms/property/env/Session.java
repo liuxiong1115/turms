@@ -35,16 +35,11 @@ import java.util.Set;
 @Data
 public class Session implements IdentifiedDataSerializable {
     private static final Set<DeviceType> BROWSER_SET = Set.of(DeviceType.BROWSER);
-    
+
     @JsonView(MutablePropertiesView.class)
     @Description("A websocket connection will be closed if the turms server doesn't receive any request (including heartbeat request) from the client during requestHeartbeatTimeoutSeconds")
     @Min(0)
-    private int requestHeartbeatTimeoutSeconds = 50;
-
-    @JsonView(MutablePropertiesView.class)
-    @Description("The minimum interval between requests from a client to refresh the heartbeat timer")
-    @Min(0)
-    private int minHeartbeatRefreshIntervalSeconds = 3;
+    private int heartbeatTimeoutSeconds = 60;
 
     @Description("Whether to enable to query the login failed reason")
     private boolean enableQueryLoginFailedReason = true;
@@ -82,8 +77,7 @@ public class Session implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeInt(requestHeartbeatTimeoutSeconds);
-        out.writeInt(minHeartbeatRefreshIntervalSeconds);
+        out.writeInt(heartbeatTimeoutSeconds);
         out.writeBoolean(enableQueryLoginFailedReason);
         out.writeBoolean(enableQueryDisconnectionReason);
         out.writeBoolean(notifyClientsOfSessionInfoAfterConnected);
@@ -92,8 +86,7 @@ public class Session implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        requestHeartbeatTimeoutSeconds = in.readInt();
-        minHeartbeatRefreshIntervalSeconds = in.readInt();
+        heartbeatTimeoutSeconds = in.readInt();
         enableQueryLoginFailedReason = in.readBoolean();
         enableQueryDisconnectionReason = in.readBoolean();
         notifyClientsOfSessionInfoAfterConnected = in.readBoolean();

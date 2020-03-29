@@ -118,7 +118,7 @@ public class InboundMessageDispatcher {
                 return Mono.empty();
             }
 
-            onlineUserService.resetHeartbeatTimeout(userId, deviceType);
+            onlineUserService.updateHeartbeatTimestamp(userId, deviceType);
             switch (webSocketMessage.getType()) {
                 case BINARY:
                     return handleBinaryMessage(userId, deviceType, webSocketMessage, session);
@@ -281,16 +281,13 @@ public class InboundMessageDispatcher {
                     Long requestId = request.hasRequestId() ? request.getRequestId().getValue() : null;
                     return handleResult(session, result, requestId, userId);
                 } else {
-                    onlineUserService.getLocalOnlineUserManager(userId)
-                            .setOfflineByDeviceType(deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, "No handler for the request"));
+                    onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, "No handler for the request"));
                 }
             } else {
-                onlineUserService.getLocalOnlineUserManager(userId)
-                        .setOfflineByDeviceType(deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST));
+                onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST));
             }
         } catch (Exception e) {
-            onlineUserService.getLocalOnlineUserManager(userId)
-                    .setOfflineByDeviceType(deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, e.getMessage()));
+            onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, e.getMessage()));
         }
         return Mono.empty();
     }

@@ -177,10 +177,9 @@ public class OnlineUserService {
             for (DeviceType deviceType : deviceTypes) {
                 OnlineUserManager.Session session = manager.getSession(deviceType);
                 if (session != null) {
-                    clearSession(userId, session, now, closeStatus);
+                    clearSession(userId, manager, session, now, closeStatus);
                 }
             }
-            manager.setSpecificDevicesOffline(deviceTypes, closeStatus);
             if (manager.getSessionsNumber() == 0) {
                 clearOnlineUserManager(userId);
             }
@@ -198,15 +197,15 @@ public class OnlineUserService {
         }
     }
 
-    private void clearSession(Long userId, OnlineUserManager.Session session, Date date, CloseStatus closeStatus) {
+    private void clearSession(Long userId, OnlineUserManager manager, OnlineUserManager.Session session, Date date, CloseStatus closeStatus) {
         Long logId = session.getLogId();
         if (logId != null) {
             userLoginLogService
                     .updateLogoutDate(logId, date)
                     .subscribe();
         }
-        session.getNotificationSink().complete();
         DeviceType deviceType = session.getDeviceType();
+        manager.setDeviceOffline(deviceType, closeStatus);
         usersNearbyService.removeUserLocation(userId, deviceType);
         if (degradedDeviceTypes.contains(deviceType)) {
             disconnectionReasonCache.put(Triple.of(userId, deviceType, session.getWebSocketSession().getId()),
@@ -221,9 +220,8 @@ public class OnlineUserService {
                 Date now = new Date();
                 Long userId = manager.getOnlineUserInfo().getUserId();
                 for (OnlineUserManager.Session session : sessionMap.values()) {
-                    clearSession(userId, session, now, closeStatus);
+                    clearSession(userId, manager, session, now, closeStatus);
                 }
-                manager.setAllDevicesOffline(closeStatus);
                 if (manager.getSessionsNumber() == 0) {
                     clearOnlineUserManager(userId);
                 }
@@ -338,32 +336,28 @@ public class OnlineUserService {
         return MathFlux.sumInt(futures);
     }
 
-    public void resetHeartbeatTimeout(
+    public void updateHeartbeatTimestamp(
             @NotNull Long userId,
             @NotNull @DeviceTypeConstraint DeviceType deviceType) {
         OnlineUserManager onlineUserManager = getLocalOnlineUserManager(userId);
         if (onlineUserManager != null) {
             OnlineUserManager.Session session = onlineUserManager.getSession(deviceType);
             if (session != null) {
-                int minInterval = turmsClusterManager.getTurmsProperties().getSession().getMinHeartbeatRefreshIntervalSeconds();
-                long now = System.currentTimeMillis();
-                int interval = (int) ((now - session.getLastHeartbeatTimestamp()) / 1000);
-                if (interval >= minInterval) {
-                    boolean success = session.getHeartbeatTimeout().cancel();
-                    if (success) {
-                        Timeout heartbeatTimeout = newHeartbeatTimeout(userId, deviceType);
-                        session.setHeartbeatTimeout(heartbeatTimeout);
-                        session.setLastHeartbeatTimestamp(now);
-                    }
-                }
+                session.setLastHeartbeatTimestamp(System.currentTimeMillis());
             }
         }
     }
 
-    private Timeout newHeartbeatTimeout(@NotNull Long userId, @NotNull @DeviceTypeConstraint DeviceType deviceType) {
-        return heartbeatTimer.newTimeout(
-                timeout -> setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.HEARTBEAT_TIMEOUT)),
-                turmsClusterManager.getTurmsProperties().getSession().getRequestHeartbeatTimeoutSeconds(),
+    private Timeout newHeartbeatTimeout(@NotNull Long userId, @NotNull @DeviceTypeConstraint DeviceType deviceType, @NotNull OnlineUserManager.Session session) {
+        int heartbeatTimeoutSeconds = turmsClusterManager.getTurmsProperties().getSession().getHeartbeatTimeoutSeconds();
+        return heartbeatTimer.newTimeout(timeout -> {
+                    long now = System.currentTimeMillis();
+                    int elapsedTime = (int) ((now - session.getLastHeartbeatTimestamp()) / 1000);
+                    if (elapsedTime > heartbeatTimeoutSeconds) {
+                        setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.HEARTBEAT_TIMEOUT));
+                    }
+                },
+                Math.max(heartbeatTimeoutSeconds / 3, 1),
                 TimeUnit.SECONDS);
     }
 
@@ -444,18 +438,22 @@ public class OnlineUserService {
             return TurmsStatusCode.NOT_RESPONSIBLE;
         } else {
             OnlineUserManager onlineUserManager = getLocalOnlineUserManager(userId);
-            Timeout heartbeatTimeout = newHeartbeatTimeout(userId, loggingInDeviceType);
+            // If the user's devices are already online
             if (onlineUserManager != null) {
                 onlineUserManager.setUserOnlineStatus(
                         userStatus == UserStatus.OFFLINE || userStatus == UserStatus.UNRECOGNIZED ?
                                 UserStatus.AVAILABLE : userStatus);
+                try {
                 onlineUserManager.setDeviceTypeOnline(
                         loggingInDeviceType,
                         location == EMPTY_USER_LOCATION ? null : location,
                         webSocketSession,
                         notificationSink,
-                        heartbeatTimeout,
+                        null,
                         logId);
+                } catch (Exception e) {
+                    return TurmsStatusCode.SERVER_INTERNAL_ERROR;
+                }
             } else {
                 onlineUserManager = new OnlineUserManager(
                         userId,
@@ -464,8 +462,15 @@ public class OnlineUserService {
                         location == EMPTY_USER_LOCATION ? null : location,
                         webSocketSession,
                         notificationSink,
-                        heartbeatTimeout,
+                        null,
                         logId);
+            }
+            if (turmsClusterManager.getTurmsProperties().getSession().getHeartbeatTimeoutSeconds() > 0) {
+            Timeout heartbeatTimeout = newHeartbeatTimeout(
+                    userId,
+                    loggingInDeviceType,
+                    onlineUserManager.getSession(loggingInDeviceType));
+            onlineUserManager.getSession(loggingInDeviceType).setHeartbeatTimeout(heartbeatTimeout);
             }
             getOrAddOnlineUsersManager(slotIndex).put(userId, onlineUserManager);
             if (pluginEnabled) {
