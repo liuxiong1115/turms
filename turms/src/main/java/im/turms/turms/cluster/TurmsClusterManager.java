@@ -187,7 +187,7 @@ public class TurmsClusterManager {
     public boolean uploadPropertiesToAllMembers(@NotNull TurmsProperties properties) {
         log.info("uploading turms properties to all members");
         try {
-        sharedProperties.put(SharedPropertiesKey.TURMS_PROPERTIES, properties);
+            sharedProperties.put(SharedPropertiesKey.TURMS_PROPERTIES, properties);
         } catch (Exception e) {
             log.error("failed to upload turms properties to all members", e);
             return false;
@@ -199,8 +199,8 @@ public class TurmsClusterManager {
     public void updatePropertiesAndNotify(@NotNull TurmsProperties properties) {
         boolean isUploaded = uploadPropertiesToAllMembers(properties);
         if (isUploaded) {
-        TurmsProperties.notifyListeners(properties);
-    }
+            TurmsProperties.notifyListeners(properties);
+        }
     }
 
     private EntryAdapter<SharedPropertiesKey, Object> sharedPropertiesEntryListener() {

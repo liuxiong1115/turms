@@ -444,13 +444,13 @@ public class OnlineUserService {
                         userStatus == UserStatus.OFFLINE || userStatus == UserStatus.UNRECOGNIZED ?
                                 UserStatus.AVAILABLE : userStatus);
                 try {
-                onlineUserManager.setDeviceTypeOnline(
-                        loggingInDeviceType,
-                        location == EMPTY_USER_LOCATION ? null : location,
-                        webSocketSession,
-                        notificationSink,
-                        null,
-                        logId);
+                    onlineUserManager.setDeviceTypeOnline(
+                            loggingInDeviceType,
+                            location == EMPTY_USER_LOCATION ? null : location,
+                            webSocketSession,
+                            notificationSink,
+                            null,
+                            logId);
                 } catch (Exception e) {
                     return TurmsStatusCode.SERVER_INTERNAL_ERROR;
                 }
@@ -466,11 +466,11 @@ public class OnlineUserService {
                         logId);
             }
             if (turmsClusterManager.getTurmsProperties().getSession().getHeartbeatTimeoutSeconds() > 0) {
-            Timeout heartbeatTimeout = newHeartbeatTimeout(
-                    userId,
-                    loggingInDeviceType,
-                    onlineUserManager.getSession(loggingInDeviceType));
-            onlineUserManager.getSession(loggingInDeviceType).setHeartbeatTimeout(heartbeatTimeout);
+                Timeout heartbeatTimeout = newHeartbeatTimeout(
+                        userId,
+                        loggingInDeviceType,
+                        onlineUserManager.getSession(loggingInDeviceType));
+                onlineUserManager.getSession(loggingInDeviceType).setHeartbeatTimeout(heartbeatTimeout);
             }
             getOrAddOnlineUsersManager(slotIndex).put(userId, onlineUserManager);
             if (pluginEnabled) {
