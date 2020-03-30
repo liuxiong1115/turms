@@ -99,7 +99,7 @@ public class TurmsPluginManager {
         }
     }
 
-    private void initExtensions(List<? extends TurmsExtension> extensions) {
+    private void initExtensions(List<? extends TurmsExtension> extensions) throws Exception {
         for (TurmsExtension extension : extensions) {
             initExtension(extension);
         }
