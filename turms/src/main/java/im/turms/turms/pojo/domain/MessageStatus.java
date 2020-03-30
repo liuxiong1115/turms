@@ -21,6 +21,7 @@ import im.turms.common.constant.MessageDeliveryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
@@ -79,17 +80,18 @@ public final class MessageStatus {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor // Make sure spring can initiate the key and use setters
     @EqualsAndHashCode
     public static final class Key {
-        private final Long messageId;
+        private Long messageId;
 
         @Indexed
-        private final Long recipientId;
+        private Long recipientId;
     }
 
     @Data
     @AllArgsConstructor
     public static final class KeyList {
-        private final List<Key> keys;
+        private List<Key> keys;
     }
 }

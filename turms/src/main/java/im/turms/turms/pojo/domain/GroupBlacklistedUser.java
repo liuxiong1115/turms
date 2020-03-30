@@ -20,6 +20,7 @@ package im.turms.turms.pojo.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
@@ -51,17 +52,18 @@ public final class GroupBlacklistedUser {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor // Make sure spring can initiate the key and use setters
     @EqualsAndHashCode
     public static final class Key {
-        private final Long groupId;
+        private Long groupId;
 
         @Indexed
-        private final Long userId;
+        private Long userId;
     }
 
     @Data
     @AllArgsConstructor
     public static final class KeyList {
-        private final List<Key> keys;
+        private List<Key> keys;
     }
 }
