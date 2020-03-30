@@ -39,6 +39,9 @@ public class Plugin implements IdentifiedDataSerializable {
     @Description("The path of plugins")
     private String dir = "plugins";
 
+    @Description("Whether to exit if any exception is thrown")
+    private boolean exitIfExceptionOccurs = false;
+
     @JsonIgnore
     @Override
     public int getFactoryId() {
