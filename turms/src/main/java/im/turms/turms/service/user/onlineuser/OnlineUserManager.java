@@ -17,7 +17,6 @@
 
 package im.turms.turms.service.user.onlineuser;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
@@ -25,7 +24,6 @@ import im.turms.turms.pojo.domain.UserLocation;
 import io.netty.util.Timeout;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.data.annotation.Transient;
 import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -150,20 +148,11 @@ public class OnlineUserManager {
         private final DeviceType deviceType;
         private final Date loginDate;
         private UserLocation location;
-        @JsonIgnore
-        @Transient
+
         private final transient WebSocketSession webSocketSession;
-        @JsonIgnore
-        @Transient
         private final transient FluxSink<WebSocketMessage> notificationSink;
-        @JsonIgnore
-        @Transient
         private transient Timeout heartbeatTimeout;
-        @JsonIgnore
-        @Transient
-        private Long logId;
-        @JsonIgnore
-        @Transient
-        private volatile long lastHeartbeatTimestamp;
+        private transient Long logId;
+        private transient volatile long lastHeartbeatTimestamp;
     }
 }
