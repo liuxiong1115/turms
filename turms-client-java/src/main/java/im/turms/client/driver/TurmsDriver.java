@@ -209,7 +209,7 @@ public class TurmsDriver {
                                                 future.complete(notification);
                                             } else {
                                                 TurmsBusinessException exception;
-                                                if (code == TurmsStatusCode.FAILED.getBusinessCode()) {
+                                                if (notification.hasReason()) {
                                                     exception = TurmsBusinessException.get(code, notification.getReason().getValue());
                                                 } else {
                                                     exception = TurmsBusinessException.get(code);
