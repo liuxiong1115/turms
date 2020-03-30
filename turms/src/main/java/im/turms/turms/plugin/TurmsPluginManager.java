@@ -47,7 +47,7 @@ public class TurmsPluginManager {
     private List<UserOnlineStatusChangeHandler> userOnlineStatusChangeHandlerList;
     private StorageServiceProvider storageServiceProvider;
 
-    public TurmsPluginManager(ApplicationContext context, TurmsProperties turmsProperties) {
+    public TurmsPluginManager(ApplicationContext context, TurmsProperties turmsProperties) throws Exception {
         this.context = context;
         this.turmsProperties = turmsProperties;
         if (turmsProperties.getPlugin().isEnabled()) {
@@ -60,7 +60,7 @@ public class TurmsPluginManager {
         }
     }
 
-    public void init() {
+    public void init() throws Exception {
         Path dir = Path.of(turmsProperties.getPlugin().getDir());
         pluginManager = new DefaultPluginManager(dir);
         pluginManager.loadPlugins();
@@ -88,11 +88,14 @@ public class TurmsPluginManager {
         pluginManager.stopPlugins();
     }
 
-    private void initExtension(TurmsExtension extension) {
+    private void initExtension(TurmsExtension extension) throws Exception {
         try {
             extension.setContext(context);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error(e.getMessage(), e);
+            if (turmsProperties.getPlugin().isExitIfExceptionOccurs()) {
+                throw e;
+            }
         }
     }
 
