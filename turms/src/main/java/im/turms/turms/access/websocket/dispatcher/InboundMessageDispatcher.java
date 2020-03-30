@@ -124,9 +124,10 @@ public class InboundMessageDispatcher {
                     return handleBinaryMessage(userId, deviceType, webSocketMessage, session);
                 case TEXT:
                 case PING:
+                    return Mono.just(session.pongMessage(DataBufferFactory::allocateBuffer));
                 case PONG:
                 default:
-                    return Mono.just(session.pongMessage(DataBufferFactory::allocateBuffer));
+                    return Mono.empty();
             }
         } else {
             // This should never happen
@@ -228,7 +229,8 @@ public class InboundMessageDispatcher {
                                                       @NotNull WebSocketMessage message, @NotNull WebSocketSession session) {
         DataBuffer payload = message.getPayload();
         if (payload.capacity() == 0) {
-            return Mono.empty();
+            // Send an binary message instead of a pong frame to make sure turms-client-js can get the response
+            return Mono.just(session.binaryMessage(DataBufferFactory::allocateBuffer));
         }
         try {
             TurmsRequest request = TurmsRequest.parseFrom(payload.asByteBuffer());
