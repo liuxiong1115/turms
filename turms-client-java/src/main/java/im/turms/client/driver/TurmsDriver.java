@@ -51,6 +51,7 @@ public class TurmsDriver {
     private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
     private final List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
+    private final ConcurrentLinkedQueue<CompletableFuture<Void>> heartbeatCallbacks = new ConcurrentLinkedQueue<>();
     // TurmsCloseStatus, WebSocket status code, WebSocket reason, error
     private Function4<TurmsCloseStatus, Integer, String, Throwable, Void> onClose;
 
@@ -102,7 +103,11 @@ public class TurmsDriver {
         if (this.connected()) {
             lastRequestDate = System.currentTimeMillis();
             return websocket.sendBinary(ByteBuffer.allocate(0), true)
-                    .thenApply(webSocket -> null);
+                    .thenCompose(webSocket -> {
+                        CompletableFuture<Void> future = new CompletableFuture<>();
+                        heartbeatCallbacks.offer(future);
+                        return future;
+                    });
         } else {
             return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
         }
@@ -171,6 +176,17 @@ public class TurmsDriver {
                         public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
                             webSocket.request(1);
                             TurmsNotification notification;
+
+                            if (!data.hasRemaining()) {
+                                while (!heartbeatCallbacks.isEmpty()) {
+                                    CompletableFuture<Void> future = heartbeatCallbacks.poll();
+                                    if (future != null) {
+                                        future.complete(null);
+                                    }
+                                }
+                                return CompletableFuture.completedStage(null);
+                            }
+
                             try {
                                 notification = TurmsNotification.parseFrom(data);
                             } catch (InvalidProtocolBufferException e) {
