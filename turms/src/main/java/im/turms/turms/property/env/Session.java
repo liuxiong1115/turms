@@ -57,6 +57,22 @@ public class Session implements IdentifiedDataSerializable {
     @Description("Whether to notify clients of the session information after connected with a turms server")
     private boolean notifyClientsOfSessionInfoAfterConnected = true;
 
+    @Description("Whether to allow users to connect to irresponsible servers.")
+    private boolean allowIrresponsibleUsersWhenConnecting = true;
+
+    @Description("Whether to allow online users to be still connecting to irresponsible servers after the servers' responsibility has changed." +
+            "If false, when a server goes up or down, a part of users connected to other servers have to be disconnected to keep the consistency of users' status due to the consistent hashing")
+    private boolean allowIrresponsibleUsersAfterResponsibilityChanged = true;
+
+    @Description("The irresponsible users will be disconnected after [clearUpIrresponsibleUsersAfter - jitter, clearUpIrresponsibleUsersAfter + jitter] roughly." +
+            "If the status of cluster members change again before the irresponsible users disconnect, the time to disconnect will be recalculated according to the new responsibility." +
+            "When reaching the time for the irresponsible users to disconnect, the users connected to the irresponsible server will be disconnected and routed to other responsible servers.")
+    @Min(0)
+    private int clearUpIrresponsibleUsersAfter = 2 * 60;
+
+    @Min(0)
+    private int clearUpIrresponsibleUsersJitter = 30;
+
     /**
      * If the turms server only receives heartbeat requests from the client during maxIdleTime,
      * the session will be closed when the Session Cleaner detects it.

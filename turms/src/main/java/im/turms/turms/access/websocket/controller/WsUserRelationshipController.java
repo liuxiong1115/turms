@@ -21,7 +21,7 @@ import im.turms.common.constant.ResponseAction;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.user.relationship.*;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
-import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
 import im.turms.turms.service.user.relationship.UserFriendRequestService;
@@ -37,7 +37,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static im.turms.common.model.dto.request.TurmsRequest.KindCase.*;
-import static im.turms.turms.common.Constants.DEFAULT_RELATIONSHIP_GROUP_INDEX;
+import static im.turms.turms.constant.Common.DEFAULT_RELATIONSHIP_GROUP_INDEX;
 
 @Controller
 public class WsUserRelationshipController {

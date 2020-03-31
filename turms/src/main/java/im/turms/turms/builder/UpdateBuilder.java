@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.builder;
 
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.Collection;
 
 public class UpdateBuilder {
-    private Update update;
+    private final Update update;
 
     private UpdateBuilder() {
         this.update = new Update();

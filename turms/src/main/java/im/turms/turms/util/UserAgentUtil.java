@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.util;
 
 import im.turms.common.constant.DeviceType;
 import nl.basjes.parse.useragent.UserAgent;
@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class UserAgentUtil {
+    private UserAgentUtil() {}
+
     private static final Set<String> REQUIRED_FIELDS = Set.of(
             UserAgent.DEVICE_NAME,
             UserAgent.DEVICE_BRAND,

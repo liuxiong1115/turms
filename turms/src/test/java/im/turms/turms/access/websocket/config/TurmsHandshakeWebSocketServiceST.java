@@ -18,7 +18,7 @@
 package im.turms.turms.access.websocket.config;
 
 import im.turms.common.constant.ProfileAccessStrategy;
-import im.turms.turms.common.TurmsPasswordUtil;
+import im.turms.turms.util.TurmsPasswordUtil;
 import im.turms.turms.pojo.domain.User;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,7 +39,7 @@ import java.util.Date;
 
 import static helper.util.LoginUtil.getLoginParams;
 import static helper.util.LoginUtil.getServerUrl;
-import static im.turms.turms.common.Constants.DEFAULT_USER_PERMISSION_GROUP_ID;
+import static im.turms.turms.constant.Common.DEFAULT_USER_PERMISSION_GROUP_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

@@ -1,4 +1,4 @@
-package im.turms.turms.common;
+package im.turms.turms.util;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

@@ -1,4 +1,4 @@
-package im.turms.turms.common;
+package im.turms.turms.util;
 
 import im.turms.common.constant.RequestStatus;
 import im.turms.turms.pojo.domain.GroupInvitation;

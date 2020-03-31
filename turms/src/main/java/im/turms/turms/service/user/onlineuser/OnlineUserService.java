@@ -17,8 +17,6 @@
 
 package im.turms.turms.service.user.onlineuser;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.hazelcast.cluster.Member;
 import im.turms.common.TurmsCloseStatus;
@@ -27,11 +25,8 @@ import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ReactorUtil;
-import im.turms.turms.common.TrivialTaskService;
 import im.turms.turms.constant.CloseStatusFactory;
-import im.turms.turms.plugin.TurmsPluginManager;
+import im.turms.turms.manager.*;
 import im.turms.turms.plugin.UserOnlineStatusChangeHandler;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
@@ -40,11 +35,15 @@ import im.turms.turms.pojo.domain.UserOnlineUserNumber;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserLocationService;
 import im.turms.turms.service.user.UserLoginLogService;
-import im.turms.turms.task.*;
+import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
+import im.turms.turms.task.CountOnlineUsersTask;
+import im.turms.turms.task.QueryUserOnlineInfoTask;
+import im.turms.turms.task.SetUserOfflineTask;
+import im.turms.turms.task.UpdateOnlineUserStatusTask;
+import im.turms.turms.util.ReactorUtil;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -61,13 +60,15 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
-import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
-import static im.turms.turms.common.Constants.ALL_DEVICE_TYPES;
-import static im.turms.turms.common.Constants.EMPTY_USER_LOCATION;
+import static im.turms.turms.constant.Common.ALL_DEVICE_TYPES;
+import static im.turms.turms.constant.Common.EMPTY_USER_LOCATION;
+import static im.turms.turms.manager.TurmsClusterManager.HASH_SLOTS_NUMBER;
 
 @Service
 @Validated
@@ -77,24 +78,22 @@ public class OnlineUserService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
+    private final ReasonCacheManager reasonCacheManager;
     private final UsersNearbyService usersNearbyService;
+    private final IrresponsibleUserService irresponsibleUserService;
     private final UserLoginLogService userLoginLogService;
     private final UserLocationService userLocationService;
     private final HashedWheelTimer heartbeatTimer;
-    private final TrivialTaskService onlineUsersNumberPersisterTimer;
-    private final TurmsTaskExecutor turmsTaskExecutor;
-    private final Set<DeviceType> degradedDeviceTypes;
-    private final boolean enableQueryDisconnectionReason;
+    private final TrivialTaskManager onlineUsersNumberPersisterTimer;
+    private final TurmsTaskManager turmsTaskManager;
+    private final Queue<Timeout> disconnectionTasks;
+    private final ReentrantLock disconnectionLock;
     private final boolean locationEnabled;
     private final boolean pluginEnabled;
     /**
      * Integer(Slot) -> Long(userId) -> OnlineUserManager
      */
     private final List<Map<Long, OnlineUserManager>> onlineUsersManagerAtSlots;
-    /**
-     * Triple<user ID, device type, session ID> -> Custom CloseStatus (TurmsCloseStatus)
-     */
-    private final Cache<Triple<Long, DeviceType, String>, Integer> disconnectionReasonCache;
 
     public OnlineUserService(
             TurmsClusterManager turmsClusterManager,
@@ -102,10 +101,11 @@ public class OnlineUserService {
             ReactiveMongoTemplate mongoTemplate,
             UserLoginLogService userLoginLogService,
             UserLocationService userLocationService,
-            TurmsTaskExecutor turmsTaskExecutor,
+            TurmsTaskManager turmsTaskManager,
             TurmsPluginManager turmsPluginManager,
-            TrivialTaskService trivialTaskService,
-            TurmsProperties turmsProperties) {
+            TrivialTaskManager trivialTaskManager,
+            IrresponsibleUserService irresponsibleUserService,
+            ReasonCacheManager reasonCacheManager) {
         this.turmsClusterManager = turmsClusterManager;
         this.usersNearbyService = usersNearbyService;
         turmsClusterManager.addListenerOnMembersChange(
@@ -116,18 +116,11 @@ public class OnlineUserService {
         this.mongoTemplate = mongoTemplate;
         this.userLoginLogService = userLoginLogService;
         this.userLocationService = userLocationService;
-        this.turmsTaskExecutor = turmsTaskExecutor;
+        this.turmsTaskManager = turmsTaskManager;
         this.turmsPluginManager = turmsPluginManager;
         this.heartbeatTimer = new HashedWheelTimer();
-        this.onlineUsersNumberPersisterTimer = trivialTaskService;
-        this.disconnectionReasonCache = Caffeine
-                .newBuilder()
-                .maximumSize(turmsProperties.getCache().getDisconnectionReasonCacheMaxSize())
-                .expireAfterWrite(Duration.ofSeconds(turmsProperties.getCache().getDisconnectionReasonExpireAfter()))
-                .build();
-        degradedDeviceTypes = turmsProperties.getSession().getDegradedDeviceTypesForDisconnectionReason();
+        this.onlineUsersNumberPersisterTimer = trivialTaskManager;
         onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
-        enableQueryDisconnectionReason = turmsClusterManager.getTurmsProperties().getSession().isEnableQueryDisconnectionReason();
         locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
         rescheduleOnlineUsersNumberPersister();
         TurmsProperties.addListeners(properties -> {
@@ -135,6 +128,16 @@ public class OnlineUserService {
             return null;
         });
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
+        this.irresponsibleUserService = irresponsibleUserService;
+        if (irresponsibleUserService.isAllowIrresponsibleUsersAfterResponsibilityChanged() ||
+                irresponsibleUserService.isAllowIrresponsibleUsersWhenConnecting()) {
+            disconnectionTasks = new LinkedList<>();
+            disconnectionLock = new ReentrantLock(true);
+        } else {
+            disconnectionTasks = null;
+            disconnectionLock = null;
+        }
+        this.reasonCacheManager = reasonCacheManager;
     }
 
     private void rescheduleOnlineUsersNumberPersister() {
@@ -144,16 +147,44 @@ public class OnlineUserService {
     }
 
     public void setIrresponsibleUsersOffline(boolean isServerClosing) {
+        Pair<Integer, Integer> slotIndexRange = turmsClusterManager.getResponsibleSlotIndexRange();
         for (int index = 0; index < HASH_SLOTS_NUMBER; index++) {
-            Member member = turmsClusterManager.getClusterMemberBySlotIndex(index);
-            if (member != null) {
-                if (!member.equals(turmsClusterManager.getLocalMember())) {
+            boolean isIrresponsible = slotIndexRange.getLeft() > index || index >= slotIndexRange.getRight();
+            if (isIrresponsible) {
+                Member member = turmsClusterManager.getClusterMemberBySlotIndex(index);
+                if (member != null) {
                     TurmsCloseStatus status = isServerClosing ? TurmsCloseStatus.SERVER_CLOSED : TurmsCloseStatus.REDIRECT;
                     String address = turmsClusterManager.getAddress(member);
                     setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(status, address));
+                } else {
+                    // This should never happen
+                    setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "Cannot find a server responsible for the user"));
                 }
-            } else {
-                setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "Cannot find a server responsible for the user"));
+            }
+        }
+    }
+
+    public void setIrresponsibleUsersOffline(boolean isServerClosing, int jitter) {
+        Pair<Integer, Integer> slotIndexRange = turmsClusterManager.getResponsibleSlotIndexRange();
+        int irresponsibleSlotNumber = TurmsClusterManager.HASH_SLOTS_NUMBER + slotIndexRange.getRight() - slotIndexRange.getLeft();
+        int step = Math.max(jitter * 2 / irresponsibleSlotNumber, 1);
+        int start = Math.max(irresponsibleUserService.getClearUpIrresponsibleUsersAfter() - jitter, 0);
+        for (int index = 0; index < HASH_SLOTS_NUMBER; index++) {
+            boolean isIrresponsible = slotIndexRange.getLeft() > index || index >= slotIndexRange.getRight();
+            if (isIrresponsible) {
+                Member member = turmsClusterManager.getClusterMemberBySlotIndex(index);
+                if (member != null) {
+                    TurmsCloseStatus status = isServerClosing ? TurmsCloseStatus.SERVER_CLOSED : TurmsCloseStatus.REDIRECT;
+                    String address = turmsClusterManager.getAddress(member);
+                    int finalIndex = index;
+                    Timeout timeout = irresponsibleUserService.getIrresponsibleUsersCleanerTimer().newTimeout(ignored -> {
+                        setUsersOfflineBySlotIndex(finalIndex, CloseStatusFactory.get(status, address));
+                    }, start + index * step, TimeUnit.SECONDS);
+                    disconnectionTasks.offer(timeout);
+                } else {
+                    // This should never happen
+                    setUsersOfflineBySlotIndex(index, CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "Cannot find a server responsible for the user"));
+                }
             }
         }
     }
@@ -165,6 +196,24 @@ public class OnlineUserService {
                 setManagersOffline(closeStatus, managerMap.values());
             }
         }
+    }
+
+    /**
+     * Use LinkedList instead of Set for better performance
+     */
+    public List<Long> getUsersBySlotIndex(@NotNull Integer slotIndex) {
+        List<Long> userIds = new LinkedList<>();
+        if (slotIndex >= 0 && slotIndex < HASH_SLOTS_NUMBER) {
+            Map<Long, OnlineUserManager> managerMap = getOnlineUsersManager(slotIndex);
+            if (managerMap != null) {
+                for (OnlineUserManager manager : managerMap.values()) {
+                    if (manager != null) {
+                        userIds.add(manager.getOnlineUserInfo().getUserId());
+                    }
+                }
+            }
+        }
+        return userIds;
     }
 
     public boolean setLocalUserDevicesOffline(
@@ -207,9 +256,10 @@ public class OnlineUserService {
         DeviceType deviceType = session.getDeviceType();
         manager.setDeviceOffline(deviceType, closeStatus);
         usersNearbyService.removeUserLocation(userId, deviceType);
-        if (degradedDeviceTypes.contains(deviceType)) {
-            disconnectionReasonCache.put(Triple.of(userId, deviceType, session.getWebSocketSession().getId()),
-                    closeStatus.getCode());
+        irresponsibleUserService.remove(userId);
+        String sessionId = session.getWebSocketSession().getId();
+        if (reasonCacheManager.shouldCacheDisconnectionReason(userId, deviceType, sessionId)) {
+            reasonCacheManager.cacheDisconnectionReason(userId, deviceType, sessionId, closeStatus.getCode());
         }
     }
 
@@ -273,7 +323,13 @@ public class OnlineUserService {
             setLocalUserOffline(userId, closeStatus);
             return Mono.just(true);
         } else {
-            Member member = turmsClusterManager.getMemberByUserId(userId);
+            Member member;
+            UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
+            if (memberId != null) {
+                member = turmsClusterManager.getMemberById(memberId);
+            } else {
+                member = turmsClusterManager.getMemberByUserId(userId);
+            }
             if (member != null) {
                 Future<Boolean> future = turmsClusterManager
                         .getExecutor()
@@ -305,7 +361,13 @@ public class OnlineUserService {
             setLocalUserDevicesOffline(userId, deviceTypes, closeStatus);
             return Mono.just(true);
         } else {
-            Member member = turmsClusterManager.getMemberByUserId(userId);
+            Member member;
+            UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
+            if (memberId != null) {
+                member = turmsClusterManager.getMemberById(memberId);
+            } else {
+                member = turmsClusterManager.getMemberByUserId(userId);
+            }
             if (member != null) {
                 Set<Integer> types = new HashSet<>(deviceTypes.size());
                 for (DeviceType deviceType : deviceTypes) {
@@ -332,7 +394,7 @@ public class OnlineUserService {
     }
 
     public Mono<Integer> countOnlineUsers() {
-        Flux<Integer> futures = turmsTaskExecutor.callAll(new CountOnlineUsersTask(), Duration.ofSeconds(30));
+        Flux<Integer> futures = turmsTaskManager.callAll(new CountOnlineUsersTask(), Duration.ofSeconds(30));
         return MathFlux.sumInt(futures);
     }
 
@@ -491,7 +553,7 @@ public class OnlineUserService {
         }
         Map<Long, OnlineUserManager> userManagerMap = onlineUsersManagerAtSlots.get(slotIndex);
         if (userManagerMap == null) {
-            Map<Long, OnlineUserManager> map = new HashMap<>(DEFAULT_ONLINE_USERS_MANAGER_CAPACITY);
+            Map<Long, OnlineUserManager> map = new ConcurrentHashMap<>(DEFAULT_ONLINE_USERS_MANAGER_CAPACITY);
             onlineUsersManagerAtSlots.set(slotIndex, map);
             return map;
         } else {
@@ -540,7 +602,13 @@ public class OnlineUserService {
                 return Mono.just(false);
             }
         } else {
-            Member member = turmsClusterManager.getMemberByUserId(userId);
+            Member member;
+            UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
+            if (memberId != null) {
+                member = turmsClusterManager.getMemberById(memberId);
+            } else {
+                member = turmsClusterManager.getMemberByUserId(userId);
+            }
             UpdateOnlineUserStatusTask task = new UpdateOnlineUserStatusTask(userId, userStatus.getNumber());
             Future<Boolean> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
@@ -560,7 +628,13 @@ public class OnlineUserService {
                         .build());
             }
         } else {
-            Member member = turmsClusterManager.getMemberByUserId(userId);
+            Member member;
+            UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
+            if (memberId != null) {
+                member = turmsClusterManager.getMemberById(memberId);
+            } else {
+                member = turmsClusterManager.getMemberByUserId(userId);
+            }
             QueryUserOnlineInfoTask task = new QueryUserOnlineInfoTask(userId);
             Future<UserOnlineInfo> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
@@ -569,7 +643,7 @@ public class OnlineUserService {
     }
 
     public Flux<UserOnlineInfo> queryUserOnlineInfos(@NotNull Integer number) {
-        Pair<Integer, Integer> workingRange = turmsClusterManager.getWorkingRange();
+        Pair<Integer, Integer> workingRange = turmsClusterManager.getResponsibleSlotIndexRange();
         if (workingRange == null) {
             return Flux.empty();
         } else {
@@ -599,7 +673,21 @@ public class OnlineUserService {
     }
 
     private void onClusterMembersChange() {
-        setIrresponsibleUsersOffline(false);
+        if (irresponsibleUserService.isAllowIrresponsibleUsersAfterResponsibilityChanged()) {
+            // Make sure to drain disconnectionTasks and fill it up again in a lock
+            // So it won't get in trouble when onClusterMembersChange are triggered several times at one moment
+            disconnectionLock.lock();
+            while (!disconnectionTasks.isEmpty()) {
+                disconnectionTasks.poll().cancel();
+            }
+            try {
+                setIrresponsibleUsersOffline(false, irresponsibleUserService.getClearUpIrresponsibleUsersJitter());
+            } finally {
+                disconnectionLock.unlock();
+            }
+        } else {
+            setIrresponsibleUsersOffline(false);
+        }
     }
 
     public SortedSet<UserLocation> getUserLocations(@NotNull Long userId, @DeviceTypeConstraint DeviceType deviceType) {
@@ -647,16 +735,5 @@ public class OnlineUserService {
             }
         }
         return false;
-    }
-
-    public Integer getDisconnectionReason(@NotNull Long userId, @NotNull DeviceType deviceType, @NotNull String sessionId) {
-        if (!enableQueryDisconnectionReason) {
-            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
-        } else if (!degradedDeviceTypes.contains(deviceType)) {
-            String reason = String.format("The device type %s is not allowed to query disconnection reason", deviceType);
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, reason);
-        } else {
-            return disconnectionReasonCache.getIfPresent(Triple.of(userId, deviceType, sessionId));
-        }
     }
 }

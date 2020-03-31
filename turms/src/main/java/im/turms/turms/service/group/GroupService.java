@@ -27,18 +27,18 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.group.GroupsWithVersion;
 import im.turms.common.util.Validator;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.Constants;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
+import im.turms.turms.constant.Common;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.Group;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.pojo.domain.GroupType;
 import im.turms.turms.pojo.domain.UserPermissionGroup;
 import im.turms.turms.service.user.UserPermissionGroupService;
 import im.turms.turms.service.user.UserVersionService;
+import im.turms.turms.util.ProtoUtil;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -57,7 +57,7 @@ import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Service
 @Validated
@@ -208,7 +208,7 @@ public class GroupService {
             @Nullable Integer page,
             @Nullable Integer size) {
         return getGroupIdsFromGroupIdsAndMemberIds(ids, memberIds)
-                .switchIfEmpty(Constants.emptySetMono())
+                .switchIfEmpty(Common.emptySetMono())
                 .flatMapMany(groupIds -> {
                     Query query = QueryBuilder
                             .newBuilder()
@@ -749,7 +749,7 @@ public class GroupService {
             @Nullable DateRange muteEndDateRange,
             @Nullable Set<Long> memberIds) {
         return getGroupIdsFromGroupIdsAndMemberIds(ids, memberIds)
-                .switchIfEmpty(Constants.emptySetMono())
+                .switchIfEmpty(Common.emptySetMono())
                 .flatMap(groupIds -> {
                     Query query = QueryBuilder
                             .newBuilder()
@@ -800,7 +800,7 @@ public class GroupService {
     }
 
     private Mono<Set<Long>> getGroupIdsFromGroupIdsAndMemberIds(@Nullable Set<Long> ids, @Nullable Set<Long> memberIds) {
-        Mono<Set<Long>> idsMono = ids != null ? Mono.just(ids) : Constants.emptySetMono();
+        Mono<Set<Long>> idsMono = ids != null ? Mono.just(ids) : Common.emptySetMono();
         if (memberIds != null) {
             Mono<Set<Long>> joinedGroupIdsMono = groupMemberService
                     .queryUsersJoinedGroupsIds(memberIds, null, null)

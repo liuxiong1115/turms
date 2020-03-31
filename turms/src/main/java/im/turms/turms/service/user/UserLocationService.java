@@ -3,7 +3,7 @@ package im.turms.turms.service.user;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.exception.TurmsBusinessException;
-import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.UserLocation;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;

@@ -17,8 +17,8 @@
 
 package im.turms.turms.service.user;
 
+import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.LogHandler;
-import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.UserActionLog;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;

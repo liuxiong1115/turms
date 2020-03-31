@@ -8,14 +8,14 @@ import im.turms.common.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.user.UserRelationshipGroupsWithVersion;
 import im.turms.turms.annotation.constraint.UserRelationshipGroupKeyConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.UserRelationshipGroup;
 import im.turms.turms.pojo.domain.UserRelationshipGroupMember;
 import im.turms.turms.service.user.UserVersionService;
+import im.turms.turms.util.ProtoUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -36,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Service
 @Validated

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.util;
 
-import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.manager.TurmsClusterManager;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;

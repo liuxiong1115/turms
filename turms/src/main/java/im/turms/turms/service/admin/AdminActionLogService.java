@@ -22,11 +22,11 @@ import com.mongodb.DBObject;
 import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.annotation.constraint.IpAddressConstraint;
 import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.LogHandler;
-import im.turms.turms.plugin.TurmsPluginManager;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.AdminActionLog;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -43,7 +43,7 @@ import java.net.InetAddress;
 import java.util.Date;
 import java.util.Set;
 
-import static im.turms.turms.common.Constants.ID;
+import static im.turms.turms.constant.Common.ID;
 
 @Service
 @Validated

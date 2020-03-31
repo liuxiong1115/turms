@@ -31,7 +31,7 @@ import im.turms.common.model.dto.request.group.member.DeleteGroupMemberRequest;
 import im.turms.common.model.dto.request.group.member.QueryGroupMembersRequest;
 import im.turms.common.model.dto.request.group.member.UpdateGroupMemberRequest;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
-import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.GroupQuestionIdAndAnswer;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;

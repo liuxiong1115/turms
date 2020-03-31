@@ -18,11 +18,12 @@
 package im.turms.turms.service.message;
 
 import com.hazelcast.cluster.Member;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ReactorUtil;
-import im.turms.turms.service.user.onlineuser.OnlineUserManager;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.service.user.onlineuser.IrresponsibleUserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
 import im.turms.turms.task.DeliveryUserMessageTask;
+import im.turms.turms.util.ReactorUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.socket.WebSocketMessage;
@@ -33,17 +34,20 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 @Component
 @Validated
 public class OutboundMessageService {
     private final OnlineUserService onlineUserService;
+    private final IrresponsibleUserService irresponsibleUserService;
     private final TurmsClusterManager turmsClusterManager;
 
-    public OutboundMessageService(OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager) {
+    public OutboundMessageService(OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, IrresponsibleUserService irresponsibleUserService) {
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
+        this.irresponsibleUserService = irresponsibleUserService;
     }
 
     public Mono<Boolean> relayClientMessageToClient(
@@ -57,8 +61,17 @@ public class OutboundMessageService {
         boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(recipientId);
         if (responsible) {
             return relayClientMessageToLocalClient(clientMessage, clientMessageBytes, recipientId);
-        } else if (isRelayable) {
-            return relayClientMessageToRemoteClient(clientMessageBytes, recipientId);
+        } else {
+            UUID memberId = irresponsibleUserService.getMemberIdIfExists(recipientId);
+            if (memberId != null) {
+                if (memberId == turmsClusterManager.getLocalMember().getUuid()) {
+                    return relayClientMessageToLocalClient(clientMessage, clientMessageBytes, recipientId);
+                } else if (isRelayable) {
+                    return relayClientMessageToMember(clientMessageBytes, recipientId, memberId);
+                }
+            } else if (isRelayable) {
+                return relayClientMessageToRemoteClient(clientMessageBytes, recipientId);
+            }
         }
         return Mono.just(false);
     }
@@ -85,6 +98,20 @@ public class OutboundMessageService {
                 recipientSink.next(clientMessage);
             }
             return Mono.just(true);
+        }
+        return Mono.just(false);
+    }
+
+    public Mono<Boolean> relayClientMessageToMember(
+            @Nullable byte[] clientMessageBytes,
+            @NotNull Long recipientId,
+            @NotNull UUID memberId) {
+        Member member = turmsClusterManager.getMemberById(memberId);
+        if (member != null) {
+            DeliveryUserMessageTask task = new DeliveryUserMessageTask(clientMessageBytes, recipientId);
+            Future<Boolean> future = turmsClusterManager.getExecutor()
+                    .submitToMember(task, member);
+            return ReactorUtil.future2Mono(future);
         }
         return Mono.just(false);
     }

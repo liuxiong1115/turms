@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.service.user.onlineuser;
+package im.turms.turms.service.user.onlineuser.manager;
 
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;

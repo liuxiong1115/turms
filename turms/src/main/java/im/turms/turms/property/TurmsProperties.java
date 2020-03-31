@@ -24,14 +24,14 @@ import com.fasterxml.jackson.databind.*;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import im.turms.turms.common.Constants;
-import im.turms.turms.common.MapUtil;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
+import im.turms.turms.constant.Common;
 import im.turms.turms.property.business.Group;
 import im.turms.turms.property.business.Message;
 import im.turms.turms.property.business.Notification;
 import im.turms.turms.property.business.User;
 import im.turms.turms.property.env.*;
+import im.turms.turms.util.MapUtil;
 import jdk.jfr.Description;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -216,9 +216,9 @@ public class TurmsProperties implements IdentifiedDataSerializable {
 
     public static Map<String, Object> getPropertyValueMap(TurmsProperties turmsProperties, boolean mutable) throws IOException {
         if (mutable) {
-            return Constants.MAPPER.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(turmsProperties), Constants.TYPE_REF_MAP);
+            return Common.MAPPER.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(turmsProperties), Common.TYPE_REF_MAP);
         } else {
-            return Constants.MAPPER.readValue(Constants.MAPPER.writeValueAsBytes(turmsProperties), Constants.TYPE_REF_MAP);
+            return Common.MAPPER.readValue(Common.MAPPER.writeValueAsBytes(turmsProperties), Common.TYPE_REF_MAP);
         }
     }
 

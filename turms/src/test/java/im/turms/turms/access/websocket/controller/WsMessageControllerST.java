@@ -21,7 +21,7 @@ import helper.Constants;
 import im.turms.client.TurmsClient;
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.ProfileAccessStrategy;
-import im.turms.turms.common.TurmsPasswordUtil;
+import im.turms.turms.util.TurmsPasswordUtil;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserRelationship;
 import org.junit.jupiter.api.AfterAll;
@@ -37,7 +37,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static im.turms.turms.common.Constants.DEFAULT_USER_PERMISSION_GROUP_ID;
+import static im.turms.turms.constant.Common.DEFAULT_USER_PERMISSION_GROUP_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WsMessageControllerST extends BaseController {

@@ -28,13 +28,14 @@ import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.manager.TurmsTaskManager;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLocation;
 import im.turms.turms.service.user.UserService;
+import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
 import im.turms.turms.task.QueryNearestUserIdsTask;
 import im.turms.turms.task.QueryNearestUserSessionsIdsTask;
-import im.turms.turms.task.TurmsTaskExecutor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
 public class UsersNearbyService {
     private static final Duration TASK_DURATION = Duration.ofSeconds(15);
     private final TurmsClusterManager turmsClusterManager;
-    private final TurmsTaskExecutor turmsTaskExecutor;
+    private final TurmsTaskManager turmsTaskManager;
     private final UserService userService;
     private final OnlineUserService onlineUserService;
 
@@ -75,10 +76,10 @@ public class UsersNearbyService {
     private SortedSetMultimap<Pair<Long, DeviceType>, UserLocation> userSessionLocations;
     private SortedSetMultimap<Long, UserLocation> userLocations;
 
-    public UsersNearbyService(@Lazy OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsTaskExecutor turmsTaskExecutor, UserService userService) {
+    public UsersNearbyService(@Lazy OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsTaskManager turmsTaskManager, UserService userService) {
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
-        this.turmsTaskExecutor = turmsTaskExecutor;
+        this.turmsTaskManager = turmsTaskManager;
         this.userService = userService;
         locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
         treatUserIdAndDeviceTypeAsUniqueUser = turmsClusterManager.getTurmsProperties().getUser().getLocation().isTreatUserIdAndDeviceTypeAsUniqueUser();
@@ -308,7 +309,7 @@ public class UsersNearbyService {
             }
             Double finalMaxDistance = maxDistance;
             Integer finalMaxPeopleNumber = maxNumber;
-            return turmsTaskExecutor.callAll(new QueryNearestUserIdsTask(
+            return turmsTaskManager.callAll(new QueryNearestUserIdsTask(
                     longitude,
                     latitude,
                     maxDistance,
@@ -350,7 +351,7 @@ public class UsersNearbyService {
             }
             Double finalMaxDistance = maxDistance;
             Integer finalMaxPeopleNumber = maxNumber;
-            return turmsTaskExecutor.callAll(new QueryNearestUserSessionsIdsTask(
+            return turmsTaskManager.callAll(new QueryNearestUserSessionsIdsTask(
                     longitude,
                     latitude,
                     maxDistance,

@@ -19,10 +19,10 @@ package im.turms.turms.access.web.controller.group;
 
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
-import im.turms.turms.common.PageUtil;
 import im.turms.turms.pojo.domain.GroupType;
 import im.turms.turms.pojo.dto.*;
 import im.turms.turms.service.group.GroupTypeService;
+import im.turms.turms.util.PageUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;

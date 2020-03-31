@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.builder;
 
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.pojo.bo.DateRange;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -32,8 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class QueryBuilder {
-    private static Criteria EMPTY_CRITERIA = new Criteria();
-    private List<Criteria> criteriaList;
+    private static final Criteria EMPTY_CRITERIA = new Criteria();
+    private final List<Criteria> criteriaList;
     private Criteria finalCriteria;
     private Query outputQuery;
 

@@ -26,15 +26,15 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.RequestStatusConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.RequestStatusUtil;
-import im.turms.turms.common.UpdateBuilder;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.GroupInvitation;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserVersionService;
+import im.turms.turms.util.ProtoUtil;
+import im.turms.turms.util.RequestStatusUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -57,7 +57,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service

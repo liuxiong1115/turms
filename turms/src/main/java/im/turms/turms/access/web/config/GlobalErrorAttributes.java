@@ -31,7 +31,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
-import static im.turms.turms.common.Constants.STATUS;
+import static im.turms.turms.constant.Common.STATUS;
 
 @Component
 public class GlobalErrorAttributes extends DefaultErrorAttributes {

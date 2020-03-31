@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.constant;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -32,9 +32,9 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Constants {
+public class Common {
 
-    private Constants() {
+    private Common() {
     }
 
     public static final String ID = "_id";
@@ -50,6 +50,7 @@ public class Constants {
     public static final String HAZELCAST_ADMINS_MAP = "admins";
     public static final String HAZELCAST_ROLES_MAP = "adminRoles";
     public static final String HAZELCAST_USER_PERMISSION_GROUPS_MAP = "userPermissionGroups";
+    public static final String HAZELCAST_IRRESPONSIBLE_USERS_MAP = "users";
     public static final String HAZELCAST_GROUP_TYPES_MAP = "groupTypes";
 
     public static final String EXPIRED_USER_FRIEND_REQUESTS_CLEANER_CRON = "0 0 2 * * ?";

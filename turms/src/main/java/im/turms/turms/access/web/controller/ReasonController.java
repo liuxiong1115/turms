@@ -18,9 +18,8 @@
 package im.turms.turms.access.web.controller;
 
 import im.turms.common.constant.DeviceType;
-import im.turms.turms.access.websocket.config.TurmsHandshakeWebSocketService;
 import im.turms.turms.annotation.web.RequiredPermission;
-import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import im.turms.turms.manager.ReasonCacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,12 +32,10 @@ import static im.turms.turms.constant.AdminPermission.NONE;
 @RestController
 @RequestMapping("/reasons")
 public class ReasonController {
-    private final TurmsHandshakeWebSocketService handshakeService;
-    private final OnlineUserService onlineUserService;
+    private final ReasonCacheManager reasonCacheManager;
 
-    public ReasonController(TurmsHandshakeWebSocketService handshakeService, OnlineUserService onlineUserService) {
-        this.handshakeService = handshakeService;
-        this.onlineUserService = onlineUserService;
+    public ReasonController(ReasonCacheManager reasonCacheManager) {
+        this.reasonCacheManager = reasonCacheManager;
     }
 
     @GetMapping("/login-failed")
@@ -47,7 +44,7 @@ public class ReasonController {
             @RequestParam Long userId,
             @RequestParam DeviceType deviceType,
             @RequestParam Long requestId) {
-        Object reason = handshakeService.getLoginFailedReason(userId, deviceType, requestId);
+        Object reason = reasonCacheManager.getLoginFailedReason(userId, deviceType, requestId);
         if (reason instanceof String) {
             return ResponseEntity
                     .status(HttpStatus.TEMPORARY_REDIRECT)
@@ -65,6 +62,6 @@ public class ReasonController {
             @RequestParam Long userId,
             @RequestParam DeviceType deviceType,
             @RequestParam String sessionId) {
-        return onlineUserService.getDisconnectionReason(userId, deviceType, sessionId);
+        return reasonCacheManager.getDisconnectionReason(userId, deviceType, sessionId);
     }
 }

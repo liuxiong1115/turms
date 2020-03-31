@@ -2,11 +2,11 @@ package im.turms.turms.config.mongo;
 
 import com.google.common.net.InetAddresses;
 import im.turms.common.constant.*;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.TurmsPasswordUtil;
 import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.*;
+import im.turms.turms.util.TurmsPasswordUtil;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Log4j2
 @Component

@@ -1,4 +1,4 @@
-package im.turms.turms.pojo;
+package im.turms.turms.pojo.bo;
 
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;

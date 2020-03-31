@@ -27,9 +27,9 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.GroupType;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -48,7 +48,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 import java.util.function.Function;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Service
 @Validated
