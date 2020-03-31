@@ -20,7 +20,7 @@ package im.turms.turms.pojo.bo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
-import im.turms.turms.service.user.onlineuser.OnlineUserManager;
+import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

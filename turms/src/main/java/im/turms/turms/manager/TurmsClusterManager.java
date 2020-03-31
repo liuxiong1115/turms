@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.cluster;
+package im.turms.turms.manager;
 
 import com.hazelcast.cluster.Member;
 import com.hazelcast.cluster.MembershipAdapter;
@@ -31,11 +31,14 @@ import com.hazelcast.core.IExecutorService;
 import com.hazelcast.flakeidgen.FlakeIdGenerator;
 import com.hazelcast.replicatedmap.ReplicatedMap;
 import im.turms.turms.annotation.cluster.HazelcastConfig;
+import im.turms.turms.annotation.cluster.PostHazelcastJoined;
 import im.turms.turms.property.TurmsProperties;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -50,20 +53,23 @@ public class TurmsClusterManager {
 
     public static final int HASH_SLOTS_NUMBER = 127;
     public static final String ATTRIBUTE_ADDRESS = "ADDR";
-    private static final String HAZELCAST_KEY_SHARED_PROPERTIES = "sharedProperties";
+    private static final String HAZELCAST_KEY_SHARED_PROPERTIES = "properties";
     private static final String HAZELCAST_KEY_MEMBER_ADDRESSES = "addresses";
     private static final String HAZELCAST_KEY_DEFAULT = "default";
     private static final String CLUSTER_STATE = "clusterState";
     private static final String CLUSTER_TIME = "clusterTime";
     private static final String CLUSTER_VERSION = "clusterVersion";
     private static final String MEMBERS = "members";
+    private final ApplicationContext context;
     @Getter
     @Setter
     private HazelcastInstance hazelcastInstance;
     private TurmsProperties sharedTurmsProperties;
     private ReplicatedMap<SharedPropertiesKey, Object> sharedProperties;
     private ReplicatedMap<UUID, String> memberAddresses; // Don't just use MemberAttributeConfig that only supports immutable attributes
+
     private List<Member> membersSnapshot = Collections.emptyList();
+    private Map<UUID, Member> membersSnapshotMap = Collections.emptyMap();
     private Member localMembersSnapshot;
     private boolean isMaster = false;
     private boolean hasJoinedCluster = false;
@@ -77,6 +83,7 @@ public class TurmsClusterManager {
         sharedTurmsProperties = localTurmsProperties;
         onMembersChangeListeners = new LinkedList<>();
         this.hazelcastInstance = hazelcastInstance;
+        this.context = context;
     }
 
     @HazelcastConfig
@@ -88,44 +95,51 @@ public class TurmsClusterManager {
             config.addListenerConfig(new ListenerConfig(new MembershipAdapter() {
                 @Override
                 public void memberAdded(MembershipEvent membershipEvent) {
-                    membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
-                    if (membersSnapshot.size() > HASH_SLOTS_NUMBER) {
-                        shutdown();
-                        throw new RuntimeException("The members of cluster should be not more than " + HASH_SLOTS_NUMBER);
-                    }
-                    localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
-                    if (!hasJoinedCluster) {
-                        initEnvAfterJoinedCluster();
-                    }
-                    hasJoinedCluster = true;
-                    if (isCurrentMemberMaster()) {
-                        if (!isMaster && membersSnapshot.size() > 1) {
-                            uploadPropertiesToAllMembers(sharedTurmsProperties);
-                        }
-                        isMaster = true;
-                    } else {
-                        isMaster = false;
-                    }
-                    logWorkingRanges(
-                            membershipEvent.getCluster().getMembers(),
-                            membershipEvent.getCluster().getLocalMember());
-                    notifyMembersChangeListeners(membershipEvent);
+                    initCurrentNodeStatusAfterMemberChange(membershipEvent);
                 }
 
                 @Override
                 public void memberRemoved(MembershipEvent membershipEvent) {
-                    membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
-                    localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
-                    logWorkingRanges(
-                            membershipEvent.getCluster().getMembers(),
-                            membershipEvent.getCluster().getLocalMember());
-                    hasJoinedCluster = hasJoinedCluster();
-                    memberAddresses.remove(membershipEvent.getMember().getUuid());
-                    notifyMembersChangeListeners(membershipEvent);
+                    initCurrentNodeStatusAfterMemberChange(membershipEvent);
                 }
             }));
             return null;
         };
+    }
+
+    private synchronized void initCurrentNodeStatusAfterMemberChange(MembershipEvent membershipEvent) {
+        membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
+        Map<UUID, Member> memberMap = new HashMap<>(membersSnapshot.size());
+        for (Member member : membersSnapshot) {
+            memberMap.put(member.getUuid(), member);
+        }
+        membersSnapshotMap = memberMap;
+        localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
+        if (membershipEvent.getEventType() == MembershipEvent.MEMBER_ADDED) {
+            if (membersSnapshot.size() > HASH_SLOTS_NUMBER) {
+                shutdown();
+                throw new RuntimeException("The members of cluster should be not more than " + HASH_SLOTS_NUMBER);
+            }
+            if (!hasJoinedCluster) {
+                initEnvAfterJoinedCluster();
+            }
+            hasJoinedCluster = true;
+            if (isCurrentMemberMaster()) {
+                if (!isMaster && membersSnapshot.size() > 1) {
+                    uploadPropertiesToAllMembers(sharedTurmsProperties);
+                }
+                isMaster = true;
+            } else {
+                isMaster = false;
+            }
+        } else {
+            hasJoinedCluster = hasJoinedCluster();
+            memberAddresses.remove(membershipEvent.getMember().getUuid());
+        }
+        logWorkingRanges(
+                membershipEvent.getCluster().getMembers(),
+                membershipEvent.getCluster().getLocalMember());
+        notifyMembersChangeListeners(membershipEvent);
     }
 
     public boolean isServing() {
@@ -165,6 +179,14 @@ public class TurmsClusterManager {
             idGenerator = hazelcastInstance.getFlakeIdGenerator(HAZELCAST_KEY_DEFAULT);
             sharedProperties = hazelcastInstance.getReplicatedMap(HAZELCAST_KEY_SHARED_PROPERTIES);
             memberAddresses = hazelcastInstance.getReplicatedMap(HAZELCAST_KEY_MEMBER_ADDRESSES);
+
+            Map<String, Object> beans = context.getBeansWithAnnotation(PostHazelcastJoined.class);
+            for (Object value : beans.values()) {
+                if (value instanceof Function) {
+                    Function<HazelcastInstance, Void> function = (Function<HazelcastInstance, Void>) value;
+                    function.apply(hazelcastInstance);
+                }
+            }
             fetchSharedPropertiesFromCluster();
         }
     }
@@ -275,9 +297,13 @@ public class TurmsClusterManager {
         }
     }
 
-    public boolean isCurrentNodeResponsibleBySlotIndex(@NotNull Integer slotIndex) {
-        Member member = getClusterMemberBySlotIndex(slotIndex);
-        return member != null && member.getUuid().equals(localMembersSnapshot.getUuid());
+    public Member getMemberIfCurrentNodeIrresponsibleByUserId(@NotNull Long userId) {
+        Member member = getMemberByUserId(userId);
+        if (member == null || member == localMembersSnapshot) {
+            return null;
+        } else {
+            return member;
+        }
     }
 
     public Member getLocalMember() {
@@ -315,7 +341,7 @@ public class TurmsClusterManager {
     /**
      * [start, end)
      */
-    public Pair<Integer, Integer> getWorkingRange() {
+    public Pair<Integer, Integer> getResponsibleSlotIndexRange() {
         int size = membersSnapshot.size();
         if (size != 0) {
             Integer localMemberIndex = getLocalMemberIndex();
@@ -331,6 +357,10 @@ public class TurmsClusterManager {
     public Member getMemberByUserId(@NotNull Long userId) {
         int index = getSlotIndexByUserId(userId);
         return getClusterMemberBySlotIndex(index);
+    }
+
+    public Member getMemberById(@NotNull UUID memberId) {
+        return membersSnapshotMap.get(memberId);
     }
 
     public int getSlotIndexByUserId(@NotNull Long userId) {

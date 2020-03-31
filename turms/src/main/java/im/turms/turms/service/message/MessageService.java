@@ -28,18 +28,18 @@ import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.ChatTypeConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.AggregationUtil;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.ExpiredMessageAutoDeletionNotificationHandler;
-import im.turms.turms.plugin.TurmsPluginManager;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;
+import im.turms.turms.util.AggregationUtil;
+import im.turms.turms.util.ProtoUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -66,7 +66,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static im.turms.common.TurmsStatusCode.*;
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Service
 @Validated

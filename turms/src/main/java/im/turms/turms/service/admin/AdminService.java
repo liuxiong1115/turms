@@ -23,13 +23,13 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsPasswordUtil;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.AdminInfo;
 import im.turms.turms.pojo.domain.Admin;
+import im.turms.turms.util.TurmsPasswordUtil;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.validator.constraints.Length;
@@ -54,7 +54,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Log4j2
 @Service

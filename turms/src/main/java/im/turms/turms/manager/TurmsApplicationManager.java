@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.manager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;

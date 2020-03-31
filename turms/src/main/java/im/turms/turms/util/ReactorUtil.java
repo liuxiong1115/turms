@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.util;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

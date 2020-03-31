@@ -19,7 +19,7 @@ package im.turms.turms.service.group;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.turms.common.QueryBuilder;
+import im.turms.turms.builder.QueryBuilder;
 import im.turms.turms.pojo.domain.GroupVersion;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -36,8 +36,8 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
 
-import static im.turms.turms.common.Constants.ID;
-import static im.turms.turms.common.Constants.ID_GROUP_ID;
+import static im.turms.turms.constant.Common.ID;
+import static im.turms.turms.constant.Common.ID_GROUP_ID;
 
 @Service
 @Validated

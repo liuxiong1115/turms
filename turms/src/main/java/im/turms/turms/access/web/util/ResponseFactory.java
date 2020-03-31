@@ -30,7 +30,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 
-import static im.turms.turms.common.Constants.EMPTY_OBJECT;
+import static im.turms.turms.constant.Common.EMPTY_OBJECT;
 
 @Data
 public class ResponseFactory {

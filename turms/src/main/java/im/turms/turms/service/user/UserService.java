@@ -26,13 +26,11 @@ import im.turms.common.constant.ProfileAccessStrategy;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.ProfileAccessConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.AggregationUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.TurmsPasswordUtil;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
 import im.turms.turms.constant.CloseStatusFactory;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLoginLog;
 import im.turms.turms.pojo.domain.UserOnlineUserNumber;
@@ -40,6 +38,8 @@ import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.relationship.UserRelationshipGroupService;
 import im.turms.turms.service.user.relationship.UserRelationshipService;
+import im.turms.turms.util.AggregationUtil;
+import im.turms.turms.util.TurmsPasswordUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -57,7 +57,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Component
 @Validated

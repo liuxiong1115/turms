@@ -27,12 +27,12 @@ import im.turms.common.model.bo.group.GroupJoinQuestionsAnswerResult;
 import im.turms.common.model.bo.group.GroupJoinQuestionsWithVersion;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.GroupQuestionIdAndAnswerConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.GroupQuestionIdAndAnswer;
 import im.turms.turms.pojo.domain.GroupJoinQuestion;
+import im.turms.turms.util.ProtoUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -53,8 +53,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.common.Constants.ID;
-import static im.turms.turms.common.Constants.MAX_DATE;
+import static im.turms.turms.constant.Common.ID;
+import static im.turms.turms.constant.Common.MAX_DATE;
 
 @Service
 @Validated

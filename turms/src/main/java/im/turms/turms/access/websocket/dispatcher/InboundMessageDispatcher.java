@@ -29,17 +29,18 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.SessionUtil;
 import im.turms.turms.constant.CloseStatusFactory;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.ClientRequestHandler;
-import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
 import im.turms.turms.pojo.domain.UserActionLog;
 import im.turms.turms.service.message.OutboundMessageService;
 import im.turms.turms.service.user.UserActionLogService;
+import im.turms.turms.service.user.onlineuser.IrresponsibleUserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import im.turms.turms.util.SessionUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -59,6 +60,7 @@ import java.util.function.Function;
 public class InboundMessageDispatcher {
     private final OutboundMessageService outboundMessageService;
     private final OnlineUserService onlineUserService;
+    private final IrresponsibleUserService irresponsibleUserService;
     private final UserActionLogService userActionLogService;
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
@@ -67,7 +69,7 @@ public class InboundMessageDispatcher {
     private final boolean logUserAction;
     private final JsonFormat.Printer jsonPrinter;
 
-    public InboundMessageDispatcher(ApplicationContext context, OutboundMessageService outboundMessageService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager, UserActionLogService userActionLogService) {
+    public InboundMessageDispatcher(ApplicationContext context, OutboundMessageService outboundMessageService, OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager, UserActionLogService userActionLogService, IrresponsibleUserService irresponsibleUserService) {
         router = new EnumMap<>(TurmsRequest.KindCase.class);
         this.outboundMessageService = outboundMessageService;
         Map<String, Object> beans = context.getBeansWithAnnotation(TurmsRequestMapping.class);
@@ -89,6 +91,7 @@ public class InboundMessageDispatcher {
         } else {
             jsonPrinter = null;
         }
+        this.irresponsibleUserService = irresponsibleUserService;
     }
 
     private TurmsRequestMapping getMapping(Function<TurmsRequestWrapper, Mono<RequestResult>> request, String methodName) {
@@ -113,7 +116,7 @@ public class InboundMessageDispatcher {
             // and the responsibility of cluster members is redistributing, and members are disconnecting online users.
             // If it's done before the user becomes online status, the user will be connecting to an irresponsible server that cannot realize it.
             String serverAddress = turmsClusterManager.getAddressIfCurrentNodeIrresponsibleByUserId(userId);
-            if (serverAddress != null) {
+            if (serverAddress != null && !irresponsibleUserService.isIrresponsibleUserServedByCurrentNode(userId)) {
                 onlineUserService.setLocalUserOffline(userId, CloseStatusFactory.get(TurmsCloseStatus.REDIRECT, serverAddress));
                 return Mono.empty();
             }

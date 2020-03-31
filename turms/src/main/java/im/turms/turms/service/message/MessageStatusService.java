@@ -8,12 +8,12 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.MessageDeliveryStatusConstraint;
 import im.turms.turms.annotation.constraint.MessageStatusKeyConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.MapUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.MessageStatus;
+import im.turms.turms.util.MapUtil;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Service
 @Validated

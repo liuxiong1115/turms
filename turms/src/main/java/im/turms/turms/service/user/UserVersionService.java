@@ -36,7 +36,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
-import static im.turms.turms.common.Constants.ID;
+import static im.turms.turms.constant.Common.ID;
 
 @Service
 @Validated

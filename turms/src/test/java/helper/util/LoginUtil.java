@@ -18,8 +18,8 @@ package helper.util;/*
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static im.turms.turms.common.SessionUtil.PASSWORD_FIELD;
-import static im.turms.turms.common.SessionUtil.USER_ID_FIELD;
+import static im.turms.turms.util.SessionUtil.PASSWORD_FIELD;
+import static im.turms.turms.util.SessionUtil.USER_ID_FIELD;
 
 public class LoginUtil {
 

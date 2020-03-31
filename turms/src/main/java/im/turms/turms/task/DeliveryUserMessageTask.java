@@ -19,7 +19,7 @@ package im.turms.turms.task;
 
 import com.hazelcast.spring.context.SpringAware;
 import im.turms.common.constant.DeviceType;
-import im.turms.turms.service.user.onlineuser.OnlineUserManager;
+import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;

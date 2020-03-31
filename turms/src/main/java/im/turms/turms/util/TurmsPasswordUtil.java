@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.util;
 
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.property.env.Security;
@@ -27,10 +27,10 @@ import javax.validation.constraints.NotNull;
 
 @Component
 public class TurmsPasswordUtil {
-    private static BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
+    private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
     // Ignore @Deprecated because it's still secure enough for IM.
     @SuppressWarnings("deprecation")
-    private static MessageDigestPasswordEncoder messageDigestPasswordEncoder = new MessageDigestPasswordEncoder("SHA-256");
+    private static final MessageDigestPasswordEncoder messageDigestPasswordEncoder = new MessageDigestPasswordEncoder("SHA-256");
     private final TurmsProperties turmsProperties;
 
     public TurmsPasswordUtil(TurmsProperties turmsProperties) {

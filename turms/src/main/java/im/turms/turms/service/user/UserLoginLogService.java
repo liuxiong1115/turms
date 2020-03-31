@@ -20,9 +20,9 @@ package im.turms.turms.service.user;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.DeviceType;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.LogHandler;
-import im.turms.turms.plugin.TurmsPluginManager;
 import im.turms.turms.pojo.domain.UserLoginLog;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -40,7 +40,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static im.turms.turms.common.Constants.ID;
+import static im.turms.turms.constant.Common.ID;
 
 @Service
 @Validated

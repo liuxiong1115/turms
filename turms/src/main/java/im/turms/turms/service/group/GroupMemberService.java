@@ -26,17 +26,17 @@ import im.turms.common.model.bo.group.GroupMembersWithVersion;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.constraint.GroupMemberKeyConstraint;
 import im.turms.turms.annotation.constraint.GroupMemberRoleConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.MapUtil;
-import im.turms.turms.common.ProtoUtil;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.bo.InvitableAndInvitationStrategy;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.GroupBlacklistedUser;
 import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import im.turms.turms.util.MapUtil;
+import im.turms.turms.util.ProtoUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Service
 @Validated

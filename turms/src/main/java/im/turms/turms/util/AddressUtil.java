@@ -1,7 +1,7 @@
-package im.turms.turms.common;
+package im.turms.turms.util;
 
 import com.google.common.net.InetAddresses;
-import im.turms.turms.cluster.TurmsClusterManager;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.property.TurmsProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;

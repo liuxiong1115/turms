@@ -1,6 +1,7 @@
 package im.turms.turms.cluster;
 
 import com.hazelcast.cluster.Member;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.property.TurmsProperties;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import static im.turms.turms.cluster.TurmsClusterManager.HASH_SLOTS_NUMBER;
+import static im.turms.turms.manager.TurmsClusterManager.HASH_SLOTS_NUMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;

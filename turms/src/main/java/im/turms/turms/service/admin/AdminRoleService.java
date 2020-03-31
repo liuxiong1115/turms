@@ -23,11 +23,11 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.annotation.constraint.NoWhitespaceConstraint;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.Constants;
-import im.turms.turms.common.QueryBuilder;
-import im.turms.turms.common.UpdateBuilder;
+import im.turms.turms.builder.QueryBuilder;
+import im.turms.turms.builder.UpdateBuilder;
 import im.turms.turms.constant.AdminPermission;
+import im.turms.turms.constant.Common;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.AdminRole;
 import org.apache.commons.lang3.tuple.Triple;
 import org.hibernate.validator.constraints.Length;
@@ -48,7 +48,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.common.Constants.*;
+import static im.turms.turms.constant.Common.*;
 
 @Service
 @Validated
@@ -67,7 +67,7 @@ public class AdminRoleService {
     @PostHazelcastInitialized
     public Function<TurmsClusterManager, Void> initAdminRolesCache() {
         return turmsClusterManager -> {
-            roles = turmsClusterManager.getHazelcastInstance().getReplicatedMap(Constants.HAZELCAST_ROLES_MAP);
+            roles = turmsClusterManager.getHazelcastInstance().getReplicatedMap(Common.HAZELCAST_ROLES_MAP);
             if (roles.isEmpty()) {
                 loadAllRoles();
             }
@@ -149,7 +149,7 @@ public class AdminRoleService {
         if (roleIds.contains(ADMIN_ROLE_ROOT_ID)) {
             throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
         }
-        Query query = new Query().addCriteria(Criteria.where(Constants.ID).in(roleIds));
+        Query query = new Query().addCriteria(Criteria.where(Common.ID).in(roleIds));
         return mongoTemplate.remove(query, AdminRole.class)
                 .map(result -> {
                     if (result.wasAcknowledged()) {
@@ -207,7 +207,7 @@ public class AdminRoleService {
         if (roleIds.contains(ADMIN_ROLE_ROOT_ID)) {
             throw TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED);
         }
-        Query query = new Query().addCriteria(Criteria.where(Constants.ID).in(roleIds));
+        Query query = new Query().addCriteria(Criteria.where(Common.ID).in(roleIds));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(AdminRole.Fields.name, newName)
                 .setIfNotNull(AdminRole.Fields.permissions, permissions)

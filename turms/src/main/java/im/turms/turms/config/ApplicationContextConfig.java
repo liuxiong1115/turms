@@ -17,8 +17,8 @@
 
 package im.turms.turms.config;
 
-import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.compiler.CompilerOptions;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.event.ContextClosedEvent;

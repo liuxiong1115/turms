@@ -1,4 +1,4 @@
-package im.turms.turms.common;
+package im.turms.turms.manager;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 @Component
-public class TrivialTaskService {
+public class TrivialTaskManager {
 
     Map<String, ScheduledFuture<?>> scheduledFutureMap;
 
     TaskScheduler taskScheduler;
 
-    public TrivialTaskService() {
+    public TrivialTaskManager() {
         scheduledFutureMap = new HashMap<>();
         taskScheduler = new ConcurrentTaskScheduler();
     }

@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package im.turms.turms.plugin;
+package im.turms.turms.manager;
 
+import im.turms.turms.plugin.*;
 import im.turms.turms.property.TurmsProperties;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;

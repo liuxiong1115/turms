@@ -64,26 +64,40 @@ hazelcast:
       merge-policy:
         batch-size: 100
         class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
-    sharedProperties:
+    properties:
+      in-memory-format: OBJECT
+      async-fillup: false
+      statistics-enabled: false
+      merge-policy:
+        batch-size: 100
+        class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
+    addresses:
+      in-memory-format: OBJECT
+      async-fillup: false
+      statistics-enabled: false
+      merge-policy:
+        batch-size: 500 # Always higher than TurmsClusterManager.HASH_SLOTS_NUMBER
+        class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
+    users:
       in-memory-format: OBJECT
       async-fillup: true
       statistics-enabled: false
       merge-policy:
-        batch-size: 100
+        batch-size: 1000
         class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
     admins:
       in-memory-format: OBJECT
       async-fillup: true
       statistics-enabled: false
       merge-policy:
-        batch-size: 100
+        batch-size: 500
         class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
     adminRoles:
       in-memory-format: OBJECT
       async-fillup: true
       statistics-enabled: false
       merge-policy:
-        batch-size: 100
+        batch-size: 500
         class-name: com.hazelcast.spi.merge.PutIfAbsentMergePolicy
 
   flake-id-generator:

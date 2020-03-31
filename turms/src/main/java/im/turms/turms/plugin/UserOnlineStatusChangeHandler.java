@@ -18,7 +18,7 @@
 package im.turms.turms.plugin;
 
 import im.turms.common.constant.DeviceType;
-import im.turms.turms.service.user.onlineuser.OnlineUserManager;
+import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
 import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Mono;
 

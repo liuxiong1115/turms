@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package im.turms.turms.task;
+package im.turms.turms.manager;
 
 import com.google.common.annotations.Beta;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.IExecutorService;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.common.ReactorUtil;
+import im.turms.turms.util.ReactorUtil;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -34,13 +33,11 @@ import java.util.concurrent.Future;
 
 @Component
 @Beta
-public class TurmsTaskExecutor {
-    private final TurmsClusterManager turmsClusterManager;
-    private IExecutorService executor;
+public class TurmsTaskManager {
+    private final IExecutorService executor;
 
-    public TurmsTaskExecutor(TurmsClusterManager turmsClusterManager) {
-        this.turmsClusterManager = turmsClusterManager;
-        executor = this.turmsClusterManager.getExecutor();
+    public TurmsTaskManager(TurmsClusterManager turmsClusterManager) {
+        executor = turmsClusterManager.getExecutor();
     }
 
     public <T> Flux<T> callAll(@NotNull Callable<T> task) {

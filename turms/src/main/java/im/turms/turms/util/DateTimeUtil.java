@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.util;
 
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.DivideBy;
-import im.turms.turms.cluster.TurmsClusterManager;
-import im.turms.turms.pojo.DateRange;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.dto.StatisticsRecordDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;

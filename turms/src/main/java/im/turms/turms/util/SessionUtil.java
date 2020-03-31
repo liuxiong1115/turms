@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.turms.common;
+package im.turms.turms.util;
 
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.google.common.base.Enums;

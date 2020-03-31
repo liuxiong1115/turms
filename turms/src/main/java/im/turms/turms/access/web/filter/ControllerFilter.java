@@ -20,10 +20,10 @@ package im.turms.turms.access.web.filter;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import im.turms.turms.annotation.web.RequiredPermission;
-import im.turms.turms.cluster.TurmsClusterManager;
 import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.AdminPermission;
-import im.turms.turms.plugin.TurmsPluginManager;
+import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.service.admin.AdminActionLogService;
 import im.turms.turms.service.admin.AdminService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -50,8 +50,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
 
-import static im.turms.turms.common.Constants.ACCOUNT;
-import static im.turms.turms.common.Constants.PASSWORD;
+import static im.turms.turms.constant.Common.ACCOUNT;
+import static im.turms.turms.constant.Common.PASSWORD;
 
 @Component
 public class ControllerFilter implements WebFilter {
