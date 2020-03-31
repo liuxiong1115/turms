@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.hazelcast.cluster.MembershipEvent.MEMBER_ADDED;
@@ -86,10 +83,20 @@ public class IrresponsibleUserService {
             return null;
         };
     }
-
+    
     public void put(@NotNull Long userId, @NotNull UUID memberId) {
         if (isEnabled && clearUpIrresponsibleUsersAfter > 0) {
-            irresponsibleUserMap.put(userId, memberId, clearUpIrresponsibleUsersAfter, TimeUnit.SECONDS);
+            irresponsibleUserMap.put(userId, memberId);
+        }
+    }
+
+    public void putAll(@NotNull List<Long> userIds, @NotNull UUID memberId) {
+        if (isEnabled && clearUpIrresponsibleUsersAfter > 0) {
+            Map<Long, UUID> map = new HashMap<>(userIds.size());
+            for (Long userId : userIds) {
+                map.put(userId, memberId);
+            }
+            irresponsibleUserMap.putAll(map);
         }
     }
 

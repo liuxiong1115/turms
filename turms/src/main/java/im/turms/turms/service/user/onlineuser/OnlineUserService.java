@@ -169,6 +169,7 @@ public class OnlineUserService {
         int irresponsibleSlotNumber = TurmsClusterManager.HASH_SLOTS_NUMBER + slotIndexRange.getRight() - slotIndexRange.getLeft();
         int step = Math.max(jitter * 2 / irresponsibleSlotNumber, 1);
         int start = Math.max(irresponsibleUserService.getClearUpIrresponsibleUsersAfter() - jitter, 0);
+        UUID localMemberId = turmsClusterManager.getLocalMember().getUuid();
         for (int index = 0; index < HASH_SLOTS_NUMBER; index++) {
             boolean isIrresponsible = slotIndexRange.getLeft() > index || index >= slotIndexRange.getRight();
             if (isIrresponsible) {
@@ -176,6 +177,7 @@ public class OnlineUserService {
                 if (member != null) {
                     TurmsCloseStatus status = isServerClosing ? TurmsCloseStatus.SERVER_CLOSED : TurmsCloseStatus.REDIRECT;
                     String address = turmsClusterManager.getAddress(member);
+                    irresponsibleUserService.putAll(getUsersBySlotIndex(index), localMemberId);
                     int finalIndex = index;
                     Timeout timeout = irresponsibleUserService.getIrresponsibleUsersCleanerTimer().newTimeout(ignored -> {
                         setUsersOfflineBySlotIndex(finalIndex, CloseStatusFactory.get(status, address));
