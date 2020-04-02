@@ -1,10 +1,10 @@
 package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
-import im.turms.client.driver.TurmsDriver;
 import im.turms.client.model.UserInfoWithVersion;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
+import im.turms.client.util.SystemUtil;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.ProfileAccessStrategy;
@@ -33,7 +33,7 @@ public class UserService {
     private String password;
     private UserLocation location;
     private UserStatus userOnlineStatus;
-    private DeviceType deviceType;
+    private DeviceType deviceType = SystemUtil.getDeviceType();
 
     public UserService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;
@@ -42,34 +42,28 @@ public class UserService {
     public CompletableFuture<Void> login(
             long userId,
             @NotNull String password,
-            @Nullable UserLocation location,
+            @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus,
-            @Nullable DeviceType deviceType) {
+            @Nullable UserLocation location) {
         Validator.throwIfAnyFalsy(password);
-        if (userOnlineStatus == null) {
-            userOnlineStatus = UserStatus.AVAILABLE;
-        }
-        if (deviceType == null) {
-            deviceType = DeviceType.UNKNOWN;
-        }
         this.userId = userId;
         this.password = password;
-        this.userOnlineStatus = userOnlineStatus;
-        this.deviceType = deviceType;
-        TurmsDriver driver = turmsClient.getDriver();
-        return driver.connect(userId, password, null, location, userOnlineStatus, deviceType)
+        if (deviceType != null) {
+            this.deviceType = deviceType;
+        }
+        this.userOnlineStatus = userOnlineStatus != null ? userOnlineStatus : UserStatus.AVAILABLE;
+        this.location = location;
+        return turmsClient.getDriver().connect(userId, password, deviceType, userOnlineStatus, location)
                 .thenApply(webSocket -> null);
     }
 
-    public CompletableFuture<Void> login(
-            long userId,
-            @NotNull String password) {
+    public CompletableFuture<Void> login(long userId, @NotNull String password) {
         return login(userId, password, null, null, null);
     }
 
     public CompletableFuture<Void> relogin() {
         if (userId != null && password != null) {
-            return this.login(userId, password, location, userOnlineStatus, deviceType);
+            return this.login(userId, password, deviceType, userOnlineStatus, location);
         } else {
             return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_USER_ID_AND_PASSWORD_MUST_NOT_NULL));
         }

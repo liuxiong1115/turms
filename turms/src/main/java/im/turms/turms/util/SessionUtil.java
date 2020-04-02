@@ -314,7 +314,11 @@ public class SessionUtil {
         if (location != null) {
             String[] split = location.split(LOCATION_SPLIT);
             if (split.length == 2) {
-                return PointFloat.create(Float.parseFloat(split[0]), Float.parseFloat(split[1]));
+                try {
+                    return PointFloat.create(Float.parseFloat(split[0]), Float.parseFloat(split[1]));
+                } catch (Exception e) {
+                    return null;
+                }
             }
         }
         return null;

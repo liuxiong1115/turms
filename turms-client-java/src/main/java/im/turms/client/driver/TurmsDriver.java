@@ -4,6 +4,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
+import im.turms.client.TurmsClient;
 import im.turms.client.common.Function4;
 import im.turms.client.common.StringUtil;
 import im.turms.client.common.TurmsLogger;
@@ -45,6 +46,7 @@ public class TurmsDriver {
 
     private final Integer heartbeatInterval;
 
+    private final TurmsClient turmsClient;
     private WebSocket websocket;
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> heartbeatFuture;
@@ -56,14 +58,9 @@ public class TurmsDriver {
     private Function4<TurmsCloseStatus, Integer, String, Throwable, Void> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
-    private int connectionTimeout = 10 * 1000;
+    private int connectionTimeout = 10;
     private int minRequestsInterval = 0;
     private long lastRequestDate = 0;
-    private Long userId;
-    private String password;
-    private UserLocation userLocation;
-    private UserStatus userOnlineStatus;
-    private DeviceType deviceType;
 
     private String address;
     private String sessionId;
@@ -84,9 +81,11 @@ public class TurmsDriver {
         this.onClose = onClose;
     }
 
-    public TurmsDriver(@Nullable String websocketUrl,
+    public TurmsDriver(@NotNull TurmsClient turmsClient,
+                       @Nullable String websocketUrl,
                        @Nullable Integer connectionTimeout,
                        @Nullable Integer minRequestsInterval) {
+        this.turmsClient = turmsClient;
         if (websocketUrl != null) {
             this.websocketUrl = websocketUrl;
         }
@@ -97,6 +96,10 @@ public class TurmsDriver {
             this.minRequestsInterval = minRequestsInterval;
         }
         this.heartbeatInterval = HEARTBEAT_INTERVAL;
+    }
+
+    public TurmsDriver(@NotNull TurmsClient turmsClient) {
+        this(turmsClient, null, null, null);
     }
 
     public CompletableFuture<Void> sendHeartbeat() {
@@ -127,25 +130,19 @@ public class TurmsDriver {
         }
     }
 
+    public CompletableFuture<Void> connect(long userId, @NotNull String password) {
+        return connect(userId, password, null, null, null);
+    }
+
     public CompletableFuture<Void> connect(
             long userId,
             @NotNull String password,
-            @Nullable Integer connectionTimeout,
-            @Nullable UserLocation userLocation,
+            @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus,
-            @Nullable DeviceType deviceType) {
-        if (connectionTimeout == null) {
-            connectionTimeout = this.connectionTimeout;
-        }
-        Integer finalConnectionTimeout = connectionTimeout;
+            @Nullable UserLocation userLocation) {
         if (connected()) {
             return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_ALREADY_ESTABLISHED));
         } else {
-            this.userId = userId;
-            this.password = password;
-            this.userLocation = userLocation;
-            this.userOnlineStatus = userOnlineStatus;
-            this.deviceType = deviceType;
             long connectionRequestId = (long) Math.ceil(Math.random() * Long.MAX_VALUE);
             WebSocket.Builder builder = HttpClient.newHttpClient()
                     .newWebSocketBuilder();
@@ -163,7 +160,7 @@ public class TurmsDriver {
                 builder.header(DEVICE_TYPE_FIELD, deviceType.name());
             }
             return builder
-                    .connectTimeout(Duration.ofSeconds(finalConnectionTimeout))
+                    .connectTimeout(Duration.ofSeconds(connectionTimeout))
                     .buildAsync(URI.create(websocketUrl), new WebSocket.Listener() {
 
                         @Override
@@ -364,7 +361,12 @@ public class TurmsDriver {
     private CompletableFuture<Void> reconnect(String address) {
         boolean isSecure = websocketUrl.startsWith("wss://");
         websocketUrl = (isSecure ? "wss://" : "ws://") + address;
-        return this.connect(userId, password, connectionTimeout, userLocation, userOnlineStatus, deviceType);
+        return this.connect(
+                turmsClient.getUserService().getUserId(),
+                turmsClient.getUserService().getPassword(),
+                turmsClient.getUserService().getDeviceType(),
+                turmsClient.getUserService().getUserOnlineStatus(),
+                turmsClient.getUserService().getLocation());
     }
 
     private void cancelHeartbeatFuture() {

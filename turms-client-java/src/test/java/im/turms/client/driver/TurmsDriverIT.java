@@ -1,5 +1,6 @@
 package im.turms.client.driver;
 
+import im.turms.client.TurmsClient;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.model.bo.user.UserLocation;
@@ -23,7 +24,7 @@ public class TurmsDriverIT {
 
     @BeforeAll
     static void setup() {
-        turmsDriver = new TurmsDriver(WS_URL, null, null);
+        turmsDriver = new TurmsClient(WS_URL).getDriver();
     }
 
     @AfterAll
@@ -47,7 +48,7 @@ public class TurmsDriverIT {
                 .setLongitude(1.0f)
                 .setLatitude(1.0f)
                 .build();
-        CompletableFuture<Void> future = turmsDriver.connect(1, "123", 10, location, UserStatus.BUSY, DeviceType.ANDROID);
+        CompletableFuture<Void> future = turmsDriver.connect(1, "123", DeviceType.ANDROID, UserStatus.BUSY, location);
         Void result = future.get(5, TimeUnit.SECONDS);
         assertNull(result);
     }

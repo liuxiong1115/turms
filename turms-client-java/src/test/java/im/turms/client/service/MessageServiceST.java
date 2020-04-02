@@ -2,8 +2,6 @@ package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
 import im.turms.common.constant.ChatType;
-import im.turms.common.constant.DeviceType;
-import im.turms.common.constant.UserStatus;
 import im.turms.common.model.bo.message.Message;
 import im.turms.common.model.bo.message.MessageStatus;
 import im.turms.common.model.bo.message.MessagesWithTotal;
@@ -32,12 +30,8 @@ public class MessageServiceST {
     static void setup() throws ExecutionException, InterruptedException, TimeoutException {
         senderClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
         recipientClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
-        senderClient.getDriver()
-                .connect(SENDER_ID, "123", 10, null, UserStatus.BUSY, DeviceType.ANDROID)
-                .get(5, TimeUnit.SECONDS);
-        recipientClient.getDriver()
-                .connect(RECIPIENT_ID, "123", 10, null, UserStatus.BUSY, DeviceType.ANDROID)
-                .get(5, TimeUnit.SECONDS);
+        senderClient.getDriver().connect(SENDER_ID, "123").get(5, TimeUnit.SECONDS);
+        recipientClient.getDriver().connect(RECIPIENT_ID, "123").get(5, TimeUnit.SECONDS);
     }
 
     @AfterAll
