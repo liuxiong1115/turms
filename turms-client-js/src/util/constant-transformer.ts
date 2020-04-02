@@ -117,6 +117,8 @@ export default class ConstantTransformer {
                 return DeviceType.DESKTOP;
             case 'OTHERS':
                 return DeviceType.OTHERS;
+            case 'UNKNOWN':
+                return DeviceType.UNKNOWN;
             default:
                 throw new Error('illegal params');
         }

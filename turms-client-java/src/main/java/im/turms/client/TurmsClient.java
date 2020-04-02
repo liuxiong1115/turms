@@ -34,7 +34,7 @@ public class TurmsClient {
             @Nullable Integer connectionTimeout,
             @Nullable Integer minRequestsInterval,
             @Nullable String storageServerUrl) {
-        driver = new TurmsDriver(turmsServerUrl, connectionTimeout, minRequestsInterval);
+        driver = new TurmsDriver(this, turmsServerUrl, connectionTimeout, minRequestsInterval);
         userService = new UserService(this);
         groupService = new GroupService(this);
         messageService = new MessageService(this);
