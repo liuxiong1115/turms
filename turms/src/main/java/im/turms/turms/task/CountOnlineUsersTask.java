@@ -33,9 +33,6 @@ public class CountOnlineUsersTask implements Callable<Integer>, Serializable, Ap
     private transient ApplicationContext context;
     private transient OnlineUserService onlineUserService;
 
-    public CountOnlineUsersTask() {
-    }
-
     @Override
     public Integer call() {
         return onlineUserService.countLocalOnlineUsers();
