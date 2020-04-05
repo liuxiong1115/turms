@@ -320,6 +320,10 @@ public class TurmsClusterManager {
         return hazelcastInstance.getCluster().getMembers();
     }
 
+    public Map<UUID, Member> getMembersMap() {
+        return membersSnapshotMap;
+    }
+
     public Member getClusterMemberBySlotIndex(@NotNull Integer slotIndex) {
         if (slotIndex >= 0 && slotIndex < HASH_SLOTS_NUMBER) {
             int count = membersSnapshot.size();

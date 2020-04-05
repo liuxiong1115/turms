@@ -2,7 +2,6 @@ package im.turms.turms.service.user.onlineuser;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.replicatedmap.ReplicatedMap;
-import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.annotation.cluster.PostHazelcastJoined;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.property.TurmsProperties;
@@ -13,10 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
-import static com.hazelcast.cluster.MembershipEvent.MEMBER_ADDED;
 import static im.turms.turms.constant.Common.HAZELCAST_IRRESPONSIBLE_USERS_MAP;
 
 /**
@@ -29,7 +30,6 @@ import static im.turms.turms.constant.Common.HAZELCAST_IRRESPONSIBLE_USERS_MAP;
 @Validated
 public class IrresponsibleUserService {
     private final TurmsClusterManager turmsClusterManager;
-    private final Set<UUID> disconnectedMemberIds;
     @Getter
     private final HashedWheelTimer irresponsibleUsersCleanerTimer;
     @Getter
@@ -46,7 +46,6 @@ public class IrresponsibleUserService {
 
     public IrresponsibleUserService(TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager) {
         this.turmsClusterManager = turmsClusterManager;
-        disconnectedMemberIds = new HashSet<>();
         allowIrresponsibleUsersWhenConnecting = turmsProperties.getSession().isAllowIrresponsibleUsersWhenConnecting();
         allowIrresponsibleUsersAfterResponsibilityChanged = turmsProperties.getSession().isAllowIrresponsibleUsersAfterResponsibilityChanged();
         clearUpIrresponsibleUsersAfter = turmsProperties.getSession().getClearUpIrresponsibleUsersAfter();
@@ -57,23 +56,6 @@ public class IrresponsibleUserService {
         } else {
             irresponsibleUsersCleanerTimer = null;
         }
-    }
-
-    @PostHazelcastInitialized
-    public Function<TurmsClusterManager, Void> initMembersChangeListener() {
-        return clusterManager -> {
-            clusterManager.addListenerOnMembersChange(membershipEvent -> {
-                int eventType = membershipEvent.getEventType();
-                UUID uuid = membershipEvent.getMember().getUuid();
-                if (MEMBER_ADDED == eventType) {
-                    disconnectedMemberIds.remove(uuid);
-                } else {
-                    disconnectedMemberIds.add(uuid);
-                }
-                return null;
-            });
-            return null;
-        };
     }
 
     @PostHazelcastJoined
@@ -104,10 +86,10 @@ public class IrresponsibleUserService {
         if (isEnabled) {
             UUID uuid = irresponsibleUserMap.get(userId);
             if (uuid != null) {
-                if (disconnectedMemberIds.contains(uuid)) {
-                    irresponsibleUserMap.remove(userId);
-                } else {
+                if (turmsClusterManager.getMembersMap().containsKey(uuid)) {
                     return true;
+                } else {
+                    irresponsibleUserMap.remove(userId);
                 }
             }
         }
@@ -118,10 +100,10 @@ public class IrresponsibleUserService {
         if (isEnabled) {
             UUID uuid = irresponsibleUserMap.get(userId);
             if (uuid != null) {
-                if (disconnectedMemberIds.contains(uuid)) {
-                    irresponsibleUserMap.remove(userId);
-                } else {
+                if (turmsClusterManager.getMembersMap().containsKey(uuid)) {
                     return uuid;
+                } else {
+                    irresponsibleUserMap.remove(userId);
                 }
             }
         }
