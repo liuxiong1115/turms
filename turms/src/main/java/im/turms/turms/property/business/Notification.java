@@ -71,7 +71,7 @@ public class Notification implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to notify members after a group has been updated")
-    private boolean notifyMembersAfterGroupUpdate = true;
+    private boolean notifyMembersAfterGroupUpdated = true;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to notify members after other group member's online status has been updated")
@@ -143,7 +143,7 @@ public class Notification implements IdentifiedDataSerializable {
 
         // Group
         out.writeBoolean(notifyMembersAfterGroupDeleted);
-        out.writeBoolean(notifyMembersAfterGroupUpdate);
+        out.writeBoolean(notifyMembersAfterGroupUpdated);
         out.writeBoolean(notifyMembersAfterOtherMemberOnlineStatusUpdated);
         out.writeBoolean(notifyMembersAfterOtherMemberInfoUpdated);
         out.writeBoolean(notifyUserAfterBlacklistedByGroup);
@@ -171,7 +171,7 @@ public class Notification implements IdentifiedDataSerializable {
 
         // Group
         notifyMembersAfterGroupDeleted = in.readBoolean();
-        notifyMembersAfterGroupUpdate = in.readBoolean();
+        notifyMembersAfterGroupUpdated = in.readBoolean();
         notifyMembersAfterOtherMemberOnlineStatusUpdated = in.readBoolean();
         notifyMembersAfterOtherMemberInfoUpdated = in.readBoolean();
         notifyUserAfterBlacklistedByGroup = in.readBoolean();

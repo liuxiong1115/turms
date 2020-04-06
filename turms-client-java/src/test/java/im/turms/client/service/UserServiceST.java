@@ -4,7 +4,6 @@ import helper.ExceptionUtil;
 import im.turms.client.TurmsClient;
 import im.turms.client.model.UserInfoWithVersion;
 import im.turms.common.TurmsStatusCode;
-import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.ResponseAction;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
@@ -52,7 +51,7 @@ public class UserServiceST {
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
     public void login_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = turmsClient.getUserService().login(1, "123", null, UserStatus.BUSY, DeviceType.ANDROID)
+        Void result = turmsClient.getUserService().login(1, "123")
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }

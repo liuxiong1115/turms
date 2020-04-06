@@ -204,7 +204,7 @@ public class WsGroupController {
                     quitAfterTransfer)
                     .flatMap(updated -> {
                         if (updated != null && updated) {
-                            if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyMembersAfterGroupUpdate()) {
+                            if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyMembersAfterGroupUpdated()) {
                                 return groupMemberService.queryGroupMembersIds(request.getGroupId())
                                         .collect(Collectors.toSet())
                                         .map(membersIds -> RequestResult.recipientData(
