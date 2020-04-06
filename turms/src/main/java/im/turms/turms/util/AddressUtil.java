@@ -42,7 +42,7 @@ public class AddressUtil {
         TurmsProperties.propertiesChangeListeners.add(properties -> {
             AddressTuple tuple;
             try {
-                tuple = queryAddresses();
+                tuple = queryAddress();
             } catch (UnknownHostException e) {
                 log.error(e.getMessage(), e);
                 return null;
@@ -59,16 +59,16 @@ public class AddressUtil {
     }
 
     @PostConstruct
-    private void initAddresses() throws UnknownHostException {
+    private void initAddress() throws UnknownHostException {
         Environment env = context.getEnvironment();
         isSslEnabled = Boolean.parseBoolean(env.getProperty("server.ssl.enabled", "false"));
-        addressTuple = queryAddresses();
+        addressTuple = queryAddress();
         for (Function<AddressTuple, Void> listener : onAddressChangeListeners) {
             listener.apply(addressTuple);
         }
     }
 
-    private AddressTuple queryAddresses() throws UnknownHostException {
+    private AddressTuple queryAddress() throws UnknownHostException {
         String ip = queryIp(turmsClusterManager.getTurmsProperties());
         if (ip != null) {
             return new AddressTuple(ip,

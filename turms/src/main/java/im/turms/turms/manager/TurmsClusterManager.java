@@ -75,6 +75,7 @@ public class TurmsClusterManager {
     private boolean hasJoinedCluster = false;
     private FlakeIdGenerator idGenerator;
     private final List<Function<MembershipEvent, Void>> onMembersChangeListeners;
+    private volatile String pendingMemberAddress;
 
     public TurmsClusterManager(
             TurmsProperties localTurmsProperties,
@@ -188,6 +189,10 @@ public class TurmsClusterManager {
                 }
             }
             fetchSharedPropertiesFromCluster();
+            if (pendingMemberAddress != null) {
+                updateAddress(pendingMemberAddress);
+                pendingMemberAddress = null;
+            }
         }
     }
 
@@ -397,7 +402,11 @@ public class TurmsClusterManager {
     }
 
     public void updateAddress(String address) {
-        memberAddresses.put(localMembersSnapshot.getUuid(), address);
+        if (memberAddresses != null) {
+            memberAddresses.put(localMembersSnapshot.getUuid(), address);
+        } else {
+            pendingMemberAddress = address;
+        }
     }
 
     public String getAddress(Member member) {
