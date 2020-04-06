@@ -30,7 +30,7 @@ public class StorageServiceST {
     static void setup() throws ExecutionException, InterruptedException, TimeoutException, IOException {
         turmsClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
         turmsClient.getUserService()
-                .login(USER_ID, "123", null, UserStatus.BUSY, DeviceType.ANDROID)
+                .login(USER_ID, "123")
                 .get(5, TimeUnit.SECONDS);
         PROFILE_PICTURE = Files.readAllBytes(Path.of("src", "test", "resources", "profile.webp"));
         ATTACHMENT = PROFILE_PICTURE;
