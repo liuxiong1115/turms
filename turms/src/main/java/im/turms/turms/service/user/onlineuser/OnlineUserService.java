@@ -396,8 +396,19 @@ public class OnlineUserService {
     }
 
     public Mono<Integer> countOnlineUsers() {
-        Flux<Integer> futures = turmsTaskManager.callAll(new CountOnlineUsersTask(), Duration.ofSeconds(30));
+        Flux<Integer> futures = turmsTaskManager.callAll(new CountOnlineUsersTask(), Duration.ofSeconds(10));
         return MathFlux.sumInt(futures);
+    }
+
+    public Mono<Map<UUID, Integer>> countOnlineUsersByNodes() {
+        Mono<Map<Member, Integer>> mono = turmsTaskManager.callAllAsMap(new CountOnlineUsersTask(), Duration.ofSeconds(10));
+        return mono.map(map -> {
+            Map<UUID, Integer> idNumberMap = new HashMap<>(map.size());
+            for (Map.Entry<Member, Integer> entry : map.entrySet()) {
+                idNumberMap.put(entry.getKey().getUuid(), entry.getValue());
+            }
+            return idNumberMap;
+        });
     }
 
     public void updateHeartbeatTimestamp(
