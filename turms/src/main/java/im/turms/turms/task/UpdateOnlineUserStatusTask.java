@@ -19,8 +19,8 @@ package im.turms.turms.task;
 
 import com.hazelcast.spring.context.SpringAware;
 import im.turms.common.constant.UserStatus;
-import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

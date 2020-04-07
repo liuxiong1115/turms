@@ -22,7 +22,6 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.pojo.dto.AcknowledgedDTO;
 import im.turms.turms.pojo.dto.PaginationDTO;
 import im.turms.turms.pojo.dto.ResponseDTO;
-import im.turms.turms.pojo.dto.TotalDTO;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
@@ -37,10 +36,6 @@ public class ResponseFactory {
     private static final Object ERROR_OBJECT = EMPTY_OBJECT;
 
     private ResponseFactory() {
-    }
-
-    public static Mono<ResponseEntity<ResponseDTO<TotalDTO>>> total(Mono<Integer> data) {
-        return okIfTruthy(data.map(TotalDTO::new));
     }
 
     public static <T> Mono<ResponseEntity<ResponseDTO<PaginationDTO<T>>>> page(Mono<Long> totalMono, Flux<T> data) {

@@ -11,8 +11,8 @@ import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserLocation;
 import im.turms.turms.pojo.dto.AcknowledgedDTO;
+import im.turms.turms.pojo.dto.OnlineUserNumberDTO;
 import im.turms.turms.pojo.dto.ResponseDTO;
-import im.turms.turms.pojo.dto.TotalDTO;
 import im.turms.turms.pojo.dto.UpdateOnlineStatusDTO;
 import im.turms.turms.service.user.UserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -48,8 +48,20 @@ public class UserOnlineInfoController {
 
     @GetMapping("/count")
     @RequiredPermission(STATISTICS_USER_QUERY)
-    public Mono<ResponseEntity<ResponseDTO<TotalDTO>>> countOnlineUsers() {
-        return ResponseFactory.total(onlineUserService.countOnlineUsers());
+    public Mono<ResponseEntity<ResponseDTO<OnlineUserNumberDTO>>> countOnlineUsers(@RequestParam(required = false, defaultValue = "false") Boolean countByNodes) {
+        if (countByNodes != null && countByNodes) {
+            return ResponseFactory.okIfTruthy(onlineUserService.countOnlineUsersByNodes()
+                    .map(idNumberMap -> {
+                        int sum = 0;
+                        for (Integer number : idNumberMap.values()) {
+                            sum += number;
+                        }
+                        return new OnlineUserNumberDTO(sum, idNumberMap);
+                    }));
+        } else {
+            return ResponseFactory.okIfTruthy(onlineUserService.countOnlineUsers()
+                    .map(total -> new OnlineUserNumberDTO(total, null)));
+        }
     }
 
     /**
