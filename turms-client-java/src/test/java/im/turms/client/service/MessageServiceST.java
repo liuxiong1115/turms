@@ -20,18 +20,22 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MessageServiceST {
     private static final long SENDER_ID = 1L;
     private static final long RECIPIENT_ID = 2L;
+    private static final long GROUP_MEMBER_ID = 3L;
     private static final long TARGET_GROUP_ID = 1L;
     private static TurmsClient senderClient;
     private static TurmsClient recipientClient;
+    private static TurmsClient groupMemberClient;
     private static Long privateMessageId;
     private static Long groupMessageId;
 
     @BeforeAll
     static void setup() throws ExecutionException, InterruptedException, TimeoutException {
-        senderClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
-        recipientClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
+        senderClient = new TurmsClient(WS_URL);
+        recipientClient = new TurmsClient(WS_URL);
+        groupMemberClient = new TurmsClient(WS_URL);
         senderClient.getDriver().connect(SENDER_ID, "123").get(5, TimeUnit.SECONDS);
         recipientClient.getDriver().connect(RECIPIENT_ID, "123").get(5, TimeUnit.SECONDS);
+        groupMemberClient.getDriver().connect(GROUP_MEMBER_ID, "123").get(5, TimeUnit.SECONDS);
     }
 
     @AfterAll
@@ -41,6 +45,9 @@ public class MessageServiceST {
         }
         if (recipientClient.getDriver().connected()) {
             recipientClient.getDriver().disconnect();
+        }
+        if (groupMemberClient.getDriver().connected()) {
+            groupMemberClient.getDriver().disconnect();
         }
     }
 
@@ -150,9 +157,11 @@ public class MessageServiceST {
     @Test
     @Order(ORDER_LOW_PRIORITY)
     public void queryMessageStatus_shouldReturnNotEmptyMessageStatus() throws ExecutionException, InterruptedException, TimeoutException {
-        List<MessageStatus> messageStatuses = senderClient.getMessageService().queryMessageStatus(groupMessageId)
+        List<MessageStatus> messageStatusesOfMember1 = senderClient.getMessageService().queryMessageStatus(groupMessageId)
                 .get(5, TimeUnit.SECONDS);
-        assertFalse(messageStatuses.isEmpty());
+        List<MessageStatus> messageStatusesOfMember2 = groupMemberClient.getMessageService().queryMessageStatus(groupMessageId)
+                .get(5, TimeUnit.SECONDS);
+        assertEquals(messageStatusesOfMember1.get(0).getMessageId(), messageStatusesOfMember2.get(0).getMessageId());
     }
 
     // Util

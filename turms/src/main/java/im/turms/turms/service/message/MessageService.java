@@ -880,16 +880,15 @@ public class MessageService {
                                 .newBuilder()
                                 .setCreateMessageRequest(ProtoUtil.message2createMessageRequest(message))
                                 .build();
-                        byte[] response = TurmsNotification
+                        byte[] responseData = TurmsNotification
                                 .newBuilder()
                                 .setRelayedRequest(request)
                                 .setRequestId(Int64Value.newBuilder().setValue(0).build())
-                                .buildPartial()
+                                .build()
                                 .toByteArray();
-                        return outboundMessageService.relayClientMessageToClient(
-                                null,
-                                response,
-                                message.getTargetId(),
+                        return outboundMessageService.relayClientMessageToClients(
+                                responseData,
+                                pair.getValue(),
                                 true);
                     });
         } else {

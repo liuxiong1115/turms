@@ -104,7 +104,7 @@ public class MongoDataGenerator {
             log.info("Start mocking...");
             // Admin
             final int ADMIN_COUNT = 10;
-            final int USER_COUNT = 500;
+            final int USER_COUNT = 1000;
             final Date now = new Date();
             List<Object> objects = new LinkedList<>();
             final long GUEST_ROLE_ID = 2L;

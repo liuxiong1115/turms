@@ -18,22 +18,16 @@
 package im.turms.turms.task;
 
 import com.hazelcast.spring.context.SpringAware;
-import im.turms.common.constant.DeviceType;
-import im.turms.turms.service.user.onlineuser.OnlineUserService;
-import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
+import im.turms.turms.service.message.OutboundMessageService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import org.springframework.web.reactive.socket.WebSocketSession;
-import reactor.core.publisher.FluxSink;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Note: UserMessage refers to WebSocketMessage, not the message model in business.
@@ -42,32 +36,18 @@ import java.util.concurrent.ConcurrentMap;
 public class DeliveryUserMessageTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
     private static final long serialVersionUID = 4595269008081593689L;
     private final byte[] clientMessageBytes;
-    private final Long recipientId;
+    private final Set<Long> recipientIds;
     private transient ApplicationContext context;
-    private transient OnlineUserService onlineUserService;
+    private transient OutboundMessageService outboundMessageService;
 
-    public DeliveryUserMessageTask(@NotEmpty byte[] clientMessageBytes, @NotNull Long recipientId) {
+    public DeliveryUserMessageTask(@NotEmpty byte[] clientMessageBytes, @NotEmpty Set<Long> recipientIds) {
         this.clientMessageBytes = clientMessageBytes;
-        this.recipientId = recipientId;
+        this.recipientIds = recipientIds;
     }
 
     @Override
     public Boolean call() {
-        OnlineUserManager userManager = onlineUserService.getLocalOnlineUserManager(recipientId);
-        if (userManager != null) {
-            ConcurrentMap<DeviceType, OnlineUserManager.Session> sessionMap = userManager
-                    .getOnlineUserInfo().getSessionMap();
-            for (OnlineUserManager.Session session : sessionMap.values()) {
-                WebSocketSession webSocketSession = session.getWebSocketSession();
-                FluxSink<WebSocketMessage> outputSink = session.getNotificationSink();
-                WebSocketMessage message = webSocketSession
-                        .binaryMessage(factory -> factory.wrap(clientMessageBytes));
-                outputSink.next(message);
-            }
-            return true;
-        } else {
-            return false;
-        }
+        return outboundMessageService.relayClientMessageToLocalClients(clientMessageBytes, recipientIds);
     }
 
     @Override
@@ -76,7 +56,7 @@ public class DeliveryUserMessageTask implements Callable<Boolean>, Serializable,
     }
 
     @Autowired
-    public void setOnlineUserService(final OnlineUserService onlineUserService) {
-        this.onlineUserService = onlineUserService;
+    public void setOutboundMessageService(final OutboundMessageService outboundMessageService) {
+        this.outboundMessageService = outboundMessageService;
     }
 }
