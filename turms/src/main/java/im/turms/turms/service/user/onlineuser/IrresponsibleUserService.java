@@ -1,5 +1,8 @@
 package im.turms.turms.service.user.onlineuser;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
+import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.replicatedmap.ReplicatedMap;
 import im.turms.turms.annotation.cluster.PostHazelcastJoined;
@@ -11,11 +14,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import static im.turms.turms.constant.Common.HAZELCAST_IRRESPONSIBLE_USERS_MAP;
@@ -108,6 +109,22 @@ public class IrresponsibleUserService {
             }
         }
         return null;
+    }
+
+    public Multimap<Member, Long> getMembersIfExists(@NotEmpty Set<Long> userIds) {
+        Multimap<Member, Long> map = LinkedListMultimap.create();
+        if (isEnabled) {
+            for (Long userId : userIds) {
+                UUID uuid = getMemberIdIfExists(userId);
+                if (uuid != null) {
+                    Member member = turmsClusterManager.getMemberById(uuid);
+                    if (member != null) {
+                        map.put(member, userId);
+                    }
+                }
+            }
+        }
+        return map;
     }
 
     public boolean isIrresponsibleUserServedByCurrentNode(@NotNull Long userId) {

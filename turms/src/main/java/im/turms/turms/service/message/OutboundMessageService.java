@@ -17,6 +17,7 @@
 
 package im.turms.turms.service.message;
 
+import com.google.common.collect.Multimap;
 import com.hazelcast.cluster.Member;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.service.user.onlineuser.IrresponsibleUserService;
@@ -31,10 +32,9 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Future;
 
 @Component
@@ -50,82 +50,119 @@ public class OutboundMessageService {
         this.irresponsibleUserService = irresponsibleUserService;
     }
 
+    public Mono<Boolean> relayClientMessageToClients(
+            @NotNull byte[] messageData,
+            @NotNull Set<Long> recipientIds,
+            boolean isRelayable) {
+        if (recipientIds.isEmpty()) {
+            return Mono.just(true);
+        } else if (recipientIds.size() == 1) {
+            return relayClientMessageToClient(messageData, recipientIds.iterator().next(), isRelayable);
+        } else {
+            Multimap<Member, Long> userIdsByMember = irresponsibleUserService.getMembersIfExists(recipientIds);
+            for (Long recipientId : recipientIds) {
+                if (!userIdsByMember.containsValue(recipientId)) {
+                    Member member = turmsClusterManager.getMemberByUserId(recipientId);
+                    userIdsByMember.put(member, recipientId);
+                }
+            }
+            List<Mono<Boolean>> monoList = new ArrayList<>(userIdsByMember.keySet().size());
+            for (Member member : userIdsByMember.keySet()) {
+                UUID localUuid = turmsClusterManager.getLocalMember().getUuid();
+                if (member.getUuid() == localUuid) {
+                    monoList.add(Mono.just(relayClientMessageToLocalClients(messageData, recipientIds)));
+                } else {
+                    monoList.add(relayClientMessageByMember(messageData, recipientIds, member));
+                }
+            }
+            return ReactorUtil.areAllTrue(monoList);
+        }
+    }
+
     public Mono<Boolean> relayClientMessageToClient(
-            @Nullable WebSocketMessage clientMessage,
-            @Nullable byte[] clientMessageBytes,
+            @NotNull byte[] messageData,
             @NotNull Long recipientId,
             boolean isRelayable) {
-        if (clientMessage == null && clientMessageBytes == null) {
-            throw new IllegalArgumentException();
-        }
         boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(recipientId);
         if (responsible) {
-            return relayClientMessageToLocalClient(clientMessage, clientMessageBytes, recipientId);
+            return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId)));
         } else {
             UUID memberId = irresponsibleUserService.getMemberIdIfExists(recipientId);
             if (memberId != null) {
                 if (memberId == turmsClusterManager.getLocalMember().getUuid()) {
-                    return relayClientMessageToLocalClient(clientMessage, clientMessageBytes, recipientId);
+                    return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId)));
                 } else if (isRelayable) {
-                    return relayClientMessageToMember(clientMessageBytes, recipientId, memberId);
+                    return relayClientMessageByMemberId(messageData, recipientId, memberId);
                 }
             } else if (isRelayable) {
-                return relayClientMessageToRemoteClient(clientMessageBytes, recipientId);
+                return relayClientMessageByRecipientId(messageData, recipientId);
             }
         }
         return Mono.just(false);
     }
 
-
-    public Mono<Boolean> relayClientMessageToLocalClient(
-            @Nullable WebSocketMessage clientMessage,
-            @Nullable byte[] clientMessageBytes,
-            @NotNull Long recipientId) {
-        OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(recipientId);
-        if (onlineUserManager != null) {
-            if (clientMessage == null) {
+    public boolean relayClientMessageToLocalClients(
+            @NotNull byte[] messageData,
+            @NotEmpty Set<Long> recipientIds) {
+        boolean isSuccess = true;
+        WebSocketMessage message = null;
+        for (Long recipientId : recipientIds) {
+            OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(recipientId);
+            if (onlineUserManager != null) {
                 List<WebSocketSession> sessions = onlineUserManager.getWebSocketSessions();
                 if (!sessions.isEmpty()) {
-                    WebSocketSession session = sessions.get(0);
-                    clientMessage = session.binaryMessage(dataBufferFactory ->
-                            dataBufferFactory.wrap(clientMessageBytes));
+                    if (message == null) {
+                        WebSocketSession session = sessions.get(0);
+                        message = session.binaryMessage(factory -> factory.wrap(messageData));
+                    }
+                    List<FluxSink<WebSocketMessage>> outputSinks = onlineUserManager.getOutputSinks();
+                    for (FluxSink<WebSocketMessage> recipientSink : outputSinks) {
+                        message.retain();
+                        recipientSink.next(message); // This will decrease the reference count of the message
+                    }
                 } else {
-                    return Mono.just(true);
+                    isSuccess = false;
                 }
+            } else {
+                isSuccess = false;
             }
-            List<FluxSink<WebSocketMessage>> outputSinks = onlineUserManager.getOutputSinks();
-            for (FluxSink<WebSocketMessage> recipientSink : outputSinks) {
-                recipientSink.next(clientMessage);
-            }
-            return Mono.just(true);
         }
-        return Mono.just(false);
+        if (message != null) {
+            message.release();
+        }
+        return isSuccess;
     }
 
-    public Mono<Boolean> relayClientMessageToMember(
-            @Nullable byte[] clientMessageBytes,
+    private Mono<Boolean> relayClientMessageByMemberId(
+            @NotNull byte[] messageData,
             @NotNull Long recipientId,
             @NotNull UUID memberId) {
         Member member = turmsClusterManager.getMemberById(memberId);
         if (member != null) {
-            DeliveryUserMessageTask task = new DeliveryUserMessageTask(clientMessageBytes, recipientId);
-            Future<Boolean> future = turmsClusterManager.getExecutor()
-                    .submitToMember(task, member);
-            return ReactorUtil.future2Mono(future);
+            return relayClientMessageByMember(messageData, Collections.singleton(recipientId), member);
+        } else {
+            return Mono.just(false);
         }
-        return Mono.just(false);
     }
 
-    public Mono<Boolean> relayClientMessageToRemoteClient(
-            @Nullable byte[] clientMessageBytes,
+    private Mono<Boolean> relayClientMessageByMember(
+            @NotNull byte[] messageData,
+            @NotNull Set<Long> recipientIds,
+            @NotNull Member member) {
+        DeliveryUserMessageTask task = new DeliveryUserMessageTask(messageData, recipientIds);
+        Future<Boolean> future = turmsClusterManager.getExecutor()
+                .submitToMember(task, member);
+        return ReactorUtil.future2Mono(future);
+    }
+
+    private Mono<Boolean> relayClientMessageByRecipientId(
+            @NotNull byte[] messageData,
             @NotNull Long recipientId) {
         Member member = turmsClusterManager.getMemberByUserId(recipientId);
         if (member != null) {
-            DeliveryUserMessageTask task = new DeliveryUserMessageTask(clientMessageBytes, recipientId);
-            Future<Boolean> future = turmsClusterManager.getExecutor()
-                    .submitToMember(task, member);
-            return ReactorUtil.future2Mono(future);
+            return relayClientMessageByMember(messageData, Collections.singleton(recipientId), member);
+        } else {
+            return Mono.just(false);
         }
-        return Mono.just(false);
     }
 }

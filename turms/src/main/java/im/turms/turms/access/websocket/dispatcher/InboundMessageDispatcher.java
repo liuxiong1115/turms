@@ -141,51 +141,27 @@ public class InboundMessageDispatcher {
 
     private Mono<Boolean> notifyRelatedUsersOfAction(
             @NotNull RequestResult requestResult,
-            @NotNull WebSocketSession session,
             @Nullable Long requesterId) {
         TurmsRequest dataForRecipients = requestResult.getDataForRecipients();
         if (dataForRecipients != null && !requestResult.getRecipients().isEmpty()) {
-            final byte[][] dataInBytes = new byte[1][1];
-            WebSocketMessage messagesForRecipients = session
-                    .binaryMessage(dataBufferFactory -> {
-                        TurmsNotification.Builder builder = TurmsNotification
-                                .newBuilder()
-                                .setRelayedRequest(dataForRecipients);
-                        if (requesterId != null) {
-                            builder.setRequesterId(Int64Value.newBuilder().setValue(requesterId).build());
-                        }
-                        dataInBytes[0] = builder.build().toByteArray();
-                        return dataBufferFactory.wrap(dataInBytes[0]);
-                    });
-            boolean onlyOneRecipient = requestResult.getRecipients().size() == 1;
-            if (onlyOneRecipient) {
+            TurmsNotification.Builder builder = TurmsNotification
+                    .newBuilder()
+                    .setRelayedRequest(dataForRecipients);
+            if (requesterId != null) {
+                builder.setRequesterId(Int64Value.newBuilder().setValue(requesterId).build());
+            }
+            byte[] data = builder.build().toByteArray();
+            if (requestResult.getRecipients().size() == 1) {
                 Long recipientId = requestResult.getRecipients().iterator().next();
                 return outboundMessageService.relayClientMessageToClient(
-                        messagesForRecipients,
-                        dataInBytes[0],
+                        data,
                         recipientId,
                         true);
             } else {
-                List<Mono<Boolean>> monos = new LinkedList<>();
-                for (Long recipientId : requestResult.getRecipients()) {
-                    messagesForRecipients.retain();
-                    Mono<Boolean> mono = outboundMessageService.relayClientMessageToClient(
-                            messagesForRecipients,
-                            dataInBytes[0],
-                            recipientId,
-                            true);
-                    monos.add(mono);
-                }
-                return Mono.zip(monos, results -> results)
-                        .map(results -> {
-                            messagesForRecipients.retain();
-                            for (Object result : results) {
-                                if (!(boolean) result) {
-                                    return false;
-                                }
-                            }
-                            return true;
-                        });
+                return outboundMessageService.relayClientMessageToClients(
+                        data,
+                        requestResult.getRecipients(),
+                        true);
             }
         } else {
             return Mono.just(true);
@@ -315,7 +291,7 @@ public class InboundMessageDispatcher {
     }
 
     private Mono<WebSocketMessage> handleSuccessResult(RequestResult requestResult, WebSocketSession session, Long requestId, Long requesterId) {
-        return notifyRelatedUsersOfAction(requestResult, session, requesterId)
+        return notifyRelatedUsersOfAction(requestResult, requesterId)
                 .flatMap(success -> {
                     if (requestId != null) {
                         TurmsNotification notification = generateNotificationBuilder(requestResult, requestResult.getCode(), requestId)

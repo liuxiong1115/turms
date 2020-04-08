@@ -43,6 +43,18 @@ public class ReactorUtil {
     }
 
     public static <T> Mono<T> future2Mono(Future<T> future) {
-        return Mono.fromCompletionStage((CompletableFuture<T>)future);
+        return Mono.fromCompletionStage((CompletableFuture<T>) future);
+    }
+
+    public static Mono<Boolean> areAllTrue(List<Mono<Boolean>> monos) {
+        return Mono.zip(monos, results -> results)
+                .map(results -> {
+                    for (Object result : results) {
+                        if (!(boolean) result) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
     }
 }
