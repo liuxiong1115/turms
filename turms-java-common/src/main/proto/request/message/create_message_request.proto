@@ -7,14 +7,13 @@ option java_multiple_files = true;
 option swift_prefix = "";
 
 import "google/protobuf/wrappers.proto";
-import "constant/chat_type.proto";
 
 message CreateMessageRequest {
     google.protobuf.Int64Value message_id = 1;
-    ChatType chat_type = 2;
     // Client can never set this to true
-    google.protobuf.BoolValue is_system_message = 3;
-    int64 to_id = 4;
+    google.protobuf.BoolValue is_system_message = 2;
+    google.protobuf.Int64Value group_id = 3;
+    google.protobuf.Int64Value recipient_id = 4;
     int64 delivery_date = 5;
     google.protobuf.StringValue text = 6;
     repeated bytes records = 7;
