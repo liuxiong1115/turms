@@ -75,13 +75,18 @@ public class WsMessageController {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Users cannot create system messages"));
             }
             Mono<Pair<Long, Set<Long>>> pairMono;
+            ChatType chatType = request.hasGroupId() ? ChatType.GROUP : ChatType.PRIVATE;
+            if (chatType == ChatType.PRIVATE && !request.hasRecipientId()) {
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The recipientId must not be null for private messages"));
+            }
+            long targetId = chatType == ChatType.GROUP ? request.getGroupId().getValue() : request.getRecipientId().getValue();
             if (request.hasMessageId()) {
                 pairMono = messageService.authAndCloneAndSendMessage(
                         turmsRequestWrapper.getUserId(),
                         request.getMessageId().getValue(),
-                        request.getChatType(),
+                        chatType,
                         false,
-                        request.getToId());
+                        targetId);
             } else {
                 List<byte[]> records = null;
                 if (request.getRecordsCount() != 0) {
@@ -95,8 +100,8 @@ public class WsMessageController {
                 pairMono = messageService.authAndSendMessage(
                         null,
                         turmsRequestWrapper.getUserId(),
-                        request.getToId(),
-                        request.getChatType(),
+                        targetId,
+                        chatType,
                         false,
                         request.hasText() ? request.getText().getValue() : null,
                         records,

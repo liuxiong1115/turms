@@ -5,8 +5,10 @@ import im.turms.client.TurmsClient;
 import im.turms.client.model.MessageAddition;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
+import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.file.AudioFile;
 import im.turms.common.model.bo.file.File;
 import im.turms.common.model.bo.file.ImageFile;
@@ -81,20 +83,23 @@ public class MessageService {
 
     public CompletableFuture<Long> sendMessage(
             @NotNull ChatType chatType,
-            long toId,
+            long targetId,
             @Nullable Date deliveryDate,
             @Nullable String text,
             @Nullable byte[] records,
             @Nullable Integer burnAfter) {
         Validator.throwIfAnyFalsy(chatType);
         Validator.throwIfAllFalsy(text, records);
+        if (chatType == ChatType.UNRECOGNIZED) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The chat type cannot be UNRECOGNIZED"));
+        }
         if (deliveryDate == null) {
             deliveryDate = new Date();
         }
         return turmsClient.getDriver()
                 .send(CreateMessageRequest.newBuilder(), MapUtil.of(
-                        "chat_type", chatType,
-                        "to_id", toId,
+                        "group_id", chatType == ChatType.GROUP ? targetId : null,
+                        "recipient_id", chatType == ChatType.PRIVATE ? targetId : null,
                         "delivery_date", deliveryDate,
                         "text", text,
                         "records", records,
@@ -107,11 +112,14 @@ public class MessageService {
             @NotNull ChatType chatType,
             long targetId) {
         Validator.throwIfAnyFalsy(chatType);
+        if (chatType == ChatType.UNRECOGNIZED) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The chat type cannot be UNRECOGNIZED"));
+        }
         return turmsClient.getDriver()
                 .send(CreateMessageRequest.newBuilder(), MapUtil.of(
                         "message_id", messageId,
-                        "chat_type", chatType,
-                        "to_id", targetId))
+                        "group_id", chatType == ChatType.GROUP ? targetId : null,
+                        "recipient_id", chatType == ChatType.PRIVATE ? targetId : null))
                 .thenApply(NotificationUtil::getFirstId);
     }
 
