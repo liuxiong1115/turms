@@ -20,6 +20,7 @@ package im.turms.turms.access.websocket.controller;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Int64Value;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
@@ -29,6 +30,7 @@ import im.turms.common.model.bo.message.Messages;
 import im.turms.common.model.bo.message.MessagesWithTotal;
 import im.turms.common.model.bo.message.MessagesWithTotalList;
 import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.message.*;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
 import im.turms.turms.manager.TurmsClusterManager;
@@ -112,13 +114,26 @@ public class WsMessageController {
             return pairMono.map(pair -> {
                 Long messageId = pair.getLeft();
                 Set<Long> recipientsIds = pair.getRight();
-                if (messageId != null && recipientsIds != null && !recipientsIds.isEmpty()) {
-                    return RequestResult.idAndRecipientData(
-                            messageId,
-                            recipientsIds,
-                            turmsRequestWrapper.getTurmsRequest());
-                } else if (messageId != null) {
-                    return RequestResult.id(messageId);
+                if (messageId != null) {
+                    if (recipientsIds != null && !recipientsIds.isEmpty()) {
+                        TurmsRequest turmsRequest;
+                        if (request.hasMessageId()) {
+                            turmsRequest = turmsRequestWrapper.getTurmsRequest();
+                        } else {
+                            Int64Value.Builder messageIdBuilder = Int64Value.newBuilder().setValue(messageId);
+                            CreateMessageRequest.Builder requestBuilder = request.toBuilder().setMessageId(messageIdBuilder);
+                            turmsRequest = turmsRequestWrapper.getTurmsRequest()
+                                    .toBuilder()
+                                    .setCreateMessageRequest(requestBuilder)
+                                    .build();
+                        }
+                        return RequestResult.idAndRecipientData(
+                                messageId,
+                                recipientsIds,
+                                turmsRequest);
+                    } else {
+                        return RequestResult.id(messageId);
+                    }
                 } else if (recipientsIds != null && !recipientsIds.isEmpty()) {
                     return RequestResult.recipientData(
                             recipientsIds,
