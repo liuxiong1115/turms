@@ -82,7 +82,7 @@ public class WsUserController {
             return groupInvitationService.queryUserGroupInvitationsWithVersion(
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
-                    .map(groupInvitationsWithVersion -> RequestResult.responseData(TurmsNotification.Data
+                    .map(groupInvitationsWithVersion -> RequestResult.data(TurmsNotification.Data
                             .newBuilder()
                             .setGroupInvitationsWithVersion(groupInvitationsWithVersion)
                             .build()));
@@ -101,7 +101,7 @@ public class WsUserController {
                         UsersInfosWithVersion.Builder userBuilder = UsersInfosWithVersion
                                 .newBuilder()
                                 .addUserInfos(ProtoUtil.userProfile2proto(user).build());
-                        return RequestResult.responseData(TurmsNotification.Data
+                        return RequestResult.data(TurmsNotification.Data
                                 .newBuilder()
                                 .setUsersInfosWithVersion(userBuilder)
                                 .build());
@@ -137,7 +137,7 @@ public class WsUserController {
                                         .build();
                                 builder.addUserSessionIds(sessionId);
                             }
-                            return RequestResult.responseData(TurmsNotification.Data
+                            return RequestResult.data(TurmsNotification.Data
                                     .newBuilder()
                                     .setUserSessionIds(builder.build())
                                     .build());
@@ -149,7 +149,7 @@ public class WsUserController {
                         maxNumber,
                         distance)
                         .collectList()
-                        .map(ids -> RequestResult.responseData(TurmsNotification.Data
+                        .map(ids -> RequestResult.data(TurmsNotification.Data
                                 .newBuilder()
                                 .setIds(Int64Values.newBuilder().addAllValues(ids))
                                 .build()));
@@ -184,7 +184,7 @@ public class WsUserController {
                             builder.addUserInfos(ProtoUtil.userProfile2proto(user));
                         }
                         return RequestResult
-                                .responseData(TurmsNotification.Data
+                                .data(TurmsNotification.Data
                                         .newBuilder()
                                         .setUsersInfosWithVersion(builder)
                                         .build());
@@ -216,7 +216,7 @@ public class WsUserController {
                                             turmsClusterManager.getTurmsProperties().getUser().isRespondOfflineIfInvisible())
                                     .build());
                         }
-                        return RequestResult.responseData(TurmsNotification.Data.newBuilder()
+                        return RequestResult.data(TurmsNotification.Data.newBuilder()
                                 .setUsersOnlineStatuses(statusesBuilder)
                                 .build());
                     });

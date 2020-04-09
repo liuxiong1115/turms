@@ -113,12 +113,12 @@ public class WsMessageController {
                 Long messageId = pair.getLeft();
                 Set<Long> recipientsIds = pair.getRight();
                 if (messageId != null && recipientsIds != null && !recipientsIds.isEmpty()) {
-                    return RequestResult.responseIdAndRecipientData(
+                    return RequestResult.idAndRecipientData(
                             messageId,
                             recipientsIds,
                             turmsRequestWrapper.getTurmsRequest());
                 } else if (messageId != null) {
-                    return RequestResult.responseId(messageId);
+                    return RequestResult.id(messageId);
                 } else if (recipientsIds != null && !recipientsIds.isEmpty()) {
                     return RequestResult.recipientData(
                             recipientsIds,
@@ -142,7 +142,7 @@ public class WsMessageController {
                                 .newBuilder()
                                 .setMessageStatuses(builder)
                                 .build();
-                        return RequestResult.responseData(data);
+                        return RequestResult.data(data);
                     });
         };
     }
@@ -193,7 +193,7 @@ public class WsMessageController {
                                         }
                                         listBuilder.addMessagesWithTotalList(messagesWithTotalBuilder);
                                     }
-                                    return RequestResult.responseData(TurmsNotification.Data.newBuilder()
+                                    return RequestResult.data(TurmsNotification.Data.newBuilder()
                                             .setMessagesWithTotalList(listBuilder).build());
                                 });
                     });
@@ -248,7 +248,7 @@ public class WsMessageController {
                         for (Message message : messages) {
                             messagesIds.add(message.getId());
                         }
-                        return Mono.just(RequestResult.responseData(data))
+                        return Mono.just(RequestResult.data(data))
                                 .flatMap(response -> messageStatusService.acknowledge(messagesIds)
                                         .thenReturn(response));
                     });
