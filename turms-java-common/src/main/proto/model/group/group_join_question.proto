@@ -12,6 +12,6 @@ message GroupJoinQuestion {
     google.protobuf.Int64Value id = 1;
     google.protobuf.Int64Value group_id = 2;
     google.protobuf.StringValue question = 3;
-    repeated google.protobuf.StringValue answers = 4;
+    repeated string answers = 4;
     google.protobuf.Int32Value score = 5;
 }

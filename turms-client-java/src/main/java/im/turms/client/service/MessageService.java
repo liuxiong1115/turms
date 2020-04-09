@@ -404,9 +404,7 @@ public class MessageService {
             builder.setText(request.getText());
         }
         if (request.getRecordsCount() > 0) {
-            for (ByteString byteString : request.getRecordsList()) {
-                builder.addRecords(BytesValue.newBuilder().setValue(byteString).build());
-            }
+            builder.addAllRecords(request.getRecordsList());
         }
         builder.setSenderId(Int64Value.newBuilder().setValue(requesterId).build());
         if (request.hasGroupId()) {
