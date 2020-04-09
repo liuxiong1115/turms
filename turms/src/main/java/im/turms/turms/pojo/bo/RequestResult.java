@@ -59,7 +59,7 @@ public final class RequestResult {
         return new RequestResult(null, Collections.emptySet(), null, code, reason);
     }
 
-    public static RequestResult responseId(@NotNull Long id) {
+    public static RequestResult id(@NotNull Long id) {
         TurmsNotification.Data data = TurmsNotification.Data
                 .newBuilder()
                 .setIds(Int64Values.newBuilder().addValues(id).build())
@@ -72,7 +72,7 @@ public final class RequestResult {
                 null);
     }
 
-    public static RequestResult responseIdAndRecipientData(
+    public static RequestResult idAndRecipientData(
             @NotNull Long id,
             @NotNull Long recipientId,
             @NotNull TurmsRequest dataForRecipient) {
@@ -83,12 +83,12 @@ public final class RequestResult {
         return new RequestResult(data, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK, null);
     }
 
-    public static RequestResult responseIdAndRecipientData(
+    public static RequestResult idAndRecipientData(
             @NotNull Long id,
             @Nullable Set<Long> recipients,
             TurmsRequest dataForRecipients) {
         if (recipients == null || recipients.isEmpty()) {
-            return responseId(id);
+            return id(id);
         } else {
             TurmsNotification.Data data = TurmsNotification.Data
                     .newBuilder()
@@ -103,7 +103,7 @@ public final class RequestResult {
         }
     }
 
-    public static RequestResult responseData(@NotNull TurmsNotification.Data data) {
+    public static RequestResult data(@NotNull TurmsNotification.Data data) {
         return new RequestResult(data, Collections.emptySet(), null, TurmsStatusCode.OK, null);
     }
 
