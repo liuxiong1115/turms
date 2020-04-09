@@ -17,7 +17,7 @@ import im.turms.common.model.bo.message.Message;
 import im.turms.common.model.bo.message.MessageStatus;
 import im.turms.common.model.bo.message.MessagesWithTotal;
 import im.turms.common.model.bo.user.UserLocation;
-import im.turms.common.model.dto.notification.TurmsNotification;
+import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.message.*;
 import im.turms.common.util.Validator;
 
@@ -64,13 +64,13 @@ public class MessageService {
         this.turmsClient.getDriver()
                 .getOnNotificationListeners()
                 .add(notification -> {
-                    if (onMessage != null && notification.hasData()) {
-                        TurmsNotification.Data data = notification.getData();
-                        if (data.hasMessages()) {
-                            for (Message message : data.getMessages().getMessagesList()) {
-                                MessageAddition addition = parseMessageAddition(message);
-                                onMessage.apply(message, addition);
-                            }
+                    if (onMessage != null && notification.hasRelayedRequest()) {
+                        TurmsRequest relayedRequest = notification.getRelayedRequest();
+                        if (relayedRequest.hasCreateMessageRequest()) {
+                            CreateMessageRequest createMessageRequest = relayedRequest.getCreateMessageRequest();
+                            Message message = createMessageRequest2Message(notification.getRequestId().getValue(), createMessageRequest);
+                            MessageAddition addition = parseMessageAddition(message);
+                            onMessage.apply(message, addition);
                         }
                     }
                     return null;
@@ -391,5 +391,30 @@ public class MessageService {
         }
         boolean isMentioned = mentionedUserIds.contains(turmsClient.getUserService().getUserId());
         return new MessageAddition(isMentioned, mentionedUserIds);
+    }
+
+    private Message createMessageRequest2Message(long requesterId, CreateMessageRequest request) {
+        Message.Builder builder = Message.newBuilder();
+        if (request.hasMessageId()) {
+            builder.setId(request.getMessageId());
+        }
+        builder.setDeliveryDate(Int64Value.newBuilder().setValue(request.getDeliveryDate()).build());
+
+        if (request.hasText()) {
+            builder.setText(request.getText());
+        }
+        if (request.getRecordsCount() > 0) {
+            for (ByteString byteString : request.getRecordsList()) {
+                builder.addRecords(BytesValue.newBuilder().setValue(byteString).build());
+            }
+        }
+        builder.setSenderId(Int64Value.newBuilder().setValue(requesterId).build());
+        if (request.hasGroupId()) {
+            builder.setGroupId(request.getGroupId());
+        }
+        if (request.hasRecipientId()) {
+            builder.setRecipientId(request.getRecipientId());
+        }
+        return builder.build();
     }
 }

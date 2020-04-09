@@ -13,7 +13,10 @@ public class NotificationService {
                 .getOnNotificationListeners()
                 .add(notification -> {
                     if (onNotification != null && notification.hasRelayedRequest()) {
-                        onNotification.apply(notification.getRelayedRequest());
+                        TurmsRequest request = notification.getRelayedRequest();
+                        if (!request.hasCreateMessageRequest()) {
+                            onNotification.apply(request);
+                        }
                     }
                     return null;
                 });
