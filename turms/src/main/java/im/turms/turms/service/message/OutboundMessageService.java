@@ -20,6 +20,7 @@ package im.turms.turms.service.message;
 import com.google.common.collect.Multimap;
 import com.hazelcast.cluster.Member;
 import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.onlineuser.IrresponsibleUserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
@@ -43,11 +44,13 @@ public class OutboundMessageService {
     private final OnlineUserService onlineUserService;
     private final IrresponsibleUserService irresponsibleUserService;
     private final TurmsClusterManager turmsClusterManager;
+    private final int maxMessageSizeToRelayDirectly;
 
-    public OutboundMessageService(OnlineUserService onlineUserService, TurmsClusterManager turmsClusterManager, IrresponsibleUserService irresponsibleUserService) {
+    public OutboundMessageService(OnlineUserService onlineUserService, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, IrresponsibleUserService irresponsibleUserService) {
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
         this.irresponsibleUserService = irresponsibleUserService;
+        this.maxMessageSizeToRelayDirectly = turmsProperties.getMessage().getMaxMessageSizeToRelayDirectly();
     }
 
     public Mono<Boolean> relayClientMessageToClients(
@@ -72,7 +75,7 @@ public class OutboundMessageService {
                 if (member.getUuid() == localUuid) {
                     monoList.add(Mono.just(relayClientMessageToLocalClients(messageData, recipientIds)));
                 } else {
-                    monoList.add(relayClientMessageByMember(messageData, recipientIds, member));
+                    monoList.add(relayClientMessageByRemoteMember(messageData, recipientIds, member));
                 }
             }
             return ReactorUtil.areAllTrue(monoList);
@@ -92,7 +95,7 @@ public class OutboundMessageService {
                 if (memberId == turmsClusterManager.getLocalMember().getUuid()) {
                     return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId)));
                 } else if (isRelayable) {
-                    return relayClientMessageByMemberId(messageData, recipientId, memberId);
+                    return relayClientMessageByRemoteMemberId(messageData, recipientId, memberId);
                 }
             } else if (isRelayable) {
                 return relayClientMessageByRecipientId(messageData, recipientId);
@@ -133,26 +136,40 @@ public class OutboundMessageService {
         return isSuccess;
     }
 
-    private Mono<Boolean> relayClientMessageByMemberId(
+    private Mono<Boolean> relayClientMessageByRemoteMemberId(
             @NotNull byte[] messageData,
             @NotNull Long recipientId,
             @NotNull UUID memberId) {
         Member member = turmsClusterManager.getMemberById(memberId);
         if (member != null) {
-            return relayClientMessageByMember(messageData, Collections.singleton(recipientId), member);
+            return relayClientMessageByRemoteMember(messageData, Collections.singleton(recipientId), member);
         } else {
             return Mono.just(false);
         }
     }
 
-    private Mono<Boolean> relayClientMessageByMember(
+    private Mono<Boolean> relayClientMessageByRemoteMember(
             @NotNull byte[] messageData,
             @NotNull Set<Long> recipientIds,
             @NotNull Member member) {
-        DeliveryUserMessageTask task = new DeliveryUserMessageTask(messageData, recipientIds);
-        Future<Boolean> future = turmsClusterManager.getExecutor()
-                .submitToMember(task, member);
-        return ReactorUtil.future2Mono(future);
+        if (messageData.length > maxMessageSizeToRelayDirectly && recipientIds.size() == 1) {
+            return onlineUserService.checkIfRemoteUserOffline(member, recipientIds.iterator().next())
+                    .flatMap(isOnline -> {
+                        if (isOnline) {
+                            DeliveryUserMessageTask task = new DeliveryUserMessageTask(messageData, recipientIds);
+                            Future<Boolean> future = turmsClusterManager.getExecutor()
+                                    .submitToMember(task, member);
+                            return ReactorUtil.future2Mono(future);
+                        } else {
+                            return Mono.just(false);
+                        }
+                    });
+        } else {
+            DeliveryUserMessageTask task = new DeliveryUserMessageTask(messageData, recipientIds);
+            Future<Boolean> future = turmsClusterManager.getExecutor()
+                    .submitToMember(task, member);
+            return ReactorUtil.future2Mono(future);
+        }
     }
 
     private Mono<Boolean> relayClientMessageByRecipientId(
@@ -160,7 +177,7 @@ public class OutboundMessageService {
             @NotNull Long recipientId) {
         Member member = turmsClusterManager.getMemberByUserId(recipientId);
         if (member != null) {
-            return relayClientMessageByMember(messageData, Collections.singleton(recipientId), member);
+            return relayClientMessageByRemoteMember(messageData, Collections.singleton(recipientId), member);
         } else {
             return Mono.just(false);
         }
