@@ -34,7 +34,6 @@ import java.io.IOException;
 
 @Data
 public class Message implements IdentifiedDataSerializable {
-    @JsonView(MutablePropertiesView.class)
     @Description("The time type for the delivery time of message")
     private TimeType timeType = TimeType.LOCAL_SERVER_TIME;
 
@@ -51,6 +50,12 @@ public class Message implements IdentifiedDataSerializable {
     @Description("The maximum allowed size for the records of a message")
     @Min(0)
     private int maxRecordsSizeBytes = 15 * 1024 * 1024;
+
+    @Description("The maximum message size to relay directly." +
+            "If the size of a message is below the specified threshold," +
+            "the server will check the recipient' status first and send the message if the recipient is online")
+    @Min(0)
+    private int maxMessageSizeToRelayDirectly = 5 * 1024;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to persist messages in databases.\n" +
@@ -133,7 +138,6 @@ public class Message implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeInt(timeType.ordinal());
         out.writeBoolean(checkIfTargetActiveAndNotDeleted);
         out.writeInt(maxTextLimit);
         out.writeInt(maxRecordsSizeBytes);
@@ -156,7 +160,6 @@ public class Message implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        timeType = TimeType.values()[in.readInt()];
         checkIfTargetActiveAndNotDeleted = in.readBoolean();
         maxTextLimit = in.readInt();
         maxRecordsSizeBytes = in.readInt();

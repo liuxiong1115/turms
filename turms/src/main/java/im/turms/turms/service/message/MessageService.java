@@ -36,10 +36,12 @@ import im.turms.turms.plugin.ExpiredMessageAutoDeletionNotificationHandler;
 import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.Message;
 import im.turms.turms.pojo.domain.MessageStatus;
+import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;
 import im.turms.turms.util.AggregationUtil;
 import im.turms.turms.util.ProtoUtil;
+import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -67,6 +69,7 @@ import java.util.stream.Collectors;
 
 import static im.turms.common.TurmsStatusCode.*;
 import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.property.business.Message.TimeType;
 
 @Service
 @Validated
@@ -79,9 +82,11 @@ public class MessageService {
     private final UserService userService;
     private final TurmsPluginManager turmsPluginManager;
     private final boolean pluginEnabled;
+    @Getter
+    private final TimeType timeType;
 
     @Autowired
-    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
+    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.messageStatusService = messageStatusService;
@@ -90,6 +95,7 @@ public class MessageService {
         this.outboundMessageService = outboundMessageService;
         this.turmsPluginManager = turmsPluginManager;
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
+        timeType = turmsProperties.getMessage().getTimeType();
     }
 
     @Scheduled(cron = EXPIRED_MESSAGES_CLEANER_CRON)
@@ -263,9 +269,7 @@ public class MessageService {
                 throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
             }
         }
-        if (turmsClusterManager.getTurmsProperties().getMessage().getTimeType()
-                != im.turms.turms.property.business.Message.TimeType.CLIENT_TIME
-                || deliveryDate == null) {
+        if (timeType == TimeType.LOCAL_SERVER_TIME || deliveryDate == null) {
             deliveryDate = new Date();
         }
         if (!turmsClusterManager.getTurmsProperties().getMessage().isRecordsPersistent()) {
@@ -359,9 +363,7 @@ public class MessageService {
             @Nullable Long referenceId,
             @Nullable Set<Long> auxiliaryMemberIds) {
         Validator.throwIfAllFalsy(text, records);
-        if (turmsClusterManager.getTurmsProperties().getMessage().getTimeType()
-                != im.turms.turms.property.business.Message.TimeType.CLIENT_TIME
-                || deliveryDate == null) {
+        if (timeType == TimeType.LOCAL_SERVER_TIME || deliveryDate == null) {
             deliveryDate = new Date();
         }
         if (messageId == null) {
