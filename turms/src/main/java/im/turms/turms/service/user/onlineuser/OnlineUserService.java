@@ -36,10 +36,7 @@ import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserLocationService;
 import im.turms.turms.service.user.UserLoginLogService;
 import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
-import im.turms.turms.task.CountOnlineUsersTask;
-import im.turms.turms.task.QueryUserOnlineInfoTask;
-import im.turms.turms.task.SetUserOfflineTask;
-import im.turms.turms.task.UpdateOnlineUserStatusTask;
+import im.turms.turms.task.*;
 import im.turms.turms.util.ReactorUtil;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
@@ -74,6 +71,7 @@ import static im.turms.turms.manager.TurmsClusterManager.HASH_SLOTS_NUMBER;
 @Validated
 public class OnlineUserService {
     private static final int DEFAULT_ONLINE_USERS_MANAGER_CAPACITY = 1024;
+    private static final Duration QUERY_TASK_DURATION = Duration.ofSeconds(10);
     private static final String LOG_ONLINE_USERS_NUMBER_TASK = "loun";
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
@@ -396,12 +394,12 @@ public class OnlineUserService {
     }
 
     public Mono<Integer> countOnlineUsers() {
-        Flux<Integer> futures = turmsTaskManager.callAll(new CountOnlineUsersTask(), Duration.ofSeconds(10));
+        Flux<Integer> futures = turmsTaskManager.callAll(new CountOnlineUsersTask(), QUERY_TASK_DURATION);
         return MathFlux.sumInt(futures);
     }
 
     public Mono<Map<UUID, Integer>> countOnlineUsersByNodes() {
-        Mono<Map<Member, Integer>> mono = turmsTaskManager.callAllAsMap(new CountOnlineUsersTask(), Duration.ofSeconds(10));
+        Mono<Map<Member, Integer>> mono = turmsTaskManager.callAllAsMap(new CountOnlineUsersTask(), QUERY_TASK_DURATION);
         return mono.map(map -> {
             Map<UUID, Integer> idNumberMap = new HashMap<>(map.size());
             for (Map.Entry<Member, Integer> entry : map.entrySet()) {
@@ -683,6 +681,10 @@ public class OnlineUserService {
                 sink.complete();
             });
         }
+    }
+
+    public Mono<Boolean> checkIfRemoteUserOffline(@NotNull Member member, @NotNull Long userId) {
+        return turmsTaskManager.call(member, new CheckIfUserOnlineTask(userId), QUERY_TASK_DURATION);
     }
 
     private void onClusterMembersChange() {

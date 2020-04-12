@@ -41,6 +41,11 @@ public class TurmsTaskManager {
         executor = turmsClusterManager.getExecutor();
     }
 
+    public <T> Mono<T> call(@NotNull Member member, @NotNull Callable<T> task, @NotNull Duration duration) {
+        Future<T> future = executor.submitToMember(task, member);
+        return ReactorUtil.future2Mono(future).timeout(duration);
+    }
+
     public <T> Flux<T> callAll(@NotNull Callable<T> task, @NotNull Duration duration) {
         Map<Member, Future<T>> futureMap = executor.submitToAllMembers(task);
         return ReactorUtil.futures2Flux(futureMap.values()).timeout(duration);
