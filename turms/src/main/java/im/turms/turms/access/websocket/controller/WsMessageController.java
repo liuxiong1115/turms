@@ -54,6 +54,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static im.turms.common.model.dto.request.TurmsRequest.KindCase.*;
+import static im.turms.turms.property.business.Message.TimeType;
 
 @Controller
 public class WsMessageController {
@@ -126,6 +127,9 @@ public class WsMessageController {
                         } else {
                             Int64Value.Builder messageIdBuilder = Int64Value.newBuilder().setValue(messageId);
                             CreateMessageRequest.Builder requestBuilder = request.toBuilder().setMessageId(messageIdBuilder);
+                            if (messageService.getTimeType() == TimeType.LOCAL_SERVER_TIME) {
+                                requestBuilder.setDeliveryDate(message.getDeliveryDate().getTime());
+                            }
                             turmsRequest = turmsRequestWrapper.getTurmsRequest()
                                     .toBuilder()
                                     .setCreateMessageRequest(requestBuilder)
@@ -139,9 +143,15 @@ public class WsMessageController {
                         return RequestResult.id(messageId);
                     }
                 } else if (recipientsIds != null && !recipientsIds.isEmpty()) {
+                    TurmsRequest turmsRequest = turmsRequestWrapper.getTurmsRequest();
+                    if (messageService.getTimeType() == TimeType.LOCAL_SERVER_TIME) {
+                        turmsRequest = turmsRequest.toBuilder()
+                                .setCreateMessageRequest(request.toBuilder().setDeliveryDate(System.currentTimeMillis()))
+                                .build();
+                    }
                     return RequestResult.recipientData(
                             recipientsIds,
-                            turmsRequestWrapper.getTurmsRequest());
+                            turmsRequest);
                 } else {
                     return RequestResult.status(TurmsStatusCode.OK);
                 }
