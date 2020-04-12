@@ -766,8 +766,8 @@ public class MessageService {
                 .map(Message::getSenderId);
     }
 
-    // messageId - recipientsIds
-    public Mono<Pair<Long, Set<Long>>> authAndSendMessage(
+    // message - recipientsIds
+    public Mono<Pair<Message, Set<Long>>> authAndSendMessage(
             @Nullable Long messageId,
             @NotNull Long senderId,
             @NotNull Long targetId,
@@ -810,7 +810,7 @@ public class MessageService {
                                         isSystemMessage, text, records, burnAfter, deliveryDate,
                                         referenceId, null);
                             }
-                            return saveMono.map(message -> Pair.of(message.getId(), recipientsIds));
+                            return saveMono.map(message -> Pair.of(message, recipientsIds));
                         });
                     });
         } else {
@@ -819,9 +819,9 @@ public class MessageService {
     }
 
     /**
-     * Use clone rather than reference
+     * clone a new message rather than using its ID as a reference
      */
-    public Mono<Pair<Long, Set<Long>>> authAndCloneAndSendMessage(
+    public Mono<Pair<Message, Set<Long>>> authAndCloneAndSendMessage(
             @NotNull Long requesterId,
             @NotNull Long referenceId,
             @NotNull @ChatTypeConstraint ChatType chatType,
