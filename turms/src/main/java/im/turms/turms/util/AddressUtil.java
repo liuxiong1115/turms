@@ -91,13 +91,13 @@ public class AddressUtil {
     }
 
     public static String queryPublicIp(TurmsProperties properties) {
-        List<String> checkerAddresses = properties.getIp().getIpCheckerAddresses();
-        if (!checkerAddresses.isEmpty()) {
-            List<CompletableFuture<HttpResponse<String>>> futures = new ArrayList<>(checkerAddresses.size());
+        List<String> detectorAddresses = properties.getIp().getIpDetectorAddresses();
+        if (!detectorAddresses.isEmpty()) {
+            List<CompletableFuture<HttpResponse<String>>> futures = new ArrayList<>(detectorAddresses.size());
             if (client == null) {
                 client = HttpClient.newHttpClient();
             }
-            for (String checkerAddress : checkerAddresses) {
+            for (String checkerAddress : detectorAddresses) {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(checkerAddress))
                         .build();

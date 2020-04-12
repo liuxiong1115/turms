@@ -21,8 +21,10 @@ import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.MessageDeliveryStatus;
 import im.turms.common.model.dto.request.signal.AckRequest;
 import im.turms.turms.annotation.websocket.TurmsRequestMapping;
+import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.service.message.MessageService;
 import im.turms.turms.service.message.MessageStatusService;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
@@ -34,10 +36,14 @@ import static im.turms.common.model.dto.request.TurmsRequest.KindCase.ACK_REQUES
 
 @Controller
 public class WsSignalController {
+    private final MessageService messageService;
     private final MessageStatusService messageStatusService;
+    private final TurmsClusterManager turmsClusterManager;
 
-    public WsSignalController(MessageStatusService messageStatusService) {
+    public WsSignalController(MessageService messageService, MessageStatusService messageStatusService, TurmsClusterManager turmsClusterManager) {
+        this.messageService = messageService;
         this.messageStatusService = messageStatusService;
+        this.turmsClusterManager = turmsClusterManager;
     }
 
     /**
@@ -51,13 +57,19 @@ public class WsSignalController {
             List<Long> messagesIds = ackRequest.getMessagesIdsList();
             if (messagesIds.isEmpty()) {
                 return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The list of message ID must not be empty"));
+            } else {
+                if (turmsClusterManager.getTurmsProperties().getMessage().isDeletePrivateMessageAfterAcknowledged()) {
+                    return messageService.deleteMessages(messagesIds, true, false)
+                            .map(RequestResult::okIfTrue);
+                } else {
+                    return messageStatusService
+                            .authAndUpdateMessagesDeliveryStatus(
+                                    turmsRequestWrapper.getUserId(),
+                                    messagesIds,
+                                    MessageDeliveryStatus.RECEIVED)
+                            .map(RequestResult::okIfTrue);
+                }
             }
-            return messageStatusService
-                    .authAndUpdateMessagesDeliveryStatus(
-                            turmsRequestWrapper.getUserId(),
-                            messagesIds,
-                            MessageDeliveryStatus.RECEIVED)
-                    .map(RequestResult::okIfTrue);
         };
     }
 }
