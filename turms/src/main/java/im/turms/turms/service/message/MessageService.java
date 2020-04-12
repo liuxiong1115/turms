@@ -451,7 +451,7 @@ public class MessageService {
     }
 
     public Mono<Boolean> deleteMessages(
-            @Nullable Set<Long> messageIds,
+            @Nullable Collection<Long> messageIds,
             boolean deleteMessageStatus,
             @Nullable Boolean shouldDeleteLogically) {
         Query queryMessage = QueryBuilder
