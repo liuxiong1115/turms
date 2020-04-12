@@ -76,14 +76,14 @@ public class WsMessageController {
             if (request.hasIsSystemMessage() && request.getIsSystemMessage().getValue()) {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Users cannot create system messages"));
             }
-            Mono<Pair<Long, Set<Long>>> pairMono;
+            Mono<Pair<Message, Set<Long>>> messageAndRelatedUserIdsMono;
             ChatType chatType = request.hasGroupId() ? ChatType.GROUP : ChatType.PRIVATE;
             if (chatType == ChatType.PRIVATE && !request.hasRecipientId()) {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The recipientId must not be null for private messages"));
             }
             long targetId = chatType == ChatType.GROUP ? request.getGroupId().getValue() : request.getRecipientId().getValue();
             if (request.hasMessageId()) {
-                pairMono = messageService.authAndCloneAndSendMessage(
+                messageAndRelatedUserIdsMono = messageService.authAndCloneAndSendMessage(
                         turmsRequestWrapper.getUserId(),
                         request.getMessageId().getValue(),
                         chatType,
@@ -99,7 +99,7 @@ public class WsMessageController {
                 }
                 Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
                 Date deliveryDate = new Date(request.getDeliveryDate());
-                pairMono = messageService.authAndSendMessage(
+                messageAndRelatedUserIdsMono = messageService.authAndSendMessage(
                         null,
                         turmsRequestWrapper.getUserId(),
                         targetId,
@@ -111,14 +111,18 @@ public class WsMessageController {
                         deliveryDate,
                         null);
             }
-            return pairMono.map(pair -> {
-                Long messageId = pair.getLeft();
+            return messageAndRelatedUserIdsMono.map(pair -> {
+                Message message = pair.getLeft();
+                Long messageId = message != null ? message.getId() : null;
                 Set<Long> recipientsIds = pair.getRight();
                 if (messageId != null) {
                     if (recipientsIds != null && !recipientsIds.isEmpty()) {
                         TurmsRequest turmsRequest;
                         if (request.hasMessageId()) {
-                            turmsRequest = turmsRequestWrapper.getTurmsRequest();
+                            turmsRequest = turmsRequestWrapper.getTurmsRequest()
+                                    .toBuilder()
+                                    .setCreateMessageRequest(ProtoUtil.fillCloneMessageRequest(request, message))
+                                    .build();
                         } else {
                             Int64Value.Builder messageIdBuilder = Int64Value.newBuilder().setValue(messageId);
                             CreateMessageRequest.Builder requestBuilder = request.toBuilder().setMessageId(messageIdBuilder);
