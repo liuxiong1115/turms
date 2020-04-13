@@ -30,10 +30,10 @@ import java.io.IOException;
 @Data
 public class Cache implements IdentifiedDataSerializable {
 
-    @Description("The maximum size of the cache for the disconnection reasons")
+    @Description("The maximum size of the cache of disconnection reasons")
     private int disconnectionReasonCacheMaxSize = 1024;
 
-    @Description("The maximum size of the cache for the login-failed reasons")
+    @Description("The maximum size of the cache of login-failed reasons")
     private int loginFailedReasonCacheMaxSize = 1024;
 
     @Description("The life duration of each disconnection reason")
@@ -41,6 +41,13 @@ public class Cache implements IdentifiedDataSerializable {
 
     @Description("The life duration of each login-failed reason")
     private int loginFailedReasonExpireAfter = 60;
+
+    @Description("The maximum size of the cache of sent messages.")
+    private int sentMessageCacheMaxSize = 10240;
+
+    @Description("The life duration of each sent message in cache." +
+            "For a better performance, it's a good practice to keep the value greater than the allowed recall duration")
+    private int sentMessageExpireAfter = 30;
 
     @JsonIgnore
     @Override

@@ -28,7 +28,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -148,7 +147,7 @@ public class MessageStatusService {
 
     public Mono<Boolean> authAndUpdateMessagesDeliveryStatus(
             @NotNull Long recipientId,
-            @NotEmpty Collection<Long> messagesIds,
+            @NotEmpty Set<Long> messagesIds,
             @NotNull @MessageDeliveryStatusConstraint MessageDeliveryStatus deliveryStatus) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds))

@@ -17,6 +17,8 @@
 
 package im.turms.turms.service.message;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -62,6 +64,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -84,6 +87,7 @@ public class MessageService {
     private final boolean pluginEnabled;
     @Getter
     private final TimeType timeType;
+    private final Cache<Long, Message> sentMessageCache;
 
     @Autowired
     public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
@@ -96,6 +100,16 @@ public class MessageService {
         this.turmsPluginManager = turmsPluginManager;
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
         timeType = turmsProperties.getMessage().getTimeType();
+        int relayedMessageCacheMaxSize = turmsProperties.getCache().getSentMessageCacheMaxSize();
+        if (relayedMessageCacheMaxSize > 0 && turmsProperties.getMessage().isMessagePersistent()) {
+            this.sentMessageCache = Caffeine
+                    .newBuilder()
+                    .maximumSize(relayedMessageCacheMaxSize)
+                    .expireAfterWrite(Duration.ofSeconds(turmsProperties.getCache().getSentMessageExpireAfter()))
+                    .build();
+        } else {
+            sentMessageCache = null;
+        }
     }
 
     @Scheduled(cron = EXPIRED_MESSAGES_CLEANER_CRON)
@@ -110,6 +124,12 @@ public class MessageService {
     }
 
     public Mono<Boolean> isMessageSentByUser(@NotNull Long messageId, @NotNull Long senderId) {
+        if (sentMessageCache != null) {
+            Message message = sentMessageCache.getIfPresent(messageId);
+            if (message != null) {
+                return Mono.just(message.getSenderId().equals(senderId));
+            }
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(messageId))
                 .addCriteria(Criteria.where(Message.Fields.senderId).is(senderId));
@@ -117,7 +137,12 @@ public class MessageService {
     }
 
     public Mono<Boolean> isMessageSentToUser(@NotNull Long messageId, @NotNull Long recipientId) {
-        // Warning: Do not check whether a user is the recipient of a message because a message can be sent to user or group.
+        if (sentMessageCache != null) {
+            Message message = sentMessageCache.getIfPresent(messageId);
+            if (message != null && message.getChatType() == ChatType.PRIVATE) {
+                return Mono.just(message.getTargetId().equals(recipientId));
+            }
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
                 .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId));
@@ -136,9 +161,19 @@ public class MessageService {
     }
 
     public Mono<Boolean> isMessageRecallable(@NotNull Long messageId) {
-        Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
-        query.fields().include(Message.Fields.deliveryDate);
-        return mongoTemplate.findOne(query, Message.class)
+        Mono<Message> messageMono = null;
+        if (sentMessageCache != null) {
+            Message message = sentMessageCache.getIfPresent(messageId);
+            if (message != null) {
+                messageMono = Mono.just(message);
+            }
+        }
+        if (messageMono == null) {
+            Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
+            query.fields().include(Message.Fields.deliveryDate);
+            messageMono = mongoTemplate.findOne(query, Message.class);
+        }
+        return messageMono
                 .map(message -> {
                     Date deliveryDate = message.getDeliveryDate();
                     if (deliveryDate != null) {
@@ -329,21 +364,22 @@ public class MessageService {
                         .flatMap(membersIds -> {
                             if (membersIds.isEmpty()) {
                                 return Mono.just(true);
+                            } else {
+                                List<MessageStatus> messageStatuses = new ArrayList<>(membersIds.size());
+                                for (Long memberId : membersIds) {
+                                    messageStatuses.add(new MessageStatus(
+                                            messageId,
+                                            targetId,
+                                            isSystemMessage,
+                                            senderId,
+                                            memberId,
+                                            MessageDeliveryStatus.READY,
+                                            null,
+                                            null,
+                                            null));
+                                }
+                                return mongoOperations.insertAll(messageStatuses).then(Mono.just(true));
                             }
-                            List<MessageStatus> messageStatuses = new ArrayList<>(membersIds.size());
-                            for (Long memberId : membersIds) {
-                                messageStatuses.add(new MessageStatus(
-                                        messageId,
-                                        targetId,
-                                        isSystemMessage,
-                                        senderId,
-                                        memberId,
-                                        MessageDeliveryStatus.READY,
-                                        null,
-                                        null,
-                                        null));
-                            }
-                            return mongoOperations.insertAll(messageStatuses).then(Mono.just(true));
                         });
             default:
                 throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
@@ -451,7 +487,7 @@ public class MessageService {
     }
 
     public Mono<Boolean> deleteMessages(
-            @Nullable Collection<Long> messageIds,
+            @Nullable Set<Long> messageIds,
             boolean deleteMessageStatus,
             @Nullable Boolean shouldDeleteLogically) {
         Query queryMessage = QueryBuilder
@@ -491,13 +527,6 @@ public class MessageService {
             return mongoTemplate.remove(queryMessage, Message.class)
                     .map(DeleteResult::wasAcknowledged);
         }
-    }
-
-    public Mono<Boolean> deleteMessage(
-            @NotNull Long messageId,
-            boolean deleteMessageStatus,
-            @Nullable Boolean shouldDeleteLogically) {
-        return deleteMessages(Set.of(messageId), deleteMessageStatus, shouldDeleteLogically);
     }
 
     public Mono<Boolean> updateMessage(
@@ -812,7 +841,13 @@ public class MessageService {
                                         isSystemMessage, text, records, burnAfter, deliveryDate,
                                         referenceId, null);
                             }
-                            return saveMono.map(message -> Pair.of(message, recipientsIds));
+                            return saveMono.map(message -> {
+                                Long id = message.getId();
+                                if (id != null) {
+                                    sentMessageCache.put(id, message);
+                                }
+                                return Pair.of(message, recipientsIds);
+                            });
                         });
                     });
         } else {
@@ -894,15 +929,20 @@ public class MessageService {
                                 true);
                     });
         } else {
+            Mono<Message> messageMono;
             if (turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent()) {
-                return saveMessageAndMessagesStatus(messageId, senderId, targetId, chatType,
-                        isSystemMessage, text, records, burnAfter, deliveryDate, null, null)
-                        .thenReturn(true);
+                messageMono = saveMessageAndMessagesStatus(messageId, senderId, targetId, chatType,
+                        isSystemMessage, text, records, burnAfter, deliveryDate, null, null);
             } else {
-                return saveMessage(null, senderId, targetId, chatType,
-                        isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, null)
-                        .thenReturn(true);
+                messageMono = saveMessage(null, senderId, targetId, chatType,
+                        isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, null);
             }
+            return messageMono.doOnSuccess(msg -> {
+                Long id = message.getId();
+                if (id != null) {
+                    sentMessageCache.put(id, message);
+                }
+            }).thenReturn(true);
         }
     }
 }
