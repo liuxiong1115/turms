@@ -797,6 +797,12 @@ public class MessageService {
                 .map(Message::getSenderId);
     }
 
+    public Flux<Message> queryChatTypes(@NotEmpty Set<Long> messageIds) {
+        Query query = new Query().addCriteria(Criteria.where(ID).in(messageIds));
+        query.fields().include(Message.Fields.chatType);
+        return mongoTemplate.find(query, Message.class);
+    }
+
     // message - recipientsIds
     public Mono<Pair<Message, Set<Long>>> authAndSendMessage(
             @Nullable Long messageId,
@@ -943,6 +949,57 @@ public class MessageService {
                     sentMessageCache.put(id, message);
                 }
             }).thenReturn(true);
+        }
+    }
+
+    public Mono<Set<Long>> filterPrivateMessages(Set<Long> messagesIds) {
+        if (messagesIds.isEmpty()) {
+            return Mono.just(Collections.emptySet());
+        } else {
+            Set<Long> privateMessageIds = null;
+            Set<Long> uncachedMessageIds = null;
+            for (Long messagesId : messagesIds) {
+                Message message = sentMessageCache.getIfPresent(messagesId);
+                if (message != null) {
+                    if (message.getChatType() == ChatType.PRIVATE) {
+                        if (privateMessageIds == null) {
+                            privateMessageIds = new HashSet<>();
+                        }
+                        privateMessageIds.add(messagesId);
+                    }
+                } else {
+                    if (uncachedMessageIds == null) {
+                        uncachedMessageIds = new HashSet<>();
+                    }
+                    uncachedMessageIds.add(messagesId);
+                }
+            }
+            if (uncachedMessageIds == null) {
+                return Mono.just(privateMessageIds != null ? privateMessageIds : Collections.emptySet());
+            } else {
+                Set<Long> finalPrivateMessageIds = privateMessageIds;
+                return queryChatTypes(uncachedMessageIds)
+                        .collectList()
+                        .map(messages -> {
+                            Set<Long> ids = null;
+                            for (Message message : messages) {
+                                if (message.getChatType() == ChatType.PRIVATE) {
+                                    if (ids == null) {
+                                        ids = new HashSet<>();
+                                    }
+                                    ids.add(message.getId());
+                                }
+                            }
+                            if (ids == null) {
+                                return finalPrivateMessageIds == null ? Collections.emptySet() : finalPrivateMessageIds;
+                            } else {
+                                if (finalPrivateMessageIds != null) {
+                                    ids.addAll(finalPrivateMessageIds);
+                                }
+                                return ids;
+                            }
+                        });
+            }
         }
     }
 }

@@ -29,7 +29,9 @@ import im.turms.turms.service.message.MessageStatusService;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 import static im.turms.common.model.dto.request.TurmsRequest.KindCase.ACK_REQUEST;
@@ -47,8 +49,7 @@ public class WsSignalController {
     }
 
     /**
-     * NOTE: If recipients acknowledged the message sent to them, it DOESN'T mean that the message is read
-     * and only means the message is received
+     * NOTE: If recipients acknowledge a received message, it DOESN'T mean that the message was read
      */
     @TurmsRequestMapping(ACK_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleAckRequest() {
@@ -58,18 +59,34 @@ public class WsSignalController {
             if (messagesIds.isEmpty()) {
                 return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The list of message ID must not be empty"));
             } else {
+                Set<Long> ids = new HashSet<>(messagesIds);
                 if (turmsClusterManager.getTurmsProperties().getMessage().isDeletePrivateMessageAfterAcknowledged()) {
-                    return messageService.deleteMessages(messagesIds, true, false)
-                            .map(RequestResult::okIfTrue);
+                    return messageService.filterPrivateMessages(ids)
+                            .flatMap(privateMessageIds -> {
+                                if (!privateMessageIds.isEmpty()) {
+                                    if (privateMessageIds.size() == ids.size()) {
+                                        return messageService.deleteMessages(privateMessageIds, true, false)
+                                                .map(RequestResult::okIfTrue);
+                                    } else {
+                                        ids.removeAll(privateMessageIds);
+                                        return authAndUpdateMessagesDeliveryStatus(turmsRequestWrapper.getUserId(), ids)
+                                                .then(messageService.deleteMessages(privateMessageIds, true, false)
+                                                        .map(RequestResult::okIfTrue));
+                                    }
+                                } else {
+                                    return authAndUpdateMessagesDeliveryStatus(turmsRequestWrapper.getUserId(), ids);
+                                }
+                            });
                 } else {
-                    return messageStatusService
-                            .authAndUpdateMessagesDeliveryStatus(
-                                    turmsRequestWrapper.getUserId(),
-                                    messagesIds,
-                                    MessageDeliveryStatus.RECEIVED)
-                            .map(RequestResult::okIfTrue);
+                    return authAndUpdateMessagesDeliveryStatus(turmsRequestWrapper.getUserId(), ids);
                 }
             }
         };
+    }
+
+    private Mono<RequestResult> authAndUpdateMessagesDeliveryStatus(Long userId, Set<Long> messageIds) {
+        return messageStatusService
+                .authAndUpdateMessagesDeliveryStatus(userId, messageIds, MessageDeliveryStatus.RECEIVED)
+                .map(RequestResult::okIfTrue);
     }
 }

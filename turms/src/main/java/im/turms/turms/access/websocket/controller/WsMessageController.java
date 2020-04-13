@@ -378,15 +378,10 @@ public class WsMessageController {
                             } else {
                                 date = readDate;
                             }
-                        }
-//                        if (turmsClusterManager.getTurmsProperties().getMessage()
-//                                .isShouldDeletePrivateMessageAfterAcknowledged()) { //TODO: bug
-//                            return messageService.deleteMessage(messageId, true, false);
-//                        } else {
+                        } // else unset the read date
                         return messageStatusService.updateMessagesReadDate(
                                 messageId,
                                 date);
-//                        }
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
