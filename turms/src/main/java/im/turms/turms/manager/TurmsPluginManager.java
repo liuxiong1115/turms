@@ -44,6 +44,7 @@ public class TurmsPluginManager {
     private List<ClientRequestHandler> clientRequestHandlerList;
     private List<ExpiredMessageAutoDeletionNotificationHandler> expiredMessageAutoDeletionNotificationHandlerList;
     private List<LogHandler> logHandlerList;
+    private List<RelayedTurmsNotificationHandler> notificationHandlerList;
     private List<UserAuthenticator> userAuthenticatorList;
     private List<UserOnlineStatusChangeHandler> userOnlineStatusChangeHandlerList;
     private StorageServiceProvider storageServiceProvider;
@@ -55,6 +56,7 @@ public class TurmsPluginManager {
             clientRequestHandlerList = Collections.emptyList();
             expiredMessageAutoDeletionNotificationHandlerList = Collections.emptyList();
             logHandlerList = Collections.emptyList();
+            notificationHandlerList = Collections.emptyList();
             userAuthenticatorList = Collections.emptyList();
             userOnlineStatusChangeHandlerList = Collections.emptyList();
             init();
@@ -70,6 +72,7 @@ public class TurmsPluginManager {
         clientRequestHandlerList = pluginManager.getExtensions(ClientRequestHandler.class);
         expiredMessageAutoDeletionNotificationHandlerList = pluginManager.getExtensions(ExpiredMessageAutoDeletionNotificationHandler.class);
         logHandlerList = pluginManager.getExtensions(LogHandler.class);
+        notificationHandlerList = pluginManager.getExtensions(RelayedTurmsNotificationHandler.class);
         userAuthenticatorList = pluginManager.getExtensions(UserAuthenticator.class);
         userOnlineStatusChangeHandlerList = pluginManager.getExtensions(UserOnlineStatusChangeHandler.class);
         List<StorageServiceProvider> storageServiceProviders = pluginManager.getExtensions(StorageServiceProvider.class);
@@ -79,6 +82,7 @@ public class TurmsPluginManager {
         initExtensions(clientRequestHandlerList);
         initExtensions(expiredMessageAutoDeletionNotificationHandlerList);
         initExtensions(logHandlerList);
+        initExtensions(notificationHandlerList);
         initExtensions(userAuthenticatorList);
         initExtensions(userOnlineStatusChangeHandlerList);
         initExtension(storageServiceProvider);

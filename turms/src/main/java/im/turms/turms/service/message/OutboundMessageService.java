@@ -19,7 +19,10 @@ package im.turms.turms.service.message;
 
 import com.google.common.collect.Multimap;
 import com.hazelcast.cluster.Member;
+import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.manager.TurmsPluginManager;
+import im.turms.turms.plugin.RelayedTurmsNotificationHandler;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.onlineuser.IrresponsibleUserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -44,12 +47,14 @@ public class OutboundMessageService {
     private final OnlineUserService onlineUserService;
     private final IrresponsibleUserService irresponsibleUserService;
     private final TurmsClusterManager turmsClusterManager;
+    private final TurmsPluginManager turmsPluginManager;
     private final int maxMessageSizeToRelayDirectly;
 
-    public OutboundMessageService(OnlineUserService onlineUserService, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, IrresponsibleUserService irresponsibleUserService) {
+    public OutboundMessageService(OnlineUserService onlineUserService, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, IrresponsibleUserService irresponsibleUserService, TurmsPluginManager turmsPluginManager) {
         this.onlineUserService = onlineUserService;
         this.turmsClusterManager = turmsClusterManager;
         this.irresponsibleUserService = irresponsibleUserService;
+        this.turmsPluginManager = turmsPluginManager;
         this.maxMessageSizeToRelayDirectly = turmsProperties.getMessage().getMaxMessageSizeToRelayDirectly();
     }
 
@@ -70,8 +75,8 @@ public class OutboundMessageService {
                 }
             }
             List<Mono<Boolean>> monoList = new ArrayList<>(userIdsByMember.keySet().size());
+            UUID localUuid = turmsClusterManager.getLocalMember().getUuid();
             for (Member member : userIdsByMember.keySet()) {
-                UUID localUuid = turmsClusterManager.getLocalMember().getUuid();
                 if (member.getUuid() == localUuid) {
                     monoList.add(Mono.just(relayClientMessageToLocalClients(messageData, recipientIds)));
                 } else {
@@ -104,11 +109,16 @@ public class OutboundMessageService {
         return Mono.just(false);
     }
 
+    /**
+     * Note that all operations will go here finally
+     */
     public boolean relayClientMessageToLocalClients(
             @NotNull byte[] messageData,
             @NotEmpty Set<Long> recipientIds) {
         boolean isSuccess = true;
         WebSocketMessage message = null;
+        boolean shouldTriggerHandlers = !turmsPluginManager.getNotificationHandlerList().isEmpty() && turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
+        Set<Long> offlineRecipientIds = shouldTriggerHandlers ? new HashSet<>() : null;
         for (Long recipientId : recipientIds) {
             OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(recipientId);
             if (onlineUserManager != null) {
@@ -125,9 +135,24 @@ public class OutboundMessageService {
                     }
                 } else {
                     isSuccess = false;
+                    if (shouldTriggerHandlers) {
+                        offlineRecipientIds.add(recipientId);
+                    }
                 }
             } else {
                 isSuccess = false;
+                if (shouldTriggerHandlers) {
+                    offlineRecipientIds.add(recipientId);
+                }
+            }
+        }
+        if (shouldTriggerHandlers) {
+            try {
+                TurmsNotification notification = TurmsNotification.parseFrom(messageData);
+                for (RelayedTurmsNotificationHandler handler : turmsPluginManager.getNotificationHandlerList()) {
+                    handler.handle(notification, recipientIds, offlineRecipientIds);
+                }
+            } catch (Exception ignored) {
             }
         }
         if (message != null) {
