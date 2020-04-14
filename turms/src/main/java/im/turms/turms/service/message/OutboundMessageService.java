@@ -27,7 +27,7 @@ import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.onlineuser.IrresponsibleUserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
-import im.turms.turms.task.DeliveryUserMessageTask;
+import im.turms.turms.task.DeliveryTurmsNotificationTask;
 import im.turms.turms.util.ReactorUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -181,7 +181,7 @@ public class OutboundMessageService {
             return onlineUserService.checkIfRemoteUserOffline(member, recipientIds.iterator().next())
                     .flatMap(isOnline -> {
                         if (isOnline) {
-                            DeliveryUserMessageTask task = new DeliveryUserMessageTask(messageData, recipientIds);
+                            DeliveryTurmsNotificationTask task = new DeliveryTurmsNotificationTask(messageData, recipientIds);
                             Future<Boolean> future = turmsClusterManager.getExecutor()
                                     .submitToMember(task, member);
                             return ReactorUtil.future2Mono(future);
@@ -190,7 +190,7 @@ public class OutboundMessageService {
                         }
                     });
         } else {
-            DeliveryUserMessageTask task = new DeliveryUserMessageTask(messageData, recipientIds);
+            DeliveryTurmsNotificationTask task = new DeliveryTurmsNotificationTask(messageData, recipientIds);
             Future<Boolean> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
             return ReactorUtil.future2Mono(future);

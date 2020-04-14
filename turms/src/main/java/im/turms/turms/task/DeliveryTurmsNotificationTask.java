@@ -29,25 +29,22 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-/**
- * Note: UserMessage refers to WebSocketMessage, not the message model in business.
- */
 @SpringAware
-public class DeliveryUserMessageTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
+public class DeliveryTurmsNotificationTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
     private static final long serialVersionUID = 4595269008081593689L;
-    private final byte[] clientMessageBytes;
+    private final byte[] notificationBytes;
     private final Set<Long> recipientIds;
     private transient ApplicationContext context;
     private transient OutboundMessageService outboundMessageService;
 
-    public DeliveryUserMessageTask(@NotEmpty byte[] clientMessageBytes, @NotEmpty Set<Long> recipientIds) {
-        this.clientMessageBytes = clientMessageBytes;
+    public DeliveryTurmsNotificationTask(@NotEmpty byte[] notificationBytes, @NotEmpty Set<Long> recipientIds) {
+        this.notificationBytes = notificationBytes;
         this.recipientIds = recipientIds;
     }
 
     @Override
     public Boolean call() {
-        return outboundMessageService.relayClientMessageToLocalClients(clientMessageBytes, recipientIds);
+        return outboundMessageService.relayClientMessageToLocalClients(notificationBytes, recipientIds);
     }
 
     @Override
