@@ -41,6 +41,7 @@ import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;
+import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.util.AggregationUtil;
 import im.turms.turms.util.ProtoUtil;
 import lombok.Getter;
@@ -83,6 +84,7 @@ public class MessageService {
     private final OutboundMessageService outboundMessageService;
     private final GroupMemberService groupMemberService;
     private final UserService userService;
+    private final OnlineUserService onlineUserService;
     private final TurmsPluginManager turmsPluginManager;
     private final boolean pluginEnabled;
     @Getter
@@ -90,12 +92,13 @@ public class MessageService {
     private final Cache<Long, Message> sentMessageCache;
 
     @Autowired
-    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
+    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OnlineUserService onlineUserService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.messageStatusService = messageStatusService;
         this.groupMemberService = groupMemberService;
         this.userService = userService;
+        this.onlineUserService = onlineUserService;
         this.outboundMessageService = outboundMessageService;
         this.turmsPluginManager = turmsPluginManager;
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
@@ -804,7 +807,7 @@ public class MessageService {
     }
 
     // message - recipientsIds
-    public Mono<Pair<Message, Set<Long>>> authAndSendMessage(
+    public Mono<Pair<Message, Set<Long>>> authAndSaveMessage(
             @Nullable Long messageId,
             @NotNull Long senderId,
             @NotNull Long targetId,
@@ -864,14 +867,14 @@ public class MessageService {
     /**
      * clone a new message rather than using its ID as a reference
      */
-    public Mono<Pair<Message, Set<Long>>> authAndCloneAndSendMessage(
+    public Mono<Pair<Message, Set<Long>>> authAndCloneAndSaveMessage(
             @NotNull Long requesterId,
             @NotNull Long referenceId,
             @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Boolean isSystemMessage,
             @NotNull Long targetId) {
         return queryMessage(referenceId)
-                .flatMap(message -> authAndSendMessage(
+                .flatMap(message -> authAndSaveMessage(
                         turmsClusterManager.generateRandomId(),
                         requesterId,
                         targetId,
@@ -907,7 +910,7 @@ public class MessageService {
         Message message = new Message(messageId, chatType, isSystemMessage, deliveryDate, null,
                 text, senderId, targetId, records, burnAfter, referenceId);
         if (shouldSend) {
-            return authAndSendMessage(
+            return authAndSaveMessage(
                     messageId,
                     senderId,
                     targetId,
@@ -929,9 +932,14 @@ public class MessageService {
                                 .setRequestId(Int64Value.newBuilder().setValue(0).build())
                                 .build()
                                 .toByteArray();
+                        Set<Long> recipientIds = pair.getValue();
+                        if (turmsClusterManager.getTurmsProperties().getMessage().isSendMessageToOtherSenderOnlineDevices()) {
+                            recipientIds.add(message.getId());
+                        }
                         return outboundMessageService.relayClientMessageToClients(
                                 responseData,
-                                pair.getValue(),
+                                recipientIds,
+                                null,
                                 true);
                     });
         } else {

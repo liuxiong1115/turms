@@ -65,12 +65,12 @@ public class WsUserRelationshipController {
                     .map(friendRequest -> {
                         if (turmsClusterManager.getTurmsProperties()
                                 .getNotification().isNotifyRecipientWhenReceivingFriendRequest()) {
-                            return RequestResult.idAndRecipientData(
+                            return RequestResult.create(
                                     friendRequest.getId(),
                                     request.getRecipientId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
-                        return RequestResult.id(friendRequest.getId());
+                        return RequestResult.create(friendRequest.getId());
                     });
         };
     }
@@ -85,7 +85,7 @@ public class WsUserRelationshipController {
                     request.getName(),
                     new Date(),
                     null)
-                    .map(group -> RequestResult.id(group.getKey().getIndex().longValue()));
+                    .map(group -> RequestResult.create(group.getKey().getIndex().longValue()));
         };
     }
 
@@ -110,7 +110,7 @@ public class WsUserRelationshipController {
                         if (upserted != null && upserted
                                 && turmsClusterManager.getTurmsProperties().getNotification()
                                 .isNotifyRelatedUserAfterAddedToOneSidedRelationshipGroupByOthers()) {
-                            return RequestResult.recipientData(
+                            return RequestResult.create(
                                     request.getUserId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
@@ -138,7 +138,7 @@ public class WsUserRelationshipController {
                                 targetGroupIndex)
                                 .map(deleted -> {
                                     if (!ids.isEmpty()) {
-                                        return RequestResult.recipientData(
+                                        return RequestResult.create(
                                                 ids, turmsRequestWrapper.getTurmsRequest());
                                     }
                                     return RequestResult.okIfTrue(deleted);
@@ -172,7 +172,7 @@ public class WsUserRelationshipController {
                 if (deleted != null && deleted
                         && turmsClusterManager.getTurmsProperties().getNotification()
                         .isNotifyMemberAfterRemovedFromRelationshipGroupByOthers()) {
-                    return RequestResult.recipientData(
+                    return RequestResult.create(
                             request.getRelatedUserId(),
                             turmsRequestWrapper.getTurmsRequest());
                 }
@@ -190,7 +190,7 @@ public class WsUserRelationshipController {
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
                     .map(friendRequestsWithVersion -> RequestResult
-                            .data(TurmsNotification.Data
+                            .create(TurmsNotification.Data
                                     .newBuilder()
                                     .setUserFriendRequestsWithVersion(friendRequestsWithVersion)
                                     .build()));
@@ -210,7 +210,7 @@ public class WsUserRelationshipController {
                     isBlocked,
                     lastUpdatedDate)
                     .map(idsWithVersion -> RequestResult
-                            .data(TurmsNotification.Data
+                            .create(TurmsNotification.Data
                                     .newBuilder()
                                     .setIdsWithVersion(idsWithVersion)
                                     .build()));
@@ -228,7 +228,7 @@ public class WsUserRelationshipController {
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
                     .map(groupsWithVersion -> RequestResult
-                            .data(TurmsNotification.Data
+                            .create(TurmsNotification.Data
                                     .newBuilder()
                                     .setUserRelationshipGroupsWithVersion(groupsWithVersion)
                                     .build()));
@@ -254,7 +254,7 @@ public class WsUserRelationshipController {
                     isBlocked,
                     lastUpdatedDate)
                     .map(relationshipsWithVersion -> RequestResult
-                            .data(TurmsNotification.Data
+                            .create(TurmsNotification.Data
                                     .newBuilder()
                                     .setUserRelationshipsWithVersion(relationshipsWithVersion)
                                     .build()));
@@ -276,7 +276,7 @@ public class WsUserRelationshipController {
                         if (handled != null && handled
                                 && turmsClusterManager.getTurmsProperties().getNotification()
                                 .isNotifyRequesterAfterFriendRequestUpdated()) {
-                            return RequestResult.recipientData(
+                            return RequestResult.create(
                                     request.getRequestId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
@@ -317,7 +317,7 @@ public class WsUserRelationshipController {
                         if (upserted != null && upserted
                                 && turmsClusterManager.getTurmsProperties().getNotification()
                                 .isNotifyRelatedUserAfterOneSidedRelationshipUpdatedByOthers()) {
-                            return RequestResult.recipientData(
+                            return RequestResult.create(
                                     request.getRelatedUserId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }

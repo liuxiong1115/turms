@@ -35,6 +35,7 @@ import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.ClientRequestHandler;
 import im.turms.turms.pojo.bo.RequestResult;
 import im.turms.turms.pojo.bo.TurmsRequestWrapper;
+import im.turms.turms.pojo.bo.UserSessionId;
 import im.turms.turms.pojo.domain.UserActionLog;
 import im.turms.turms.service.message.OutboundMessageService;
 import im.turms.turms.service.user.UserActionLogService;
@@ -141,28 +142,25 @@ public class InboundMessageDispatcher {
 
     private Mono<Boolean> notifyRelatedUsersOfAction(
             @NotNull RequestResult requestResult,
-            @Nullable Long requesterId) {
+            @NotNull Long requesterId,
+            @NotNull DeviceType requesterDevice) {
         TurmsRequest dataForRecipients = requestResult.getDataForRecipients();
         if (dataForRecipients != null && !requestResult.getRecipients().isEmpty()) {
-            TurmsNotification.Builder builder = TurmsNotification
+            byte[] data = TurmsNotification
                     .newBuilder()
-                    .setRelayedRequest(dataForRecipients);
-            if (requesterId != null) {
-                builder.setRequesterId(Int64Value.newBuilder().setValue(requesterId).build());
+                    .setRelayedRequest(dataForRecipients)
+                    .setRequesterId(Int64Value.newBuilder().setValue(requesterId).build())
+                    .build()
+                    .toByteArray();
+            UserSessionId senderSessionId = null;
+            if (requestResult.relayDataToOtherSenderOnlineDevices) {
+                senderSessionId = new UserSessionId(requesterId, requesterDevice);
             }
-            byte[] data = builder.build().toByteArray();
-            if (requestResult.getRecipients().size() == 1) {
-                Long recipientId = requestResult.getRecipients().iterator().next();
-                return outboundMessageService.relayClientMessageToClient(
-                        data,
-                        recipientId,
-                        true);
-            } else {
-                return outboundMessageService.relayClientMessageToClients(
-                        data,
-                        requestResult.getRecipients(),
-                        true);
-            }
+            return outboundMessageService.relayClientMessageToClients(
+                    data,
+                    requestResult.getRecipients(),
+                    senderSessionId,
+                    true);
         } else {
             return Mono.just(true);
         }
@@ -179,12 +177,13 @@ public class InboundMessageDispatcher {
             @NotNull WebSocketSession session,
             @NotNull Mono<RequestResult> result,
             @Nullable Long requestId,
-            @Nullable Long requesterId) {
+            @NotNull Long requesterId,
+            @NotNull DeviceType requesterDevice) {
         return result
                 .defaultIfEmpty(RequestResult.NO_CONTENT)
                 .onErrorResume(throwable -> {
                     if (throwable instanceof TurmsBusinessException) {
-                        return Mono.just(RequestResult.status(((TurmsBusinessException) throwable).getCode()));
+                        return Mono.just(RequestResult.create(((TurmsBusinessException) throwable).getCode()));
                     } else {
                         String message;
                         if (turmsClusterManager.getTurmsProperties().getSecurity().isRespondStackTraceIfException()) {
@@ -192,12 +191,12 @@ public class InboundMessageDispatcher {
                         } else {
                             message = throwable.getMessage();
                         }
-                        return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.FAILED, message));
+                        return Mono.just(RequestResult.create(TurmsStatusCode.FAILED, message));
                     }
                 })
                 .flatMap(requestResult -> {
                     if (requestResult.getCode() == TurmsStatusCode.OK) {
-                        return handleSuccessResult(requestResult, session, requestId, requesterId);
+                        return handleSuccessResult(requestResult, session, requestId, requesterId, requesterDevice);
                     } else {
                         return handleFailResult(requestResult, session, requestId);
                     }
@@ -260,7 +259,7 @@ public class InboundMessageDispatcher {
                         return requestResultMono.switchIfEmpty(handler.apply(requestWrapper));
                     });
                     Long requestId = request.hasRequestId() ? request.getRequestId().getValue() : null;
-                    return handleResult(session, result, requestId, userId);
+                    return handleResult(session, result, requestId, userId, deviceType);
                 } else {
                     onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, "No handler for the request"));
                 }
@@ -290,8 +289,8 @@ public class InboundMessageDispatcher {
                 .setRequestId(Int64Value.newBuilder().setValue(requestId).build());
     }
 
-    private Mono<WebSocketMessage> handleSuccessResult(RequestResult requestResult, WebSocketSession session, Long requestId, Long requesterId) {
-        return notifyRelatedUsersOfAction(requestResult, requesterId)
+    private Mono<WebSocketMessage> handleSuccessResult(RequestResult requestResult, WebSocketSession session, Long requestId, Long requesterId, DeviceType requesterDevice) {
+        return notifyRelatedUsersOfAction(requestResult, requesterId, requesterDevice)
                 .flatMap(success -> {
                     if (requestId != null) {
                         TurmsNotification notification = generateNotificationBuilder(requestResult, requestResult.getCode(), requestId)

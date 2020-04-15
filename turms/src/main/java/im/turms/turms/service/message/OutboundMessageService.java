@@ -19,10 +19,12 @@ package im.turms.turms.service.message;
 
 import com.google.common.collect.Multimap;
 import com.hazelcast.cluster.Member;
+import im.turms.common.constant.DeviceType;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.RelayedTurmsNotificationHandler;
+import im.turms.turms.pojo.bo.UserSessionId;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.onlineuser.IrresponsibleUserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
@@ -36,6 +38,7 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -61,11 +64,12 @@ public class OutboundMessageService {
     public Mono<Boolean> relayClientMessageToClients(
             @NotNull byte[] messageData,
             @NotNull Set<Long> recipientIds,
-            boolean isRelayable) {
+            @Nullable UserSessionId senderSessionId,
+            boolean relayToRemoteMemberIfNotInLocal) {
         if (recipientIds.isEmpty()) {
             return Mono.just(true);
         } else if (recipientIds.size() == 1) {
-            return relayClientMessageToClient(messageData, recipientIds.iterator().next(), isRelayable);
+            return relayClientMessageToClient(messageData, recipientIds.iterator().next(), senderSessionId, relayToRemoteMemberIfNotInLocal);
         } else {
             Multimap<Member, Long> userIdsByMember = irresponsibleUserService.getMembersIfExists(recipientIds);
             for (Long recipientId : recipientIds) {
@@ -78,7 +82,7 @@ public class OutboundMessageService {
             UUID localUuid = turmsClusterManager.getLocalMember().getUuid();
             for (Member member : userIdsByMember.keySet()) {
                 if (member.getUuid() == localUuid) {
-                    monoList.add(Mono.just(relayClientMessageToLocalClients(messageData, recipientIds)));
+                    monoList.add(Mono.just(relayClientMessageToLocalClients(messageData, recipientIds, senderSessionId)));
                 } else {
                     monoList.add(relayClientMessageByRemoteMember(messageData, recipientIds, member));
                 }
@@ -87,22 +91,23 @@ public class OutboundMessageService {
         }
     }
 
-    public Mono<Boolean> relayClientMessageToClient(
+    private Mono<Boolean> relayClientMessageToClient(
             @NotNull byte[] messageData,
             @NotNull Long recipientId,
-            boolean isRelayable) {
+            @Nullable UserSessionId senderSessionId,
+            boolean relayToRemoteMemberIfNotInLocal) {
         boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(recipientId);
         if (responsible) {
-            return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId)));
+            return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId), senderSessionId));
         } else {
             UUID memberId = irresponsibleUserService.getMemberIdIfExists(recipientId);
             if (memberId != null) {
                 if (memberId == turmsClusterManager.getLocalMember().getUuid()) {
-                    return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId)));
-                } else if (isRelayable) {
+                    return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId), senderSessionId));
+                } else if (relayToRemoteMemberIfNotInLocal) {
                     return relayClientMessageByRemoteMemberId(messageData, recipientId, memberId);
                 }
-            } else if (isRelayable) {
+            } else if (relayToRemoteMemberIfNotInLocal) {
                 return relayClientMessageByRecipientId(messageData, recipientId);
             }
         }
@@ -110,11 +115,16 @@ public class OutboundMessageService {
     }
 
     /**
-     * Note that all operations will go here finally
+     * @param senderSessionId If not null, the messageData will also be relayed to the sender's devices except the device specified
+     *                        in the UserSessionId.
+     *                        This is not graceful implementation but most friendly to performance
+     *                        so that the messageData doesn't be wrapped as a WebSocketMessage again
+     *                        for the case when both local recipients and sender's devices need the same data
      */
     public boolean relayClientMessageToLocalClients(
             @NotNull byte[] messageData,
-            @NotEmpty Set<Long> recipientIds) {
+            @NotEmpty Set<Long> recipientIds,
+            @Nullable UserSessionId senderSessionId) {
         boolean isSuccess = true;
         WebSocketMessage message = null;
         boolean shouldTriggerHandlers = !turmsPluginManager.getNotificationHandlerList().isEmpty() && turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
@@ -143,6 +153,24 @@ public class OutboundMessageService {
                 isSuccess = false;
                 if (shouldTriggerHandlers) {
                     offlineRecipientIds.add(recipientId);
+                }
+            }
+        }
+        if (senderSessionId != null) {
+            OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(senderSessionId.getUserId());
+            if (onlineUserManager != null) {
+                Set<DeviceType> onlineDeviceTypes = onlineUserManager.getUsingDeviceTypes();
+                if (onlineDeviceTypes.size() > 1) {
+                    for (DeviceType onlineDeviceType : onlineDeviceTypes) {
+                        if (onlineDeviceType != senderSessionId.getDeviceType()) {
+                            OnlineUserManager.Session userSession = onlineUserManager.getSession(onlineDeviceType);
+                            if (message == null) {
+                                message = userSession.getWebSocketSession().binaryMessage(factory -> factory.wrap(messageData));
+                            }
+                            message.retain();
+                            userSession.getNotificationSink().next(message);
+                        }
+                    }
                 }
             }
         }

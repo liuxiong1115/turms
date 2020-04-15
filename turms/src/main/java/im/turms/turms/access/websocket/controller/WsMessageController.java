@@ -84,7 +84,7 @@ public class WsMessageController {
             }
             long targetId = chatType == ChatType.GROUP ? request.getGroupId().getValue() : request.getRecipientId().getValue();
             if (request.hasMessageId()) {
-                messageAndRelatedUserIdsMono = messageService.authAndCloneAndSendMessage(
+                messageAndRelatedUserIdsMono = messageService.authAndCloneAndSaveMessage(
                         turmsRequestWrapper.getUserId(),
                         request.getMessageId().getValue(),
                         chatType,
@@ -100,7 +100,7 @@ public class WsMessageController {
                 }
                 Integer burnAfter = request.hasBurnAfter() ? request.getBurnAfter().getValue() : null;
                 Date deliveryDate = new Date(request.getDeliveryDate());
-                messageAndRelatedUserIdsMono = messageService.authAndSendMessage(
+                messageAndRelatedUserIdsMono = messageService.authAndSaveMessage(
                         null,
                         turmsRequestWrapper.getUserId(),
                         targetId,
@@ -135,12 +135,13 @@ public class WsMessageController {
                                     .setCreateMessageRequest(requestBuilder)
                                     .build();
                         }
-                        return RequestResult.idAndRecipientData(
+                        return RequestResult.create(
                                 messageId,
                                 recipientsIds,
+                                turmsClusterManager.getTurmsProperties().getMessage().isSendMessageToOtherSenderOnlineDevices(),
                                 turmsRequest);
                     } else {
-                        return RequestResult.id(messageId);
+                        return RequestResult.create(messageId);
                     }
                 } else if (recipientsIds != null && !recipientsIds.isEmpty()) {
                     TurmsRequest turmsRequest = turmsRequestWrapper.getTurmsRequest();
@@ -149,11 +150,11 @@ public class WsMessageController {
                                 .setCreateMessageRequest(request.toBuilder().setDeliveryDate(System.currentTimeMillis()))
                                 .build();
                     }
-                    return RequestResult.recipientData(
+                    return RequestResult.create(
                             recipientsIds,
                             turmsRequest);
                 } else {
-                    return RequestResult.status(TurmsStatusCode.OK);
+                    return RequestResult.create(TurmsStatusCode.OK);
                 }
             });
         };
@@ -171,7 +172,7 @@ public class WsMessageController {
                                 .newBuilder()
                                 .setMessageStatuses(builder)
                                 .build();
-                        return RequestResult.data(data);
+                        return RequestResult.create(data);
                     });
         };
     }
@@ -222,7 +223,7 @@ public class WsMessageController {
                                         }
                                         listBuilder.addMessagesWithTotalList(messagesWithTotalBuilder);
                                     }
-                                    return RequestResult.data(TurmsNotification.Data.newBuilder()
+                                    return RequestResult.create(TurmsNotification.Data.newBuilder()
                                             .setMessagesWithTotalList(listBuilder).build());
                                 });
                     });
@@ -277,7 +278,7 @@ public class WsMessageController {
                         for (Message message : messages) {
                             messagesIds.add(message.getId());
                         }
-                        return Mono.just(RequestResult.data(data))
+                        return Mono.just(RequestResult.create(data))
                                 .flatMap(response -> messageStatusService.acknowledge(messagesIds)
                                         .thenReturn(response));
                     });
@@ -304,7 +305,7 @@ public class WsMessageController {
                                 if (turmsClusterManager.getTurmsProperties().getMessage().getReadReceipt().isEnabled()) {
                                     return messageService.queryMessageSenderId(messageId)
                                             .flatMap(senderId -> {
-                                                RequestResult result = RequestResult.recipientData(
+                                                RequestResult result = RequestResult.create(
                                                         senderId,
                                                         turmsRequestWrapper.getTurmsRequest(),
                                                         TurmsStatusCode.OK);
@@ -338,7 +339,7 @@ public class WsMessageController {
                     null)
                     .flatMap(success -> messageService.queryMessageRecipients(messageId)
                             .collect(Collectors.toSet())
-                            .map(recipientsIds -> RequestResult.recipientData(
+                            .map(recipientsIds -> RequestResult.create(
                                     recipientsIds,
                                     turmsRequestWrapper.getTurmsRequest())));
         };
@@ -353,12 +354,12 @@ public class WsMessageController {
             if (turmsClusterManager.getTurmsProperties().getMessage().getTypingStatus().isEnabled()) {
                 UpdateTypingStatusRequest request = turmsRequestWrapper.getTurmsRequest()
                         .getUpdateTypingStatusRequest();
-                return Mono.just(RequestResult.recipientData(
+                return Mono.just(RequestResult.create(
                         request.getToId(),
                         turmsRequestWrapper.getTurmsRequest(),
                         TurmsStatusCode.OK));
             } else {
-                return Mono.just(RequestResult.status(TurmsStatusCode.DISABLED_FUNCTION));
+                return Mono.just(RequestResult.create(TurmsStatusCode.DISABLED_FUNCTION));
             }
         };
     }

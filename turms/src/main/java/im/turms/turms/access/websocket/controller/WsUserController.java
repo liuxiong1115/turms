@@ -82,7 +82,7 @@ public class WsUserController {
             return groupInvitationService.queryUserGroupInvitationsWithVersion(
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
-                    .map(groupInvitationsWithVersion -> RequestResult.data(TurmsNotification.Data
+                    .map(groupInvitationsWithVersion -> RequestResult.create(TurmsNotification.Data
                             .newBuilder()
                             .setGroupInvitationsWithVersion(groupInvitationsWithVersion)
                             .build()));
@@ -101,7 +101,7 @@ public class WsUserController {
                         UsersInfosWithVersion.Builder userBuilder = UsersInfosWithVersion
                                 .newBuilder()
                                 .addUserInfos(ProtoUtil.userProfile2proto(user).build());
-                        return RequestResult.data(TurmsNotification.Data
+                        return RequestResult.create(TurmsNotification.Data
                                 .newBuilder()
                                 .setUsersInfosWithVersion(userBuilder)
                                 .build());
@@ -137,7 +137,7 @@ public class WsUserController {
                                         .build();
                                 builder.addUserSessionIds(sessionId);
                             }
-                            return RequestResult.data(TurmsNotification.Data
+                            return RequestResult.create(TurmsNotification.Data
                                     .newBuilder()
                                     .setUserSessionIds(builder.build())
                                     .build());
@@ -149,7 +149,7 @@ public class WsUserController {
                         maxNumber,
                         distance)
                         .collectList()
-                        .map(ids -> RequestResult.data(TurmsNotification.Data
+                        .map(ids -> RequestResult.create(TurmsNotification.Data
                                 .newBuilder()
                                 .setIds(Int64Values.newBuilder().addAllValues(ids))
                                 .build()));
@@ -177,14 +177,14 @@ public class WsUserController {
                     .collectList()
                     .map(users -> {
                         if (users.isEmpty()) {
-                            return RequestResult.status(TurmsStatusCode.NO_CONTENT);
+                            return RequestResult.create(TurmsStatusCode.NO_CONTENT);
                         }
                         UsersInfosWithVersion.Builder builder = UsersInfosWithVersion.newBuilder();
                         for (User user : users) {
                             builder.addUserInfos(ProtoUtil.userProfile2proto(user));
                         }
                         return RequestResult
-                                .data(TurmsNotification.Data
+                                .create(TurmsNotification.Data
                                         .newBuilder()
                                         .setUsersInfosWithVersion(builder)
                                         .build());
@@ -216,7 +216,7 @@ public class WsUserController {
                                             turmsClusterManager.getTurmsProperties().getUser().isRespondOfflineIfInvisible())
                                     .build());
                         }
-                        return RequestResult.data(TurmsNotification.Data.newBuilder()
+                        return RequestResult.create(TurmsNotification.Data.newBuilder()
                                 .setUsersOnlineStatuses(statusesBuilder)
                                 .build());
                     });
@@ -251,7 +251,7 @@ public class WsUserController {
             UpdateUserOnlineStatusRequest request = turmsRequestWrapper.getTurmsRequest().getUpdateUserOnlineStatusRequest();
             UserStatus userStatus = request.getUserStatus();
             if (userStatus == UserStatus.UNRECOGNIZED) {
-                return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The user status must not be UNRECOGNIZED"));
+                return Mono.just(RequestResult.create(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The user status must not be UNRECOGNIZED"));
             }
             Set<DeviceType> deviceTypes = request.getDeviceTypesCount() > 0 ? Sets.newHashSet(request.getDeviceTypesList()) : null;
             boolean updated;
@@ -291,7 +291,7 @@ public class WsUserController {
                             if (results.getT1().isEmpty()) {
                                 return RequestResult.ok();
                             } else {
-                                return RequestResult.recipientData(
+                                return RequestResult.create(
                                         results.getT1(),
                                         turmsRequestWrapper.getTurmsRequest());
                             }
@@ -326,7 +326,7 @@ public class WsUserController {
                                         if (relatedUsersIds.isEmpty()) {
                                             return RequestResult.ok();
                                         } else {
-                                            return RequestResult.recipientData(
+                                            return RequestResult.create(
                                                     relatedUsersIds,
                                                     turmsRequestWrapper.getTurmsRequest());
                                         }

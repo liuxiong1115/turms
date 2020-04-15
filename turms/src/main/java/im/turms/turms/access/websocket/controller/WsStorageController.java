@@ -52,7 +52,7 @@ public class WsStorageController {
                 String keyStr = querySignedGetUrlRequest.hasKeyStr() ? querySignedGetUrlRequest.getKeyStr().getValue() : null;
                 Long keyNum = querySignedGetUrlRequest.hasKeyNum() ? querySignedGetUrlRequest.getKeyNum().getValue() : null;
                 return storageService.queryPresignedGetUrl(turmsRequestWrapper.getUserId(), contentType, keyStr, keyNum)
-                        .map(url -> RequestResult.data(TurmsNotification.Data.newBuilder()
+                        .map(url -> RequestResult.create(TurmsNotification.Data.newBuilder()
                                 .setUrl(StringValue.newBuilder().setValue(url).build())
                                 .build()));
             } else {
@@ -71,7 +71,7 @@ public class WsStorageController {
                 String keyStr = querySignedPutUrlRequest.hasKeyStr() ? querySignedPutUrlRequest.getKeyStr().getValue() : null;
                 Long keyNum = querySignedPutUrlRequest.hasKeyNum() ? querySignedPutUrlRequest.getKeyNum().getValue() : null;
                 return storageService.queryPresignedPutUrl(turmsRequestWrapper.getUserId(), contentType, keyStr, keyNum, contentLength)
-                        .map(url -> RequestResult.data(TurmsNotification.Data.newBuilder()
+                        .map(url -> RequestResult.create(TurmsNotification.Data.newBuilder()
                                 .setUrl(StringValue.newBuilder().setValue(url).build())
                                 .build()));
             } else {

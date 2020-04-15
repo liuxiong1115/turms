@@ -36,43 +36,46 @@ import java.util.Set;
 public final class RequestResult {
     public static final RequestResult NO_CONTENT = new RequestResult(
             null,
+            false,
             null,
             null,
             TurmsStatusCode.NO_CONTENT,
             null);
 
     private final TurmsNotification.Data dataForRequester;
+    public final boolean relayDataToOtherSenderOnlineDevices;
     private final Set<Long> recipients;
     private final TurmsRequest dataForRecipients;
     private final TurmsStatusCode code;
     private final String reason;
 
     public static RequestResult fail() {
-        return status(TurmsStatusCode.FAILED);
+        return create(TurmsStatusCode.FAILED);
     }
 
-    public static RequestResult status(@NotNull TurmsStatusCode code) {
-        return new RequestResult(null, Collections.emptySet(), null, code, null);
+    public static RequestResult create(@NotNull TurmsStatusCode code) {
+        return new RequestResult(null, false, Collections.emptySet(), null, code, null);
     }
 
-    public static RequestResult statusAndReason(@NotNull TurmsStatusCode code, @NotNull String reason) {
-        return new RequestResult(null, Collections.emptySet(), null, code, reason);
+    public static RequestResult create(@NotNull TurmsStatusCode code, @NotNull String reason) {
+        return new RequestResult(null, false, Collections.emptySet(), null, code, reason);
     }
 
-    public static RequestResult id(@NotNull Long id) {
+    public static RequestResult create(@NotNull Long id) {
         TurmsNotification.Data data = TurmsNotification.Data
                 .newBuilder()
                 .setIds(Int64Values.newBuilder().addValues(id).build())
                 .build();
         return new RequestResult(
                 data,
+                false,
                 Collections.emptySet(),
                 null,
                 TurmsStatusCode.OK,
                 null);
     }
 
-    public static RequestResult idAndRecipientData(
+    public static RequestResult create(
             @NotNull Long id,
             @NotNull Long recipientId,
             @NotNull TurmsRequest dataForRecipient) {
@@ -80,50 +83,48 @@ public final class RequestResult {
                 .newBuilder()
                 .setIds(Int64Values.newBuilder().addValues(id).build())
                 .build();
-        return new RequestResult(data, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK, null);
+        return new RequestResult(data, false, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK, null);
     }
 
-    public static RequestResult idAndRecipientData(
+    public static RequestResult create(
             @NotNull Long id,
-            @Nullable Set<Long> recipients,
+            @NotEmpty Set<Long> recipients,
+            boolean relayDataToOtherSenderOnlineDevices,
             TurmsRequest dataForRecipients) {
-        if (recipients == null || recipients.isEmpty()) {
-            return id(id);
-        } else {
-            TurmsNotification.Data data = TurmsNotification.Data
-                    .newBuilder()
-                    .setIds(Int64Values.newBuilder().addValues(id).build())
-                    .build();
-            return new RequestResult(
-                    data,
-                    recipients,
-                    dataForRecipients,
-                    TurmsStatusCode.OK,
-                    null);
-        }
+        TurmsNotification.Data data = TurmsNotification.Data
+                .newBuilder()
+                .setIds(Int64Values.newBuilder().addValues(id).build())
+                .build();
+        return new RequestResult(
+                data,
+                relayDataToOtherSenderOnlineDevices,
+                recipients,
+                dataForRecipients,
+                TurmsStatusCode.OK,
+                null);
     }
 
-    public static RequestResult data(@NotNull TurmsNotification.Data data) {
-        return new RequestResult(data, Collections.emptySet(), null, TurmsStatusCode.OK, null);
+    public static RequestResult create(@NotNull TurmsNotification.Data data) {
+        return new RequestResult(data, false, Collections.emptySet(), null, TurmsStatusCode.OK, null);
     }
 
-    public static RequestResult recipientData(
+    public static RequestResult create(
             @NotNull Long recipientId,
             @NotNull TurmsRequest dataForRecipient) {
-        return new RequestResult(null, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK, null);
+        return new RequestResult(null, false, Collections.singleton(recipientId), dataForRecipient, TurmsStatusCode.OK, null);
     }
 
-    public static RequestResult recipientData(
+    public static RequestResult create(
             @NotEmpty Set<Long> recipientsIds,
             @NotNull TurmsRequest dataForRecipient) {
-        return new RequestResult(null, recipientsIds, dataForRecipient, TurmsStatusCode.OK, null);
+        return new RequestResult(null, false, recipientsIds, dataForRecipient, TurmsStatusCode.OK, null);
     }
 
-    public static RequestResult recipientData(
+    public static RequestResult create(
             @NotNull Long recipientId,
             @NotNull TurmsRequest dataForRecipient,
             @NotNull TurmsStatusCode code) {
-        return new RequestResult(null, Collections.singleton(recipientId), dataForRecipient, code, null);
+        return new RequestResult(null, false, Collections.singleton(recipientId), dataForRecipient, code, null);
     }
 
     public static RequestResult okIfTrue(@Nullable Boolean acknowledged) {
@@ -131,6 +132,6 @@ public final class RequestResult {
     }
 
     public static RequestResult ok() {
-        return status(TurmsStatusCode.OK);
+        return create(TurmsStatusCode.OK);
     }
 }

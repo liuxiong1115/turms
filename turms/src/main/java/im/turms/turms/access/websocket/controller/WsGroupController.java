@@ -89,7 +89,7 @@ public class WsGroupController {
                     null,
                     null,
                     turmsClusterManager.getTurmsProperties().getGroup().isActivateGroupWhenCreated())
-                    .map(group -> RequestResult.id(group.getId()));
+                    .map(group -> RequestResult.create(group.getId()));
         };
     }
 
@@ -101,7 +101,7 @@ public class WsGroupController {
                     .isOwner(turmsRequestWrapper.getUserId(), request.getGroupId())
                     .flatMap(authenticated -> {
                         if (authenticated == null || !authenticated) {
-                            return Mono.just(RequestResult.status(TurmsStatusCode.UNAUTHORIZED));
+                            return Mono.just(RequestResult.create(TurmsStatusCode.UNAUTHORIZED));
                         }
                         if (!turmsClusterManager.getTurmsProperties().getNotification().isNotifyMembersAfterGroupDeleted()) {
                             return groupService.deleteGroupsAndGroupMembers(
@@ -117,7 +117,7 @@ public class WsGroupController {
                                                 if (membersIds.isEmpty()) {
                                                     return RequestResult.ok();
                                                 } else {
-                                                    return RequestResult.recipientData(
+                                                    return RequestResult.create(
                                                             membersIds,
                                                             turmsRequestWrapper.getTurmsRequest());
                                                 }
@@ -136,7 +136,7 @@ public class WsGroupController {
             Date lastUpdatedDate = request.hasLastUpdatedDate() ?
                     new Date(request.getLastUpdatedDate().getValue()) : null;
             return groupService.queryGroupWithVersion(request.getGroupId(), lastUpdatedDate)
-                    .map(groupsWithVersion -> RequestResult.data(TurmsNotification.Data.newBuilder()
+                    .map(groupsWithVersion -> RequestResult.create(TurmsNotification.Data.newBuilder()
                             .setGroupsWithVersion(groupsWithVersion)
                             .build()));
         };
@@ -151,7 +151,7 @@ public class WsGroupController {
             return groupService.queryJoinedGroupsIdsWithVersion(
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
-                    .map(idsWithVersion -> RequestResult.data(TurmsNotification.Data
+                    .map(idsWithVersion -> RequestResult.create(TurmsNotification.Data
                             .newBuilder()
                             .setIdsWithVersion(idsWithVersion)
                             .build()));
@@ -167,7 +167,7 @@ public class WsGroupController {
             return groupService.queryJoinedGroupsWithVersion(
                     turmsRequestWrapper.getUserId(),
                     lastUpdatedDate)
-                    .map(groupsWithVersion -> RequestResult.data(TurmsNotification.Data
+                    .map(groupsWithVersion -> RequestResult.create(TurmsNotification.Data
                             .newBuilder()
                             .setGroupsWithVersion(groupsWithVersion)
                             .build()));
@@ -207,7 +207,7 @@ public class WsGroupController {
                             if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyMembersAfterGroupUpdated()) {
                                 return groupMemberService.queryGroupMembersIds(request.getGroupId())
                                         .collect(Collectors.toSet())
-                                        .map(membersIds -> RequestResult.recipientData(
+                                        .map(membersIds -> RequestResult.create(
                                                 membersIds,
                                                 turmsRequestWrapper.getTurmsRequest()));
                             } else {
@@ -233,7 +233,7 @@ public class WsGroupController {
                     .map(success -> {
                         if (success != null && success
                                 && turmsClusterManager.getTurmsProperties().getNotification().isNotifyUserAfterBlacklistedByGroup()) {
-                            return RequestResult.recipientData(
+                            return RequestResult.create(
                                     request.getBlacklistedUserId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
@@ -256,7 +256,7 @@ public class WsGroupController {
                     .map(success -> {
                         if (success != null && success
                                 && turmsClusterManager.getTurmsProperties().getNotification().isNotifyUserAfterUnblacklistedByGroup()) {
-                            return RequestResult.recipientData(
+                            return RequestResult.create(
                                     request.getUnblacklistedUserId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
@@ -275,7 +275,7 @@ public class WsGroupController {
             return groupBlacklistService.queryGroupBlacklistedUsersIdsWithVersion(
                     request.getGroupId(),
                     lastUpdatedDate)
-                    .map(version -> RequestResult.data(TurmsNotification.Data
+                    .map(version -> RequestResult.create(TurmsNotification.Data
                             .newBuilder()
                             .setIdsWithVersion(version)
                             .build()));
@@ -291,7 +291,7 @@ public class WsGroupController {
             return groupBlacklistService.queryGroupBlacklistedUsersInfosWithVersion(
                     request.getGroupId(),
                     lastUpdatedDate)
-                    .map(version -> RequestResult.data(TurmsNotification.Data
+                    .map(version -> RequestResult.create(TurmsNotification.Data
                             .newBuilder()
                             .setUsersInfosWithVersion(version)
                             .build()));
@@ -308,7 +308,7 @@ public class WsGroupController {
                 set.add(new GroupQuestionIdAndAnswer(entry.getKey(), entry.getValue()));
             }
             return groupQuestionService.checkGroupQuestionAnswerAndJoin(turmsRequestWrapper.getUserId(), set)
-                    .map(answerResult -> RequestResult.data(TurmsNotification.Data.newBuilder()
+                    .map(answerResult -> RequestResult.create(TurmsNotification.Data.newBuilder()
                             .setGroupJoinQuestionAnswerResult(answerResult).build()));
         };
     }
@@ -325,7 +325,7 @@ public class WsGroupController {
                     request.getContent())
                     .map(invitation -> {
                         if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyUserAfterInvitedByGroup()) {
-                            return RequestResult.idAndRecipientData(
+                            return RequestResult.create(
                                     invitation.getId(),
                                     request.getInviteeId(),
                                     turmsRequestWrapper.getTurmsRequest());
@@ -352,9 +352,10 @@ public class WsGroupController {
                                         if (recipientsIds.isEmpty()) {
                                             return RequestResult.ok();
                                         } else {
-                                            return RequestResult.idAndRecipientData(
+                                            return RequestResult.create(
                                                     joinRequest.getId(),
                                                     recipientsIds,
+                                                    false,
                                                     turmsRequestWrapper.getTurmsRequest());
                                         }
                                     });
@@ -381,9 +382,9 @@ public class WsGroupController {
                             request.getQuestion(),
                             answers,
                             score)
-                            .map(question -> RequestResult.id(question.getId()));
+                            .map(question -> RequestResult.create(question.getId()));
                 } else {
-                    return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The score must be greater than or equal to 0"));
+                    return Mono.just(RequestResult.create(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The score must be greater than or equal to 0"));
                 }
             }
         };
@@ -400,7 +401,7 @@ public class WsGroupController {
                             .map(recalled -> {
                                 if (recalled != null && recalled
                                         && turmsClusterManager.getTurmsProperties().getNotification().isNotifyInviteeAfterGroupInvitationRecalled()) {
-                                    return RequestResult.recipientData(
+                                    return RequestResult.create(
                                             inviteeId,
                                             turmsRequestWrapper.getTurmsRequest());
                                 }
@@ -428,7 +429,7 @@ public class WsGroupController {
                                                 if (ids.isEmpty()) {
                                                     return RequestResult.ok();
                                                 } else {
-                                                    return RequestResult.recipientData(
+                                                    return RequestResult.create(
                                                             ids,
                                                             turmsRequestWrapper.getTurmsRequest());
                                                 }
@@ -464,7 +465,7 @@ public class WsGroupController {
                     turmsRequestWrapper.getUserId(),
                     groupId,
                     lastUpdatedDate)
-                    .map(groupInvitationsWithVersion -> RequestResult.data(
+                    .map(groupInvitationsWithVersion -> RequestResult.create(
                             TurmsNotification.Data.newBuilder()
                                     .setGroupInvitationsWithVersion(groupInvitationsWithVersion)
                                     .build()));
@@ -482,7 +483,7 @@ public class WsGroupController {
                     turmsRequestWrapper.getUserId(),
                     request.getGroupId(),
                     lastUpdatedDate)
-                    .map(groupJoinRequestsWithVersion -> RequestResult.data(TurmsNotification.Data.newBuilder()
+                    .map(groupJoinRequestsWithVersion -> RequestResult.create(TurmsNotification.Data.newBuilder()
                             .setGroupJoinRequestsWithVersion(groupJoinRequestsWithVersion)
                             .build()));
         };
@@ -499,7 +500,7 @@ public class WsGroupController {
                     request.getGroupId(),
                     request.getWithAnswers(),
                     lastUpdatedDate)
-                    .map(groupJoinQuestionsWithVersion -> RequestResult.data(TurmsNotification.Data.newBuilder()
+                    .map(groupJoinQuestionsWithVersion -> RequestResult.create(TurmsNotification.Data.newBuilder()
                             .setGroupJoinQuestionsWithVersion(groupJoinQuestionsWithVersion)
                             .build()));
         };
@@ -534,7 +535,7 @@ public class WsGroupController {
             if (role == null || role == GroupMemberRole.UNRECOGNIZED) {
                 role = GroupMemberRole.MEMBER;
             } else if (role == GroupMemberRole.OWNER) {
-                return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The role of the new member must not be OWNER"));
+                return Mono.just(RequestResult.create(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The role of the new member must not be OWNER"));
             }
             return groupMemberService.authAndAddGroupMember(
                     turmsRequestWrapper.getUserId(),
@@ -546,7 +547,7 @@ public class WsGroupController {
                     null)
                     .map(member -> {
                         if (member != null && turmsClusterManager.getTurmsProperties().getNotification().isNotifyUserAfterAddedToGroupByOthers()) {
-                            return RequestResult.recipientData(
+                            return RequestResult.create(
                                     request.getUserId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
@@ -571,7 +572,7 @@ public class WsGroupController {
                         if (deleted != null && deleted
                                 && turmsClusterManager.getTurmsProperties().getNotification().isNotifyUserAfterRemovedFromGroupByOthers()
                                 && !turmsRequestWrapper.getUserId().equals(request.getGroupMemberId())) {
-                            return RequestResult.recipientData(
+                            return RequestResult.create(
                                     request.getGroupMemberId(),
                                     turmsRequestWrapper.getTurmsRequest());
                         }
@@ -594,7 +595,7 @@ public class WsGroupController {
                         request.getGroupId(),
                         membersIds,
                         withStatus)
-                        .map(groupMembersWithVersion -> RequestResult.data(
+                        .map(groupMembersWithVersion -> RequestResult.create(
                                 TurmsNotification.Data.newBuilder()
                                         .setGroupMembersWithVersion(groupMembersWithVersion)
                                         .build()));
@@ -604,7 +605,7 @@ public class WsGroupController {
                         request.getGroupId(),
                         lastUpdatedDate,
                         withStatus)
-                        .map(groupMembersWithVersion -> RequestResult.data(
+                        .map(groupMembersWithVersion -> RequestResult.create(
                                 TurmsNotification.Data.newBuilder()
                                         .setGroupMembersWithVersion(groupMembersWithVersion)
                                         .build()));
@@ -632,12 +633,12 @@ public class WsGroupController {
                                     .isNotifyMembersAfterOtherMemberInfoUpdated()) {
                                 return groupMemberService.queryGroupMembersIds(request.getGroupId())
                                         .collect(Collectors.toSet())
-                                        .map(groupMembersIds -> RequestResult.recipientData(
+                                        .map(groupMembersIds -> RequestResult.create(
                                                 groupMembersIds,
                                                 turmsRequestWrapper.getTurmsRequest()));
                             } else if (!turmsRequestWrapper.getUserId().equals(request.getMemberId())
                                     && turmsClusterManager.getTurmsProperties().getNotification().isNotifyMemberAfterInfoUpdatedByOthers()) {
-                                return Mono.just(RequestResult.recipientData(
+                                return Mono.just(RequestResult.create(
                                         turmsRequestWrapper.getUserId(),
                                         turmsRequestWrapper.getTurmsRequest()));
                             }

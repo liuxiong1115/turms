@@ -44,7 +44,7 @@ public class DeliveryTurmsNotificationTask implements Callable<Boolean>, Seriali
 
     @Override
     public Boolean call() {
-        return outboundMessageService.relayClientMessageToLocalClients(notificationBytes, recipientIds);
+        return outboundMessageService.relayClientMessageToLocalClients(notificationBytes, recipientIds, null);
     }
 
     @Override

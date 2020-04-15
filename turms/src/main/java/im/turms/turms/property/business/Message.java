@@ -116,6 +116,10 @@ public class Message implements IdentifiedDataSerializable {
     @Description("Whether to update the read date when users querying messages")
     private boolean updateReadDateWhenUserQueryingMessage = true;
 
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to send the message to the other sender's online devices when sending a message")
+    private boolean sendMessageToOtherSenderOnlineDevices = true;
+
     @Valid
     @NestedConfigurationProperty
     private ReadReceipt readReceipt = new ReadReceipt();
@@ -156,6 +160,7 @@ public class Message implements IdentifiedDataSerializable {
         typingStatus.writeData(out);
         out.writeInt(defaultAvailableMessagesNumberWithTotal);
         out.writeBoolean(updateReadDateWhenUserQueryingMessage);
+        out.writeBoolean(sendMessageToOtherSenderOnlineDevices);
     }
 
     @Override
@@ -178,6 +183,7 @@ public class Message implements IdentifiedDataSerializable {
         typingStatus.readData(in);
         defaultAvailableMessagesNumberWithTotal = in.readInt();
         updateReadDateWhenUserQueryingMessage = in.readBoolean();
+        sendMessageToOtherSenderOnlineDevices = in.readBoolean();
     }
 
     public enum TimeType {

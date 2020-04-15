@@ -57,7 +57,7 @@ public class WsSignalController {
             AckRequest ackRequest = turmsRequestWrapper.getTurmsRequest().getAckRequest();
             List<Long> messagesIds = ackRequest.getMessagesIdsList();
             if (messagesIds.isEmpty()) {
-                return Mono.just(RequestResult.statusAndReason(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The list of message ID must not be empty"));
+                return Mono.just(RequestResult.create(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The list of message ID must not be empty"));
             } else {
                 Set<Long> ids = new HashSet<>(messagesIds);
                 if (turmsClusterManager.getTurmsProperties().getMessage().isDeletePrivateMessageAfterAcknowledged()) {
