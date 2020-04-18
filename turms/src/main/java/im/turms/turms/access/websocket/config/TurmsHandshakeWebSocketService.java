@@ -104,9 +104,10 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                         if (!userSimultaneousLoginService.isDeviceTypeAllowedToLogin(userId, deviceType)) {
                             return tryCacheReasonAndReturnError(exchange, HttpStatus.CONFLICT, deviceType, userId, requestId);
                         } else {
-                            String password = SessionUtil.getPasswordFromRequest(request);
-                            Mono<Boolean> authenticate = Mono.empty();
-                            if (pluginEnabled) {
+                            boolean enableAuthentication = turmsClusterManager.getTurmsProperties().getSession().isEnableAuthentication();
+                            String password = enableAuthentication ? SessionUtil.getPasswordFromRequest(request) : null;
+                            Mono<Boolean> authenticate = enableAuthentication ? Mono.empty() : Mono.just(true);
+                            if (enableAuthentication && pluginEnabled) {
                                 List<UserAuthenticator> authenticatorList = turmsPluginManager.getUserAuthenticatorList();
                                 if (!authenticatorList.isEmpty()) {
                                     UserLoginInfo userLoginInfo = new UserLoginInfo(
@@ -126,14 +127,10 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                                             return userSimultaneousLoginService.setConflictedDevicesOffline(userId, deviceType)
                                                     .flatMap(success -> {
                                                         if (success) {
-                                                            if (password != null && !password.isBlank()) {
-                                                                if (redirectMember != null) {
-                                                                    irresponsibleUserService.put(userId, turmsClusterManager.getLocalMember().getUuid());
-                                                                }
-                                                                return super.handleRequest(exchange, handler);
-                                                            } else {
-                                                                return tryCacheReasonAndReturnError(exchange, HttpStatus.UNAUTHORIZED, deviceType, userId, requestId);
+                                                            if (redirectMember != null) {
+                                                                irresponsibleUserService.put(userId, turmsClusterManager.getLocalMember().getUuid());
                                                             }
+                                                            return super.handleRequest(exchange, handler);
                                                         } else {
                                                             return tryCacheReasonAndReturnError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, deviceType, userId, requestId);
                                                         }

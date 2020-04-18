@@ -26,7 +26,7 @@ public abstract class UserAuthenticator extends TurmsExtension {
     /**
      * @return 1. Return Mono.just(true) if the user is authenticated.<br/>
      * 2. Return Mono.just(false) if the user is unauthenticated.<br/>
-     * 3. Return Mono.empty() if the authentication should be passed.
+     * 3. Return Mono.empty() if the authentication should be processed by the next handler.
      */
     public abstract Mono<Boolean> authenticate(@NotNull UserLoginInfo userLoginInfo);
 }

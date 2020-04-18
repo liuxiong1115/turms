@@ -73,6 +73,11 @@ public class Session implements IdentifiedDataSerializable {
     @Min(0)
     private int clearUpIrresponsibleUsersJitter = 30;
 
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to enable to authenticate users when logging in." +
+            "Note that user ID is always needed even if enableAuthentication is false")
+    private boolean enableAuthentication = true;
+
     /**
      * If the turms server only receives heartbeat requests from the client during maxIdleTime,
      * the session will be closed when the Session Cleaner detects it.
@@ -97,6 +102,7 @@ public class Session implements IdentifiedDataSerializable {
         out.writeBoolean(enableQueryLoginFailedReason);
         out.writeBoolean(enableQueryDisconnectionReason);
         out.writeBoolean(notifyClientsOfSessionInfoAfterConnected);
+        out.writeBoolean(enableAuthentication);
 //        out.writeInt(idleHeartbeatTimeoutSeconds);
     }
 
@@ -106,6 +112,7 @@ public class Session implements IdentifiedDataSerializable {
         enableQueryLoginFailedReason = in.readBoolean();
         enableQueryDisconnectionReason = in.readBoolean();
         notifyClientsOfSessionInfoAfterConnected = in.readBoolean();
+        enableAuthentication = in.readBoolean();
 //        idleHeartbeatTimeoutSeconds = in.readInt();
     }
 }
