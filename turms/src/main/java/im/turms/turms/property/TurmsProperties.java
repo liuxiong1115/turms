@@ -112,6 +112,11 @@ public class TurmsProperties implements IdentifiedDataSerializable {
     @NestedConfigurationProperty
     private Plugin plugin = new Plugin();
 
+    @JsonView(MutablePropertiesView.class)
+    @Valid
+    @NestedConfigurationProperty
+    private Rpc rpc = new Rpc();
+
     // Business
 
     @JsonView(MutablePropertiesView.class)
@@ -157,6 +162,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         security.writeData(out);
         storage.writeData(out);
         plugin.writeData(out);
+        rpc.writeData(out);
 
         message.writeData(out);
         group.writeData(out);
@@ -175,6 +181,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         security.readData(in);
         storage.readData(in);
         plugin.readData(in);
+        rpc.readData(in);
 
         message.readData(in);
         group.readData(in);

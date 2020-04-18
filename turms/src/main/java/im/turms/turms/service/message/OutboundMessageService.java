@@ -212,7 +212,7 @@ public class OutboundMessageService {
                             DeliveryTurmsNotificationTask task = new DeliveryTurmsNotificationTask(messageData, recipientIds);
                             Future<Boolean> future = turmsClusterManager.getExecutor()
                                     .submitToMember(task, member);
-                            return ReactorUtil.future2Mono(future);
+                            return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
                         } else {
                             return Mono.just(false);
                         }
@@ -221,7 +221,7 @@ public class OutboundMessageService {
             DeliveryTurmsNotificationTask task = new DeliveryTurmsNotificationTask(messageData, recipientIds);
             Future<Boolean> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
-            return ReactorUtil.future2Mono(future);
+            return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
         }
     }
 

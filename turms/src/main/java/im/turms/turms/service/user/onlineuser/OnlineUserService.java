@@ -55,7 +55,6 @@ import reactor.math.MathFlux;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -71,7 +70,6 @@ import static im.turms.turms.manager.TurmsClusterManager.HASH_SLOTS_NUMBER;
 @Validated
 public class OnlineUserService {
     private static final int DEFAULT_ONLINE_USERS_MANAGER_CAPACITY = 1024;
-    private static final Duration QUERY_TASK_DURATION = Duration.ofSeconds(10);
     private static final String LOG_ONLINE_USERS_NUMBER_TASK = "loun";
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
@@ -334,7 +332,7 @@ public class OnlineUserService {
                 Future<Boolean> future = turmsClusterManager
                         .getExecutor()
                         .submitToMember(new SetUserOfflineTask(userId, null, closeStatus.getCode()), member);
-                return ReactorUtil.future2Mono(future);
+                return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
             } else {
                 return Mono.just(false);
             }
@@ -376,7 +374,7 @@ public class OnlineUserService {
                 Future<Boolean> future = turmsClusterManager
                         .getExecutor()
                         .submitToMember(new SetUserOfflineTask(userId, types, closeStatus.getCode()), member);
-                return ReactorUtil.future2Mono(future);
+                return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
             } else {
                 return Mono.just(false);
             }
@@ -394,12 +392,14 @@ public class OnlineUserService {
     }
 
     public Mono<Integer> countOnlineUsers() {
-        Flux<Integer> futures = turmsTaskManager.callAll(new CountOnlineUsersTask(), QUERY_TASK_DURATION);
+        Flux<Integer> futures = turmsTaskManager.callAll(new CountOnlineUsersTask(),
+                turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
         return MathFlux.sumInt(futures);
     }
 
     public Mono<Map<UUID, Integer>> countOnlineUsersByNodes() {
-        Mono<Map<Member, Integer>> mono = turmsTaskManager.callAllAsMap(new CountOnlineUsersTask(), QUERY_TASK_DURATION);
+        Mono<Map<Member, Integer>> mono = turmsTaskManager.callAllAsMap(new CountOnlineUsersTask(),
+                turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
         return mono.map(map -> {
             Map<UUID, Integer> idNumberMap = new HashMap<>(map.size());
             for (Map.Entry<Member, Integer> entry : map.entrySet()) {
@@ -623,7 +623,7 @@ public class OnlineUserService {
             UpdateOnlineUserStatusTask task = new UpdateOnlineUserStatusTask(userId, userStatus.getNumber());
             Future<Boolean> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
-            return ReactorUtil.future2Mono(future);
+            return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
         }
     }
 
@@ -649,7 +649,7 @@ public class OnlineUserService {
             QueryUserOnlineInfoTask task = new QueryUserOnlineInfoTask(userId);
             Future<UserOnlineInfo> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
-            return ReactorUtil.future2Mono(future);
+            return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
         }
     }
 
@@ -684,7 +684,8 @@ public class OnlineUserService {
     }
 
     public Mono<Boolean> checkIfRemoteUserOffline(@NotNull Member member, @NotNull Long userId) {
-        return turmsTaskManager.call(member, new CheckIfUserOnlineTask(userId), QUERY_TASK_DURATION);
+        return turmsTaskManager.call(member, new CheckIfUserOnlineTask(userId),
+                turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
     }
 
     private void onClusterMembersChange() {

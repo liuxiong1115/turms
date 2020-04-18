@@ -21,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotEmpty;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -34,16 +35,16 @@ public class ReactorUtil {
         return object.map(obj -> Collections.singletonMap(title, obj));
     }
 
-    public static <T> Flux<T> futures2Flux(@NotEmpty Collection<Future<T>> futures) {
+    public static <T> Flux<T> futures2Flux(@NotEmpty Collection<Future<T>> futures, Duration timeout) {
         List<Mono<T>> list = new ArrayList<>(futures.size());
         for (Future<T> future : futures) {
-            list.add(future2Mono(future));
+            list.add(future2Mono(future, timeout));
         }
         return Flux.merge(list);
     }
 
-    public static <T> Mono<T> future2Mono(Future<T> future) {
-        return Mono.fromCompletionStage((CompletableFuture<T>) future);
+    public static <T> Mono<T> future2Mono(Future<T> future, Duration timeout) {
+        return Mono.fromCompletionStage((CompletableFuture<T>) future).timeout(timeout);
     }
 
     public static Mono<Boolean> areAllTrue(List<Mono<Boolean>> monos) {

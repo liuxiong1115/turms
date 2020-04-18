@@ -79,6 +79,8 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
                 return new Notification();
             case PROPERTY_PLUGIN:
                 return new Plugin();
+            case PROPERTY_RPC:
+                return new Rpc();
             case PROPERTY_SECURITY:
                 return new Security();
             case PROPERTY_SESSION:
@@ -118,6 +120,7 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
         PROPERTY_MESSAGE_TYPING_STATUS,
         PROPERTY_NOTIFICATION,
         PROPERTY_PLUGIN,
+        PROPERTY_RPC,
         PROPERTY_SECURITY,
         PROPERTY_SESSION,
         PROPERTY_STORAGE,

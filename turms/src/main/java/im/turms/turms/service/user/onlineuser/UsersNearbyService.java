@@ -47,7 +47,6 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,7 +56,6 @@ import java.util.stream.Collectors;
 @Service
 @Validated
 public class UsersNearbyService {
-    private static final Duration TASK_DURATION = Duration.ofSeconds(15);
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsTaskManager turmsTaskManager;
     private final UserService userService;
@@ -313,7 +311,7 @@ public class UsersNearbyService {
                     longitude,
                     latitude,
                     maxDistance,
-                    maxNumber), TASK_DURATION)
+                    maxNumber), turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration())
                     .collectList()
                     .flatMapMany(entries -> Flux.fromIterable(getNearestUserIds(
                             PointFloat.create(longitude, latitude),
@@ -355,7 +353,7 @@ public class UsersNearbyService {
                     longitude,
                     latitude,
                     maxDistance,
-                    maxNumber), TASK_DURATION)
+                    maxNumber), turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration())
                     .collectList()
                     .flatMapMany(entries -> Flux.fromIterable(getNearestUserSessionIds(
                             PointFloat.create(longitude, latitude),
