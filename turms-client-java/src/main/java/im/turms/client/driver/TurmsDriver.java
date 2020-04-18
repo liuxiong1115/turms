@@ -137,6 +137,21 @@ public class TurmsDriver {
     public CompletableFuture<Void> connect(
             long userId,
             @NotNull String password,
+            @Nullable DeviceType deviceType) {
+        return connect(userId, password, deviceType, null, null);
+    }
+
+    public CompletableFuture<Void> connect(
+            long userId,
+            @NotNull String password,
+            @Nullable DeviceType deviceType,
+            @Nullable UserStatus userOnlineStatus) {
+        return connect(userId, password, deviceType, userOnlineStatus, null);
+    }
+
+    public CompletableFuture<Void> connect(
+            long userId,
+            @NotNull String password,
             @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus,
             @Nullable UserLocation userLocation) {

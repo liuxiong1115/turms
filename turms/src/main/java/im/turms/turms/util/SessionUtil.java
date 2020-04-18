@@ -291,7 +291,7 @@ public class SessionUtil {
         }
     }
 
-    public static DeviceType getDeviceTypeFromCookies(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
+    public static DeviceType getDeviceTypeFromCookiesAndHeaders(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
         String deviceType = getFirstValue(cookies, headers, DEVICE_TYPE_FIELD);
         if (deviceType != null) {
             return Enums.getIfPresent(DeviceType.class, deviceType).or(DeviceType.UNKNOWN);
@@ -300,7 +300,7 @@ public class SessionUtil {
         }
     }
 
-    public static UserStatus getUserStatusFromCookies(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
+    public static UserStatus getUserStatusFromCookiesAndHeaders(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
         String userStatus = getFirstValue(cookies, headers, USER_ONLINE_STATUS_FIELD);
         if (userStatus != null) {
             return Enums.getIfPresent(UserStatus.class, userStatus).or(UserStatus.AVAILABLE);
@@ -309,7 +309,7 @@ public class SessionUtil {
         }
     }
 
-    public static PointFloat getLocationFromCookies(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
+    public static PointFloat getLocationFromCookiesAndHeaders(@Nullable Map<String, String> cookies, @Nullable HttpHeaders headers) {
         String location = getFirstValue(cookies, headers, USER_LOCATION_FIELD);
         if (location != null) {
             String[] split = location.split(LOCATION_SPLIT);

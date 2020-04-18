@@ -66,11 +66,11 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
         Map<String, String> cookies = SessionUtil.getCookiesFromSession(session);
         HttpHeaders headers = session.getHandshakeInfo().getHeaders();
         Long userId = SessionUtil.getUserIdFromCookiesOrHeaders(cookies, headers);
-        DeviceType deviceType = SessionUtil.getDeviceTypeFromCookies(cookies, headers);
-        UserStatus userStatus = SessionUtil.getUserStatusFromCookies(cookies, headers);
+        DeviceType deviceType = SessionUtil.getDeviceTypeFromCookiesAndHeaders(cookies, headers);
+        UserStatus userStatus = SessionUtil.getUserStatusFromCookiesAndHeaders(cookies, headers);
         PointFloat userLocation;
         if (locationEnabled) {
-            userLocation = SessionUtil.getLocationFromCookies(cookies, headers);
+            userLocation = SessionUtil.getLocationFromCookiesAndHeaders(cookies, headers);
         } else {
             userLocation = null;
         }
