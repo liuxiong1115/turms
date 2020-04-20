@@ -54,7 +54,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.constant.Common.ID;
-import static im.turms.turms.constant.Common.MAX_DATE;
 
 @Service
 @Validated
@@ -276,8 +275,7 @@ public class GroupQuestionService {
         return authenticated
                 .flatMap(isAuthenticated -> {
                     if (isAuthenticated != null && isAuthenticated) {
-                        return groupVersionService.queryGroupJoinQuestionsVersion(groupId)
-                                .defaultIfEmpty(MAX_DATE);
+                        return groupVersionService.queryGroupJoinQuestionsVersion(groupId);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -301,7 +299,8 @@ public class GroupQuestionService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Mono<Boolean> authAndUpdateGroupJoinQuestion(

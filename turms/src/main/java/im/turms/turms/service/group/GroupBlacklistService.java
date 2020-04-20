@@ -200,7 +200,6 @@ public class GroupBlacklistService {
             @Nullable Date lastUpdatedDate) {
         return groupVersionService
                 .queryBlacklistVersion(groupId)
-                .defaultIfEmpty(MAX_DATE)
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                         return queryGroupBlacklistedUsersIds(groupId)
@@ -218,7 +217,8 @@ public class GroupBlacklistService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Mono<UsersInfosWithVersion> queryGroupBlacklistedUsersInfosWithVersion(
@@ -226,7 +226,6 @@ public class GroupBlacklistService {
             @Nullable Date lastUpdatedDate) {
         return groupVersionService
                 .queryBlacklistVersion(groupId)
-                .defaultIfEmpty(MAX_DATE)
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                         return queryGroupBlacklistedUsersIds(groupId)
@@ -254,7 +253,8 @@ public class GroupBlacklistService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Mono<GroupBlacklistedUser> addBlacklistedUser(

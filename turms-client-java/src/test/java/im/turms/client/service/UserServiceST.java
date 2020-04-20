@@ -7,7 +7,6 @@ import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.ResponseAction;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
-import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
 import im.turms.common.model.bo.user.*;
 import org.junit.jupiter.api.*;
 
@@ -207,14 +206,6 @@ public class UserServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    public void queryUserGroupInvitations_shouldReturnGroupInvitationsWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupInvitationsWithVersion result = turmsClient.getUserService().queryUserGroupInvitations(null)
-                .get(5, TimeUnit.SECONDS);
-        assertNotNull(result);
-    }
-
-    @Test
-    @Order(ORDER_LOW_PRIORITY)
     public void queryUserProfile_shouldReturnUserInfoWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
         UserInfoWithVersion result = turmsClient.getUserService().queryUserProfile(1, null)
                 .get(5, TimeUnit.SECONDS);
@@ -236,7 +227,7 @@ public class UserServiceST {
     public void queryUsersInfosNearby_shouldReturnUsersInfos() throws ExecutionException, InterruptedException, TimeoutException {
         List<UserInfo> result = turmsClient.getUserService().queryUsersInfosNearby(1f, 1f, null, null)
                 .get(5, TimeUnit.SECONDS);
-        assertTrue(result != null);
+        assertNotNull(result);
     }
 
     @Test
@@ -282,7 +273,7 @@ public class UserServiceST {
     @Test
     @Order(ORDER_LOW_PRIORITY)
     public void queryFriendRequests_shouldReturnFriendRequests() throws ExecutionException, InterruptedException, TimeoutException {
-        UserFriendRequestsWithVersion result = turmsClient.getUserService().queryFriendRequests(null)
+        UserFriendRequestsWithVersion result = turmsClient.getUserService().queryFriendRequests(true, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(result);
     }

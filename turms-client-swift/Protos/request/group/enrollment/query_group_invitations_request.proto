@@ -9,6 +9,7 @@ option swift_prefix = "";
 import "google/protobuf/wrappers.proto";
 
 message QueryGroupInvitationsRequest {
-    int64 group_id = 1;
-    google.protobuf.Int64Value last_updated_date = 2;
+    google.protobuf.Int64Value group_id = 1;
+    google.protobuf.BoolValue are_sent_by_me = 2;
+    google.protobuf.Int64Value last_updated_date = 3;
 }

@@ -30,10 +30,13 @@ import java.util.Date;
 public final class UserVersion {
     @Id
     private final Long userId;
-    private final Date friendRequests;
+    private final Date sentFriendRequests;
+    private final Date receivedFriendRequests;
     private final Date relationships;
     private final Date relationshipGroups;
     private final Date relationshipGroupsMembers;
-    private final Date groupInvitations;
+    private final Date groupJoinRequests; // sent group join requests
+    private final Date sentGroupInvitations;
+    private final Date receivedGroupInvitations;
     private final Date joinedGroups;
 }

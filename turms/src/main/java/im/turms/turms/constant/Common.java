@@ -77,7 +77,6 @@ public class Common {
     public static final UserLocation EMPTY_USER_LOCATION = new UserLocation(null, null, null, null, null, null, null, null);
     public static final Mono EMPTY_SET_MONO = Mono.just(Collections.emptySet());
     public static final Date EPOCH = new Date(0);
-    public static final Date MAX_DATE = new Date(Long.MAX_VALUE);
     public static final Set<DeviceType> ALL_DEVICE_TYPES = Arrays.stream(DeviceType.values())
             .filter(deviceType -> deviceType != DeviceType.UNRECOGNIZED)
             .collect(Collectors.toSet());

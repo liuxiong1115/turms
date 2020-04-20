@@ -31,6 +31,7 @@ import im.turms.turms.builder.UpdateBuilder;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.GroupJoinRequest;
+import im.turms.turms.service.user.UserVersionService;
 import im.turms.turms.util.ProtoUtil;
 import im.turms.turms.util.RequestStatusUtil;
 import org.springframework.context.annotation.Lazy;
@@ -53,9 +54,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.constant.Common.EXPIRED_GROUP_JOIN_REQUESTS_CLEANER_CRON;
+import static im.turms.turms.constant.Common.ID;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
@@ -66,9 +67,9 @@ public class GroupJoinRequestService {
     private final GroupService groupService;
     private final GroupVersionService groupVersionService;
     private final GroupMemberService groupMemberService;
-    private final GroupVersionService userVersionService;
+    private final UserVersionService userVersionService;
 
-    public GroupJoinRequestService(ReactiveMongoTemplate mongoTemplate, @Lazy TurmsClusterManager turmsClusterManager, GroupVersionService groupVersionService, GroupMemberService groupMemberService, @Lazy GroupService groupService, GroupVersionService userVersionService) {
+    public GroupJoinRequestService(ReactiveMongoTemplate mongoTemplate, @Lazy TurmsClusterManager turmsClusterManager, GroupVersionService groupVersionService, GroupMemberService groupMemberService, @Lazy GroupService groupService, UserVersionService userVersionService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.groupVersionService = groupVersionService;
@@ -149,8 +150,9 @@ public class GroupJoinRequestService {
                                             requesterId,
                                             null);
                                     return mongoTemplate.insert(groupJoinRequest)
-                                            .zipWith(groupVersionService.updateJoinRequestsVersion(groupId))
-                                            .map(Tuple2::getT1);
+                                            .flatMap(request -> groupVersionService.updateJoinRequestsVersion(groupId)
+                                                    .then(userVersionService.updateSentGroupJoinRequestsVersion(requesterId))
+                                                    .thenReturn(request));
                                 });
                     }
                 });
@@ -195,6 +197,7 @@ public class GroupJoinRequestService {
                             .flatMap(result -> {
                                 if (result.wasAcknowledged()) {
                                     return groupVersionService.updateJoinRequestsVersion(request.getGroupId())
+                                            .zipWith(userVersionService.updateSentGroupJoinRequestsVersion(requesterId))
                                             .thenReturn(true);
                                 } else {
                                     return Mono.just(false);
@@ -203,54 +206,57 @@ public class GroupJoinRequestService {
                 });
     }
 
-    private Flux<GroupJoinRequest> queryGroupJoinRequests(@NotNull Long groupId) {
-        Query query = new Query().addCriteria(where(GroupJoinRequest.Fields.groupId).is(groupId));
-        return mongoTemplate.find(query, GroupJoinRequest.class)
-                .map(groupJoinRequest -> {
-                    Date expirationDate = groupJoinRequest.getExpirationDate();
-                    if (expirationDate != null
-                            && groupJoinRequest.getStatus() == RequestStatus.PENDING
-                            && expirationDate.getTime() < System.currentTimeMillis()) {
-                        return groupJoinRequest.toBuilder().status(RequestStatus.EXPIRED).build();
-                    } else {
-                        return groupJoinRequest;
-                    }
-                });
-    }
-
     public Mono<GroupJoinRequestsWithVersion> queryGroupJoinRequestsWithVersion(
-            @NotNull Long requesterId,
-            @NotNull Long groupId,
+            @NotNull Long userId,
+            @Nullable Long groupId,
             @Nullable Date lastUpdatedDate) {
-        return groupMemberService.isOwnerOrManager(requesterId, groupId)
-                .flatMap(authenticated -> {
-                    if (authenticated != null && authenticated) {
-                        return groupVersionService.queryGroupJoinRequestsVersion(groupId)
-                                .defaultIfEmpty(MAX_DATE);
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                    }
-                })
+        boolean searchRequestsByGroupId = groupId != null;
+        Mono<Date> versionMono = searchRequestsByGroupId ?
+                groupMemberService.isOwnerOrManager(userId, groupId)
+                        .flatMap(authenticated -> {
+                            if (authenticated != null && authenticated) {
+                                return groupVersionService.queryGroupJoinRequestsVersion(groupId);
+                            } else {
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                            }
+                        })
+                : userVersionService.queryGroupJoinRequestsVersion(userId);
+        return versionMono
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return queryGroupJoinRequests(groupId)
-                                .collect(Collectors.toSet())
+                        Flux<GroupJoinRequest> requestFlux = searchRequestsByGroupId
+                                ? queryGroupJoinRequestsByGroupId(groupId)
+                                : queryGroupJoinRequestsByRequesterId(userId);
+                        return requestFlux
+                                .collectList()
                                 .map(groupJoinRequests -> {
-                                    if (groupJoinRequests.isEmpty()) {
+                                    if (!groupJoinRequests.isEmpty()) {
+                                        GroupJoinRequestsWithVersion.Builder builder = GroupJoinRequestsWithVersion.newBuilder();
+                                        for (GroupJoinRequest groupJoinRequest : groupJoinRequests) {
+                                            builder.addGroupJoinRequests(ProtoUtil.groupJoinRequest2proto(groupJoinRequest).build());
+                                        }
+                                        return builder
+                                                .setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build())
+                                                .build();
+                                    } else {
                                         throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
-                                    GroupJoinRequestsWithVersion.Builder builder = GroupJoinRequestsWithVersion.newBuilder();
-                                    builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
-                                    for (GroupJoinRequest groupJoinRequest : groupJoinRequests) {
-                                        im.turms.common.model.bo.group.GroupJoinRequest request = ProtoUtil.groupJoinRequest2proto(groupJoinRequest).build();
-                                        builder.addGroupJoinRequests(request);
-                                    }
-                                    return builder.build();
                                 });
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
+    }
+
+    public Flux<GroupJoinRequest> queryGroupJoinRequestsByGroupId(@NotNull Long groupId) {
+        Query query = new Query().addCriteria(where(GroupJoinRequest.Fields.groupId).is(groupId));
+        return queryExpirableData(query);
+    }
+
+    public Flux<GroupJoinRequest> queryGroupJoinRequestsByRequesterId(@NotNull Long requesterId) {
+        Query query = new Query().addCriteria(where(GroupJoinRequest.Fields.requesterId).is(requesterId));
+        return queryExpirableData(query);
     }
 
     public Mono<Long> queryGroupId(@NotNull Long requestId) {
@@ -375,7 +381,21 @@ public class GroupJoinRequestService {
                 expirationDate, groupId, requesterId, responderId);
         return Mono.zip(mongoTemplate.insert(groupJoinRequest),
                 groupVersionService.updateJoinRequestsVersion(groupId),
-                userVersionService.updateJoinRequestsVersion(responderId))
+                userVersionService.updateSentGroupJoinRequestsVersion(responderId))
                 .map(Tuple2::getT1);
+    }
+
+    private Flux<GroupJoinRequest> queryExpirableData(Query query) {
+        return mongoTemplate.find(query, GroupJoinRequest.class)
+                .map(groupJoinRequest -> {
+                    Date expirationDate = groupJoinRequest.getExpirationDate();
+                    if (expirationDate != null
+                            && groupJoinRequest.getStatus() == RequestStatus.PENDING
+                            && expirationDate.getTime() < System.currentTimeMillis()) {
+                        return groupJoinRequest.toBuilder().status(RequestStatus.EXPIRED).build();
+                    } else {
+                        return groupJoinRequest;
+                    }
+                });
     }
 }

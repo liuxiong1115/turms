@@ -74,21 +74,6 @@ public class WsUserController {
         this.groupInvitationService = groupInvitationService;
     }
 
-    @TurmsRequestMapping(QUERY_USER_GROUP_INVITATIONS_REQUEST)
-    public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryUserGroupInvitationsRequest() {
-        return turmsRequestWrapper -> {
-            QueryUserGroupInvitationsRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUserGroupInvitationsRequest();
-            Date lastUpdatedDate = request.hasLastUpdatedDate() ? new Date(request.getLastUpdatedDate().getValue()) : null;
-            return groupInvitationService.queryUserGroupInvitationsWithVersion(
-                    turmsRequestWrapper.getUserId(),
-                    lastUpdatedDate)
-                    .map(groupInvitationsWithVersion -> RequestResult.create(TurmsNotification.Data
-                            .newBuilder()
-                            .setGroupInvitationsWithVersion(groupInvitationsWithVersion)
-                            .build()));
-        };
-    }
-
     @TurmsRequestMapping(QUERY_USER_PROFILE_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryUserProfileRequest() {
         return turmsRequestWrapper -> {

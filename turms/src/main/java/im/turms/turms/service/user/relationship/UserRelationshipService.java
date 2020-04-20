@@ -196,7 +196,6 @@ public class UserRelationshipService {
             @Nullable Boolean isBlocked,
             @Nullable Date lastUpdatedDate) {
         return userVersionService.queryRelationshipsLastUpdatedDate(ownerId)
-                .defaultIfEmpty(MAX_DATE)
                 .flatMap(date -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
                         return queryMembersRelatedUsersIds(Set.of(ownerId), Set.of(groupIndex), isBlocked)
@@ -208,7 +207,8 @@ public class UserRelationshipService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Mono<UserRelationshipsWithVersion> queryRelationshipsWithVersion(
@@ -218,7 +218,6 @@ public class UserRelationshipService {
             @Nullable Boolean isBlocked,
             @Nullable Date lastUpdatedDate) {
         return userVersionService.queryRelationshipsLastUpdatedDate(ownerId)
-                .defaultIfEmpty(MAX_DATE)
                 .flatMap(date -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
                         return queryRelationships(
@@ -242,7 +241,8 @@ public class UserRelationshipService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Flux<Long> queryRelatedUsersIds(

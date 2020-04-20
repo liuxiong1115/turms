@@ -144,8 +144,9 @@ public class UserFriendRequestService {
         UserFriendRequest userFriendRequest = new UserFriendRequest(id, content, status, reason, creationDate,
                 expirationDate, responseDate, requesterId, recipientId);
         return mongoTemplate.insert(userFriendRequest)
-                .zipWith(userVersionService.updateFriendRequestsVersion(recipientId))
-                .map(Tuple2::getT1);
+                .flatMap(request -> userVersionService.updateReceivedFriendRequestsVersion(recipientId)
+                        .then(userVersionService.updateSentFriendRequestsVersion(requesterId))
+                        .thenReturn(request));
     }
 
     public Mono<UserFriendRequest> authAndCreateFriendRequest(
@@ -225,7 +226,7 @@ public class UserFriendRequestService {
                 .thenReturn(true)
                 .defaultIfEmpty(false)
                 .zipWith(queryRecipientId(requestId)
-                        .map(userVersionService::updateFriendRequestsVersion))
+                        .map(userVersionService::updateSentFriendRequestsVersion))
                 .map(Tuple2::getT1);
     }
 
@@ -309,37 +310,69 @@ public class UserFriendRequestService {
     }
 
     public Mono<UserFriendRequestsWithVersion> queryFriendRequestsWithVersion(
-            @NotNull Long recipientId,
+            @NotNull Long userId,
+            boolean areSentByUser,
             @Nullable Date lastUpdatedDate) {
-        return userVersionService.queryFriendRequestsVersion(recipientId)
-                .defaultIfEmpty(MAX_DATE)
+        Mono<Date> versionMono = areSentByUser
+                ? userVersionService.querySentFriendRequestsVersion(userId)
+                : userVersionService.queryReceivedFriendRequestsVersion(userId);
+        return versionMono
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        Query query = new Query()
-                                .addCriteria(Criteria.where(UserFriendRequest.Fields.recipientId).is(recipientId));
-                        return mongoTemplate.find(query, UserFriendRequest.class)
+                        Flux<UserFriendRequest> requestFlux = areSentByUser
+                                ? queryFriendRequestsByRequesterId(userId)
+                                : queryFriendRequestsByRecipientId(userId);
+                        return requestFlux
                                 .collectList()
                                 .map(requests -> {
                                     if (!requests.isEmpty()) {
                                         UserFriendRequestsWithVersion.Builder builder = UserFriendRequestsWithVersion.newBuilder();
-                                        builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                         for (UserFriendRequest request : requests) {
-                                            Date expirationDate = request.getExpirationDate();
-                                            if (expirationDate != null
-                                                    && request.getStatus() == RequestStatus.PENDING
-                                                    && expirationDate.getTime() < System.currentTimeMillis()) {
-                                                builder.addUserFriendRequests(ProtoUtil.friendRequest2proto(request));
-                                                request = request.toBuilder().status(RequestStatus.EXPIRED).build();
-                                            }
                                             builder.addUserFriendRequests(ProtoUtil.friendRequest2proto(request));
                                         }
-                                        return builder.build();
+                                        return builder
+                                                .setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build())
+                                                .build();
                                     } else {
                                         throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
                                 });
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
+                    }
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
+    }
+
+    public Flux<UserFriendRequest> queryFriendRequestsByRecipientId(@NotNull Long recipientId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(UserFriendRequest.Fields.recipientId).is(recipientId));
+        return queryExpirableData(query);
+    }
+
+    public Flux<UserFriendRequest> queryFriendRequestsByRequesterId(@NotNull Long requesterId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(UserFriendRequest.Fields.requesterId).is(requesterId));
+        return queryExpirableData(query);
+    }
+
+    public Flux<UserFriendRequest> queryFriendRequestsByRecipientIdOrRequesterId(@NotNull Long userId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where(UserFriendRequest.Fields.recipientId).is(userId)
+                        .orOperator(Criteria.where(UserFriendRequest.Fields.requesterId).is(userId)));
+        return queryExpirableData(query);
+    }
+
+    private Flux<UserFriendRequest> queryExpirableData(Query query) {
+        return mongoTemplate.find(query, UserFriendRequest.class)
+                .map(friendRequest -> {
+                    Date expirationDate = friendRequest.getExpirationDate();
+                    if (expirationDate != null
+                            && friendRequest.getStatus() == RequestStatus.PENDING
+                            && expirationDate.getTime() < System.currentTimeMillis()) {
+                        return friendRequest.toBuilder().status(RequestStatus.EXPIRED).build();
+                    } else {
+                        return friendRequest;
                     }
                 });
     }

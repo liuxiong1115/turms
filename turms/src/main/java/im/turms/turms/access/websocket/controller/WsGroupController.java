@@ -452,23 +452,32 @@ public class WsGroupController {
         };
     }
 
-    //TODO: by to user
     @TurmsRequestMapping(QUERY_GROUP_INVITATIONS_REQUEST)
     public Function<TurmsRequestWrapper, Mono<RequestResult>> handleQueryGroupInvitationsRequest() {
         return turmsRequestWrapper -> {
             QueryGroupInvitationsRequest request = turmsRequestWrapper.getTurmsRequest()
                     .getQueryGroupInvitationsRequest();
-            long groupId = request.getGroupId();
-            Date lastUpdatedDate = request.hasLastUpdatedDate() ?
-                    new Date(request.getLastUpdatedDate().getValue()) : null;
-            return groupInvitationService.queryGroupInvitationsWithVersion(
-                    turmsRequestWrapper.getUserId(),
-                    groupId,
-                    lastUpdatedDate)
-                    .map(groupInvitationsWithVersion -> RequestResult.create(
-                            TurmsNotification.Data.newBuilder()
-                                    .setGroupInvitationsWithVersion(groupInvitationsWithVersion)
-                                    .build()));
+            Long groupId = request.hasGroupId() ? request.getGroupId().getValue() : null;
+            Date lastUpdatedDate = request.hasLastUpdatedDate() ? new Date(request.getLastUpdatedDate().getValue()) : null;
+            if (groupId != null) {
+                return groupInvitationService.queryGroupInvitationsWithVersion(
+                        turmsRequestWrapper.getUserId(),
+                        groupId,
+                        lastUpdatedDate)
+                        .map(groupInvitationsWithVersion -> RequestResult.create(
+                                TurmsNotification.Data.newBuilder()
+                                        .setGroupInvitationsWithVersion(groupInvitationsWithVersion)
+                                        .build()));
+            } else {
+                return groupInvitationService.queryUserGroupInvitationsWithVersion(
+                        turmsRequestWrapper.getUserId(),
+                        request.hasAreSentByMe() && request.getAreSentByMe().getValue(),
+                        lastUpdatedDate)
+                        .map(groupInvitationsWithVersion -> RequestResult.create(TurmsNotification.Data
+                                .newBuilder()
+                                .setGroupInvitationsWithVersion(groupInvitationsWithVersion)
+                                .build()));
+            }
         };
     }
 
@@ -477,11 +486,11 @@ public class WsGroupController {
         return turmsRequestWrapper -> {
             QueryGroupJoinRequestsRequest request = turmsRequestWrapper.getTurmsRequest()
                     .getQueryGroupJoinRequestsRequest();
-            Date lastUpdatedDate = request.hasLastUpdatedDate() ?
-                    new Date(request.getLastUpdatedDate().getValue()) : null;
+            Long groupId = request.hasGroupId() ? request.getGroupId().getValue() : null;
+            Date lastUpdatedDate = request.hasLastUpdatedDate() ? new Date(request.getLastUpdatedDate().getValue()) : null;
             return groupJoinRequestService.queryGroupJoinRequestsWithVersion(
                     turmsRequestWrapper.getUserId(),
-                    request.getGroupId(),
+                    groupId,
                     lastUpdatedDate)
                     .map(groupJoinRequestsWithVersion -> RequestResult.create(TurmsNotification.Data.newBuilder()
                             .setGroupJoinRequestsWithVersion(groupJoinRequestsWithVersion)

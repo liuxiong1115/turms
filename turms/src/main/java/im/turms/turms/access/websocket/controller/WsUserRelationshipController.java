@@ -188,6 +188,7 @@ public class WsUserRelationshipController {
             Date lastUpdatedDate = request.hasLastUpdatedDate() ? new Date(request.getLastUpdatedDate().getValue()) : null;
             return userFriendRequestService.queryFriendRequestsWithVersion(
                     turmsRequestWrapper.getUserId(),
+                    request.getAreSentByMe(),
                     lastUpdatedDate)
                     .map(friendRequestsWithVersion -> RequestResult
                             .create(TurmsNotification.Data

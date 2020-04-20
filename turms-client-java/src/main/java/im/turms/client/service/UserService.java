@@ -12,7 +12,6 @@ import im.turms.common.constant.ResponseAction;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
-import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
 import im.turms.common.model.bo.user.*;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.user.*;
@@ -114,16 +113,6 @@ public class UserService {
                         "intro", intro,
                         "profile_access_strategy", profileAccessStrategy))
                 .thenApply(notification -> null);
-    }
-
-    public CompletableFuture<GroupInvitationsWithVersion> queryUserGroupInvitations(@Nullable Date lastUpdatedDate) {
-        return turmsClient.getDriver()
-                .send(QueryUserGroupInvitationsRequest.newBuilder(), MapUtil.of(
-                        "last_updated_date", lastUpdatedDate))
-                .thenApply(notification -> {
-                    TurmsNotification.Data data = notification.getData();
-                    return data.hasGroupInvitationsWithVersion() ? data.getGroupInvitationsWithVersion() : null;
-                });
     }
 
     public CompletableFuture<UserInfoWithVersion> queryUserProfile(
@@ -307,9 +296,10 @@ public class UserService {
                 .thenApply(notification -> null);
     }
 
-    public CompletableFuture<UserFriendRequestsWithVersion> queryFriendRequests(@Nullable Date lastUpdatedDate) {
+    public CompletableFuture<UserFriendRequestsWithVersion> queryFriendRequests(boolean areSentByMe, @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryFriendRequestsRequest.newBuilder(), MapUtil.of(
+                        "are_sent_by_me", areSentByMe,
                         "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> {
                     TurmsNotification.Data data = notification.getData();

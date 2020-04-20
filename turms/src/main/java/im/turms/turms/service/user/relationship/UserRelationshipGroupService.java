@@ -85,7 +85,6 @@ public class UserRelationshipGroupService {
             @NotNull Long ownerId,
             @Nullable Date lastUpdatedDate) {
         return userVersionService.queryRelationshipGroupsLastUpdatedDate(ownerId)
-                .defaultIfEmpty(MAX_DATE)
                 .flatMap(date -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
                         UserRelationshipGroupsWithVersion.Builder builder = UserRelationshipGroupsWithVersion.newBuilder();
@@ -96,7 +95,8 @@ public class UserRelationshipGroupService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Flux<Integer> queryGroupIndexes(

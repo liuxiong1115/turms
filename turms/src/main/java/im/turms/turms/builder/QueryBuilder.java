@@ -84,7 +84,7 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder addInIfNotNull(@NotNull String key, @Nullable Collection collection) {
+    public QueryBuilder addInIfNotNull(@NotNull String key, @Nullable Collection<?> collection) {
         if (collection != null && !collection.isEmpty()) {
             criteriaList.add(Criteria.where(key).in(collection));
         }

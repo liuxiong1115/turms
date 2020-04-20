@@ -249,6 +249,17 @@ public class GroupService {
                 });
     }
 
+    public CompletableFuture<GroupInvitationsWithVersion> queryInvitations(boolean areSentByMe, @Nullable Date lastUpdatedDate) {
+        return turmsClient.getDriver()
+                .send(QueryGroupInvitationsRequest.newBuilder(), MapUtil.of(
+                        "are_sent_by_me", areSentByMe,
+                        "last_updated_date", lastUpdatedDate))
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupInvitationsWithVersion() ? data.getGroupInvitationsWithVersion() : null;
+                });
+    }
+
     public CompletableFuture<Long> createJoinRequest(long groupId, @NotNull String content) {
         Validator.throwIfAnyFalsy(content);
         return turmsClient.getDriver()
@@ -270,6 +281,16 @@ public class GroupService {
         return turmsClient.getDriver()
                 .send(QueryGroupJoinRequestsRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
+                        "last_updated_date", lastUpdatedDate))
+                .thenApply(notification -> {
+                    TurmsNotification.Data data = notification.getData();
+                    return data.hasGroupJoinRequestsWithVersion() ? data.getGroupJoinRequestsWithVersion() : null;
+                });
+    }
+
+    public CompletableFuture<GroupJoinRequestsWithVersion> querySentJoinRequests(@Nullable Date lastUpdatedDate) {
+        return turmsClient.getDriver()
+                .send(QueryGroupJoinRequestsRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> {
                     TurmsNotification.Data data = notification.getData();

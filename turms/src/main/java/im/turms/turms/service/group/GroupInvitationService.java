@@ -45,7 +45,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
@@ -57,7 +56,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.constant.Common.EXPIRED_GROUP_INVITATIONS_CLEANER_CRON;
+import static im.turms.turms.constant.Common.ID;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
@@ -171,10 +171,11 @@ public class GroupInvitationService {
             status = RequestStatus.PENDING;
         }
         GroupInvitation groupInvitation = new GroupInvitation(id, groupId, inviterId, inviteeId, content, status, creationDate, responseDate, expirationDate);
-        return Mono.zip(mongoTemplate.insert(groupInvitation),
-                groupVersionService.updateGroupInvitationsVersion(groupId),
-                userVersionService.updateGroupInvitationsVersion(inviteeId))
-                .map(Tuple2::getT1);
+        return mongoTemplate.insert(groupInvitation)
+                .flatMap(invitation -> groupVersionService.updateGroupInvitationsVersion(groupId)
+                        .then(userVersionService.updateSentGroupInvitationsVersion(inviterId))
+                        .then(userVersionService.updateReceivedGroupInvitationsVersion(inviteeId))
+                        .thenReturn(invitation));
     }
 
     public Mono<GroupInvitation> queryGroupIdAndStatus(@NotNull Long invitationId) {
@@ -232,57 +233,61 @@ public class GroupInvitationService {
     public Flux<GroupInvitation> queryGroupInvitationsByInviteeId(@NotNull Long inviteeId) {
         Query query = new Query()
                 .addCriteria(where(GroupInvitation.Fields.inviteeId).is(inviteeId));
-        return mongoTemplate.find(query, GroupInvitation.class)
-                .map(groupInvitation -> {
-                    Date expirationDate = groupInvitation.getExpirationDate();
-                    if (expirationDate != null
-                            && groupInvitation.getStatus() == RequestStatus.PENDING
-                            && expirationDate.getTime() < System.currentTimeMillis()) {
-                        return groupInvitation.toBuilder().status(RequestStatus.EXPIRED).build();
-                    } else {
-                        return groupInvitation;
-                    }
-                });
+        return queryExpirableData(query);
+    }
+
+    public Flux<GroupInvitation> queryGroupInvitationsByInviterId(@NotNull Long inviterId) {
+        Query query = new Query()
+                .addCriteria(where(GroupInvitation.Fields.inviterId).is(inviterId));
+        return queryExpirableData(query);
+    }
+
+    public Flux<GroupInvitation> queryGroupInvitationsByInviteeIdOrInviterId(@NotNull Long userId) {
+        Query query = new Query()
+                .addCriteria(where(GroupInvitation.Fields.inviteeId).is(userId)
+                        .orOperator(where(GroupInvitation.Fields.inviterId).is(userId)));
+        return queryExpirableData(query);
     }
 
     public Flux<GroupInvitation> queryGroupInvitationsByGroupId(@NotNull Long groupId) {
         Query query = new Query()
                 .addCriteria(where(GroupInvitation.Fields.groupId).is(groupId));
-        return mongoTemplate.find(query, GroupInvitation.class)
-                .map(groupInvitation -> {
-                    Date expirationDate = groupInvitation.getExpirationDate();
-                    if (expirationDate != null
-                            && groupInvitation.getStatus() == RequestStatus.PENDING
-                            && expirationDate.getTime() < System.currentTimeMillis()) {
-                        return groupInvitation.toBuilder().status(RequestStatus.EXPIRED).build();
-                    } else {
-                        return groupInvitation;
-                    }
-                });
+        return queryExpirableData(query);
     }
 
     public Mono<GroupInvitationsWithVersion> queryUserGroupInvitationsWithVersion(
             @NotNull Long userId,
+            boolean areSentByUser,
             @Nullable Date lastUpdatedDate) {
-        return userVersionService.queryGroupInvitationsLastUpdatedDate(userId)
-                .defaultIfEmpty(MAX_DATE)
+        Mono<Date> versionMono = areSentByUser
+                ? userVersionService.querySentGroupInvitationsLastUpdatedDate(userId)
+                : userVersionService.queryReceivedGroupInvitationsLastUpdatedDate(userId);
+        return versionMono
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
-                        return queryGroupInvitationsByInviteeId(userId)
-                                .collect(Collectors.toSet())
+                        Flux<GroupInvitation> invitationFlux = areSentByUser
+                                ? queryGroupInvitationsByInviterId(userId)
+                                : queryGroupInvitationsByInviteeId(userId);
+                        return invitationFlux
+                                .collectList()
                                 .map(groupInvitations -> {
-                                    GroupInvitationsWithVersion.Builder builder = GroupInvitationsWithVersion.newBuilder();
-                                    for (GroupInvitation groupInvitation : groupInvitations) {
-                                        builder.addGroupInvitations(ProtoUtil.groupInvitation2proto(groupInvitation));
+                                    if (!groupInvitations.isEmpty()) {
+                                        GroupInvitationsWithVersion.Builder builder = GroupInvitationsWithVersion.newBuilder();
+                                        for (GroupInvitation groupInvitation : groupInvitations) {
+                                            builder.addGroupInvitations(ProtoUtil.groupInvitation2proto(groupInvitation));
+                                        }
+                                        return builder
+                                                .setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build())
+                                                .build();
+                                    } else {
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
                                     }
-                                    return builder
-                                            .setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build())
-                                            .build();
                                 });
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Mono<GroupInvitationsWithVersion> queryGroupInvitationsWithVersion(
@@ -295,7 +300,6 @@ public class GroupInvitationService {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
                     return groupVersionService.queryGroupInvitationsVersion(groupId)
-                            .defaultIfEmpty(MAX_DATE)
                             .flatMap(version -> {
                                 if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                                     return queryGroupInvitationsByGroupId(groupId)
@@ -307,15 +311,15 @@ public class GroupInvitationService {
                                                 GroupInvitationsWithVersion.Builder builder = GroupInvitationsWithVersion.newBuilder();
                                                 builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(version.getTime()).build());
                                                 for (GroupInvitation invitation : groupInvitations) {
-                                                    im.turms.common.model.bo.group.GroupInvitation groupInvitation = ProtoUtil.groupInvitation2proto(invitation).build();
-                                                    builder.addGroupInvitations(groupInvitation);
+                                                    builder.addGroupInvitations(ProtoUtil.groupInvitation2proto(invitation).build());
                                                 }
                                                 return builder.build();
                                             });
                                 } else {
                                     return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                                 }
-                            });
+                            })
+                            .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
                 });
     }
 
@@ -408,5 +412,19 @@ public class GroupInvitationService {
         RequestStatusUtil.updateResponseDateBasedOnStatus(update, status, responseDate);
         return mongoTemplate.updateMulti(query, update, GroupInvitation.class)
                 .map(UpdateResult::wasAcknowledged);
+    }
+
+    private Flux<GroupInvitation> queryExpirableData(Query query) {
+        return mongoTemplate.find(query, GroupInvitation.class)
+                .map(groupInvitation -> {
+                    Date expirationDate = groupInvitation.getExpirationDate();
+                    if (expirationDate != null
+                            && groupInvitation.getStatus() == RequestStatus.PENDING
+                            && expirationDate.getTime() < System.currentTimeMillis()) {
+                        return groupInvitation.toBuilder().status(RequestStatus.EXPIRED).build();
+                    } else {
+                        return groupInvitation;
+                    }
+                });
     }
 }

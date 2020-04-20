@@ -427,7 +427,6 @@ public class GroupService {
             @NotNull Long groupId,
             @Nullable Date lastUpdatedDate) {
         return groupVersionService.queryInfoVersion(groupId)
-                .defaultIfEmpty(MAX_DATE)
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                         return mongoTemplate.findById(groupId, Group.class)
@@ -438,7 +437,8 @@ public class GroupService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     private Flux<Group> queryGroups(@NotEmpty List<Long> groupsIds) {
@@ -465,7 +465,6 @@ public class GroupService {
             @Nullable Date lastUpdatedDate) {
         return userVersionService
                 .queryJoinedGroupVersion(memberId)
-                .defaultIfEmpty(MAX_DATE)
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                         return queryJoinedGroupsIds(memberId)
@@ -483,7 +482,8 @@ public class GroupService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Mono<GroupsWithVersion> queryJoinedGroupsWithVersion(
@@ -491,7 +491,6 @@ public class GroupService {
             @Nullable Date lastUpdatedDate) {
         return userVersionService
                 .queryJoinedGroupVersion(memberId)
-                .defaultIfEmpty(MAX_DATE)
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                         return queryJoinedGroups(memberId)
@@ -511,7 +510,8 @@ public class GroupService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Mono<Boolean> updateGroups(

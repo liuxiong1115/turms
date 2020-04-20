@@ -54,11 +54,25 @@ public class UserVersionService {
                 .map(UserVersion::getRelationships);
     }
 
-    public Mono<Date> queryGroupInvitationsLastUpdatedDate(@NotNull Long userId) {
+    public Mono<Date> querySentGroupInvitationsLastUpdatedDate(@NotNull Long userId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
-        query.fields().include(UserVersion.Fields.groupInvitations);
+        query.fields().include(UserVersion.Fields.sentGroupInvitations);
         return mongoTemplate.findOne(query, UserVersion.class)
-                .map(UserVersion::getGroupInvitations);
+                .map(UserVersion::getSentGroupInvitations);
+    }
+
+    public Mono<Date> queryReceivedGroupInvitationsLastUpdatedDate(@NotNull Long userId) {
+        Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
+        query.fields().include(UserVersion.Fields.receivedGroupInvitations);
+        return mongoTemplate.findOne(query, UserVersion.class)
+                .map(UserVersion::getReceivedGroupInvitations);
+    }
+
+    public Mono<Date> queryGroupJoinRequestsVersion(@NotNull Long userId) {
+        Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
+        query.fields().include(UserVersion.Fields.groupJoinRequests);
+        return mongoTemplate.findOne(query, UserVersion.class)
+                .map(UserVersion::getGroupJoinRequests);
     }
 
     public Mono<Date> queryRelationshipGroupsLastUpdatedDate(@NotNull Long userId) {
@@ -75,17 +89,24 @@ public class UserVersionService {
                 .map(UserVersion::getJoinedGroups);
     }
 
-    public Mono<Date> queryFriendRequestsVersion(@NotNull Long userId) {
+    public Mono<Date> querySentFriendRequestsVersion(@NotNull Long userId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
-        query.fields().include(UserVersion.Fields.friendRequests);
+        query.fields().include(UserVersion.Fields.sentFriendRequests);
         return mongoTemplate.findOne(query, UserVersion.class)
-                .map(UserVersion::getFriendRequests);
+                .map(UserVersion::getSentFriendRequests);
+    }
+
+    public Mono<Date> queryReceivedFriendRequestsVersion(@NotNull Long userId) {
+        Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
+        query.fields().include(UserVersion.Fields.receivedFriendRequests);
+        return mongoTemplate.findOne(query, UserVersion.class)
+                .map(UserVersion::getReceivedFriendRequests);
     }
 
     public Mono<UserVersion> upsertEmptyUserVersion(
             @NotNull Long userId,
             @Nullable ReactiveMongoOperations operations) {
-        UserVersion userVersion = new UserVersion(userId, null, null, null, null, null, null);
+        UserVersion userVersion = new UserVersion(userId, null, null, null, null, null, null, null, null, null);
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.save(userVersion);
     }
@@ -98,8 +119,12 @@ public class UserVersionService {
         return updateSpecificVersion(userIds, operations, UserVersion.Fields.relationships);
     }
 
-    public Mono<Boolean> updateFriendRequestsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, null, UserVersion.Fields.friendRequests);
+    public Mono<Boolean> updateSentFriendRequestsVersion(@NotNull Long userId) {
+        return updateSpecificVersion(userId, null, UserVersion.Fields.sentFriendRequests);
+    }
+
+    public Mono<Boolean> updateReceivedFriendRequestsVersion(@NotNull Long userId) {
+        return updateSpecificVersion(userId, null, UserVersion.Fields.receivedFriendRequests);
     }
 
     public Mono<Boolean> updateRelationshipGroupsVersion(@NotNull Long userId) {
@@ -118,8 +143,16 @@ public class UserVersionService {
         return updateSpecificVersion(userIds, null, UserVersion.Fields.relationshipGroupsMembers);
     }
 
-    public Mono<Boolean> updateGroupInvitationsVersion(@NotNull Long userId) {
-        return updateSpecificVersion(userId, null, UserVersion.Fields.groupInvitations);
+    public Mono<Boolean> updateSentGroupInvitationsVersion(@NotNull Long userId) {
+        return updateSpecificVersion(userId, null, UserVersion.Fields.sentGroupInvitations);
+    }
+
+    public Mono<Boolean> updateReceivedGroupInvitationsVersion(@NotNull Long userId) {
+        return updateSpecificVersion(userId, null, UserVersion.Fields.receivedGroupInvitations);
+    }
+
+    public Mono<Boolean> updateSentGroupJoinRequestsVersion(@NotNull Long userId) {
+        return updateSpecificVersion(userId, null, UserVersion.Fields.groupJoinRequests);
     }
 
     public Mono<Boolean> updateJoinedGroupsVersion(@NotNull Long userId) {

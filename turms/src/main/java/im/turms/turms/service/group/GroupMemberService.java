@@ -622,8 +622,7 @@ public class GroupMemberService {
         return isGroupMember(groupId, requesterId)
                 .flatMap(isGroupMember -> {
                     if (isGroupMember != null && isGroupMember) {
-                        return groupVersionService.queryMembersVersion(groupId)
-                                .defaultIfEmpty(MAX_DATE);
+                        return groupVersionService.queryMembersVersion(groupId);
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
@@ -653,7 +652,8 @@ public class GroupMemberService {
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
-                });
+                })
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
     public Mono<Boolean> authAndUpdateGroupMember(

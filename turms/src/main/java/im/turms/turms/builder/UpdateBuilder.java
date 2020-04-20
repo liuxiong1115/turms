@@ -35,7 +35,7 @@ public class UpdateBuilder {
     public UpdateBuilder setIfNotNull(String key, Object value) {
         if (value != null) {
             if (value instanceof Collection) {
-                if (!((Collection) value).isEmpty()) {
+                if (!((Collection<?>) value).isEmpty()) {
                     update.set(key, value);
                 }
             } else {
