@@ -135,12 +135,9 @@ public class GroupMemberController {
     @RequiredPermission(GROUP_MEMBER_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupMembers(
             GroupMember.KeyList keys) {
-        Mono<Boolean> deleteMono;
-        if (keys != null && !keys.getKeys().isEmpty()) {
-            deleteMono = groupMemberService.deleteGroupsMembers(new HashSet<>(keys.getKeys()), true);
-        } else {
-            deleteMono = groupMemberService.deleteGroupMembers(true);
-        }
+        Mono<Boolean> deleteMono = keys != null && !keys.getKeys().isEmpty()
+                ? groupMemberService.deleteGroupsMembers(new HashSet<>(keys.getKeys()), true)
+                : groupMemberService.deleteGroupMembers(true);
         return ResponseFactory.acknowledged(deleteMono);
     }
 }

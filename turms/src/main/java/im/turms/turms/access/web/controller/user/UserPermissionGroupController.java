@@ -87,19 +87,19 @@ public class UserPermissionGroupController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUserPermissionGroup(
             @RequestParam Set<Long> ids,
             @RequestBody UpdateUserPermissionGroupDTO updateUserPermissionGroupDTO) {
-        Mono<Boolean> updated = userPermissionGroupService.updateUserPermissionGroups(
+        Mono<Boolean> updateMono = userPermissionGroupService.updateUserPermissionGroups(
                 ids,
                 updateUserPermissionGroupDTO.getCreatableGroupTypeIds(),
                 updateUserPermissionGroupDTO.getOwnedGroupLimit(),
                 updateUserPermissionGroupDTO.getOwnedGroupLimitForEachGroupType(),
                 updateUserPermissionGroupDTO.getGroupTypeLimits());
-        return ResponseFactory.acknowledged(updated);
+        return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping
     @RequiredPermission(USER_PERMISSION_GROUP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteUserPermissionGroup(@RequestParam Set<Long> ids) {
-        Mono<Boolean> deleted = userPermissionGroupService.deleteUserPermissionGroups(ids);
-        return ResponseFactory.acknowledged(deleted);
+        Mono<Boolean> deleteMono = userPermissionGroupService.deleteUserPermissionGroups(ids);
+        return ResponseFactory.acknowledged(deleteMono);
     }
 }

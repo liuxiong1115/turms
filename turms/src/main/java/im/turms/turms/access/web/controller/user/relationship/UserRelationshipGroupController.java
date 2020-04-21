@@ -63,13 +63,10 @@ public class UserRelationshipGroupController {
     @RequiredPermission(USER_RELATIONSHIP_GROUP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteRelationshipGroups(
             UserRelationshipGroup.KeyList keys) {
-        Mono<Boolean> deleted;
-        if (keys != null && !keys.getKeys().isEmpty()) {
-            deleted = userRelationshipGroupService.deleteRelationshipGroups(new HashSet<>(keys.getKeys()));
-        } else {
-            deleted = userRelationshipGroupService.deleteRelationshipGroups();
-        }
-        return ResponseFactory.acknowledged(deleted);
+        Mono<Boolean> deleteMono = keys != null && !keys.getKeys().isEmpty()
+                ? userRelationshipGroupService.deleteRelationshipGroups(new HashSet<>(keys.getKeys()))
+                : userRelationshipGroupService.deleteRelationshipGroups();
+        return ResponseFactory.acknowledged(deleteMono);
     }
 
     @PutMapping
@@ -77,11 +74,11 @@ public class UserRelationshipGroupController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateRelationshipGroups(
             UserRelationshipGroup.KeyList keys,
             @RequestBody UpdateRelationshipGroupDTO updateRelationshipGroupDTO) {
-        Mono<Boolean> updated = userRelationshipGroupService.updateRelationshipGroups(
+        Mono<Boolean> updateMono = userRelationshipGroupService.updateRelationshipGroups(
                 new HashSet<>(keys.getKeys()),
                 updateRelationshipGroupDTO.getName(),
                 updateRelationshipGroupDTO.getCreationDate());
-        return ResponseFactory.acknowledged(updated);
+        return ResponseFactory.acknowledged(updateMono);
     }
 
     @GetMapping

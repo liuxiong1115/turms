@@ -227,20 +227,24 @@ public class OnlineUserService {
                     clearSession(userId, manager, session, now, closeStatus);
                 }
             }
-            if (manager.getSessionsNumber() == 0) {
-                clearOnlineUserManager(userId);
-            }
-            if (pluginEnabled) {
-                List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
-                if (!handlerList.isEmpty()) {
-                    for (UserOnlineStatusChangeHandler handler : handlerList) {
-                        handler.goOffline(manager, closeStatus).subscribe();
-                    }
-                }
-            }
+            clearOnlineUserManagerAndTriggerPlugins(closeStatus, manager, userId);
             return true;
         } else {
             return false;
+        }
+    }
+
+    private void setManagersOffline(@NotNull CloseStatus closeStatus, @NotNull Collection<OnlineUserManager> managers) {
+        for (OnlineUserManager manager : managers) {
+            if (manager != null) {
+                ConcurrentMap<DeviceType, OnlineUserManager.Session> sessionMap = manager.getOnlineUserInfo().getSessionMap();
+                Date now = new Date();
+                Long userId = manager.getOnlineUserInfo().getUserId();
+                for (OnlineUserManager.Session session : sessionMap.values()) {
+                    clearSession(userId, manager, session, now, closeStatus);
+                }
+                clearOnlineUserManagerAndTriggerPlugins(closeStatus, manager, userId);
+            }
         }
     }
 
@@ -261,33 +265,23 @@ public class OnlineUserService {
         }
     }
 
-    private void setManagersOffline(@NotNull CloseStatus closeStatus, @NotNull Collection<OnlineUserManager> managers) {
-        for (OnlineUserManager manager : managers) {
-            if (manager != null) {
-                ConcurrentMap<DeviceType, OnlineUserManager.Session> sessionMap = manager.getOnlineUserInfo().getSessionMap();
-                Date now = new Date();
-                Long userId = manager.getOnlineUserInfo().getUserId();
-                for (OnlineUserManager.Session session : sessionMap.values()) {
-                    clearSession(userId, manager, session, now, closeStatus);
-                }
-                if (manager.getSessionsNumber() == 0) {
-                    clearOnlineUserManager(userId);
-                }
-                if (pluginEnabled) {
-                    List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
-                    if (!handlerList.isEmpty()) {
-                        for (UserOnlineStatusChangeHandler handler : handlerList) {
-                            handler.goOffline(manager, closeStatus).subscribe();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public void clearOnlineUserManager(@NotNull Long userId) {
         int slotIndex = turmsClusterManager.getSlotIndexByUserId(userId);
         onlineUsersManagerAtSlots.get(slotIndex).remove(userId);
+    }
+
+    private void clearOnlineUserManagerAndTriggerPlugins(@NotNull CloseStatus closeStatus, OnlineUserManager manager, Long userId) {
+        if (manager.getSessionsNumber() == 0) {
+            clearOnlineUserManager(userId);
+        }
+        if (pluginEnabled) {
+            List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
+            if (!handlerList.isEmpty()) {
+                for (UserOnlineStatusChangeHandler handler : handlerList) {
+                    handler.goOffline(manager, closeStatus).subscribe();
+                }
+            }
+        }
     }
 
     public boolean setLocalUserOffline(
@@ -356,8 +350,7 @@ public class OnlineUserService {
             @NotNull CloseStatus closeStatus) {
         boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(userId);
         if (responsible) {
-            setLocalUserDevicesOffline(userId, deviceTypes, closeStatus);
-            return Mono.just(true);
+            return Mono.just(setLocalUserDevicesOffline(userId, deviceTypes, closeStatus));
         } else {
             Member member;
             UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);

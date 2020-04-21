@@ -86,7 +86,7 @@ public class GroupTypeController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroupType(
             @RequestParam Set<Long> ids,
             @RequestBody UpdateGroupTypeDTO updateGroupTypeDTO) {
-        Mono<Boolean> updated = groupTypeService.updateGroupTypes(
+        Mono<Boolean> updateMono = groupTypeService.updateGroupTypes(
                 ids,
                 updateGroupTypeDTO.getName(),
                 updateGroupTypeDTO.getGroupSizeLimit(),
@@ -98,13 +98,13 @@ public class GroupTypeController {
                 updateGroupTypeDTO.getSelfInfoUpdatable(),
                 updateGroupTypeDTO.getEnableReadReceipt(),
                 updateGroupTypeDTO.getMessageEditable());
-        return ResponseFactory.acknowledged(updated);
+        return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping
     @RequiredPermission(GROUP_TYPE_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroupType(@RequestParam Set<Long> ids) {
-        Mono<Boolean> deleted = groupTypeService.deleteGroupTypes(ids);
-        return ResponseFactory.acknowledged(deleted);
+        Mono<Boolean> deleteMono = groupTypeService.deleteGroupTypes(ids);
+        return ResponseFactory.acknowledged(deleteMono);
     }
 }

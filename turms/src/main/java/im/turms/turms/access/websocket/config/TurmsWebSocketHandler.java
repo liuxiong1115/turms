@@ -66,7 +66,6 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
         Map<String, String> cookies = SessionUtil.getCookiesFromSession(session);
         HttpHeaders headers = session.getHandshakeInfo().getHeaders();
         Long userId = SessionUtil.getUserIdFromCookiesOrHeaders(cookies, headers);
-        DeviceType deviceType = SessionUtil.getDeviceTypeFromCookiesAndHeaders(cookies, headers);
         UserStatus userStatus = SessionUtil.getUserStatusFromCookiesAndHeaders(cookies, headers);
         PointFloat userLocation;
         if (locationEnabled) {
@@ -76,8 +75,8 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
         }
         String agent = session.getHandshakeInfo().getHeaders().getFirst(HttpHeaders.USER_AGENT);
         Map<String, String> deviceDetails = UserAgentUtil.parse(agent);
-        deviceType = UserAgentUtil.detectDeviceTypeIfUnset(
-                deviceType,
+        DeviceType deviceType = UserAgentUtil.detectDeviceTypeIfUnset(
+                SessionUtil.getDeviceTypeFromCookiesAndHeaders(cookies, headers),
                 deviceDetails,
                 turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
         if (userId != null) {
@@ -86,12 +85,11 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                 SessionUtil.putIp(session.getAttributes(), ip);
             }
             SessionUtil.putOnlineUserInfoToSession(session, userId, userStatus, deviceType, userLocation);
-            DeviceType finalDeviceType = deviceType;
             Flux<WebSocketMessage> notificationOutput = Flux.create(notificationSink ->
                     onlineUserService.addOnlineUser(
                             userId,
                             userStatus,
-                            finalDeviceType,
+                            deviceType,
                             deviceDetails,
                             ip,
                             userLocation,
@@ -101,14 +99,14 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                 notificationSink.error(throwable);
                                 onlineUserService.setLocalUserDevicesOffline(
                                         userId,
-                                        Collections.singleton(finalDeviceType),
+                                        Collections.singleton(deviceType),
                                         CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, throwable.getMessage()));
                             })
                             .doOnSuccess(code -> {
                                 if (code != TurmsStatusCode.OK) {
                                     onlineUserService.setLocalUserDevicesOffline(
                                             userId,
-                                            Collections.singleton(finalDeviceType),
+                                            Collections.singleton(deviceType),
                                             CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, String.valueOf(code.getBusinessCode())));
                                 } else if (turmsClusterManager.getTurmsProperties().getSession()
                                         .isNotifyClientsOfSessionInfoAfterConnected()) {
@@ -130,7 +128,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                         TurmsCloseStatus status = signalType == SignalType.ON_COMPLETE ?
                                 TurmsCloseStatus.DISCONNECTED_BY_CLIENT :
                                 TurmsCloseStatus.UNKNOWN_ERROR;
-                        onlineUserService.setLocalUserDeviceOffline(userId, finalDeviceType, CloseStatusFactory.get(status));
+                        onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(status));
                     })
                     .flatMap(inboundMessage -> inboundMessageDispatcher.dispatch(session, inboundMessage));
             return session.send(notificationOutput.mergeWith(responseOutput));

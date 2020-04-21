@@ -55,7 +55,7 @@ public class UserRelationshipController {
     @PostMapping
     @RequiredPermission(USER_RELATIONSHIP_CREATE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> addRelationship(@RequestBody AddRelationshipDTO addRelationshipDTO) {
-        Mono<Boolean> upsert = userRelationshipService.upsertOneSidedRelationship(
+        Mono<Boolean> upsertMono = userRelationshipService.upsertOneSidedRelationship(
                 addRelationshipDTO.getOwnerId(),
                 addRelationshipDTO.getRelatedUserId(),
                 addRelationshipDTO.getIsBlocked(),
@@ -64,7 +64,7 @@ public class UserRelationshipController {
                 addRelationshipDTO.getEstablishmentDate(),
                 false,
                 null);
-        return ResponseFactory.acknowledged(upsert);
+        return ResponseFactory.acknowledged(upsertMono);
     }
 
     @GetMapping
@@ -122,8 +122,8 @@ public class UserRelationshipController {
     @RequiredPermission(USER_RELATIONSHIP_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteRelationships(
             UserRelationship.KeyList keys) {
-        Mono<Boolean> deleted = userRelationshipService.deleteOneSidedRelationships(new HashSet<>(keys.getKeys()));
-        return ResponseFactory.acknowledged(deleted);
+        Mono<Boolean> deleteMono = userRelationshipService.deleteOneSidedRelationships(new HashSet<>(keys.getKeys()));
+        return ResponseFactory.acknowledged(deleteMono);
     }
 
     private Flux<UserRelationshipDTO> relationship2dto(Boolean withGroupIndexes, Flux<UserRelationship> relationshipsFlux) {

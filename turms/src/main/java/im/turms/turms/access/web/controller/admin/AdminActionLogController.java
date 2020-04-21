@@ -86,7 +86,7 @@ public class AdminActionLogController {
     @RequiredPermission(ADMIN_ACTION_LOG_DELETE)
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdminActionLog(
             @RequestParam(required = false) Set<Long> ids) {
-        Mono<Boolean> deleted = adminActionLogService.deleteAdminActionLogs(ids);
-        return ResponseFactory.acknowledged(deleted);
+        Mono<Boolean> deleteMono = adminActionLogService.deleteAdminActionLogs(ids);
+        return ResponseFactory.acknowledged(deleteMono);
     }
 }

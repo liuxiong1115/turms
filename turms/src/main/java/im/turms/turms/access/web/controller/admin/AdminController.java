@@ -55,11 +55,10 @@ public class AdminController {
         if (!account.isBlank() && !password.isBlank()) {
             return adminService.authenticate(account, password)
                     .map(authenticated -> {
-                        if (authenticated != null && authenticated) {
-                            throw new ResponseStatusException(HttpStatus.OK);
-                        } else {
-                            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-                        }
+                        HttpStatus httpStatus = authenticated != null && authenticated
+                                ? HttpStatus.OK
+                                : HttpStatus.UNAUTHORIZED;
+                        throw new ResponseStatusException(httpStatus);
                     });
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -114,13 +113,13 @@ public class AdminController {
             @RequestHeader("account") String requesterAccount,
             @RequestParam Set<String> accounts,
             @RequestBody UpdateAdminDTO updateAdminDTO) {
-        Mono<Boolean> updated = adminService.authAndUpdateAdmins(
+        Mono<Boolean> updateMono = adminService.authAndUpdateAdmins(
                 requesterAccount,
                 accounts,
                 updateAdminDTO.getPassword(),
                 updateAdminDTO.getName(),
                 updateAdminDTO.getRoleId());
-        return ResponseFactory.acknowledged(updated);
+        return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping
@@ -128,7 +127,7 @@ public class AdminController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteAdmins(
             @RequestHeader("account") String requesterAccount,
             @RequestParam Set<String> accounts) {
-        Mono<Boolean> deleted = adminService.authAndDeleteAdmins(requesterAccount, accounts);
-        return ResponseFactory.acknowledged(deleted);
+        Mono<Boolean> deleteMono = adminService.authAndDeleteAdmins(requesterAccount, accounts);
+        return ResponseFactory.acknowledged(deleteMono);
     }
 }

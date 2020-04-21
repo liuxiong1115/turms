@@ -68,7 +68,7 @@ public class MessageStatusController {
             @RequestParam(required = false) Date recallDateEnd,
             @RequestParam(required = false) Integer size) {
         size = pageUtil.getSize(size);
-        Flux<MessageStatus> messageStatuses = messageStatusService.queryMessageStatuses(
+        Flux<MessageStatus> messageStatusesFlux = messageStatusService.queryMessageStatuses(
                 messageIds,
                 recipientIds,
                 areSystemMessages,
@@ -79,7 +79,7 @@ public class MessageStatusController {
                 DateRange.of(recallDateStart, recallDateEnd),
                 0,
                 size);
-        return ResponseFactory.okIfTruthy(messageStatuses);
+        return ResponseFactory.okIfTruthy(messageStatusesFlux);
     }
 
     @GetMapping("/page")
@@ -108,7 +108,7 @@ public class MessageStatusController {
                 DateRange.of(receptionDateStart, receptionDateEnd),
                 DateRange.of(readDateStart, readDateEnd),
                 DateRange.of(recallDateStart, recallDateEnd));
-        Flux<MessageStatus> messageStatuses = messageStatusService.queryMessageStatuses(
+        Flux<MessageStatus> messageStatusesFlux = messageStatusService.queryMessageStatuses(
                 messageIds,
                 recipientIds,
                 areSystemMessages,
@@ -119,7 +119,7 @@ public class MessageStatusController {
                 DateRange.of(recallDateStart, recallDateEnd),
                 page,
                 size);
-        return ResponseFactory.page(count, messageStatuses);
+        return ResponseFactory.page(count, messageStatusesFlux);
     }
 
     @PutMapping

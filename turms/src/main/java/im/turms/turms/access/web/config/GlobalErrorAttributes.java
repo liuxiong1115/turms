@@ -48,8 +48,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
             ServerRequest request,
             boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(request, respondStackTraceIfException);
-        Throwable throwable = super.getError(request);
-        throwable = translate(throwable, errorAttributes);
+        Throwable throwable = translate(super.getError(request), errorAttributes);
         if (throwable instanceof TurmsBusinessException) {
             TurmsStatusCode code = ((TurmsBusinessException) throwable).getCode();
             errorAttributes.put(STATUS, code.getHttpStatusCode());

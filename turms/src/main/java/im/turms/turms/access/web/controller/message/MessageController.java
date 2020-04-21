@@ -57,7 +57,7 @@ public class MessageController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> createMessages(
             @RequestParam(defaultValue = "true") Boolean shouldSend,
             @RequestBody CreateMessageDTO createMessageDTO) {
-        Mono<Boolean> acknowledged = messageService.sendMessage(
+        Mono<Boolean> sendMono = messageService.sendMessage(
                 shouldSend,
                 createMessageDTO.getId(),
                 createMessageDTO.getChatType(),
@@ -68,7 +68,7 @@ public class MessageController {
                 createMessageDTO.getTargetId(),
                 createMessageDTO.getBurnAfter(),
                 createMessageDTO.getReferenceId());
-        return ResponseFactory.acknowledged(acknowledged);
+        return ResponseFactory.acknowledged(sendMono);
     }
 
     @GetMapping
@@ -85,7 +85,7 @@ public class MessageController {
             @RequestParam(required = false) Date deletionDateEnd,
             @RequestParam(required = false) Set<MessageDeliveryStatus> deliveryStatuses,
             @RequestParam(required = false) Integer size) {
-        Flux<Message> completeMessages = messageService.queryMessages(
+        Flux<Message> completeMessagesFlux = messageService.queryMessages(
                 false,
                 ids,
                 chatType,
@@ -97,7 +97,7 @@ public class MessageController {
                 deliveryStatuses,
                 0,
                 pageUtil.getSize(size));
-        return ResponseFactory.okIfTruthy(completeMessages);
+        return ResponseFactory.okIfTruthy(completeMessagesFlux);
     }
 
     @GetMapping("/page")
@@ -124,7 +124,7 @@ public class MessageController {
                 DateRange.of(deliveryDateStart, deliveryDateEnd),
                 DateRange.of(deletionDateStart, deletionDateEnd),
                 deliveryStatuses);
-        Flux<Message> completeMessages = messageService.queryMessages(
+        Flux<Message> completeMessagesFlux = messageService.queryMessages(
                 false,
                 ids,
                 chatType,
@@ -136,7 +136,7 @@ public class MessageController {
                 deliveryStatuses,
                 page,
                 pageUtil.getSize(size));
-        return ResponseFactory.page(count, completeMessages);
+        return ResponseFactory.page(count, completeMessagesFlux);
     }
 
     @GetMapping("/count")
@@ -236,14 +236,14 @@ public class MessageController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateMessages(
             @RequestParam Set<Long> ids,
             @RequestBody UpdateMessageDTO updateMessageDTO) {
-        Mono<Boolean> acknowledged = messageService.updateMessage(
+        Mono<Boolean> updateMono = messageService.updateMessage(
                 ids,
                 updateMessageDTO.getIsSystemMessage(),
                 updateMessageDTO.getText(),
                 updateMessageDTO.getRecords(),
                 updateMessageDTO.getBurnAfter(),
                 null);
-        return ResponseFactory.acknowledged(acknowledged);
+        return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping
@@ -252,8 +252,8 @@ public class MessageController {
             @RequestParam Set<Long> ids,
             @RequestParam(defaultValue = "false") Boolean shouldDeleteMessagesStatuses,
             @RequestParam(required = false) Boolean shouldDeleteLogically) {
-        Mono<Boolean> deleted = messageService
+        Mono<Boolean> deleteMono = messageService
                 .deleteMessages(ids, shouldDeleteMessagesStatuses, shouldDeleteLogically);
-        return ResponseFactory.acknowledged(deleted);
+        return ResponseFactory.acknowledged(deleteMono);
     }
 }

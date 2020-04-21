@@ -210,7 +210,7 @@ public class UserController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateUser(
             @RequestParam Set<Long> ids,
             @RequestBody UpdateUserDTO updateUserDTO) {
-        Mono<Boolean> updated = userService.updateUsers(
+        Mono<Boolean> updateMono = userService.updateUsers(
                 ids,
                 updateUserDTO.getPassword(),
                 updateUserDTO.getName(),
@@ -219,7 +219,7 @@ public class UserController {
                 updateUserDTO.getPermissionGroupId(),
                 updateUserDTO.getRegistrationDate(),
                 updateUserDTO.getIsActive());
-        return ResponseFactory.acknowledged(updated);
+        return ResponseFactory.acknowledged(updateMono);
     }
 
     @DeleteMapping
@@ -227,7 +227,7 @@ public class UserController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteUsers(
             @RequestParam Set<Long> ids,
             @RequestParam(required = false) Boolean shouldDeleteLogically) {
-        Mono<Boolean> deleted = userService.deleteUsers(ids, shouldDeleteLogically);
-        return ResponseFactory.acknowledged(deleted);
+        Mono<Boolean> deleteMono = userService.deleteUsers(ids, shouldDeleteLogically);
+        return ResponseFactory.acknowledged(deleteMono);
     }
 }

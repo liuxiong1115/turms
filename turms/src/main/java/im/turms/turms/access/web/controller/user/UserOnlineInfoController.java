@@ -129,17 +129,15 @@ public class UserOnlineInfoController {
             @RequestParam Set<Long> userIds,
             @RequestParam(required = false) Set<DeviceType> deviceTypes,
             @RequestBody UpdateOnlineStatusDTO updateOnlineStatusDTO) {
-        Mono<Boolean> updated;
+        Mono<Boolean> updateMono;
         UserStatus onlineStatus = updateOnlineStatusDTO.getOnlineStatus();
         if (onlineStatus == UserStatus.OFFLINE) {
-            if (deviceTypes != null) {
-                updated = onlineUserService.setUsersDevicesOffline(userIds, deviceTypes, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_ADMIN));
-            } else {
-                updated = onlineUserService.setUsersOffline(userIds, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_ADMIN));
-            }
+            updateMono = deviceTypes != null
+                    ? onlineUserService.setUsersDevicesOffline(userIds, deviceTypes, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_ADMIN))
+                    : onlineUserService.setUsersOffline(userIds, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_ADMIN));
         } else {
-            updated = onlineUserService.updateOnlineUsersStatus(userIds, onlineStatus);
+            updateMono = onlineUserService.updateOnlineUsersStatus(userIds, onlineStatus);
         }
-        return ResponseFactory.acknowledged(updated);
+        return ResponseFactory.acknowledged(updateMono);
     }
 }

@@ -245,11 +245,9 @@ public class InboundMessageDispatcher {
                             }
                             Mono<?> mono;
                             if (logUserAction) {
+                                mono = userActionLogService.save(actionLog);
                                 if (triggerHandlers) {
-                                    mono = userActionLogService.save(actionLog)
-                                            .doOnTerminate(userActionLogService.triggerLogHandlers(actionLog)::subscribe);
-                                } else {
-                                    mono = userActionLogService.save(actionLog);
+                                    mono = mono.doOnTerminate(userActionLogService.triggerLogHandlers(actionLog)::subscribe);
                                 }
                             } else {
                                 mono = userActionLogService.triggerLogHandlers(actionLog);
