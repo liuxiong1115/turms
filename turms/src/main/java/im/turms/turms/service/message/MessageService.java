@@ -41,7 +41,6 @@ import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.group.GroupMemberService;
 import im.turms.turms.service.user.UserService;
-import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.util.AggregationUtil;
 import im.turms.turms.util.ProtoUtil;
 import lombok.Getter;
@@ -84,7 +83,6 @@ public class MessageService {
     private final OutboundMessageService outboundMessageService;
     private final GroupMemberService groupMemberService;
     private final UserService userService;
-    private final OnlineUserService onlineUserService;
     private final TurmsPluginManager turmsPluginManager;
     private final boolean pluginEnabled;
     @Getter
@@ -92,13 +90,12 @@ public class MessageService {
     private final Cache<Long, Message> sentMessageCache;
 
     @Autowired
-    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OnlineUserService onlineUserService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
+    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.messageStatusService = messageStatusService;
         this.groupMemberService = groupMemberService;
         this.userService = userService;
-        this.onlineUserService = onlineUserService;
         this.outboundMessageService = outboundMessageService;
         this.turmsPluginManager = turmsPluginManager;
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
@@ -818,50 +815,43 @@ public class MessageService {
             @Nullable @Min(0) Integer burnAfter,
             @Nullable @PastOrPresent Date deliveryDate,
             @Nullable Long referenceId) {
-        boolean messagePersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent();
-        boolean messageStatusPersistent = turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent();
-        if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP) {
-            return userService.isAllowedToSendMessageToTarget(chatType, isSystemMessage, senderId, targetId)
-                    .flatMap(allowed -> {
-                        if (allowed == null || !allowed) {
-                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                        }
-                        Mono<Set<Long>> recipientIdsMono;
-                        if (chatType == ChatType.PRIVATE) {
-                            recipientIdsMono = Mono.just(Collections.singleton(targetId));
-                        } else {
-                            recipientIdsMono = groupMemberService.getMembersIdsByGroupId(targetId)
-                                    .collect(Collectors.toSet());
-                        }
-                        return recipientIdsMono.flatMap(recipientsIds -> {
-                            if (!messagePersistent) {
-                                if (recipientsIds.isEmpty()) {
-                                    return Mono.empty();
-                                } else {
-                                    return Mono.just(Pair.of(null, recipientsIds));
-                                }
-                            }
-                            Mono<Message> saveMono;
-                            if (messageStatusPersistent) {
-                                saveMono = saveMessageAndMessagesStatus(messageId, senderId, targetId, chatType,
-                                        isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, recipientsIds);
+        return userService.isAllowedToSendMessageToTarget(chatType, isSystemMessage, senderId, targetId)
+                .flatMap(allowed -> {
+                    if (allowed == null || !allowed) {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+                    }
+                    Mono<Set<Long>> recipientIdsMono;
+                    if (chatType == ChatType.PRIVATE) {
+                        recipientIdsMono = Mono.just(Collections.singleton(targetId));
+                    } else {
+                        recipientIdsMono = groupMemberService.getMembersIdsByGroupId(targetId)
+                                .collect(Collectors.toSet());
+                    }
+                    return recipientIdsMono.flatMap(recipientsIds -> {
+                        if (!turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent()) {
+                            if (recipientsIds.isEmpty()) {
+                                return Mono.empty();
                             } else {
-                                saveMono = saveMessage(null, senderId, targetId, chatType,
-                                        isSystemMessage, text, records, burnAfter, deliveryDate,
-                                        referenceId, null);
+                                return Mono.just(Pair.of(null, recipientsIds));
                             }
-                            return saveMono.map(message -> {
-                                Long id = message.getId();
-                                if (id != null) {
-                                    sentMessageCache.put(id, message);
-                                }
-                                return Pair.of(message, recipientsIds);
-                            });
+                        }
+                        Mono<Message> saveMono;
+                        if (turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent()) {
+                            saveMono = saveMessageAndMessagesStatus(messageId, senderId, targetId, chatType,
+                                    isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, recipientsIds);
+                        } else {
+                            saveMono = saveMessage(null, senderId, targetId, chatType,
+                                    isSystemMessage, text, records, burnAfter, deliveryDate,
+                                    referenceId, null);
+                        }
+                        return saveMono.map(message -> {
+                            if (message.getId() != null && sentMessageCache != null) {
+                                addSentMessage2Cache(message);
+                            }
+                            return Pair.of(message, recipientsIds);
                         });
                     });
-        } else {
-            throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
-        }
+                });
     }
 
     /**
@@ -952,9 +942,8 @@ public class MessageService {
                         isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, null);
             }
             return messageMono.doOnSuccess(msg -> {
-                Long id = message.getId();
-                if (id != null) {
-                    sentMessageCache.put(id, message);
+                if (msg.getId() != null && sentMessageCache != null) {
+                    addSentMessage2Cache(msg);
                 }
             }).thenReturn(true);
         }
@@ -1009,5 +998,20 @@ public class MessageService {
                         });
             }
         }
+    }
+
+    private void addSentMessage2Cache(@NotNull Message message) {
+        sentMessageCache.put(message.getId(), new Message(
+                message.getId(),
+                message.getChatType(),
+                message.getIsSystemMessage(),
+                message.getDeliveryDate(),
+                null,
+                null,
+                message.getSenderId(),
+                message.getTargetId(),
+                null,
+                null,
+                null));
     }
 }
