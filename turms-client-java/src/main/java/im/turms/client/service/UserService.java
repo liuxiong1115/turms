@@ -44,7 +44,9 @@ public class UserService {
             @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus,
             @Nullable UserLocation location) {
-        Validator.throwIfAnyFalsy(password);
+        if (password == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "password must not be null"));
+        }
         this.userId = userId;
         this.password = password;
         if (deviceType != null) {
@@ -73,7 +75,9 @@ public class UserService {
     }
 
     public CompletableFuture<Void> updateUserOnlineStatus(@NotNull UserStatus onlineStatus) {
-        Validator.throwIfAnyFalsy(onlineStatus);
+        if (onlineStatus == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "onlineStatus must not be null"));
+        }
         if (onlineStatus == UserStatus.OFFLINE) {
             return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The online status must not be OFFLINE"));
         }
@@ -84,7 +88,9 @@ public class UserService {
     }
 
     public CompletableFuture<Void> disconnectOnlineDevices(@NotEmpty Set<DeviceType> deviceTypes) {
-        Validator.throwIfAnyFalsy(deviceTypes);
+        if (deviceTypes == null || deviceTypes.isEmpty()) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "deviceTypes must not be null or empty"));
+        }
         return turmsClient.getDriver()
                 .send(UpdateUserOnlineStatusRequest.newBuilder(), MapUtil.of(
                         "user_status", UserStatus.OFFLINE,
@@ -93,7 +99,9 @@ public class UserService {
     }
 
     public CompletableFuture<Void> updatePassword(@NotNull String password) {
-        Validator.throwIfAnyFalsy(password);
+        if (password == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "password must not be null"));
+        }
         return turmsClient.getDriver()
                 .send(UpdateUserRequest.newBuilder(), MapUtil.of(
                         password, password))
@@ -168,7 +176,9 @@ public class UserService {
     }
 
     public CompletableFuture<List<UserStatusDetail>> queryUsersOnlineStatusRequest(@NotEmpty Set<Long> usersIds) {
-        Validator.throwIfAnyFalsy(usersIds);
+        if (usersIds == null || usersIds.isEmpty()) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "usersIds must not be null or empty"));
+        }
         return turmsClient.getDriver()
                 .send(QueryUsersOnlineStatusRequest.newBuilder(), MapUtil.of(
                         "users_ids", usersIds))
@@ -275,7 +285,9 @@ public class UserService {
     public CompletableFuture<Long> sendFriendRequest(
             long recipientId,
             @NotNull String content) {
-        Validator.throwIfAnyFalsy(content);
+        if (content == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "content must not be null"));
+        }
         return turmsClient.getDriver()
                 .send(CreateFriendRequestRequest.newBuilder(), MapUtil.of(
                         "recipient_id", recipientId,
@@ -287,7 +299,9 @@ public class UserService {
             long requestId,
             @NotNull ResponseAction responseAction,
             @Nullable String reason) {
-        Validator.throwIfAnyFalsy(responseAction);
+        if (responseAction == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "responseAction must not be null"));
+        }
         return turmsClient.getDriver()
                 .send(UpdateFriendRequestRequest.newBuilder(), MapUtil.of(
                         "request_id", requestId,
@@ -308,7 +322,9 @@ public class UserService {
     }
 
     public CompletableFuture<Integer> createRelationshipGroup(@NotNull String name) {
-        Validator.throwIfAnyFalsy(name);
+        if (name == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "name must not be null"));
+        }
         return turmsClient.getDriver()
                 .send(CreateRelationshipGroupRequest.newBuilder(), MapUtil.of(
                         "name", name))
@@ -328,7 +344,9 @@ public class UserService {
     public CompletableFuture<Void> updateRelationshipGroup(
             int groupIndex,
             @NotNull String newName) {
-        Validator.throwIfAnyFalsy(newName);
+        if (newName == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "newName must not be null"));
+        }
         return turmsClient.getDriver()
                 .send(UpdateRelationshipGroupRequest.newBuilder(), MapUtil.of(
                         "group_index", groupIndex,

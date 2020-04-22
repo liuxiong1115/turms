@@ -45,7 +45,9 @@ public class GroupService {
             @Nullable Integer minimumScore,
             @Nullable Date muteEndDate,
             @Nullable Long groupTypeId) {
-        Validator.throwIfAnyFalsy(name);
+        if (name == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "name must not be null"));
+        }
         return this.turmsClient.getDriver()
                 .send(CreateGroupRequest.newBuilder(), MapUtil.of(
                         "name", name,
@@ -99,7 +101,9 @@ public class GroupService {
     }
 
     public CompletableFuture<Void> muteGroup(long groupId, @NotNull Date muteEndDate) {
-        Validator.throwIfAnyFalsy(muteEndDate);
+        if (muteEndDate == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "muteEndDate must not be null"));
+        }
         return updateGroup(groupId, null, null, null, null, null, muteEndDate, null, null);
     }
 
@@ -140,7 +144,12 @@ public class GroupService {
             @NotNull String question,
             @NotEmpty List<String> answers,
             int score) {
-        Validator.throwIfAnyFalsy(question, answers);
+        if (question == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "question must not be null"));
+        }
+        if (answers == null || answers.isEmpty()) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "answers must not be null or empty"));
+        }
         return turmsClient.getDriver()
                 .send(CreateGroupJoinQuestionRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
@@ -222,7 +231,9 @@ public class GroupService {
             long groupId,
             long inviteeId,
             @NotNull String content) {
-        Validator.throwIfAnyFalsy(content);
+        if (content == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "content must not be null"));
+        }
         return turmsClient.getDriver()
                 .send(CreateGroupInvitationRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
@@ -261,7 +272,9 @@ public class GroupService {
     }
 
     public CompletableFuture<Long> createJoinRequest(long groupId, @NotNull String content) {
-        Validator.throwIfAnyFalsy(content);
+        if (content == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "content must not be null"));
+        }
         return turmsClient.getDriver()
                 .send(CreateGroupJoinRequestRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
@@ -317,7 +330,9 @@ public class GroupService {
     }
 
     public CompletableFuture<GroupJoinQuestionsAnswerResult> answerGroupQuestions(@NotEmpty Map<Long, String> questionIdAndAnswerMap) {
-        Validator.throwIfEmpty(questionIdAndAnswerMap);
+        if (questionIdAndAnswerMap == null || questionIdAndAnswerMap.isEmpty()) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "questionIdAndAnswerMap must not be null or empty"));
+        }
         return turmsClient.getDriver()
                 .send(CheckGroupJoinQuestionsAnswersRequest.newBuilder(), MapUtil.of(
                         "question_id_and_answer", questionIdAndAnswerMap))
@@ -394,7 +409,9 @@ public class GroupService {
             long groupId,
             long memberId,
             @NotNull Date muteEndDate) {
-        Validator.throwIfAnyFalsy(muteEndDate);
+        if (muteEndDate == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "muteEndDate must not be null"));
+        }
         return this.updateGroupMemberInfo(groupId, memberId, null, null, muteEndDate);
     }
 
@@ -421,7 +438,9 @@ public class GroupService {
             long groupId,
             @NotEmpty List<Long> membersIds,
             boolean withStatus) {
-        Validator.throwIfAnyFalsy(membersIds);
+        if (membersIds == null || membersIds.isEmpty()) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "membersIds must not be null or empty"));
+        }
         return turmsClient.getDriver()
                 .send(QueryGroupMembersRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,

@@ -88,10 +88,14 @@ public class MessageService {
             @Nullable String text,
             @Nullable byte[] records,
             @Nullable Integer burnAfter) {
-        Validator.throwIfAnyFalsy(chatType);
-        Validator.throwIfAllFalsy(text, records);
+        if (chatType == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType must not be null"));
+        }
         if (chatType == ChatType.UNRECOGNIZED) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The chat type cannot be UNRECOGNIZED"));
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType cannot be UNRECOGNIZED"));
+        }
+        if (text == null && records == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "text and records must not all be null"));
         }
         if (deliveryDate == null) {
             deliveryDate = new Date();
@@ -111,9 +115,11 @@ public class MessageService {
             long messageId,
             @NotNull ChatType chatType,
             long targetId) {
-        Validator.throwIfAnyFalsy(chatType);
+        if (chatType == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType must not be null"));
+        }
         if (chatType == ChatType.UNRECOGNIZED) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The chat type cannot be UNRECOGNIZED"));
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType cannot be UNRECOGNIZED"));
         }
         return turmsClient.getDriver()
                 .send(CreateMessageRequest.newBuilder(), MapUtil.of(
@@ -209,7 +215,12 @@ public class MessageService {
     public CompletableFuture<Void> updateTypingStatusRequest(
             @NotNull ChatType chatType,
             long targetId) {
-        Validator.throwIfAnyFalsy(chatType);
+        if (chatType == null) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType must not be null"));
+        }
+        if (chatType == ChatType.UNRECOGNIZED) {
+            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType cannot be UNRECOGNIZED"));
+        }
         return turmsClient.getDriver()
                 .send(UpdateTypingStatusRequest.newBuilder(), MapUtil.of(
                         "chat_type", chatType,

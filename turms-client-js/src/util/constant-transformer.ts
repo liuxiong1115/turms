@@ -16,7 +16,7 @@ export default class ConstantTransformer {
             case 'GROUP':
                 return ChatType.GROUP;
             default:
-                throw new Error('illegal params');
+                throw 'illegal ChatType';
         }
     }
 
@@ -34,7 +34,7 @@ export default class ConstantTransformer {
             case 'ANONYMOUS_GUEST':
                 return GroupMemberRole.ANONYMOUS_GUEST;
             default:
-                throw new Error('illegal params');
+                throw 'illegal GroupMemberRole';
         }
     }
 
@@ -54,7 +54,7 @@ export default class ConstantTransformer {
             case 'BE_RIGHT_BACK':
                 return UserStatus.BE_RIGHT_BACK;
             default:
-                throw new Error('illegal params');
+                throw 'illegal UserStatus';
         }
     }
 
@@ -68,7 +68,7 @@ export default class ConstantTransformer {
             case 'FRIENDS':
                 return ProfileAccessStrategy.FRIENDS;
             default:
-                throw new Error('illegal params');
+                throw 'illegal ProfileAccessStrategy';
         }
     }
 
@@ -82,7 +82,7 @@ export default class ConstantTransformer {
             case 'IGNORE':
                 return ResponseAction.IGNORE;
             default:
-                throw new Error('illegal params');
+                throw 'illegal ResponseAction';
         }
     }
 
@@ -100,7 +100,7 @@ export default class ConstantTransformer {
             case 'RECALLED':
                 return MessageDeliveryStatus.RECALLED;
             default:
-                throw new Error('illegal params');
+                throw 'illegal MessageDeliveryStatus';
         }
     }
 
@@ -120,7 +120,7 @@ export default class ConstantTransformer {
             case 'UNKNOWN':
                 return DeviceType.UNKNOWN;
             default:
-                throw new Error('illegal params');
+                throw 'illegal DeviceType';
         }
     }
 }
