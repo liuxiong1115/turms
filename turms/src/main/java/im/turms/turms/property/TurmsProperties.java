@@ -20,7 +20,10 @@ package im.turms.turms.property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -36,20 +39,25 @@ import jdk.jfr.Description;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -64,6 +72,10 @@ public class TurmsProperties implements IdentifiedDataSerializable {
             .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
             .writerWithView(MutablePropertiesView.class);
     public static final List<Function<TurmsProperties, Void>> propertiesChangeListeners = new LinkedList<>();
+
+    private static final ThreadLocal<Yaml> yamlThreadLocal = new ThreadLocal<>();
+
+    private static Path latestConfigFilePath;
 
     // Env
 
@@ -139,6 +151,27 @@ public class TurmsProperties implements IdentifiedDataSerializable {
     @NestedConfigurationProperty
     private Notification notification = new Notification();
 
+    @Autowired
+    public TurmsProperties(Environment environment) {
+        String[] activeProfiles = environment.getActiveProfiles();
+        String activeProfile = null;
+        for (String profile : activeProfiles) {
+            if (!profile.contains("latest")) {
+                activeProfile = profile;
+                break;
+            }
+        }
+        // The property should be passed from turms.cmd or turms.sh
+        String configDir = System.getProperty("spring.config.location");
+        if (configDir == null || configDir.isBlank()) {
+            configDir = "./config";
+        }
+        String latestConfigFileName = activeProfile != null
+                ? String.format("application-%s-latest.yaml", activeProfile)
+                : "application-latest.yaml";
+        latestConfigFilePath = Path.of(String.format("%s/%s", configDir, latestConfigFileName));
+    }
+
     @JsonIgnore
     @Override
     public int getFactoryId() {
@@ -189,15 +222,39 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         notification.readData(in);
     }
 
+    public void persist(String propertiesJson) throws IOException {
+        ObjectNode tree = getNotEmptyPropertiesTree(propertiesJson);
+        Yaml yaml = getYaml();
+        String configYaml = yaml.dump(yaml.load(MUTABLE_PROPERTIES_WRITER.writeValueAsString(tree)));
+        Path dir = latestConfigFilePath.getParent();
+        if (dir != null) {
+            Files.createDirectories(dir);
+        }
+        Files.writeString(latestConfigFilePath, configYaml, StandardCharsets.UTF_8,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.CREATE);
+    }
+
     public static TurmsProperties merge(
             @NotNull TurmsProperties propertiesToUpdate,
-            @NotNull TurmsProperties propertiesForUpdating) throws IOException {
+            @NotNull String propertiesForUpdating) throws IOException {
         ObjectReader objectReader = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
                 .readerForUpdating(propertiesToUpdate)
                 .forType(TurmsProperties.class);
-        return objectReader.readValue(MUTABLE_PROPERTIES_WRITER.writeValueAsBytes(propertiesForUpdating));
+        return objectReader.readValue(propertiesForUpdating);
+    }
+
+    public static TurmsProperties merge(
+            @NotNull TurmsProperties propertiesToUpdate,
+            @NotNull TurmsProperties propertiesForUpdating) throws IOException {
+        return merge(propertiesToUpdate, getMutablePropertiesString(propertiesForUpdating));
+    }
+
+    public static String getMutablePropertiesString(TurmsProperties propertiesForUpdating) throws JsonProcessingException {
+        return MUTABLE_PROPERTIES_WRITER.writeValueAsString(propertiesForUpdating);
     }
 
     public TurmsProperties reset() throws IOException {
@@ -240,6 +297,10 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         } else {
             fieldList = FieldUtils.getAllFieldsList(clazz);
         }
+        fieldList = fieldList
+                .stream()
+                .filter(field -> !field.isAnnotationPresent(JsonIgnore.class))
+                .collect(Collectors.toList());
         for (Field field : fieldList) {
             if (field.getType().getTypeName().startsWith(packageName)) {
                 if (field.getType().isEnum()) {
@@ -288,5 +349,40 @@ public class TurmsProperties implements IdentifiedDataSerializable {
             }
         }
         return false;
+    }
+
+    private Yaml getYaml() {
+        Yaml yaml = yamlThreadLocal.get();
+        if (yaml == null) {
+            synchronized (this) {
+                if (yaml == null) {
+                    DumperOptions options = new DumperOptions();
+                    options.setIndent(2);
+                    options.setPrettyFlow(true);
+                    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+                    yaml = new Yaml(options);
+                    yamlThreadLocal.set(yaml);
+                }
+            }
+        }
+        return yaml;
+    }
+
+    private ObjectNode getNotEmptyPropertiesTree(String propertiesJson) throws JsonProcessingException {
+        ObjectNode jsonNodeTree = (ObjectNode) new ObjectMapper().readTree(propertiesJson);
+        List<String> emptyFieldNames = new LinkedList<>();
+        Iterator<Map.Entry<String, JsonNode>> fields = jsonNodeTree.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> entry = fields.next();
+            if (entry.getValue().size() == 0) {
+                emptyFieldNames.add(entry.getKey());
+            }
+        }
+        for (String name : emptyFieldNames) {
+            jsonNodeTree.remove(name);
+        }
+        ObjectNode tree = JsonNodeFactory.instance.objectNode();
+        tree.set("turms", jsonNodeTree);
+        return tree;
     }
 }

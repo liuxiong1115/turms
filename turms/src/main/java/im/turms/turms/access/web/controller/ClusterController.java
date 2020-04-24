@@ -97,10 +97,12 @@ public class ClusterController {
             return ResponseFactory.okIfTruthy(turmsClusterManager.getTurmsProperties().reset());
         } else {
             if (turmsProperties != null) {
+                String propertiesForUpdating = TurmsProperties.getMutablePropertiesString(turmsProperties);
                 TurmsProperties mergedProperties = TurmsProperties.merge(
                         turmsClusterManager.getTurmsProperties(),
-                        turmsProperties);
+                        propertiesForUpdating);
                 turmsClusterManager.updatePropertiesAndNotify(mergedProperties);
+                mergedProperties.persist(propertiesForUpdating);
                 return ResponseFactory.okIfTruthy(mergedProperties);
             } else {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The new properties must not be null if shouldReset is false");
