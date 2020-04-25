@@ -54,17 +54,10 @@ public class HazelcastConfig {
     public HazelcastConfig(ApplicationContext applicationContext, TurmsClusterManager turmsClusterManager) throws UnknownHostException {
         this.applicationContext = applicationContext;
         this.turmsClusterManager = turmsClusterManager;
-        String portStr = applicationContext.getEnvironment().getProperty("server.port");
-        Integer tempPort;
-        try {
-            tempPort = portStr != null ? Integer.parseInt(portStr) : null;
-        } catch (NumberFormatException ignored) {
-            tempPort = null;
-        }
-        if (tempPort == null) {
+        port = applicationContext.getEnvironment().getProperty("server.port", Integer.class);
+        if (port == null) {
             throw new UnknownHostException("The local port of the current server cannot be found");
         }
-        this.port = tempPort;
     }
 
     @Bean

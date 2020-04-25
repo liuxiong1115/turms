@@ -46,6 +46,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Component
@@ -109,7 +110,10 @@ public class TurmsClusterManager {
     }
 
     private synchronized void initCurrentNodeStatusAfterMemberChange(MembershipEvent membershipEvent) {
-        membersSnapshot = new ArrayList<>(hazelcastInstance.getCluster().getMembers());
+        membersSnapshot = hazelcastInstance.getCluster().getMembers()
+                .stream()
+                .sorted(Comparator.comparing(Member::getUuid))
+                .collect(Collectors.toList());
         Map<UUID, Member> memberMap = new HashMap<>(membersSnapshot.size());
         for (Member member : membersSnapshot) {
             memberMap.put(member.getUuid(), member);
@@ -125,7 +129,7 @@ public class TurmsClusterManager {
                 initEnvAfterJoinedCluster();
             }
             hasJoinedCluster = true;
-            if (isCurrentMemberMaster()) {
+            if (membersSnapshot.get(0).getUuid().equals(localMembersSnapshot.getUuid())) {
                 if (!isMaster && membersSnapshot.size() > 1) {
                     uploadPropertiesToAllMembers(sharedTurmsProperties);
                 }
@@ -150,13 +154,7 @@ public class TurmsClusterManager {
     }
 
     public boolean isCurrentMemberMaster() {
-        Iterator<Member> iterator = hazelcastInstance.getCluster().getMembers().iterator();
-        if (iterator.hasNext()) {
-            return iterator.next().getUuid()
-                    .equals(hazelcastInstance.getCluster().getLocalMember().getUuid());
-        } else {
-            return false;
-        }
+        return isMaster;
     }
 
     private void logWorkingRanges(@NotEmpty Set<Member> members, @NotNull Member localMember) {
