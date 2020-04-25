@@ -422,6 +422,14 @@ public class TurmsClusterManager {
         return getAddress(localMembersSnapshot);
     }
 
+    public List<String> getServersAddress() {
+        List<String> addresses = new ArrayList<>(membersSnapshot.size());
+        for (Member member : membersSnapshot) {
+            addresses.add(getAddress(member));
+        }
+        return addresses;
+    }
+
     private enum SharedPropertiesKey {
         TURMS_PROPERTIES
     }

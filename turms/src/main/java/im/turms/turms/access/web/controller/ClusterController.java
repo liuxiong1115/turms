@@ -28,12 +28,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.constant.AdminPermission.CLUSTER_CONFIG_QUERY;
 import static im.turms.turms.constant.AdminPermission.CLUSTER_CONFIG_UPDATE;
+import static im.turms.turms.constant.AdminPermission.CLUSTER_SERVER_INFO_QUERY;
 
 @RestController
 @RequestMapping("/cluster")
@@ -45,14 +46,16 @@ public class ClusterController {
     }
 
     @GetMapping("/hazelcast-info")
-    @RequiredPermission(CLUSTER_CONFIG_QUERY)
+    @RequiredPermission(CLUSTER_SERVER_INFO_QUERY)
     public ResponseEntity<ResponseDTO<Map>> queryHazelcastInfo(@RequestParam(defaultValue = "false") boolean withConfigs) {
         Map<String, ?> hazelcastInfo = turmsClusterManager.getHazelcastInfo(withConfigs);
         return ResponseFactory.okIfTruthy(hazelcastInfo);
     }
 
+    // Config
+
     @GetMapping("/config")
-    @RequiredPermission(CLUSTER_CONFIG_QUERY)
+    @RequiredPermission(CLUSTER_SERVER_INFO_QUERY)
     public ResponseEntity<ResponseDTO<Map<String, Object>>> queryClusterConfig(@RequestParam(defaultValue = "false") Boolean onlyMutable) {
         try {
             return ResponseFactory.okIfTruthy(TurmsProperties.getPropertyValueMap(turmsClusterManager.getTurmsProperties(), onlyMutable));
@@ -62,7 +65,7 @@ public class ClusterController {
     }
 
     @GetMapping("/config/metadata")
-    @RequiredPermission(CLUSTER_CONFIG_QUERY)
+    @RequiredPermission(CLUSTER_SERVER_INFO_QUERY)
     public ResponseEntity<ResponseDTO<Map<String, Object>>> queryClusterConfigMetadata(
             @RequestParam(defaultValue = "false") Boolean onlyMutable,
             @RequestParam(defaultValue = "false") Boolean withValue,
@@ -108,5 +111,13 @@ public class ClusterController {
                 throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The new properties must not be null if shouldReset is false");
             }
         }
+    }
+
+    // Server
+
+    @GetMapping("/servers")
+    @RequiredPermission(CLUSTER_SERVER_INFO_QUERY)
+    public ResponseEntity<ResponseDTO<Collection<String>>> queryServers() {
+        return ResponseFactory.okIfTruthy(turmsClusterManager.getServersAddress());
     }
 }
