@@ -111,6 +111,7 @@ public enum AdminPermission {
     ADMIN_ACTION_LOG_QUERY,
 
     CLUSTER_CONFIG_UPDATE,
+    CLUSTER_SERVER_ACTIVATION_UPDATE,
     CLUSTER_SERVER_INFO_QUERY;
 
     public static final Set<AdminPermission> ALL = Set.of(AdminPermission.values());
@@ -195,6 +196,7 @@ public enum AdminPermission {
 
     public static final Set<AdminPermission> ALL_CLUSTER = Set.of(
             CLUSTER_CONFIG_UPDATE,
+            CLUSTER_SERVER_ACTIVATION_UPDATE,
             CLUSTER_SERVER_INFO_QUERY);
 
     public static final Set<AdminPermission> ALL_CREATE = Set.of(

@@ -20,6 +20,7 @@ package im.turms.turms.manager;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.cluster.MembershipAdapter;
 import com.hazelcast.cluster.MembershipEvent;
+import com.hazelcast.collection.ISet;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
 import com.hazelcast.config.ListenerConfig;
@@ -57,21 +58,25 @@ public class TurmsClusterManager {
     private static final String HAZELCAST_KEY_SHARED_PROPERTIES = "properties";
     private static final String HAZELCAST_KEY_MEMBER_ADDRESSES = "addresses";
     private static final String HAZELCAST_KEY_DEFAULT = "default";
+    private static final String HAZELCAST_KEY_INACTIVE_MEMBERS = "inactiveMembers";
+
     private static final String CLUSTER_STATE = "clusterState";
     private static final String CLUSTER_TIME = "clusterTime";
     private static final String CLUSTER_VERSION = "clusterVersion";
     private static final String MEMBERS = "members";
     private final ApplicationContext context;
+    private TurmsProperties sharedTurmsProperties;
     @Getter
     @Setter
     private HazelcastInstance hazelcastInstance;
-    private TurmsProperties sharedTurmsProperties;
     private ReplicatedMap<SharedPropertiesKey, Object> sharedProperties;
-    private ReplicatedMap<UUID, String> memberAddresses; // Don't just use MemberAttributeConfig that only supports immutable attributes
+    private ReplicatedMap<UUID, String> memberAddresses; // Don't just use MemberAttributeConfig because it only supports immutable attributes
+    private ISet<UUID> inactiveMembers;
 
     private List<Member> membersSnapshot = Collections.emptyList();
     private Map<UUID, Member> membersSnapshotMap = Collections.emptyMap();
     private Member localMembersSnapshot;
+
     private boolean isMaster = false;
     private boolean hasJoinedCluster = false;
     private FlakeIdGenerator idGenerator;
@@ -138,7 +143,7 @@ public class TurmsClusterManager {
                 isMaster = false;
             }
         } else {
-            hasJoinedCluster = hasJoinedCluster();
+            hasJoinedCluster = membersSnapshot.contains(localMembersSnapshot);
             memberAddresses.remove(membershipEvent.getMember().getUuid());
         }
         logWorkingRanges(
@@ -147,10 +152,11 @@ public class TurmsClusterManager {
         notifyMembersChangeListeners(membershipEvent);
     }
 
-    public boolean isServing() {
-        return hazelcastInstance.getLifecycleService().isRunning() &&
-                hasJoinedCluster &&
-                sharedTurmsProperties.getCluster().getMinimumQuorumToServe() <= membersSnapshot.size();
+    public boolean isActive() {
+        return hazelcastInstance.getLifecycleService().isRunning()
+                && hasJoinedCluster
+                && sharedTurmsProperties.getCluster().getMinimumQuorumToServe() <= membersSnapshot.size()
+                && !inactiveMembers.contains(localMembersSnapshot.getUuid());
     }
 
     public boolean isCurrentMemberMaster() {
@@ -178,6 +184,7 @@ public class TurmsClusterManager {
             idGenerator = hazelcastInstance.getFlakeIdGenerator(HAZELCAST_KEY_DEFAULT);
             sharedProperties = hazelcastInstance.getReplicatedMap(HAZELCAST_KEY_SHARED_PROPERTIES);
             memberAddresses = hazelcastInstance.getReplicatedMap(HAZELCAST_KEY_MEMBER_ADDRESSES);
+            inactiveMembers = hazelcastInstance.getSet(HAZELCAST_KEY_INACTIVE_MEMBERS);
 
             Map<String, Object> beans = context.getBeansWithAnnotation(PostHazelcastJoined.class);
             for (Object value : beans.values()) {
@@ -192,10 +199,6 @@ public class TurmsClusterManager {
                 pendingMemberAddress = null;
             }
         }
-    }
-
-    private boolean hasJoinedCluster() {
-        return membersSnapshot.contains(localMembersSnapshot);
     }
 
     public IExecutorService getExecutor() {
@@ -420,12 +423,50 @@ public class TurmsClusterManager {
         return getAddress(localMembersSnapshot);
     }
 
-    public List<String> getServersAddress() {
+    public List<String> getServersAddress(boolean onlyActiveServers, boolean onlyInactiveServers) {
         List<String> addresses = new ArrayList<>(membersSnapshot.size());
         for (Member member : membersSnapshot) {
-            addresses.add(getAddress(member));
+            if (onlyActiveServers) {
+                if (!inactiveMembers.contains(member.getUuid())) {
+                    addresses.add(getAddress(member));
+                }
+            } else if (onlyInactiveServers) {
+                if (inactiveMembers.contains(member.getUuid())) {
+                    addresses.add(getAddress(member));
+                }
+            } else {
+                addresses.add(getAddress(member));
+            }
         }
         return addresses;
+    }
+
+    public Map<UUID, String> getServersIdMap(boolean onlyActiveServers, boolean onlyInactiveServers) {
+        Map<UUID, String> map = new HashMap<>(membersSnapshot.size());
+        for (Map.Entry<UUID, Member> entry : membersSnapshotMap.entrySet()) {
+            UUID uuid = entry.getKey();
+            Member member = entry.getValue();
+            if (onlyActiveServers) {
+                if (!inactiveMembers.contains(uuid)) {
+                    map.put(uuid, getAddress(member));
+                }
+            } else if (onlyInactiveServers) {
+                if (inactiveMembers.contains(uuid)) {
+                    map.put(uuid, getAddress(member));
+                }
+            } else {
+                map.put(uuid, getAddress(member));
+            }
+        }
+        return map;
+    }
+
+    public void activateServers(Set<UUID> ids) {
+        inactiveMembers.removeAll(ids);
+    }
+
+    public void deactivateServers(Set<UUID> ids) {
+        inactiveMembers.addAll(ids);
     }
 
     private enum SharedPropertiesKey {

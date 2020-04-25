@@ -22,19 +22,17 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.dto.AcknowledgedDTO;
 import im.turms.turms.pojo.dto.ResponseDTO;
 import im.turms.turms.property.TurmsProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.constant.AdminPermission.CLUSTER_CONFIG_UPDATE;
-import static im.turms.turms.constant.AdminPermission.CLUSTER_SERVER_INFO_QUERY;
+import static im.turms.turms.constant.AdminPermission.*;
 
 @RestController
 @RequestMapping("/cluster")
@@ -117,7 +115,39 @@ public class ClusterController {
 
     @GetMapping("/servers")
     @RequiredPermission(CLUSTER_SERVER_INFO_QUERY)
-    public ResponseEntity<ResponseDTO<Collection<String>>> queryServers() {
-        return ResponseFactory.okIfTruthy(turmsClusterManager.getServersAddress());
+    public ResponseEntity<ResponseDTO<Collection<String>>> queryServers(
+            @RequestParam(defaultValue = "false") boolean onlyActiveServers,
+            @RequestParam(defaultValue = "false") boolean onlyInactiveServers) {
+        return ResponseFactory.okIfTruthy(turmsClusterManager.getServersAddress(onlyActiveServers, onlyInactiveServers));
+    }
+
+    @DeleteMapping("/servers")
+    @RequiredPermission(CLUSTER_SERVER_ACTIVATION_UPDATE)
+    public ResponseEntity<ResponseDTO<AcknowledgedDTO>> deactivateServers(@RequestParam List<String> ids) {
+        Set<UUID> uuids = new HashSet<>(ids.size());
+        for (String id : ids) {
+            uuids.add(UUID.fromString(id));
+        }
+        turmsClusterManager.deactivateServers(uuids);
+        return ResponseFactory.acknowledged(true);
+    }
+
+    @PostMapping("/servers")
+    @RequiredPermission(CLUSTER_SERVER_ACTIVATION_UPDATE)
+    public ResponseEntity<ResponseDTO<AcknowledgedDTO>> activateServers(@RequestParam List<String> ids) {
+        Set<UUID> uuids = new HashSet<>(ids.size());
+        for (String id : ids) {
+            uuids.add(UUID.fromString(id));
+        }
+        turmsClusterManager.activateServers(uuids);
+        return ResponseFactory.acknowledged(true);
+    }
+
+    @GetMapping("/servers/ids")
+    @RequiredPermission(CLUSTER_SERVER_INFO_QUERY)
+    public ResponseEntity<ResponseDTO<Map<UUID, String>>> queryServersId(
+            @RequestParam(defaultValue = "false") boolean onlyActiveServers,
+            @RequestParam(defaultValue = "false") boolean onlyInactiveServers) {
+        return ResponseFactory.okIfTruthy(turmsClusterManager.getServersIdMap(onlyActiveServers, onlyInactiveServers));
     }
 }

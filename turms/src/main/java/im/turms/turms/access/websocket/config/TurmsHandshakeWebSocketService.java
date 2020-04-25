@@ -86,7 +86,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                 request,
                 turmsClusterManager.getTurmsProperties().getUser().isUseOsAsDefaultDeviceType());
         DeviceType deviceType = loggingInDeviceType.getRight();
-        if (!turmsClusterManager.isServing()) {
+        if (!turmsClusterManager.isActive()) {
             return tryCacheReasonAndReturnError(exchange, HttpStatus.GONE, deviceType, userId, requestId);
         }
         if (userId == null) {
