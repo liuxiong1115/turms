@@ -37,17 +37,17 @@ import static im.turms.turms.constant.Common.STATUS;
 public class GlobalErrorAttributes extends DefaultErrorAttributes {
     private static final String ATTR_MESSAGE = "message";
     private static final String ATTR_ERROR = "error";
-    private final boolean respondStackTraceIfException;
+    private final boolean respondStackTraceWhenExceptionThrown;
 
     public GlobalErrorAttributes(TurmsProperties turmsProperties) {
-        respondStackTraceIfException = turmsProperties.getSecurity().isRespondStackTraceIfException();
+        respondStackTraceWhenExceptionThrown = turmsProperties.getSecurity().isRespondStackTraceWhenExceptionThrown();
     }
 
     @Override
     public Map<String, Object> getErrorAttributes(
             ServerRequest request,
             boolean includeStackTrace) {
-        Map<String, Object> errorAttributes = super.getErrorAttributes(request, respondStackTraceIfException);
+        Map<String, Object> errorAttributes = super.getErrorAttributes(request, respondStackTraceWhenExceptionThrown);
         Throwable throwable = translate(super.getError(request), errorAttributes);
         if (throwable instanceof TurmsBusinessException) {
             TurmsStatusCode code = ((TurmsBusinessException) throwable).getCode();

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import im.turms.turms.annotation.property.ImmutableOnceApplied;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.property.MutablePropertiesView;
 import jdk.jfr.Description;
@@ -34,9 +35,11 @@ import java.io.IOException;
 @Data
 public class Security implements IdentifiedDataSerializable {
 
+    @ImmutableOnceApplied
     @Description("The password encoding algorithm for users")
     private PasswordEncodingAlgorithm userPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.SALTED_SHA256;
 
+    @ImmutableOnceApplied
     @Description("The password encoding algorithm for admins")
     private PasswordEncodingAlgorithm adminPasswordEncodingAlgorithm = PasswordEncodingAlgorithm.BCRYPT;
 
@@ -84,8 +87,8 @@ public class Security implements IdentifiedDataSerializable {
     @Min(0)
     private int minClientRequestsIntervalMillis = 0;
 
-    @Description("Whether to respond the stack trace information to client if an exception has been thrown")
-    private boolean respondStackTraceIfException = true;
+    @Description("Whether to respond the stack trace information to client when an exception is thrown")
+    private boolean respondStackTraceWhenExceptionThrown = true;
 
     @JsonIgnore
     @Override

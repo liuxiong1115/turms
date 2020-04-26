@@ -34,8 +34,7 @@ import java.time.Duration;
 public class Storage implements IdentifiedDataSerializable {
     @Description("Whether to enable the functionalities of storage")
     private boolean enabled = true;
-    // Wait for "https://github.com/minio/minio/issues/2111"
-    // private boolean profileVersionEnabled = true;
+
     @Min(0)
     private int profileExpiration = 30;
 

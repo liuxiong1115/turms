@@ -186,7 +186,7 @@ public class InboundMessageDispatcher {
                         return Mono.just(RequestResult.create(((TurmsBusinessException) throwable).getCode()));
                     } else {
                         String message;
-                        if (turmsClusterManager.getTurmsProperties().getSecurity().isRespondStackTraceIfException()) {
+                        if (turmsClusterManager.getTurmsProperties().getSecurity().isRespondStackTraceWhenExceptionThrown()) {
                             message = throwable.getMessage().concat(Arrays.toString(throwable.getStackTrace()));
                         } else {
                             message = throwable.getMessage();
