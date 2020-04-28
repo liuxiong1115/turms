@@ -61,7 +61,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@ConfigurationProperties(prefix = "turms")
+@ConfigurationProperties(prefix = "turms", ignoreUnknownFields = false)
 @Component
 @Data
 @NoArgsConstructor
