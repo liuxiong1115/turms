@@ -72,12 +72,14 @@ public class TurmsProperties implements IdentifiedDataSerializable {
             .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
             .writerWithView(MutablePropertiesView.class);
     public static final List<Function<TurmsProperties, Void>> propertiesChangeListeners = new LinkedList<>();
-
-    private static final ThreadLocal<Yaml> yamlThreadLocal = new ThreadLocal<>();
-
     private static Path latestConfigFilePath;
 
     // Env
+
+    @JsonView(MutablePropertiesView.class)
+    @Valid
+    @NestedConfigurationProperty
+    private Admin admin = new Admin();
 
     @JsonView(MutablePropertiesView.class)
     @Valid
@@ -186,6 +188,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
+        admin.writeData(out);
         cache.writeData(out);
         cluster.writeData(out);
         database.writeData(out);
@@ -205,6 +208,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
+        admin.readData(in);
         cache.readData(in);
         cluster.readData(in);
         database.readData(in);
@@ -351,21 +355,13 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         return false;
     }
 
+    @JsonIgnore
     private Yaml getYaml() {
-        Yaml yaml = yamlThreadLocal.get();
-        if (yaml == null) {
-            synchronized (this) {
-                if (yaml == null) {
-                    DumperOptions options = new DumperOptions();
-                    options.setIndent(2);
-                    options.setPrettyFlow(true);
-                    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-                    yaml = new Yaml(options);
-                    yamlThreadLocal.set(yaml);
-                }
-            }
-        }
-        return yaml;
+        DumperOptions options = new DumperOptions();
+        options.setIndent(2);
+        options.setPrettyFlow(true);
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        return new Yaml(options);
     }
 
     private ObjectNode getNotEmptyPropertiesTree(String propertiesJson) throws JsonProcessingException {

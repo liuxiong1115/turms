@@ -57,6 +57,8 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
                 return new UserPermissionGroup();
             case PROPERTIES:
                 return new TurmsProperties();
+            case PROPERTY_ADMIN:
+                return new im.turms.turms.property.env.Admin();
             case PROPERTY_CACHE:
                 return new Cache();
             case PROPERTY_CLUSTER:
@@ -109,6 +111,7 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
         DOMAIN_GROUP_TYPE,
         DOMAIN_USER_PERMISSION_GROUP,
         PROPERTIES,
+        PROPERTY_ADMIN,
         PROPERTY_CACHE,
         PROPERTY_CLUSTER,
         PROPERTY_DATABASE,

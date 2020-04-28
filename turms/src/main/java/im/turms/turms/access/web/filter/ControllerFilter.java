@@ -63,6 +63,7 @@ public class ControllerFilter implements WebFilter {
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
     private final boolean pluginEnabled;
+    private final boolean enableAdminApi;
 
     public ControllerFilter(RequestMappingHandlerMapping requestMappingHandlerMapping, AdminService adminService, AdminActionLogService adminActionLogService, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager) {
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
@@ -71,6 +72,7 @@ public class ControllerFilter implements WebFilter {
         this.turmsClusterManager = turmsClusterManager;
         this.turmsPluginManager = turmsPluginManager;
         pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
+        enableAdminApi = turmsClusterManager.getTurmsProperties().getAdmin().isEnabled();
     }
 
     @Override
@@ -129,7 +131,7 @@ public class ControllerFilter implements WebFilter {
     private Mono<Void> filterUnhandledRequest(ServerWebExchange exchange, WebFilterChain chain) {
         if (isHandshakeRequest(exchange) || isCorsPreflightRequest(exchange)) {
             return chain.filter(exchange);
-        } else {
+        } else if (enableAdminApi) {
             Pair<String, String> pair = parseAccountAndPassword(exchange);
             String account = pair.getLeft();
             String password = pair.getRight();
@@ -147,6 +149,9 @@ public class ControllerFilter implements WebFilter {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return Mono.empty();
             }
+        } else {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return Mono.empty();
         }
     }
 
