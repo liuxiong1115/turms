@@ -98,7 +98,7 @@ public class ControllerFilter implements WebFilter {
         RequiredPermission requiredPermission = handlerMethod.getMethodAnnotation(RequiredPermission.class);
         if (requiredPermission != null && requiredPermission.value().equals(AdminPermission.NONE)) {
             return chain.filter(exchange);
-        } else {
+        } else if (enableAdminApi) {
             if (account != null && password != null) {
                 return adminService.authenticate(account, password)
                         .flatMap(authenticated -> {
@@ -125,6 +125,9 @@ public class ControllerFilter implements WebFilter {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return Mono.empty();
             }
+        } else {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return Mono.empty();
         }
     }
 
