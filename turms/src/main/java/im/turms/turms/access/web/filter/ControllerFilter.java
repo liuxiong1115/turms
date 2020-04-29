@@ -37,6 +37,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.server.ServerWebExchange;
@@ -46,8 +47,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
+import java.lang.reflect.Parameter;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import static im.turms.turms.constant.Common.ACCOUNT;
@@ -57,6 +60,7 @@ import static im.turms.turms.constant.Common.PASSWORD;
 public class ControllerFilter implements WebFilter {
     private static final BasicDBObject EMPTY_DBOJBECT = new BasicDBObject();
     private static final String ATTR_BODY = "BODY";
+    private static final List<String> DELETE_FILTER_PARAM_NAME = List.of("ids", "keys", "accounts");
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final AdminService adminService;
     private final AdminActionLogService adminActionLogService;
@@ -84,21 +88,28 @@ public class ControllerFilter implements WebFilter {
             return chain.filter(exchange);
         }
         if (handlerMethodObject instanceof HandlerMethod) {
-            return filterHandlerMethod(handlerMethodObject, exchange, chain);
+            HandlerMethod handlerMethod = (HandlerMethod) handlerMethodObject;
+            return filterHandlerMethod(handlerMethod, exchange, chain);
         } else {
             return filterUnhandledRequest(exchange, chain);
         }
     }
 
-    private Mono<Void> filterHandlerMethod(Object handlerMethodObject, ServerWebExchange exchange, WebFilterChain chain) {
-        HandlerMethod handlerMethod = (HandlerMethod) handlerMethodObject;
-        Pair<String, String> pair = parseAccountAndPassword(exchange);
-        String account = pair.getLeft();
-        String password = pair.getRight();
+    private Mono<Void> filterHandlerMethod(HandlerMethod handlerMethod, ServerWebExchange exchange, WebFilterChain chain) {
         RequiredPermission requiredPermission = handlerMethod.getMethodAnnotation(RequiredPermission.class);
         if (requiredPermission != null && requiredPermission.value().equals(AdminPermission.NONE)) {
             return chain.filter(exchange);
         } else if (enableAdminApi) {
+            if (!turmsClusterManager.getTurmsProperties().getAdmin().isAllowDeletingWithoutFilter()) {
+                DeleteMapping deleteMapping = handlerMethod.getMethodAnnotation(DeleteMapping.class);
+                if (deleteMapping != null && !isValidDeleteRequest(handlerMethod, exchange, deleteMapping)) {
+                    exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
+                    return Mono.empty();
+                }
+            }
+            Pair<String, String> pair = parseAccountAndPassword(exchange);
+            String account = pair.getLeft();
+            String password = pair.getRight();
             if (account != null && password != null) {
                 return adminService.authenticate(account, password)
                         .flatMap(authenticated -> {
@@ -293,6 +304,23 @@ public class ControllerFilter implements WebFilter {
         return request.getMethodValue().equals(HttpMethod.OPTIONS.name())
                 && request.getHeaders().containsKey(HttpHeaders.ORIGIN)
                 && request.getHeaders().containsKey(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD);
+    }
+
+    private boolean isValidDeleteRequest(HandlerMethod handlerMethod, ServerWebExchange exchange, DeleteMapping deleteMapping) {
+        String methodFilterName = null;
+        for (Parameter parameter : handlerMethod.getMethod().getParameters()) {
+            String name = parameter.getName();
+            if (DELETE_FILTER_PARAM_NAME.contains(name)) {
+                methodFilterName = name;
+            }
+        }
+        if (methodFilterName == null) {
+            return true;
+        } else {
+            MultiValueMap<String, String> queryParams = exchange.getRequest().getQueryParams();
+            String filterValue = queryParams.getFirst(methodFilterName);
+            return filterValue != null && !filterValue.isBlank();
+        }
     }
 
     private boolean isDevAndSwaggerRequest(@NotNull ServerWebExchange exchange) {
