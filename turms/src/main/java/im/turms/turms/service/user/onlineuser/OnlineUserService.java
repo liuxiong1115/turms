@@ -449,48 +449,44 @@ public class OnlineUserService {
             @Nullable PointFloat userLocation,
             @NotNull WebSocketSession webSocketSession,
             @NotNull FluxSink<WebSocketMessage> notificationSink) {
-        Mono<UserLocation> locationIdMono;
-        if (userLocation != null) {
-            locationIdMono = userLocationService
-                    .saveUserLocation(null, userId, loggingInDeviceType, userLocation.xFloat(), userLocation.yFloat(), new Date());
-        } else {
-            locationIdMono = Mono.empty();
-        }
+        Mono<UserLocation> locationIdMono = userLocation != null
+                ? userLocationService.saveUserLocation(null, userId, loggingInDeviceType, userLocation.xFloat(), userLocation.yFloat(), new Date())
+                : Mono.empty();
         return locationIdMono
                 .onErrorReturn(EMPTY_USER_LOCATION)
                 .defaultIfEmpty(EMPTY_USER_LOCATION)
                 .flatMap(location -> {
-                    Long locationId;
-                    if (EMPTY_USER_LOCATION != location) {
-                        locationId = location.getId();
-                    } else {
-                        locationId = null;
-                    }
+                    Long locationId = EMPTY_USER_LOCATION != location ? location.getId() : null;
                     boolean logUserLogin = turmsClusterManager.getTurmsProperties().getLog().isLogUserLogin();
                     boolean triggerHandlers = pluginEnabled && !turmsPluginManager.getLogHandlerList().isEmpty();
                     if (logUserLogin || triggerHandlers) {
                         UserLoginLog log = new UserLoginLog(turmsClusterManager.generateRandomId(), userId,
                                 new Date(), null, locationId, ip, loggingInDeviceType, deviceDetails);
-                        Mono<TurmsStatusCode> codeMono;
-                        if (logUserLogin) {
-                            codeMono = userLoginLogService.save(log).thenReturn(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId()));
-                        } else {
-                            codeMono = Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId()));
-                        }
+                        Mono<TurmsStatusCode> codeMono = logUserLogin
+                                ? userLoginLogService.save(log).onErrorReturn(log)
+                                .thenReturn(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId()))
+                                : Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, log.getId()));
                         if (triggerHandlers) {
-                            codeMono = codeMono.doOnSuccess(turmsStatusCode -> userLoginLogService.triggerLogHandlers(log).subscribe());
+                            codeMono = codeMono.doOnSuccess(turmsStatusCode -> {
+                                try {
+                                    userLoginLogService.triggerLogHandlers(log).subscribe();
+                                } catch (Exception ignored) {
+                                }
+                            });
                         }
-                        return codeMono.onErrorReturn(TurmsStatusCode.FAILED);
+                        return codeMono;
                     } else {
                         Mono<TurmsStatusCode> mono = Mono.just(setUpOnlineUserManager(userId, loggingInDeviceType, userStatus, location, webSocketSession, notificationSink, null));
-                        if (pluginEnabled) {
-                            mono = mono.doOnSuccess(turmsStatusCode -> userLoginLogService.triggerLogHandlers(userId, ip, loggingInDeviceType, deviceDetails, locationId).subscribe());
-                        }
-                        return mono;
+                        return pluginEnabled
+                                ? mono.flatMap(statusCode -> userLoginLogService.triggerLogHandlers(userId, ip, loggingInDeviceType, deviceDetails, locationId).thenReturn(statusCode))
+                                : mono;
                     }
                 });
     }
 
+    /**
+     * @return Posible values: OK, NOT_RESPONSIBLE, SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE
+     */
     private TurmsStatusCode setUpOnlineUserManager(
             @NotNull Long userId,
             @NotNull DeviceType loggingInDeviceType,
@@ -510,15 +506,15 @@ public class OnlineUserService {
                         userStatus == UserStatus.OFFLINE || userStatus == UserStatus.UNRECOGNIZED ?
                                 UserStatus.AVAILABLE : userStatus);
                 try {
-                    onlineUserManager.setDeviceTypeOnline(
+                    onlineUserManager.addOnlineDeviceType(
                             loggingInDeviceType,
                             location == EMPTY_USER_LOCATION ? null : location,
                             webSocketSession,
                             notificationSink,
                             null,
                             logId);
-                } catch (Exception e) {
-                    return TurmsStatusCode.SERVER_INTERNAL_ERROR;
+                } catch (TurmsBusinessException e) {
+                    return e.getCode();
                 }
             } else {
                 onlineUserManager = new OnlineUserManager(
@@ -543,7 +539,10 @@ public class OnlineUserService {
                 List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();
                 if (!handlerList.isEmpty()) {
                     for (UserOnlineStatusChangeHandler handler : handlerList) {
-                        handler.goOnline(onlineUserManager, loggingInDeviceType).subscribe();
+                        try {
+                            handler.goOnline(onlineUserManager, loggingInDeviceType).subscribe();
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }

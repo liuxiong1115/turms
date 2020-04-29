@@ -22,6 +22,7 @@ import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.signal.Session;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.turms.access.websocket.dispatcher.InboundMessageDispatcher;
@@ -30,6 +31,7 @@ import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.util.SessionUtil;
 import im.turms.turms.util.UserAgentUtil;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -37,15 +39,21 @@ import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SignalType;
 
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Component
+@Log4j2
 public class TurmsWebSocketHandler implements WebSocketHandler {
+    private static final String HAS_LOGGED_IN = "hasLoggedIn";
+    private static final List<TurmsStatusCode> LOGIN_CONFLICT_STATUS_CODES = List.of(
+            TurmsStatusCode.SESSION_SIMULTANEOUS_CONFLICTS_DECLINE,
+            TurmsStatusCode.SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE,
+            TurmsStatusCode.SESSION_SIMULTANEOUS_CONFLICTS_NOTIFY);
     private final TurmsClusterManager turmsClusterManager;
     private final InboundMessageDispatcher inboundMessageDispatcher;
     private final OnlineUserService onlineUserService;
@@ -81,6 +89,8 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
             }
             SessionUtil.putOnlineUserInfoToSession(session, userId, userStatus, deviceType, userLocation);
             Flux<WebSocketMessage> notificationOutput = Flux.create(notificationSink ->
+                    // Note that executing addOnlineUser synchronously
+                    // so that the user is in online or offline status after addOnlineUser
                     onlineUserService.addOnlineUser(
                             userId,
                             userStatus,
@@ -90,24 +100,18 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                             userLocation,
                             session,
                             notificationSink)
-                            .doOnError(throwable -> {
-                                notificationSink.error(throwable);
-                                onlineUserService.setLocalUserDevicesOffline(
-                                        userId,
-                                        Collections.singleton(deviceType),
-                                        CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, throwable.getMessage()));
-                            })
+                            .doOnError(notificationSink::error) // This should never happen
                             .doOnSuccess(code -> {
-                                if (code != TurmsStatusCode.OK) {
-                                    onlineUserService.setLocalUserDevicesOffline(
-                                            userId,
-                                            Collections.singleton(deviceType),
-                                            CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, String.valueOf(code.getBusinessCode())));
-                                } else if (turmsClusterManager.getTurmsProperties().getSession()
-                                        .isNotifyClientsOfSessionInfoAfterConnected()) {
-                                    String address = turmsClusterManager.getLocalServerAddress();
-                                    WebSocketMessage message = generateSessionNotification(session, address);
-                                    notificationSink.next(message);
+                                if (code == TurmsStatusCode.OK) {
+                                    session.getAttributes().put(HAS_LOGGED_IN, true);
+                                    if (turmsClusterManager.getTurmsProperties().getSession()
+                                            .isNotifyClientsOfSessionInfoAfterConnected()) {
+                                        String address = turmsClusterManager.getLocalServerAddress();
+                                        WebSocketMessage message = generateSessionNotification(session, address);
+                                        notificationSink.next(message);
+                                    }
+                                } else {
+                                    notificationSink.error(TurmsBusinessException.get(code));
                                 }
                             })
                             .subscribe());
@@ -118,15 +122,39 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                         .doOnNext(WebSocketMessage::retain)
                         .sample(Duration.ofMillis(requestInterval));
             }
-            responseOutput = responseOutput
-                    .doFinally(signalType -> {
-                        TurmsCloseStatus status = signalType == SignalType.ON_COMPLETE ?
-                                TurmsCloseStatus.DISCONNECTED_BY_CLIENT :
-                                TurmsCloseStatus.UNKNOWN_ERROR;
-                        onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(status));
-                    })
-                    .flatMap(inboundMessage -> inboundMessageDispatcher.dispatch(session, inboundMessage));
-            return session.send(notificationOutput.mergeWith(responseOutput));
+            responseOutput = responseOutput.flatMap(inboundMessage -> inboundMessageDispatcher.dispatch(session, inboundMessage));
+            return session.send(notificationOutput
+                    .doOnComplete(() -> onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_ADMIN)))
+                    .mergeWith(responseOutput.doOnComplete(() -> onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_CLIENT))))
+                    .doOnError(throwable -> {
+                        boolean hasLoggedIn = (boolean) session.getAttributes().getOrDefault(HAS_LOGGED_IN, false);
+                        if (hasLoggedIn) {
+                            TurmsCloseStatus closeStatus;
+                            String reason;
+                            if (throwable instanceof TurmsBusinessException) {
+                                TurmsBusinessException exception = (TurmsBusinessException) throwable;
+                                TurmsStatusCode code = exception.getCode();
+                                if (LOGIN_CONFLICT_STATUS_CODES.contains(code)) {
+                                    closeStatus = TurmsCloseStatus.LOGIN_CONFLICT;
+                                    reason = null;
+                                } else if (code == TurmsStatusCode.NOT_RESPONSIBLE) {
+                                    closeStatus = TurmsCloseStatus.REDIRECT;
+                                    reason = turmsClusterManager.getAddressIfCurrentNodeIrresponsibleByUserId(userId);
+                                } else {
+                                    closeStatus = TurmsCloseStatus.SERVER_ERROR;
+                                    reason = throwable.getMessage();
+                                }
+                            } else {
+                                closeStatus = TurmsCloseStatus.SERVER_ERROR;
+                                reason = throwable.getMessage();
+                            }
+                            onlineUserService.setLocalUserDevicesOffline(
+                                    userId,
+                                    Collections.singleton(deviceType),
+                                    CloseStatusFactory.get(closeStatus, reason));
+                        }
+                        log.error(throwable);
+                    }));
         } else {
             return session.close(CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "The user ID or IP is missing"));
         }

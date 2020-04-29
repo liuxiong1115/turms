@@ -17,8 +17,10 @@
 
 package im.turms.turms.service.user.onlineuser.manager;
 
+import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
 import io.netty.util.Timeout;
@@ -61,7 +63,7 @@ public class OnlineUserManager {
         this.userOnlineInfo = new UserOnlineInfo(userId, userStatus, sessionMap);
     }
 
-    public void setDeviceTypeOnline(
+    public void addOnlineDeviceType(
             @NotNull DeviceType deviceType,
             @Nullable UserLocation userLocation,
             @NotNull WebSocketSession webSocketSession,
@@ -78,9 +80,11 @@ public class OnlineUserManager {
                     heartbeatTimeout,
                     logId,
                     System.currentTimeMillis());
-            userOnlineInfo.getSessionMap().put(deviceType, session);
+            if (userOnlineInfo.getSessionMap().putIfAbsent(deviceType, session) != null) {
+                throw TurmsBusinessException.get(TurmsStatusCode.SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE);
+            }
         } else {
-            throw new RuntimeException("The device type has already logged in");
+            throw TurmsBusinessException.get(TurmsStatusCode.SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE);
         }
     }
 

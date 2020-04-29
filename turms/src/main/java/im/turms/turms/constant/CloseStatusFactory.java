@@ -22,6 +22,10 @@ public class CloseStatusFactory {
     }
 
     public static CloseStatus get(TurmsCloseStatus status, String reason) {
-        return new CloseStatus(status.getCode(), reason);
+        if (reason != null) {
+            return new CloseStatus(status.getCode(), reason);
+        } else {
+            return get(status);
+        }
     }
 }
