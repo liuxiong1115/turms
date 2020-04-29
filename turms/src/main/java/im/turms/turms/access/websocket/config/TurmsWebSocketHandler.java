@@ -89,8 +89,8 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
             }
             SessionUtil.putOnlineUserInfoToSession(session, userId, userStatus, deviceType, userLocation);
             Flux<WebSocketMessage> notificationOutput = Flux.create(notificationSink ->
-                    // Note that executing addOnlineUser synchronously
-                    // so that the user is in online or offline status after addOnlineUser
+                    // Note that executing addOnlineUser synchronously so that we can make sure
+                    // that the user is in online or offline status after addOnlineUser
                     onlineUserService.addOnlineUser(
                             userId,
                             userStatus,
@@ -143,19 +143,21 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                 } else {
                                     closeStatus = TurmsCloseStatus.SERVER_ERROR;
                                     reason = throwable.getMessage();
+                                    log.error(throwable);
                                 }
                             } else {
                                 closeStatus = TurmsCloseStatus.SERVER_ERROR;
                                 reason = throwable.getMessage();
+                                log.error(throwable);
                             }
                             onlineUserService.setLocalUserDevicesOffline(
                                     userId,
                                     Collections.singleton(deviceType),
                                     CloseStatusFactory.get(closeStatus, reason));
                         }
-                        log.error(throwable);
                     }));
         } else {
+            log.error(String.format("The user ID or IP is missing for the session: %s", session.getId()));
             return session.close(CloseStatusFactory.get(TurmsCloseStatus.SERVER_ERROR, "The user ID or IP is missing"));
         }
     }
