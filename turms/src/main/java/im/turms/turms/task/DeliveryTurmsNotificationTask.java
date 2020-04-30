@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Set;
@@ -34,17 +35,21 @@ public class DeliveryTurmsNotificationTask implements Callable<Boolean>, Seriali
     private static final long serialVersionUID = 4595269008081593689L;
     private final byte[] notificationBytes;
     private final Set<Long> recipientIds;
+    // Use a independent requester ID instead of the requester ID in notificationBytes
+    // to avoid deserialize the bytes data
+    private final Long remoteRequesterIdForCaching;
     private transient ApplicationContext context;
     private transient OutboundMessageService outboundMessageService;
 
-    public DeliveryTurmsNotificationTask(@NotEmpty byte[] notificationBytes, @NotEmpty Set<Long> recipientIds) {
+    public DeliveryTurmsNotificationTask(@NotEmpty byte[] notificationBytes, @NotEmpty Set<Long> recipientIds, @Nullable Long remoteRequesterIdForCaching) {
         this.notificationBytes = notificationBytes;
         this.recipientIds = recipientIds;
+        this.remoteRequesterIdForCaching = remoteRequesterIdForCaching;
     }
 
     @Override
     public Boolean call() {
-        return outboundMessageService.relayClientMessageToLocalClients(notificationBytes, recipientIds, null);
+        return outboundMessageService.relayClientMessageToLocalClients(notificationBytes, recipientIds, null, remoteRequesterIdForCaching);
     }
 
     @Override

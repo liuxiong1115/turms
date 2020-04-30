@@ -64,12 +64,13 @@ public class OutboundMessageService {
     public Mono<Boolean> relayClientMessageToClients(
             @NotNull byte[] messageData,
             @NotNull Set<Long> recipientIds,
-            @Nullable UserSessionId senderSessionId,
+            @Nullable UserSessionId senderSessionIdExcludedForReceiving,
+            @Nullable Long remoteRequesterIdForCaching,
             boolean relayToRemoteMemberIfNotInLocal) {
         if (recipientIds.isEmpty()) {
             return Mono.just(true);
         } else if (recipientIds.size() == 1) {
-            return relayClientMessageToClient(messageData, recipientIds.iterator().next(), senderSessionId, relayToRemoteMemberIfNotInLocal);
+            return relayClientMessageToClient(messageData, recipientIds.iterator().next(), senderSessionIdExcludedForReceiving, remoteRequesterIdForCaching, relayToRemoteMemberIfNotInLocal);
         } else {
             Multimap<Member, Long> userIdsByMember = irresponsibleUserService.getMembersIfExists(recipientIds);
             for (Long recipientId : recipientIds) {
@@ -82,9 +83,9 @@ public class OutboundMessageService {
             UUID localUuid = turmsClusterManager.getLocalMember().getUuid();
             for (Member member : userIdsByMember.keySet()) {
                 if (member.getUuid() == localUuid) {
-                    monoList.add(Mono.just(relayClientMessageToLocalClients(messageData, recipientIds, senderSessionId)));
+                    monoList.add(Mono.just(relayClientMessageToLocalClients(messageData, recipientIds, senderSessionIdExcludedForReceiving, null)));
                 } else {
-                    monoList.add(relayClientMessageByRemoteMember(messageData, recipientIds, member));
+                    monoList.add(relayClientMessageByRemoteMember(messageData, recipientIds, member, remoteRequesterIdForCaching));
                 }
             }
             return ReactorUtil.areAllTrue(monoList);
@@ -94,37 +95,42 @@ public class OutboundMessageService {
     private Mono<Boolean> relayClientMessageToClient(
             @NotNull byte[] messageData,
             @NotNull Long recipientId,
-            @Nullable UserSessionId senderSessionId,
+            @Nullable UserSessionId senderSessionIdExcludedForReceiving,
+            @Nullable Long remoteRequesterIdForCaching,
             boolean relayToRemoteMemberIfNotInLocal) {
         boolean responsible = turmsClusterManager.isCurrentNodeResponsibleByUserId(recipientId);
         if (responsible) {
-            return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId), senderSessionId));
+            return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId), senderSessionIdExcludedForReceiving, null));
         } else {
             UUID memberId = irresponsibleUserService.getMemberIdIfExists(recipientId);
             if (memberId != null) {
                 if (memberId == turmsClusterManager.getLocalMember().getUuid()) {
-                    return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId), senderSessionId));
+                    return Mono.just(relayClientMessageToLocalClients(messageData, Collections.singleton(recipientId), senderSessionIdExcludedForReceiving, null));
                 } else if (relayToRemoteMemberIfNotInLocal) {
-                    return relayClientMessageByRemoteMemberId(messageData, recipientId, memberId);
+                    return relayClientMessageByRemoteMemberId(messageData, recipientId, memberId, remoteRequesterIdForCaching);
                 }
             } else if (relayToRemoteMemberIfNotInLocal) {
-                return relayClientMessageByRecipientId(messageData, recipientId);
+                return relayClientMessageByRecipientId(messageData, recipientId, remoteRequesterIdForCaching);
             }
         }
         return Mono.just(false);
     }
 
     /**
-     * @param senderSessionId If not null, the messageData will also be relayed to the sender's devices except the device specified
-     *                        in the UserSessionId.
-     *                        This is not graceful implementation but most friendly to performance
-     *                        so that the messageData doesn't be wrapped as a WebSocketMessage again
-     *                        for the case when both local recipients and sender's devices need the same data
+     * @param senderSessionIdExcludedForReceiving If not null, the messageData will also be relayed to the sender's devices except the device specified
+     *                                            in the UserSessionId.
+     *                                            This is not graceful implementation but most friendly to performance
+     *                                            so that the messageData doesn't be wrapped as a WebSocketMessage again
+     *                                            for the case when both local recipients and sender's devices need the same data
+     * @param remoteRequesterIdForCaching         remoteRequesterIdForCaching is used to notify the remote member of the sender of the notification
+     *                                            so that the remote member doesn't need to parse the messageData and extract
+     *                                            the sender ID from it and can cache the sender's online status.
      */
     public boolean relayClientMessageToLocalClients(
             @NotNull byte[] messageData,
             @NotEmpty Set<Long> recipientIds,
-            @Nullable UserSessionId senderSessionId) {
+            @Nullable UserSessionId senderSessionIdExcludedForReceiving,
+            @Nullable Long remoteRequesterIdForCaching) {
         boolean isSuccess = true;
         WebSocketMessage message = null;
         boolean shouldTriggerHandlers = !turmsPluginManager.getNotificationHandlerList().isEmpty() && turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
@@ -156,13 +162,13 @@ public class OutboundMessageService {
                 }
             }
         }
-        if (senderSessionId != null) {
-            OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(senderSessionId.getUserId());
+        if (senderSessionIdExcludedForReceiving != null) {
+            OnlineUserManager onlineUserManager = onlineUserService.getLocalOnlineUserManager(senderSessionIdExcludedForReceiving.getUserId());
             if (onlineUserManager != null) {
                 Set<DeviceType> onlineDeviceTypes = onlineUserManager.getUsingDeviceTypes();
                 if (onlineDeviceTypes.size() > 1) {
                     for (DeviceType onlineDeviceType : onlineDeviceTypes) {
-                        if (onlineDeviceType != senderSessionId.getDeviceType()) {
+                        if (onlineDeviceType != senderSessionIdExcludedForReceiving.getDeviceType()) {
                             OnlineUserManager.Session userSession = onlineUserManager.getSession(onlineDeviceType);
                             if (message == null) {
                                 message = userSession.getWebSocketSession().binaryMessage(factory -> factory.wrap(messageData));
@@ -173,6 +179,9 @@ public class OutboundMessageService {
                     }
                 }
             }
+        }
+        if (remoteRequesterIdForCaching != null) {
+            onlineUserService.cacheRemoteUserOnlineStatus(remoteRequesterIdForCaching);
         }
         if (shouldTriggerHandlers) {
             try {
@@ -192,10 +201,11 @@ public class OutboundMessageService {
     private Mono<Boolean> relayClientMessageByRemoteMemberId(
             @NotNull byte[] messageData,
             @NotNull Long recipientId,
-            @NotNull UUID memberId) {
+            @NotNull UUID memberId,
+            @Nullable Long remoteRequesterIdForCaching) {
         Member member = turmsClusterManager.getMemberById(memberId);
         if (member != null) {
-            return relayClientMessageByRemoteMember(messageData, Collections.singleton(recipientId), member);
+            return relayClientMessageByRemoteMember(messageData, Collections.singleton(recipientId), member, remoteRequesterIdForCaching);
         } else {
             return Mono.just(false);
         }
@@ -204,12 +214,14 @@ public class OutboundMessageService {
     private Mono<Boolean> relayClientMessageByRemoteMember(
             @NotNull byte[] messageData,
             @NotNull Set<Long> recipientIds,
-            @NotNull Member member) {
+            @NotNull Member member,
+            @Nullable Long remoteRequesterIdForCaching) {
         if (messageData.length > maxMessageSizeToRelayDirectly && recipientIds.size() == 1) {
             return onlineUserService.checkIfRemoteUserOffline(member, recipientIds.iterator().next())
                     .flatMap(isOnline -> {
                         if (isOnline) {
-                            DeliveryTurmsNotificationTask task = new DeliveryTurmsNotificationTask(messageData, recipientIds);
+                            DeliveryTurmsNotificationTask task = new DeliveryTurmsNotificationTask(messageData, recipientIds,
+                                    onlineUserService.shouldCacheRemoteUserOnlineStatus() ? remoteRequesterIdForCaching : null);
                             Future<Boolean> future = turmsClusterManager.getExecutor()
                                     .submitToMember(task, member);
                             return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
@@ -218,7 +230,8 @@ public class OutboundMessageService {
                         }
                     });
         } else {
-            DeliveryTurmsNotificationTask task = new DeliveryTurmsNotificationTask(messageData, recipientIds);
+            DeliveryTurmsNotificationTask task = new DeliveryTurmsNotificationTask(messageData, recipientIds,
+                    onlineUserService.shouldCacheRemoteUserOnlineStatus() ? remoteRequesterIdForCaching : null);
             Future<Boolean> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
             return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
@@ -227,10 +240,11 @@ public class OutboundMessageService {
 
     private Mono<Boolean> relayClientMessageByRecipientId(
             @NotNull byte[] messageData,
-            @NotNull Long recipientId) {
+            @NotNull Long recipientId,
+            @Nullable Long remoteRequesterIdForCaching) {
         Member member = turmsClusterManager.getMemberByUserId(recipientId);
         if (member != null) {
-            return relayClientMessageByRemoteMember(messageData, Collections.singleton(recipientId), member);
+            return relayClientMessageByRemoteMember(messageData, Collections.singleton(recipientId), member, remoteRequesterIdForCaching);
         } else {
             return Mono.just(false);
         }

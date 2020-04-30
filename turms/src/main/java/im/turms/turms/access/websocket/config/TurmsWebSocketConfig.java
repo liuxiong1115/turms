@@ -42,9 +42,8 @@ public class TurmsWebSocketConfig {
 
     @Bean
     public HandlerMapping handlerMapping() {
-        Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put("/", turmsWebSocketHandler);
         SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+        Map<String, WebSocketHandler> map = Map.of("/", turmsWebSocketHandler);
         mapping.setUrlMap(map);
         mapping.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return mapping;

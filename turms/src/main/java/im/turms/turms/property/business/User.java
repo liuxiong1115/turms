@@ -51,7 +51,12 @@ public class User implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Description("The cron expression to specify the time to log online users' number")
     @CronConstraint
-    public String onlineUsersNumberPersisterCron = "0 0/5 * * * ?";
+    private String onlineUsersNumberPersisterCron = "0 0/5 * * * ?";
+
+    @JsonView(MutablePropertiesView.class)
+    @Description("Whether to only respond the targets' online status when a user queries other users' online status." +
+            "If the property is true and the cache for remote users' online status is enabled, this can improve the performance.")
+    private boolean onlyRespondOnlineStatusWhenQueryOnlineInfo = false;
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to use the operating system class as the device type instead of the agent class")
@@ -91,6 +96,7 @@ public class User implements IdentifiedDataSerializable {
         simultaneousLogin.writeData(out);
         friendRequest.writeData(out);
         out.writeUTF(onlineUsersNumberPersisterCron);
+        out.writeBoolean(onlyRespondOnlineStatusWhenQueryOnlineInfo);
         out.writeBoolean(useOsAsDefaultDeviceType);
         out.writeBoolean(deleteTwoSidedRelationships);
         out.writeBoolean(deleteUserLogically);
@@ -103,6 +109,7 @@ public class User implements IdentifiedDataSerializable {
         simultaneousLogin.readData(in);
         friendRequest.readData(in);
         onlineUsersNumberPersisterCron = in.readUTF();
+        onlyRespondOnlineStatusWhenQueryOnlineInfo = in.readBoolean();
         useOsAsDefaultDeviceType = in.readBoolean();
         deleteTwoSidedRelationships = in.readBoolean();
         deleteUserLogically = in.readBoolean();

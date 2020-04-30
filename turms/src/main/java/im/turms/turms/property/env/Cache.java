@@ -25,29 +25,56 @@ import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import jdk.jfr.Description;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import java.io.IOException;
 
 @Data
 public class Cache implements IdentifiedDataSerializable {
 
     @Description("The maximum size of the cache of disconnection reasons")
+    @Min(1024)
     private int disconnectionReasonCacheMaxSize = 1024;
 
     @Description("The maximum size of the cache of login-failed reasons")
+    @Min(1024)
     private int loginFailedReasonCacheMaxSize = 1024;
 
     @Description("The life duration of each disconnection reason")
+    @Min(1)
     private int disconnectionReasonExpireAfter = 60;
 
     @Description("The life duration of each login-failed reason")
+    @Min(1)
     private int loginFailedReasonExpireAfter = 60;
 
     @Description("The maximum size of the cache of sent messages.")
+    @Min(0)
     private int sentMessageCacheMaxSize = 10240;
 
     @Description("The life duration of each sent message in cache." +
             "For a better performance, it's a good practice to keep the value greater than the allowed recall duration")
+    @Min(1)
     private int sentMessageExpireAfter = 30;
+
+    @Description("The maximum size of the cache of remote users' online status.")
+    @Min(0)
+    private int remoteUserOnlineStatusCacheMaxSize = 10240;
+
+    @Description("The life duration of each remote user's online status in cache." +
+            "Note that the cache will make the presentation of users' online status inconsistent" +
+            "and only online status will be cached.")
+    @Min(1)
+    private int remoteUserOnlineStatusExpireAfter = 30;
+
+    @Description("The maximum size of the cache of remote users' online information.")
+    @Min(0)
+    private int remoteUserOnlineInfoCacheMaxSize = 10240;
+
+    @Description("The life duration of each remote user's online information in cache." +
+            "Note that the cache will make the presentation of users' online information inconsistent" +
+            "and only online inforamtion will be cached.")
+    @Min(1)
+    private int remoteUserOnlineInfoExpireAfter = 30;
 
     @JsonIgnore
     @Override

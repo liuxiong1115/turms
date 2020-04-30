@@ -17,6 +17,8 @@
 
 package im.turms.turms.service.user.onlineuser;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.hazelcast.cluster.Member;
 import im.turms.common.TurmsCloseStatus;
@@ -27,6 +29,7 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.constant.CloseStatusFactory;
 import im.turms.turms.manager.*;
+import im.turms.turms.constant.Common;
 import im.turms.turms.plugin.UserOnlineStatusChangeHandler;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
@@ -84,6 +87,14 @@ public class OnlineUserService {
     private final TurmsTaskManager turmsTaskManager;
     private final Queue<Timeout> disconnectionTasks;
     private final ReentrantLock disconnectionLock;
+    // user ID -> Dummy Value.
+    // Note that only the online status will be cached and the offline status will not be cached
+    // because it's unacceptable if a user is indeed online but considered as offline
+    private final Cache<Long, Object> remoteOnlineUsersCache;
+    // user ID -> Online information.
+    // Note that only the online information will be cached and the offline information will not be cached
+    // because it's unacceptable if a user is indeed online but considered as offline
+    private final Cache<Long, UserOnlineInfo> remoteUsersOnlineInfoCache;
     private final boolean locationEnabled;
     private final boolean pluginEnabled;
     /**
@@ -116,14 +127,33 @@ public class OnlineUserService {
         this.turmsPluginManager = turmsPluginManager;
         this.heartbeatTimer = new HashedWheelTimer();
         this.onlineUsersNumberPersisterTimer = trivialTaskManager;
+        TurmsProperties turmsProperties = turmsClusterManager.getTurmsProperties();
+        if (turmsProperties.getCache().getRemoteUserOnlineStatusCacheMaxSize() > 0
+                && turmsProperties.getCache().getRemoteUserOnlineStatusExpireAfter() > 0) {
+            remoteOnlineUsersCache = Caffeine.newBuilder()
+                    .maximumSize(turmsProperties.getCache().getRemoteUserOnlineStatusCacheMaxSize())
+                    .expireAfterWrite(Duration.ofSeconds(turmsProperties.getCache().getRemoteUserOnlineStatusExpireAfter()))
+                    .build();
+        } else {
+            remoteOnlineUsersCache = null;
+        }
+        if (turmsProperties.getCache().getRemoteUserOnlineInfoCacheMaxSize() > 0
+                && turmsProperties.getCache().getRemoteUserOnlineInfoExpireAfter() > 0) {
+            remoteUsersOnlineInfoCache = Caffeine.newBuilder()
+                    .maximumSize(turmsProperties.getCache().getRemoteUserOnlineInfoCacheMaxSize())
+                    .expireAfterWrite(Duration.ofSeconds(turmsProperties.getCache().getRemoteUserOnlineInfoExpireAfter()))
+                    .build();
+        } else {
+            remoteUsersOnlineInfoCache = null;
+        }
         onlineUsersManagerAtSlots = new ArrayList(Arrays.asList(new HashMap[HASH_SLOTS_NUMBER]));
-        locationEnabled = turmsClusterManager.getTurmsProperties().getUser().getLocation().isEnabled();
+        locationEnabled = turmsProperties.getUser().getLocation().isEnabled();
         rescheduleOnlineUsersNumberPersister();
         TurmsProperties.addListeners(properties -> {
             rescheduleOnlineUsersNumberPersister();
             return null;
         });
-        pluginEnabled = turmsClusterManager.getTurmsProperties().getPlugin().isEnabled();
+        pluginEnabled = turmsProperties.getPlugin().isEnabled();
         this.irresponsibleUserService = irresponsibleUserService;
         if (irresponsibleUserService.isAllowIrresponsibleUsersAfterResponsibilityChanged() ||
                 irresponsibleUserService.isAllowIrresponsibleUsersWhenConnecting()) {
@@ -620,10 +650,21 @@ public class OnlineUserService {
     }
 
     public Mono<UserOnlineInfo> queryUserOnlineInfo(@NotNull Long userId) {
+        boolean onlyRespondOnlineStatus = turmsClusterManager.getTurmsProperties().getUser().isOnlyRespondOnlineStatusWhenQueryOnlineInfo();
         if (turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
             OnlineUserManager localOnlineUserManager = getLocalOnlineUserManager(userId);
             if (localOnlineUserManager != null) {
-                return Mono.just(localOnlineUserManager.getOnlineUserInfo());
+                UserOnlineInfo onlineUserInfo = localOnlineUserManager.getOnlineUserInfo();
+                if (onlyRespondOnlineStatus) {
+                    return Mono.just(UserOnlineInfo.builder()
+                            .userId(userId)
+                            // Reduce the possibilities of OnlineStatus to unify
+                            // the possibilities when querying a remote user's status
+                            .userStatus(onlineUserInfo.getUserStatus() != UserStatus.OFFLINE ? UserStatus.AVAILABLE : UserStatus.OFFLINE)
+                            .build());
+                } else {
+                    return Mono.just(localOnlineUserManager.getOnlineUserInfo());
+                }
             } else {
                 return Mono.just(UserOnlineInfo.builder()
                         .userId(userId)
@@ -631,17 +672,35 @@ public class OnlineUserService {
                         .build());
             }
         } else {
-            Member member;
             UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
-            if (memberId != null) {
-                member = turmsClusterManager.getMemberById(memberId);
+            Member member = memberId != null
+                    ? turmsClusterManager.getMemberById(memberId)
+                    : turmsClusterManager.getMemberByUserId(userId);
+            if (onlyRespondOnlineStatus) {
+                return checkIfRemoteUserOffline(member, userId)
+                        .map(isOnline -> UserOnlineInfo.builder()
+                                .userId(userId)
+                                .userStatus(isOnline ? UserStatus.AVAILABLE : UserStatus.OFFLINE)
+                                .build());
             } else {
-                member = turmsClusterManager.getMemberByUserId(userId);
+                if (remoteUsersOnlineInfoCache != null) {
+                    UserOnlineInfo onlineInfo = remoteUsersOnlineInfoCache.getIfPresent(userId);
+                    if (onlineInfo != null) {
+                        return Mono.just(onlineInfo);
+                    }
+                }
+                QueryUserOnlineInfoTask task = new QueryUserOnlineInfoTask(userId);
+                Future<UserOnlineInfo> future = turmsClusterManager.getExecutor()
+                        .submitToMember(task, member);
+                Mono<UserOnlineInfo> mono = ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
+                return remoteUsersOnlineInfoCache != null ?
+                        mono.doOnNext(userOnlineInfo -> {
+                            if (userOnlineInfo.getUserStatus(false) != UserStatus.OFFLINE) {
+                                remoteUsersOnlineInfoCache.put(userId, userOnlineInfo);
+                            }
+                        })
+                        : mono;
             }
-            QueryUserOnlineInfoTask task = new QueryUserOnlineInfoTask(userId);
-            Future<UserOnlineInfo> future = turmsClusterManager.getExecutor()
-                    .submitToMember(task, member);
-            return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
         }
     }
 
@@ -676,6 +735,9 @@ public class OnlineUserService {
     }
 
     public Mono<Boolean> checkIfRemoteUserOffline(@NotNull Member member, @NotNull Long userId) {
+        if (remoteOnlineUsersCache != null && remoteOnlineUsersCache.getIfPresent(userId) != null) {
+            return Mono.just(true);
+        }
         return turmsTaskManager.call(member, new CheckIfUserOnlineTask(userId),
                 turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
     }
@@ -743,5 +805,15 @@ public class OnlineUserService {
             }
         }
         return false;
+    }
+
+    public boolean shouldCacheRemoteUserOnlineStatus() {
+        return remoteOnlineUsersCache != null;
+    }
+
+    public void cacheRemoteUserOnlineStatus(@NotNull Long userId) {
+        if (remoteOnlineUsersCache != null) {
+            remoteOnlineUsersCache.put(userId, Common.EMPTY_OBJECT);
+        }
     }
 }
