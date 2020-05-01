@@ -37,7 +37,6 @@ import java.util.Date;
 import java.util.Set;
 
 import static im.turms.turms.constant.Common.ID;
-import static im.turms.turms.constant.Common.ID_GROUP_ID;
 
 @Service
 @Validated
@@ -49,38 +48,38 @@ public class GroupVersionService {
     }
 
     public Mono<Date> queryInfoVersion(@NotNull Long groupId) {
-        Query query = new Query(Criteria.where(ID_GROUP_ID).is(groupId));
+        Query query = new Query(Criteria.where(ID).is(groupId));
         query.fields().include(GroupVersion.Fields.info);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getInfo);
     }
 
     public Mono<Date> queryMembersVersion(@NotNull Long groupId) {
-        Query query = new Query(Criteria.where(ID_GROUP_ID).is(groupId));
+        Query query = new Query(Criteria.where(ID).is(groupId));
         query.fields().include(GroupVersion.Fields.members);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getMembers);
     }
 
     public Mono<Date> queryBlacklistVersion(@NotNull Long groupId) {
-        Query query = new Query(Criteria.where(ID_GROUP_ID).is(groupId));
+        Query query = new Query(Criteria.where(ID).is(groupId));
         query.fields().include(GroupVersion.Fields.blacklist);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getBlacklist);
     }
 
     public Mono<Date> queryGroupJoinRequestsVersion(@NotNull Long groupId) {
-        Query query = new Query(Criteria.where(ID_GROUP_ID).is(groupId));
+        Query query = new Query(Criteria.where(ID).is(groupId));
         query.fields().include(GroupVersion.Fields.joinRequests);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getJoinRequests);
     }
 
     public Mono<Date> queryGroupJoinQuestionsVersion(@NotNull Long groupId) {
-        Query query = new Query(Criteria.where(ID_GROUP_ID).is(groupId));
+        Query query = new Query(Criteria.where(ID).is(groupId));
         query.fields().include(GroupVersion.Fields.joinQuestions);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getJoinQuestions);
     }
 
     public Mono<Date> queryGroupInvitationsVersion(@NotNull Long groupId) {
-        Query query = new Query(Criteria.where(ID_GROUP_ID).is(groupId));
-        query.fields().include(GroupVersion.Fields.joinQuestions);
+        Query query = new Query(Criteria.where(ID).is(groupId));
+        query.fields().include(GroupVersion.Fields.invitations);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getInvitations);
     }
 
@@ -158,8 +157,8 @@ public class GroupVersionService {
                 .map(UpdateResult::wasAcknowledged);
     }
 
-    public Mono<Boolean> upsert(@NotNull Long groupId) {
-        GroupVersion version = GroupVersion.builder().groupId(groupId).build();
+    public Mono<Boolean> upsert(@NotNull Long groupId, @NotNull Date timestamp) {
+        GroupVersion version = new GroupVersion(groupId, timestamp, timestamp, timestamp, timestamp, timestamp, timestamp);
         return mongoTemplate.insert(version).thenReturn(true);
     }
 

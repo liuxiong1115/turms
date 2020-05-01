@@ -105,17 +105,20 @@ public class GroupService {
                 announcement, minimumScore, creationDate, deletionDate, muteEndDate, isActive);
         return mongoTemplate
                 .inTransaction()
-                .execute(operations -> operations.insert(group)
-                        .zipWith(groupMemberService.addGroupMember(
-                                group.getId(),
-                                creatorId,
-                                GroupMemberRole.OWNER,
-                                null,
-                                new Date(),
-                                null,
-                                operations))
-                        .flatMap(results -> groupVersionService.upsert(groupId)
-                                .thenReturn(results.getT1())))
+                .execute(operations -> {
+                    Date now = new Date();
+                    return operations.insert(group)
+                            .zipWith(groupMemberService.addGroupMember(
+                                    group.getId(),
+                                    creatorId,
+                                    GroupMemberRole.OWNER,
+                                    null,
+                                    now,
+                                    null,
+                                    operations))
+                            .flatMap(results -> groupVersionService.upsert(groupId, now)
+                                    .thenReturn(results.getT1()));
+                })
                 .retryWhen(TRANSACTION_RETRY)
                 .singleOrEmpty();
     }

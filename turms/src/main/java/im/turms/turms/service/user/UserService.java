@@ -165,8 +165,8 @@ public class UserService {
         intro = intro != null ? intro : "";
         profileAccess = profileAccess != null ? profileAccess : ProfileAccessStrategy.ALL;
         permissionGroupId = permissionGroupId != null ? permissionGroupId : DEFAULT_USER_PERMISSION_GROUP_ID;
-        registrationDate = registrationDate != null ? registrationDate : now;
         isActive = isActive != null ? isActive : turmsClusterManager.getTurmsProperties().getUser().isActivateUserWhenAdded();
+        Date date = registrationDate != null ? registrationDate : now;
         User user = new User(
                 id,
                 turmsPasswordUtil.encodeUserPassword(rawPassword),
@@ -174,7 +174,7 @@ public class UserService {
                 intro,
                 profileAccess,
                 permissionGroupId,
-                registrationDate,
+                date,
                 null,
                 isActive,
                 now);
@@ -182,7 +182,7 @@ public class UserService {
         return mongoTemplate.inTransaction()
                 .execute(operations -> operations.save(user)
                         .then(userRelationshipGroupService.createRelationshipGroup(finalId, 0, "", now, operations))
-                        .then(userVersionService.upsertEmptyUserVersion(user.getId(), operations))
+                        .then(userVersionService.upsertEmptyUserVersion(user.getId(), date, operations))
                         .thenReturn(user))
                 .retryWhen(TRANSACTION_RETRY)
                 .singleOrEmpty();

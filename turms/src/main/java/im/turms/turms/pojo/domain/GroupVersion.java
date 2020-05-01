@@ -18,7 +18,6 @@
 package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
@@ -27,7 +26,6 @@ import java.util.Date;
 
 @Data
 @FieldNameConstants
-@Builder
 @AllArgsConstructor
 public final class GroupVersion {
     @Id
