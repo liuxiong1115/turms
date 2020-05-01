@@ -32,7 +32,6 @@ import java.time.Duration;
 @Data
 public class Rpc implements IdentifiedDataSerializable {
 
-
     @Description("The timeout for RPC in milliseconds")
     @Min(1)
     private int timeout = 3000;
@@ -44,7 +43,6 @@ public class Rpc implements IdentifiedDataSerializable {
         this.timeout = timeout;
         timeoutDuration = Duration.ofMillis(timeout);
     }
-
 
     @JsonIgnore
     @Override

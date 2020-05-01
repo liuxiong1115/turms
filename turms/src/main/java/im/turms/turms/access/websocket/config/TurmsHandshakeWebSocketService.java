@@ -125,15 +125,11 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                                     .flatMap(authenticated -> {
                                         if (authenticated != null && authenticated) {
                                             return userSimultaneousLoginService.setConflictedDevicesOffline(userId, deviceType)
-                                                    .flatMap(success -> {
-                                                        if (success) {
-                                                            if (redirectMember != null) {
-                                                                irresponsibleUserService.put(userId, turmsClusterManager.getLocalMember().getUuid());
-                                                            }
-                                                            return super.handleRequest(exchange, handler);
-                                                        } else {
-                                                            return tryCacheReasonAndReturnError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, deviceType, userId, requestId);
+                                                    .flatMap(wasOnline -> {
+                                                        if (redirectMember != null) {
+                                                            irresponsibleUserService.put(userId, turmsClusterManager.getLocalMember().getUuid());
                                                         }
+                                                        return super.handleRequest(exchange, handler);
                                                     });
                                         } else {
                                             return tryCacheReasonAndReturnError(exchange, HttpStatus.UNAUTHORIZED, deviceType, userId, requestId);

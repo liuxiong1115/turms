@@ -82,10 +82,12 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     private boolean isClientError(Map<String, Object> errorAttributes) {
         Integer status = (Integer) errorAttributes.get(STATUS);
         if (status == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-            String message = errorAttributes.get(ATTR_MESSAGE).toString();
-            return message.contains("WebFlux") || message.contains("cast");
-        } else {
-            return false;
+            Object messageObj = errorAttributes.get(ATTR_MESSAGE);
+            if (messageObj instanceof String) {
+                String message = (String) messageObj;
+                return message.contains("WebFlux") || message.contains("cast");
+            }
         }
+        return false;
     }
 }

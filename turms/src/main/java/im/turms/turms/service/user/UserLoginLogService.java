@@ -20,7 +20,6 @@ package im.turms.turms.service.user;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.DeviceType;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
-import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.pojo.domain.UserLoginLog;
@@ -46,12 +45,10 @@ import static im.turms.turms.constant.Common.ID;
 @Validated
 public class UserLoginLogService {
     private final ReactiveMongoTemplate mongoTemplate;
-    private final TurmsClusterManager turmsClusterManager;
     private final TurmsPluginManager turmsPluginManager;
 
-    public UserLoginLogService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, TurmsPluginManager turmsPluginManager) {
+    public UserLoginLogService(ReactiveMongoTemplate mongoTemplate, TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
-        this.turmsClusterManager = turmsClusterManager;
         this.turmsPluginManager = turmsPluginManager;
     }
 

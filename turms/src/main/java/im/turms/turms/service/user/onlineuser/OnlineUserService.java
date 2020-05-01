@@ -28,8 +28,8 @@ import im.turms.common.constant.UserStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.constant.CloseStatusFactory;
-import im.turms.turms.manager.*;
 import im.turms.turms.constant.Common;
+import im.turms.turms.manager.*;
 import im.turms.turms.plugin.UserOnlineStatusChangeHandler;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.pojo.domain.UserLocation;
@@ -58,6 +58,7 @@ import reactor.math.MathFlux;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -244,6 +245,9 @@ public class OnlineUserService {
         return userIds;
     }
 
+    /**
+     * @return true if the any device was in online status
+     */
     public boolean setLocalUserDevicesOffline(
             @NotNull Long userId,
             @NotEmpty Set<@DeviceTypeConstraint DeviceType> deviceTypes,
@@ -345,13 +349,7 @@ public class OnlineUserService {
             setLocalUserOffline(userId, closeStatus);
             return Mono.just(true);
         } else {
-            Member member;
-            UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
-            if (memberId != null) {
-                member = turmsClusterManager.getMemberById(memberId);
-            } else {
-                member = turmsClusterManager.getMemberByUserId(userId);
-            }
+            Member member = getMemberByUserId(userId);
             if (member != null) {
                 Future<Boolean> future = turmsClusterManager
                         .getExecutor()
@@ -382,13 +380,7 @@ public class OnlineUserService {
         if (responsible) {
             return Mono.just(setLocalUserDevicesOffline(userId, deviceTypes, closeStatus));
         } else {
-            Member member;
-            UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
-            if (memberId != null) {
-                member = turmsClusterManager.getMemberById(memberId);
-            } else {
-                member = turmsClusterManager.getMemberByUserId(userId);
-            }
+            Member member = getMemberByUserId(userId);
             if (member != null) {
                 Set<Integer> types = new HashSet<>(deviceTypes.size());
                 for (DeviceType deviceType : deviceTypes) {
@@ -629,19 +621,9 @@ public class OnlineUserService {
         }
         if (turmsClusterManager.isCurrentNodeResponsibleByUserId(userId)) {
             OnlineUserManager manager = getLocalOnlineUserManager(userId);
-            if (manager != null) {
-                return Mono.just(manager.setUserOnlineStatus(userStatus));
-            } else {
-                return Mono.just(false);
-            }
+            return Mono.just(manager != null && manager.setUserOnlineStatus(userStatus));
         } else {
-            Member member;
-            UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
-            if (memberId != null) {
-                member = turmsClusterManager.getMemberById(memberId);
-            } else {
-                member = turmsClusterManager.getMemberByUserId(userId);
-            }
+            Member member = getMemberByUserId(userId);
             UpdateOnlineUserStatusTask task = new UpdateOnlineUserStatusTask(userId, userStatus.getNumber());
             Future<Boolean> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
@@ -672,10 +654,7 @@ public class OnlineUserService {
                         .build());
             }
         } else {
-            UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
-            Member member = memberId != null
-                    ? turmsClusterManager.getMemberById(memberId)
-                    : turmsClusterManager.getMemberByUserId(userId);
+            Member member = getMemberByUserId(userId);
             if (onlyRespondOnlineStatus) {
                 return checkIfRemoteUserOffline(member, userId)
                         .map(isOnline -> UserOnlineInfo.builder()
@@ -815,5 +794,12 @@ public class OnlineUserService {
         if (remoteOnlineUsersCache != null) {
             remoteOnlineUsersCache.put(userId, Common.EMPTY_OBJECT);
         }
+    }
+
+    private Member getMemberByUserId(@NotNull Long userId) {
+        UUID memberId = irresponsibleUserService.getMemberIdIfExists(userId);
+        return memberId != null
+                ? turmsClusterManager.getMemberById(memberId)
+                : turmsClusterManager.getMemberByUserId(userId);
     }
 }
