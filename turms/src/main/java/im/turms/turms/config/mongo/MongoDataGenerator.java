@@ -6,6 +6,7 @@ import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.*;
+import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.util.TurmsPasswordUtil;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.SetUtils;
@@ -34,19 +35,55 @@ import static im.turms.turms.constant.Common.*;
 @Component
 public class MongoDataGenerator {
 
+    public final boolean isMockEnabled;
+    public final int userNumber;
+    public final int step;
+
+    public final int targetUserToBeGroupMemberStart;
+    public final int targetUserToBeGroupMemberEnd;
+    public final int targetUserForGroupJoinRequestStart;
+    public final int targetUserForGroupJoinRequestEnd;
+    public final int targetUserForGroupInvitationStart;
+    public final int targetUserForGroupInvitationEnd;
+    public final int targetUserToBlacklistInGroupStart;
+    public final int targetUserToBlacklistInGroupEnd;
+
+    public final int targetUserToRequestFriendRequestStart;
+    public final int targetUserToRequestFriendRequestEnd;
+    public final int targetUserToBeFriendRelationshipStart;
+    public final int targetUserToBeFriendRelationshipEnd;
+
     private final TurmsClusterManager turmsClusterManager;
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsPasswordUtil passwordUtil;
 
-    public MongoDataGenerator(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, TurmsPasswordUtil passwordUtil) {
+    public MongoDataGenerator(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, TurmsPasswordUtil passwordUtil, TurmsProperties turmsProperties) {
         this.turmsClusterManager = turmsClusterManager;
         this.mongoTemplate = mongoTemplate;
         this.passwordUtil = passwordUtil;
+
+        isMockEnabled = turmsProperties.getMock().isEnabled();
+        userNumber = turmsProperties.getMock().getUserNumber();
+        step = userNumber / 10;
+
+        targetUserToBeGroupMemberStart = 1;
+        targetUserToBeGroupMemberEnd = step;
+        targetUserForGroupJoinRequestStart = 1 + step * 7;
+        targetUserForGroupJoinRequestEnd = step * 8;
+        targetUserForGroupInvitationStart = 1 + step * 8;
+        targetUserForGroupInvitationEnd = step * 9;
+        targetUserToBlacklistInGroupStart = 1 + step * 9;
+        targetUserToBlacklistInGroupEnd = step * 10;
+
+        targetUserToBeFriendRelationshipStart = 2;
+        targetUserToBeFriendRelationshipEnd = step;
+        targetUserToRequestFriendRequestStart = 1 + step;
+        targetUserToRequestFriendRequestEnd = 1 + step * 2;
     }
 
     @EventListener(classes = ContextRefreshedEvent.class)
     public void createCollectionsIfNotExist() {
-        if (isDevEnv()) {
+        if (isDevAndMockEnabled()) {
             log.info("Start clearing collections...");
             Query queryAll = new Query();
             mongoTemplate.getCollectionNames()
@@ -89,22 +126,23 @@ public class MongoDataGenerator {
                 createCollectionIfNotExist(UserVersion.class, null))
                 .doOnTerminate(() -> {
                     log.info("All collections are created");
-                    mockIfDev();
+                    mockIfDevOrTest();
                 })
                 .subscribe();
     }
 
-    private boolean isDevEnv() {
-        return CompilerOptions.ENV == CompilerOptions.Env.DEV && mongoTemplate.getMongoDatabase().getName().contains("-dev");
+    private boolean isDevAndMockEnabled() {
+        return CompilerOptions.ENV == CompilerOptions.Env.DEV && isMockEnabled;
     }
 
     // Note: Better not to remove all mock data after turms closed
-    private void mockIfDev() {
-        if (isDevEnv()) {
+    private void mockIfDevOrTest() {
+        if (isDevAndMockEnabled()) {
             log.info("Start mocking...");
-            // Admin
+
             final int ADMIN_COUNT = 10;
-            final int USER_COUNT = 1000;
+
+            // Admin
             final Date now = new Date();
             List<Object> objects = new LinkedList<>();
             final long GUEST_ROLE_ID = 2L;
@@ -170,7 +208,7 @@ public class MongoDataGenerator {
             objects.add(group);
             GroupVersion groupVersion = new GroupVersion(1L, now, now, now, now, now, now);
             objects.add(groupVersion);
-            for (int i = 1 + USER_COUNT / 10 * 9; i <= USER_COUNT; i++) {
+            for (int i = targetUserToBlacklistInGroupStart; i <= targetUserToBlacklistInGroupEnd; i++) {
                 GroupBlacklistedUser groupBlacklistedUser = new GroupBlacklistedUser(
                         1L,
                         (long) i,
@@ -178,7 +216,7 @@ public class MongoDataGenerator {
                         1L);
                 objects.add(groupBlacklistedUser);
             }
-            for (int i = 1 + USER_COUNT / 10 * 8; i <= USER_COUNT / 10 * 9; i++) {
+            for (int i = targetUserForGroupInvitationStart; i <= targetUserForGroupInvitationEnd; i++) {
                 GroupInvitation groupInvitation = new GroupInvitation(
                         turmsClusterManager.generateRandomId(),
                         1L,
@@ -198,7 +236,7 @@ public class MongoDataGenerator {
                     Set.of("a", "b", "c"),
                     20);
             objects.add(groupJoinQuestion);
-            for (int i = 1 + USER_COUNT / 10 * 7; i <= USER_COUNT / 10 * 8; i++) {
+            for (int i = targetUserForGroupJoinRequestStart; i <= targetUserForGroupJoinRequestEnd; i++) {
                 GroupJoinRequest groupJoinRequest = new GroupJoinRequest(
                         turmsClusterManager.generateRandomId(),
                         "test-content",
@@ -211,14 +249,14 @@ public class MongoDataGenerator {
                         null);
                 objects.add(groupJoinRequest);
             }
-            for (int i = 1; i <= USER_COUNT / 10; i++) {
+            for (int i = targetUserToBeGroupMemberStart; i <= targetUserToBeGroupMemberEnd; i++) {
                 GroupMember groupMember = new GroupMember(
                         1L,
                         (long) i,
                         "test-name",
                         i == 1 ? GroupMemberRole.OWNER : GroupMemberRole.MEMBER,
                         now,
-                        i > USER_COUNT / 10 / 2 ? new Date(9999999999999L) : null);
+                        i > userNumber / 10 / 2 ? new Date(9999999999999L) : null);
                 objects.add(groupMember);
             }
 
@@ -261,7 +299,7 @@ public class MongoDataGenerator {
                         null,
                         30,
                         null);
-                for (long j = 2; j <= USER_COUNT / 10; j++) {
+                for (long j = 2; j <= step; j++) {
                     MessageStatus groupMessageStatus = new MessageStatus(
                             id,
                             1L,
@@ -279,7 +317,7 @@ public class MongoDataGenerator {
             }
 
             // User
-            for (int i = 1; i <= USER_COUNT; i++) {
+            for (int i = 1; i <= userNumber; i++) {
                 Date userDate = DateUtils.addDays(now, -i);
                 User user = new User(
                         (long) i,
@@ -300,7 +338,7 @@ public class MongoDataGenerator {
                 objects.add(userVersion);
                 objects.add(relationshipGroup);
             }
-            for (int i = 1 + USER_COUNT / 10; i <= USER_COUNT / 10 * 2; i++) {
+            for (int i = targetUserToRequestFriendRequestStart; i <= targetUserToRequestFriendRequestEnd; i++) {
                 UserFriendRequest userFriendRequest = new UserFriendRequest(
                         turmsClusterManager.generateRandomId(),
                         "test-request",
@@ -313,7 +351,7 @@ public class MongoDataGenerator {
                         (long) i);
                 objects.add(userFriendRequest);
             }
-            for (int i = 2; i <= USER_COUNT / 10; i++) {
+            for (int i = targetUserToBeFriendRelationshipStart; i <= targetUserToBeFriendRelationshipEnd; i++) {
                 UserRelationship userRelationship1 = new UserRelationship(
                         new UserRelationship.Key(1L, (long) i),
                         false,

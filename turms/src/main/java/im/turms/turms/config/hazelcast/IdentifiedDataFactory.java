@@ -79,6 +79,8 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
                 return new Message.TypingStatus();
             case PROPERTY_NOTIFICATION:
                 return new Notification();
+            case PROPERTY_MOCK:
+                return new Mock();
             case PROPERTY_PLUGIN:
                 return new Plugin();
             case PROPERTY_RPC:
@@ -122,6 +124,7 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
         PROPERTY_MESSAGE_READ_RECEIPT,
         PROPERTY_MESSAGE_TYPING_STATUS,
         PROPERTY_NOTIFICATION,
+        PROPERTY_MOCK,
         PROPERTY_PLUGIN,
         PROPERTY_RPC,
         PROPERTY_SECURITY,
