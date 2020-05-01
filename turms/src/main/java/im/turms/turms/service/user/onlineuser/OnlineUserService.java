@@ -246,7 +246,7 @@ public class OnlineUserService {
     }
 
     /**
-     * @return true if the any device was in online status
+     * @return true if the user is online
      */
     public boolean setLocalUserDevicesOffline(
             @NotNull Long userId,
@@ -261,7 +261,7 @@ public class OnlineUserService {
                     clearSession(userId, manager, session, now, closeStatus);
                 }
             }
-            clearOnlineUserManagerAndTriggerPlugins(closeStatus, manager, userId);
+            removeOnlineUserManagerIfEmpty(closeStatus, manager, userId);
             return true;
         } else {
             return false;
@@ -277,7 +277,7 @@ public class OnlineUserService {
                 for (OnlineUserManager.Session session : sessionMap.values()) {
                     clearSession(userId, manager, session, now, closeStatus);
                 }
-                clearOnlineUserManagerAndTriggerPlugins(closeStatus, manager, userId);
+                removeOnlineUserManagerIfEmpty(closeStatus, manager, userId);
             }
         }
     }
@@ -299,14 +299,14 @@ public class OnlineUserService {
         }
     }
 
-    public void clearOnlineUserManager(@NotNull Long userId) {
+    public void removeOnlineUserManager(@NotNull Long userId) {
         int slotIndex = turmsClusterManager.getSlotIndexByUserId(userId);
         onlineUsersManagerAtSlots.get(slotIndex).remove(userId);
     }
 
-    private void clearOnlineUserManagerAndTriggerPlugins(@NotNull CloseStatus closeStatus, OnlineUserManager manager, Long userId) {
+    private void removeOnlineUserManagerIfEmpty(@NotNull CloseStatus closeStatus, OnlineUserManager manager, Long userId) {
         if (manager.getSessionsNumber() == 0) {
-            clearOnlineUserManager(userId);
+            removeOnlineUserManager(userId);
         }
         if (pluginEnabled) {
             List<UserOnlineStatusChangeHandler> handlerList = turmsPluginManager.getUserOnlineStatusChangeHandlerList();

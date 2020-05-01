@@ -124,6 +124,11 @@ public class TurmsProperties implements IdentifiedDataSerializable {
     @JsonView(MutablePropertiesView.class)
     @Valid
     @NestedConfigurationProperty
+    private Mock mock = new Mock();
+
+    @JsonView(MutablePropertiesView.class)
+    @Valid
+    @NestedConfigurationProperty
     private Plugin plugin = new Plugin();
 
     @JsonView(MutablePropertiesView.class)
@@ -197,6 +202,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         session.writeData(out);
         security.writeData(out);
         storage.writeData(out);
+        mock.writeData(out);
         plugin.writeData(out);
         rpc.writeData(out);
 
@@ -217,6 +223,7 @@ public class TurmsProperties implements IdentifiedDataSerializable {
         session.readData(in);
         security.readData(in);
         storage.readData(in);
+        mock.readData(in);
         plugin.readData(in);
         rpc.readData(in);
 
