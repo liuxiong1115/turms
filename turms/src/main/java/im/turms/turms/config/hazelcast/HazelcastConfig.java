@@ -105,12 +105,24 @@ public class HazelcastConfig {
         config.setManagedContext(springManagedContext);
 
         MemberAttributeConfig attributeConfig = new MemberAttributeConfig();
-        String ip = AddressUtil.queryIp(turmsProperties);
-        attributeConfig.setAttribute(TurmsClusterManager.ATTRIBUTE_ADDRESS, String.format("%s:%d", ip, port));
+        String address;
+        if (turmsProperties.getAddress().isEnabled()) {
+            String identity = turmsProperties.getAddress().getIdentity();
+            address = identity != null
+                    ? identity
+                    : String.format("%s:%d", AddressUtil.queryIp(turmsProperties), port);
+        } else {
+            address = "";
+        }
+        attributeConfig.setAttribute(TurmsClusterManager.ATTRIBUTE_ADDRESS, address);
         config.setMemberAttributeConfig(attributeConfig);
 
         AddressUtil.onAddressChangeListeners.add(addressTuple -> {
-            turmsClusterManager.updateAddress(String.format("%s:%d", addressTuple.getIp(), port));
+            if (addressTuple.getIdentity() != null) {
+                turmsClusterManager.updateAddress(addressTuple.getIdentity());
+            } else {
+                turmsClusterManager.updateAddress(String.format("%s:%d", addressTuple.getIp(), port));
+            }
             return null;
         });
 

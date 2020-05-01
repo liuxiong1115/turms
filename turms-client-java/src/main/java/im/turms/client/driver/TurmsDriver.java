@@ -356,7 +356,7 @@ public class TurmsDriver {
     private void onWebsocketClose(int code, String reason) {
         cancelHeartbeatFuture();
         TurmsCloseStatus status = TurmsCloseStatus.get(code);
-        if (status == TurmsCloseStatus.REDIRECT) {
+        if (status == TurmsCloseStatus.REDIRECT && reason != null && !reason.isEmpty()) {
             try {
                 reconnect(reason).get(10, TimeUnit.SECONDS);
             } catch (Exception e) {

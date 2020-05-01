@@ -33,18 +33,26 @@ import java.util.Arrays;
 import java.util.List;
 
 @Data
-public class Ip implements IdentifiedDataSerializable {
+public class Address implements IdentifiedDataSerializable {
+
+    @Description("Whether to expose any kind of address to the public. " +
+            "WARNING: If false, the load balancing balancing mechanism of this node will also be disabled.")
+    private boolean enabled = true;
 
     @JsonView(MutablePropertiesView.class)
-    @Description("The ip will be used if it's a valid IP")
-    private String ip;
+    @Description("The identity of this node exposed to the public. " +
+            "The identity property is used if not null for your own custom deployment design " +
+            "(e.g. use a custom identity to help Nginx proxy " +
+            "or use the DDoS Protected IP address to hide the origin IP address)")
+    private String identity;
 
     @JsonView(MutablePropertiesView.class)
-    @Description("Whether to use the local IP to serve if \"ip\" property isn't valid")
+    @Description("Whether to use the local IP to serve if \"identity\" property isn't valid." +
+            "WARNING: For security, do NOT set this property to true in production to prevent from exposing the public IP address for DDoS attack.")
     private boolean useLocalIp = false;
 
     @JsonView(MutablePropertiesView.class)
-    @Description("The IP detectors will be used to query the public IP if \"ip\" property isn't valid and useLocalIp is false")
+    @Description("The IP detectors will be used to query the public IP if \"identity\" property isn't valid and useLocalIp is false")
     private List<String> ipDetectorAddresses = List.of("http://checkip.amazonaws.com", "http://bot.whatismyipaddress.com", "http://myip.dnsomatic.com");
 
     @JsonIgnore
@@ -56,19 +64,19 @@ public class Ip implements IdentifiedDataSerializable {
     @JsonIgnore
     @Override
     public int getClassId() {
-        return IdentifiedDataFactory.Type.PROPERTY_IP.getValue();
+        return IdentifiedDataFactory.Type.PROPERTY_ADDRESS.getValue();
     }
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeUTF(ip);
+        out.writeUTF(identity);
         out.writeBoolean(useLocalIp);
         out.writeUTFArray(ipDetectorAddresses.toArray(new String[0]));
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        ip = in.readUTF();
+        identity = in.readUTF();
         useLocalIp = in.readBoolean();
         ipDetectorAddresses = Arrays.asList(in.readUTFArray());
     }

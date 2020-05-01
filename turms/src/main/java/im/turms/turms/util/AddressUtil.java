@@ -5,6 +5,7 @@ import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.property.TurmsProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
@@ -34,64 +35,72 @@ public class AddressUtil {
     private final ApplicationContext context;
     private AddressTuple addressTuple;
     @Getter
+    private final boolean isEnabled;
+    @Getter
     private boolean isSslEnabled;
 
-    public AddressUtil(TurmsClusterManager turmsClusterManager, ApplicationContext context) {
+    public AddressUtil(TurmsClusterManager turmsClusterManager, ApplicationContext context, TurmsProperties turmsProperties) {
         this.turmsClusterManager = turmsClusterManager;
         this.context = context;
-        TurmsProperties.propertiesChangeListeners.add(properties -> {
-            AddressTuple tuple;
-            try {
-                tuple = queryAddress();
-            } catch (UnknownHostException e) {
-                log.error(e.getMessage(), e);
-                return null;
-            }
-            boolean changed = !addressTuple.equals(tuple);
-            if (changed) {
-                for (Function<AddressTuple, Void> listener : onAddressChangeListeners) {
-                    listener.apply(tuple);
+        isEnabled = turmsProperties.getAddress().isEnabled();
+        if (isEnabled) {
+            TurmsProperties.propertiesChangeListeners.add(properties -> {
+                AddressTuple tuple;
+                try {
+                    tuple = queryAddressTuple();
+                } catch (UnknownHostException e) {
+                    log.error(e.getMessage(), e);
+                    return null;
                 }
-                addressTuple = tuple;
-            }
-            return null;
-        });
+                boolean changed = !addressTuple.equals(tuple);
+                if (changed) {
+                    for (Function<AddressTuple, Void> listener : onAddressChangeListeners) {
+                        listener.apply(tuple);
+                    }
+                    addressTuple = tuple;
+                }
+                return null;
+            });
+        }
     }
 
     @PostConstruct
     private void initAddress() throws UnknownHostException {
-        Environment env = context.getEnvironment();
-        isSslEnabled = Boolean.parseBoolean(env.getProperty("server.ssl.enabled", "false"));
-        addressTuple = queryAddress();
-        for (Function<AddressTuple, Void> listener : onAddressChangeListeners) {
-            listener.apply(addressTuple);
+        if (isEnabled) {
+            Environment env = context.getEnvironment();
+            isSslEnabled = Boolean.parseBoolean(env.getProperty("server.ssl.enabled", "false"));
+            addressTuple = queryAddressTuple();
+            for (Function<AddressTuple, Void> listener : onAddressChangeListeners) {
+                listener.apply(addressTuple);
+            }
         }
     }
 
-    private AddressTuple queryAddress() throws UnknownHostException {
-        String ip = queryIp(turmsClusterManager.getTurmsProperties());
-        if (ip != null) {
-            return new AddressTuple(ip,
-                    String.format("%s://%s", isSslEnabled ? "https" : "http", ip),
-                    String.format("%s://%s", isSslEnabled ? "wss" : "ws", ip));
+    private AddressTuple queryAddressTuple() throws UnknownHostException {
+        String identity = turmsClusterManager.getTurmsProperties().getAddress().getIdentity();
+        if (identity != null) {
+            return new AddressTuple(identity, null, null, null);
         } else {
-            throw new UnknownHostException("The IP of the current server cannot be found");
+            String ip = queryIp(turmsClusterManager.getTurmsProperties());
+            if (ip != null) {
+                return new AddressTuple(null,
+                        ip,
+                        String.format("%s://%s", isSslEnabled ? "https" : "http", ip),
+                        String.format("%s://%s", isSslEnabled ? "wss" : "ws", ip));
+            } else {
+                throw new UnknownHostException("The address of the current server cannot be found");
+            }
         }
     }
 
     public static String queryIp(TurmsProperties properties) {
-        String ip = properties.getIp().getIp();
-        if (ip != null && InetAddresses.isInetAddress(ip)) {
-            return ip;
-        } else if (properties.getIp().isUseLocalIp()) {
-            return getLocalIp();
-        } else {
-            return queryPublicIp(properties);
-        }
+        return properties.getAddress().isUseLocalIp()
+                ? getLocalIp()
+                : queryPublicIp(properties);
     }
 
     public static String queryPublicIp(TurmsProperties properties) {
-        List<String> detectorAddresses = properties.getIp().getIpDetectorAddresses();
+        List<String> detectorAddresses = properties.getAddress().getIpDetectorAddresses();
         if (!detectorAddresses.isEmpty()) {
             List<CompletableFuture<HttpResponse<String>>> futures = new ArrayList<>(detectorAddresses.size());
             if (client == null) {
@@ -123,6 +132,10 @@ public class AddressUtil {
         }
     }
 
+    public String getIdentity() {
+        return addressTuple.identity;
+    }
+
     public String getIp() {
         return addressTuple.ip;
     }
@@ -136,8 +149,10 @@ public class AddressUtil {
     }
 
     @AllArgsConstructor
+    @EqualsAndHashCode
     @Data
     public static final class AddressTuple {
+        private final String identity;
         private final String ip;
         private final String httpAddress;
         private final String wsAddress;
