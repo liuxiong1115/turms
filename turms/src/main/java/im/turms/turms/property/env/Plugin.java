@@ -40,7 +40,7 @@ public class Plugin implements IdentifiedDataSerializable {
     private String dir = "plugins";
 
     @Description("Whether to exit if any exception is thrown")
-    private boolean exitIfExceptionOccurs = false;
+    private boolean exitIfExceptionOccurs = true;
 
     @JsonIgnore
     @Override
