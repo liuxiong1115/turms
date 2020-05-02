@@ -108,7 +108,7 @@ public class HazelcastConfig {
         String address;
         if (turmsProperties.getAddress().isEnabled()) {
             String identity = turmsProperties.getAddress().getIdentity();
-            address = identity != null
+            address = identity != null && !identity.isEmpty()
                     ? identity
                     : String.format("%s:%d", AddressUtil.queryIp(turmsProperties), port);
         } else {

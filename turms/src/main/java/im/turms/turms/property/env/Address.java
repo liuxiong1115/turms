@@ -41,10 +41,10 @@ public class Address implements IdentifiedDataSerializable {
 
     @JsonView(MutablePropertiesView.class)
     @Description("The identity of this node exposed to the public. " +
-            "The identity property is used if not null for your own custom deployment design " +
+            "The identity property is used if not null and not empty for your own custom deployment design " +
             "(e.g. use a custom identity to help Nginx proxy " +
             "or use the DDoS Protected IP address to hide the origin IP address)")
-    private String identity;
+    private String identity = "";
 
     @JsonView(MutablePropertiesView.class)
     @Description("Whether to use the local IP to serve if \"identity\" property isn't valid." +

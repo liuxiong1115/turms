@@ -78,7 +78,7 @@ public class AddressUtil {
 
     private AddressTuple queryAddressTuple() throws UnknownHostException {
         String identity = turmsClusterManager.getTurmsProperties().getAddress().getIdentity();
-        if (identity != null) {
+        if (identity != null && !identity.isEmpty()) {
             return new AddressTuple(identity, null, null, null);
         } else {
             String ip = queryIp(turmsClusterManager.getTurmsProperties());
