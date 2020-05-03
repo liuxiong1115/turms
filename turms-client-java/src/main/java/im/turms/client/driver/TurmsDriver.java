@@ -333,7 +333,7 @@ public class TurmsDriver {
     private long generateRandomId() {
         long id;
         do {
-            id = (long) Math.floor(Math.random() * Long.MAX_VALUE);
+            id = (long) (Math.random() * 16384);
         } while (requestMap.containsKey(id));
         return id;
     }

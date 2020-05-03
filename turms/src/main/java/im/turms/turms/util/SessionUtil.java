@@ -101,8 +101,8 @@ public class SessionUtil {
 
     public static Long getUserIdFromSession(WebSocketSession session) {
         Object uid = session.getAttributes().get(USER_ID_FIELD);
-        if (uid != null) {
-            return Long.parseLong(String.valueOf(uid));
+        if (uid instanceof Long) {
+            return (Long) uid;
         } else {
             return null;
         }
@@ -114,7 +114,11 @@ public class SessionUtil {
                 deviceType :
                 session.getHandshakeInfo().getHeaders().getFirst(DEVICE_TYPE_FIELD);
         if (deviceType != null) {
-            return EnumUtils.getEnum(DeviceType.class, String.valueOf(deviceType));
+            if (deviceType instanceof DeviceType) {
+                return (DeviceType) deviceType;
+            } else {
+                return EnumUtils.getEnum(DeviceType.class, String.valueOf(deviceType));
+            }
         } else {
             return null;
         }
