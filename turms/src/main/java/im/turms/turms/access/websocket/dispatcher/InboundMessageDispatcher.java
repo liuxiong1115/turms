@@ -41,6 +41,7 @@ import im.turms.turms.service.message.OutboundMessageService;
 import im.turms.turms.service.user.UserActionLogService;
 import im.turms.turms.service.user.onlineuser.IrresponsibleUserService;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import im.turms.turms.util.ProtoUtil;
 import im.turms.turms.util.SessionUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
@@ -59,6 +60,8 @@ import java.util.function.Function;
 @Log4j2
 @Service
 public class InboundMessageDispatcher {
+    private static final String SESSION_ATTR_LAST_REQUEST_TIMESTAMP = "lrt";
+
     private final OutboundMessageService outboundMessageService;
     private final OnlineUserService onlineUserService;
     private final IrresponsibleUserService irresponsibleUserService;
@@ -204,96 +207,133 @@ public class InboundMessageDispatcher {
                 });
     }
 
+    /**
+     * @return WebSocketMessage should wrap the data of TurmsNotification
+     */
     public Mono<WebSocketMessage> handleBinaryMessage(@NotNull Long userId, @NotNull DeviceType deviceType,
                                                       @NotNull WebSocketMessage message, @NotNull WebSocketSession session) {
         DataBuffer payload = message.getPayload();
+        // Check if the request is a heartbeat request
         if (payload.capacity() == 0) {
-            // Send an binary message instead of a pong frame to make sure turms-client-js can get the response
+            // Send an binary message instead of a pong frame to make sure that turms-client-js can get the response
             return Mono.just(session.binaryMessage(DataBufferFactory::allocateBuffer));
         }
+        TurmsRequest request;
         try {
-            TurmsRequest request = TurmsRequest.parseFrom(payload.asByteBuffer());
-            if (request.getKindCase() != TurmsRequest.KindCase.KIND_NOT_SET) {
-                Function<TurmsRequestWrapper, Mono<RequestResult>> handler = router.get(request.getKindCase());
-                if (handler != null) {
-                    Mono<TurmsRequestWrapper> wrapperMono = Mono.just(new TurmsRequestWrapper(
-                            request, userId, deviceType, message, session));
-                    if (pluginEnabled) {
-                        List<ClientRequestHandler> handlerList = turmsPluginManager.getClientRequestHandlerList();
-                        for (ClientRequestHandler clientRequestHandler : handlerList) {
-                            wrapperMono = wrapperMono.flatMap(clientRequestHandler::transform);
-                        }
-                    }
-                    Mono<RequestResult> result = wrapperMono.flatMap(requestWrapper -> {
-                        Mono<RequestResult> requestResultMono = Mono.empty();
-                        if (pluginEnabled) {
-                            List<ClientRequestHandler> handlerList = turmsPluginManager.getClientRequestHandlerList();
-                            for (ClientRequestHandler clientRequestHandler : handlerList) {
-                                requestResultMono = requestResultMono
-                                        .switchIfEmpty(clientRequestHandler.handleTurmsRequest(requestWrapper));
-                            }
-                        }
-                        boolean triggerHandlers = pluginEnabled && !turmsPluginManager.getLogHandlerList().isEmpty();
-                        if (logUserAction || triggerHandlers) {
-                            Integer ip = SessionUtil.getIp(session);
-                            UserActionLog actionLog;
-                            try {
-                                actionLog = new UserActionLog(turmsClusterManager.generateRandomId(), requestWrapper.getUserId(),
-                                        requestWrapper.getDeviceType(), new Date(), ip, request.getKindCase().name(), jsonPrinter.print(request));
-                            } catch (InvalidProtocolBufferException e) {
-                                log.error(e.getMessage(), e);
-                                return requestResultMono;
-                            }
-                            Mono<?> mono;
-                            if (logUserAction) {
-                                mono = userActionLogService.save(actionLog);
-                                if (triggerHandlers) {
-                                    mono = mono.doOnTerminate(userActionLogService.triggerLogHandlers(actionLog)::subscribe);
-                                }
-                            } else {
-                                mono = userActionLogService.triggerLogHandlers(actionLog);
-                            }
-                            requestResultMono = mono.then(requestResultMono);
-                        }
-                        return requestResultMono.switchIfEmpty(handler.apply(requestWrapper));
-                    });
-                    Long requestId = request.hasRequestId() ? request.getRequestId().getValue() : null;
-                    return handleResult(session, result, requestId, userId, deviceType);
-                } else {
-                    onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, "No handler for the request"));
-                }
+            if (areRequestsTooFrequent(session)) {
+                long requestId = ProtoUtil.parseRequestId(payload.asByteBuffer());
+                RequestResult requestResult = RequestResult.create(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT);
+                TurmsNotification notification = generateNotification(requestResult, requestId);
+                WebSocketMessage binaryMessage = session.binaryMessage(factory -> factory.wrap(notification.toByteArray()));
+                return Mono.just(binaryMessage);
             } else {
-                onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST));
+                request = TurmsRequest.parseFrom(payload.asByteBuffer());
             }
         } catch (Exception e) {
             onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, e.getMessage()));
+            return Mono.empty();
         }
-        return Mono.empty();
+
+        // Validate
+        if (request.getKindCase() == TurmsRequest.KindCase.KIND_NOT_SET) {
+            onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST));
+            return Mono.empty();
+        }
+        Function<TurmsRequestWrapper, Mono<RequestResult>> handler = router.get(request.getKindCase());
+        if (handler == null) {
+            onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.ILLEGAL_REQUEST, "No handler for the request"));
+            return Mono.empty();
+        }
+
+        // Handle
+        Mono<TurmsRequestWrapper> wrapperMono = Mono.just(new TurmsRequestWrapper(
+                request, userId, deviceType, message, session));
+        if (pluginEnabled) {
+            List<ClientRequestHandler> handlerList = turmsPluginManager.getClientRequestHandlerList();
+            for (ClientRequestHandler clientRequestHandler : handlerList) {
+                wrapperMono = wrapperMono.flatMap(clientRequestHandler::transform);
+            }
+        }
+        Mono<RequestResult> result = wrapperMono.flatMap(requestWrapper -> {
+            Mono<RequestResult> requestResultMono = Mono.empty();
+            if (pluginEnabled) {
+                List<ClientRequestHandler> handlerList = turmsPluginManager.getClientRequestHandlerList();
+                for (ClientRequestHandler clientRequestHandler : handlerList) {
+                    requestResultMono = requestResultMono
+                            .switchIfEmpty(clientRequestHandler.handleTurmsRequest(requestWrapper));
+                }
+            }
+            boolean triggerHandlers = pluginEnabled && !turmsPluginManager.getLogHandlerList().isEmpty();
+            if (logUserAction || triggerHandlers) {
+                Integer ip = SessionUtil.getIp(session);
+                UserActionLog actionLog;
+                try {
+                    actionLog = new UserActionLog(turmsClusterManager.generateRandomId(), requestWrapper.getUserId(),
+                            requestWrapper.getDeviceType(), new Date(), ip, request.getKindCase().name(), jsonPrinter.print(request));
+                } catch (InvalidProtocolBufferException e) {
+                    log.error(e.getMessage(), e);
+                    return requestResultMono;
+                }
+                Mono<?> mono;
+                if (logUserAction) {
+                    mono = userActionLogService.save(actionLog);
+                    if (triggerHandlers) {
+                        mono = mono.doOnTerminate(userActionLogService.triggerLogHandlers(actionLog)::subscribe);
+                    }
+                } else {
+                    mono = userActionLogService.triggerLogHandlers(actionLog);
+                }
+                requestResultMono = mono.then(requestResultMono);
+            }
+            return requestResultMono.switchIfEmpty(handler.apply(requestWrapper));
+        });
+        Long requestId = request.hasRequestId() ? request.getRequestId().getValue() : null;
+        return handleResult(session, result, requestId, userId, deviceType);
     }
 
-    private TurmsNotification.Builder generateNotificationBuilder(RequestResult requestResult, TurmsStatusCode code, long requestId) {
+    private boolean areRequestsTooFrequent(WebSocketSession session) {
+        int requestInterval = turmsClusterManager.getTurmsProperties().getSecurity().getMinClientRequestsIntervalMillis();
+        if (requestInterval != 0) {
+            long timestamp = (long) session.getAttributes().getOrDefault(SESSION_ATTR_LAST_REQUEST_TIMESTAMP, 0L);
+            long now = System.currentTimeMillis();
+            boolean areFrequent = now - timestamp < requestInterval;
+            if (!areFrequent) {
+                session.getAttributes().put(SESSION_ATTR_LAST_REQUEST_TIMESTAMP, now);
+            }
+            return areFrequent;
+        } else {
+            return false;
+        }
+    }
+
+    private TurmsNotification generateNotification(RequestResult requestResult, long requestId) {
+        TurmsStatusCode code = requestResult.getCode();
+        if (code == null) {
+            IllegalArgumentException exception = new IllegalArgumentException("the business code must not be null");
+            log.error(exception);
+            throw exception;
+        }
         TurmsNotification.Builder builder = TurmsNotification.newBuilder();
         String reason = requestResult.getReason();
-        TurmsNotification.Data dataForRequester = requestResult.getDataForRequester();
         if (reason != null) {
             builder.setReason(StringValue.newBuilder().setValue(reason).build());
         }
+        TurmsNotification.Data dataForRequester = requestResult.getDataForRequester();
         if (dataForRequester != null) {
             builder.setData(dataForRequester);
         }
-        Int32Value businessCode = Int32Value.newBuilder()
-                .setValue(code.getBusinessCode()).build();
+        Int32Value businessCode = Int32Value.newBuilder().setValue(code.getBusinessCode()).build();
         return builder
                 .setCode(businessCode)
-                .setRequestId(Int64Value.newBuilder().setValue(requestId).build());
+                .setRequestId(Int64Value.newBuilder().setValue(requestId).build())
+                .build();
     }
 
     private Mono<WebSocketMessage> handleSuccessResult(RequestResult requestResult, WebSocketSession session, Long requestId, Long requesterId, DeviceType requesterDevice) {
         return notifyRelatedUsersOfAction(requestResult, requesterId, requesterDevice)
                 .flatMap(success -> {
                     if (requestId != null) {
-                        TurmsNotification notification = generateNotificationBuilder(requestResult, requestResult.getCode(), requestId)
-                                .build();
+                        TurmsNotification notification = generateNotification(requestResult, requestId);
                         return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory.wrap(notification.toByteArray())));
                     } else {
                         return Mono.empty();
@@ -303,8 +343,7 @@ public class InboundMessageDispatcher {
 
     private Mono<WebSocketMessage> handleFailResult(RequestResult requestResult, WebSocketSession session, Long requestId) {
         if (requestId != null) {
-            TurmsNotification notification = generateNotificationBuilder(requestResult, requestResult.getCode(), requestId)
-                    .build();
+            TurmsNotification notification = generateNotification(requestResult, requestId);
             return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory
                     .wrap(notification.toByteArray())));
         } else {

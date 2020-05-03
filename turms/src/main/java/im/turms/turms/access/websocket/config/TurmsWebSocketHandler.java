@@ -115,14 +115,8 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                 }
                             })
                             .subscribe());
-            Flux<WebSocketMessage> responseOutput = session.receive();
-            int requestInterval = turmsClusterManager.getTurmsProperties().getSecurity().getMinClientRequestsIntervalMillis();
-            if (requestInterval != 0) {
-                responseOutput = responseOutput
-                        .doOnNext(WebSocketMessage::retain)
-                        .sample(Duration.ofMillis(requestInterval));
-            }
-            responseOutput = responseOutput.flatMap(inboundMessage -> inboundMessageDispatcher.dispatch(session, inboundMessage));
+            Flux<WebSocketMessage> responseOutput = session.receive()
+                    .flatMap(inboundMessage -> inboundMessageDispatcher.dispatch(session, inboundMessage));
             return session.send(notificationOutput
                     .doOnComplete(() -> onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_ADMIN)))
                     .mergeWith(responseOutput.doOnComplete(() -> onlineUserService.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(TurmsCloseStatus.DISCONNECTED_BY_CLIENT))))
