@@ -122,6 +122,7 @@ public class TurmsClusterManager {
                 .stream()
                 .sorted(Comparator.comparing(Member::getUuid))
                 .collect(Collectors.toList());
+        localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
         otherMembersSnapshot = membersSnapshot
                 .stream()
                 .filter(member -> !member.getUuid().equals(localMembersSnapshot.getUuid()))
@@ -131,7 +132,6 @@ public class TurmsClusterManager {
             memberMap.put(member.getUuid(), member);
         }
         membersSnapshotMap = memberMap;
-        localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
         if (membershipEvent.getEventType() == MembershipEvent.MEMBER_ADDED) {
             if (membersSnapshot.size() > HASH_SLOTS_NUMBER) {
                 shutdown();
