@@ -19,6 +19,7 @@ package im.turms.turms.task;
 
 import com.hazelcast.spring.context.SpringAware;
 import im.turms.turms.service.message.OutboundMessageService;
+import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -26,18 +27,23 @@ import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
-import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 @SpringAware
-public class DeliveryTurmsNotificationTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
-    private static final long serialVersionUID = 4595269008081593689L;
+public class DeliveryTurmsNotificationTask implements Callable<Boolean>, ApplicationContextAware {
+
+    @Getter
     private final byte[] notificationBytes;
+
+    @Getter
     private final Set<Long> recipientIds;
+
     // Use a independent requester ID instead of the requester ID in notificationBytes
     // to avoid deserialize the bytes data
+    @Getter
     private final Long remoteRequesterIdForCaching;
+
     private transient ApplicationContext context;
     private transient OutboundMessageService outboundMessageService;
 

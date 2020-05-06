@@ -108,10 +108,22 @@ public class IdentifiedDataFactory implements DataSerializableFactory {
 
     public enum Type {
         BO_ADMIN_INFO,
+        BO_USER_ONLINE_INFO,
+
         DOMAIN_ADMIN,
         DOMAIN_ADMIN_ROLE,
         DOMAIN_GROUP_TYPE,
         DOMAIN_USER_PERMISSION_GROUP,
+
+        TASK_CHECK_IF_USER_ONLINE,
+        TASK_COUNT_ONLINE_USERS,
+        TASK_DELIVERY_TURMS_NOTIFICATION,
+        TASK_QUERY_NEAREST_USER_IDS,
+        TASK_QUERY_NEAREST_USER_SESSIONS_IDS,
+        TASK_QUERY_USER_ONLINE_INFO,
+        TASK_SET_USER_OFFLINE,
+        TASK_UPDATE_ONLINE_USER_STATUS,
+
         PROPERTIES,
         PROPERTY_ADMIN,
         PROPERTY_CACHE,

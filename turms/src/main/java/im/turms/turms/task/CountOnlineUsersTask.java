@@ -24,12 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 @SpringAware
-public class CountOnlineUsersTask implements Callable<Integer>, Serializable, ApplicationContextAware {
-    private static final long serialVersionUID = 3249743676724648705L;
+public class CountOnlineUsersTask implements Callable<Integer>, ApplicationContextAware {
+
     private transient ApplicationContext context;
     private transient OnlineUserService onlineUserService;
 

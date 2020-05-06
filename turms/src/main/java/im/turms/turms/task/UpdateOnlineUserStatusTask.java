@@ -21,34 +21,41 @@ import com.hazelcast.spring.context.SpringAware;
 import im.turms.common.constant.UserStatus;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
+import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 @SpringAware
-public class UpdateOnlineUserStatusTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
-    private static final long serialVersionUID = 3056833768547804518L;
+public class UpdateOnlineUserStatusTask implements Callable<Boolean>, ApplicationContextAware {
+
+    @Getter
     private final Long userId;
-    private final Integer userStatus;
+
+    @Getter
+    private final UserStatus userStatus;
+
     private transient ApplicationContext context;
     private transient OnlineUserService onlineUserService;
 
-    public UpdateOnlineUserStatusTask(@NotNull Long userId, @NotNull Integer userStatus) {
+    public UpdateOnlineUserStatusTask(@NotNull Long userId, @NotNull UserStatus userStatus) {
         this.userId = userId;
-        this.userStatus = userStatus;
+        if (userStatus != UserStatus.UNRECOGNIZED && userStatus != UserStatus.OFFLINE) {
+            this.userStatus = userStatus;
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
     public Boolean call() {
         OnlineUserManager userManager = onlineUserService.getLocalOnlineUserManager(userId);
-        UserStatus status = UserStatus.forNumber(userStatus);
-        if (userManager != null && status != UserStatus.UNRECOGNIZED && status != UserStatus.OFFLINE) {
-            return userManager.setUserOnlineStatus(status);
+        if (userManager != null) {
+            return userManager.setUserOnlineStatus(userStatus);
         } else {
             return false;
         }

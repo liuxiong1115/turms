@@ -25,20 +25,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @AllArgsConstructor
 @Builder
-public final class UserOnlineInfo implements Serializable {
+public final class UserOnlineInfo {
     // Note that do NOT set the field deviceType because sessionMap has contained the using device types of a user
     private final Long userId;
     private UserStatus userStatus;
-    // Use the concrete ConcurrentHashMap to make sure it's serializable
-    private final ConcurrentHashMap<DeviceType, OnlineUserManager.Session> sessionMap;
+    private final Map<DeviceType, OnlineUserManager.Session> sessionMap;
 
     @JsonIgnore
     public UserStatus getUserStatus(boolean shouldConvertInvisibleToOffline) {

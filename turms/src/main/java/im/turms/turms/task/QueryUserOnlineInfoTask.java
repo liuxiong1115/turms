@@ -22,19 +22,21 @@ import im.turms.common.constant.UserStatus;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.service.user.onlineuser.manager.OnlineUserManager;
+import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 @SpringAware
-public class QueryUserOnlineInfoTask implements Callable<UserOnlineInfo>, Serializable, ApplicationContextAware {
-    private static final long serialVersionUID = -550684968620853839L;
+public class QueryUserOnlineInfoTask implements Callable<UserOnlineInfo>, ApplicationContextAware {
+
+    @Getter
     private final Long userId;
+
     private transient ApplicationContext context;
     private transient OnlineUserService onlineUserService;
 

@@ -17,16 +17,17 @@
 
 package im.turms.turms.config.hazelcast;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.MemberAttributeConfig;
-import com.hazelcast.config.XmlConfigBuilder;
-import com.hazelcast.config.YamlConfigBuilder;
+import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.spring.context.SpringManagedContext;
 import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.manager.TurmsClusterManager;
+import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.property.TurmsProperties;
+import im.turms.turms.serializer.model.UserOnlineInfoSerializer;
+import im.turms.turms.serializer.task.*;
+import im.turms.turms.task.*;
 import im.turms.turms.util.AddressUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.hazelcast.HazelcastProperties;
@@ -100,10 +101,45 @@ public class HazelcastConfig {
                 function.apply(config);
             }
         }
+
+        // ManagedContext
         SpringManagedContext springManagedContext = new SpringManagedContext();
         springManagedContext.setApplicationContext(applicationContext);
         config.setManagedContext(springManagedContext);
 
+        // SerializerConfig
+        config.getSerializationConfig()
+                // model
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new UserOnlineInfoSerializer())
+                        .setTypeClass(UserOnlineInfo.class))
+                // RPC
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new CheckIfUserOnlineTaskSerializer())
+                        .setTypeClass(CheckIfUserOnlineTask.class))
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new CountOnlineUsersTaskSerializer())
+                        .setTypeClass(CountOnlineUsersTask.class))
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new DeliveryTurmsNotificationTaskSerializer())
+                        .setTypeClass(DeliveryTurmsNotificationTask.class))
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new QueryNearestUserIdsTaskSerializer())
+                        .setTypeClass(QueryNearestUserIdsTask.class))
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new QueryNearestUserSessionsIdsTaskSerializer())
+                        .setTypeClass(QueryNearestUserSessionsIdsTask.class))
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new QueryUserOnlineInfoTaskSerializer())
+                        .setTypeClass(QueryUserOnlineInfoTask.class))
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new SetUserOfflineTaskSerializer())
+                        .setTypeClass(SetUserOfflineTask.class))
+                .addSerializerConfig(new SerializerConfig()
+                        .setImplementation(new UpdateOnlineUserStatusTaskSerializer())
+                        .setTypeClass(UpdateOnlineUserStatusTask.class));
+
+        // MemberAttributeConfig
         MemberAttributeConfig attributeConfig = new MemberAttributeConfig();
         String address;
         if (turmsProperties.getAddress().isEnabled()) {

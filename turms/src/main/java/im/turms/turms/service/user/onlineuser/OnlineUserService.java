@@ -271,7 +271,7 @@ public class OnlineUserService {
     private void setManagersOffline(@NotNull CloseStatus closeStatus, @NotNull Collection<OnlineUserManager> managers) {
         for (OnlineUserManager manager : managers) {
             if (manager != null) {
-                ConcurrentMap<DeviceType, OnlineUserManager.Session> sessionMap = manager.getOnlineUserInfo().getSessionMap();
+                ConcurrentMap<DeviceType, OnlineUserManager.Session> sessionMap = (ConcurrentMap<DeviceType, OnlineUserManager.Session>) manager.getOnlineUserInfo().getSessionMap();
                 Date now = new Date();
                 Long userId = manager.getOnlineUserInfo().getUserId();
                 for (OnlineUserManager.Session session : sessionMap.values()) {
@@ -353,7 +353,7 @@ public class OnlineUserService {
             if (member != null) {
                 Future<Boolean> future = turmsClusterManager
                         .getExecutor()
-                        .submitToMember(new SetUserOfflineTask(userId, null, closeStatus.getCode()), member);
+                        .submitToMember(new SetUserOfflineTask(userId, null, closeStatus), member);
                 return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
             } else {
                 return Mono.just(false);
@@ -382,13 +382,9 @@ public class OnlineUserService {
         } else {
             Member member = getMemberByUserId(userId);
             if (member != null) {
-                Set<Integer> types = new HashSet<>(deviceTypes.size());
-                for (DeviceType deviceType : deviceTypes) {
-                    types.add(deviceType.ordinal());
-                }
                 Future<Boolean> future = turmsClusterManager
                         .getExecutor()
-                        .submitToMember(new SetUserOfflineTask(userId, types, closeStatus.getCode()), member);
+                        .submitToMember(new SetUserOfflineTask(userId, deviceTypes, closeStatus), member);
                 return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
             } else {
                 return Mono.just(false);
@@ -624,7 +620,7 @@ public class OnlineUserService {
             return Mono.just(manager != null && manager.setUserOnlineStatus(userStatus));
         } else {
             Member member = getMemberByUserId(userId);
-            UpdateOnlineUserStatusTask task = new UpdateOnlineUserStatusTask(userId, userStatus.getNumber());
+            UpdateOnlineUserStatusTask task = new UpdateOnlineUserStatusTask(userId, userStatus);
             Future<Boolean> future = turmsClusterManager.getExecutor()
                     .submitToMember(task, member);
             return ReactorUtil.future2Mono(future, turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());

@@ -180,7 +180,7 @@ public class UsersNearbyService {
     public Flux<Long> queryNearestUserIds(
             @NotNull Long userId,
             @Nullable DeviceType deviceType,
-            @Nullable Integer maxPeopleNumber,
+            @Nullable Short maxPeopleNumber,
             @Nullable Double maxDistance) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
@@ -214,7 +214,7 @@ public class UsersNearbyService {
     public Flux<Pair<Long, DeviceType>> queryNearestUserSessionIds(
             @NotNull Long userId,
             @Nullable DeviceType deviceType,
-            @Nullable Integer maxPeopleNumber,
+            @Nullable Short maxPeopleNumber,
             @Nullable Double maxDistance) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
@@ -248,7 +248,7 @@ public class UsersNearbyService {
     public Flux<User> queryUsersProfilesNearby(
             @NotNull Long userId,
             @Nullable DeviceType deviceType,
-            @Nullable Integer maxPeopleNumber,
+            @Nullable Short maxPeopleNumber,
             @Nullable Double maxDistance) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
@@ -283,7 +283,7 @@ public class UsersNearbyService {
     public Flux<Long> queryNearestUserIds(
             @NotNull Float longitude,
             @NotNull Float latitude,
-            @Nullable Integer maxNumber,
+            @Nullable Short maxNumber,
             @Nullable Double maxDistance) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
@@ -306,7 +306,7 @@ public class UsersNearbyService {
                 maxDistance = location.getMaxDistanceLimitPerQuery();
             }
             Double finalMaxDistance = maxDistance;
-            Integer finalMaxPeopleNumber = maxNumber;
+            Short finalMaxPeopleNumber = maxNumber;
             return turmsTaskManager.callAll(new QueryNearestUserIdsTask(
                     longitude,
                     latitude,
@@ -327,7 +327,7 @@ public class UsersNearbyService {
     public Flux<Pair<Long, DeviceType>> queryUserSessionIdsNearby(
             @NotNull Float longitude,
             @NotNull Float latitude,
-            @Nullable Integer maxNumber,
+            @Nullable Short maxNumber,
             @Nullable Double maxDistance) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
@@ -348,7 +348,7 @@ public class UsersNearbyService {
                         .getDefaultMaxDistancePerQuery();
             }
             Double finalMaxDistance = maxDistance;
-            Integer finalMaxPeopleNumber = maxNumber;
+            Short finalMaxPeopleNumber = maxNumber;
             return turmsTaskManager.callAll(new QueryNearestUserSessionsIdsTask(
                     longitude,
                     latitude,
@@ -369,7 +369,7 @@ public class UsersNearbyService {
     public Iterable<Entry<Long, PointFloat>> getNearestUserIds(
             @NotNull PointFloat point,
             @NotNull Double maxDistance,
-            @NotNull Integer maxNumber) {
+            @NotNull Short maxNumber) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
         }
@@ -380,7 +380,7 @@ public class UsersNearbyService {
             @NotNull PointFloat point,
             @NotEmpty List<Iterable<Entry<Long, PointFloat>>> entries,
             @NotNull Double maxDistance,
-            @NotNull Integer maxNumber) {
+            @NotNull Short maxNumber) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
         }
@@ -396,7 +396,7 @@ public class UsersNearbyService {
     public Iterable<Entry<Pair<Long, DeviceType>, PointFloat>> getNearestUserSessionIds(
             @NotNull PointFloat point,
             @NotNull Double maxDistance,
-            @NotNull Integer maxNumber) {
+            @NotNull Short maxNumber) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
         }
@@ -407,7 +407,7 @@ public class UsersNearbyService {
             @NotNull PointFloat point,
             @NotEmpty List<Iterable<Entry<Pair<Long, DeviceType>, PointFloat>>> entries,
             @NotNull Double maxDistance,
-            @NotNull Integer maxNumber) {
+            @NotNull Short maxNumber) {
         if (!locationEnabled) {
             throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
         }

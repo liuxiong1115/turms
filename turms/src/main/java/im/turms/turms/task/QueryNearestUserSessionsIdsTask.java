@@ -22,6 +22,7 @@ import com.github.davidmoten.rtree2.geometry.internal.PointFloat;
 import com.hazelcast.spring.context.SpringAware;
 import im.turms.common.constant.DeviceType;
 import im.turms.turms.service.user.onlineuser.UsersNearbyService;
+import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +30,23 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 @SpringAware
-public class QueryNearestUserSessionsIdsTask implements Callable<Iterable<Entry<Pair<Long, DeviceType>, PointFloat>>>, Serializable, ApplicationContextAware {
-    private static final long serialVersionUID = 3220885919318177439L;
+public class QueryNearestUserSessionsIdsTask implements Callable<Iterable<Entry<Pair<Long, DeviceType>, PointFloat>>>, ApplicationContextAware {
+
+    @Getter
     private final Float longitude;
+
+    @Getter
     private final Float latitude;
+
+    @Getter
     private final Double maxDistance;
-    private final Integer maxNumber;
+
+    @Getter
+    private final Short maxNumber;
+
     private transient ApplicationContext context;
     private transient UsersNearbyService usersNearbyService;
 
@@ -46,7 +54,7 @@ public class QueryNearestUserSessionsIdsTask implements Callable<Iterable<Entry<
             @NotNull Float longitude,
             @NotNull Float latitude,
             @NotNull Double maxDistance,
-            @NotNull Integer maxNumber) {
+            @NotNull Short maxNumber) {
         this.longitude = longitude;
         this.latitude = latitude;
         this.maxDistance = maxDistance;

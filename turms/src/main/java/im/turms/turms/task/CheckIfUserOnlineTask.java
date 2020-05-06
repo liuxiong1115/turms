@@ -19,18 +19,21 @@ package im.turms.turms.task;
 
 import com.hazelcast.spring.context.SpringAware;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
+import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 @SpringAware
-public class CheckIfUserOnlineTask implements Callable<Boolean>, Serializable, ApplicationContextAware {
+public class CheckIfUserOnlineTask implements Callable<Boolean>, ApplicationContextAware {
+
+    @Getter
     private final Long userId;
+
     private transient ApplicationContext context;
     private transient OnlineUserService onlineUserService;
 

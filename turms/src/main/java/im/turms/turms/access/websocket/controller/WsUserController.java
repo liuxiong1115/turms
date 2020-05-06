@@ -99,7 +99,7 @@ public class WsUserController {
         return turmsRequestWrapper -> {
             QueryUsersIdsNearbyRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUsersIdsNearbyRequest();
             Double distance = request.hasDistance() ? (double) request.getDistance().getValue() : null;
-            Integer maxNumber = request.hasMaxNumber() ? request.getMaxNumber().getValue() : null;
+            Short maxNumber = request.hasMaxNumber() ? (short) request.getMaxNumber().getValue() : null;
             usersNearbyService.upsertUserLocation(
                     turmsRequestWrapper.getUserId(),
                     turmsRequestWrapper.getDeviceType(),
@@ -147,7 +147,7 @@ public class WsUserController {
         return turmsRequestWrapper -> {
             QueryUsersInfosNearbyRequest request = turmsRequestWrapper.getTurmsRequest().getQueryUsersInfosNearbyRequest();
             Double distance = request.hasDistance() ? (double) request.getDistance().getValue() : null;
-            Integer maxNumber = request.hasMaxNumber() ? request.getMaxNumber().getValue() : null;
+            Short maxNumber = request.hasMaxNumber() ? (short) request.getMaxNumber().getValue() : null;
             usersNearbyService.upsertUserLocation(
                     turmsRequestWrapper.getUserId(),
                     turmsRequestWrapper.getDeviceType(),

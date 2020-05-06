@@ -59,7 +59,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.constant.Common.ID_GROUP_ID;
+import static im.turms.turms.constant.Common.ID_USER_ID;
 
 @Service
 @Validated

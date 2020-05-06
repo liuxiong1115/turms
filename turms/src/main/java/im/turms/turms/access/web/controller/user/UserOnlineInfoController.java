@@ -110,7 +110,7 @@ public class UserOnlineInfoController {
     public Mono<ResponseEntity<ResponseDTO<Collection<User>>>> queryUsersNearby(
             @RequestParam Long userId,
             @RequestParam(required = false) DeviceType deviceType,
-            @RequestParam(required = false) Integer maxPeopleNumber,
+            @RequestParam(required = false) Short maxPeopleNumber,
             @RequestParam(required = false) Double maxDistance) {
         Flux<User> usersNearby = usersNearbyService.queryUsersProfilesNearby(userId, deviceType, maxPeopleNumber, maxDistance);
         return ResponseFactory.okIfTruthy(usersNearby);

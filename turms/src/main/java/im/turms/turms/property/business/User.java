@@ -128,7 +128,7 @@ public class User implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         @Description("The default maximum available number of users nearby records per query request")
         @Min(0)
-        private int defaultMaxAvailableUsersNearbyNumberPerQuery = 20;
+        private short defaultMaxAvailableUsersNearbyNumberPerQuery = 20;
 
         @JsonView(MutablePropertiesView.class)
         @Description("The default maximum distance per query request")
@@ -138,7 +138,7 @@ public class User implements IdentifiedDataSerializable {
         @JsonView(MutablePropertiesView.class)
         @Description("The maximum allowed available number of users nearby records per query request")
         @Min(0)
-        private int maxAvailableUsersNearbyNumberLimitPerQuery = 100;
+        private short maxAvailableUsersNearbyNumberLimitPerQuery = 100;
 
         @JsonView(MutablePropertiesView.class)
         @Description("The maximum allowed distance per query request")
@@ -164,9 +164,9 @@ public class User implements IdentifiedDataSerializable {
         public void writeData(ObjectDataOutput out) throws IOException {
             out.writeBoolean(enabled);
             out.writeBoolean(persistent);
-            out.writeInt(defaultMaxAvailableUsersNearbyNumberPerQuery);
+            out.writeShort(defaultMaxAvailableUsersNearbyNumberPerQuery);
             out.writeDouble(defaultMaxDistancePerQuery);
-            out.writeInt(maxAvailableUsersNearbyNumberLimitPerQuery);
+            out.writeShort(maxAvailableUsersNearbyNumberLimitPerQuery);
             out.writeDouble(maxDistanceLimitPerQuery);
         }
 
@@ -174,9 +174,9 @@ public class User implements IdentifiedDataSerializable {
         public void readData(ObjectDataInput in) throws IOException {
             enabled = in.readBoolean();
             persistent = in.readBoolean();
-            defaultMaxAvailableUsersNearbyNumberPerQuery = in.readInt();
+            defaultMaxAvailableUsersNearbyNumberPerQuery = in.readShort();
             defaultMaxDistancePerQuery = in.readDouble();
-            maxAvailableUsersNearbyNumberLimitPerQuery = in.readInt();
+            maxAvailableUsersNearbyNumberLimitPerQuery = in.readShort();
             maxDistanceLimitPerQuery = in.readDouble();
         }
     }

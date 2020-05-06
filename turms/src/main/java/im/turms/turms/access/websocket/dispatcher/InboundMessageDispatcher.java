@@ -172,10 +172,10 @@ public class InboundMessageDispatcher {
 
     /**
      * Convert RequestResult to WebSocketMessage.
-     * Scenario 1: If Mono<RequestResult> returns a RequestResult object -> TurmsStatusCode.getCode()
-     * Scenario 2: If Mono<RequestResult> is Mono.empty() -> TurmsStatusCode.NO_CONTENT
-     * Scenario 3: If Mono<RequestResult> throws a TurmsBusinessException -> TurmsStatusCode.getCode()
-     * Scenario 4: If Mono<RequestResult> throws an exception of other types -> TurmsStatusCode.FAILED and throwable.getMessage()
+     * Case 1: If Mono<RequestResult> returns a RequestResult object -> TurmsStatusCode.getCode()
+     * Case 2: If Mono<RequestResult> is Mono.empty() -> TurmsStatusCode.NO_CONTENT
+     * Case 3: If Mono<RequestResult> throws a TurmsBusinessException -> TurmsStatusCode.getCode()
+     * Case 4: If Mono<RequestResult> throws an exception of other types -> TurmsStatusCode.FAILED and throwable.getMessage()
      */
     private Mono<WebSocketMessage> handleResult(
             @NotNull WebSocketSession session,
@@ -189,22 +189,15 @@ public class InboundMessageDispatcher {
                     if (throwable instanceof TurmsBusinessException) {
                         return Mono.just(RequestResult.create(((TurmsBusinessException) throwable).getCode()));
                     } else {
-                        String message;
-                        if (turmsClusterManager.getTurmsProperties().getSecurity().isRespondStackTraceWhenExceptionThrown()) {
-                            message = throwable.getMessage().concat(Arrays.toString(throwable.getStackTrace()));
-                        } else {
-                            message = throwable.getMessage();
-                        }
+                        String message = turmsClusterManager.getTurmsProperties().getSecurity().isRespondStackTraceWhenExceptionThrown()
+                                ? throwable.getMessage().concat(Arrays.toString(throwable.getStackTrace()))
+                                : throwable.getMessage();
                         return Mono.just(RequestResult.create(TurmsStatusCode.FAILED, message));
                     }
                 })
-                .flatMap(requestResult -> {
-                    if (requestResult.getCode() == TurmsStatusCode.OK) {
-                        return handleSuccessResult(requestResult, session, requestId, requesterId, requesterDevice);
-                    } else {
-                        return handleFailResult(requestResult, session, requestId);
-                    }
-                });
+                .flatMap(requestResult -> requestResult.getCode() == TurmsStatusCode.OK
+                        ? handleSuccessResult(requestResult, session, requestId, requesterId, requesterDevice)
+                        : handleFailResult(requestResult, session, requestId));
     }
 
     /**

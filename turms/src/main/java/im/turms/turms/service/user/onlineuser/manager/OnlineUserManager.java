@@ -33,7 +33,6 @@ import reactor.core.publisher.FluxSink;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -148,7 +147,7 @@ public class OnlineUserManager {
 
     @Data
     @AllArgsConstructor
-    public static class Session implements Serializable {
+    public static class Session {
         private final DeviceType deviceType;
         private final Date loginDate;
         private UserLocation location;
