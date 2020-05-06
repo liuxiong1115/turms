@@ -403,19 +403,21 @@ public class OnlineUserService {
     }
 
     public Mono<Integer> countOnlineUsers() {
-        Flux<Integer> futures = turmsTaskManager.callAll(new CountOnlineUsersTask(),
+        Flux<Integer> futures = turmsTaskManager.callAllOthers(new CountOnlineUsersTask(),
                 turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
-        return MathFlux.sumInt(futures);
+        return MathFlux.sumInt(futures)
+                .map(count -> count + countLocalOnlineUsers());
     }
 
     public Mono<Map<UUID, Integer>> countOnlineUsersByNodes() {
-        Mono<Map<Member, Integer>> mono = turmsTaskManager.callAllAsMap(new CountOnlineUsersTask(),
+        Mono<Map<Member, Integer>> mono = turmsTaskManager.callAllOthersAsMap(new CountOnlineUsersTask(),
                 turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration());
         return mono.map(map -> {
-            Map<UUID, Integer> idNumberMap = new HashMap<>(map.size());
+            Map<UUID, Integer> idNumberMap = new HashMap<>(map.size() + 1);
             for (Map.Entry<Member, Integer> entry : map.entrySet()) {
                 idNumberMap.put(entry.getKey().getUuid(), entry.getValue());
             }
+            idNumberMap.put(turmsClusterManager.getLocalMember().getUuid(), countLocalOnlineUsers());
             return idNumberMap;
         });
     }

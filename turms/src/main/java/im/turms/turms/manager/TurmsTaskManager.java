@@ -36,9 +36,11 @@ import java.util.concurrent.Future;
 @Beta
 public class TurmsTaskManager {
     private final IExecutorService executor;
+    private final TurmsClusterManager turmsClusterManager;
 
     public TurmsTaskManager(TurmsClusterManager turmsClusterManager) {
         executor = turmsClusterManager.getExecutor();
+        this.turmsClusterManager = turmsClusterManager;
     }
 
     public <T> Mono<T> call(@NotNull Member member, @NotNull Callable<T> task, @NotNull Duration duration) {
@@ -46,13 +48,13 @@ public class TurmsTaskManager {
         return ReactorUtil.future2Mono(future, duration);
     }
 
-    public <T> Flux<T> callAll(@NotNull Callable<T> task, @NotNull Duration duration) {
-        Map<Member, Future<T>> futureMap = executor.submitToAllMembers(task);
+    public <T> Flux<T> callAllOthers(@NotNull Callable<T> task, @NotNull Duration duration) {
+        Map<Member, Future<T>> futureMap = executor.submitToMembers(task, turmsClusterManager.getOtherMembersSnapshot());
         return ReactorUtil.futures2Flux(futureMap.values(), duration);
     }
 
-    public <T> Mono<Map<Member, T>> callAllAsMap(@NotNull Callable<T> task, @NotNull Duration duration) {
-        Mono<Map<Member, T>> map = Mono.create(sink -> executor.submitToAllMembers(task, new MultiExecutionCallback() {
+    public <T> Mono<Map<Member, T>> callAllOthersAsMap(@NotNull Callable<T> task, @NotNull Duration duration) {
+        Mono<Map<Member, T>> map = Mono.create(sink -> executor.submitToMembers(task, turmsClusterManager.getOtherMembersSnapshot(), new MultiExecutionCallback() {
             @Override
             public void onResponse(Member member, Object value) {
 

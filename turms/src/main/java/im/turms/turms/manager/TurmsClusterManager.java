@@ -73,7 +73,10 @@ public class TurmsClusterManager {
     private ReplicatedMap<UUID, String> memberAddresses; // Don't just use MemberAttributeConfig because it only supports immutable attributes
     private ISet<UUID> inactiveMembers;
 
+    @Getter
     private List<Member> membersSnapshot = Collections.emptyList();
+    @Getter
+    private List<Member> otherMembersSnapshot = Collections.emptyList();
     private Map<UUID, Member> membersSnapshotMap = Collections.emptyMap();
     private Member localMembersSnapshot;
 
@@ -118,6 +121,10 @@ public class TurmsClusterManager {
         membersSnapshot = hazelcastInstance.getCluster().getMembers()
                 .stream()
                 .sorted(Comparator.comparing(Member::getUuid))
+                .collect(Collectors.toList());
+        otherMembersSnapshot = membersSnapshot
+                .stream()
+                .filter(member -> !member.getUuid().equals(localMembersSnapshot.getUuid()))
                 .collect(Collectors.toList());
         Map<UUID, Member> memberMap = new HashMap<>(membersSnapshot.size());
         for (Member member : membersSnapshot) {

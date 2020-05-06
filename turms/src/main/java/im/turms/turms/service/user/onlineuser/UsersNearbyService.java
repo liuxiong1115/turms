@@ -307,14 +307,16 @@ public class UsersNearbyService {
             }
             Double finalMaxDistance = maxDistance;
             Short finalMaxPeopleNumber = maxNumber;
-            return turmsTaskManager.callAll(new QueryNearestUserIdsTask(
+            PointFloat point = PointFloat.create(longitude, latitude);
+            return turmsTaskManager.callAllOthers(new QueryNearestUserIdsTask(
                     longitude,
                     latitude,
                     maxDistance,
                     maxNumber), turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration())
+                    .concatWith(s -> s.onNext(getNearestUserIds(point, finalMaxDistance, finalMaxPeopleNumber)))
                     .collectList()
                     .flatMapMany(entries -> Flux.fromIterable(getNearestUserIds(
-                            PointFloat.create(longitude, latitude),
+                            point,
                             entries,
                             finalMaxDistance,
                             finalMaxPeopleNumber)))
@@ -349,14 +351,16 @@ public class UsersNearbyService {
             }
             Double finalMaxDistance = maxDistance;
             Short finalMaxPeopleNumber = maxNumber;
-            return turmsTaskManager.callAll(new QueryNearestUserSessionsIdsTask(
+            PointFloat point = PointFloat.create(longitude, latitude);
+            return turmsTaskManager.callAllOthers(new QueryNearestUserSessionsIdsTask(
                     longitude,
                     latitude,
                     maxDistance,
                     maxNumber), turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration())
+                    .concatWith(s -> s.onNext(getNearestUserSessionIds(point, finalMaxDistance, finalMaxPeopleNumber)))
                     .collectList()
                     .flatMapMany(entries -> Flux.fromIterable(getNearestUserSessionIds(
-                            PointFloat.create(longitude, latitude),
+                            point,
                             entries,
                             finalMaxDistance,
                             finalMaxPeopleNumber)))
