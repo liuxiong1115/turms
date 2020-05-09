@@ -35,6 +35,7 @@ import im.turms.turms.property.TurmsProperties;
 import im.turms.turms.service.user.UserVersionService;
 import im.turms.turms.util.ProtoUtil;
 import im.turms.turms.util.RequestStatusUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -70,7 +71,13 @@ public class GroupInvitationService {
     private final UserVersionService userVersionService;
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public GroupInvitationService(TurmsProperties turmsProperties, GroupMemberService groupMemberService, @Lazy TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, UserVersionService userVersionService, GroupVersionService groupVersionService) {
+    public GroupInvitationService(
+            TurmsProperties turmsProperties,
+            GroupMemberService groupMemberService,
+            @Lazy TurmsClusterManager turmsClusterManager,
+            @Qualifier("groupMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            UserVersionService userVersionService,
+            GroupVersionService groupVersionService) {
         this.turmsProperties = turmsProperties;
         this.groupMemberService = groupMemberService;
         this.turmsClusterManager = turmsClusterManager;

@@ -31,6 +31,7 @@ import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.AdminRole;
 import org.apache.commons.lang3.tuple.Triple;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -59,7 +60,7 @@ public class AdminRoleService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final AdminService adminService;
 
-    public AdminRoleService(ReactiveMongoTemplate mongoTemplate, @Lazy AdminService adminService) {
+    public AdminRoleService(@Qualifier("adminMongoTemplate") ReactiveMongoTemplate mongoTemplate, @Lazy AdminService adminService) {
         this.mongoTemplate = mongoTemplate;
         this.adminService = adminService;
     }

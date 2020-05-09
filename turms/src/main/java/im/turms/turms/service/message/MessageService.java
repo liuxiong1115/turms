@@ -46,6 +46,7 @@ import im.turms.turms.util.ProtoUtil;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -90,7 +91,15 @@ public class MessageService {
     private final Cache<Long, Message> sentMessageCache;
 
     @Autowired
-    public MessageService(ReactiveMongoTemplate mongoTemplate, TurmsProperties turmsProperties, TurmsClusterManager turmsClusterManager, MessageStatusService messageStatusService, GroupMemberService groupMemberService, UserService userService, OutboundMessageService outboundMessageService, TurmsPluginManager turmsPluginManager) {
+    public MessageService(
+            @Qualifier("messageMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            TurmsProperties turmsProperties,
+            TurmsClusterManager turmsClusterManager,
+            MessageStatusService messageStatusService,
+            GroupMemberService groupMemberService,
+            UserService userService,
+            OutboundMessageService outboundMessageService,
+            TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.messageStatusService = messageStatusService;

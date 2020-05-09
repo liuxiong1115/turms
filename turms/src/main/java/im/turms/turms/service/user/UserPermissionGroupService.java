@@ -27,6 +27,7 @@ import im.turms.turms.builder.QueryBuilder;
 import im.turms.turms.builder.UpdateBuilder;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.UserPermissionGroup;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -56,7 +57,10 @@ public class UserPermissionGroupService {
     private final TurmsClusterManager turmsClusterManager;
     private final UserService userService;
 
-    public UserPermissionGroupService(ReactiveMongoTemplate mongoTemplate, @Lazy TurmsClusterManager turmsClusterManager, UserService userService) {
+    public UserPermissionGroupService(
+            @Qualifier("userMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            @Lazy TurmsClusterManager turmsClusterManager,
+            UserService userService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.userService = userService;

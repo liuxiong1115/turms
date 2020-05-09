@@ -44,6 +44,7 @@ import im.turms.turms.util.ReactorUtil;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -106,7 +107,7 @@ public class OnlineUserService {
     public OnlineUserService(
             TurmsClusterManager turmsClusterManager,
             UsersNearbyService usersNearbyService,
-            ReactiveMongoTemplate mongoTemplate,
+            @Qualifier("userMongoTemplate") ReactiveMongoTemplate mongoTemplate,
             UserLoginLogService userLoginLogService,
             UserLocationService userLocationService,
             TurmsTaskManager turmsTaskManager,

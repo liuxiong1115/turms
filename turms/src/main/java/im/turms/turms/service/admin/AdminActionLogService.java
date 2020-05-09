@@ -28,6 +28,7 @@ import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.AdminActionLog;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,10 @@ public class AdminActionLogService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsPluginManager turmsPluginManager;
 
-    public AdminActionLogService(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, TurmsPluginManager turmsPluginManager) {
+    public AdminActionLogService(
+            TurmsClusterManager turmsClusterManager,
+            @Qualifier("logMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            TurmsPluginManager turmsPluginManager) {
         this.turmsClusterManager = turmsClusterManager;
         this.mongoTemplate = mongoTemplate;
         this.turmsPluginManager = turmsPluginManager;

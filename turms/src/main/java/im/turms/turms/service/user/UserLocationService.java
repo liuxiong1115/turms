@@ -5,6 +5,7 @@ import im.turms.common.constant.DeviceType;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.UserLocation;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +22,9 @@ public class UserLocationService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
 
-    public UserLocationService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager) {
+    public UserLocationService(
+            @Qualifier("userMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            TurmsClusterManager turmsClusterManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
     }

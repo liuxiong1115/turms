@@ -34,6 +34,7 @@ import im.turms.turms.pojo.bo.GroupQuestionIdAndAnswer;
 import im.turms.turms.pojo.domain.GroupJoinQuestion;
 import im.turms.turms.util.ProtoUtil;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -64,7 +65,12 @@ public class GroupQuestionService {
     private final GroupService groupService;
     private final GroupVersionService groupVersionService;
 
-    public GroupQuestionService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, GroupMemberService groupMemberService, GroupVersionService groupVersionService, GroupService groupService) {
+    public GroupQuestionService(
+            @Qualifier("groupMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            TurmsClusterManager turmsClusterManager,
+            GroupMemberService groupMemberService,
+            GroupVersionService groupVersionService,
+            GroupService groupService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.groupMemberService = groupMemberService;

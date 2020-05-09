@@ -34,6 +34,7 @@ import im.turms.turms.pojo.domain.User;
 import im.turms.turms.service.user.UserService;
 import im.turms.turms.util.MapUtil;
 import im.turms.turms.util.ProtoUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -64,7 +65,7 @@ public class GroupBlacklistService {
 
     public GroupBlacklistService(
             GroupMemberService groupMemberService,
-            ReactiveMongoTemplate mongoTemplate,
+            @Qualifier("groupMongoTemplate") ReactiveMongoTemplate mongoTemplate,
             GroupVersionService groupVersionService,
             UserService userService) {
         this.groupMemberService = groupMemberService;

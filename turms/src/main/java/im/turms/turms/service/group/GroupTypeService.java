@@ -31,6 +31,7 @@ import im.turms.turms.builder.QueryBuilder;
 import im.turms.turms.builder.UpdateBuilder;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.domain.GroupType;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -58,7 +59,9 @@ public class GroupTypeService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
 
-    public GroupTypeService(ReactiveMongoTemplate mongoTemplate, @Lazy TurmsClusterManager turmsClusterManager) {
+    public GroupTypeService(
+            @Qualifier("groupMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            @Lazy TurmsClusterManager turmsClusterManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
     }

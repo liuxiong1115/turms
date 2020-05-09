@@ -33,6 +33,7 @@ import im.turms.turms.util.TurmsPasswordUtil;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -76,7 +77,7 @@ public class AdminService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final AdminRoleService adminRoleService;
 
-    public AdminService(TurmsPasswordUtil turmsPasswordUtil, ReactiveMongoTemplate mongoTemplate, AdminRoleService adminRoleService) {
+    public AdminService(TurmsPasswordUtil turmsPasswordUtil, @Qualifier("adminMongoTemplate") ReactiveMongoTemplate mongoTemplate, AdminRoleService adminRoleService) {
         this.turmsPasswordUtil = turmsPasswordUtil;
         this.mongoTemplate = mongoTemplate;
         this.adminRoleService = adminRoleService;

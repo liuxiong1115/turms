@@ -37,6 +37,7 @@ import im.turms.turms.pojo.domain.GroupMember;
 import im.turms.turms.service.user.onlineuser.OnlineUserService;
 import im.turms.turms.util.MapUtil;
 import im.turms.turms.util.ProtoUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -71,7 +72,12 @@ public class GroupMemberService {
     private final OnlineUserService onlineUserService;
     private final TurmsClusterManager turmsClusterManager;
 
-    public GroupMemberService(ReactiveMongoTemplate mongoTemplate, @Lazy GroupService groupService, GroupVersionService groupVersionService, @Lazy OnlineUserService onlineUserService, @Lazy TurmsClusterManager turmsClusterManager) {
+    public GroupMemberService(
+            @Qualifier("groupMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            @Lazy GroupService groupService,
+            GroupVersionService groupVersionService,
+            @Lazy OnlineUserService onlineUserService,
+            @Lazy TurmsClusterManager turmsClusterManager) {
         this.mongoTemplate = mongoTemplate;
         this.groupService = groupService;
         this.groupVersionService = groupVersionService;

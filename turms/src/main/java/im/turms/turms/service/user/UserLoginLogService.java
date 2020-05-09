@@ -23,6 +23,7 @@ import im.turms.turms.annotation.constraint.DeviceTypeConstraint;
 import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.pojo.domain.UserLoginLog;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -47,7 +48,9 @@ public class UserLoginLogService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsPluginManager turmsPluginManager;
 
-    public UserLoginLogService(ReactiveMongoTemplate mongoTemplate, TurmsPluginManager turmsPluginManager) {
+    public UserLoginLogService(
+            @Qualifier("logMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsPluginManager = turmsPluginManager;
     }

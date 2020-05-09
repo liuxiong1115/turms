@@ -20,6 +20,7 @@ package im.turms.turms.service.user;
 import im.turms.turms.manager.TurmsPluginManager;
 import im.turms.turms.plugin.LogHandler;
 import im.turms.turms.pojo.domain.UserActionLog;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -35,7 +36,9 @@ public class UserActionLogService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsPluginManager turmsPluginManager;
 
-    public UserActionLogService(ReactiveMongoTemplate mongoTemplate, TurmsPluginManager turmsPluginManager) {
+    public UserActionLogService(
+            @Qualifier("logMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            TurmsPluginManager turmsPluginManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsPluginManager = turmsPluginManager;
     }

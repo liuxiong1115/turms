@@ -24,11 +24,16 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import java.io.IOException;
 
 @Data
 public class Database implements IdentifiedDataSerializable {
+
+    @NestedConfigurationProperty
+    private Properties mongoProperties = new Properties();
 
     @JsonIgnore
     private WriteConcern writeConcern = new WriteConcern();
@@ -51,6 +56,26 @@ public class Database implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class Properties {
+
+        @NestedConfigurationProperty
+        private MongoProperties defaultProperties = new MongoProperties();
+
+        @NestedConfigurationProperty
+        private MongoProperties log = new MongoProperties();
+
+        @NestedConfigurationProperty
+        private MongoProperties admin = new MongoProperties();
+        @NestedConfigurationProperty
+        private MongoProperties user = new MongoProperties();
+        @NestedConfigurationProperty
+        private MongoProperties group = new MongoProperties();
+        @NestedConfigurationProperty
+        private MongoProperties message = new MongoProperties();
     }
 
     @Data

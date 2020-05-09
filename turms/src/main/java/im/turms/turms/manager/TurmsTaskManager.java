@@ -28,6 +28,7 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -49,22 +50,34 @@ public class TurmsTaskManager {
     }
 
     public <T> Flux<T> callAllOthers(@NotNull Callable<T> task, @NotNull Duration duration) {
-        Map<Member, Future<T>> futureMap = executor.submitToMembers(task, turmsClusterManager.getOtherMembersSnapshot());
-        return ReactorUtil.futures2Flux(futureMap.values(), duration);
+        List<Member> members = turmsClusterManager.getOtherMembersSnapshot();
+        if (!members.isEmpty()) {
+            Map<Member, Future<T>> futureMap = executor.submitToMembers(task, members);
+            return ReactorUtil.futures2Flux(futureMap.values(), duration);
+        } else {
+            return Flux.empty();
+        }
     }
 
     public <T> Mono<Map<Member, T>> callAllOthersAsMap(@NotNull Callable<T> task, @NotNull Duration duration) {
-        Mono<Map<Member, T>> map = Mono.create(sink -> executor.submitToMembers(task, turmsClusterManager.getOtherMembersSnapshot(), new MultiExecutionCallback() {
-            @Override
-            public void onResponse(Member member, Object value) {
+        List<Member> members = turmsClusterManager.getOtherMembersSnapshot();
+        if (!members.isEmpty()) {
+            Mono<Map<Member, T>> map = Mono.create(sink -> {
+                executor.submitToMembers(task, members, new MultiExecutionCallback() {
+                    @Override
+                    public void onResponse(Member member, Object value) {
 
-            }
+                    }
 
-            @Override
-            public void onComplete(Map<Member, Object> values) {
-                sink.success((Map<Member, T>) values);
-            }
-        }));
-        return map.timeout(duration);
+                    @Override
+                    public void onComplete(Map<Member, Object> values) {
+                        sink.success((Map<Member, T>) values);
+                    }
+                });
+            });
+            return map.timeout(duration);
+        } else {
+            return Mono.empty();
+        }
     }
 }

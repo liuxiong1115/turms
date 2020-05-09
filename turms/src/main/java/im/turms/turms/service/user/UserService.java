@@ -41,6 +41,7 @@ import im.turms.turms.service.user.relationship.UserRelationshipService;
 import im.turms.turms.util.AggregationUtil;
 import im.turms.turms.util.TurmsPasswordUtil;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -71,7 +72,15 @@ public class UserService {
     private final TurmsPasswordUtil turmsPasswordUtil;
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public UserService(UserRelationshipService userRelationshipService, GroupMemberService groupMemberService, TurmsPasswordUtil turmsPasswordUtil, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, @Lazy OnlineUserService onlineUserService, UserRelationshipGroupService userRelationshipGroupService) {
+    public UserService(
+            UserRelationshipService userRelationshipService,
+            GroupMemberService groupMemberService,
+            TurmsPasswordUtil turmsPasswordUtil,
+            TurmsClusterManager turmsClusterManager,
+            UserVersionService userVersionService,
+            @Qualifier("userMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            @Lazy OnlineUserService onlineUserService,
+            UserRelationshipGroupService userRelationshipGroupService) {
         this.userRelationshipService = userRelationshipService;
         this.groupMemberService = groupMemberService;
         this.turmsPasswordUtil = turmsPasswordUtil;

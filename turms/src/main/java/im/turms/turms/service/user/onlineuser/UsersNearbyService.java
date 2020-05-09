@@ -318,13 +318,15 @@ public class UsersNearbyService {
                     latitude,
                     maxDistance,
                     maxNumber), turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration())
-                    .concatWith(s -> s.onNext(localNearestUserIds))
                     .collectList()
-                    .flatMapMany(entries -> Flux.fromIterable(getNearestUserIds(
-                            origin,
-                            entries,
-                            finalMaxDistance,
-                            finalMaxPeopleNumber)))
+                    .flatMapMany(entries -> {
+                        entries.add(localNearestUserIds);
+                        return Flux.fromIterable(getNearestUserIds(
+                                origin,
+                                entries,
+                                finalMaxDistance,
+                                finalMaxPeopleNumber));
+                    })
                     .map(Entry::value);
         } else {
             return Flux.empty();
@@ -362,13 +364,15 @@ public class UsersNearbyService {
                     latitude,
                     maxDistance,
                     maxNumber), turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration())
-                    .concatWith(s -> s.onNext(getNearestUserSessionIds(point, finalMaxDistance, finalMaxPeopleNumber)))
                     .collectList()
-                    .flatMapMany(entries -> Flux.fromIterable(getNearestUserSessionIds(
-                            point,
-                            entries,
-                            finalMaxDistance,
-                            finalMaxPeopleNumber)))
+                    .flatMapMany(entries -> {
+                        entries.add(getNearestUserSessionIds(point, finalMaxDistance, finalMaxPeopleNumber));
+                        return Flux.fromIterable(getNearestUserSessionIds(
+                                point,
+                                entries,
+                                finalMaxDistance,
+                                finalMaxPeopleNumber));
+                    })
                     .map(Entry::value);
         } else {
             return Flux.empty();

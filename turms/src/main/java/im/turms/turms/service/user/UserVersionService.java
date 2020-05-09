@@ -20,6 +20,7 @@ package im.turms.turms.service.user;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.pojo.domain.UserVersion;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -43,7 +44,7 @@ import static im.turms.turms.constant.Common.ID;
 public class UserVersionService {
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public UserVersionService(ReactiveMongoTemplate mongoTemplate) {
+    public UserVersionService(@Qualifier("userMongoTemplate") ReactiveMongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 

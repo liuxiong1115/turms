@@ -39,6 +39,7 @@ import im.turms.turms.pojo.domain.UserPermissionGroup;
 import im.turms.turms.service.user.UserPermissionGroupService;
 import im.turms.turms.service.user.UserVersionService;
 import im.turms.turms.util.ProtoUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -74,7 +75,7 @@ public class GroupService {
             GroupMemberService groupMemberService,
             TurmsClusterManager turmsClusterManager,
             GroupTypeService groupTypeService,
-            ReactiveMongoTemplate mongoTemplate,
+            @Qualifier("groupMongoTemplate") ReactiveMongoTemplate mongoTemplate,
             UserVersionService userVersionService,
             GroupVersionService groupVersionService,
             UserPermissionGroupService userPermissionGroupService) {

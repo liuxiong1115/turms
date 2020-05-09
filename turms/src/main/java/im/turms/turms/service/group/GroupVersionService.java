@@ -21,6 +21,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.turms.builder.QueryBuilder;
 import im.turms.turms.pojo.domain.GroupVersion;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -43,7 +44,7 @@ import static im.turms.turms.constant.Common.ID;
 public class GroupVersionService {
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public GroupVersionService(ReactiveMongoTemplate mongoTemplate) {
+    public GroupVersionService(@Qualifier("groupMongoTemplate") ReactiveMongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 

@@ -34,6 +34,7 @@ import im.turms.turms.pojo.domain.GroupJoinRequest;
 import im.turms.turms.service.user.UserVersionService;
 import im.turms.turms.util.ProtoUtil;
 import im.turms.turms.util.RequestStatusUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -69,7 +70,13 @@ public class GroupJoinRequestService {
     private final GroupMemberService groupMemberService;
     private final UserVersionService userVersionService;
 
-    public GroupJoinRequestService(ReactiveMongoTemplate mongoTemplate, @Lazy TurmsClusterManager turmsClusterManager, GroupVersionService groupVersionService, GroupMemberService groupMemberService, @Lazy GroupService groupService, UserVersionService userVersionService) {
+    public GroupJoinRequestService(
+            @Qualifier("groupMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            @Lazy TurmsClusterManager turmsClusterManager,
+            GroupVersionService groupVersionService,
+            GroupMemberService groupMemberService,
+            @Lazy GroupService groupService,
+            UserVersionService userVersionService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.groupVersionService = groupVersionService;

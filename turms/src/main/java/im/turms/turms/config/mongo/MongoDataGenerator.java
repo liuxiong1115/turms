@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
@@ -54,12 +55,28 @@ public class MongoDataGenerator {
     public final int targetUserToBeFriendRelationshipEnd;
 
     private final TurmsClusterManager turmsClusterManager;
-    private final ReactiveMongoTemplate mongoTemplate;
+    private final ReactiveMongoTemplate logMongoTemplate;
+    private final ReactiveMongoTemplate adminMongoTemplate;
+    private final ReactiveMongoTemplate userMongoTemplate;
+    private final ReactiveMongoTemplate groupMongoTemplate;
+    private final ReactiveMongoTemplate messageMongoTemplate;
     private final TurmsPasswordUtil passwordUtil;
 
-    public MongoDataGenerator(TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, TurmsPasswordUtil passwordUtil, TurmsProperties turmsProperties) {
+    public MongoDataGenerator(
+            TurmsClusterManager turmsClusterManager,
+            ReactiveMongoTemplate logMongoTemplate,
+            ReactiveMongoTemplate adminMongoTemplate,
+            ReactiveMongoTemplate userMongoTemplate,
+            ReactiveMongoTemplate groupMongoTemplate,
+            ReactiveMongoTemplate messageMongoTemplate,
+            TurmsPasswordUtil passwordUtil,
+            TurmsProperties turmsProperties) {
         this.turmsClusterManager = turmsClusterManager;
-        this.mongoTemplate = mongoTemplate;
+        this.logMongoTemplate = logMongoTemplate;
+        this.adminMongoTemplate = adminMongoTemplate;
+        this.userMongoTemplate = userMongoTemplate;
+        this.groupMongoTemplate = groupMongoTemplate;
+        this.messageMongoTemplate = messageMongoTemplate;
         this.passwordUtil = passwordUtil;
 
         isMockEnabled = turmsProperties.getMock().isEnabled();
@@ -85,18 +102,7 @@ public class MongoDataGenerator {
     public void createCollectionsIfNotExist() {
         if (isDevAndMockEnabled()) {
             log.info("Start clearing collections...");
-            Query queryAll = new Query();
-            mongoTemplate.getCollectionNames()
-                    .flatMap(name -> {
-                        if (name.equals("admin")) {
-                            Query query = new Query();
-                            query.addCriteria(Criteria.where(Admin.Fields.roleId).ne(ADMIN_ROLE_ROOT_ID));
-                            return mongoTemplate.remove(query, name);
-                        } else {
-                            return mongoTemplate.remove(queryAll, name);
-                        }
-                    })
-                    .blockLast();
+            clearAllCollections();
             log.info("All collections are cleared");
         }
         log.info("Start creating collections...");
@@ -131,6 +137,33 @@ public class MongoDataGenerator {
                 .subscribe();
     }
 
+    private void clearAllCollections() {
+        Query queryAll = new Query();
+        logMongoTemplate.getCollectionNames()
+                .flatMap(name -> logMongoTemplate.remove(queryAll, name))
+                .blockLast();
+        adminMongoTemplate.getCollectionNames()
+                .flatMap(name -> {
+                    if (name.equals("admin")) {
+                        Query query = new Query();
+                        query.addCriteria(Criteria.where(Admin.Fields.roleId).ne(ADMIN_ROLE_ROOT_ID));
+                        return adminMongoTemplate.remove(query, name);
+                    } else {
+                        return adminMongoTemplate.remove(queryAll, name);
+                    }
+                })
+                .blockLast();
+        userMongoTemplate.getCollectionNames()
+                .flatMap(name -> userMongoTemplate.remove(queryAll, name))
+                .blockLast();
+        groupMongoTemplate.getCollectionNames()
+                .flatMap(name -> groupMongoTemplate.remove(queryAll, name))
+                .blockLast();
+        messageMongoTemplate.getCollectionNames()
+                .flatMap(name -> messageMongoTemplate.remove(queryAll, name))
+                .blockLast();
+    }
+
     private boolean isDevAndMockEnabled() {
         return CompilerOptions.ENV == CompilerOptions.Env.DEV && isMockEnabled;
     }
@@ -142,9 +175,14 @@ public class MongoDataGenerator {
 
             final int ADMIN_COUNT = 10;
 
+            List<Object> logRelatedObjs = new LinkedList<>();
+            List<Object> adminRelatedObjs = new LinkedList<>();
+            List<Object> userRelatedObjs = new LinkedList<>();
+            List<Object> groupRelatedObjs = new LinkedList<>();
+            List<Object> messageRelatedObjs = new LinkedList<>();
+
             // Admin
             final Date now = new Date();
-            List<Object> objects = new LinkedList<>();
             final long GUEST_ROLE_ID = 2L;
             Admin guest = new Admin(
                     "guest",
@@ -152,7 +190,7 @@ public class MongoDataGenerator {
                     "guest",
                     GUEST_ROLE_ID,
                     now);
-            objects.add(guest);
+            adminRelatedObjs.add(guest);
             for (int i = 1; i <= ADMIN_COUNT; i++) {
                 Admin admin = new Admin(
                         "account" + i,
@@ -160,7 +198,7 @@ public class MongoDataGenerator {
                         "myname",
                         1L,
                         DateUtils.addDays(now, -i));
-                objects.add(admin);
+                adminRelatedObjs.add(admin);
             }
             for (int i = 1; i <= 100; i++) {
                 AdminActionLog adminActionLog;
@@ -173,7 +211,7 @@ public class MongoDataGenerator {
                             "testaction",
                             null,
                             null);
-                    objects.add(adminActionLog);
+                    logRelatedObjs.add(adminActionLog);
                 } catch (UnknownHostException e) {
                     // This should never happen
                     e.printStackTrace();
@@ -189,8 +227,8 @@ public class MongoDataGenerator {
                     "GUEST",
                     SetUtils.union(AdminPermission.ALL_QUERY, AdminPermission.ALL_CREATE),
                     0);
-            objects.add(adminRole);
-            objects.add(guestRole);
+            adminRelatedObjs.add(adminRole);
+            adminRelatedObjs.add(guestRole);
             // Group
             Group group = new Group(
                     1L,
@@ -205,16 +243,16 @@ public class MongoDataGenerator {
                     null,
                     null,
                     true);
-            objects.add(group);
+            groupRelatedObjs.add(group);
             GroupVersion groupVersion = new GroupVersion(1L, now, now, now, now, now, now);
-            objects.add(groupVersion);
+            groupRelatedObjs.add(groupVersion);
             for (int i = targetUserToBlacklistInGroupStart; i <= targetUserToBlacklistInGroupEnd; i++) {
                 GroupBlacklistedUser groupBlacklistedUser = new GroupBlacklistedUser(
                         1L,
                         (long) i,
                         now,
                         1L);
-                objects.add(groupBlacklistedUser);
+                groupRelatedObjs.add(groupBlacklistedUser);
             }
             for (int i = targetUserForGroupInvitationStart; i <= targetUserForGroupInvitationEnd; i++) {
                 GroupInvitation groupInvitation = new GroupInvitation(
@@ -227,7 +265,7 @@ public class MongoDataGenerator {
                         DateUtils.addDays(now, -i),
                         null,
                         null);
-                objects.add(groupInvitation);
+                groupRelatedObjs.add(groupInvitation);
             }
             GroupJoinQuestion groupJoinQuestion = new GroupJoinQuestion(
                     turmsClusterManager.generateRandomId(),
@@ -235,7 +273,7 @@ public class MongoDataGenerator {
                     "test-question",
                     Set.of("a", "b", "c"),
                     20);
-            objects.add(groupJoinQuestion);
+            groupRelatedObjs.add(groupJoinQuestion);
             for (int i = targetUserForGroupJoinRequestStart; i <= targetUserForGroupJoinRequestEnd; i++) {
                 GroupJoinRequest groupJoinRequest = new GroupJoinRequest(
                         turmsClusterManager.generateRandomId(),
@@ -247,7 +285,7 @@ public class MongoDataGenerator {
                         1L,
                         (long) i,
                         null);
-                objects.add(groupJoinRequest);
+                groupRelatedObjs.add(groupJoinRequest);
             }
             for (int i = targetUserToBeGroupMemberStart; i <= targetUserToBeGroupMemberEnd; i++) {
                 GroupMember groupMember = new GroupMember(
@@ -257,7 +295,7 @@ public class MongoDataGenerator {
                         i == 1 ? GroupMemberRole.OWNER : GroupMemberRole.MEMBER,
                         now,
                         i > userNumber / 10 / 2 ? new Date(9999999999999L) : null);
-                objects.add(groupMember);
+                groupRelatedObjs.add(groupMember);
             }
 
             // Message
@@ -285,7 +323,7 @@ public class MongoDataGenerator {
                         null,
                         null,
                         null);
-                objects.add(privateMessageStatus);
+                messageRelatedObjs.add(privateMessageStatus);
                 id = turmsClusterManager.generateRandomId();
                 Message groupMessage = new Message(
                         id,
@@ -310,10 +348,10 @@ public class MongoDataGenerator {
                             null,
                             null,
                             null);
-                    objects.add(groupMessageStatus);
+                    messageRelatedObjs.add(groupMessageStatus);
                 }
-                objects.add(privateMessage);
-                objects.add(groupMessage);
+                messageRelatedObjs.add(privateMessage);
+                messageRelatedObjs.add(groupMessage);
             }
 
             // User
@@ -334,9 +372,9 @@ public class MongoDataGenerator {
                         (long) i, userDate, userDate, userDate, userDate,
                         userDate, userDate, userDate, userDate, userDate);
                 UserRelationshipGroup relationshipGroup = new UserRelationshipGroup((long) i, 0, "", userDate);
-                objects.add(user);
-                objects.add(userVersion);
-                objects.add(relationshipGroup);
+                userRelatedObjs.add(user);
+                userRelatedObjs.add(userVersion);
+                userRelatedObjs.add(relationshipGroup);
             }
             for (int i = targetUserToRequestFriendRequestStart; i <= targetUserToRequestFriendRequestEnd; i++) {
                 UserFriendRequest userFriendRequest = new UserFriendRequest(
@@ -349,7 +387,7 @@ public class MongoDataGenerator {
                         null,
                         1L,
                         (long) i);
-                objects.add(userFriendRequest);
+                userRelatedObjs.add(userFriendRequest);
             }
             for (int i = targetUserToBeFriendRelationshipStart; i <= targetUserToBeFriendRelationshipEnd; i++) {
                 UserRelationship userRelationship1 = new UserRelationship(
@@ -364,15 +402,29 @@ public class MongoDataGenerator {
                         1L, 0, (long) i, now);
                 UserRelationshipGroupMember relationshipGroupMember2 = new UserRelationshipGroupMember(
                         (long) i, 0, 1L, now);
-                objects.add(userRelationship1);
-                objects.add(userRelationship2);
-                objects.add(relationshipGroupMember1);
-                objects.add(relationshipGroupMember2);
+                userRelatedObjs.add(userRelationship1);
+                userRelatedObjs.add(userRelationship2);
+                userRelatedObjs.add(relationshipGroupMember1);
+                userRelatedObjs.add(relationshipGroupMember2);
             }
+
             // Execute
-            mongoTemplate.insertAll(objects)
-                    .doOnError(error -> log.error("Mocking failed", error))
-                    .doOnComplete(() -> log.info("Mocking succeeded"))
+            Flux.merge(
+                    logMongoTemplate.insertAll(logRelatedObjs)
+                            .doOnError(error -> log.error("Mocking log-related data failed", error))
+                            .doOnComplete(() -> log.info("Mocking log-related data succeeded")),
+                    adminMongoTemplate.insertAll(adminRelatedObjs)
+                            .doOnError(error -> log.error("Mocking admin-related data failed", error))
+                            .doOnComplete(() -> log.info("Mocking admin-related data succeeded")),
+                    userMongoTemplate.insertAll(userRelatedObjs)
+                            .doOnError(error -> log.error("Mocking user-related data failed", error))
+                            .doOnComplete(() -> log.info("Mocking user-related data succeeded")),
+                    groupMongoTemplate.insertAll(groupRelatedObjs)
+                            .doOnError(error -> log.error("Mocking group-related data failed", error))
+                            .doOnComplete(() -> log.info("Mocking group-related data succeeded")),
+                    messageMongoTemplate.insertAll(messageRelatedObjs)
+                            .doOnError(error -> log.error("Mocking message-related data failed", error))
+                            .doOnComplete(() -> log.info("Mocking message-related data succeeded")))
                     .subscribe();
         }
     }
@@ -380,6 +432,39 @@ public class MongoDataGenerator {
     private <T> Mono<Boolean> createCollectionIfNotExist(
             Class<T> clazz,
             @Nullable CollectionOptions options) {
+        ReactiveMongoTemplate mongoTemplate;
+        if (clazz == AdminActionLog.class) mongoTemplate = logMongoTemplate;
+        else if (clazz == UserActionLog.class) mongoTemplate = logMongoTemplate;
+        else if (clazz == UserLoginLog.class) mongoTemplate = logMongoTemplate;
+
+        else if (clazz == Admin.class) mongoTemplate = adminMongoTemplate;
+        else if (clazz == AdminRole.class) mongoTemplate = adminMongoTemplate;
+
+        else if (clazz == User.class) mongoTemplate = userMongoTemplate;
+        else if (clazz == UserFriendRequest.class) mongoTemplate = userMongoTemplate;
+        else if (clazz == UserLocation.class) mongoTemplate = userMongoTemplate;
+        else if (clazz == UserOnlineUserNumber.class) mongoTemplate = userMongoTemplate;
+        else if (clazz == UserPermissionGroup.class) mongoTemplate = userMongoTemplate;
+        else if (clazz == UserRelationship.class) mongoTemplate = userMongoTemplate;
+        else if (clazz == UserRelationshipGroup.class) mongoTemplate = userMongoTemplate;
+        else if (clazz == UserRelationshipGroupMember.class) mongoTemplate = userMongoTemplate;
+        else if (clazz == UserVersion.class) mongoTemplate = userMongoTemplate;
+
+        else if (clazz == Group.class) mongoTemplate = groupMongoTemplate;
+        else if (clazz == GroupBlacklistedUser.class) mongoTemplate = groupMongoTemplate;
+        else if (clazz == GroupInvitation.class) mongoTemplate = groupMongoTemplate;
+        else if (clazz == GroupJoinQuestion.class) mongoTemplate = groupMongoTemplate;
+        else if (clazz == GroupJoinRequest.class) mongoTemplate = groupMongoTemplate;
+        else if (clazz == GroupMember.class) mongoTemplate = groupMongoTemplate;
+        else if (clazz == GroupType.class) mongoTemplate = groupMongoTemplate;
+        else if (clazz == GroupVersion.class) mongoTemplate = groupMongoTemplate;
+
+        else if (clazz == Message.class) mongoTemplate = messageMongoTemplate;
+        else if (clazz == MessageStatus.class) mongoTemplate = messageMongoTemplate;
+        else {
+            return Mono.error(new IllegalArgumentException());
+        }
+
         return mongoTemplate.collectionExists(clazz)
                 .flatMap(exists -> {
                     if (exists != null && !exists) {

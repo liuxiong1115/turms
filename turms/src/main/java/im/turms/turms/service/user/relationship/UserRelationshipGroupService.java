@@ -16,6 +16,7 @@ import im.turms.turms.pojo.domain.UserRelationshipGroup;
 import im.turms.turms.pojo.domain.UserRelationshipGroupMember;
 import im.turms.turms.service.user.UserVersionService;
 import im.turms.turms.util.ProtoUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -47,7 +48,11 @@ public class UserRelationshipGroupService {
     private final UserRelationshipService userRelationshipService;
     private static final UserRelationshipGroup EMPTY_RELATIONSHIP_GROUP = new UserRelationshipGroup(null, null, null, null);
 
-    public UserRelationshipGroupService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager, UserVersionService userVersionService, @Lazy UserRelationshipService userRelationshipService) {
+    public UserRelationshipGroupService(
+            @Qualifier("userMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            TurmsClusterManager turmsClusterManager,
+            UserVersionService userVersionService,
+            @Lazy UserRelationshipService userRelationshipService) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
         this.userVersionService = userVersionService;

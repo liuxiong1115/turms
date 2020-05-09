@@ -19,6 +19,7 @@ import im.turms.turms.pojo.domain.UserFriendRequest;
 import im.turms.turms.service.user.UserVersionService;
 import im.turms.turms.util.ProtoUtil;
 import im.turms.turms.util.RequestStatusUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -50,7 +51,11 @@ public class UserFriendRequestService {
     private final UserVersionService userVersionService;
     private final UserRelationshipService userRelationshipService;
 
-    public UserFriendRequestService(@Lazy TurmsClusterManager turmsClusterManager, ReactiveMongoTemplate mongoTemplate, UserVersionService userVersionService, @Lazy UserRelationshipService userRelationshipService) {
+    public UserFriendRequestService(
+            @Lazy TurmsClusterManager turmsClusterManager,
+            @Qualifier("userMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            UserVersionService userVersionService,
+            @Lazy UserRelationshipService userRelationshipService) {
         this.turmsClusterManager = turmsClusterManager;
         this.mongoTemplate = mongoTemplate;
         this.userVersionService = userVersionService;

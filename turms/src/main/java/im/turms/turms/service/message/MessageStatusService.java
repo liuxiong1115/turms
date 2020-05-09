@@ -14,6 +14,7 @@ import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.DateRange;
 import im.turms.turms.pojo.domain.MessageStatus;
 import im.turms.turms.util.MapUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -41,7 +42,9 @@ public class MessageStatusService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final TurmsClusterManager turmsClusterManager;
 
-    public MessageStatusService(ReactiveMongoTemplate mongoTemplate, TurmsClusterManager turmsClusterManager) {
+    public MessageStatusService(
+            @Qualifier("messageMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            TurmsClusterManager turmsClusterManager) {
         this.mongoTemplate = mongoTemplate;
         this.turmsClusterManager = turmsClusterManager;
     }

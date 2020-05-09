@@ -34,6 +34,7 @@ import im.turms.turms.pojo.domain.UserVersion;
 import im.turms.turms.service.user.UserVersionService;
 import im.turms.turms.util.MapUtil;
 import im.turms.turms.util.ProtoUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -61,7 +62,10 @@ public class UserRelationshipService {
     private final UserRelationshipGroupService userRelationshipGroupService;
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public UserRelationshipService(UserVersionService userVersionService, ReactiveMongoTemplate mongoTemplate, UserRelationshipGroupService userRelationshipGroupService) {
+    public UserRelationshipService(
+            UserVersionService userVersionService,
+            @Qualifier("userMongoTemplate") ReactiveMongoTemplate mongoTemplate,
+            UserRelationshipGroupService userRelationshipGroupService) {
         this.userVersionService = userVersionService;
         this.mongoTemplate = mongoTemplate;
         this.userRelationshipGroupService = userRelationshipGroupService;
