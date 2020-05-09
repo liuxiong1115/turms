@@ -305,18 +305,23 @@ public class UsersNearbyService {
             if (maxDistance > location.getMaxDistanceLimitPerQuery()) {
                 maxDistance = location.getMaxDistanceLimitPerQuery();
             }
+            PointFloat origin = PointFloat.create(longitude, latitude);
+            List<Entry<Long, PointFloat>> localNearestUserIds = (List<Entry<Long, PointFloat>>) getNearestUserIds(origin, maxDistance, maxNumber);
+            short localNearestUsersSize = (short) localNearestUserIds.size();
+            if (maxNumber.equals(localNearestUsersSize)) {
+                maxDistance = localNearestUserIds.get(localNearestUsersSize - 1).geometry().distance(origin);
+            }
             Double finalMaxDistance = maxDistance;
             Short finalMaxPeopleNumber = maxNumber;
-            PointFloat point = PointFloat.create(longitude, latitude);
             return turmsTaskManager.callAllOthers(new QueryNearestUserIdsTask(
                     longitude,
                     latitude,
                     maxDistance,
                     maxNumber), turmsClusterManager.getTurmsProperties().getRpc().getTimeoutDuration())
-                    .concatWith(s -> s.onNext(getNearestUserIds(point, finalMaxDistance, finalMaxPeopleNumber)))
+                    .concatWith(s -> s.onNext(localNearestUserIds))
                     .collectList()
                     .flatMapMany(entries -> Flux.fromIterable(getNearestUserIds(
-                            point,
+                            origin,
                             entries,
                             finalMaxDistance,
                             finalMaxPeopleNumber)))
