@@ -34,10 +34,15 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.convert.CustomConversions;
+import org.springframework.data.mapping.model.CamelCaseAbbreviatingFieldNamingStrategy;
+import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
 import org.springframework.data.mongodb.core.WriteConcernResolver;
-import org.springframework.data.mongodb.core.convert.*;
+import org.springframework.data.mongodb.core.WriteResultChecking;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.NoOpDbRefResolver;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 import java.util.*;
@@ -49,33 +54,12 @@ import java.util.stream.Collectors;
 @Configuration
 public class MongoConfig {
     private final TurmsProperties turmsProperties;
-    private final MongoMappingContext mongoMappingContext;
-    private static final Map<MongoProperties, ReactiveMongoTemplate> map = new HashMap<>();
+    // hash code of MongoProperties -> ReactiveMongoTemplate
+    // because MongoProperties doesn't have a custom hashcode implementation but a native implementation
+    private static final Map<Integer, ReactiveMongoTemplate> TEMPLATE_MAP = new HashMap<>(5);
 
-    public MongoConfig(
-            TurmsProperties turmsProperties,
-            MongoMappingContext mongoMappingContext) {
-        this.mongoMappingContext = mongoMappingContext;
+    public MongoConfig(TurmsProperties turmsProperties) {
         this.turmsProperties = turmsProperties;
-        this.mongoMappingContext.setAutoIndexCreation(true);
-    }
-
-    @Bean
-    public MappingMongoConverter mappingMongoConverter() {
-        List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new EnumToIntegerConverter());
-        converters.add(new IntegerToEnumConverter(null));
-        CustomConversions customConversions = new CustomConversions(CustomConversions.StoreConversions.NONE, converters);
-
-        DbRefResolver dbRefResolver = NoOpDbRefResolver.INSTANCE;
-        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
-        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        converter.setCustomConversions(customConversions);
-        ConversionService conversionService = converter.getConversionService();
-        ((GenericConversionService) conversionService)
-                .addConverterFactory(new IntegerToEnumConverterFactory());
-        converter.afterPropertiesSet();
-        return converter;
     }
 
     @Bean
@@ -131,94 +115,104 @@ public class MongoConfig {
     @Bean
     public ReactiveMongoTemplate logMongoTemplate(
             TurmsProperties turmsProperties,
-            MongoConverter mappingMongoConverter,
             ObjectProvider<MongoClientSettingsBuilderCustomizer> builderCustomizers,
             ObjectProvider<MongoClientSettings> settings,
             WriteConcernResolver writeConcernResolver) {
-        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getLog(), builderCustomizers, settings, mappingMongoConverter, writeConcernResolver);
+        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getLog(), builderCustomizers, settings, writeConcernResolver);
     }
 
     @Bean
     public ReactiveMongoTemplate adminMongoTemplate(
             TurmsProperties turmsProperties,
-            MongoConverter mappingMongoConverter,
             ObjectProvider<MongoClientSettingsBuilderCustomizer> builderCustomizers,
             ObjectProvider<MongoClientSettings> settings,
             WriteConcernResolver writeConcernResolver) {
-        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getAdmin(), builderCustomizers, settings, mappingMongoConverter, writeConcernResolver);
+        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getAdmin(), builderCustomizers, settings, writeConcernResolver);
     }
 
     @Bean
     public ReactiveMongoTemplate groupMongoTemplate(
             TurmsProperties turmsProperties,
-            MongoConverter mappingMongoConverter,
             ObjectProvider<MongoClientSettingsBuilderCustomizer> builderCustomizers,
             ObjectProvider<MongoClientSettings> settings,
             WriteConcernResolver writeConcernResolver) {
-        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getGroup(), builderCustomizers, settings, mappingMongoConverter, writeConcernResolver);
+        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getGroup(), builderCustomizers, settings, writeConcernResolver);
     }
 
     @Bean
     public ReactiveMongoTemplate messageMongoTemplate(
             TurmsProperties turmsProperties,
-            MongoConverter mappingMongoConverter,
             ObjectProvider<MongoClientSettingsBuilderCustomizer> builderCustomizers,
             ObjectProvider<MongoClientSettings> settings,
             WriteConcernResolver writeConcernResolver) {
-        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getMessage(), builderCustomizers, settings, mappingMongoConverter, writeConcernResolver);
+        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getMessage(), builderCustomizers, settings, writeConcernResolver);
     }
 
     @Bean
     public ReactiveMongoTemplate userMongoTemplate(
             TurmsProperties turmsProperties,
-            MongoConverter mappingMongoConverter,
             ObjectProvider<MongoClientSettingsBuilderCustomizer> builderCustomizers,
             ObjectProvider<MongoClientSettings> settings,
             WriteConcernResolver writeConcernResolver) {
-        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getUser(), builderCustomizers, settings, mappingMongoConverter, writeConcernResolver);
+        return getMongoTemplate(turmsProperties.getDatabase().getMongoProperties().getUser(), builderCustomizers, settings, writeConcernResolver);
+    }
+
+    public MappingMongoConverter newMongoConverter(MongoMappingContext mongoMappingContext) {
+        List<Converter<?, ?>> converters = new ArrayList<>();
+        converters.add(new EnumToIntegerConverter());
+        converters.add(new IntegerToEnumConverter(null));
+
+        CustomConversions customConversions = new CustomConversions(CustomConversions.StoreConversions.NONE, converters);
+        MappingMongoConverter converter = new MappingMongoConverter(NoOpDbRefResolver.INSTANCE, mongoMappingContext);
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        converter.setCustomConversions(customConversions);
+
+        ConversionService conversionService = converter.getConversionService();
+        ((GenericConversionService) conversionService)
+                .addConverterFactory(new IntegerToEnumConverterFactory());
+        converter.afterPropertiesSet();
+        return converter;
     }
 
     private ReactiveMongoTemplate getMongoTemplate(
             MongoProperties properties,
             ObjectProvider<MongoClientSettingsBuilderCustomizer> builderCustomizers,
             ObjectProvider<MongoClientSettings> settings,
-            MongoConverter converter,
             WriteConcernResolver writeConcernResolver) {
-        return map.computeIfAbsent(getDefaultIfNotUpdated(properties), mongoProperties -> {
-            ReactiveMongoClientFactory factory = new ReactiveMongoClientFactory(mongoProperties, null,
+        return TEMPLATE_MAP.computeIfAbsent(getPropertiesHashCode(properties), key -> {
+            // ReactiveMongoClientFactory
+            ReactiveMongoClientFactory factory = new ReactiveMongoClientFactory(properties, null,
                     builderCustomizers.orderedStream().collect(Collectors.toList()));
             MongoClient mongoClient = factory.createMongoClient(settings.getIfAvailable());
-            SimpleReactiveMongoDatabaseFactory databaseFactory = new SimpleReactiveMongoDatabaseFactory(mongoClient, mongoProperties.getMongoClientDatabase());
+            SimpleReactiveMongoDatabaseFactory databaseFactory = new SimpleReactiveMongoDatabaseFactory(mongoClient, properties.getMongoClientDatabase());
+
+            // MongoMappingContext
+            boolean autoIndexCreation = properties.isAutoIndexCreation() != null
+                    ? properties.isAutoIndexCreation()
+                    : true;
+            // Note that we don't use the field naming strategy specified by developer
+            MongoMappingContext context = new MongoMappingContext();
+            context.setAutoIndexCreation(autoIndexCreation);
+
+            // MappingMongoConverter
+            MappingMongoConverter converter = newMongoConverter(context);
+
+            // ReactiveMongoTemplate
             ReactiveMongoTemplate mongoTemplate = new ReactiveMongoTemplate(databaseFactory, converter);
             mongoTemplate.setWriteConcernResolver(writeConcernResolver);
+            mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+
             return mongoTemplate;
         });
     }
 
-    private MongoProperties getDefaultIfNotUpdated(MongoProperties properties) {
-        MongoProperties defaultProperties = turmsProperties.getDatabase().getMongoProperties().getDefaultProperties();
-        if (properties.getHost() != null && !properties.getHost().equals(defaultProperties.getHost()))
-            return properties;
-        if (properties.getPort() != null && !properties.getPort().equals(defaultProperties.getPort()))
-            return properties;
-        if (properties.getUri() != null && !properties.getUri().equals(defaultProperties.getUri()))
-            return properties;
-        if (properties.getDatabase() != null && !properties.getDatabase().equals(defaultProperties.getDatabase()))
-            return properties;
-        if (properties.getAuthenticationDatabase() != null && !properties.getAuthenticationDatabase().equals(defaultProperties.getAuthenticationDatabase()))
-            return properties;
-        if (properties.getGridFsDatabase() != null && !properties.getGridFsDatabase().equals(defaultProperties.getGridFsDatabase()))
-            return properties;
-        if (properties.getUsername() != null && !properties.getUsername().equals(defaultProperties.getUsername()))
-            return properties;
-        if (properties.getPassword() != null && !Arrays.equals(properties.getPassword(), defaultProperties.getPassword()))
-            return properties;
-        if (properties.getReplicaSetName() != null && !properties.getReplicaSetName().equals(defaultProperties.getReplicaSetName()))
-            return properties;
-        if (properties.getFieldNamingStrategy() != null && !properties.getFieldNamingStrategy().equals(defaultProperties.getFieldNamingStrategy()))
-            return properties;
-        if (properties.isAutoIndexCreation() != null && !properties.isAutoIndexCreation().equals(defaultProperties.isAutoIndexCreation()))
-            return properties;
-        return defaultProperties;
+    private int getPropertiesHashCode(MongoProperties properties) {
+        int result = Objects.hash(properties.getHost(), properties.getPort(), properties.getUri(),
+                properties.getDatabase(), properties.getAuthenticationDatabase(),
+                properties.getGridFsDatabase(), properties.getUsername(),
+                properties.getReplicaSetName(), properties.getFieldNamingStrategy(),
+                properties.getUuidRepresentation(), properties.isAutoIndexCreation());
+        result = 31 * result + Arrays.hashCode(properties.getPassword());
+        return result;
     }
 }

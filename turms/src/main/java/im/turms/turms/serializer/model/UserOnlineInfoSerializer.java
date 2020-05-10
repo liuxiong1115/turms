@@ -29,7 +29,7 @@ public class UserOnlineInfoSerializer implements StreamSerializer<UserOnlineInfo
         Map<DeviceType, OnlineUserManager.Session> sessionMap = object.getSessionMap();
         // The most significant bit for determining whether there is any UserLocation
         // The next 3 bits for determining the size of sessions
-        // The next 4 bits for determining the user status
+        // The last 4 bits for determining the user status
         byte schema = (byte) object.getUserStatus().getNumber();
         schema |= object.getSessionMap().size() << 4;
 

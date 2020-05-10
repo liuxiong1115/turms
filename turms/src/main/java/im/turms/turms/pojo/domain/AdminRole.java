@@ -55,8 +55,7 @@ public final class AdminRole implements IdentifiedDataSerializable {
     @Indexed
     private Set<AdminPermission> permissions;
     /**
-     * Only the admins with higher rank can add/delete/update
-     * the records of admins with lower rank.
+     * Only the higher-ranking admins can add/delete/update lower-ranking admins' information.
      */
     private Integer rank;
 
