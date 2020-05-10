@@ -151,6 +151,7 @@ public class HazelcastConfig {
             address = "";
         }
         attributeConfig.setAttribute(TurmsClusterManager.ATTRIBUTE_ADDRESS, address);
+        attributeConfig.setAttribute(TurmsClusterManager.ATTRIBUTE_JOIN_TIMESTAMP, String.valueOf(System.currentTimeMillis()));
         config.setMemberAttributeConfig(attributeConfig);
 
         AddressUtil.onAddressChangeListeners.add(addressTuple -> {

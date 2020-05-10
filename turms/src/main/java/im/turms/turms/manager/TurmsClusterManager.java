@@ -55,6 +55,7 @@ public class TurmsClusterManager {
 
     public static final int HASH_SLOTS_NUMBER = 127;
     public static final String ATTRIBUTE_ADDRESS = "ADDR";
+    public static final String ATTRIBUTE_JOIN_TIMESTAMP = "JOIN_TIMESTAMP";
     private static final String HAZELCAST_KEY_SHARED_PROPERTIES = "properties";
     private static final String HAZELCAST_KEY_MEMBER_ADDRESSES = "addresses";
     private static final String HAZELCAST_KEY_DEFAULT = "default";
@@ -118,9 +119,22 @@ public class TurmsClusterManager {
     }
 
     private synchronized void initCurrentNodeStatusAfterMemberChange(MembershipEvent membershipEvent) {
+        // Use the first joined member as the master so that the cluster can have a stable master.
+        // 1. Although https://github.com/hazelcast/hazelcast/issues/3760 said the first item of the set
+        // is the master, but to avoid any pitfall, don't just use the first member as the master
+        // 2. Although ClusterService has a public isMaster() but we have to use reflection to access it.
+        // As a result, use the join timestamp to find out the consistent master.
         membersSnapshot = hazelcastInstance.getCluster().getMembers()
                 .stream()
-                .sorted(Comparator.comparing(Member::getUuid))
+                .sorted((m1, m2) -> {
+                    long m1JoinTimestamp = Long.parseLong(m1.getAttribute(ATTRIBUTE_JOIN_TIMESTAMP));
+                    long m2JoinTimestamp = Long.parseLong(m2.getAttribute(ATTRIBUTE_JOIN_TIMESTAMP));
+                    if (m1JoinTimestamp == m2JoinTimestamp) {
+                        return 0;
+                    } else {
+                        return m1JoinTimestamp < m2JoinTimestamp ? -1 : 1;
+                    }
+                })
                 .collect(Collectors.toList());
         localMembersSnapshot = hazelcastInstance.getCluster().getLocalMember();
         otherMembersSnapshot = membersSnapshot
