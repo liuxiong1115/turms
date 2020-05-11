@@ -25,6 +25,7 @@ import im.turms.turms.annotation.cluster.PostHazelcastInitialized;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.UserOnlineInfo;
 import im.turms.turms.property.TurmsProperties;
+import im.turms.turms.property.env.LoadBalancing;
 import im.turms.turms.serializer.model.UserOnlineInfoSerializer;
 import im.turms.turms.serializer.task.*;
 import im.turms.turms.task.*;
@@ -40,7 +41,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.function.Function;
@@ -48,17 +48,14 @@ import java.util.function.Function;
 @Log4j2
 @Configuration
 public class HazelcastConfig {
-    private final Integer port;
     private final ApplicationContext applicationContext;
     private final TurmsClusterManager turmsClusterManager;
+    private final AddressUtil addressUtil;
 
-    public HazelcastConfig(ApplicationContext applicationContext, TurmsClusterManager turmsClusterManager) throws UnknownHostException {
+    public HazelcastConfig(ApplicationContext applicationContext, TurmsClusterManager turmsClusterManager, AddressUtil addressUtil) {
         this.applicationContext = applicationContext;
         this.turmsClusterManager = turmsClusterManager;
-        port = applicationContext.getEnvironment().getProperty("server.port", Integer.class);
-        if (port == null) {
-            throw new UnknownHostException("The local port of the current server cannot be found");
-        }
+        this.addressUtil = addressUtil;
     }
 
     @Bean
@@ -142,11 +139,13 @@ public class HazelcastConfig {
         // MemberAttributeConfig
         MemberAttributeConfig attributeConfig = new MemberAttributeConfig();
         String address;
-        if (turmsProperties.getAddress().isEnabled()) {
-            String identity = turmsProperties.getAddress().getIdentity();
-            address = identity != null && !identity.isEmpty()
-                    ? identity
-                    : String.format("%s:%d", AddressUtil.queryIp(turmsProperties), port);
+        LoadBalancing loadBalancing = turmsProperties.getLoadBalancing();
+        if (loadBalancing.isEnabled()) {
+            if (loadBalancing.getAdvertiseStrategy() == LoadBalancing.AdvertiseStrategy.IDENTIFY) {
+                address = addressUtil.getIdentity();
+            } else {
+                address = addressUtil.getAddress();
+            }
         } else {
             address = "";
         }
@@ -158,7 +157,7 @@ public class HazelcastConfig {
             if (addressTuple.getIdentity() != null) {
                 turmsClusterManager.updateAddress(addressTuple.getIdentity());
             } else {
-                turmsClusterManager.updateAddress(String.format("%s:%d", addressTuple.getIp(), port));
+                turmsClusterManager.updateAddress(addressTuple.getAddress());
             }
             return null;
         });
