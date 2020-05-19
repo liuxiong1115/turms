@@ -14,8 +14,13 @@ hazelcast:
       - 0
     join:
       multicast:
-        enabled: true
-        multicast-timeout-seconds: 4
+        enabled: true # only used for development/test
+      discovery-strategies:
+        discovery-strategies:
+          - enabled: false
+            class: im.turms.turms.discovery.mongo.MongoDiscoveryStrategy
+            properties:
+              uri: mongodb://localhost:27017/turms-config
     failure-detector:
       icmp:
         enabled: false

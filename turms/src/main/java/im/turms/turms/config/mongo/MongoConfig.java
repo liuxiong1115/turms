@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
 public class MongoConfig {
     private final TurmsProperties turmsProperties;
     // hash code of MongoProperties -> ReactiveMongoTemplate
+    // rather than MongoProperties -> ReactiveMongoTemplate
     // because MongoProperties doesn't have a custom hashcode implementation but a native implementation
     private static final Map<Integer, ReactiveMongoTemplate> TEMPLATE_MAP = new HashMap<>(5);
 
@@ -185,7 +186,6 @@ public class MongoConfig {
                     builderCustomizers.orderedStream().collect(Collectors.toList()));
             MongoClient mongoClient = factory.createMongoClient(settings.getIfAvailable());
             SimpleReactiveMongoDatabaseFactory databaseFactory = new SimpleReactiveMongoDatabaseFactory(mongoClient, properties.getMongoClientDatabase());
-
             // MongoMappingContext
             boolean autoIndexCreation = properties.isAutoIndexCreation() != null
                     ? properties.isAutoIndexCreation()
