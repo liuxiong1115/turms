@@ -14,8 +14,14 @@ hazelcast:
       - 0
     join:
       multicast:
-        enabled: true
+        enabled: true # only used for development/test
         multicast-timeout-seconds: 4
+      discovery-strategies:
+        discovery-strategies:
+          - enabled: false
+            class: im.turms.turms.discovery.mongo.MongoDiscoveryStrategy
+            properties:
+              uri: mongodb://localhost:27017/turms-config
     failure-detector:
       icmp:
         enabled: false
@@ -33,7 +39,7 @@ hazelcast:
   map:
     default:
       statistics-enabled: false
-      in-memory-format: BINARY
+      in-memory-format: OBJECT
       metadata-policy: CREATE_ON_UPDATE
       backup-count: 1
       async-backup-count: 0
