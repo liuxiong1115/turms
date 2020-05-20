@@ -141,11 +141,9 @@ public class HazelcastConfig {
         String address;
         LoadBalancing loadBalancing = turmsProperties.getLoadBalancing();
         if (loadBalancing.isEnabled()) {
-            if (loadBalancing.getAdvertiseStrategy() == LoadBalancing.AdvertiseStrategy.IDENTIFY) {
-                address = addressUtil.getIdentity();
-            } else {
-                address = addressUtil.getAddress();
-            }
+            address = loadBalancing.getAdvertiseStrategy() == LoadBalancing.AdvertiseStrategy.IDENTIFY
+                    ? addressUtil.getIdentity()
+                    : addressUtil.getAddress();
         } else {
             address = "";
         }

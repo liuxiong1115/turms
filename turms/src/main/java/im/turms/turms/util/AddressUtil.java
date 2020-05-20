@@ -108,7 +108,7 @@ public class AddressUtil {
                 address = InetAddress.getLocalHost().getHostAddress();
                 break;
             case PUBLIC_ADDRESS:
-                address = queryPublicIp(loadBalancing.getIpDetectorAddresses());
+                address = queryPublicIp(loadBalancing.getPublicIpDetectorAddresses());
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected value: " + advertiseStrategy.name());

@@ -61,8 +61,8 @@ public class LoadBalancing implements IdentifiedDataSerializable {
     private String advertiseAddress = "";
 
     @JsonView(MutablePropertiesView.class)
-    @Description("The IP detectors will be used to query the public IP if \"identity\" property isn't valid and useLocalIp is false")
-    private List<String> ipDetectorAddresses = List.of("https://checkip.amazonaws.com", "https://bot.whatismyipaddress.com", "https://myip.dnsomatic.com");
+    @Description("The public IP detectors will be used to query the public IP if \"advertiseStrategy\" is PUBLIC_ADDRESS")
+    private List<String> publicIpDetectorAddresses = List.of("https://checkip.amazonaws.com", "https://bot.whatismyipaddress.com", "https://myip.dnsomatic.com");
 
     @JsonIgnore
     @Override
@@ -80,14 +80,14 @@ public class LoadBalancing implements IdentifiedDataSerializable {
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeUTF(identity);
         out.writeUTF(advertiseAddress);
-        out.writeUTFArray(ipDetectorAddresses.toArray(new String[0]));
+        out.writeUTFArray(publicIpDetectorAddresses.toArray(new String[0]));
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         identity = in.readUTF();
         advertiseAddress = in.readUTF();
-        ipDetectorAddresses = Arrays.asList(in.readUTFArray());
+        publicIpDetectorAddresses = Arrays.asList(in.readUTFArray());
     }
 
     public enum AdvertiseStrategy {
@@ -96,7 +96,7 @@ public class LoadBalancing implements IdentifiedDataSerializable {
         BIND_ADDRESS,
         LOCAL_ADDRESS,
         /**
-         * WARNING: For security, do NOT use REAL_PUBLIC_ADDRESS in the production environment
+         * WARNING: For security, do NOT use PUBLIC_ADDRESS in the production environment
          * to prevent from exposing the origin IP address for DDoS attack.
          */
         PUBLIC_ADDRESS,

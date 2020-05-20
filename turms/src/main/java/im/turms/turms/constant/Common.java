@@ -58,11 +58,6 @@ public class Common {
     public static final String EXPIRED_GROUP_JOIN_REQUESTS_CLEANER_CRON = "0 30 2 * * ?";
     public static final String EXPIRED_MESSAGES_CLEANER_CRON = "0 45 2 * * ?";
 
-    public static final String ACCOUNT = "account";
-    public static final String PASSWORD = "password";
-    public static final String STATUS = "status";
-    public static final String TOTAL = "total";
-
     public static final Long RESERVED_ID = 0L;
     public static final Long ADMIN_ROLE_ROOT_ID = RESERVED_ID;
     public static final Long ADMIN_REQUESTER_ID = RESERVED_ID;

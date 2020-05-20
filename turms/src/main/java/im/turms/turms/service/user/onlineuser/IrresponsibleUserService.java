@@ -23,8 +23,8 @@ import static im.turms.turms.constant.Common.HAZELCAST_IRRESPONSIBLE_USERS_MAP;
 
 /**
  * Note that the users' status are not strongly consistent and inconsistency is allowed.
- * clearUpIrresponsibleUsersAfter is used to make them consistent.
- * so don't waste system resources to rely on synchronization mechanism to try to keep it more consistent.
+ * clearUpIrresponsibleUsersAfter is used to make the statuses consistent eventually.
+ * So don't waste system resources to rely on synchronization mechanism to try to keep it more consistent.
  */
 @Log4j2
 @Service

@@ -34,8 +34,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.convert.CustomConversions;
-import org.springframework.data.mapping.model.CamelCaseAbbreviatingFieldNamingStrategy;
-import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
 import org.springframework.data.mongodb.core.WriteConcernResolver;
@@ -57,6 +55,7 @@ public class MongoConfig {
     // hash code of MongoProperties -> ReactiveMongoTemplate
     // because MongoProperties doesn't have a custom hashcode implementation but a native implementation
     private static final Map<Integer, ReactiveMongoTemplate> TEMPLATE_MAP = new HashMap<>(5);
+    private static final int EMPTY_MONGO_HASHCODE = getPropertiesHashCode(new MongoProperties());
 
     public MongoConfig(TurmsProperties turmsProperties) {
         this.turmsProperties = turmsProperties;
@@ -180,15 +179,18 @@ public class MongoConfig {
             ObjectProvider<MongoClientSettings> settings,
             WriteConcernResolver writeConcernResolver) {
         return TEMPLATE_MAP.computeIfAbsent(getPropertiesHashCode(properties), key -> {
+            MongoProperties currentProperties = key.equals(EMPTY_MONGO_HASHCODE)
+                    ? turmsProperties.getDatabase().getMongoProperties().getDefaultProperties()
+                    : properties;
             // ReactiveMongoClientFactory
-            ReactiveMongoClientFactory factory = new ReactiveMongoClientFactory(properties, null,
+            ReactiveMongoClientFactory factory = new ReactiveMongoClientFactory(currentProperties, null,
                     builderCustomizers.orderedStream().collect(Collectors.toList()));
             MongoClient mongoClient = factory.createMongoClient(settings.getIfAvailable());
-            SimpleReactiveMongoDatabaseFactory databaseFactory = new SimpleReactiveMongoDatabaseFactory(mongoClient, properties.getMongoClientDatabase());
+            SimpleReactiveMongoDatabaseFactory databaseFactory = new SimpleReactiveMongoDatabaseFactory(mongoClient, currentProperties.getMongoClientDatabase());
 
             // MongoMappingContext
-            boolean autoIndexCreation = properties.isAutoIndexCreation() != null
-                    ? properties.isAutoIndexCreation()
+            boolean autoIndexCreation = currentProperties.isAutoIndexCreation() != null
+                    ? currentProperties.isAutoIndexCreation()
                     : true;
             // Note that we don't use the field naming strategy specified by developer
             MongoMappingContext context = new MongoMappingContext();
@@ -206,7 +208,7 @@ public class MongoConfig {
         });
     }
 
-    private int getPropertiesHashCode(MongoProperties properties) {
+    private static int getPropertiesHashCode(MongoProperties properties) {
         int result = Objects.hash(properties.getHost(), properties.getPort(), properties.getUri(),
                 properties.getDatabase(), properties.getAuthenticationDatabase(),
                 properties.getGridFsDatabase(), properties.getUsername(),

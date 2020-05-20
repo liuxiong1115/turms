@@ -26,9 +26,9 @@ import reactor.core.publisher.Mono;
 import javax.validation.constraints.NotNull;
 import java.util.NoSuchElementException;
 
-import static im.turms.turms.constant.Common.TOTAL;
-
 public class AggregationUtil {
+    private static final String TOTAL = "total";
+
     private AggregationUtil() {
     }
 

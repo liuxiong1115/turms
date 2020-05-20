@@ -31,10 +31,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
-import static im.turms.turms.constant.Common.STATUS;
-
 @Component
 public class GlobalErrorAttributes extends DefaultErrorAttributes {
+    private static final String ATTR_STATUS = "status";
     private static final String ATTR_MESSAGE = "message";
     private static final String ATTR_ERROR = "error";
     private final boolean respondStackTraceWhenExceptionThrown;
@@ -44,19 +43,17 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     }
 
     @Override
-    public Map<String, Object> getErrorAttributes(
-            ServerRequest request,
-            boolean includeStackTrace) {
-        Map<String, Object> errorAttributes = super.getErrorAttributes(request, respondStackTraceWhenExceptionThrown);
+    public Map<String, Object> getErrorAttributes(ServerRequest request, boolean includeStackTrace, boolean includeMessage, boolean includeBindingErrors) {
+        Map<String, Object> errorAttributes = super.getErrorAttributes(request, respondStackTraceWhenExceptionThrown, includeMessage, includeBindingErrors);
         Throwable throwable = translate(super.getError(request), errorAttributes);
         if (throwable instanceof TurmsBusinessException) {
             TurmsStatusCode code = ((TurmsBusinessException) throwable).getCode();
-            errorAttributes.put(STATUS, code.getHttpStatusCode());
+            errorAttributes.put(ATTR_STATUS, code.getHttpStatusCode());
             errorAttributes.put(ResponseDTO.Fields.code, code.getBusinessCode());
             errorAttributes.put(ResponseDTO.Fields.reason, code.getReason());
         } else {
             if (isClientError(errorAttributes)) {
-                errorAttributes.put(STATUS, 400);
+                errorAttributes.put(ATTR_STATUS, 400);
             }
             errorAttributes.putIfAbsent(ResponseDTO.Fields.code, TurmsStatusCode.FAILED.getBusinessCode());
             errorAttributes.putIfAbsent(ResponseDTO.Fields.reason, errorAttributes.get(ATTR_MESSAGE));
@@ -80,7 +77,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     }
 
     private boolean isClientError(Map<String, Object> errorAttributes) {
-        Integer status = (Integer) errorAttributes.get(STATUS);
+        Integer status = (Integer) errorAttributes.get(ATTR_STATUS);
         if (status == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
             Object messageObj = errorAttributes.get(ATTR_MESSAGE);
             if (messageObj instanceof String) {

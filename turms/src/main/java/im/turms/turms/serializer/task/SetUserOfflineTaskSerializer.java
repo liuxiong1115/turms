@@ -24,6 +24,7 @@ public class SetUserOfflineTaskSerializer implements StreamSerializer<SetUserOff
         if (deviceTypes != null && !deviceTypes.isEmpty()) {
             byte deviceTypesMask = 0;
             for (DeviceType deviceType : deviceTypes) {
+                // e.g.
                 // The first device type (0) -> 0000 0001
                 // The last device type (5) -> 0001 0000
                 deviceTypesMask |= 1 << deviceType.getNumber();

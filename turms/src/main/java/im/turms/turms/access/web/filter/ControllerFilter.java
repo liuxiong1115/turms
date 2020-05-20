@@ -53,12 +53,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static im.turms.turms.constant.Common.ACCOUNT;
-import static im.turms.turms.constant.Common.PASSWORD;
-
 @Component
 public class ControllerFilter implements WebFilter {
     private static final BasicDBObject EMPTY_DBOJBECT = new BasicDBObject();
+    private static final String HEADER_ACCOUNT = "account";
+    private static final String HEADER_PASSWORD = "password";
     private static final String ATTR_BODY = "BODY";
     private static final List<String> DELETE_FILTER_PARAM_NAME = List.of("ids", "keys", "accounts");
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
@@ -171,8 +170,8 @@ public class ControllerFilter implements WebFilter {
 
     private Pair<String, String> parseAccountAndPassword(@NotNull ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
-        return Pair.of(request.getHeaders().getFirst(ACCOUNT),
-                request.getHeaders().getFirst(PASSWORD));
+        return Pair.of(request.getHeaders().getFirst(HEADER_ACCOUNT),
+                request.getHeaders().getFirst(HEADER_PASSWORD));
     }
 
     private Mono<Void> tryPersistingAndPass(

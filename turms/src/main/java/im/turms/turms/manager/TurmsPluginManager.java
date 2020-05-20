@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -53,12 +52,6 @@ public class TurmsPluginManager {
         this.context = context;
         this.turmsProperties = turmsProperties;
         if (turmsProperties.getPlugin().isEnabled()) {
-            clientRequestHandlerList = Collections.emptyList();
-            expiredMessageAutoDeletionNotificationHandlerList = Collections.emptyList();
-            logHandlerList = Collections.emptyList();
-            notificationHandlerList = Collections.emptyList();
-            userAuthenticatorList = Collections.emptyList();
-            userOnlineStatusChangeHandlerList = Collections.emptyList();
             init();
         }
     }
@@ -69,6 +62,8 @@ public class TurmsPluginManager {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
 
+        // According to the method org.pf4j.AbstractPluginManager.getExtensions(java.util.List<org.pf4j.ExtensionWrapper<T>>)
+        // getExtensions never return null
         clientRequestHandlerList = pluginManager.getExtensions(ClientRequestHandler.class);
         expiredMessageAutoDeletionNotificationHandlerList = pluginManager.getExtensions(ExpiredMessageAutoDeletionNotificationHandler.class);
         logHandlerList = pluginManager.getExtensions(LogHandler.class);

@@ -24,7 +24,7 @@ public class DeliveryTurmsNotificationTaskSerializer implements StreamSerializer
         // 01 -> if 1 < recipientNumber < 256, use 1 extra byte
         // 10 -> Otherwise, use 2 extra bytes
         // 11 -> illegal
-        // The remaining 14 bits for the size of notification
+        // The remaining 14 bits for determining the size of notification
         short schema = 0;
         short recipientsNumber = (short) object.getRecipientIds().size();
         if (recipientsNumber == 0) {
