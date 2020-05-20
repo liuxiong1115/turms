@@ -54,7 +54,7 @@ export default {
                     options: {
                         base: [{
                             id: 'ALL',
-                            label: this.$t('userMessageAndSystemMessage')
+                            label: this.$t('privateMessageAndGroupMessage')
                         },
                         {
                             id: false,
