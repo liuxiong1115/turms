@@ -10,9 +10,9 @@ import im.turms.common.model.bo.group.*;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
 import org.junit.jupiter.api.*;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -70,7 +70,7 @@ public class GroupServiceST {
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void addGroupJoinQuestion_shouldReturnQuestionId() throws ExecutionException, InterruptedException {
-        CompletableFuture<Long> future = turmsClient.getGroupService().addGroupJoinQuestion(groupId, "question", List.of("answer1", "answer2"), 10);
+        CompletableFuture<Long> future = turmsClient.getGroupService().addGroupJoinQuestion(groupId, "question", Arrays.asList("answer1", "answer2"), 10);
         groupJoinQuestionId = future.get();
         assertNotNull(groupJoinQuestionId);
     }
@@ -143,7 +143,7 @@ public class GroupServiceST {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void updateGroupJoinQuestion_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = turmsClient.getGroupService().updateGroupJoinQuestion(groupId, "new-question", List.of("answer"), null)
+        Void result = turmsClient.getGroupService().updateGroupJoinQuestion(groupId, "new-question", Arrays.asList("answer"), null)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -252,7 +252,7 @@ public class GroupServiceST {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void queryGroupMembersByMembersIds_shouldEqualNewMemberId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupMembersWithVersion groupMembersWithVersion = turmsClient.getGroupService().queryGroupMembersByMembersIds(groupId, List.of(GROUP_MEMBER_ID), true)
+        GroupMembersWithVersion groupMembersWithVersion = turmsClient.getGroupService().queryGroupMembersByMembersIds(groupId, Arrays.asList(GROUP_MEMBER_ID), true)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(GROUP_MEMBER_ID, groupMembersWithVersion.getGroupMembers(0).getUserId().getValue());
     }
@@ -260,7 +260,8 @@ public class GroupServiceST {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void answerGroupQuestions_shouldReturnAnswerResult() throws InterruptedException, TimeoutException {
-        Map<Long, String> map = Map.of(groupJoinQuestionId, "answer");
+        HashMap<Long, String> map = new HashMap<>();
+        map.put(groupJoinQuestionId, "answer");
         try {
             GroupJoinQuestionsAnswerResult answerResult = turmsClient.getGroupService()
                     .answerGroupQuestions(map)

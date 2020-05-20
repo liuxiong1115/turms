@@ -10,19 +10,17 @@ import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.storage.DeleteResourceRequest;
 import im.turms.common.model.dto.request.storage.QuerySignedGetUrlRequest;
 import im.turms.common.model.dto.request.storage.QuerySignedPutUrlRequest;
+import okhttp3.*;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 public class StorageService {
 
     private final TurmsClient turmsClient;
-    private final HttpClient httpClient;
+    private final OkHttpClient httpClient;
     private String serverUrl = "http://localhost:9000";
 
     public StorageService(TurmsClient turmsClient, String storageServerUrl) {
@@ -30,7 +28,7 @@ public class StorageService {
         if (storageServerUrl != null) {
             serverUrl = storageServerUrl;
         }
-        httpClient = HttpClient.newHttpClient();
+        httpClient = new OkHttpClient.Builder().build();
     }
 
     public void setServerUrl(String serverUrl) {
@@ -53,7 +51,9 @@ public class StorageService {
         if (userId != null) {
             return getSignedPutUrl(ContentType.PROFILE, pictureSize, null, userId);
         } else {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+            CompletableFuture<String> future = new CompletableFuture<>();
+            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+            return future;
         }
     }
 
@@ -164,32 +164,52 @@ public class StorageService {
     }
 
     private CompletableFuture<byte[]> getBytesFromGetUrl(@NotNull String url) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
+        CompletableFuture<byte[]> future = new CompletableFuture<>();
+        Request request = new Request.Builder()
+                .url(url)
                 .build();
-        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray())
-                .thenApply(response -> {
-                    if (response.statusCode() == 200) {
-                        return response.body();
-                    } else {
-                        throw new RuntimeException(response.toString());
-                    }
-                });
+        httpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@org.jetbrains.annotations.NotNull Call call, @org.jetbrains.annotations.NotNull IOException e) {
+                future.completeExceptionally(e);
+            }
+
+            @Override
+            public void onResponse(@org.jetbrains.annotations.NotNull Call call, @org.jetbrains.annotations.NotNull Response response) throws IOException {
+                ResponseBody body = response.body();
+                if (body != null) {
+                    future.complete(body.bytes());
+                } else {
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MISSING_DATA));
+                }
+            }
+        });
+        return future;
     }
 
     private CompletableFuture<String> upload(String url, byte[] bytes) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .PUT(HttpRequest.BodyPublishers.ofByteArray(bytes))
+        CompletableFuture<String> future = new CompletableFuture<>();
+        Request request = new Request.Builder()
+                .url(url)
+                .put(RequestBody.create(bytes))
                 .build();
-        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    if (response.statusCode() == 200) {
-                        return response.uri().toString();
-                    } else {
-                        throw new RuntimeException(response.toString());
-                    }
-                });
+        httpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@org.jetbrains.annotations.NotNull Call call, @org.jetbrains.annotations.NotNull IOException e) {
+                future.completeExceptionally(e);
+            }
+
+            @Override
+            public void onResponse(@org.jetbrains.annotations.NotNull Call call, @org.jetbrains.annotations.NotNull Response response) throws IOException {
+                ResponseBody body = response.body();
+                if (body != null) {
+                    future.complete(body.string());
+                } else {
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MISSING_DATA));
+                }
+            }
+        });
+        return future;
     }
 
     private String getBucketName(ContentType contentType) {

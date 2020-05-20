@@ -7,7 +7,6 @@ import com.google.protobuf.Message;
 import im.turms.client.TurmsClient;
 import im.turms.client.common.Function4;
 import im.turms.client.common.StringUtil;
-import im.turms.client.common.TurmsLogger;
 import im.turms.client.util.ProtoUtil;
 import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
@@ -17,23 +16,24 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.user.UserLocation;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
+import okhttp3.*;
+import okio.ByteString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.WebSocket;
-import java.net.http.WebSocketHandshakeException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.util.AbstractMap.SimpleEntry;
 
 public class TurmsDriver {
+    private static final Logger LOGGER = Logger.getLogger(TurmsDriver.class.getName());
+
     private static final Integer HEARTBEAT_INTERVAL = 20 * 1000;
     public static final String REQUEST_ID_FIELD = "rid";
     public static final String USER_ID_FIELD = "uid";
@@ -47,7 +47,11 @@ public class TurmsDriver {
     private final Integer heartbeatInterval;
 
     private final TurmsClient turmsClient;
+
+    private final OkHttpClient httpClient;
     private WebSocket websocket;
+    private volatile boolean isWebsocketOpen;
+    private CompletableFuture<Void> disconnectFuture;
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> heartbeatFuture;
     private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
@@ -64,6 +68,10 @@ public class TurmsDriver {
 
     private String address;
     private String sessionId;
+
+    public OkHttpClient getHttpClient() {
+        return httpClient;
+    }
 
     public List<Function<TurmsNotification, Void>> getOnNotificationListeners() {
         return onNotificationListeners;
@@ -95,6 +103,9 @@ public class TurmsDriver {
         if (minRequestsInterval != null) {
             this.minRequestsInterval = minRequestsInterval;
         }
+        httpClient = new OkHttpClient.Builder()
+                .connectTimeout(Duration.ofSeconds(this.connectionTimeout))
+                .build();
         this.heartbeatInterval = HEARTBEAT_INTERVAL;
     }
 
@@ -103,31 +114,40 @@ public class TurmsDriver {
     }
 
     public CompletableFuture<Void> sendHeartbeat() {
+        CompletableFuture<Void> future = new CompletableFuture<>();
         if (this.connected()) {
             lastRequestDate = System.currentTimeMillis();
-            return websocket.sendBinary(ByteBuffer.allocate(0), true)
-                    .thenCompose(webSocket -> {
-                        CompletableFuture<Void> future = new CompletableFuture<>();
-                        heartbeatCallbacks.offer(future);
-                        return future;
-                    });
+            boolean wasEnqueued = websocket.send(ByteString.EMPTY);
+            if (wasEnqueued) {
+                heartbeatCallbacks.offer(future);
+            } else {
+                future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
+            }
         } else {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
+            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
         }
+        return future;
     }
 
     public boolean connected() {
-        return websocket != null && !websocket.isInputClosed() && !websocket.isOutputClosed();
+        return websocket != null && isWebsocketOpen;
     }
 
     public CompletableFuture<Void> disconnect() {
+        CompletableFuture<Void> future = new CompletableFuture<>();
         if (connected()) {
-            return this.websocket
-                    .sendClose(WebSocket.NORMAL_CLOSURE, "")
-                    .thenApply(webSocket -> null);
+            // close is a synchronous method
+            boolean wasEnqueued = this.websocket.close(1000, null);
+            if (wasEnqueued) {
+                isWebsocketOpen = false;
+                disconnectFuture = future;
+            } else {
+                future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
+            }
         } else {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
+            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
         }
+        return future;
     }
 
     public CompletableFuture<Void> connect(long userId, @NotNull String password) {
@@ -155,141 +175,133 @@ public class TurmsDriver {
             @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus,
             @Nullable UserLocation userLocation) {
+        CompletableFuture<Void> loginFuture = new CompletableFuture<>();
         if (connected()) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_ALREADY_ESTABLISHED));
+            loginFuture.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_ALREADY_ESTABLISHED));
+            return loginFuture;
         } else {
             long connectionRequestId = (long) Math.ceil(Math.random() * Long.MAX_VALUE);
-            WebSocket.Builder builder = HttpClient.newHttpClient()
-                    .newWebSocketBuilder();
-            builder.header(REQUEST_ID_FIELD, String.valueOf(connectionRequestId));
-            builder.header(USER_ID_FIELD, String.valueOf(userId));
-            builder.header(PASSWORD_FIELD, password);
+            Request.Builder requestBuilder = new Request.Builder()
+                    .url(websocketUrl)
+                    .header(REQUEST_ID_FIELD, String.valueOf(connectionRequestId))
+                    .header(USER_ID_FIELD, String.valueOf(userId))
+                    .header(PASSWORD_FIELD, password);
             if (userLocation != null) {
                 String location = String.format("%f%s%f", userLocation.getLongitude(), LOCATION_SPLIT, userLocation.getLatitude());
-                builder.header(USER_LOCATION_FIELD, location);
+                requestBuilder.header(USER_LOCATION_FIELD, location);
             }
             if (userOnlineStatus != null) {
-                builder.header(USER_ONLINE_STATUS_FIELD, userOnlineStatus.toString());
+                requestBuilder.header(USER_ONLINE_STATUS_FIELD, userOnlineStatus.toString());
             }
             if (deviceType != null) {
-                builder.header(DEVICE_TYPE_FIELD, deviceType.name());
+                requestBuilder.header(DEVICE_TYPE_FIELD, deviceType.name());
             }
-            return builder
-                    .connectTimeout(Duration.ofSeconds(connectionTimeout))
-                    .buildAsync(URI.create(websocketUrl), new WebSocket.Listener() {
+            websocket = httpClient.newWebSocket(requestBuilder.build(), new WebSocketListener() {
+                @Override
+                public void onOpen(@org.jetbrains.annotations.NotNull WebSocket webSocket, @org.jetbrains.annotations.NotNull Response response) {
+                    heartbeatFuture = heartbeatTimer.scheduleAtFixedRate(
+                            (() -> checkAndSendHeartbeatTask()),
+                            heartbeatInterval,
+                            heartbeatInterval,
+                            TimeUnit.SECONDS);
+                    isWebsocketOpen = true;
+                    loginFuture.complete(null);
+                }
 
-                        @Override
-                        public void onOpen(WebSocket webSocket) {
-                            webSocket.request(1);
-                            onWebsocketOpen();
-                        }
-
-                        @Override
-                        public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
-                            webSocket.request(1);
-                            TurmsNotification notification;
-
-                            if (!data.hasRemaining()) {
-                                while (!heartbeatCallbacks.isEmpty()) {
-                                    CompletableFuture<Void> future = heartbeatCallbacks.poll();
-                                    if (future != null) {
-                                        future.complete(null);
-                                    }
-                                }
-                                return CompletableFuture.completedStage(null);
-                            }
-
-                            try {
-                                notification = TurmsNotification.parseFrom(data);
-                            } catch (InvalidProtocolBufferException e) {
-                                TurmsLogger.logger.log(Level.SEVERE, "", e);
-                                return CompletableFuture.failedStage(e);
-                            }
-                            if (notification != null) {
-                                boolean isSessionInfo = notification.hasData() && notification.getData().hasSession();
-                                if (isSessionInfo) {
-                                    address = notification.getData().getSession().getAddress();
-                                    sessionId = notification.getData().getSession().getSessionId();
-                                } else if (notification.hasRequestId()) {
-                                    long requestId = notification.getRequestId().getValue();
-                                    SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.remove(requestId);
-                                    if (pair != null) {
-                                        CompletableFuture<TurmsNotification> future = pair.getValue();
-                                        if (notification.hasCode()) {
-                                            int code = notification.getCode().getValue();
-                                            if (TurmsStatusCode.isSuccess(code)) {
-                                                future.complete(notification);
-                                            } else {
-                                                TurmsBusinessException exception;
-                                                if (notification.hasReason()) {
-                                                    exception = TurmsBusinessException.get(code, notification.getReason().getValue());
-                                                } else {
-                                                    exception = TurmsBusinessException.get(code);
-                                                }
-                                                if (exception != null) {
-                                                    future.completeExceptionally(exception);
-                                                } else {
-                                                    TurmsLogger.logger.log(Level.WARNING, "Unknown status code");
-                                                }
-                                            }
+                @Override
+                public void onMessage(@org.jetbrains.annotations.NotNull WebSocket webSocket, @org.jetbrains.annotations.NotNull ByteString bytes) {
+                    TurmsNotification notification;
+                    try {
+                        notification = TurmsNotification.parseFrom(bytes.asByteBuffer());
+                    } catch (InvalidProtocolBufferException e) {
+                        LOGGER.log(Level.SEVERE, "", e);
+                        return;
+                    }
+                    if (notification != null) {
+                        boolean isSessionInfo = notification.hasData() && notification.getData().hasSession();
+                        if (isSessionInfo) {
+                            address = notification.getData().getSession().getAddress();
+                            sessionId = notification.getData().getSession().getSessionId();
+                        } else if (notification.hasRequestId()) {
+                            long requestId = notification.getRequestId().getValue();
+                            SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.remove(requestId);
+                            if (pair != null) {
+                                CompletableFuture<TurmsNotification> future = pair.getValue();
+                                if (notification.hasCode()) {
+                                    int code = notification.getCode().getValue();
+                                    if (TurmsStatusCode.isSuccess(code)) {
+                                        future.complete(notification);
+                                    } else {
+                                        TurmsBusinessException exception = notification.hasReason()
+                                                ? TurmsBusinessException.get(code, notification.getReason().getValue())
+                                                : TurmsBusinessException.get(code);
+                                        if (exception != null) {
+                                            future.completeExceptionally(exception);
                                         } else {
-                                            future.complete(notification);
+                                            LOGGER.log(Level.WARNING, "Unknown status code");
                                         }
                                     }
-                                }
-                                for (Function<TurmsNotification, Void> listener : onNotificationListeners) {
-                                    try {
-                                        listener.apply(notification);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                                } else {
+                                    future.complete(notification);
                                 }
                             }
-                            return CompletableFuture.completedStage(notification);
                         }
-
-                        /**
-                         * This is the last invocation from the specified WebSocket.
-                         */
-                        @Override
-                        public CompletionStage<?> onClose(WebSocket webSocket, int wsStatusCode, String reason) {
-                            webSocket.request(1);
-                            onWebsocketClose(wsStatusCode, reason);
-                            return null;
-                        }
-
-                        /**
-                         * This is the last invocation from the specified WebSocket.
-                         */
-                        @Override
-                        public void onError(WebSocket webSocket, Throwable error) {
-                            onWebsocketError(error);
-                        }
-                    })
-                    .handle((webSocket, throwable) -> {
-                        if (throwable != null) {
-                            Throwable cause = throwable.getCause();
-                            // Note that the WebSocketHandshakeException cannot be caught by onError
-                            if (cause instanceof WebSocketHandshakeException) {
-                                WebSocketHandshakeException handshakeException = (WebSocketHandshakeException) cause;
-                                int httpStatusCode = handshakeException.getResponse().statusCode();
-                                if (httpStatusCode == 307) {
-                                    Optional<String> reason = handshakeException.getResponse()
-                                            .headers().firstValue("reason");
-                                    if (reason.isPresent()) {
-                                        return this.reconnect(reason.get());
-                                    }
-                                }
+                        for (Function<TurmsNotification, Void> listener : onNotificationListeners) {
+                            try {
+                                listener.apply(notification);
+                            } catch (Exception e) {
+                                LOGGER.log(Level.SEVERE, "", e);
                             }
-                            return CompletableFuture.failedFuture(throwable);
-                        } else {
-                            this.websocket = webSocket;
-                            return CompletableFuture.completedFuture(null);
                         }
-                    })
-                    .thenCompose(future -> future)
-                    .thenApply(ignored -> null);
+                    }
+                }
+
+                @Override
+                public void onClosed(@org.jetbrains.annotations.NotNull WebSocket webSocket, int code, @org.jetbrains.annotations.NotNull String reason) {
+                    clearWebSocket();
+                    TurmsCloseStatus status = TurmsCloseStatus.get(code);
+                    if (status == TurmsCloseStatus.REDIRECT && !reason.isEmpty()) {
+                        try {
+                            reconnect(reason).get(10, TimeUnit.SECONDS);
+                        } catch (Exception e) {
+                            RuntimeException runtimeException = new RuntimeException("Failed to reconnect", e);
+                            if (onClose != null) {
+                                onClose.apply(status, code, reason, runtimeException);
+                            }
+                        }
+                    } else if (onClose != null) {
+                        onClose.apply(status, code, reason, null);
+                    }
+                }
+
+                @Override
+                public void onFailure(@org.jetbrains.annotations.NotNull WebSocket webSocket, @org.jetbrains.annotations.NotNull Throwable throwable, @org.jetbrains.annotations.Nullable Response response) {
+                    clearWebSocket();
+                    // response != null when it failed at handshake stage
+                    boolean isReconnecting = false;
+                    if (response != null && response.code() == 307) {
+                        String reason = response.header("reason");
+                        if (reason != null) {
+                            isReconnecting = true;
+                            reconnect(reason).whenComplete((aVoid, t) -> {
+                                if (t != null) {
+                                    loginFuture.completeExceptionally(throwable);
+                                } else {
+                                    loginFuture.complete(null);
+                                }
+                            });
+                        }
+                    }
+                    if (onClose != null) {
+                        onClose.apply(null, null, null, throwable);
+                    }
+                    if (!isReconnecting) {
+                        loginFuture.completeExceptionally(throwable);
+                    }
+                }
+            });
         }
+        return loginFuture;
     }
 
     public CompletableFuture<TurmsNotification> send(Message.Builder builder, Map<String, ?> fields) {
@@ -306,6 +318,7 @@ public class TurmsDriver {
     }
 
     public CompletableFuture<TurmsNotification> send(TurmsRequest.Builder requestBuilder) {
+        CompletableFuture<TurmsNotification> future = new CompletableFuture<>();
         if (this.connected()) {
             Date now = new Date();
             if (minRequestsInterval == 0 || now.getTime() - lastRequestDate > minRequestsInterval) {
@@ -314,20 +327,18 @@ public class TurmsDriver {
                 requestBuilder.setRequestId(Int64Value.newBuilder().setValue(requestId).build());
                 TurmsRequest request = requestBuilder.build();
                 ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
-                CompletableFuture<TurmsNotification> future = new CompletableFuture<>();
                 requestMap.put(requestId, new SimpleEntry<>(request, future));
-                websocket.sendBinary(data, true).whenComplete((webSocket, throwable) -> {
-                    if (throwable != null) {
-                        future.completeExceptionally(throwable);
-                    }
-                });
-                return future;
+                boolean wasEnqueued = websocket.send(ByteString.of(data));
+                if (!wasEnqueued) {
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
+                }
             } else {
-                return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT));
+                future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT));
             }
         } else {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
+            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
         }
+        return future;
     }
 
     private long generateRandomId() {
@@ -338,39 +349,11 @@ public class TurmsDriver {
         return id;
     }
 
-    private void onWebsocketOpen() {
-        heartbeatFuture = this.heartbeatTimer.scheduleAtFixedRate(
-                this::checkAndSendHeartbeatTask,
-                heartbeatInterval,
-                heartbeatInterval,
-                TimeUnit.SECONDS);
-    }
-
     private void checkAndSendHeartbeatTask() {
         long difference = System.currentTimeMillis() - lastRequestDate;
         if (difference > minRequestsInterval) {
             this.sendHeartbeat();
         }
-    }
-
-    private void onWebsocketClose(int code, String reason) {
-        cancelHeartbeatFuture();
-        TurmsCloseStatus status = TurmsCloseStatus.get(code);
-        if (status == TurmsCloseStatus.REDIRECT && reason != null && !reason.isEmpty()) {
-            try {
-                reconnect(reason).get(10, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                RuntimeException runtimeException = new RuntimeException("Failed to reconnect", e);
-                onClose.apply(status, code, reason, runtimeException);
-            }
-        } else if (onClose != null) {
-            onClose.apply(status, code, reason, null);
-        }
-    }
-
-    private void onWebsocketError(Throwable error) {
-        cancelHeartbeatFuture();
-        onClose.apply(null, null, null, error);
     }
 
     private CompletableFuture<Void> reconnect(String address) {
@@ -384,9 +367,16 @@ public class TurmsDriver {
                 turmsClient.getUserService().getLocation());
     }
 
-    private void cancelHeartbeatFuture() {
-        if (!heartbeatFuture.isCancelled() && !heartbeatFuture.isDone()) {
+    private void clearWebSocket() {
+        isWebsocketOpen = false;
+        if (heartbeatFuture != null && !heartbeatFuture.isCancelled() && !heartbeatFuture.isDone()) {
             heartbeatFuture.cancel(true);
+        }
+        if (disconnectFuture != null) {
+            disconnectFuture.complete(null);
+        }
+        for (CompletableFuture<Void> future : heartbeatCallbacks) {
+            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
         }
     }
 }

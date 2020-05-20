@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -29,7 +29,7 @@ public class StorageServiceST {
         turmsClient.getUserService()
                 .login(USER_ID, "123")
                 .get(5, TimeUnit.SECONDS);
-        PROFILE_PICTURE = Files.readAllBytes(Path.of("src", "test", "resources", "profile.webp"));
+        PROFILE_PICTURE = Files.readAllBytes(Paths.get("src", "test", "resources", "profile.webp"));
         ATTACHMENT = PROFILE_PICTURE;
     }
 
