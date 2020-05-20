@@ -34,6 +34,7 @@ import java.io.IOException;
 
 @Data
 public class Message implements IdentifiedDataSerializable {
+    @JsonView(MutablePropertiesView.class)
     @Description("The time type for the delivery time of message")
     private TimeType timeType = TimeType.LOCAL_SERVER_TIME;
 
@@ -142,6 +143,7 @@ public class Message implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
+        out.writeInt(timeType.ordinal());
         out.writeBoolean(checkIfTargetActiveAndNotDeleted);
         out.writeInt(maxTextLimit);
         out.writeInt(maxRecordsSizeBytes);
@@ -165,6 +167,7 @@ public class Message implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
+        timeType = TimeType.values()[in.readInt()];
         checkIfTargetActiveAndNotDeleted = in.readBoolean();
         maxTextLimit = in.readInt();
         maxRecordsSizeBytes = in.readInt();

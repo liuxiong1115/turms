@@ -114,6 +114,9 @@ public class WsUserController {
                         distance)
                         .collectList()
                         .map(ids -> {
+                            if (ids.isEmpty()) {
+                                return RequestResult.NO_CONTENT;
+                            }
                             UserSessionIds.Builder builder = UserSessionIds.newBuilder();
                             for (Pair<Long, DeviceType> id : ids) {
                                 UserSessionId sessionId = UserSessionId.newBuilder()
@@ -134,7 +137,8 @@ public class WsUserController {
                         maxNumber,
                         distance)
                         .collectList()
-                        .map(ids -> RequestResult.create(TurmsNotification.Data
+                        .map(ids -> ids.isEmpty() ? RequestResult.NO_CONTENT
+                                : RequestResult.create(TurmsNotification.Data
                                 .newBuilder()
                                 .setIds(Int64Values.newBuilder().addAllValues(ids))
                                 .build()));
@@ -162,7 +166,7 @@ public class WsUserController {
                     .collectList()
                     .map(users -> {
                         if (users.isEmpty()) {
-                            return RequestResult.create(TurmsStatusCode.NO_CONTENT);
+                            return RequestResult.NO_CONTENT;
                         }
                         UsersInfosWithVersion.Builder builder = UsersInfosWithVersion.newBuilder();
                         for (User user : users) {

@@ -53,7 +53,11 @@ import javax.validation.constraints.PastOrPresent;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.constant.Common.DEFAULT_RELATIONSHIP_GROUP_INDEX;
+import static im.turms.turms.constant.Common.TRANSACTION_RETRY;
+import static im.turms.turms.pojo.domain.UserRelationship.Fields.ID_OWNER_ID;
+import static im.turms.turms.pojo.domain.UserRelationship.Fields.ID_RELATED_USER_ID;
+import static im.turms.turms.pojo.domain.UserRelationshipGroupMember.Fields.ID_GROUP_INDEX;
 
 @Service
 @Validated
@@ -157,8 +161,8 @@ public class UserRelationshipService {
                     .then(userVersionService.updateSpecificVersion(
                             ownerId,
                             operations,
-                            UserVersion.Fields.relationshipGroupsMembers,
-                            UserVersion.Fields.relationships))
+                            UserVersion.Fields.RELATIONSHIP_GROUPS_MEMBERS,
+                            UserVersion.Fields.RELATIONSHIPS))
                     .thenReturn(true);
         } else {
             return mongoTemplate.inTransaction()
@@ -204,10 +208,15 @@ public class UserRelationshipService {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(date)) {
                         return queryMembersRelatedUsersIds(Set.of(ownerId), Set.of(groupIndex), isBlocked)
                                 .collect(Collectors.toSet())
-                                .map(ids -> Int64ValuesWithVersion.newBuilder()
-                                        .setLastUpdatedDate(Int64Value.newBuilder().setValue(date.getTime()).build())
-                                        .addAllValues(ids)
-                                        .build());
+                                .map(ids -> {
+                                    if (ids.isEmpty()) {
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
+                                    }
+                                    return Int64ValuesWithVersion.newBuilder()
+                                            .setLastUpdatedDate(Int64Value.newBuilder().setValue(date.getTime()).build())
+                                            .addAllValues(ids)
+                                            .build();
+                                });
                     } else {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE));
                     }
@@ -234,6 +243,9 @@ public class UserRelationshipService {
                                 null)
                                 .collect(Collectors.toSet())
                                 .map(relationships -> {
+                                    if (relationships.isEmpty()) {
+                                        throw TurmsBusinessException.get(TurmsStatusCode.NO_CONTENT);
+                                    }
                                     UserRelationshipsWithVersion.Builder builder = UserRelationshipsWithVersion.newBuilder();
                                     builder.setLastUpdatedDate(Int64Value.newBuilder().setValue(date.getTime()).build());
                                     for (UserRelationship relationship : relationships) {
@@ -254,7 +266,7 @@ public class UserRelationshipService {
             @Nullable Boolean isBlocked) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID_OWNER_ID, ownerIds)
-                .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
+                .addIsIfNotNull(UserRelationship.Fields.IS_BLOCKED, isBlocked)
                 .buildQuery();
         query.fields().include(ID_RELATED_USER_ID);
         return mongoTemplate.find(query, UserRelationship.class)
@@ -267,8 +279,10 @@ public class UserRelationshipService {
             @Nullable Boolean isBlocked) {
         if (groupIndexes != null && isBlocked != null) {
             return Mono.zip(
-                    queryMembersRelatedUsersIds(ownerIds, groupIndexes, null, null).collect(Collectors.toSet()),
-                    queryRelatedUsersIds(ownerIds, isBlocked).collect(Collectors.toSet()))
+                    queryMembersRelatedUsersIds(ownerIds, groupIndexes, null, null)
+                            .collect(Collectors.toSet()),
+                    queryRelatedUsersIds(ownerIds, isBlocked)
+                            .collect(Collectors.toSet()))
                     .flatMapIterable(tuple -> {
                         tuple.getT1().retainAll(tuple.getT2());
                         return tuple.getT1();
@@ -290,8 +304,8 @@ public class UserRelationshipService {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID_OWNER_ID, ownerIds)
                 .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
-                .addBetweenIfNotNull(UserRelationship.Fields.establishmentDate, establishmentDateRange)
-                .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
+                .addBetweenIfNotNull(UserRelationship.Fields.ESTABLISHMENT_DATE, establishmentDateRange)
+                .addIsIfNotNull(UserRelationship.Fields.IS_BLOCKED, isBlocked)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, UserRelationship.class);
     }
@@ -390,7 +404,7 @@ public class UserRelationshipService {
                 .newBuilder()
                 .addInIfNotNull(ID_OWNER_ID, ownerIds)
                 .addInIfNotNull(ID_RELATED_USER_ID, relatedUsersIds)
-                .addIsIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
+                .addIsIfNotNull(UserRelationship.Fields.IS_BLOCKED, isBlocked)
                 .buildQuery();
         return mongoTemplate.count(query, UserRelationship.class);
     }
@@ -484,7 +498,7 @@ public class UserRelationshipService {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId))
-                .addCriteria(Criteria.where(UserRelationship.Fields.isBlocked).is(true));
+                .addCriteria(Criteria.where(UserRelationship.Fields.IS_BLOCKED).is(true));
         return mongoTemplate.exists(query, UserRelationship.class);
     }
 
@@ -492,7 +506,7 @@ public class UserRelationshipService {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId))
-                .addCriteria(Criteria.where(UserRelationship.Fields.isBlocked).is(true));
+                .addCriteria(Criteria.where(UserRelationship.Fields.IS_BLOCKED).is(true));
         return mongoTemplate.exists(query, UserRelationship.class)
                 .map(isBlocked -> !isBlocked);
     }
@@ -500,7 +514,7 @@ public class UserRelationshipService {
     public Mono<Boolean> isRelatedAndAllowed(@NotNull Long ownerId, @NotNull Long relatedUserId) {
         Query query = new Query().addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(relatedUserId))
-                .addCriteria(Criteria.where(UserRelationship.Fields.isBlocked).is(false));
+                .addCriteria(Criteria.where(UserRelationship.Fields.IS_BLOCKED).is(false));
         return mongoTemplate.exists(query, UserRelationship.class);
     }
 
@@ -531,8 +545,8 @@ public class UserRelationshipService {
                 .addCriteria(Criteria.where(ID_OWNER_ID).is(ownerId))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).in(relatedUsersIds));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(UserRelationship.Fields.isBlocked, isBlocked)
-                .setIfNotNull(UserRelationship.Fields.establishmentDate, establishmentDate)
+                .setIfNotNull(UserRelationship.Fields.IS_BLOCKED, isBlocked)
+                .setIfNotNull(UserRelationship.Fields.ESTABLISHMENT_DATE, establishmentDate)
                 .build();
         return mongoTemplate.updateMulti(query, update, UserRelationship.class)
                 .zipWith(userVersionService.updateRelationshipsVersion(ownerId, null))
@@ -548,7 +562,7 @@ public class UserRelationshipService {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_OWNER_ID).is(userTwoId))
                 .addCriteria(Criteria.where(ID_RELATED_USER_ID).is(userOneId))
-                .addCriteria(Criteria.where(UserRelationship.Fields.isBlocked).is(null));
+                .addCriteria(Criteria.where(UserRelationship.Fields.IS_BLOCKED).is(null));
         return mongoTemplate.exists(query, UserRelationship.class);
     }
 

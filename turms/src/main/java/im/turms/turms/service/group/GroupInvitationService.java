@@ -101,7 +101,7 @@ public class GroupInvitationService {
     public Mono<Boolean> removeAllExpiredGroupInvitations() {
         Date now = new Date();
         Query query = new Query()
-                .addCriteria(Criteria.where(GroupInvitation.Fields.expirationDate).lt(now));
+                .addCriteria(Criteria.where(GroupInvitation.Fields.EXPIRATION_DATE).lt(now));
         return mongoTemplate.remove(query, GroupInvitation.class)
                 .map(DeleteResult::wasAcknowledged);
     }
@@ -114,9 +114,9 @@ public class GroupInvitationService {
     public Mono<Boolean> updateExpiredRequestsStatus() {
         Date now = new Date();
         Query query = new Query()
-                .addCriteria(Criteria.where(GroupInvitation.Fields.expirationDate).lt(now))
-                .addCriteria(Criteria.where(GroupInvitation.Fields.status).is(RequestStatus.PENDING));
-        Update update = new Update().set(GroupInvitation.Fields.status, RequestStatus.EXPIRED);
+                .addCriteria(Criteria.where(GroupInvitation.Fields.EXPIRATION_DATE).lt(now))
+                .addCriteria(Criteria.where(GroupInvitation.Fields.STATUS).is(RequestStatus.PENDING));
+        Update update = new Update().set(GroupInvitation.Fields.STATUS, RequestStatus.EXPIRED);
         return mongoTemplate.updateMulti(query, update, GroupInvitation.class)
                 .map(UpdateResult::wasAcknowledged);
     }
@@ -188,8 +188,8 @@ public class GroupInvitationService {
     public Mono<GroupInvitation> queryGroupIdAndStatus(@NotNull Long invitationId) {
         Query query = new Query().addCriteria(where(ID).is(invitationId));
         query.fields()
-                .include(GroupInvitation.Fields.groupId)
-                .include(GroupInvitation.Fields.status);
+                .include(GroupInvitation.Fields.GROUP_ID)
+                .include(GroupInvitation.Fields.STATUS);
         return mongoTemplate.findOne(query, GroupInvitation.class)
                 .map(groupInvitation -> {
                     Date expirationDate = groupInvitation.getExpirationDate();
@@ -222,7 +222,7 @@ public class GroupInvitationService {
                                 }
                                 Query query = new Query().addCriteria(where(ID).is(invitationId));
                                 Update update = new Update()
-                                        .set(GroupInvitation.Fields.status, RequestStatus.CANCELED);
+                                        .set(GroupInvitation.Fields.STATUS, RequestStatus.CANCELED);
                                 return mongoTemplate.updateFirst(query, update, GroupInvitation.class)
                                         .flatMap(result -> {
                                             if (result.wasAcknowledged()) {
@@ -239,26 +239,26 @@ public class GroupInvitationService {
 
     public Flux<GroupInvitation> queryGroupInvitationsByInviteeId(@NotNull Long inviteeId) {
         Query query = new Query()
-                .addCriteria(where(GroupInvitation.Fields.inviteeId).is(inviteeId));
+                .addCriteria(where(GroupInvitation.Fields.INVITEE_ID).is(inviteeId));
         return queryExpirableData(query);
     }
 
     public Flux<GroupInvitation> queryGroupInvitationsByInviterId(@NotNull Long inviterId) {
         Query query = new Query()
-                .addCriteria(where(GroupInvitation.Fields.inviterId).is(inviterId));
+                .addCriteria(where(GroupInvitation.Fields.INVITER_ID).is(inviterId));
         return queryExpirableData(query);
     }
 
     public Flux<GroupInvitation> queryGroupInvitationsByInviteeIdOrInviterId(@NotNull Long userId) {
         Query query = new Query()
-                .addCriteria(where(GroupInvitation.Fields.inviteeId).is(userId)
-                        .orOperator(where(GroupInvitation.Fields.inviterId).is(userId)));
+                .addCriteria(where(GroupInvitation.Fields.INVITEE_ID).is(userId)
+                        .orOperator(where(GroupInvitation.Fields.INVITER_ID).is(userId)));
         return queryExpirableData(query);
     }
 
     public Flux<GroupInvitation> queryGroupInvitationsByGroupId(@NotNull Long groupId) {
         Query query = new Query()
-                .addCriteria(where(GroupInvitation.Fields.groupId).is(groupId));
+                .addCriteria(where(GroupInvitation.Fields.GROUP_ID).is(groupId));
         return queryExpirableData(query);
     }
 
@@ -332,7 +332,7 @@ public class GroupInvitationService {
 
     public Mono<Long> queryInviteeIdByInvitationId(@NotNull Long invitationId) {
         Query query = new Query().addCriteria(where(ID).is(invitationId));
-        query.fields().include(GroupInvitation.Fields.inviteeId);
+        query.fields().include(GroupInvitation.Fields.INVITEE_ID);
         return mongoTemplate.findOne(query, GroupInvitation.class)
                 .map(GroupInvitation::getInviteeId);
     }
@@ -351,13 +351,13 @@ public class GroupInvitationService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(GroupInvitation.Fields.groupId, groupIds)
-                .addInIfNotNull(GroupInvitation.Fields.inviterId, inviterIds)
-                .addInIfNotNull(GroupInvitation.Fields.inviteeId, inviteeIds)
-                .addInIfNotNull(GroupInvitation.Fields.status, statuses)
-                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateRange)
-                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateRange)
-                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateRange)
+                .addInIfNotNull(GroupInvitation.Fields.GROUP_ID, groupIds)
+                .addInIfNotNull(GroupInvitation.Fields.INVITER_ID, inviterIds)
+                .addInIfNotNull(GroupInvitation.Fields.INVITEE_ID, inviteeIds)
+                .addInIfNotNull(GroupInvitation.Fields.STATUS, statuses)
+                .addBetweenIfNotNull(GroupInvitation.Fields.CREATION_DATE, creationDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.RESPONSE_DATE, responseDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.EXPIRATION_DATE, expirationDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupInvitation.class);
     }
@@ -374,13 +374,13 @@ public class GroupInvitationService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(GroupInvitation.Fields.groupId, groupIds)
-                .addInIfNotNull(GroupInvitation.Fields.inviterId, inviterIds)
-                .addInIfNotNull(GroupInvitation.Fields.inviteeId, inviteeIds)
-                .addInIfNotNull(GroupInvitation.Fields.status, statuses)
-                .addBetweenIfNotNull(GroupInvitation.Fields.creationDate, creationDateRange)
-                .addBetweenIfNotNull(GroupInvitation.Fields.responseDate, responseDateRange)
-                .addBetweenIfNotNull(GroupInvitation.Fields.expirationDate, expirationDateRange)
+                .addInIfNotNull(GroupInvitation.Fields.GROUP_ID, groupIds)
+                .addInIfNotNull(GroupInvitation.Fields.INVITER_ID, inviterIds)
+                .addInIfNotNull(GroupInvitation.Fields.INVITEE_ID, inviteeIds)
+                .addInIfNotNull(GroupInvitation.Fields.STATUS, statuses)
+                .addBetweenIfNotNull(GroupInvitation.Fields.CREATION_DATE, creationDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.RESPONSE_DATE, responseDateRange)
+                .addBetweenIfNotNull(GroupInvitation.Fields.EXPIRATION_DATE, expirationDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, GroupInvitation.class);
     }
@@ -409,12 +409,12 @@ public class GroupInvitationService {
         Query query = new Query().addCriteria(where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()
-                .setIfNotNull(GroupInvitation.Fields.inviterId, inviterId)
-                .setIfNotNull(GroupInvitation.Fields.inviteeId, inviteeId)
-                .setIfNotNull(GroupInvitation.Fields.content, content)
-                .setIfNotNull(GroupInvitation.Fields.status, status)
-                .setIfNotNull(GroupInvitation.Fields.creationDate, creationDate)
-                .setIfNotNull(GroupInvitation.Fields.expirationDate, expirationDate)
+                .setIfNotNull(GroupInvitation.Fields.INVITER_ID, inviterId)
+                .setIfNotNull(GroupInvitation.Fields.INVITEE_ID, inviteeId)
+                .setIfNotNull(GroupInvitation.Fields.CONTENT, content)
+                .setIfNotNull(GroupInvitation.Fields.STATUS, status)
+                .setIfNotNull(GroupInvitation.Fields.CREATION_DATE, creationDate)
+                .setIfNotNull(GroupInvitation.Fields.EXPIRATION_DATE, expirationDate)
                 .build();
         RequestStatusUtil.updateResponseDateBasedOnStatus(update, status, responseDate);
         return mongoTemplate.updateMulti(query, update, GroupInvitation.class)

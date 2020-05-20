@@ -1,9 +1,6 @@
 package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
-import im.turms.common.constant.ChatType;
-import im.turms.common.constant.DeviceType;
-import im.turms.common.constant.UserStatus;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -64,7 +61,7 @@ public class StorageServiceST {
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void uploadAttachment_shouldReturnUrl() throws InterruptedException, ExecutionException, TimeoutException {
-        messageId = turmsClient.getMessageService().sendMessage(ChatType.PRIVATE, 2L, null, "I've attached a picture", null, null)
+        messageId = turmsClient.getMessageService().sendMessage(false, 2L, null, "I've attached a picture", null, null)
                 .get(5, TimeUnit.SECONDS);
         String url = turmsClient.getStorageService().uploadAttachment(messageId, ATTACHMENT)
                 .get(5, TimeUnit.SECONDS);

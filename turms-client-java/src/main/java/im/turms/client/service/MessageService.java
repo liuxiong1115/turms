@@ -6,7 +6,6 @@ import im.turms.client.model.MessageAddition;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
 import im.turms.common.TurmsStatusCode;
-import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.file.AudioFile;
@@ -82,18 +81,12 @@ public class MessageService {
     }
 
     public CompletableFuture<Long> sendMessage(
-            @NotNull ChatType chatType,
+            boolean isGroupMessage,
             long targetId,
             @Nullable Date deliveryDate,
             @Nullable String text,
             @Nullable byte[] records,
             @Nullable Integer burnAfter) {
-        if (chatType == null) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType must not be null"));
-        }
-        if (chatType == ChatType.UNRECOGNIZED) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType cannot be UNRECOGNIZED"));
-        }
         if (text == null && records == null) {
             return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "text and records must not all be null"));
         }
@@ -102,8 +95,8 @@ public class MessageService {
         }
         return turmsClient.getDriver()
                 .send(CreateMessageRequest.newBuilder(), MapUtil.of(
-                        "group_id", chatType == ChatType.GROUP ? targetId : null,
-                        "recipient_id", chatType == ChatType.PRIVATE ? targetId : null,
+                        "group_id", isGroupMessage ? targetId : null,
+                        "recipient_id", !isGroupMessage ? targetId : null,
                         "delivery_date", deliveryDate,
                         "text", text,
                         "records", records,
@@ -113,19 +106,13 @@ public class MessageService {
 
     public CompletableFuture<Long> forwardMessage(
             long messageId,
-            @NotNull ChatType chatType,
+            boolean isGroupMessage,
             long targetId) {
-        if (chatType == null) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType must not be null"));
-        }
-        if (chatType == ChatType.UNRECOGNIZED) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType cannot be UNRECOGNIZED"));
-        }
         return turmsClient.getDriver()
                 .send(CreateMessageRequest.newBuilder(), MapUtil.of(
                         "message_id", messageId,
-                        "group_id", chatType == ChatType.GROUP ? targetId : null,
-                        "recipient_id", chatType == ChatType.PRIVATE ? targetId : null))
+                        "group_id", isGroupMessage ? targetId : null,
+                        "recipient_id", !isGroupMessage ? targetId : null))
                 .thenApply(NotificationUtil::getFirstId);
     }
 
@@ -146,7 +133,7 @@ public class MessageService {
 
     public CompletableFuture<List<Message>> queryMessages(
             @Nullable List<Long> ids,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Date deliveryDateStart,
@@ -159,7 +146,7 @@ public class MessageService {
         return turmsClient.getDriver()
                 .send(QueryMessagesRequest.newBuilder(), MapUtil.of(
                         "ids", ids,
-                        "chat_type", chatType,
+                        "are_group_messages", areGroupMessages,
                         "are_system_messages", areSystemMessages,
                         "from_id", senderId,
                         "delivery_date_after", deliveryDateStart,
@@ -213,17 +200,11 @@ public class MessageService {
     }
 
     public CompletableFuture<Void> updateTypingStatusRequest(
-            @NotNull ChatType chatType,
+            boolean isGroupMessage,
             long targetId) {
-        if (chatType == null) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType must not be null"));
-        }
-        if (chatType == ChatType.UNRECOGNIZED) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "chatType cannot be UNRECOGNIZED"));
-        }
         return turmsClient.getDriver()
                 .send(UpdateTypingStatusRequest.newBuilder(), MapUtil.of(
-                        "chat_type", chatType,
+                        "is_group_message", isGroupMessage,
                         "to_id", targetId))
                 .thenApply(notification -> null);
     }

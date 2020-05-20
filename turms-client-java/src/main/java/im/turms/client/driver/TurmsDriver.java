@@ -212,7 +212,7 @@ public class TurmsDriver {
                                     sessionId = notification.getData().getSession().getSessionId();
                                 } else if (notification.hasRequestId()) {
                                     long requestId = notification.getRequestId().getValue();
-                                    SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.get(requestId);
+                                    SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.remove(requestId);
                                     if (pair != null) {
                                         CompletableFuture<TurmsNotification> future = pair.getValue();
                                         if (notification.hasCode()) {

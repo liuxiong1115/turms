@@ -21,42 +21,50 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import im.turms.turms.annotation.domain.OptionalIndexedForDifferentAmount;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import im.turms.turms.constant.AdminPermission;
-import lombok.*;
-import lombok.experimental.FieldNameConstants;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Data
-@Document
-@FieldNameConstants
-@AllArgsConstructor
-@NoArgsConstructor
 /**
- * Note that a built-in admin role {
- *     id: 0,
- *     name: "ROOT",
- *     permissions: all permissions
- *     rank: Integer.MAX_VALUE
- * } always exists in Turms
+ * Note that there is always a built-in root role {
+ * id: 0,
+ * name: "ROOT",
+ * permissions: AdminPermission.ALL,
+ * rank: Integer.MAX_VALUE
+ * }
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Document
 public final class AdminRole implements IdentifiedDataSerializable {
+
     @Id
-    @Setter(AccessLevel.NONE)
     private Long id;
+
+    @Field(Fields.NAME)
     private String name;
-    @Indexed
+
+    @Field(Fields.PERMISSIONS)
+    @OptionalIndexedForDifferentAmount
     private Set<AdminPermission> permissions;
+
     /**
      * Only the higher-ranking admins can add/delete/update lower-ranking admins' information.
      */
+    @Field(Fields.RANK)
+    @OptionalIndexedForDifferentAmount
     private Integer rank;
 
     @JsonIgnore
@@ -90,5 +98,14 @@ public final class AdminRole implements IdentifiedDataSerializable {
                 .mapToObj(value -> AdminPermission.values()[value])
                 .collect(Collectors.toSet());
         rank = in.readInt();
+    }
+
+    public static class Fields {
+        public static final String NAME = "n";
+        public static final String PERMISSIONS = "perm";
+        public static final String RANK = "rank";
+
+        private Fields() {
+        }
     }
 }

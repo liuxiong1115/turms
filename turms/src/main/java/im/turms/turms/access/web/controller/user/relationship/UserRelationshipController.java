@@ -134,7 +134,6 @@ public class UserRelationshipController {
                                 relationship.getKey().getOwnerId(), relationship.getKey().getRelatedUserId())
                                 .collect(Collectors.toSet())
                                 .map(indexes -> UserRelationshipDTO.fromDomain(relationship, indexes));
-
                     } else {
                         return Mono.just(UserRelationshipDTO.fromDomain(relationship));
                     }

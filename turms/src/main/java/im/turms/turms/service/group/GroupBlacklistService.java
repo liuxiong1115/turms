@@ -53,7 +53,9 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.constant.Common.TRANSACTION_RETRY;
+import static im.turms.turms.pojo.domain.GroupBlacklistedUser.Fields.ID_GROUP_ID;
+import static im.turms.turms.pojo.domain.GroupBlacklistedUser.Fields.ID_USER_ID;
 
 @Service
 @Validated
@@ -175,8 +177,8 @@ public class GroupBlacklistService {
                 .newBuilder()
                 .addInIfNotNull(ID_USER_ID, userIds)
                 .addInIfNotNull(ID_GROUP_ID, groupIds)
-                .addInIfNotNull(GroupBlacklistedUser.Fields.requesterId, requesterIds)
-                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.blockDate, blockDateRange)
+                .addInIfNotNull(GroupBlacklistedUser.Fields.REQUESTER_ID, requesterIds)
+                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.BLOCK_DATE, blockDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupBlacklistedUser.class);
     }
@@ -190,8 +192,8 @@ public class GroupBlacklistService {
                 .newBuilder()
                 .addInIfNotNull(ID_USER_ID, userIds)
                 .addInIfNotNull(ID_GROUP_ID, groupIds)
-                .addInIfNotNull(GroupBlacklistedUser.Fields.requesterId, requesterIds)
-                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.blockDate, blockDateRange)
+                .addInIfNotNull(GroupBlacklistedUser.Fields.REQUESTER_ID, requesterIds)
+                .addBetweenIfNotNull(GroupBlacklistedUser.Fields.BLOCK_DATE, blockDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, GroupBlacklistedUser.class);
     }
@@ -283,8 +285,8 @@ public class GroupBlacklistService {
                 .addCriteria(Criteria.where(ID_USER_ID).in(userIds));
         Update update = UpdateBuilder
                 .newBuilder()
-                .setIfNotNull(GroupBlacklistedUser.Fields.blockDate, blockDate)
-                .setIfNotNull(GroupBlacklistedUser.Fields.requesterId, requesterId)
+                .setIfNotNull(GroupBlacklistedUser.Fields.BLOCK_DATE, blockDate)
+                .setIfNotNull(GroupBlacklistedUser.Fields.REQUESTER_ID, requesterId)
                 .build();
         return mongoTemplate.updateMulti(query, update, GroupBlacklistedUser.class)
                 .map(UpdateResult::wasAcknowledged);

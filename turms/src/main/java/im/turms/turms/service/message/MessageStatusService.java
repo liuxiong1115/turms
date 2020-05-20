@@ -2,7 +2,6 @@ package im.turms.turms.service.message;
 
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.TurmsStatusCode;
-import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
@@ -33,7 +32,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
-import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.constant.Common.ID;
+import static im.turms.turms.pojo.domain.MessageStatus.Fields.ID_MESSAGE_ID;
+import static im.turms.turms.pojo.domain.MessageStatus.Fields.ID_RECIPIENT_ID;
 
 @Service
 @Validated
@@ -50,27 +51,27 @@ public class MessageStatusService {
     }
 
     public Mono<Boolean> isMessageRead(@NotNull Long messageId, @NotNull Long recipientId) {
+        MessageStatus.Key key = new MessageStatus.Key(messageId, recipientId);
         Query query = new Query()
-                .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
-                .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId))
-                .addCriteria(Criteria.where(MessageStatus.Fields.readDate).ne(null));
+                .addCriteria(Criteria.where(ID).is(key))
+                .addCriteria(Criteria.where(MessageStatus.Fields.READ_DATE).ne(null));
         return mongoTemplate.exists(query, MessageStatus.class);
     }
 
     public Flux<Long> queryMessagesIdsByDeliveryStatusesAndTargetIds(
             @NotEmpty Set<MessageDeliveryStatus> deliveryStatuses,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Set<Long> targetIds) {
         Query query = new Query()
-                .addCriteria(Criteria.where(MessageStatus.Fields.deliveryStatus).in(deliveryStatuses));
-        if (chatType == ChatType.PRIVATE || chatType == ChatType.GROUP) {
+                .addCriteria(Criteria.where(MessageStatus.Fields.DELIVERY_STATUS).in(deliveryStatuses));
+        if (areGroupMessages != null) {
             if (targetIds == null || targetIds.isEmpty()) {
                 return Flux.empty();
             }
-            if (chatType == ChatType.PRIVATE) {
-                query.addCriteria(Criteria.where(ID_RECIPIENT_ID).in(targetIds));
+            if (areGroupMessages) {
+                query.addCriteria(Criteria.where(MessageStatus.Fields.GROUP_ID).in(targetIds));
             } else {
-                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).in(targetIds));
+                query.addCriteria(Criteria.where(ID_RECIPIENT_ID).in(targetIds));
             }
         }
         query.fields().include(ID_MESSAGE_ID);
@@ -128,9 +129,9 @@ public class MessageStatusService {
                 .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
                 .buildQuery();
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(MessageStatus.Fields.recallDate, recallDate)
-                .setIfNotNull(MessageStatus.Fields.readDate, readDate)
-                .setIfNotNull(MessageStatus.Fields.receptionDate, receptionDate)
+                .setIfNotNull(MessageStatus.Fields.RECALL_DATE, recallDate)
+                .setIfNotNull(MessageStatus.Fields.READ_DATE, readDate)
+                .setIfNotNull(MessageStatus.Fields.RECEPTION_DATE, receptionDate)
                 .build();
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.updateMulti(query, update, MessageStatus.class)
@@ -155,7 +156,7 @@ public class MessageStatusService {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds))
                 .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId));
-        Update update = new Update().set(MessageStatus.Fields.deliveryStatus, deliveryStatus);
+        Update update = new Update().set(MessageStatus.Fields.DELIVERY_STATUS, deliveryStatus);
         return mongoTemplate.updateMulti(query, update, MessageStatus.class)
                 .map(UpdateResult::wasAcknowledged);
     }
@@ -166,10 +167,10 @@ public class MessageStatusService {
         Query query = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId));
         Update update;
         if (readDate != null) {
-            query.addCriteria(Criteria.where(MessageStatus.Fields.readDate).is(null));
-            update = new Update().set(MessageStatus.Fields.readDate, readDate);
+            query.addCriteria(Criteria.where(MessageStatus.Fields.READ_DATE).is(null));
+            update = new Update().set(MessageStatus.Fields.READ_DATE, readDate);
         } else {
-            update = new Update().unset(MessageStatus.Fields.readDate);
+            update = new Update().unset(MessageStatus.Fields.READ_DATE);
         }
         return mongoTemplate.findAndModify(query, update, MessageStatus.class)
                 .defaultIfEmpty(EMPTY_MESSAGE_STATUS)
@@ -196,12 +197,12 @@ public class MessageStatusService {
                 .newBuilder()
                 .addInIfNotNull(ID_MESSAGE_ID, messageIds)
                 .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
-                .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, isSystemMessage)
-                .addInIfNotNull(MessageStatus.Fields.senderId, senderIds)
-                .addInIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatuses)
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateRange)
-                .addBetweenIfNotNull(MessageStatus.Fields.readDate, readDateRange)
-                .addBetweenIfNotNull(MessageStatus.Fields.recallDate, recallDateRange)
+                .addIsIfNotNull(MessageStatus.Fields.IS_SYSTEM_MESSAGE, isSystemMessage)
+                .addInIfNotNull(MessageStatus.Fields.SENDER_ID, senderIds)
+                .addInIfNotNull(MessageStatus.Fields.DELIVERY_STATUS, deliveryStatuses)
+                .addBetweenIfNotNull(MessageStatus.Fields.RECEPTION_DATE, receptionDateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.READ_DATE, readDateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.RECALL_DATE, recallDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, MessageStatus.class);
     }
@@ -219,48 +220,43 @@ public class MessageStatusService {
                 .newBuilder()
                 .addInIfNotNull(ID_MESSAGE_ID, messageIds)
                 .addInIfNotNull(ID_RECIPIENT_ID, recipientIds)
-                .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, isSystemMessage)
-                .addInIfNotNull(MessageStatus.Fields.senderId, senderIds)
-                .addInIfNotNull(MessageStatus.Fields.deliveryStatus, deliveryStatuses)
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, receptionDateRange)
-                .addBetweenIfNotNull(MessageStatus.Fields.readDate, readDateRange)
-                .addBetweenIfNotNull(MessageStatus.Fields.recallDate, recallDateRange)
+                .addIsIfNotNull(MessageStatus.Fields.IS_SYSTEM_MESSAGE, isSystemMessage)
+                .addInIfNotNull(MessageStatus.Fields.SENDER_ID, senderIds)
+                .addInIfNotNull(MessageStatus.Fields.DELIVERY_STATUS, deliveryStatuses)
+                .addBetweenIfNotNull(MessageStatus.Fields.RECEPTION_DATE, receptionDateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.READ_DATE, readDateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.RECALL_DATE, recallDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, MessageStatus.class);
     }
 
     public Mono<Long> countPendingMessages(
-            @NotNull ChatType chatType,
+            @NotNull Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages,
             @NotNull Long groupOrSenderId,
             @NotNull Long recipientId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId))
-                .addCriteria(Criteria.where(MessageStatus.Fields.deliveryStatus).is(MessageDeliveryStatus.READY));
+                .addCriteria(Criteria.where(MessageStatus.Fields.DELIVERY_STATUS).is(MessageDeliveryStatus.READY));
         if (areSystemMessages != null) {
-            query.addCriteria(Criteria.where(MessageStatus.Fields.isSystemMessage).is(areSystemMessages));
+            query.addCriteria(Criteria.where(MessageStatus.Fields.IS_SYSTEM_MESSAGE).is(areSystemMessages));
         }
-        switch (chatType) {
-            case PRIVATE:
-                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null))
-                        .addCriteria(Criteria.where(MessageStatus.Fields.senderId).is(groupOrSenderId));
-                break;
-            case GROUP:
-                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(groupOrSenderId));
-                break;
-            default:
-                throw new UnsupportedOperationException("");
+        if (areGroupMessages) {
+            query.addCriteria(Criteria.where(MessageStatus.Fields.GROUP_ID).is(groupOrSenderId));
+        } else {
+            query.addCriteria(Criteria.where(MessageStatus.Fields.GROUP_ID).is(null))
+                    .addCriteria(Criteria.where(MessageStatus.Fields.SENDER_ID).is(groupOrSenderId));
         }
         return mongoTemplate.count(query, MessageStatus.class);
     }
 
     public Mono<Boolean> acknowledge(@NotEmpty Set<Long> messagesIds) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(messagesIds));
-        Update update = new Update().set(MessageStatus.Fields.deliveryStatus, MessageDeliveryStatus.RECEIVED);
+        Update update = new Update().set(MessageStatus.Fields.DELIVERY_STATUS, MessageDeliveryStatus.RECEIVED);
         if (turmsClusterManager.getTurmsProperties().getMessage()
                 .isUpdateReadDateWhenUserQueryingMessage()) {
             Date now = new Date();
-            update.set(MessageStatus.Fields.readDate, now);
+            update.set(MessageStatus.Fields.READ_DATE, now);
         }
         return mongoTemplate.updateMulti(query, update, MessageStatus.class)
                 .map(UpdateResult::wasAcknowledged);

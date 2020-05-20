@@ -84,9 +84,9 @@ public class GroupQuestionService {
             @Nullable Long groupId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(questionId))
-                .addCriteria(Criteria.where(GroupJoinQuestion.Fields.answers).in(answer));
+                .addCriteria(Criteria.where(GroupJoinQuestion.Fields.ANSWERS).in(answer));
         if (groupId != null) {
-            query.addCriteria(Criteria.where(GroupJoinQuestion.Fields.groupId).is(groupId));
+            query.addCriteria(Criteria.where(GroupJoinQuestion.Fields.GROUP_ID).is(groupId));
         }
         return mongoTemplate.findOne(query, GroupJoinQuestion.class)
                 .map(GroupJoinQuestion::getScore);
@@ -204,7 +204,7 @@ public class GroupQuestionService {
 
     public Mono<Long> queryGroupId(@NotNull Long questionId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(questionId));
-        query.fields().include(GroupJoinQuestion.Fields.groupId);
+        query.fields().include(GroupJoinQuestion.Fields.GROUP_ID);
         return mongoTemplate.findOne(query, GroupJoinQuestion.class)
                 .map(GroupJoinQuestion::getGroupId);
     }
@@ -241,10 +241,10 @@ public class GroupQuestionService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(GroupJoinQuestion.Fields.groupId, groupIds)
+                .addInIfNotNull(GroupJoinQuestion.Fields.GROUP_ID, groupIds)
                 .paginateIfNotNull(page, size);
         if (!withAnswers) {
-            query.fields().exclude(GroupJoinQuestion.Fields.answers);
+            query.fields().exclude(GroupJoinQuestion.Fields.ANSWERS);
         }
         return mongoTemplate.find(query, GroupJoinQuestion.class);
     }
@@ -253,7 +253,7 @@ public class GroupQuestionService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(GroupJoinQuestion.Fields.groupId, groupIds)
+                .addInIfNotNull(GroupJoinQuestion.Fields.GROUP_ID, groupIds)
                 .buildQuery();
         return mongoTemplate.count(query, GroupJoinQuestion.class);
     }
@@ -327,9 +327,9 @@ public class GroupQuestionService {
                             if (authenticated != null && authenticated) {
                                 Query query = new Query().addCriteria(Criteria.where(ID).is(questionId));
                                 Update update = UpdateBuilder.newBuilder()
-                                        .setIfNotNull(GroupJoinQuestion.Fields.question, question)
-                                        .setIfNotNull(GroupJoinQuestion.Fields.answers, answers)
-                                        .setIfNotNull(GroupJoinQuestion.Fields.score, score)
+                                        .setIfNotNull(GroupJoinQuestion.Fields.QUESTION, question)
+                                        .setIfNotNull(GroupJoinQuestion.Fields.ANSWERS, answers)
+                                        .setIfNotNull(GroupJoinQuestion.Fields.SCORE, score)
                                         .build();
                                 return mongoTemplate.updateFirst(query, update, GroupJoinQuestion.class)
                                         .flatMap(result -> {
@@ -357,10 +357,10 @@ public class GroupQuestionService {
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(GroupJoinQuestion.Fields.groupId, groupId)
-                .setIfNotNull(GroupJoinQuestion.Fields.question, question)
-                .setIfNotNull(GroupJoinQuestion.Fields.answers, answers)
-                .setIfNotNull(GroupJoinQuestion.Fields.score, score)
+                .setIfNotNull(GroupJoinQuestion.Fields.GROUP_ID, groupId)
+                .setIfNotNull(GroupJoinQuestion.Fields.QUESTION, question)
+                .setIfNotNull(GroupJoinQuestion.Fields.ANSWERS, answers)
+                .setIfNotNull(GroupJoinQuestion.Fields.SCORE, score)
                 .build();
         return mongoTemplate.updateMulti(query, update, GroupJoinQuestion.class)
                 .map(UpdateResult::wasAcknowledged);

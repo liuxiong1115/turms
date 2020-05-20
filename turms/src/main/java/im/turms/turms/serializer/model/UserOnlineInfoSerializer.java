@@ -54,8 +54,9 @@ public class UserOnlineInfoSerializer implements StreamSerializer<UserOnlineInfo
             out.writeByte(session.getDeviceType().getNumber());
             out.writeLong(session.getLoginDate().getTime());
             if (session.getLocation() != null) {
-                out.writeFloat(session.getLocation().getLongitude());
-                out.writeFloat(session.getLocation().getLatitude());
+                float[] coordinates = session.getLocation().getCoordinates();
+                out.writeFloat(coordinates[0]);
+                out.writeFloat(coordinates[1]);
                 out.writeLong(session.getLocation().getTimestamp().getTime());
             }
         }
@@ -78,16 +79,14 @@ public class UserOnlineInfoSerializer implements StreamSerializer<UserOnlineInfo
         for (int i = 0; i < sessionSize; i++) {
             DeviceType deviceType = DeviceType.forNumber(in.readByte() & 0xFF);
             Date loginDate = new Date(in.readLong());
-            Float longitude = null;
-            Float latitude = null;
+            float[] coordinates = null;
             Date timestamp = null;
             boolean hasUserLocation = Bits.isBitSet(userLocationExistenceBits, i);
             if (hasUserLocation) {
-                longitude = in.readFloat();
-                latitude = in.readFloat();
+                coordinates = new float[]{in.readFloat(), in.readFloat()};
                 timestamp = new Date(in.readLong());
             }
-            UserLocation userLocation = new UserLocation(null, null, null, longitude, latitude, null, null, timestamp);
+            UserLocation userLocation = new UserLocation(null, null, null, coordinates, null, null, timestamp);
             sessionMap.put(deviceType, new OnlineUserManager.Session(deviceType, loginDate, userLocation, null, null, null, null, 0));
         }
         return new UserOnlineInfo(userId, userStatus, sessionMap);

@@ -17,13 +17,15 @@
 
 package im.turms.turms.pojo.domain;
 
-import im.turms.common.constant.ChatType;
+import im.turms.turms.annotation.domain.OptionalIndexedForAdvancedFeature;
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
 
 import java.util.Date;
 import java.util.List;
@@ -31,43 +33,83 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Document
-@FieldNameConstants
+@CompoundIndex(
+        name = Message.Fields.TARGET_ID + "_" + Message.Fields.DELIVERY_DATE + "_idx",
+        def = "{'" + Message.Fields.TARGET_ID + "': 1, '" + Message.Fields.DELIVERY_DATE + "': 1}")
+@Sharded(shardKey = {Message.Fields.TARGET_ID, Message.Fields.DELIVERY_DATE}, immutableKey = true)
 public final class Message {
+    /**
+     * Note that the ID is only used when user relays a created message to another recipient/group
+     * so that it not the common for most instant messaging scenarios and the ID doesn't be used as a part of the shard key.
+     * <p>
+     * WARNING: Because of the reason mentioned above, it's not
+     * to avoid
+     */
     @Id
     private final Long id;
 
-    private final ChatType chatType;
+    /**
+     * Not indexed because it has a low index selectivity
+     * and the clients cannot/shouldn't just query messages by chat type (there must come with other conditions)
+     * https://github.com/turms-im/turms/issues/336
+     */
+    @Field(Fields.IS_GROUP_MESSAGE)
+    private final Boolean isGroupMessage;
 
+    @Field(Fields.IS_SYSTEM_MESSAGE)
     private final Boolean isSystemMessage;
 
-    @Indexed
+    @Field(Fields.DELIVERY_DATE)
     private final Date deliveryDate;
 
-    @Indexed
+    @Field(Fields.DELETION_DATE)
+    @OptionalIndexedForAdvancedFeature
     private final Date deletionDate;
 
+    @Field(Fields.TEXT)
     private final String text;
 
-    @Indexed
+    @Field(Fields.SENDER_ID)
+    @OptionalIndexedForCustomFeature
     private final Long senderId;
 
     /**
      * Use "target" rather than "recipient" because the target may be a recipient or a group.
      */
-    @Indexed
+    @Field(Fields.TARGET_ID)
     private final Long targetId;
 
     /**
      * Use list to keep order
      */
+    @Field(Fields.RECORDS)
     private final List<byte[]> records;
 
+    @Field(Fields.BURN_AFTER)
     private final Integer burnAfter;
 
-    @Indexed
+    @Field(Fields.REFERENCE_ID)
+    @OptionalIndexedForCustomFeature
     private final Long referenceId;
 
     public Long groupId() {
-        return chatType == ChatType.GROUP ? targetId : null;
+        return isGroupMessage != null && isGroupMessage ? targetId : null;
+    }
+
+    public static class Fields {
+        public static final String CHAT_TYPE = "ct";
+        public static final String IS_GROUP_MESSAGE = "gm";
+        public static final String IS_SYSTEM_MESSAGE = "sm";
+        public static final String DELIVERY_DATE = "dyd";
+        public static final String DELETION_DATE = "dd";
+        public static final String TEXT = "txt";
+        public static final String SENDER_ID = "sid";
+        public static final String TARGET_ID = "tid";
+        public static final String RECORDS = "rec";
+        public static final String BURN_AFTER = "bf";
+        public static final String REFERENCE_ID = "rid";
+
+        private Fields() {
+        }
     }
 }

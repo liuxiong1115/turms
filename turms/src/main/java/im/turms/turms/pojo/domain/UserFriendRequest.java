@@ -18,43 +18,79 @@
 package im.turms.turms.pojo.domain;
 
 import im.turms.common.constant.RequestStatus;
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
 
 import java.util.Date;
 
 @Data
-@Document
-@FieldNameConstants
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Document
+@CompoundIndex(
+        name = UserFriendRequest.Fields.CREATION_DATE + "_" + UserFriendRequest.Fields.RECIPIENT_ID + "_idx",
+        def = "{'" + UserFriendRequest.Fields.CREATION_DATE + "': 1, '" + UserFriendRequest.Fields.RECIPIENT_ID + "': 1}")
+@Sharded(shardKey = {UserFriendRequest.Fields.CREATION_DATE, UserFriendRequest.Fields.RECIPIENT_ID}, immutableKey = true)
 public final class UserFriendRequest {
+
     @Id
     private final Long id;
 
+    @Field(Fields.CONTENT)
     private final String content;
 
+    /**
+     * Not indexed because of its low index selectivity.
+     * Not recommend to change it.
+     */
+    @Field(Fields.STATUS)
     private final RequestStatus status;
 
+    @Field(Fields.REASON)
     private final String reason;
 
-    @Indexed
+    @Field(Fields.CREATION_DATE)
     private final Date creationDate;
 
+    /**
+     * Indexed so that turms can queries and remove expiry requests regularly.
+     * No need to change it.
+     */
+    @Field(Fields.EXPIRATION_DATE)
     @Indexed
     private final Date expirationDate;
 
-    @Indexed
+    @Field(Fields.RESPONSE_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date responseDate;
 
-    @Indexed
+    @Field(Fields.REQUESTER_ID)
+    @OptionalIndexedForCustomFeature
     private final Long requesterId;
 
-    @Indexed
+    @Field(Fields.RECIPIENT_ID)
+    @OptionalIndexedForCustomFeature
     private final Long recipientId;
+
+    public static class Fields {
+        public static final String CONTENT = "cnt";
+        public static final String STATUS = "stat";
+        public static final String REASON = "rsn";
+        public static final String CREATION_DATE = "cd";
+        public static final String EXPIRATION_DATE = "ed";
+        public static final String RESPONSE_DATE = "adr";
+        public static final String REQUESTER_ID = "rrid";
+        public static final String RECIPIENT_ID = "rtid";
+
+        private Fields() {
+        }
+    }
 }

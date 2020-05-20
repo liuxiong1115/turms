@@ -17,11 +17,8 @@
 
 package im.turms.turms.access.web.controller.message;
 
-import im.turms.common.TurmsStatusCode;
-import im.turms.common.constant.ChatType;
 import im.turms.common.constant.DivideBy;
 import im.turms.common.constant.MessageDeliveryStatus;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.turms.access.web.util.ResponseFactory;
 import im.turms.turms.annotation.web.RequiredPermission;
 import im.turms.turms.pojo.bo.DateRange;
@@ -60,7 +57,7 @@ public class MessageController {
         Mono<Boolean> sendMono = messageService.sendMessage(
                 shouldSend,
                 createMessageDTO.getId(),
-                createMessageDTO.getChatType(),
+                createMessageDTO.getIsGroupMessage(),
                 createMessageDTO.getIsSystemMessage(),
                 createMessageDTO.getText(),
                 createMessageDTO.getRecords(),
@@ -75,7 +72,7 @@ public class MessageController {
     @RequiredPermission(MESSAGE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<Collection<Message>>>> queryMessages(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) ChatType chatType,
+            @RequestParam(required = false) Boolean areGroupMessages,
             @RequestParam(required = false) Boolean areSystemMessages,
             @RequestParam(required = false) Set<Long> senderIds,
             @RequestParam(required = false) Set<Long> targetIds,
@@ -88,7 +85,7 @@ public class MessageController {
         Flux<Message> completeMessagesFlux = messageService.queryMessages(
                 false,
                 ids,
-                chatType,
+                areGroupMessages,
                 areSystemMessages,
                 senderIds,
                 targetIds,
@@ -104,7 +101,7 @@ public class MessageController {
     @RequiredPermission(MESSAGE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<PaginationDTO<Message>>>> queryMessages(
             @RequestParam(required = false) Set<Long> ids,
-            @RequestParam(required = false) ChatType chatType,
+            @RequestParam(required = false) Boolean areGroupMessages,
             @RequestParam(required = false) Boolean areSystemMessages,
             @RequestParam(required = false) Set<Long> senderIds,
             @RequestParam(required = false) Set<Long> targetIds,
@@ -117,7 +114,7 @@ public class MessageController {
             @RequestParam(required = false) Integer size) {
         Mono<Long> count = messageService.countMessages(
                 ids,
-                chatType,
+                areGroupMessages,
                 areSystemMessages,
                 senderIds,
                 targetIds,
@@ -127,7 +124,7 @@ public class MessageController {
         Flux<Message> completeMessagesFlux = messageService.queryMessages(
                 false,
                 ids,
-                chatType,
+                areGroupMessages,
                 areSystemMessages,
                 senderIds,
                 targetIds,
@@ -142,7 +139,7 @@ public class MessageController {
     @GetMapping("/count")
     @RequiredPermission(MESSAGE_QUERY)
     public Mono<ResponseEntity<ResponseDTO<MessageStatisticsDTO>>> countMessages(
-            @RequestParam(required = false) ChatType chatType,
+            @RequestParam(required = false) Boolean areGroupMessages,
             @RequestParam(required = false) Boolean areSystemMessages,
             @RequestParam(required = false) Date sentStartDate,
             @RequestParam(required = false) Date sentEndDate,
@@ -155,35 +152,32 @@ public class MessageController {
             @RequestParam(defaultValue = "NOOP") DivideBy divideBy) {
         List<Mono<?>> counts = new LinkedList<>();
         MessageStatisticsDTO statistics = new MessageStatisticsDTO();
-        if (chatType == ChatType.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The chat type must not be UNRECOGNIZED");
-        }
         if (divideBy == null || divideBy == DivideBy.NOOP) {
             if (sentOnAverageStartDate != null || sentOnAverageEndDate != null) {
                 counts.add(messageService.countSentMessagesOnAverage(
                         DateRange.of(sentOnAverageStartDate, sentOnAverageEndDate),
-                        chatType,
+                        areGroupMessages,
                         areSystemMessages)
                         .doOnNext(statistics::setSentMessagesOnAverage));
             }
             if (acknowledgedStartDate != null || acknowledgedEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessages(
                         DateRange.of(acknowledgedStartDate, acknowledgedEndDate),
-                        chatType,
+                        areGroupMessages,
                         areSystemMessages)
                         .doOnNext(statistics::setAcknowledgedMessages));
             }
             if (acknowledgedOnAverageStartDate != null || acknowledgedOnAverageEndDate != null) {
                 counts.add(messageService.countAcknowledgedMessagesOnAverage(
                         DateRange.of(acknowledgedOnAverageStartDate, acknowledgedOnAverageEndDate),
-                        chatType,
+                        areGroupMessages,
                         areSystemMessages)
                         .doOnNext(statistics::setAcknowledgedMessagesOnAverage));
             }
             if (counts.isEmpty() || sentStartDate != null || sentEndDate != null) {
                 counts.add(messageService.countSentMessages(
                         DateRange.of(sentStartDate, sentEndDate),
-                        chatType,
+                        areGroupMessages,
                         areSystemMessages)
                         .doOnNext(statistics::setSentMessages));
             }
@@ -193,7 +187,7 @@ public class MessageController {
                         DateRange.of(sentOnAverageStartDate, sentOnAverageEndDate),
                         divideBy,
                         messageService::countSentMessagesOnAverage,
-                        chatType,
+                        areGroupMessages,
                         areSystemMessages)
                         .doOnNext(statistics::setSentMessagesOnAverageRecords));
             }
@@ -202,7 +196,7 @@ public class MessageController {
                         DateRange.of(acknowledgedStartDate, acknowledgedEndDate),
                         divideBy,
                         messageService::countAcknowledgedMessages,
-                        chatType,
+                        areGroupMessages,
                         areSystemMessages)
                         .doOnNext(statistics::setAcknowledgedMessagesRecords));
             }
@@ -211,7 +205,7 @@ public class MessageController {
                         DateRange.of(acknowledgedOnAverageStartDate, acknowledgedOnAverageEndDate),
                         divideBy,
                         messageService::countAcknowledgedMessagesOnAverage,
-                        chatType,
+                        areGroupMessages,
                         areSystemMessages)
                         .doOnNext(statistics::setAcknowledgedMessagesOnAverageRecords));
             }
@@ -220,7 +214,7 @@ public class MessageController {
                         DateRange.of(sentStartDate, sentEndDate),
                         divideBy,
                         messageService::countSentMessages,
-                        chatType,
+                        areGroupMessages,
                         areSystemMessages)
                         .doOnNext(statistics::setSentMessagesRecords));
             }

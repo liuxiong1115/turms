@@ -1,7 +1,10 @@
 package im.turms.turms.config.mongo;
 
 import com.google.common.net.InetAddresses;
-import im.turms.common.constant.*;
+import im.turms.common.constant.GroupMemberRole;
+import im.turms.common.constant.MessageDeliveryStatus;
+import im.turms.common.constant.ProfileAccessStrategy;
+import im.turms.common.constant.RequestStatus;
 import im.turms.turms.compiler.CompilerOptions;
 import im.turms.turms.constant.AdminPermission;
 import im.turms.turms.manager.TurmsClusterManager;
@@ -146,7 +149,7 @@ public class MongoDataGenerator {
                 .flatMap(name -> {
                     if (name.equals("admin")) {
                         Query query = new Query();
-                        query.addCriteria(Criteria.where(Admin.Fields.roleId).ne(ADMIN_ROLE_ROOT_ID));
+                        query.addCriteria(Criteria.where(Admin.Fields.ROLE_ID).ne(ADMIN_ROLE_ROOT_ID));
                         return adminMongoTemplate.remove(query, name);
                     } else {
                         return adminMongoTemplate.remove(queryAll, name);
@@ -303,7 +306,7 @@ public class MongoDataGenerator {
                 long id = turmsClusterManager.generateRandomId();
                 Message privateMessage = new Message(
                         id,
-                        ChatType.PRIVATE,
+                        false,
                         false,
                         DateUtils.addHours(now, -i),
                         null,
@@ -327,7 +330,7 @@ public class MongoDataGenerator {
                 id = turmsClusterManager.generateRandomId();
                 Message groupMessage = new Message(
                         id,
-                        ChatType.GROUP,
+                        true,
                         false,
                         now,
                         null,

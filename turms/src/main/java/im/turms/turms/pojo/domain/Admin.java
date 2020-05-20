@@ -21,34 +21,42 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import im.turms.turms.annotation.domain.OptionalIndexedForDifferentAmount;
 import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.IOException;
 import java.util.Date;
 
+/**
+ * No need to shard because there are only a few (or some) admins for most groups.
+ */
 @Data
-@Document
-@FieldNameConstants
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Document
 public final class Admin implements IdentifiedDataSerializable, Cloneable {
+
     @Id
     private String account;
 
+    @Field(Fields.PASSWORD)
     private String password;
 
+    @Field(Fields.NAME)
     private String name;
 
+    @Field(Fields.ROLE_ID)
+    @OptionalIndexedForDifferentAmount
     private Long roleId;
 
-    @Indexed
+    @Field(Fields.REGISTRATION_DATE)
+    @OptionalIndexedForDifferentAmount
     private Date registrationDate;
 
     @JsonIgnore
@@ -90,5 +98,15 @@ public final class Admin implements IdentifiedDataSerializable, Cloneable {
         name = in.readUTF();
         roleId = in.readLong();
         registrationDate = new Date(in.readLong());
+    }
+
+    public static class Fields {
+        public static final String PASSWORD = "pw";
+        public static final String NAME = "n";
+        public static final String ROLE_ID = "rid";
+        public static final String REGISTRATION_DATE = "rd";
+
+        private Fields() {
+        }
     }
 }

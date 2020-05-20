@@ -18,41 +18,71 @@
 package im.turms.turms.pojo.domain;
 
 import im.turms.common.constant.ProfileAccessStrategy;
+import im.turms.turms.annotation.domain.OptionalIndexedForAdvancedFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
 
 import java.util.Date;
 
 @Data
-@Document
-@FieldNameConstants
 @AllArgsConstructor
+@Document
+@Sharded(immutableKey = true)
 public final class User {
+
     @Id
     private final Long id;
 
+    @Field(Fields.PASSWORD)
     private final String password;
 
+    @Field(Fields.NAME)
     private final String name;
 
+    @Field(Fields.INTRO)
     private final String intro;
 
+    @Field(Fields.PROFILE_ACCESS)
     private final ProfileAccessStrategy profileAccess;
 
+    @Field(Fields.PERMISSION_GROUP_ID)
     private final Long permissionGroupId;
 
-    @Indexed
+    /**
+     * Indexed for statistics for admins
+     */
+    @Field(Fields.REGISTRATION_DATE)
+    @OptionalIndexedForAdvancedFeature
     private final Date registrationDate;
 
-    @Indexed
+    @Field(Fields.DELETION_DATE)
+    @OptionalIndexedForAdvancedFeature
     private final Date deletionDate;
 
-    private final Boolean active;
+    @Field(Fields.IS_ACTIVE)
+    private final Boolean isActive;
 
+    @Field(Fields.LAST_UPDATED_DATE)
     @Indexed
-    private final Date lastUpdateDate;
+    private final Date lastUpdatedDate;
+
+    public static class Fields {
+        public static final String PASSWORD = "pw";
+        public static final String NAME = "n";
+        public static final String INTRO = "intro";
+        public static final String PROFILE_ACCESS = "pa";
+        public static final String PERMISSION_GROUP_ID = "pgid";
+        public static final String REGISTRATION_DATE = "rd";
+        public static final String DELETION_DATE = "dd";
+        public static final String IS_ACTIVE = "act";
+        public static final String LAST_UPDATED_DATE = "lud";
+
+        private Fields() {
+        }
+    }
 }

@@ -18,44 +18,73 @@
 package im.turms.turms.pojo.domain;
 
 import im.turms.common.constant.RequestStatus;
+import im.turms.turms.annotation.domain.OptionalIndexedForAdvancedFeature;
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
+import org.springframework.data.mongodb.core.mapping.ShardingStrategy;
 
 import java.util.Date;
 
 @Data
-@Document
 @AllArgsConstructor
-@FieldNameConstants
 @Builder(toBuilder = true)
+@Document
+@CompoundIndex(
+        name = GroupJoinRequest.Fields.RESPONDER_ID + "_" + GroupJoinRequest.Fields.CREATION_DATE + "_idx",
+        def = "{'" + GroupJoinRequest.Fields.RESPONDER_ID + "': 1, '" + GroupJoinRequest.Fields.CREATION_DATE + "': 1}")
+@Sharded(shardKey = {GroupJoinRequest.Fields.RESPONDER_ID, GroupJoinRequest.Fields.CREATION_DATE}, shardingStrategy = ShardingStrategy.HASH, immutableKey = true)
 public final class GroupJoinRequest {
+
     @Id
     private final Long id;
 
+    @Field(Fields.CONTENT)
     private final String content;
 
+    @Field(Fields.STATUS)
     private final RequestStatus status;
 
-    @Indexed
+    @Field(Fields.CREATION_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date creationDate;
 
-    @Indexed
+    @Field(Fields.RESPONSE_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date responseDate;
 
-    @Indexed
+    @Field(Fields.EXPIRATION_DATE)
+    @OptionalIndexedForAdvancedFeature
     private final Date expirationDate;
 
-    @Indexed
+    @Field(Fields.GROUP_ID)
+    @OptionalIndexedForCustomFeature
     private final Long groupId;
 
-    @Indexed
+    @Field(Fields.REQUESTER_ID)
+    @OptionalIndexedForCustomFeature
     private final Long requesterId;
 
-    @Indexed
+    @Field(Fields.RESPONDER_ID)
     private final Long responderId;
+
+    public static final class Fields {
+        public static final String CONTENT = "cnt";
+        public static final String STATUS = "stat";
+        public static final String CREATION_DATE = "cd";
+        public static final String RESPONSE_DATE = "rd";
+        public static final String EXPIRATION_DATE = "ed";
+        public static final String GROUP_ID = "gid";
+        public static final String REQUESTER_ID = "rqid";
+        public static final String RESPONDER_ID = "rpid";
+
+        private Fields() {
+        }
+    }
 }

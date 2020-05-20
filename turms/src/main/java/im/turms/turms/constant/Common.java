@@ -38,14 +38,6 @@ public class Common {
     }
 
     public static final String ID = "_id";
-    public static final String ID_GROUP_ID = "_id.groupId";
-    public static final String ID_USER_ID = "_id.userId";
-    public static final String ID_OWNER_ID = "_id.ownerId";
-    public static final String ID_RELATED_USER_ID = "_id.relatedUserId";
-    public static final String ID_GROUP_INDEX = "_id.groupIndex";
-    public static final String ID_INDEX = "_id.index";
-    public static final String ID_MESSAGE_ID = "_id.messageId";
-    public static final String ID_RECIPIENT_ID = "_id.recipientId";
 
     public static final String HAZELCAST_ADMINS_MAP = "admins";
     public static final String HAZELCAST_ROLES_MAP = "adminRoles";
@@ -69,7 +61,7 @@ public class Common {
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final Object EMPTY_OBJECT = new Object();
     public static final Pair EMPTY_PAIR = Pair.of(null, null);
-    public static final UserLocation EMPTY_USER_LOCATION = new UserLocation(null, null, null, null, null, null, null, null);
+    public static final UserLocation EMPTY_USER_LOCATION = new UserLocation(null, null, null, null, null, null, null);
     public static final Mono EMPTY_SET_MONO = Mono.just(Collections.emptySet());
     public static final Date EPOCH = new Date(0);
     public static final Set<DeviceType> ALL_DEVICE_TYPES = Arrays.stream(DeviceType.values())

@@ -39,9 +39,9 @@ public class RequestStatusUtil {
                 if (responseDate == null) {
                     responseDate = new Date();
                 }
-                update.set(GroupInvitation.Fields.responseDate, responseDate);
+                update.set(GroupInvitation.Fields.RESPONSE_DATE, responseDate);
             } else {
-                update.unset(GroupInvitation.Fields.responseDate);
+                update.unset(GroupInvitation.Fields.RESPONSE_DATE);
             }
         }
         return update;

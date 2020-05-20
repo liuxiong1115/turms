@@ -17,11 +17,12 @@
 
 package im.turms.turms.service.user;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.TurmsCloseStatus;
 import im.turms.common.TurmsStatusCode;
-import im.turms.common.constant.ChatType;
 import im.turms.common.constant.ProfileAccessStrategy;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
@@ -56,6 +57,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
+import java.time.Duration;
 import java.util.*;
 
 import static im.turms.turms.constant.Common.*;
@@ -71,6 +73,7 @@ public class UserService {
     private final TurmsClusterManager turmsClusterManager;
     private final TurmsPasswordUtil turmsPasswordUtil;
     private final ReactiveMongoTemplate mongoTemplate;
+    private final Cache<Long, User> userInfoForLoginCache;
 
     public UserService(
             UserRelationshipService userRelationshipService,
@@ -89,6 +92,25 @@ public class UserService {
         this.mongoTemplate = mongoTemplate;
         this.onlineUserService = onlineUserService;
         this.userRelationshipGroupService = userRelationshipGroupService;
+        // Note that only cache for seconds
+        // so that won't get in trouble
+        userInfoForLoginCache = Caffeine.newBuilder()
+                .maximumSize(1024)
+                .expireAfterWrite(Duration.ofSeconds(3))
+                .build();
+    }
+
+    public Mono<Void> cacheRequiredUserInfoForLogin(Long userId) {
+        User user = userInfoForLoginCache.getIfPresent(userId);
+        if (user == null) {
+            Query query = new Query()
+                    .addCriteria(Criteria.where(ID).is(userId));
+            return mongoTemplate.findOne(query, User.class)
+                    .doOnNext(usr -> userInfoForLoginCache.put(usr.getId(), usr))
+                    .then();
+        } else {
+            return Mono.empty();
+        }
     }
 
     /**
@@ -103,7 +125,7 @@ public class UserService {
             @NotNull String rawPassword) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(userId));
-        query.fields().include(User.Fields.password);
+        query.fields().include(User.Fields.PASSWORD);
         return mongoTemplate.findOne(query, User.class)
                 .map(user -> {
                     String encodedPassword = user.getPassword();
@@ -115,46 +137,42 @@ public class UserService {
     public Mono<Boolean> isActiveAndNotDeleted(@NotNull Long userId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(userId))
-                .addCriteria(Criteria.where(User.Fields.active).is(true))
-                .addCriteria(Criteria.where(User.Fields.deletionDate).is(null));
+                .addCriteria(Criteria.where(User.Fields.IS_ACTIVE).is(true))
+                .addCriteria(Criteria.where(User.Fields.DELETION_DATE).is(null));
         return mongoTemplate.exists(query, User.class);
     }
 
     public Mono<Boolean> isAllowedToSendMessageToTarget(
-            @NotNull ChatType chatType,
+            @NotNull Boolean isGroupMessage,
             @NotNull Boolean isSystemMessage,
             @NotNull Long requesterId,
             @NotNull Long targetId) {
         if (isSystemMessage) {
             return Mono.just(true);
         }
-        switch (chatType) {
-            case PRIVATE:
-                if (requesterId.equals(targetId)) {
-                    if (turmsClusterManager.getTurmsProperties()
-                            .getMessage().isAllowSendingMessagesToOneself()) {
-                        return Mono.just(true);
+        if (isGroupMessage) {
+            return groupMemberService.isAllowedToSendMessage(targetId, requesterId);
+        } else {
+            if (requesterId.equals(targetId)) {
+                if (turmsClusterManager.getTurmsProperties()
+                        .getMessage().isAllowSendingMessagesToOneself()) {
+                    return Mono.just(true);
+                } else {
+                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
+                }
+            } else {
+                if (turmsClusterManager.getTurmsProperties().getMessage().isAllowSendingMessagesToStranger()) {
+                    if (turmsClusterManager.getTurmsProperties().getMessage().isCheckIfTargetActiveAndNotDeleted()) {
+                        return isActiveAndNotDeleted(targetId)
+                                .zipWith(userRelationshipService.isNotBlocked(targetId, requesterId))
+                                .map(results -> results.getT1() && results.getT2());
                     } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
+                        return userRelationshipService.isNotBlocked(targetId, requesterId);
                     }
                 } else {
-                    if (turmsClusterManager.getTurmsProperties().getMessage().isAllowSendingMessagesToStranger()) {
-                        if (turmsClusterManager.getTurmsProperties().getMessage().isCheckIfTargetActiveAndNotDeleted()) {
-                            return isActiveAndNotDeleted(targetId)
-                                    .zipWith(userRelationshipService.isNotBlocked(targetId, requesterId))
-                                    .map(results -> results.getT1() && results.getT2());
-                        } else {
-                            return userRelationshipService.isNotBlocked(targetId, requesterId);
-                        }
-                    } else {
-                        return userRelationshipService.isRelatedAndAllowed(targetId, requesterId);
-                    }
+                    return userRelationshipService.isRelatedAndAllowed(targetId, requesterId);
                 }
-            case GROUP:
-                return groupMemberService.isAllowedToSendMessage(targetId, requesterId);
-            case UNRECOGNIZED:
-            default:
-                return Mono.just(false);
+            }
         }
     }
 
@@ -201,7 +219,7 @@ public class UserService {
             @NotNull Long requesterId,
             @NotNull Long targetUserId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(targetUserId));
-        query.fields().include(User.Fields.profileAccess);
+        query.fields().include(User.Fields.PROFILE_ACCESS);
         return mongoTemplate.findOne(query, User.class)
                 .flatMap(user -> {
                     switch (user.getProfileAccess()) {
@@ -249,22 +267,22 @@ public class UserService {
         Query query = QueryBuilder
                 .newBuilder()
                 .add(Criteria.where(ID).in(userIds))
-                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.DELETION_DATE, shouldQueryDeletedRecords)
                 .buildQuery();
         query.fields()
                 .include(ID)
-                .include(User.Fields.name)
-                .include(User.Fields.intro)
-                .include(User.Fields.registrationDate)
-                .include(User.Fields.profileAccess)
-                .include(User.Fields.permissionGroupId)
-                .include(User.Fields.active);
+                .include(User.Fields.NAME)
+                .include(User.Fields.INTRO)
+                .include(User.Fields.REGISTRATION_DATE)
+                .include(User.Fields.PROFILE_ACCESS)
+                .include(User.Fields.PERMISSION_GROUP_ID)
+                .include(User.Fields.IS_ACTIVE);
         return mongoTemplate.find(query, User.class);
     }
 
     public Mono<Long> queryUserPermissionGroupId(@NotNull Long userId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(userId));
-        query.fields().include(User.Fields.permissionGroupId);
+        query.fields().include(User.Fields.PERMISSION_GROUP_ID);
         return mongoTemplate.findOne(query, User.class)
                 .map(User::getPermissionGroupId);
     }
@@ -277,8 +295,8 @@ public class UserService {
         if (shouldDeleteLogically) {
             Date now = new Date();
             Update update = new Update()
-                    .set(User.Fields.deletionDate, now)
-                    .set(User.Fields.lastUpdateDate, now);
+                    .set(User.Fields.DELETION_DATE, now)
+                    .set(User.Fields.LAST_UPDATED_DATE, now);
             deleteOrUpdateMono = mongoTemplate.updateMulti(query, update, User.class)
                     .map(UpdateResult::wasAcknowledged);
         } else {
@@ -312,7 +330,7 @@ public class UserService {
         Query query = QueryBuilder
                 .newBuilder()
                 .add(Criteria.where(ID).is(userId))
-                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.DELETION_DATE, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.exists(query, User.class);
     }
@@ -347,45 +365,45 @@ public class UserService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, userIds)
-                .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateRange)
-                .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateRange)
-                .addIsIfNotNull(User.Fields.active, isActive)
-                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addBetweenIfNotNull(User.Fields.REGISTRATION_DATE, registrationDateRange)
+                .addBetweenIfNotNull(User.Fields.DELETION_DATE, deletionDateRange)
+                .addIsIfNotNull(User.Fields.IS_ACTIVE, isActive)
+                .addIsNullIfFalse(User.Fields.DELETION_DATE, shouldQueryDeletedRecords)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, User.class);
     }
 
     public Mono<Long> countRegisteredUsers(@Nullable DateRange dateRange, boolean shouldQueryDeletedRecords) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(User.Fields.registrationDate, dateRange)
-                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addBetweenIfNotNull(User.Fields.REGISTRATION_DATE, dateRange)
+                .addIsNullIfFalse(User.Fields.DELETION_DATE, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
 
     public Mono<Long> countDeletedUsers(@Nullable DateRange dateRange) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(User.Fields.deletionDate, dateRange)
+                .addBetweenIfNotNull(User.Fields.DELETION_DATE, dateRange)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
 
     public Mono<Long> countLoggedInUsers(@Nullable DateRange dateRange, boolean shouldQueryDeletedRecords) {
         Criteria criteria = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(UserLoginLog.Fields.loginDate, dateRange)
-                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addBetweenIfNotNull(UserLoginLog.Fields.LOGIN_DATE, dateRange)
+                .addIsNullIfFalse(User.Fields.DELETION_DATE, shouldQueryDeletedRecords)
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
                 criteria,
-                UserLoginLog.Fields.userId,
+                UserLoginLog.Fields.USER_ID,
                 UserLoginLog.class);
     }
 
     public Mono<Long> countUsers(boolean shouldQueryDeletedRecords) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addIsNullIfFalse(User.Fields.deletionDate, shouldQueryDeletedRecords)
+                .addIsNullIfFalse(User.Fields.DELETION_DATE, shouldQueryDeletedRecords)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
@@ -398,9 +416,9 @@ public class UserService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, userIds)
-                .addBetweenIfNotNull(User.Fields.registrationDate, registrationDateRange)
-                .addBetweenIfNotNull(User.Fields.deletionDate, deletionDateRange)
-                .addIsIfNotNull(User.Fields.active, isActive)
+                .addBetweenIfNotNull(User.Fields.REGISTRATION_DATE, registrationDateRange)
+                .addBetweenIfNotNull(User.Fields.DELETION_DATE, deletionDateRange)
+                .addIsIfNotNull(User.Fields.IS_ACTIVE, isActive)
                 .buildQuery();
         return mongoTemplate.count(query, User.class);
     }
@@ -408,8 +426,8 @@ public class UserService {
     public Mono<Long> countMaxOnlineUsers(@Nullable DateRange dateRange) {
         Query query = QueryBuilder
                 .newBuilder()
-                .addBetweenIfNotNull(UserOnlineUserNumber.Fields.timestamp, dateRange)
-                .max(UserOnlineUserNumber.Fields.number)
+                .addBetweenIfNotNull(ID, dateRange)
+                .max(UserOnlineUserNumber.Fields.NUMBER)
                 .buildQuery();
         return mongoTemplate.findOne(query, UserOnlineUserNumber.class)
                 .map(entity -> (long) entity.getNumber())
@@ -439,14 +457,14 @@ public class UserService {
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(userIds));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(User.Fields.password, password)
-                .setIfNotNull(User.Fields.name, name)
-                .setIfNotNull(User.Fields.intro, intro)
-                .setIfNotNull(User.Fields.profileAccess, profileAccessStrategy)
-                .setIfNotNull(User.Fields.permissionGroupId, permissionGroupId)
-                .setIfNotNull(User.Fields.registrationDate, registrationDate)
-                .setIfNotNull(User.Fields.active, isActive)
-                .setIfNotNull(User.Fields.lastUpdateDate, new Date())
+                .setIfNotNull(User.Fields.PASSWORD, password)
+                .setIfNotNull(User.Fields.NAME, name)
+                .setIfNotNull(User.Fields.INTRO, intro)
+                .setIfNotNull(User.Fields.PROFILE_ACCESS, profileAccessStrategy)
+                .setIfNotNull(User.Fields.PERMISSION_GROUP_ID, permissionGroupId)
+                .setIfNotNull(User.Fields.REGISTRATION_DATE, registrationDate)
+                .setIfNotNull(User.Fields.IS_ACTIVE, isActive)
+                .setIfNotNull(User.Fields.LAST_UPDATED_DATE, new Date())
                 .build();
         return mongoTemplate.updateMulti(query, update, User.class)
                 .flatMap(result -> {

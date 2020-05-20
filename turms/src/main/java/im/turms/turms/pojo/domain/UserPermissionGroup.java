@@ -26,8 +26,9 @@ import im.turms.turms.config.hazelcast.IdentifiedDataFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,19 +36,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * No need to shard because there are only a few (or some) user permission groups.
+ */
 @Data
-@FieldNameConstants
 @NoArgsConstructor
 @AllArgsConstructor
+@Document
 public final class UserPermissionGroup implements IdentifiedDataSerializable {
+
     @Id
     private Long id;
 
+    @Field(Fields.CREATABLE_GROUP_TYPE_IDS)
     private Set<Long> creatableGroupTypeIds;
 
+    @Field(Fields.OWNED_GROUP_LIMIT)
     private Integer ownedGroupLimit;
 
+    @Field(Fields.OWNED_GROUP_LIMIT_FOR_EACH_GROUP_TYPE)
     private Integer ownedGroupLimitForEachGroupType;
+
+    @Field(Fields.GROUP_TYPE_LIMITS)
     // group type id -> limit
     private Map<Long, Integer> groupTypeLimits;
 
@@ -82,4 +92,16 @@ public final class UserPermissionGroup implements IdentifiedDataSerializable {
         ownedGroupLimitForEachGroupType = in.readInt();
         groupTypeLimits = IdentifiedDataFactory.readMaps(in);
     }
+
+
+    public static class Fields {
+        public static final String CREATABLE_GROUP_TYPE_IDS = "cgtid";
+        public static final String OWNED_GROUP_LIMIT = "ogl";
+        public static final String OWNED_GROUP_LIMIT_FOR_EACH_GROUP_TYPE = "oglegt";
+        public static final String GROUP_TYPE_LIMITS = "gtl";
+
+        private Fields() {
+        }
+    }
+
 }

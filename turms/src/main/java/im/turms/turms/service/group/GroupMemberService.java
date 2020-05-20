@@ -60,8 +60,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static im.turms.turms.constant.Common.ID_GROUP_ID;
-import static im.turms.turms.constant.Common.ID_USER_ID;
+import static im.turms.turms.pojo.domain.GroupMember.Fields.ID_GROUP_ID;
+import static im.turms.turms.pojo.domain.GroupMember.Fields.ID_USER_ID;
 
 @Service
 @Validated
@@ -219,15 +219,15 @@ public class GroupMemberService {
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).in(memberIds));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(GroupMember.Fields.name, name)
-                .setIfNotNull(GroupMember.Fields.role, role)
-                .setIfNotNull(GroupMember.Fields.joinDate, joinDate)
+                .setIfNotNull(GroupMember.Fields.NAME, name)
+                .setIfNotNull(GroupMember.Fields.ROLE, role)
+                .setIfNotNull(GroupMember.Fields.JOIN_DATE, joinDate)
                 .build();
         if (muteEndDate != null) {
             if (muteEndDate.getTime() < System.currentTimeMillis()) {
-                update.unset(GroupMember.Fields.muteEndDate);
+                update.unset(GroupMember.Fields.MUTE_END_DATE);
             } else {
-                update.set(GroupMember.Fields.muteEndDate, muteEndDate);
+                update.set(GroupMember.Fields.MUTE_END_DATE, muteEndDate);
             }
         }
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
@@ -446,7 +446,7 @@ public class GroupMemberService {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
                 .addCriteria(Criteria.where(ID_USER_ID).is(userId))
-                .addCriteria(Criteria.where(GroupMember.Fields.muteEndDate).gt(new Date()));
+                .addCriteria(Criteria.where(GroupMember.Fields.MUTE_END_DATE).gt(new Date()));
         return mongoTemplate.exists(query, GroupMember.class);
     }
 
@@ -454,7 +454,7 @@ public class GroupMemberService {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_USER_ID).is(userId))
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId));
-        query.fields().include(GroupMember.Fields.role);
+        query.fields().include(GroupMember.Fields.ROLE);
         return mongoTemplate.findOne(query, GroupMember.class)
                 .map(GroupMember::getRole);
     }
@@ -496,8 +496,9 @@ public class GroupMemberService {
     public Mono<Set<Long>> queryUsersJoinedGroupsMembersIds(@NotEmpty Set<Long> userIds) {
         return queryUsersJoinedGroupsIds(userIds, null, null)
                 .collect(Collectors.toSet())
-                .flatMap(groupsIds -> queryGroupMembersIds(groupsIds)
-                        .collect(Collectors.toSet()));
+                .flatMap(groupsIds -> groupsIds.isEmpty()
+                        ? Mono.empty()
+                        : queryGroupMembersIds(groupsIds).collect(Collectors.toSet()));
     }
 
     public Mono<Boolean> isAllowedToCreateJoinQuestion(
@@ -532,9 +533,9 @@ public class GroupMemberService {
                 .newBuilder()
                 .addInIfNotNull(ID_GROUP_ID, groupIds)
                 .addInIfNotNull(ID_USER_ID, userIds)
-                .addInIfNotNull(GroupMember.Fields.role, roles)
-                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateRange)
-                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateRange)
+                .addInIfNotNull(GroupMember.Fields.ROLE, roles)
+                .addBetweenIfNotNull(GroupMember.Fields.JOIN_DATE, joinDateRange)
+                .addBetweenIfNotNull(GroupMember.Fields.MUTE_END_DATE, muteEndDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupMember.class);
     }
@@ -549,9 +550,9 @@ public class GroupMemberService {
                 .newBuilder()
                 .addInIfNotNull(ID_GROUP_ID, groupIds)
                 .addInIfNotNull(ID_USER_ID, userIds)
-                .addInIfNotNull(GroupMember.Fields.role, roles)
-                .addBetweenIfNotNull(GroupMember.Fields.joinDate, joinDateRange)
-                .addBetweenIfNotNull(GroupMember.Fields.muteEndDate, muteEndDateRange)
+                .addInIfNotNull(GroupMember.Fields.ROLE, roles)
+                .addBetweenIfNotNull(GroupMember.Fields.JOIN_DATE, joinDateRange)
+                .addBetweenIfNotNull(GroupMember.Fields.MUTE_END_DATE, muteEndDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, GroupMember.class);
     }
@@ -715,7 +716,7 @@ public class GroupMemberService {
     public Flux<Long> queryGroupManagersAndOwnerId(@NotNull Long groupId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
-                .addCriteria(Criteria.where(GroupMember.Fields.role)
+                .addCriteria(Criteria.where(GroupMember.Fields.ROLE)
                         .in(GroupMemberRole.MANAGER, GroupMemberRole.OWNER));
         return mongoTemplate.find(query, GroupMember.class)
                 .map(member -> member.getKey().getUserId());

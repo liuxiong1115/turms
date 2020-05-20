@@ -59,6 +59,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.pojo.domain.GroupMember.Fields.ID_GROUP_ID;
+import static im.turms.turms.pojo.domain.GroupMember.Fields.ID_USER_ID;
 
 @Service
 @Validated
@@ -179,7 +181,7 @@ public class GroupService {
                             .buildQuery();
                     Mono<Boolean> updateOrRemoveMono;
                     if (finalShouldDeleteLogically) {
-                        Update update = new Update().set(Group.Fields.deletionDate, new Date());
+                        Update update = new Update().set(Group.Fields.DELETION_DATE, new Date());
                         updateOrRemoveMono = operations.updateMulti(query, update, Group.class)
                                 .map(UpdateResult::wasAcknowledged);
                     } else {
@@ -217,13 +219,13 @@ public class GroupService {
                     Query query = QueryBuilder
                             .newBuilder()
                             .addInIfNotNull(ID, groupIds)
-                            .addInIfNotNull(Group.Fields.typeId, typeIds)
-                            .addInIfNotNull(Group.Fields.creatorId, creatorIds)
-                            .addInIfNotNull(Group.Fields.ownerId, ownerIds)
-                            .addIsIfNotNull(Group.Fields.active, isActive)
-                            .addBetweenIfNotNull(Group.Fields.creationDate, creationDateRange)
-                            .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateRange)
-                            .addBetweenIfNotNull(Group.Fields.muteEndDate, muteEndDateRange)
+                            .addInIfNotNull(Group.Fields.TYPE_ID, typeIds)
+                            .addInIfNotNull(Group.Fields.CREATOR_ID, creatorIds)
+                            .addInIfNotNull(Group.Fields.OWNER_ID, ownerIds)
+                            .addIsIfNotNull(Group.Fields.IS_ACTIVE, isActive)
+                            .addBetweenIfNotNull(Group.Fields.CREATION_DATE, creationDateRange)
+                            .addBetweenIfNotNull(Group.Fields.DELETION_DATE, deletionDateRange)
+                            .addBetweenIfNotNull(Group.Fields.MUTE_END_DATE, muteEndDateRange)
                             .paginateIfNotNull(page, size);
                     return mongoTemplate.find(query, Group.class);
                 });
@@ -260,7 +262,7 @@ public class GroupService {
 
     public Mono<Long> queryGroupOwnerId(@NotNull Long groupId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
-        query.fields().include(Group.Fields.ownerId);
+        query.fields().include(Group.Fields.OWNER_ID);
         return mongoTemplate.findOne(query, Group.class)
                 .map(Group::getOwnerId);
     }
@@ -323,7 +325,7 @@ public class GroupService {
 
     public Mono<GroupType> queryGroupType(@NotNull Long groupId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
-        query.fields().include(Group.Fields.typeId);
+        query.fields().include(Group.Fields.TYPE_ID);
         return mongoTemplate.findOne(query, Group.class)
                 .flatMap(group -> groupTypeService.queryGroupType(group.getTypeId()));
     }
@@ -348,17 +350,17 @@ public class GroupService {
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(groupIds));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(Group.Fields.typeId, typeId)
-                .setIfNotNull(Group.Fields.creatorId, creatorId)
-                .setIfNotNull(Group.Fields.ownerId, ownerId)
-                .setIfNotNull(Group.Fields.name, name)
-                .setIfNotNull(Group.Fields.intro, intro)
-                .setIfNotNull(Group.Fields.announcement, announcement)
-                .setIfNotNull(Group.Fields.minimumScore, minimumScore)
-                .setIfNotNull(Group.Fields.active, isActive)
-                .setIfNotNull(Group.Fields.creationDate, creationDate)
-                .setIfNotNull(Group.Fields.deletionDate, deletionDate)
-                .setIfNotNull(Group.Fields.muteEndDate, muteEndDate)
+                .setIfNotNull(Group.Fields.TYPE_ID, typeId)
+                .setIfNotNull(Group.Fields.CREATOR_ID, creatorId)
+                .setIfNotNull(Group.Fields.OWNER_ID, ownerId)
+                .setIfNotNull(Group.Fields.NAME, name)
+                .setIfNotNull(Group.Fields.INTRO, intro)
+                .setIfNotNull(Group.Fields.ANNOUNCEMENT, announcement)
+                .setIfNotNull(Group.Fields.MINIMUM_SCORE, minimumScore)
+                .setIfNotNull(Group.Fields.IS_ACTIVE, isActive)
+                .setIfNotNull(Group.Fields.CREATION_DATE, creationDate)
+                .setIfNotNull(Group.Fields.DELETION_DATE, deletionDate)
+                .setIfNotNull(Group.Fields.MUTE_END_DATE, muteEndDate)
                 .build();
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.updateMulti(query, update, Group.class)
@@ -423,7 +425,7 @@ public class GroupService {
     }
 
     private Mono<Long> countUserOwnedGroupNumber(@NotNull Long ownerId) {
-        Query query = new Query().addCriteria(Criteria.where(Group.Fields.ownerId).is(ownerId));
+        Query query = new Query().addCriteria(Criteria.where(Group.Fields.OWNER_ID).is(ownerId));
         return mongoTemplate.count(query, Group.class);
     }
 
@@ -461,7 +463,9 @@ public class GroupService {
     public Flux<Group> queryJoinedGroups(@NotNull Long memberId) {
         return queryJoinedGroupsIds(memberId)
                 .collectList()
-                .flatMapMany(this::queryGroups);
+                .flatMapMany(groupIds -> groupIds.isEmpty()
+                        ? Flux.empty()
+                        : this.queryGroups(groupIds));
     }
 
     public Mono<Int64ValuesWithVersion> queryJoinedGroupsIdsWithVersion(
@@ -721,7 +725,7 @@ public class GroupService {
 
     public Mono<Long> countOwnedGroups(@NotNull Long ownerId) {
         Query query = new Query()
-                .addCriteria(Criteria.where(Group.Fields.ownerId).is(ownerId));
+                .addCriteria(Criteria.where(Group.Fields.OWNER_ID).is(ownerId));
         return mongoTemplate.count(query, Group.class);
     }
 
@@ -729,15 +733,15 @@ public class GroupService {
             @NotNull Long ownerId,
             @NotNull Long groupTypeId) {
         Query query = new Query()
-                .addCriteria(Criteria.where(Group.Fields.ownerId).is(ownerId))
-                .addCriteria(Criteria.where(Group.Fields.typeId).is(groupTypeId));
+                .addCriteria(Criteria.where(Group.Fields.OWNER_ID).is(ownerId))
+                .addCriteria(Criteria.where(Group.Fields.TYPE_ID).is(groupTypeId));
         return mongoTemplate.count(query, Group.class);
     }
 
     public Mono<Long> countCreatedGroups(@Nullable DateRange dateRange) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Group.Fields.creationDate, dateRange)
-                .add(Criteria.where(Group.Fields.deletionDate).is(null))
+                .addBetweenIfNotNull(Group.Fields.CREATION_DATE, dateRange)
+                .add(Criteria.where(Group.Fields.DELETION_DATE).is(null))
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
     }
@@ -758,13 +762,13 @@ public class GroupService {
                     Query query = QueryBuilder
                             .newBuilder()
                             .addInIfNotNull(ID, groupIds)
-                            .addInIfNotNull(Group.Fields.typeId, typeIds)
-                            .addInIfNotNull(Group.Fields.creatorId, creatorIds)
-                            .addInIfNotNull(Group.Fields.ownerId, ownerIds)
-                            .addIsIfNotNull(Group.Fields.active, isActive)
-                            .addBetweenIfNotNull(Group.Fields.creationDate, creationDateRange)
-                            .addBetweenIfNotNull(Group.Fields.deletionDate, deletionDateRange)
-                            .addBetweenIfNotNull(Group.Fields.muteEndDate, muteEndDateRange)
+                            .addInIfNotNull(Group.Fields.TYPE_ID, typeIds)
+                            .addInIfNotNull(Group.Fields.CREATOR_ID, creatorIds)
+                            .addInIfNotNull(Group.Fields.OWNER_ID, ownerIds)
+                            .addIsIfNotNull(Group.Fields.IS_ACTIVE, isActive)
+                            .addBetweenIfNotNull(Group.Fields.CREATION_DATE, creationDateRange)
+                            .addBetweenIfNotNull(Group.Fields.DELETION_DATE, deletionDateRange)
+                            .addBetweenIfNotNull(Group.Fields.MUTE_END_DATE, muteEndDateRange)
                             .buildQuery();
                     return mongoTemplate.count(query, Group.class);
                 });
@@ -772,7 +776,7 @@ public class GroupService {
 
     public Mono<Long> countDeletedGroups(@Nullable DateRange dateRange) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Group.Fields.deletionDate, dateRange)
+                .addBetweenIfNotNull(Group.Fields.DELETION_DATE, dateRange)
                 .buildQuery();
         return mongoTemplate.count(query, Group.class);
     }
@@ -790,16 +794,16 @@ public class GroupService {
 
     public Mono<Boolean> isGroupMuted(@NotNull Long groupId) {
         Query query = new Query()
-                .addCriteria(Criteria.where(ID_GROUP_ID).is(groupId))
-                .addCriteria(Criteria.where(Group.Fields.muteEndDate).gt(new Date()));
+                .addCriteria(Criteria.where(ID).is(groupId))
+                .addCriteria(Criteria.where(Group.Fields.MUTE_END_DATE).gt(new Date()));
         return mongoTemplate.exists(query, Group.class);
     }
 
     public Mono<Boolean> isGroupActiveAndNotDeleted(@NotNull Long groupId) {
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(groupId))
-                .addCriteria(Criteria.where(Group.Fields.active).is(true))
-                .addCriteria(Criteria.where(Group.Fields.deletionDate).is(null));
+                .addCriteria(Criteria.where(Group.Fields.IS_ACTIVE).is(true))
+                .addCriteria(Criteria.where(Group.Fields.DELETION_DATE).is(null));
         return mongoTemplate.exists(query, Group.class);
     }
 

@@ -50,37 +50,37 @@ public class GroupVersionService {
 
     public Mono<Date> queryInfoVersion(@NotNull Long groupId) {
         Query query = new Query(Criteria.where(ID).is(groupId));
-        query.fields().include(GroupVersion.Fields.info);
+        query.fields().include(GroupVersion.Fields.INFO);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getInfo);
     }
 
     public Mono<Date> queryMembersVersion(@NotNull Long groupId) {
         Query query = new Query(Criteria.where(ID).is(groupId));
-        query.fields().include(GroupVersion.Fields.members);
+        query.fields().include(GroupVersion.Fields.MEMBERS);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getMembers);
     }
 
     public Mono<Date> queryBlacklistVersion(@NotNull Long groupId) {
         Query query = new Query(Criteria.where(ID).is(groupId));
-        query.fields().include(GroupVersion.Fields.blacklist);
+        query.fields().include(GroupVersion.Fields.BLACKLIST);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getBlacklist);
     }
 
     public Mono<Date> queryGroupJoinRequestsVersion(@NotNull Long groupId) {
         Query query = new Query(Criteria.where(ID).is(groupId));
-        query.fields().include(GroupVersion.Fields.joinRequests);
+        query.fields().include(GroupVersion.Fields.JOIN_REQUESTS);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getJoinRequests);
     }
 
     public Mono<Date> queryGroupJoinQuestionsVersion(@NotNull Long groupId) {
         Query query = new Query(Criteria.where(ID).is(groupId));
-        query.fields().include(GroupVersion.Fields.joinQuestions);
+        query.fields().include(GroupVersion.Fields.JOIN_QUESTIONS);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getJoinQuestions);
     }
 
     public Mono<Date> queryGroupInvitationsVersion(@NotNull Long groupId) {
         Query query = new Query(Criteria.where(ID).is(groupId));
-        query.fields().include(GroupVersion.Fields.invitations);
+        query.fields().include(GroupVersion.Fields.INVITATIONS);
         return mongoTemplate.findOne(query, GroupVersion.class).map(GroupVersion::getInvitations);
     }
 
@@ -94,45 +94,45 @@ public class GroupVersionService {
         Query query = new Query().addCriteria(Criteria.where(ID).is(groupId));
         Update update = new Update();
         Date now = new Date();
-        if (updateInfo) update.set(GroupVersion.Fields.info, now);
-        if (updateMembers) update.set(GroupVersion.Fields.members, now);
-        if (updateBlacklist) update.set(GroupVersion.Fields.blacklist, now);
-        if (joinRequests) update.set(GroupVersion.Fields.joinRequests, now);
-        if (joinQuestions) update.set(GroupVersion.Fields.joinQuestions, now);
+        if (updateInfo) update.set(GroupVersion.Fields.INFO, now);
+        if (updateMembers) update.set(GroupVersion.Fields.MEMBERS, now);
+        if (updateBlacklist) update.set(GroupVersion.Fields.BLACKLIST, now);
+        if (joinRequests) update.set(GroupVersion.Fields.JOIN_REQUESTS, now);
+        if (joinQuestions) update.set(GroupVersion.Fields.JOIN_QUESTIONS, now);
         return mongoTemplate.updateFirst(query, update, GroupVersion.class)
                 .map(UpdateResult::wasAcknowledged);
     }
 
     public Mono<Boolean> updateInformation(@NotNull Long groupId) {
-        return updateSpecificVersion(groupId, GroupVersion.Fields.info);
+        return updateSpecificVersion(groupId, GroupVersion.Fields.INFO);
     }
 
     public Mono<Boolean> updateMembersVersion(@NotNull Long groupId) {
-        return updateSpecificVersion(groupId, GroupVersion.Fields.members);
+        return updateSpecificVersion(groupId, GroupVersion.Fields.MEMBERS);
     }
 
     public Mono<Boolean> updateMembersVersion(@Nullable Set<Long> groupIds) {
-        return updateSpecificVersion(groupIds, GroupVersion.Fields.members);
+        return updateSpecificVersion(groupIds, GroupVersion.Fields.MEMBERS);
     }
 
     public Mono<Boolean> updateMembersVersion() {
-        return updateSpecificVersion(GroupVersion.Fields.members);
+        return updateSpecificVersion(GroupVersion.Fields.MEMBERS);
     }
 
     public Mono<Boolean> updateBlacklistVersion(@NotNull Long groupId) {
-        return updateSpecificVersion(groupId, GroupVersion.Fields.blacklist);
+        return updateSpecificVersion(groupId, GroupVersion.Fields.BLACKLIST);
     }
 
     public Mono<Boolean> updateJoinRequestsVersion(@NotNull Long groupId) {
-        return updateSpecificVersion(groupId, GroupVersion.Fields.joinRequests);
+        return updateSpecificVersion(groupId, GroupVersion.Fields.JOIN_REQUESTS);
     }
 
     public Mono<Boolean> updateJoinQuestionsVersion(@NotNull Long groupId) {
-        return updateSpecificVersion(groupId, GroupVersion.Fields.joinQuestions);
+        return updateSpecificVersion(groupId, GroupVersion.Fields.JOIN_QUESTIONS);
     }
 
     public Mono<Boolean> updateGroupInvitationsVersion(@NotNull Long groupId) {
-        return updateSpecificVersion(groupId, GroupVersion.Fields.invitations);
+        return updateSpecificVersion(groupId, GroupVersion.Fields.INVITATIONS);
     }
 
     public Mono<Boolean> updateSpecificVersion(@NotNull Long groupId, @NotNull String field) {

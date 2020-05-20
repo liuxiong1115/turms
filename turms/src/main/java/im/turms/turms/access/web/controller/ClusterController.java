@@ -113,6 +113,9 @@ public class ClusterController {
 
     // Server
 
+    /**
+     * Note that the master node of turms cluster is always the first active node in the response
+     */
     @GetMapping("/servers")
     @RequiredPermission(CLUSTER_SERVER_INFO_QUERY)
     public ResponseEntity<ResponseDTO<Collection<String>>> queryServers(

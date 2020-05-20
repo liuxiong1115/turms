@@ -18,15 +18,17 @@
 package im.turms.turms.pojo.domain;
 
 import im.turms.common.constant.GroupMemberRole;
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -34,21 +36,29 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Document
-@FieldNameConstants
 @AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+@Document
+@CompoundIndex(
+        name = GroupMember.Key.Fields.GROUP_ID + "_" + GroupMember.Key.Fields.USER_ID + "_idx",
+        def = "{'" + GroupMember.Fields.ID_GROUP_ID + "': 1, '" + GroupMember.Fields.ID_USER_ID + "': 1}")
+@Sharded(shardKey = {GroupMember.Fields.ID_GROUP_ID, GroupMember.Fields.ID_USER_ID}, immutableKey = true)
 public final class GroupMember {
+
     @Id
     private final Key key;
 
+    @Field(Fields.NAME)
     private final String name;
 
+    @Field(Fields.ROLE)
     private final GroupMemberRole role;
 
-    @Indexed
+    @Field(Fields.JOIN_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date joinDate;
 
-    @Indexed
+    @Field(Fields.MUTE_END_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date muteEndDate;
 
     public GroupMember(
@@ -70,10 +80,32 @@ public final class GroupMember {
     @NoArgsConstructor // Make sure spring can initiate the key and use setters
     @EqualsAndHashCode
     public static final class Key {
+
+        @Field(Fields.GROUP_ID)
         private Long groupId;
 
-        @Indexed
+        @Field(Fields.USER_ID)
         private Long userId;
+
+        public static final class Fields {
+            public static final String GROUP_ID = "gid";
+            public static final String USER_ID = "uid";
+
+            private Fields() {
+            }
+        }
+    }
+
+    public static final class Fields {
+        public static final String ID_GROUP_ID = "_id." + Key.Fields.GROUP_ID;
+        public static final String ID_USER_ID = "_id." + Key.Fields.USER_ID;
+        public static final String NAME = "n";
+        public static final String ROLE = "role";
+        public static final String JOIN_DATE = "jd";
+        public static final String MUTE_END_DATE = "med";
+
+        private Fields() {
+        }
     }
 
     @Data

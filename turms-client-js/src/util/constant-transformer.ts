@@ -1,5 +1,4 @@
 import {im} from "../model/proto-bundle";
-import ChatType = im.turms.proto.ChatType;
 import UserStatus = im.turms.proto.UserStatus;
 import ProfileAccessStrategy = im.turms.proto.ProfileAccessStrategy;
 import ResponseAction = im.turms.proto.ResponseAction;
@@ -8,17 +7,6 @@ import MessageDeliveryStatus = im.turms.proto.MessageDeliveryStatus;
 import DeviceType = im.turms.proto.DeviceType;
 
 export default class ConstantTransformer {
-    static string2ChatType(chatType: string): ChatType {
-        chatType = chatType.toUpperCase();
-        switch (chatType) {
-            case 'PRIVATE':
-                return ChatType.PRIVATE;
-            case 'GROUP':
-                return ChatType.GROUP;
-            default:
-                throw 'illegal ChatType';
-        }
-    }
 
     static string2GroupMemberRole(role: string): GroupMemberRole {
         role = role.toUpperCase();

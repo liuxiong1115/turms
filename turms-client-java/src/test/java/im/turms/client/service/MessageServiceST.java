@@ -1,7 +1,6 @@
 package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
-import im.turms.common.constant.ChatType;
 import im.turms.common.model.bo.message.Message;
 import im.turms.common.model.bo.message.MessageStatus;
 import im.turms.common.model.bo.message.MessagesWithTotal;
@@ -65,7 +64,7 @@ public class MessageServiceST {
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
     public void sendPrivateMessage_shouldReturnMessageId() throws ExecutionException, InterruptedException, TimeoutException {
-        privateMessageId = senderClient.getMessageService().sendMessage(ChatType.PRIVATE, RECIPIENT_ID, new Date(), "hello", null, null)
+        privateMessageId = senderClient.getMessageService().sendMessage(false, RECIPIENT_ID, new Date(), "hello", null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(privateMessageId);
     }
@@ -73,7 +72,7 @@ public class MessageServiceST {
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
     public void sendGroupMessage_shouldReturnMessageId() throws ExecutionException, InterruptedException, TimeoutException {
-        groupMessageId = senderClient.getMessageService().sendMessage(ChatType.GROUP, TARGET_GROUP_ID, new Date(), "hello", null, null)
+        groupMessageId = senderClient.getMessageService().sendMessage(true, TARGET_GROUP_ID, new Date(), "hello", null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(groupMessageId);
     }
@@ -81,7 +80,7 @@ public class MessageServiceST {
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void forwardPrivateMessage_shouldReturnForwardedMessageId() throws ExecutionException, InterruptedException, TimeoutException {
-        Long messageId = senderClient.getMessageService().forwardMessage(privateMessageId, ChatType.PRIVATE, RECIPIENT_ID)
+        Long messageId = senderClient.getMessageService().forwardMessage(privateMessageId, false, RECIPIENT_ID)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(messageId);
     }
@@ -89,7 +88,7 @@ public class MessageServiceST {
     @Test
     @Order(ORDER_HIGH_PRIORITY)
     public void forwardGroupMessage_shouldReturnForwardedMessageId() throws ExecutionException, InterruptedException, TimeoutException {
-        Long messageId = senderClient.getMessageService().forwardMessage(groupMessageId, ChatType.GROUP, TARGET_GROUP_ID)
+        Long messageId = senderClient.getMessageService().forwardMessage(groupMessageId, true, TARGET_GROUP_ID)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(messageId);
     }
@@ -131,7 +130,7 @@ public class MessageServiceST {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     public void updateTypingStatus_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        Void result = senderClient.getMessageService().updateTypingStatusRequest(ChatType.PRIVATE, privateMessageId)
+        Void result = senderClient.getMessageService().updateTypingStatusRequest(false, privateMessageId)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
     }
@@ -141,7 +140,7 @@ public class MessageServiceST {
     @Test
     @Order(ORDER_LOW_PRIORITY)
     public void queryMessages_shouldReturnNotEmptyMessages() throws ExecutionException, InterruptedException, TimeoutException {
-        List<Message> messages = recipientClient.getMessageService().queryMessages(null, ChatType.PRIVATE, null, SENDER_ID, null, null, null, 10)
+        List<Message> messages = recipientClient.getMessageService().queryMessages(null, false, null, SENDER_ID, null, null, null, 10)
                 .get(5, TimeUnit.SECONDS);
         assertFalse(messages.isEmpty());
     }

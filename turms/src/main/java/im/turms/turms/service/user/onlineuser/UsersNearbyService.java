@@ -140,21 +140,21 @@ public class UsersNearbyService {
             Pair<Long, DeviceType> key = Pair.of(userId, deviceType);
             SortedSet<UserLocation> locations = this.userSessionLocations.get(key);
             if (locations != null && !locations.isEmpty()) {
-                UserLocation location = locations.last();
-                PointFloat deletePoint = PointFloat.create(location.getLongitude(), location.getLatitude());
+                float[] coordinates = locations.last().getCoordinates();
+                PointFloat deletePoint = PointFloat.create(coordinates[0], coordinates[1]);
                 sessionIdTree.delete(key, deletePoint);
             }
             sessionIdTree = sessionIdTree.add(key, point);
-            this.userSessionLocations.put(key, new UserLocation(turmsClusterManager.generateRandomId(), userId, deviceType, longitude, latitude, null, null, date));
+            this.userSessionLocations.put(key, new UserLocation(turmsClusterManager.generateRandomId(), userId, deviceType, new float[]{longitude, latitude}, null, null, date));
         } else {
             SortedSet<UserLocation> locations = this.userLocations.get(userId);
             if (locations != null && !locations.isEmpty()) {
-                UserLocation location = locations.last();
-                PointFloat deletePoint = PointFloat.create(location.getLongitude(), location.getLatitude());
+                float[] coordinates = locations.last().getCoordinates();
+                PointFloat deletePoint = PointFloat.create(coordinates[0], coordinates[1]);
                 userIdTree.delete(userId, deletePoint);
             }
             userIdTree = userIdTree.add(userId, point);
-            this.userLocations.put(userId, new UserLocation(turmsClusterManager.generateRandomId(), userId, deviceType, longitude, latitude, null, null, date));
+            this.userLocations.put(userId, new UserLocation(turmsClusterManager.generateRandomId(), userId, deviceType, new float[]{longitude, latitude}, null, null, date));
         }
     }
 
@@ -164,13 +164,15 @@ public class UsersNearbyService {
                 Pair<Long, DeviceType> key = Pair.of(userId, deviceType);
                 SortedSet<UserLocation> deletedUserLocations = userSessionLocations.removeAll(key);
                 for (UserLocation deletedUserLocation : deletedUserLocations) {
-                    PointFloat point = PointFloat.create(deletedUserLocation.getLongitude(), deletedUserLocation.getLatitude());
+                    float[] coordinates = deletedUserLocation.getCoordinates();
+                    PointFloat point = PointFloat.create(coordinates[0], coordinates[1]);
                     sessionIdTree.delete(key, point);
                 }
             } else {
                 SortedSet<UserLocation> deletedUserLocations = userLocations.removeAll(userId);
                 for (UserLocation deletedUserLocation : deletedUserLocations) {
-                    PointFloat point = PointFloat.create(deletedUserLocation.getLongitude(), deletedUserLocation.getLatitude());
+                    float[] coordinates = deletedUserLocation.getCoordinates();
+                    PointFloat point = PointFloat.create(coordinates[0], coordinates[1]);
                     userIdTree.delete(userId, point);
                 }
             }
@@ -199,9 +201,10 @@ public class UsersNearbyService {
                 if (session != null) {
                     UserLocation location = onlineUserManager.getSession(deviceType).getLocation();
                     if (location != null) {
+                        float[] coordinates = location.getCoordinates();
                         return queryNearestUserIds(
-                                location.getLongitude(),
-                                location.getLatitude(),
+                                coordinates[0],
+                                coordinates[1],
                                 maxPeopleNumber,
                                 maxDistance);
                     }
@@ -233,9 +236,10 @@ public class UsersNearbyService {
                 if (session != null) {
                     UserLocation location = onlineUserManager.getSession(deviceType).getLocation();
                     if (location != null) {
+                        float[] coordinates = location.getCoordinates();
                         return queryUserSessionIdsNearby(
-                                location.getLongitude(),
-                                location.getLatitude(),
+                                coordinates[0],
+                                coordinates[1],
                                 maxPeopleNumber,
                                 maxDistance);
                     }

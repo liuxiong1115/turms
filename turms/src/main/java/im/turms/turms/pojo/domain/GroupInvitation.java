@@ -18,44 +18,75 @@
 package im.turms.turms.pojo.domain;
 
 import im.turms.common.constant.RequestStatus;
+import im.turms.turms.annotation.domain.OptionalIndexedForAdvancedFeature;
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
+import org.springframework.data.mongodb.core.mapping.ShardingStrategy;
 
 import java.util.Date;
 
 @Data
-@Document
-@FieldNameConstants
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Document
+@CompoundIndex(
+        name = GroupInvitation.Fields.INVITEE_ID + "_" + GroupInvitation.Fields.CREATION_DATE + "_idx",
+        def = "{'" + GroupInvitation.Fields.INVITEE_ID + "': 1, '" + GroupInvitation.Fields.CREATION_DATE + "': 1}")
+@Sharded(shardKey = {GroupInvitation.Fields.INVITEE_ID, GroupInvitation.Fields.CREATION_DATE}, shardingStrategy = ShardingStrategy.HASH, immutableKey = true)
 public final class GroupInvitation {
+
     @Id
     private final Long id;
 
-    @Indexed
+    @Field(Fields.GROUP_ID)
+    @OptionalIndexedForCustomFeature
     private final Long groupId;
 
-    @Indexed
+    @Field(Fields.INVITER_ID)
+    @OptionalIndexedForCustomFeature
     private final Long inviterId;
 
-    @Indexed
+    @Field(Fields.INVITEE_ID)
     private final Long inviteeId;
 
+    @Field(Fields.CONTENT)
     private final String content;
 
+    /**
+     * Not indexed because it has a low index selectivity.
+     */
+    @Field(Fields.STATUS)
     private final RequestStatus status;
 
-    @Indexed
+    @Field(Fields.CREATION_DATE)
     private final Date creationDate;
 
-    @Indexed
+    @Field(Fields.RESPONSE_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date responseDate;
 
-    @Indexed
+    @Field(Fields.EXPIRATION_DATE)
+    @OptionalIndexedForAdvancedFeature
     private final Date expirationDate;
+
+    public static final class Fields {
+        public static final String GROUP_ID = "gid";
+        public static final String INVITER_ID = "irId";
+        public static final String INVITEE_ID = "ieId";
+        public static final String CONTENT = "cnt";
+        public static final String STATUS = "stat";
+        public static final String CREATION_DATE = "cd";
+        public static final String RESPONSE_DATE = "rd";
+        public static final String EXPIRATION_DATE = "ed";
+
+        private Fields() {
+        }
+    }
 }

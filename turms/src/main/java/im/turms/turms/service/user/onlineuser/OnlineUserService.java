@@ -471,7 +471,7 @@ public class OnlineUserService {
             @NotNull WebSocketSession webSocketSession,
             @NotNull FluxSink<WebSocketMessage> notificationSink) {
         Mono<UserLocation> locationIdMono = userLocation != null
-                ? userLocationService.saveUserLocation(null, userId, loggingInDeviceType, userLocation.xFloat(), userLocation.yFloat(), new Date())
+                ? userLocationService.saveUserLocation(null, userId, loggingInDeviceType, new float[]{userLocation.xFloat(), userLocation.yFloat()}, new Date())
                 : Mono.empty();
         return locationIdMono
                 .onErrorReturn(EMPTY_USER_LOCATION)
@@ -768,8 +768,7 @@ public class OnlineUserService {
                     turmsClusterManager.generateRandomId(),
                     userId,
                     deviceType,
-                    longitude,
-                    latitude,
+                    new float[]{longitude, latitude},
                     name,
                     address,
                     now);

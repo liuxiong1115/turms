@@ -98,8 +98,8 @@ public class AdminActionLogService {
             @Nullable Integer size) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.logDate, logDateRange)
+                .addInIfNotNull(AdminActionLog.Fields.ACCOUNT, accounts)
+                .addBetweenIfNotNull(AdminActionLog.Fields.LOG_DATE, logDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, AdminActionLog.class);
     }
@@ -141,8 +141,8 @@ public class AdminActionLogService {
             @Nullable DateRange logDateRange) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(AdminActionLog.Fields.account, accounts)
-                .addBetweenIfNotNull(AdminActionLog.Fields.logDate, logDateRange)
+                .addInIfNotNull(AdminActionLog.Fields.ACCOUNT, accounts)
+                .addBetweenIfNotNull(AdminActionLog.Fields.LOG_DATE, logDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, AdminActionLog.class);
     }

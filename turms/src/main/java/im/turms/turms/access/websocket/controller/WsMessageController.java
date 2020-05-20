@@ -22,7 +22,6 @@ import com.google.common.collect.Multimap;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Int64Value;
 import im.turms.common.TurmsStatusCode;
-import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.message.MessageStatuses;
@@ -78,16 +77,16 @@ public class WsMessageController {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Users cannot create system messages"));
             }
             Mono<Pair<Message, Set<Long>>> messageAndRelatedUserIdsMono;
-            ChatType chatType = request.hasGroupId() ? ChatType.GROUP : ChatType.PRIVATE;
-            if (chatType == ChatType.PRIVATE && !request.hasRecipientId()) {
+            boolean isGroupMessage = request.hasGroupId();
+            if (!isGroupMessage && !request.hasRecipientId()) {
                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The recipientId must not be null for private messages"));
             }
-            long targetId = chatType == ChatType.GROUP ? request.getGroupId().getValue() : request.getRecipientId().getValue();
+            long targetId = isGroupMessage ? request.getGroupId().getValue() : request.getRecipientId().getValue();
             if (request.hasMessageId()) {
                 messageAndRelatedUserIdsMono = messageService.authAndCloneAndSaveMessage(
                         turmsRequestWrapper.getUserId(),
                         request.getMessageId().getValue(),
-                        chatType,
+                        isGroupMessage,
                         false,
                         targetId);
             } else {
@@ -104,7 +103,7 @@ public class WsMessageController {
                         null,
                         turmsRequestWrapper.getUserId(),
                         targetId,
-                        chatType,
+                        isGroupMessage,
                         false,
                         request.hasText() ? request.getText().getValue() : null,
                         records,
@@ -182,7 +181,7 @@ public class WsMessageController {
         return turmsRequestWrapper -> {
             QueryPendingMessagesWithTotalRequest request = turmsRequestWrapper.getTurmsRequest().getQueryPendingMessagesWithTotalRequest();
             // chat type, is system message, group id or sender id -> message
-            Multimap<Triple<ChatType, Boolean, Long>, Message> multimap = LinkedListMultimap.create();
+            Multimap<Triple<Boolean, Boolean, Long>, Message> multimap = LinkedListMultimap.create();
             Integer size = request.hasSize() ? request.getSize().getValue() : null;
             if (size == null) {
                 size = turmsClusterManager.getTurmsProperties().getMessage().getDefaultAvailableMessagesNumberWithTotal();
@@ -192,9 +191,9 @@ public class WsMessageController {
                     false, null, null, null, null,
                     Set.of(turmsRequestWrapper.getUserId()), null, null,
                     Set.of(MessageDeliveryStatus.READY), 0, size)
-                    .doOnNext(message -> multimap.put(Triple.of(message.getChatType(),
+                    .doOnNext(message -> multimap.put(Triple.of(message.getIsGroupMessage(),
                             message.getIsSystemMessage(),
-                            message.getChatType() == ChatType.GROUP ? message.getTargetId() : message.getSenderId()), message))
+                            message.getIsGroupMessage() ? message.getTargetId() : message.getSenderId()), message))
                     .collectList()
                     .flatMap(messages -> {
                         if (messages.isEmpty()) {
@@ -202,7 +201,7 @@ public class WsMessageController {
                         }
                         MessagesWithTotalList.Builder listBuilder = MessagesWithTotalList.newBuilder();
                         List<Mono<Long>> countMonos = new ArrayList<>(multimap.size());
-                        for (Triple<ChatType, Boolean, Long> key : multimap.keys()) {
+                        for (Triple<Boolean, Boolean, Long> key : multimap.keys()) {
                             countMonos.add(messageStatusService.countPendingMessages(key.getLeft(),
                                     key.getMiddle(),
                                     key.getRight(),
@@ -210,13 +209,13 @@ public class WsMessageController {
                         }
                         return Mono.zip(countMonos, objects -> objects)
                                 .map(numberObjects -> {
-                                    Iterator<Triple<ChatType, Boolean, Long>> keyIterator = multimap.keys().iterator();
+                                    Iterator<Triple<Boolean, Boolean, Long>> keyIterator = multimap.keys().iterator();
                                     for (int i = 0; i < multimap.keys().size(); i++) {
-                                        Triple<ChatType, Boolean, Long> key = keyIterator.next();
+                                        Triple<Boolean, Boolean, Long> key = keyIterator.next();
                                         int number = ((Long) numberObjects[i]).intValue();
                                         MessagesWithTotal.Builder messagesWithTotalBuilder = MessagesWithTotal.newBuilder()
                                                 .setTotal(number)
-                                                .setChatType(key.getLeft())
+                                                .setIsGroupMessage(key.getLeft())
                                                 .setFromId(key.getRight());
                                         for (Message message : multimap.get(key)) {
                                             messagesWithTotalBuilder.addMessages(ProtoUtil.message2proto(message));
@@ -235,7 +234,7 @@ public class WsMessageController {
         return turmsRequestWrapper -> {
             QueryMessagesRequest request = turmsRequestWrapper.getTurmsRequest().getQueryMessagesRequest();
             List<Long> idList = request.getIdsCount() != 0 ? request.getIdsList() : null;
-            ChatType chatType = request.getChatType();
+            Boolean areGroupMessages = request.hasAreGroupMessages() ? request.getAreGroupMessages().getValue() : null;
             Boolean areSystemMessages = request.hasAreSystemMessages() ? request.getAreSystemMessages().getValue() : null;
             Long fromId = request.hasFromId() ? request.getFromId().getValue() : null;
             Date deliveryDateAfter = request.hasDeliveryDateAfter() ? new Date(request.getDeliveryDateAfter().getValue()) : null;
@@ -251,7 +250,7 @@ public class WsMessageController {
             return messageService.authAndQueryCompleteMessages(
                     true,
                     idList,
-                    chatType,
+                    areGroupMessages,
                     areSystemMessages,
                     fromId,
                     turmsRequestWrapper.getUserId(),
@@ -337,9 +336,10 @@ public class WsMessageController {
                     records,
                     recallDate,
                     null)
-                    .flatMap(success -> messageService.queryMessageRecipients(messageId)
+                    .flatMap(success -> messageService.queryMessageRecipients(messageId) //TODO: optimize the notification logic
                             .collect(Collectors.toSet())
-                            .map(recipientsIds -> RequestResult.create(
+                            .map(recipientsIds -> recipientsIds.isEmpty() ? RequestResult.ok()
+                                    : RequestResult.create(
                                     recipientsIds,
                                     turmsRequestWrapper.getTurmsRequest())));
         };

@@ -6,9 +6,7 @@ option java_package = "im.turms.common.model.dto.request.message";
 option java_multiple_files = true;
 option swift_prefix = "";
 
-import "constant/chat_type.proto";
-
 message UpdateTypingStatusRequest {
-    ChatType chat_type = 1;
+    bool is_group_message = 1;
     int64 to_id = 2;
 }

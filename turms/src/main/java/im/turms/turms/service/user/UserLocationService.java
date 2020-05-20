@@ -41,14 +41,13 @@ public class UserLocationService {
             @Nullable Long id,
             @NotNull Long userId,
             @NotNull DeviceType deviceType,
-            float longitude,
-            float latitude,
+            float[] coordinates,
             @NotNull @PastOrPresent Date timestamp) {
         if (turmsClusterManager.getTurmsProperties().getUser().getLocation().isPersistent()) {
             if (id == null) {
                 id = turmsClusterManager.generateRandomId();
             }
-            UserLocation location = new UserLocation(id, userId, deviceType, longitude, latitude, null, null, timestamp);
+            UserLocation location = new UserLocation(id, userId, deviceType, coordinates, null, null, timestamp);
             return mongoTemplate.save(location);
         } else {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));

@@ -19,28 +19,45 @@ package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
+import org.springframework.data.mongodb.core.mapping.ShardingStrategy;
 
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @Document
-@FieldNameConstants
+@Sharded(shardKey = GroupJoinQuestion.Fields.GROUP_ID, shardingStrategy = ShardingStrategy.HASH, immutableKey = true)
 public final class GroupJoinQuestion {
+
     @Id
     private final Long id;
 
+    @Field(Fields.GROUP_ID)
     @Indexed
     private final Long groupId;
 
+    @Field(Fields.QUESTION)
     private final String question;
 
+    @Field(Fields.ANSWERS)
     private final Set<String> answers;
 
     // Note that score can be a negative number
+    @Field(Fields.SCORE)
     private final Integer score;
+
+    public static final class Fields {
+        public static final String GROUP_ID = "gid";
+        public static final String QUESTION = "q";
+        public static final String ANSWERS = "ans";
+        public static final String SCORE = "score";
+
+        private Fields() {
+        }
+    }
 }

@@ -63,7 +63,7 @@ public class UserLoginLogService {
             @NotNull Long id,
             @NotNull @PastOrPresent Date logoutDate) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(id));
-        Update update = new Update().set(UserLoginLog.Fields.logoutDate, logoutDate);
+        Update update = new Update().set(UserLoginLog.Fields.LOGOUT_DATE, logoutDate);
         return mongoTemplate.updateFirst(query, update, UserLoginLog.class)
                 .map(UpdateResult::wasAcknowledged);
     }

@@ -85,7 +85,7 @@ public class WsUserRelationshipController {
                     request.getName(),
                     new Date(),
                     null)
-                    .map(group -> RequestResult.create(group.getKey().getIndex().longValue()));
+                    .map(group -> RequestResult.create(group.getKey().getGroupIndex().longValue()));
         };
     }
 

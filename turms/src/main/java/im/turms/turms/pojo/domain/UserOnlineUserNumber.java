@@ -17,22 +17,34 @@
 
 package im.turms.turms.pojo.domain;
 
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.Date;
 
+/**
+ * No need to shard because the size of the collections is still small even after 10 years
+ * and just keep it simple by default.
+ */
 @Data
 @Document
-@FieldNameConstants
 public final class UserOnlineUserNumber {
+
     @MongoId(FieldType.DATE_TIME)
     private final Date timestamp;
 
-    @Indexed
+    @Field(Fields.NUMBER)
+    @OptionalIndexedForCustomFeature
     private final Integer number;
+
+    public static class Fields {
+        public static final String NUMBER = "no";
+
+        private Fields() {
+        }
+    }
 }

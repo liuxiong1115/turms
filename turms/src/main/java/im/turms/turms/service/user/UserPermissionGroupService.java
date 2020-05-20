@@ -138,10 +138,10 @@ public class UserPermissionGroupService {
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(UserPermissionGroup.Fields.creatableGroupTypeIds, creatableGroupTypeIds)
-                .setIfNotNull(UserPermissionGroup.Fields.ownedGroupLimit, ownedGroupLimit)
-                .setIfNotNull(UserPermissionGroup.Fields.ownedGroupLimitForEachGroupType, ownedGroupLimitForEachGroupType)
-                .setIfNotNull(UserPermissionGroup.Fields.groupTypeLimits, groupTypeLimitMap)
+                .setIfNotNull(UserPermissionGroup.Fields.CREATABLE_GROUP_TYPE_IDS, creatableGroupTypeIds)
+                .setIfNotNull(UserPermissionGroup.Fields.OWNED_GROUP_LIMIT, ownedGroupLimit)
+                .setIfNotNull(UserPermissionGroup.Fields.OWNED_GROUP_LIMIT_FOR_EACH_GROUP_TYPE, ownedGroupLimitForEachGroupType)
+                .setIfNotNull(UserPermissionGroup.Fields.GROUP_TYPE_LIMITS, groupTypeLimitMap)
                 .build();
         return mongoTemplate.updateMulti(query, update, UserPermissionGroup.class)
                 .flatMap(result -> {

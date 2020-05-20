@@ -17,26 +17,36 @@
 
 package im.turms.turms.pojo.domain;
 
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
+import org.springframework.data.mongodb.core.mapping.ShardingStrategy;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+/**
+ * Only use the field _id.ownerId instead of ID
+ * to be able to query all related users according to the owner ID in a shard to acquire a better performance.
+ * And the chunk size is acceptable.
+ */
 @Data
-@Document
-@FieldNameConstants
 @AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+@Document
+@Sharded(shardKey = UserRelationshipGroupMember.Fields.ID_OWNER_ID, shardingStrategy = ShardingStrategy.HASH, immutableKey = true)
 public final class UserRelationshipGroupMember {
+
     @Id
     private final Key key;
 
-    @Indexed
+    @Field(Fields.JOIN_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date joinDate;
 
     public UserRelationshipGroupMember(
@@ -51,12 +61,36 @@ public final class UserRelationshipGroupMember {
     @Data
     @AllArgsConstructor
     public static final class Key {
+
+        @Field(Fields.OWNER_ID)
+        @Indexed
         private final Long ownerId;
 
-        @Indexed
+        @Field(Fields.GROUP_INDEX)
+        @OptionalIndexedForCustomFeature
         private final Integer groupIndex;
 
-        @Indexed
+        @Field(Fields.RELATED_USER_ID)
+        @OptionalIndexedForCustomFeature
         private final Long relatedUserId;
+
+        public static class Fields {
+            public static final String OWNER_ID = "oid";
+            public static final String GROUP_INDEX = "gidx";
+            public static final String RELATED_USER_ID = "ruid";
+
+            private Fields() {
+            }
+        }
+    }
+
+    public static class Fields {
+        public static final String ID_OWNER_ID = "_id." + Key.Fields.OWNER_ID;
+        public static final String ID_GROUP_INDEX = "_id." + Key.Fields.GROUP_INDEX;
+        public static final String ID_RELATED_USER_ID = "_id." + Key.Fields.RELATED_USER_ID;
+        public static final String JOIN_DATE = "jd";
+
+        private Fields() {
+        }
     }
 }

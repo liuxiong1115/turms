@@ -27,7 +27,7 @@ public @interface UserRelationshipGroupKeyConstraint {
 
         @Override
         public boolean isValid(UserRelationshipGroup.Key value, ConstraintValidatorContext context) {
-            return value != null && value.getOwnerId() != null && value.getIndex() != null;
+            return value != null && value.getOwnerId() != null && value.getGroupIndex() != null;
         }
     }
 }

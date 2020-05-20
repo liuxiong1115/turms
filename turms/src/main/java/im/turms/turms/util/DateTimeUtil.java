@@ -17,7 +17,6 @@
 
 package im.turms.turms.util;
 
-import im.turms.common.constant.ChatType;
 import im.turms.common.constant.DivideBy;
 import im.turms.turms.manager.TurmsClusterManager;
 import im.turms.turms.pojo.bo.DateRange;
@@ -150,15 +149,15 @@ public class DateTimeUtil {
     public Mono<List<StatisticsRecordDTO>> queryBetweenDate(
             @NotNull DateRange dateRange,
             @NotNull DivideBy divideBy,
-            @NotNull Function3<DateRange, ChatType, Boolean, Mono<Long>> function,
-            @Nullable ChatType chatType,
+            @NotNull Function3<DateRange, Boolean, Boolean, Mono<Long>> function,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages) {
         List<Pair<Date, Date>> dates = divide(dateRange.getStart(), dateRange.getEnd(), divideBy);
         List<Mono<StatisticsRecordDTO>> monos = new ArrayList<>(dates.size());
         for (Pair<Date, Date> datePair : dates) {
             Mono<Long> result = function.apply(
                     DateRange.of(datePair.getLeft(), datePair.getRight()),
-                    chatType,
+                    areGroupMessages,
                     areSystemMessages);
             monos.add(result.map(total -> new StatisticsRecordDTO(
                     datePair.getLeft(),
@@ -185,8 +184,8 @@ public class DateTimeUtil {
     public Mono<List<StatisticsRecordDTO>> checkAndQueryBetweenDate(
             @NotNull DateRange dateRange,
             @NotNull DivideBy divideBy,
-            @NotNull Function3<DateRange, ChatType, Boolean, Mono<Long>> function,
-            @Nullable ChatType chatType,
+            @NotNull Function3<DateRange, Boolean, Boolean, Mono<Long>> function,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages) {
         int maxHourRanges = turmsClusterManager.getTurmsProperties()
                 .getSecurity().getMaxHourDifferencePerCountRequest();
@@ -197,7 +196,7 @@ public class DateTimeUtil {
         boolean checked = checkRangesNumber(dateRange, divideBy,
                 maxHourRanges, maxDayRanges, maxMonthRanges);
         if (checked) {
-            return queryBetweenDate(dateRange, divideBy, function, chatType, areSystemMessages);
+            return queryBetweenDate(dateRange, divideBy, function, areGroupMessages, areSystemMessages);
         } else {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);
         }

@@ -6,12 +6,11 @@ option java_package = "im.turms.common.model.bo.message";
 option java_multiple_files = true;
 option swift_prefix = "";
 
-import "constant/chat_type.proto";
 import "model/message/message.proto";
 
 message MessagesWithTotal {
     int32 total = 1;
-    ChatType chat_type = 2;
+    bool is_group_message = 2;
     int64 from_id = 3;
     repeated Message messages = 4;
 }

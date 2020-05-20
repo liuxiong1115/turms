@@ -17,31 +17,39 @@
 
 package im.turms.turms.pojo.domain;
 
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
-@Document
-@FieldNameConstants
 @AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+@Document
+@CompoundIndex(
+        name = GroupBlacklistedUser.Key.Fields.GROUP_ID + "_" + GroupBlacklistedUser.Key.Fields.USER_ID + "_idx",
+        def = "{'" + GroupBlacklistedUser.Fields.ID_GROUP_ID + "': 1, '" + GroupBlacklistedUser.Fields.ID_USER_ID + "': 1}")
+@Sharded(shardKey = {GroupBlacklistedUser.Fields.ID_GROUP_ID, GroupBlacklistedUser.Fields.ID_USER_ID}, immutableKey = true)
 public final class GroupBlacklistedUser {
+
     @Id
     private final Key key;
 
-    @Indexed
+    @Field(Fields.BLOCK_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date blockDate;
 
-    @Indexed
+    @Field(Fields.REQUESTER_ID)
+    @OptionalIndexedForCustomFeature
     private final Long requesterId;
 
     public GroupBlacklistedUser(Long groupId, Long userId, Date blockDate, Long requesterId) {
@@ -55,15 +63,35 @@ public final class GroupBlacklistedUser {
     @NoArgsConstructor // Make sure spring can initiate the key and use setters
     @EqualsAndHashCode
     public static final class Key {
+
+        @Field(Fields.GROUP_ID)
         private Long groupId;
 
-        @Indexed
+        @Field(Fields.USER_ID)
         private Long userId;
+
+        public static class Fields {
+            public static final String GROUP_ID = "gid";
+            public static final String USER_ID = "uid";
+
+            private Fields() {
+            }
+        }
     }
 
     @Data
     @AllArgsConstructor
     public static final class KeyList {
         private List<Key> keys;
+    }
+
+    public static class Fields {
+        public static final String ID_GROUP_ID = "_id." + Key.Fields.GROUP_ID;
+        public static final String ID_USER_ID = "_id." + Key.Fields.USER_ID;
+        public static final String BLOCK_DATE = "bd";
+        public static final String REQUESTER_ID = "rid";
+
+        private Fields() {
+        }
     }
 }

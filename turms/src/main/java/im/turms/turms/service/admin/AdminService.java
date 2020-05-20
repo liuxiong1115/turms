@@ -111,7 +111,7 @@ public class AdminService {
 
     public Mono<Boolean> rootAdminExists() {
         Query query = new Query()
-                .addCriteria(Criteria.where(Admin.Fields.roleId).is(ADMIN_ROLE_ROOT_ID));
+                .addCriteria(Criteria.where(Admin.Fields.ROLE_ID).is(ADMIN_ROLE_ROOT_ID));
         return mongoTemplate.exists(query, Admin.class);
     }
 
@@ -259,7 +259,7 @@ public class AdminService {
             @Nullable Integer size) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, accounts)
-                .addInIfNotNull(Admin.Fields.roleId, roleIds)
+                .addInIfNotNull(Admin.Fields.ROLE_ID, roleIds)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, Admin.class).map(admin -> {
             if (withPassword) {
@@ -357,9 +357,9 @@ public class AdminService {
         String password = turmsPasswordUtil.encodeAdminPassword(rawPassword);
         Update update = UpdateBuilder
                 .newBuilder()
-                .setIfNotNull(Admin.Fields.password, password)
-                .setIfNotNull(Admin.Fields.name, name)
-                .setIfNotNull(Admin.Fields.roleId, roleId)
+                .setIfNotNull(Admin.Fields.PASSWORD, password)
+                .setIfNotNull(Admin.Fields.NAME, name)
+                .setIfNotNull(Admin.Fields.ROLE_ID, roleId)
                 .build();
         return mongoTemplate.updateMulti(query, update, Admin.class)
                 .map(result -> {
@@ -388,7 +388,7 @@ public class AdminService {
     public Mono<Long> countAdmins(@Nullable Set<String> accounts, @Nullable Set<Long> roleIds) {
         Query query = QueryBuilder.newBuilder()
                 .addInIfNotNull(ID, accounts)
-                .addInIfNotNull(Admin.Fields.roleId, roleIds)
+                .addInIfNotNull(Admin.Fields.ROLE_ID, roleIds)
                 .buildQuery();
         return mongoTemplate.count(query, Admin.class);
     }

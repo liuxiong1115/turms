@@ -17,7 +17,6 @@
 
 package im.turms.turms.pojo.dto;
 
-import im.turms.common.constant.ChatType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -27,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 public final class CreateMessageDTO {
     private final Long id;
-    private final ChatType chatType;
+    private final Boolean isGroupMessage;
     private final Boolean isSystemMessage;
     private final String text;
     private final List<byte[]> records;

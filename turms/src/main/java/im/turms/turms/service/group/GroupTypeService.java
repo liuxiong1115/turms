@@ -164,16 +164,16 @@ public class GroupTypeService {
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(ids));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(GroupType.Fields.name, name)
-                .setIfNotNull(GroupType.Fields.groupSizeLimit, groupSizeLimit)
-                .setIfNotNull(GroupType.Fields.invitationStrategy, groupInvitationStrategy)
-                .setIfNotNull(GroupType.Fields.joinStrategy, groupJoinStrategy)
-                .setIfNotNull(GroupType.Fields.groupInfoUpdateStrategy, groupInfoUpdateStrategy)
-                .setIfNotNull(GroupType.Fields.memberInfoUpdateStrategy, memberInfoUpdateStrategy)
-                .setIfNotNull(GroupType.Fields.guestSpeakable, guestSpeakable)
-                .setIfNotNull(GroupType.Fields.selfInfoUpdatable, selfInfoUpdatable)
-                .setIfNotNull(GroupType.Fields.enableReadReceipt, enableReadReceipt)
-                .setIfNotNull(GroupType.Fields.messageEditable, messageEditable)
+                .setIfNotNull(GroupType.Fields.NAME, name)
+                .setIfNotNull(GroupType.Fields.GROUP_SIZE_LIMIT, groupSizeLimit)
+                .setIfNotNull(GroupType.Fields.INVITATION_STRATEGY, groupInvitationStrategy)
+                .setIfNotNull(GroupType.Fields.JOIN_STRATEGY, groupJoinStrategy)
+                .setIfNotNull(GroupType.Fields.GROUP_INFO_UPDATE_STRATEGY, groupInfoUpdateStrategy)
+                .setIfNotNull(GroupType.Fields.MEMBER_INFO_UPDATE_STRATEGY, memberInfoUpdateStrategy)
+                .setIfNotNull(GroupType.Fields.GUEST_SPEAKABLE, guestSpeakable)
+                .setIfNotNull(GroupType.Fields.SELF_INFO_UPDATABLE, selfInfoUpdatable)
+                .setIfNotNull(GroupType.Fields.ENABLE_READ_RECEIPT, enableReadReceipt)
+                .setIfNotNull(GroupType.Fields.MESSAGE_EDITABLE, messageEditable)
                 .build();
         return mongoTemplate.updateMulti(query, update, GroupType.class)
                 .flatMap(result -> {

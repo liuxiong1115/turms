@@ -100,7 +100,7 @@ public class GroupJoinRequestService {
     public Mono<Boolean> removeAllExpiredGroupJoinRequests() {
         Date now = new Date();
         Query query = new Query()
-                .addCriteria(Criteria.where(GroupJoinRequest.Fields.expirationDate).lt(now));
+                .addCriteria(Criteria.where(GroupJoinRequest.Fields.EXPIRATION_DATE).lt(now));
         return mongoTemplate.remove(query, GroupJoinRequest.class)
                 .map(DeleteResult::wasAcknowledged);
     }
@@ -113,9 +113,9 @@ public class GroupJoinRequestService {
     public Mono<Boolean> updateExpiredRequestsStatus() {
         Date now = new Date();
         Query query = new Query()
-                .addCriteria(Criteria.where(GroupJoinRequest.Fields.expirationDate).lt(now))
-                .addCriteria(Criteria.where(GroupJoinRequest.Fields.status).is(RequestStatus.PENDING));
-        Update update = new Update().set(GroupJoinRequest.Fields.status, RequestStatus.EXPIRED);
+                .addCriteria(Criteria.where(GroupJoinRequest.Fields.EXPIRATION_DATE).lt(now))
+                .addCriteria(Criteria.where(GroupJoinRequest.Fields.STATUS).is(RequestStatus.PENDING));
+        Update update = new Update().set(GroupJoinRequest.Fields.STATUS, RequestStatus.EXPIRED);
         return mongoTemplate.updateMulti(query, update, GroupJoinRequest.class)
                 .map(UpdateResult::wasAcknowledged);
     }
@@ -168,9 +168,9 @@ public class GroupJoinRequestService {
     private Mono<GroupJoinRequest> queryRequesterIdAndStatusAndGroupId(@NotNull Long requestId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(requestId));
         query.fields()
-                .include(GroupJoinRequest.Fields.requesterId)
-                .include(GroupJoinRequest.Fields.status)
-                .include(GroupJoinRequest.Fields.groupId);
+                .include(GroupJoinRequest.Fields.REQUESTER_ID)
+                .include(GroupJoinRequest.Fields.STATUS)
+                .include(GroupJoinRequest.Fields.GROUP_ID);
         return mongoTemplate.findOne(query, GroupJoinRequest.class)
                 .map(groupJoinRequest -> {
                     Date expirationDate = groupJoinRequest.getExpirationDate();
@@ -198,8 +198,8 @@ public class GroupJoinRequestService {
                     }
                     Query query = new Query().addCriteria(where(ID).is(requestId));
                     Update update = new Update()
-                            .set(GroupJoinRequest.Fields.status, RequestStatus.CANCELED)
-                            .set(GroupJoinRequest.Fields.responderId, requesterId);
+                            .set(GroupJoinRequest.Fields.STATUS, RequestStatus.CANCELED)
+                            .set(GroupJoinRequest.Fields.RESPONDER_ID, requesterId);
                     return mongoTemplate.updateFirst(query, update, GroupJoinRequest.class)
                             .flatMap(result -> {
                                 if (result.wasAcknowledged()) {
@@ -257,18 +257,18 @@ public class GroupJoinRequestService {
     }
 
     public Flux<GroupJoinRequest> queryGroupJoinRequestsByGroupId(@NotNull Long groupId) {
-        Query query = new Query().addCriteria(where(GroupJoinRequest.Fields.groupId).is(groupId));
+        Query query = new Query().addCriteria(where(GroupJoinRequest.Fields.GROUP_ID).is(groupId));
         return queryExpirableData(query);
     }
 
     public Flux<GroupJoinRequest> queryGroupJoinRequestsByRequesterId(@NotNull Long requesterId) {
-        Query query = new Query().addCriteria(where(GroupJoinRequest.Fields.requesterId).is(requesterId));
+        Query query = new Query().addCriteria(where(GroupJoinRequest.Fields.REQUESTER_ID).is(requesterId));
         return queryExpirableData(query);
     }
 
     public Mono<Long> queryGroupId(@NotNull Long requestId) {
         Query query = new Query().addCriteria(where(ID).is(requestId));
-        query.fields().include(GroupJoinRequest.Fields.groupId);
+        query.fields().include(GroupJoinRequest.Fields.GROUP_ID);
         return mongoTemplate.findOne(query, GroupJoinRequest.class)
                 .map(GroupJoinRequest::getGroupId);
     }
@@ -288,13 +288,13 @@ public class GroupJoinRequestService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(GroupJoinRequest.Fields.groupId, groupIds)
-                .addInIfNotNull(GroupJoinRequest.Fields.requesterId, requesterIds)
-                .addInIfNotNull(GroupJoinRequest.Fields.responderId, responderIds)
-                .addInIfNotNull(GroupJoinRequest.Fields.status, statuses)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateRange)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateRange)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateRange)
+                .addInIfNotNull(GroupJoinRequest.Fields.GROUP_ID, groupIds)
+                .addInIfNotNull(GroupJoinRequest.Fields.REQUESTER_ID, requesterIds)
+                .addInIfNotNull(GroupJoinRequest.Fields.RESPONDER_ID, responderIds)
+                .addInIfNotNull(GroupJoinRequest.Fields.STATUS, statuses)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.CREATION_DATE, creationDateRange)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.RESPONSE_DATE, responseDateRange)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.EXPIRATION_DATE, expirationDateRange)
                 .paginateIfNotNull(page, size);
         return mongoTemplate.find(query, GroupJoinRequest.class);
     }
@@ -311,13 +311,13 @@ public class GroupJoinRequestService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addIsIfNotNull(GroupJoinRequest.Fields.groupId, groupId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
-                .addIsIfNotNull(GroupJoinRequest.Fields.status, status)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.creationDate, creationDateRange)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.responseDate, responseDateRange)
-                .addBetweenIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDateRange)
+                .addIsIfNotNull(GroupJoinRequest.Fields.GROUP_ID, groupId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.REQUESTER_ID, requesterId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.RESPONDER_ID, responderId)
+                .addIsIfNotNull(GroupJoinRequest.Fields.STATUS, status)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.CREATION_DATE, creationDateRange)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.RESPONSE_DATE, responseDateRange)
+                .addBetweenIfNotNull(GroupJoinRequest.Fields.EXPIRATION_DATE, expirationDateRange)
                 .buildQuery();
         return mongoTemplate.count(query, GroupJoinRequest.class);
     }
@@ -346,12 +346,12 @@ public class GroupJoinRequestService {
         Query query = new Query().addCriteria(where(ID).in(ids));
         Update update = UpdateBuilder
                 .newBuilder()
-                .setIfNotNull(GroupJoinRequest.Fields.requesterId, requesterId)
-                .setIfNotNull(GroupJoinRequest.Fields.responderId, responderId)
-                .setIfNotNull(GroupJoinRequest.Fields.content, content)
-                .setIfNotNull(GroupJoinRequest.Fields.status, status)
-                .setIfNotNull(GroupJoinRequest.Fields.creationDate, creationDate)
-                .setIfNotNull(GroupJoinRequest.Fields.expirationDate, expirationDate)
+                .setIfNotNull(GroupJoinRequest.Fields.REQUESTER_ID, requesterId)
+                .setIfNotNull(GroupJoinRequest.Fields.RESPONDER_ID, responderId)
+                .setIfNotNull(GroupJoinRequest.Fields.CONTENT, content)
+                .setIfNotNull(GroupJoinRequest.Fields.STATUS, status)
+                .setIfNotNull(GroupJoinRequest.Fields.CREATION_DATE, creationDate)
+                .setIfNotNull(GroupJoinRequest.Fields.EXPIRATION_DATE, expirationDate)
                 .build();
         RequestStatusUtil.updateResponseDateBasedOnStatus(update, status, responseDate);
         return mongoTemplate.updateMulti(query, update, GroupJoinRequest.class)

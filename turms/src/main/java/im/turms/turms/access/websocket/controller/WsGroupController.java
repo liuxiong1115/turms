@@ -207,7 +207,8 @@ public class WsGroupController {
                             if (turmsClusterManager.getTurmsProperties().getNotification().isNotifyMembersAfterGroupUpdated()) {
                                 return groupMemberService.queryGroupMembersIds(request.getGroupId())
                                         .collect(Collectors.toSet())
-                                        .map(membersIds -> RequestResult.create(
+                                        .map(membersIds -> membersIds.isEmpty() ? RequestResult.ok()
+                                                : RequestResult.create(
                                                 membersIds,
                                                 turmsRequestWrapper.getTurmsRequest()));
                             } else {
@@ -642,7 +643,8 @@ public class WsGroupController {
                                     .isNotifyMembersAfterOtherMemberInfoUpdated()) {
                                 return groupMemberService.queryGroupMembersIds(request.getGroupId())
                                         .collect(Collectors.toSet())
-                                        .map(groupMembersIds -> RequestResult.create(
+                                        .map(groupMembersIds -> groupMembersIds.isEmpty() ? RequestResult.ok()
+                                        :RequestResult.create(
                                                 groupMembersIds,
                                                 turmsRequestWrapper.getTurmsRequest()));
                             } else if (!turmsRequestWrapper.getUserId().equals(request.getMemberId())

@@ -19,27 +19,51 @@ package im.turms.turms.pojo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
+import org.springframework.data.mongodb.core.mapping.ShardingStrategy;
 
 import java.util.Date;
 
+/**
+ * Use the hash-based sharding because the groupId increases monotonically.
+ */
 @Data
-@FieldNameConstants
 @AllArgsConstructor
+@Sharded(shardingStrategy = ShardingStrategy.HASH, immutableKey = true)
 public final class GroupVersion {
+
     @Id
     private final Long groupId;
 
+    @Field(Fields.INFO)
     private final Date info;
 
+    @Field(Fields.MEMBERS)
     private final Date members;
 
+    @Field(Fields.BLACKLIST)
     private final Date blacklist;
 
+    @Field(Fields.JOIN_REQUESTS)
     private final Date joinRequests;
 
+    @Field(Fields.JOIN_QUESTIONS)
     private final Date joinQuestions;
 
+    @Field(Fields.INVITATIONS)
     private final Date invitations;
+
+    public static class Fields {
+        public static final String INFO = "inf";
+        public static final String MEMBERS = "mbr";
+        public static final String BLACKLIST = "bl";
+        public static final String JOIN_REQUESTS = "jr";
+        public static final String JOIN_QUESTIONS = "jq";
+        public static final String INVITATIONS = "invt";
+
+        private Fields() {
+        }
+    }
 }

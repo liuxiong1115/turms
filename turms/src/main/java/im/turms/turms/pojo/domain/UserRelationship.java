@@ -17,30 +17,44 @@
 
 package im.turms.turms.pojo.domain;
 
+import im.turms.turms.annotation.domain.OptionalIndexedForCustomFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Sharded;
 
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Don't consolidate the two sided relationships as one model to eliminate transactions
+ * (unless MongoDB supports multiple shard keys though it seems impossible https://jira.mongodb.org/browse/SERVER-2949).
+ * Otherwise, it's impossible to use targeted queries to query the data
+ * according to either the owner ID or the related user ID because MongoDB can have only one shard key.
+ * https://github.com/turms-im/turms/issues/343
+ */
 @Data
-@Document
-@FieldNameConstants
 @AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+@Document
+@CompoundIndex(
+        name = UserRelationship.Key.Fields.OWNER_ID + "_" + UserRelationship.Key.Fields.RELATED_USER_ID + "_idx",
+        def = "{'" + UserRelationship.Fields.ID_OWNER_ID + "': 1, '" + UserRelationship.Fields.ID_RELATED_USER_ID + "': 1}")
+@Sharded(shardKey = {UserRelationship.Fields.ID_OWNER_ID, UserRelationship.Fields.ID_RELATED_USER_ID}, immutableKey = true)
 public final class UserRelationship {
     @Id
     private final Key key;
 
+    @Field(Fields.IS_BLOCKED)
     private final Boolean isBlocked;
 
-    @Indexed
+    @Field(Fields.ESTABLISHMENT_DATE)
+    @OptionalIndexedForCustomFeature
     private final Date establishmentDate;
 
     public UserRelationship(Long ownerId, Long relatedUserId, Boolean isBlocked, Date establishmentDate) {
@@ -54,10 +68,30 @@ public final class UserRelationship {
     @NoArgsConstructor // Make sure spring can initiate the key and use setters
     @EqualsAndHashCode
     public static final class Key {
+
+        @Field(Fields.OWNER_ID)
         private Long ownerId;
 
-        @Indexed
+        @Field(Fields.RELATED_USER_ID)
         private Long relatedUserId;
+
+        public static class Fields {
+            public static final String OWNER_ID = "oid";
+            public static final String RELATED_USER_ID = "rid";
+
+            private Fields() {
+            }
+        }
+    }
+
+    public static class Fields {
+        public static final String ID_OWNER_ID = "_id." + Key.Fields.OWNER_ID;
+        public static final String ID_RELATED_USER_ID = "_id." + Key.Fields.RELATED_USER_ID;
+        public static final String IS_BLOCKED = "bld";
+        public static final String ESTABLISHMENT_DATE = "ed";
+
+        private Fields() {
+        }
     }
 
     @Data

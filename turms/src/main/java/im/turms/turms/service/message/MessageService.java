@@ -23,13 +23,11 @@ import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.TurmsStatusCode;
-import im.turms.common.constant.ChatType;
 import im.turms.common.constant.MessageDeliveryStatus;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.util.Validator;
-import im.turms.turms.annotation.constraint.ChatTypeConstraint;
 import im.turms.turms.builder.QueryBuilder;
 import im.turms.turms.builder.UpdateBuilder;
 import im.turms.turms.manager.TurmsClusterManager;
@@ -73,6 +71,8 @@ import java.util.stream.Collectors;
 
 import static im.turms.common.TurmsStatusCode.*;
 import static im.turms.turms.constant.Common.*;
+import static im.turms.turms.pojo.domain.MessageStatus.Fields.ID_MESSAGE_ID;
+import static im.turms.turms.pojo.domain.MessageStatus.Fields.ID_RECIPIENT_ID;
 import static im.turms.turms.property.business.Message.TimeType;
 
 @Service
@@ -141,20 +141,19 @@ public class MessageService {
         }
         Query query = new Query()
                 .addCriteria(Criteria.where(ID).is(messageId))
-                .addCriteria(Criteria.where(Message.Fields.senderId).is(senderId));
+                .addCriteria(Criteria.where(Message.Fields.SENDER_ID).is(senderId));
         return mongoTemplate.exists(query, Message.class);
     }
 
     public Mono<Boolean> isMessageSentToUser(@NotNull Long messageId, @NotNull Long recipientId) {
         if (sentMessageCache != null) {
             Message message = sentMessageCache.getIfPresent(messageId);
-            if (message != null && message.getChatType() == ChatType.PRIVATE) {
+            if (message != null && !message.getIsGroupMessage()) {
                 return Mono.just(message.getTargetId().equals(recipientId));
             }
         }
-        Query query = new Query()
-                .addCriteria(Criteria.where(ID_MESSAGE_ID).is(messageId))
-                .addCriteria(Criteria.where(ID_RECIPIENT_ID).is(recipientId));
+        MessageStatus.Key key = new MessageStatus.Key(messageId, recipientId);
+        Query query = new Query().addCriteria(Criteria.where(ID).is(key));
         return mongoTemplate.exists(query, MessageStatus.class);
     }
 
@@ -179,7 +178,7 @@ public class MessageService {
         }
         if (messageMono == null) {
             Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
-            query.fields().include(Message.Fields.deliveryDate);
+            query.fields().include(Message.Fields.DELIVERY_DATE);
             messageMono = mongoTemplate.findOne(query, Message.class);
         }
         return messageMono
@@ -199,7 +198,7 @@ public class MessageService {
     public Flux<Message> authAndQueryCompleteMessages(
             boolean closeToDate,
             @Nullable Collection<Long> messageIds,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages,
             @Nullable Long senderId,
             @Nullable Long targetId,
@@ -213,7 +212,7 @@ public class MessageService {
             return queryMessages(
                     closeToDate,
                     messageIds,
-                    chatType,
+                    areGroupMessages,
                     areSystemMessages,
                     senderId != null ? Set.of(senderId) : null,
                     targetId != null ? Set.of(targetId) : null,
@@ -235,7 +234,7 @@ public class MessageService {
     public Flux<Message> queryMessages(
             boolean closeToDate,
             @Nullable Collection<Long> messageIds,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages,
             @Nullable Set<Long> senderIds,
             @Nullable Set<Long> targetIds,
@@ -245,19 +244,19 @@ public class MessageService {
             @Nullable Integer page,
             @Nullable Integer size) {
         QueryBuilder builder = QueryBuilder.newBuilder()
-                .addIsIfNotNull(Message.Fields.chatType, chatType)
-                .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
-                .addInIfNotNull(Message.Fields.senderId, senderIds)
-                .addInIfNotNull(Message.Fields.targetId, targetIds)
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateRange)
-                .addBetweenIfNotNull(Message.Fields.deletionDate, deletionDateRange);
+                .addIsIfNotNull(Message.Fields.IS_GROUP_MESSAGE, areGroupMessages)
+                .addIsIfNotNull(Message.Fields.IS_SYSTEM_MESSAGE, areSystemMessages)
+                .addInIfNotNull(Message.Fields.SENDER_ID, senderIds)
+                .addInIfNotNull(Message.Fields.TARGET_ID, targetIds)
+                .addBetweenIfNotNull(Message.Fields.DELIVERY_DATE, deliveryDateRange)
+                .addBetweenIfNotNull(Message.Fields.DELETION_DATE, deletionDateRange);
         Sort.Direction direction = null;
         if (closeToDate) {
             direction = (deliveryDateRange != null && deliveryDateRange.getStart() != null) ? Sort.Direction.ASC : Sort.Direction.DESC;
         }
         if (deliveryStatuses != null) {
             Sort.Direction finalDirection = direction;
-            return messageStatusService.queryMessagesIdsByDeliveryStatusesAndTargetIds(deliveryStatuses, chatType, targetIds)
+            return messageStatusService.queryMessagesIdsByDeliveryStatusesAndTargetIds(deliveryStatuses, areGroupMessages, targetIds)
                     .collect(Collectors.toSet())
                     .flatMapMany(ids -> {
                         if (ids.isEmpty()) {
@@ -269,7 +268,7 @@ public class MessageService {
                         builder.add(Criteria.where(ID).in(ids));
                         Query query;
                         if (finalDirection != null) {
-                            query = builder.paginateIfNotNull(page, size, finalDirection, Message.Fields.deliveryDate);
+                            query = builder.paginateIfNotNull(page, size, finalDirection, Message.Fields.DELIVERY_DATE);
                         } else {
                             query = builder.paginateIfNotNull(page, size);
                         }
@@ -279,7 +278,7 @@ public class MessageService {
             builder.addInIfNotNull(ID, messageIds);
             Query query;
             if (direction != null) {
-                query = builder.paginateIfNotNull(page, size, direction, Message.Fields.deliveryDate);
+                query = builder.paginateIfNotNull(page, size, direction, Message.Fields.DELIVERY_DATE);
             } else {
                 query = builder.paginateIfNotNull(page, size);
             }
@@ -291,7 +290,7 @@ public class MessageService {
             @Nullable Long messageId,
             @NotNull Long senderId,
             @NotNull Long targetId,
-            @NotNull @ChatTypeConstraint ChatType chatType,
+            @NotNull Boolean isGroupMessage,
             @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
@@ -324,7 +323,7 @@ public class MessageService {
         }
         Message message = new Message(
                 messageId,
-                chatType,
+                isGroupMessage,
                 isSystemMessage,
                 deliveryDate,
                 null,
@@ -340,58 +339,55 @@ public class MessageService {
 
     public Mono<Boolean> saveMessageStatuses(
             @NotNull Long messageId,
+            @NotNull Boolean isGroupMessage,
             @NotNull Boolean isSystemMessage,
-            @NotNull @ChatTypeConstraint ChatType chatType,
             @NotNull Long senderId,
             @NotNull Long targetId,
             @Nullable Set<Long> auxiliaryMemberIds,
             @Nullable ReactiveMongoOperations operations) {
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-        switch (chatType) {
-            case PRIVATE:
-                MessageStatus messageStatus = new MessageStatus(
-                        messageId,
-                        null,
-                        isSystemMessage,
-                        senderId,
-                        targetId,
-                        MessageDeliveryStatus.READY,
-                        null,
-                        null,
-                        null);
-                return mongoOperations.save(messageStatus).thenReturn(true);
-            case GROUP:
-                Mono<Set<Long>> memberIdsMono;
-                if (auxiliaryMemberIds != null) {
-                    memberIdsMono = Mono.just(auxiliaryMemberIds);
-                } else {
-                    memberIdsMono = groupMemberService
-                            .queryGroupMembersIds(targetId)
-                            .collect(Collectors.toSet());
-                }
-                return memberIdsMono
-                        .flatMap(membersIds -> {
-                            if (membersIds.isEmpty()) {
-                                return Mono.just(true);
-                            } else {
-                                List<MessageStatus> messageStatuses = new ArrayList<>(membersIds.size());
-                                for (Long memberId : membersIds) {
-                                    messageStatuses.add(new MessageStatus(
-                                            messageId,
-                                            targetId,
-                                            isSystemMessage,
-                                            senderId,
-                                            memberId,
-                                            MessageDeliveryStatus.READY,
-                                            null,
-                                            null,
-                                            null));
-                                }
-                                return mongoOperations.insertAll(messageStatuses).then(Mono.just(true));
+        if (isGroupMessage) {
+            Mono<Set<Long>> memberIdsMono;
+            if (auxiliaryMemberIds != null) {
+                memberIdsMono = Mono.just(auxiliaryMemberIds);
+            } else {
+                memberIdsMono = groupMemberService
+                        .queryGroupMembersIds(targetId)
+                        .collect(Collectors.toSet());
+            }
+            return memberIdsMono
+                    .flatMap(membersIds -> {
+                        if (membersIds.isEmpty()) {
+                            return Mono.just(true);
+                        } else {
+                            List<MessageStatus> messageStatuses = new ArrayList<>(membersIds.size());
+                            for (Long memberId : membersIds) {
+                                messageStatuses.add(new MessageStatus(
+                                        messageId,
+                                        targetId,
+                                        isSystemMessage,
+                                        senderId,
+                                        memberId,
+                                        MessageDeliveryStatus.READY,
+                                        null,
+                                        null,
+                                        null));
                             }
-                        });
-            default:
-                throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS);
+                            return mongoOperations.insertAll(messageStatuses).then(Mono.just(true));
+                        }
+                    });
+        } else {
+            MessageStatus messageStatus = new MessageStatus(
+                    messageId,
+                    null,
+                    isSystemMessage,
+                    senderId,
+                    targetId,
+                    MessageDeliveryStatus.READY,
+                    null,
+                    null,
+                    null);
+            return mongoOperations.save(messageStatus).thenReturn(true);
         }
     }
 
@@ -399,7 +395,7 @@ public class MessageService {
             @Nullable Long messageId,
             @NotNull Long senderId,
             @NotNull Long targetId,
-            @NotNull @ChatTypeConstraint ChatType chatType,
+            @NotNull Boolean isGroupMessage,
             @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
@@ -421,7 +417,7 @@ public class MessageService {
                         finalMessageId,
                         senderId,
                         targetId,
-                        chatType,
+                        isGroupMessage,
                         isSystemMessage,
                         text,
                         records,
@@ -432,7 +428,7 @@ public class MessageService {
                         .zipWith(saveMessageStatuses(
                                 finalMessageId,
                                 isSystemMessage,
-                                chatType,
+                                isGroupMessage,
                                 senderId,
                                 targetId,
                                 auxiliaryMemberIds,
@@ -445,7 +441,7 @@ public class MessageService {
     public Flux<Long> queryExpiredMessagesIds(@NotNull Integer timeToLiveHours) {
         Date beforeDate = Date.from(Instant.now().minus(timeToLiveHours, ChronoUnit.HOURS));
         Query query = new Query()
-                .addCriteria(Criteria.where(Message.Fields.deliveryDate).lt(beforeDate));
+                .addCriteria(Criteria.where(Message.Fields.DELIVERY_DATE).lt(beforeDate));
         query.fields().include(ID);
         return mongoTemplate.find(query, Message.class)
                 .map(Message::getId);
@@ -454,12 +450,12 @@ public class MessageService {
     public Mono<Boolean> deleteExpiredMessagesAndStatuses(@NotNull Integer timeToLiveHours) {
         return queryExpiredMessagesIds(timeToLiveHours)
                 .collectList()
-                .flatMap(messagesIds -> {
-                    if (messagesIds.isEmpty()) {
+                .flatMap(expiredMessagesIds -> {
+                    if (expiredMessagesIds.isEmpty()) {
                         return Mono.just(true);
                     } else {
-                        Query messagesQuery = new Query().addCriteria(Criteria.where(ID).in(messagesIds));
-                        Query messagesStatusesQuery = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).in(messagesIds));
+                        Query messagesQuery = new Query().addCriteria(Criteria.where(ID).in(expiredMessagesIds));
+                        Query messagesStatusesQuery = new Query().addCriteria(Criteria.where(ID_MESSAGE_ID).in(expiredMessagesIds));
                         Mono<Boolean> allowedMono = Mono.just(true);
                         if (pluginEnabled) {
                             allowedMono = mongoTemplate.find(messagesQuery, Message.class)
@@ -512,7 +508,7 @@ public class MessageService {
                     .getMessage().isDeleteMessageLogicallyByDefault();
         }
         if (shouldDeleteLogically) {
-            Update update = new Update().set(Message.Fields.deletionDate, new Date());
+            Update update = new Update().set(Message.Fields.DELETION_DATE, new Date());
             if (deleteMessageStatus) {
                 return mongoTemplate.inTransaction()
                         .execute(operations -> operations.updateMulti(queryMessage, update, Message.class)
@@ -550,8 +546,8 @@ public class MessageService {
         }
         Query query = new Query().addCriteria(Criteria.where(ID).in(messageIds));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(Message.Fields.text, text)
-                .setIfNotNull(Message.Fields.records, records)
+                .setIfNotNull(Message.Fields.TEXT, text)
+                .setIfNotNull(Message.Fields.RECORDS, records)
                 .build();
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.updateMulti(query, update, Message.class)
@@ -571,7 +567,7 @@ public class MessageService {
 
     public Mono<Long> countMessages(
             @Nullable Set<Long> messageIds,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages,
             @Nullable Set<Long> senderIds,
             @Nullable Set<Long> targetIds,
@@ -579,14 +575,14 @@ public class MessageService {
             @Nullable DateRange deletionDateRange,
             @Nullable Set<MessageDeliveryStatus> deliveryStatuses) {
         QueryBuilder builder = QueryBuilder.newBuilder()
-                .addIsIfNotNull(Message.Fields.chatType, chatType)
-                .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
-                .addIsIfNotNull(Message.Fields.senderId, senderIds)
-                .addIsIfNotNull(Message.Fields.targetId, targetIds)
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, deliveryDateRange)
-                .addBetweenIfNotNull(Message.Fields.deletionDate, deletionDateRange);
+                .addIsIfNotNull(Message.Fields.IS_GROUP_MESSAGE, areGroupMessages)
+                .addIsIfNotNull(Message.Fields.IS_SYSTEM_MESSAGE, areSystemMessages)
+                .addIsIfNotNull(Message.Fields.SENDER_ID, senderIds)
+                .addIsIfNotNull(Message.Fields.TARGET_ID, targetIds)
+                .addBetweenIfNotNull(Message.Fields.DELIVERY_DATE, deliveryDateRange)
+                .addBetweenIfNotNull(Message.Fields.DELETION_DATE, deletionDateRange);
         if (deliveryStatuses != null && !deliveryStatuses.isEmpty()) {
-            return messageStatusService.queryMessagesIdsByDeliveryStatusesAndTargetIds(deliveryStatuses, chatType, targetIds)
+            return messageStatusService.queryMessagesIdsByDeliveryStatusesAndTargetIds(deliveryStatuses, areGroupMessages, targetIds)
                     .collect(Collectors.toSet())
                     .flatMap(ids -> {
                         if (ids.isEmpty()) {
@@ -606,46 +602,46 @@ public class MessageService {
 
     public Mono<Long> countUsersWhoSentMessage(
             @Nullable DateRange dateRange,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages) {
         Criteria criteria = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, dateRange)
-                .addIsIfNotNull(Message.Fields.chatType, chatType)
-                .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
+                .addBetweenIfNotNull(Message.Fields.DELIVERY_DATE, dateRange)
+                .addIsIfNotNull(Message.Fields.IS_GROUP_MESSAGE, areGroupMessages)
+                .addIsIfNotNull(Message.Fields.IS_SYSTEM_MESSAGE, areSystemMessages)
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
                 criteria,
-                Message.Fields.senderId,
+                Message.Fields.SENDER_ID,
                 Message.class);
     }
 
     public Mono<Long> countGroupsThatSentMessages(
             @Nullable DateRange dateRange) {
         Criteria criteria = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, dateRange)
-                .add(Criteria.where(Message.Fields.chatType).is(ChatType.GROUP))
+                .addBetweenIfNotNull(Message.Fields.DELIVERY_DATE, dateRange)
+                .add(Criteria.where(Message.Fields.IS_GROUP_MESSAGE).is(true))
                 .buildCriteria();
         return AggregationUtil.countDistinct(
                 mongoTemplate,
                 criteria,
-                Message.Fields.targetId,
+                Message.Fields.TARGET_ID,
                 Message.class);
     }
 
     public Mono<Long> countUsersWhoAcknowledgedMessage(
             @Nullable DateRange dateRange,
-            @Nullable ChatType chatType) {
+            @Nullable Boolean areGroupMessage) {
         Criteria criteria = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, dateRange)
+                .addBetweenIfNotNull(MessageStatus.Fields.RECEPTION_DATE, dateRange)
                 .buildCriteria();
-        if (chatType != null) {
-            if (chatType == ChatType.GROUP) {
-                criteria.and(MessageStatus.Fields.groupId).ne(null);
-            } else if (chatType == ChatType.PRIVATE) {
-                criteria.and(MessageStatus.Fields.groupId).is(null);
-            }
+        if (areGroupMessage != null) {
+            if (areGroupMessage) {
+                criteria.and(MessageStatus.Fields.GROUP_ID).ne(null);
+            } else
+                criteria.and(MessageStatus.Fields.GROUP_ID).is(null);
         }
+
         return AggregationUtil.countDistinct(
                 mongoTemplate,
                 criteria,
@@ -655,26 +651,26 @@ public class MessageService {
 
     public Mono<Long> countSentMessages(
             @Nullable DateRange dateRange,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(Message.Fields.deliveryDate, dateRange)
-                .addIsIfNotNull(Message.Fields.chatType, chatType)
-                .addIsIfNotNull(Message.Fields.isSystemMessage, areSystemMessages)
+                .addBetweenIfNotNull(Message.Fields.DELIVERY_DATE, dateRange)
+                .addIsIfNotNull(Message.Fields.IS_GROUP_MESSAGE, areGroupMessages)
+                .addIsIfNotNull(Message.Fields.IS_SYSTEM_MESSAGE, areSystemMessages)
                 .buildQuery();
         return mongoTemplate.count(query, Message.class);
     }
 
     public Mono<Long> countSentMessagesOnAverage(
             @Nullable DateRange dateRange,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages) {
-        return countSentMessages(dateRange, chatType, areSystemMessages)
+        return countSentMessages(dateRange, areGroupMessages, areSystemMessages)
                 .flatMap(totalDeliveredMessages -> {
                     if (totalDeliveredMessages == 0) {
                         return Mono.just(0L);
                     } else {
-                        return countUsersWhoSentMessage(dateRange, chatType, areSystemMessages)
+                        return countUsersWhoSentMessage(dateRange, areGroupMessages, areSystemMessages)
                                 .map(totalUsers -> {
                                     if (totalUsers == 0) {
                                         return Long.MAX_VALUE;
@@ -688,32 +684,33 @@ public class MessageService {
 
     public Mono<Long> countAcknowledgedMessages(
             @Nullable DateRange dateRange,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages) {
         Query query = QueryBuilder.newBuilder()
-                .addBetweenIfNotNull(MessageStatus.Fields.receptionDate, dateRange)
-                .addIsIfNotNull(MessageStatus.Fields.isSystemMessage, areSystemMessages)
+                .addBetweenIfNotNull(MessageStatus.Fields.RECEPTION_DATE, dateRange)
+                .addIsIfNotNull(MessageStatus.Fields.IS_SYSTEM_MESSAGE, areSystemMessages)
                 .buildQuery();
-        if (chatType != null) {
-            if (chatType == ChatType.GROUP) {
-                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).ne(null));
-            } else if (chatType == ChatType.PRIVATE) {
-                query.addCriteria(Criteria.where(MessageStatus.Fields.groupId).is(null));
+        if (areGroupMessages != null) {
+            if (areGroupMessages) {
+                query.addCriteria(Criteria.where(MessageStatus.Fields.GROUP_ID).ne(null));
+            } else {
+                query.addCriteria(Criteria.where(MessageStatus.Fields.GROUP_ID).is(null));
             }
         }
+
         return mongoTemplate.count(query, MessageStatus.class);
     }
 
     public Mono<Long> countAcknowledgedMessagesOnAverage(
             @Nullable DateRange dateRange,
-            @Nullable ChatType chatType,
+            @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages) {
-        return countAcknowledgedMessages(dateRange, chatType, areSystemMessages)
+        return countAcknowledgedMessages(dateRange, areGroupMessages, areSystemMessages)
                 .flatMap(totalAcknowledgedMessages -> {
                     if (totalAcknowledgedMessages == 0) {
                         return Mono.just(0L);
                     } else {
-                        return countUsersWhoAcknowledgedMessage(dateRange, chatType)
+                        return countUsersWhoAcknowledgedMessage(dateRange, areGroupMessages)
                                 .map(totalUsers -> {
                                     if (totalUsers == 0) {
                                         return Long.MAX_VALUE;
@@ -756,7 +753,7 @@ public class MessageService {
                                         return updateMessageAndMessageStatus(messageId, recipientId, text, records, recallDate, readDate);
                                     });
                         } else {
-                            return updateMessageAndMessageStatus(messageId, recipientId, text, records, recallDate, readDate);
+                            return updateMessageAndMessageStatus(messageId, recipientId, text, records, null, readDate);
                         }
                     });
         } else {
@@ -801,14 +798,14 @@ public class MessageService {
 
     public Mono<Long> queryMessageSenderId(@NotNull Long messageId) {
         Query query = new Query().addCriteria(Criteria.where(ID).is(messageId));
-        query.fields().include(Message.Fields.senderId);
+        query.fields().include(Message.Fields.SENDER_ID);
         return mongoTemplate.findOne(query, Message.class)
                 .map(Message::getSenderId);
     }
 
     public Flux<Message> queryChatTypes(@NotEmpty Set<Long> messageIds) {
         Query query = new Query().addCriteria(Criteria.where(ID).in(messageIds));
-        query.fields().include(Message.Fields.chatType);
+        query.fields().include(Message.Fields.CHAT_TYPE);
         return mongoTemplate.find(query, Message.class);
     }
 
@@ -817,24 +814,24 @@ public class MessageService {
             @Nullable Long messageId,
             @NotNull Long senderId,
             @NotNull Long targetId,
-            @NotNull @ChatTypeConstraint ChatType chatType,
+            @NotNull Boolean isGroupMessage,
             @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
             @Nullable @Min(0) Integer burnAfter,
             @Nullable @PastOrPresent Date deliveryDate,
             @Nullable Long referenceId) {
-        return userService.isAllowedToSendMessageToTarget(chatType, isSystemMessage, senderId, targetId)
+        return userService.isAllowedToSendMessageToTarget(isGroupMessage, isSystemMessage, senderId, targetId)
                 .flatMap(allowed -> {
                     if (allowed == null || !allowed) {
                         return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
                     }
                     Mono<Set<Long>> recipientIdsMono;
-                    if (chatType == ChatType.PRIVATE) {
-                        recipientIdsMono = Mono.just(Collections.singleton(targetId));
-                    } else {
+                    if (isGroupMessage) {
                         recipientIdsMono = groupMemberService.getMembersIdsByGroupId(targetId)
                                 .collect(Collectors.toSet());
+                    } else {
+                        recipientIdsMono = Mono.just(Collections.singleton(targetId));
                     }
                     return recipientIdsMono.flatMap(recipientsIds -> {
                         if (!turmsClusterManager.getTurmsProperties().getMessage().isMessagePersistent()) {
@@ -846,10 +843,10 @@ public class MessageService {
                         }
                         Mono<Message> saveMono;
                         if (turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent()) {
-                            saveMono = saveMessageAndMessagesStatus(messageId, senderId, targetId, chatType,
+                            saveMono = saveMessageAndMessagesStatus(messageId, senderId, targetId, isGroupMessage,
                                     isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, recipientsIds);
                         } else {
-                            saveMono = saveMessage(null, senderId, targetId, chatType,
+                            saveMono = saveMessage(null, senderId, targetId, isGroupMessage,
                                     isSystemMessage, text, records, burnAfter, deliveryDate,
                                     referenceId, null);
                         }
@@ -869,7 +866,7 @@ public class MessageService {
     public Mono<Pair<Message, Set<Long>>> authAndCloneAndSaveMessage(
             @NotNull Long requesterId,
             @NotNull Long referenceId,
-            @NotNull @ChatTypeConstraint ChatType chatType,
+            @NotNull Boolean isGroupMessage,
             @NotNull Boolean isSystemMessage,
             @NotNull Long targetId) {
         return queryMessage(referenceId)
@@ -877,7 +874,7 @@ public class MessageService {
                         turmsClusterManager.generateRandomId(),
                         requesterId,
                         targetId,
-                        chatType,
+                        isGroupMessage,
                         isSystemMessage,
                         message.getText(),
                         message.getRecords(),
@@ -889,7 +886,7 @@ public class MessageService {
     public Mono<Boolean> sendMessage(
             boolean shouldSend,
             @Nullable Long messageId,
-            @NotNull @ChatTypeConstraint ChatType chatType,
+            @NotNull Boolean isGroupMessage,
             @NotNull Boolean isSystemMessage,
             @Nullable String text,
             @Nullable List<byte[]> records,
@@ -906,14 +903,14 @@ public class MessageService {
             }
         }
         Date deliveryDate = new Date();
-        Message message = new Message(messageId, chatType, isSystemMessage, deliveryDate, null,
+        Message message = new Message(messageId, isGroupMessage, isSystemMessage, deliveryDate, null,
                 text, senderId, targetId, records, burnAfter, referenceId);
         if (shouldSend) {
             return authAndSaveMessage(
                     messageId,
                     senderId,
                     targetId,
-                    chatType,
+                    isGroupMessage,
                     isSystemMessage,
                     text,
                     records,
@@ -945,10 +942,10 @@ public class MessageService {
         } else {
             Mono<Message> messageMono;
             if (turmsClusterManager.getTurmsProperties().getMessage().isMessageStatusPersistent()) {
-                messageMono = saveMessageAndMessagesStatus(messageId, senderId, targetId, chatType,
+                messageMono = saveMessageAndMessagesStatus(messageId, senderId, targetId, isGroupMessage,
                         isSystemMessage, text, records, burnAfter, deliveryDate, null, null);
             } else {
-                messageMono = saveMessage(null, senderId, targetId, chatType,
+                messageMono = saveMessage(null, senderId, targetId, isGroupMessage,
                         isSystemMessage, text, records, burnAfter, deliveryDate, referenceId, null);
             }
             return messageMono.doOnSuccess(msg -> {
@@ -968,7 +965,7 @@ public class MessageService {
             for (Long messagesId : messagesIds) {
                 Message message = sentMessageCache.getIfPresent(messagesId);
                 if (message != null) {
-                    if (message.getChatType() == ChatType.PRIVATE) {
+                    if (!message.getIsGroupMessage()) {
                         if (privateMessageIds == null) {
                             privateMessageIds = new HashSet<>();
                         }
@@ -990,7 +987,7 @@ public class MessageService {
                         .map(messages -> {
                             Set<Long> ids = null;
                             for (Message message : messages) {
-                                if (message.getChatType() == ChatType.PRIVATE) {
+                                if (!message.getIsGroupMessage()) {
                                     if (ids == null) {
                                         ids = new HashSet<>();
                                     }
@@ -1013,7 +1010,7 @@ public class MessageService {
     private void addSentMessage2Cache(@NotNull Message message) {
         sentMessageCache.put(message.getId(), new Message(
                 message.getId(),
-                message.getChatType(),
+                message.getIsGroupMessage(),
                 message.getIsSystemMessage(),
                 message.getDeliveryDate(),
                 null,

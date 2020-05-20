@@ -19,11 +19,10 @@ package im.turms.turms.access.websocket.controller;
 
 import helper.Constants;
 import im.turms.client.TurmsClient;
-import im.turms.common.constant.ChatType;
 import im.turms.common.constant.ProfileAccessStrategy;
-import im.turms.turms.util.TurmsPasswordUtil;
 import im.turms.turms.pojo.domain.User;
 import im.turms.turms.pojo.domain.UserRelationship;
+import im.turms.turms.util.TurmsPasswordUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +78,7 @@ public class WsMessageControllerST extends BaseController {
                 .login(2L, "123")
                 .get(5, TimeUnit.SECONDS);
         Long sentMessageId = clientOne.getMessageService()
-                .sendMessage(ChatType.PRIVATE, 2L, null, "test", null, null)
+                .sendMessage(false, 2L, null, "test", null, null)
                 .get(5, TimeUnit.SECONDS);
         long receivedMessageId = clientTwo.getMessageService()
                 .queryMessages(null, null, null, 1L, null, null, null, null)

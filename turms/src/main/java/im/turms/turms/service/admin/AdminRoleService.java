@@ -210,9 +210,9 @@ public class AdminRoleService {
         }
         Query query = new Query().addCriteria(Criteria.where(Common.ID).in(roleIds));
         Update update = UpdateBuilder.newBuilder()
-                .setIfNotNull(AdminRole.Fields.name, newName)
-                .setIfNotNull(AdminRole.Fields.permissions, permissions)
-                .setIfNotNull(AdminRole.Fields.rank, rank)
+                .setIfNotNull(AdminRole.Fields.NAME, newName)
+                .setIfNotNull(AdminRole.Fields.PERMISSIONS, permissions)
+                .setIfNotNull(AdminRole.Fields.RANK, rank)
                 .build();
         return mongoTemplate.updateMulti(query, update, AdminRole.class)
                 .map(result -> {
@@ -248,9 +248,9 @@ public class AdminRoleService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(AdminRole.Fields.name, names)
-                .addInIfNotNull(AdminRole.Fields.permissions, includedPermissions)
-                .addInIfNotNull(AdminRole.Fields.rank, ranks)
+                .addInIfNotNull(AdminRole.Fields.NAME, names)
+                .addInIfNotNull(AdminRole.Fields.PERMISSIONS, includedPermissions)
+                .addInIfNotNull(AdminRole.Fields.RANK, ranks)
                 .paginateIfNotNull(page, size);
         return Flux.from(mongoTemplate.find(query, AdminRole.class)
                 .concatWithValues(getRootRole()));
@@ -264,9 +264,9 @@ public class AdminRoleService {
         Query query = QueryBuilder
                 .newBuilder()
                 .addInIfNotNull(ID, ids)
-                .addInIfNotNull(AdminRole.Fields.name, names)
-                .addInIfNotNull(AdminRole.Fields.permissions, includedPermissions)
-                .addInIfNotNull(AdminRole.Fields.rank, ranks)
+                .addInIfNotNull(AdminRole.Fields.NAME, names)
+                .addInIfNotNull(AdminRole.Fields.PERMISSIONS, includedPermissions)
+                .addInIfNotNull(AdminRole.Fields.RANK, ranks)
                 .buildQuery();
         return mongoTemplate.count(query, AdminRole.class)
                 .map(number -> number + 1);
@@ -289,7 +289,7 @@ public class AdminRoleService {
         } else {
             Query query = new Query();
             query.addCriteria(Criteria.where(ID).is(roleId));
-            query.fields().include(AdminRole.Fields.rank);
+            query.fields().include(AdminRole.Fields.RANK);
             return mongoTemplate.findOne(query, AdminRole.class)
                     .map(AdminRole::getRank);
         }
@@ -302,7 +302,7 @@ public class AdminRoleService {
         } else {
             Query query = new Query();
             query.addCriteria(Criteria.where(ID).in(rolesIds));
-            query.fields().include(AdminRole.Fields.rank);
+            query.fields().include(AdminRole.Fields.RANK);
             Flux<AdminRole> roleFlux = mongoTemplate.find(query, AdminRole.class);
             if (containsRoot) {
                 roleFlux = roleFlux.concatWithValues(getRootRole());
