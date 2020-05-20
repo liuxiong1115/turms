@@ -29,6 +29,14 @@ public class TurmsClient {
         this(turmsServerUrl, connectionTimeout, minRequestsInterval, null);
     }
 
+    public TurmsClient(ClientOptions options) {
+        this(options.turmsServerUrl(),
+                options.connectionTimeout(),
+                options.minRequestsInterval(),
+                options.storageServerUrl());
+    }
+
+    // Base constructor
     public TurmsClient(
             @Nullable String turmsServerUrl,
             @Nullable Integer connectionTimeout,
