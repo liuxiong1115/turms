@@ -34,7 +34,7 @@ public class MessageService {
      * Format: "@{userId}"
      * Example: "@{123}", "I need to talk with @{123} and @{321}"
      */
-    private static final Function<Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<>() {
+    private static final Function<Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<Message, Set<Long>>() {
         private final Pattern regex = Pattern.compile("@\\{(\\d+?)}");
 
         @Override
@@ -88,7 +88,7 @@ public class MessageService {
             @Nullable byte[] records,
             @Nullable Integer burnAfter) {
         if (text == null && records == null) {
-            return CompletableFuture.failedFuture(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "text and records must not all be null"));
+            return TurmsBusinessException.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "text and records must not all be null");
         }
         if (deliveryDate == null) {
             deliveryDate = new Date();

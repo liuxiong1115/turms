@@ -10,6 +10,7 @@ import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.user.*;
 import org.junit.jupiter.api.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -233,7 +234,9 @@ public class UserServiceST {
     @Test
     @Order(ORDER_LOW_PRIORITY)
     public void queryUsersOnlineStatusRequest_shouldUsersOnlineStatus() throws ExecutionException, InterruptedException, TimeoutException {
-        List<UserStatusDetail> result = turmsClient.getUserService().queryUsersOnlineStatusRequest(Set.of(1L))
+        Set<Long> set = new HashSet<>();
+        set.add(1L);
+        List<UserStatusDetail> result = turmsClient.getUserService().queryUsersOnlineStatusRequest(set)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(userStatus, result.get(0).getUserStatus());
     }
@@ -241,7 +244,9 @@ public class UserServiceST {
     @Test
     @Order(ORDER_LOW_PRIORITY)
     public void queryRelationships_shouldReturnUserRelationshipsWithVersion() throws ExecutionException, InterruptedException, TimeoutException {
-        UserRelationshipsWithVersion result = turmsClient.getUserService().queryRelationships(List.of(2L), null, null, null)
+        Set<Long> set = new HashSet<>();
+        set.add(2L);
+        UserRelationshipsWithVersion result = turmsClient.getUserService().queryRelationships(set, null, null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(result);
     }
