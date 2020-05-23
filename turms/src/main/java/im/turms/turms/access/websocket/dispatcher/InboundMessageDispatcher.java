@@ -54,6 +54,7 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Function;
 
@@ -196,8 +197,9 @@ public class InboundMessageDispatcher {
                     }
                 })
                 .flatMap(requestResult -> requestResult.getCode() == TurmsStatusCode.OK
-                        ? handleSuccessResult(requestResult, session, requestId, requesterId, requesterDevice)
-                        : handleFailResult(requestResult, session, requestId));
+                        ? notifyRelatedUsersOfAction(requestResult, requesterId, requesterDevice)
+                        .map(notified -> generateWebSocketMessageFromResult(requestResult, session, requestId, requesterId, requesterDevice))
+                        : Mono.just(generateWebSocketMessageFromResult(requestResult, session, requestId, requesterId, requesterDevice)));
     }
 
     /**
@@ -216,8 +218,8 @@ public class InboundMessageDispatcher {
             if (areRequestsTooFrequent(session)) {
                 long requestId = ProtoUtil.parseRequestId(payload.asByteBuffer());
                 RequestResult requestResult = RequestResult.create(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT);
-                TurmsNotification notification = generateNotification(requestResult, requestId);
-                WebSocketMessage binaryMessage = session.binaryMessage(factory -> factory.wrap(notification.toByteArray()));
+                ByteBuffer byteBuffer = generateResponseBuffer(requestResult, requestId);
+                WebSocketMessage binaryMessage = session.binaryMessage(factory -> factory.wrap(byteBuffer));
                 return Mono.just(binaryMessage);
             } else {
                 request = TurmsRequest.parseFrom(payload.asByteBuffer());
@@ -299,7 +301,7 @@ public class InboundMessageDispatcher {
         }
     }
 
-    private TurmsNotification generateNotification(RequestResult requestResult, long requestId) {
+    private ByteBuffer generateResponseBuffer(RequestResult requestResult, long requestId) {
         TurmsStatusCode code = requestResult.getCode();
         if (code == null) {
             IllegalArgumentException exception = new IllegalArgumentException("the business code must not be null");
@@ -316,31 +318,19 @@ public class InboundMessageDispatcher {
             builder.setData(dataForRequester);
         }
         Int32Value businessCode = Int32Value.newBuilder().setValue(code.getBusinessCode()).build();
-        return builder
+        TurmsNotification notification = builder
                 .setCode(businessCode)
                 .setRequestId(Int64Value.newBuilder().setValue(requestId).build())
                 .build();
+        return ProtoUtil.getByteBuffer(notification);
     }
 
-    private Mono<WebSocketMessage> handleSuccessResult(RequestResult requestResult, WebSocketSession session, Long requestId, Long requesterId, DeviceType requesterDevice) {
-        return notifyRelatedUsersOfAction(requestResult, requesterId, requesterDevice)
-                .flatMap(success -> {
-                    if (requestId != null) {
-                        TurmsNotification notification = generateNotification(requestResult, requestId);
-                        return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory.wrap(notification.toByteArray())));
-                    } else {
-                        return Mono.empty();
-                    }
-                });
-    }
-
-    private Mono<WebSocketMessage> handleFailResult(RequestResult requestResult, WebSocketSession session, Long requestId) {
+    private WebSocketMessage generateWebSocketMessageFromResult(RequestResult requestResult, WebSocketSession session, Long requestId, Long requesterId, DeviceType requesterDevice) {
         if (requestId != null) {
-            TurmsNotification notification = generateNotification(requestResult, requestId);
-            return Mono.just(session.binaryMessage(dataBufferFactory -> dataBufferFactory
-                    .wrap(notification.toByteArray())));
+            ByteBuffer byteBuffer = generateResponseBuffer(requestResult, requestId);
+            return session.binaryMessage(dataBufferFactory -> dataBufferFactory.wrap(byteBuffer));
         } else {
-            return Mono.empty();
+            return session.binaryMessage(DataBufferFactory::allocateBuffer);
         }
     }
 }
