@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 The Turms Project
+ * https://github.com/turms-im/turms
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package im.turms.client.driver;
 
 import com.google.protobuf.Descriptors;
@@ -5,13 +22,13 @@ import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import im.turms.client.TurmsClient;
-import im.turms.client.common.Function4;
+import im.turms.client.common.Consumer4;
 import im.turms.client.common.StringUtil;
 import im.turms.client.util.ProtoUtil;
-import im.turms.common.TurmsCloseStatus;
-import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
+import im.turms.common.constant.statuscode.SessionCloseStatus;
+import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.user.UserLocation;
 import im.turms.common.model.dto.notification.TurmsNotification;
@@ -25,7 +42,7 @@ import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,14 +51,13 @@ import static java.util.AbstractMap.SimpleEntry;
 public class TurmsDriver {
     private static final Logger LOGGER = Logger.getLogger(TurmsDriver.class.getName());
 
-    private static final Integer HEARTBEAT_INTERVAL = 20 * 1000;
+    private static final Integer HEARTBEAT_INTERVAL = 120 * 1000;
     public static final String REQUEST_ID_FIELD = "rid";
     public static final String USER_ID_FIELD = "uid";
     public static final String PASSWORD_FIELD = "pwd";
     public static final String DEVICE_TYPE_FIELD = "dt";
     public static final String USER_ONLINE_STATUS_FIELD = "us";
     public static final String USER_LOCATION_FIELD = "loc";
-    public static final String USER_DEVICE_DETAILS = "dd";
     private static final String LOCATION_SPLIT = ":";
 
     private final Integer heartbeatInterval;
@@ -56,10 +72,10 @@ public class TurmsDriver {
     private ScheduledFuture<?> heartbeatFuture;
     private final HashMap<Long, SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>();
 
-    private final List<Function<TurmsNotification, Void>> onNotificationListeners = new LinkedList<>();
+    private final List<Consumer<TurmsNotification>> onNotificationListeners = new LinkedList<>();
     private final ConcurrentLinkedQueue<CompletableFuture<Void>> heartbeatCallbacks = new ConcurrentLinkedQueue<>();
     // TurmsCloseStatus, WebSocket status code, WebSocket reason, error
-    private Function4<TurmsCloseStatus, Integer, String, Throwable, Void> onClose;
+    private Consumer4<SessionCloseStatus, Integer, String, Throwable> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
     private int connectionTimeout = 10;
@@ -73,7 +89,7 @@ public class TurmsDriver {
         return httpClient;
     }
 
-    public List<Function<TurmsNotification, Void>> getOnNotificationListeners() {
+    public List<Consumer<TurmsNotification>> getOnNotificationListeners() {
         return onNotificationListeners;
     }
 
@@ -85,7 +101,7 @@ public class TurmsDriver {
         return sessionId;
     }
 
-    public void setOnClose(Function4<TurmsCloseStatus, Integer, String, Throwable, Void> onClose) {
+    public void setOnClose(Consumer4<SessionCloseStatus, Integer, String, Throwable> onClose) {
         this.onClose = onClose;
     }
 
@@ -229,7 +245,7 @@ public class TurmsDriver {
                                 CompletableFuture<TurmsNotification> future = pair.getValue();
                                 if (notification.hasCode()) {
                                     int code = notification.getCode().getValue();
-                                    if (TurmsStatusCode.isSuccess(code)) {
+                                    if (TurmsStatusCode.isSuccessCode(code)) {
                                         future.complete(notification);
                                     } else {
                                         TurmsBusinessException exception = notification.hasReason()
@@ -246,9 +262,9 @@ public class TurmsDriver {
                                 }
                             }
                         }
-                        for (Function<TurmsNotification, Void> listener : onNotificationListeners) {
+                        for (Consumer<TurmsNotification> listener : onNotificationListeners) {
                             try {
-                                listener.apply(notification);
+                                listener.accept(notification);
                             } catch (Exception e) {
                                 LOGGER.log(Level.SEVERE, "", e);
                             }
@@ -259,18 +275,18 @@ public class TurmsDriver {
                 @Override
                 public void onClosed(@org.jetbrains.annotations.NotNull WebSocket webSocket, int code, @org.jetbrains.annotations.NotNull String reason) {
                     clearWebSocket();
-                    TurmsCloseStatus status = TurmsCloseStatus.get(code);
-                    if (status == TurmsCloseStatus.REDIRECT && !reason.isEmpty()) {
+                    SessionCloseStatus status = SessionCloseStatus.get(code);
+                    if (status == SessionCloseStatus.REDIRECT && !reason.isEmpty()) {
                         try {
                             reconnect(reason).get(10, TimeUnit.SECONDS);
                         } catch (Exception e) {
                             RuntimeException runtimeException = new RuntimeException("Failed to reconnect", e);
                             if (onClose != null) {
-                                onClose.apply(status, code, reason, runtimeException);
+                                onClose.accept(status, code, reason, runtimeException);
                             }
                         }
                     } else if (onClose != null) {
-                        onClose.apply(status, code, reason, null);
+                        onClose.accept(status, code, reason, null);
                     }
                 }
 
@@ -280,7 +296,7 @@ public class TurmsDriver {
                     // response != null when it failed at handshake stage
                     boolean isReconnecting = false;
                     if (response != null && response.code() == 307) {
-                        String reason = response.header("reason");
+                        String reason = response.header("X-API-Reason");
                         if (reason != null) {
                             isReconnecting = true;
                             reconnect(reason).whenComplete((aVoid, t) -> {
@@ -293,7 +309,7 @@ public class TurmsDriver {
                         }
                     }
                     if (onClose != null) {
-                        onClose.apply(null, null, null, throwable);
+                        onClose.accept(null, null, null, throwable);
                     }
                     if (!isReconnecting) {
                         loginFuture.completeExceptionally(throwable);

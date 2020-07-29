@@ -8,5 +8,4 @@ option swift_prefix = "";
 
 message Session {
     string session_id = 1;
-    string address = 2;
 }

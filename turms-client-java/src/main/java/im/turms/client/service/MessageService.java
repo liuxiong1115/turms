@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 The Turms Project
+ * https://github.com/turms-im/turms
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package im.turms.client.service;
 
 import com.google.protobuf.*;
@@ -5,8 +22,8 @@ import im.turms.client.TurmsClient;
 import im.turms.client.model.MessageAddition;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
-import im.turms.common.TurmsStatusCode;
 import im.turms.common.constant.MessageDeliveryStatus;
+import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.file.AudioFile;
 import im.turms.common.model.bo.file.File;
@@ -24,7 +41,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,11 +51,11 @@ public class MessageService {
      * Format: "@{userId}"
      * Example: "@{123}", "I need to talk with @{123} and @{321}"
      */
-    private static final Function<Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<Message, Set<Long>>() {
+    private static final Function<im.turms.common.model.bo.message.Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<im.turms.common.model.bo.message.Message, Set<Long>>() {
         private final Pattern regex = Pattern.compile("@\\{(\\d+?)}");
 
         @Override
-        public Set<Long> apply(Message message) {
+        public Set<Long> apply(im.turms.common.model.bo.message.Message message) {
             if (message != null && message.hasText()) {
                 String text = message.getText().getValue();
                 Matcher matcher = regex.matcher(text);
@@ -54,9 +71,9 @@ public class MessageService {
     };
 
     private final TurmsClient turmsClient;
-    private Function<Message, Set<Long>> mentionedUserIdsParser;
+    private Function<im.turms.common.model.bo.message.Message, Set<Long>> mentionedUserIdsParser;
 
-    private BiFunction<Message, MessageAddition, Void> onMessage;
+    private BiConsumer<im.turms.common.model.bo.message.Message, MessageAddition> onMessage;
 
     public MessageService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;
@@ -67,16 +84,15 @@ public class MessageService {
                         TurmsRequest relayedRequest = notification.getRelayedRequest();
                         if (relayedRequest.hasCreateMessageRequest()) {
                             CreateMessageRequest createMessageRequest = relayedRequest.getCreateMessageRequest();
-                            Message message = createMessageRequest2Message(notification.getRequestId().getValue(), createMessageRequest);
+                            im.turms.common.model.bo.message.Message message = createMessageRequest2Message(notification.getRequestId().getValue(), createMessageRequest);
                             MessageAddition addition = parseMessageAddition(message);
-                            onMessage.apply(message, addition);
+                            onMessage.accept(message, addition);
                         }
                     }
-                    return null;
                 });
     }
 
-    public void setOnMessage(BiFunction<Message, MessageAddition, Void> onMessage) {
+    public void setOnMessage(BiConsumer<im.turms.common.model.bo.message.Message, MessageAddition> onMessage) {
         this.onMessage = onMessage;
     }
 
@@ -131,7 +147,7 @@ public class MessageService {
                 .thenApply(notification -> null);
     }
 
-    public CompletableFuture<List<Message>> queryMessages(
+    public CompletableFuture<List<im.turms.common.model.bo.message.Message>> queryMessages(
             @Nullable List<Long> ids,
             @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages,
@@ -219,7 +235,7 @@ public class MessageService {
         }
     }
 
-    public void enableMention(@NotNull Function<Message, Set<Long>> mentionedUserIdsParser) {
+    public void enableMention(@NotNull Function<im.turms.common.model.bo.message.Message, Set<Long>> mentionedUserIdsParser) {
         if (mentionedUserIdsParser == null) {
             throw new IllegalArgumentException("mentionedUserIdsParser must not be null");
         }
@@ -374,7 +390,7 @@ public class MessageService {
                 .toByteArray();
     }
 
-    private MessageAddition parseMessageAddition(Message message) {
+    private MessageAddition parseMessageAddition(im.turms.common.model.bo.message.Message message) {
         Set<Long> mentionedUserIds;
         if (mentionedUserIdsParser != null) {
             mentionedUserIds = mentionedUserIdsParser.apply(message);
@@ -385,8 +401,8 @@ public class MessageService {
         return new MessageAddition(isMentioned, mentionedUserIds);
     }
 
-    private Message createMessageRequest2Message(long requesterId, CreateMessageRequest request) {
-        Message.Builder builder = Message.newBuilder();
+    private im.turms.common.model.bo.message.Message createMessageRequest2Message(long requesterId, CreateMessageRequest request) {
+        im.turms.common.model.bo.message.Message.Builder builder = Message.newBuilder();
         if (request.hasMessageId()) {
             builder.setId(request.getMessageId());
         }

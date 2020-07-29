@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 The Turms Project
+ * https://github.com/turms-im/turms
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
@@ -16,7 +33,7 @@ import static helper.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class MessageServiceST {
+class MessageServiceST {
     private static final long SENDER_ID = 1L;
     private static final long RECIPIENT_ID = 2L;
     private static final long GROUP_MEMBER_ID = 3L;
@@ -54,7 +71,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_FIRST)
-    public void constructor_shouldReturnNotNullMessageServiceInstance() {
+    void constructor_shouldReturnNotNullMessageServiceInstance() {
         assertNotNull(senderClient.getMessageService());
         assertNotNull(recipientClient.getMessageService());
     }
@@ -63,7 +80,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
-    public void sendPrivateMessage_shouldReturnMessageId() throws ExecutionException, InterruptedException, TimeoutException {
+    void sendPrivateMessage_shouldReturnMessageId() throws ExecutionException, InterruptedException, TimeoutException {
         privateMessageId = senderClient.getMessageService().sendMessage(false, RECIPIENT_ID, new Date(), "hello", null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(privateMessageId);
@@ -71,7 +88,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
-    public void sendGroupMessage_shouldReturnMessageId() throws ExecutionException, InterruptedException, TimeoutException {
+    void sendGroupMessage_shouldReturnMessageId() throws ExecutionException, InterruptedException, TimeoutException {
         groupMessageId = senderClient.getMessageService().sendMessage(true, TARGET_GROUP_ID, new Date(), "hello", null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(groupMessageId);
@@ -79,7 +96,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_HIGH_PRIORITY)
-    public void forwardPrivateMessage_shouldReturnForwardedMessageId() throws ExecutionException, InterruptedException, TimeoutException {
+    void forwardPrivateMessage_shouldReturnForwardedMessageId() throws ExecutionException, InterruptedException, TimeoutException {
         Long messageId = senderClient.getMessageService().forwardMessage(privateMessageId, false, RECIPIENT_ID)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(messageId);
@@ -87,7 +104,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_HIGH_PRIORITY)
-    public void forwardGroupMessage_shouldReturnForwardedMessageId() throws ExecutionException, InterruptedException, TimeoutException {
+    void forwardGroupMessage_shouldReturnForwardedMessageId() throws ExecutionException, InterruptedException, TimeoutException {
         Long messageId = senderClient.getMessageService().forwardMessage(groupMessageId, true, TARGET_GROUP_ID)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(messageId);
@@ -97,7 +114,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void recallMessage_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
+    void recallMessage_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = senderClient.getMessageService().recallMessage(groupMessageId, null)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
@@ -105,7 +122,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void updateSentMessage_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
+    void updateSentMessage_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = senderClient.getMessageService().updateSentMessage(privateMessageId, "I have modified the message", null)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
@@ -113,7 +130,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void readMessage_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
+    void readMessage_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = recipientClient.getMessageService().readMessage(privateMessageId, new Date())
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
@@ -121,7 +138,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY - 1)
-    public void markMessageUnread_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
+    void markMessageUnread_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = recipientClient.getMessageService().markMessageUnread(privateMessageId)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
@@ -129,7 +146,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    public void updateTypingStatus_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
+    void updateTypingStatus_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
         Void result = senderClient.getMessageService().updateTypingStatusRequest(false, privateMessageId)
                 .get(5, TimeUnit.SECONDS);
         assertNull(result);
@@ -139,7 +156,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    public void queryMessages_shouldReturnNotEmptyMessages() throws ExecutionException, InterruptedException, TimeoutException {
+    void queryMessages_shouldReturnNotEmptyMessages() throws ExecutionException, InterruptedException, TimeoutException {
         List<Message> messages = recipientClient.getMessageService().queryMessages(null, false, null, SENDER_ID, null, null, null, 10)
                 .get(5, TimeUnit.SECONDS);
         assertFalse(messages.isEmpty());
@@ -147,7 +164,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    public void queryPendingMessagesWithTotal_shouldReturnNotEmptyPendingMessagesWithTotal() throws ExecutionException, InterruptedException, TimeoutException {
+    void queryPendingMessagesWithTotal_shouldReturnNotEmptyPendingMessagesWithTotal() throws ExecutionException, InterruptedException, TimeoutException {
         List<MessagesWithTotal> messagesWithTotals = senderClient.getMessageService().queryPendingMessagesWithTotal(10)
                 .get(5, TimeUnit.SECONDS);
         assertFalse(messagesWithTotals.isEmpty());
@@ -155,7 +172,7 @@ public class MessageServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    public void queryMessageStatus_shouldReturnNotEmptyMessageStatus() throws ExecutionException, InterruptedException, TimeoutException {
+    void queryMessageStatus_shouldReturnNotEmptyMessageStatus() throws ExecutionException, InterruptedException, TimeoutException {
         List<MessageStatus> messageStatusesOfMember1 = senderClient.getMessageService().queryMessageStatus(groupMessageId)
                 .get(5, TimeUnit.SECONDS);
         List<MessageStatus> messageStatusesOfMember2 = groupMemberClient.getMessageService().queryMessageStatus(groupMessageId)
@@ -166,59 +183,59 @@ public class MessageServiceST {
     // Util
 
     @Test
-    public void generateLocationRecord() {
+    void generateLocationRecord() {
         byte[] data = MessageService.generateLocationRecord(1.0f, 1.0f, "name", "address");
         assertNotNull(data);
     }
 
     @Test
-    public void generateAudioRecordByDescription() {
+    void generateAudioRecordByDescription() {
         byte[] data = MessageService.generateAudioRecordByDescription("https://abc.com", null, null, null);
         assertNotNull(data);
     }
 
     @Test
-    public void generateAudioRecordByData() {
+    void generateAudioRecordByData() {
         byte[] source = new byte[]{0, 1, 2};
         byte[] data = MessageService.generateAudioRecordByData(source);
         assertNotNull(data);
     }
 
     @Test
-    public void generateVideoRecordByDescription() {
+    void generateVideoRecordByDescription() {
         byte[] data = MessageService.generateVideoRecordByDescription("https://abc.com", null, null, null);
         assertNotNull(data);
     }
 
     @Test
-    public void generateVideoRecordByData() {
+    void generateVideoRecordByData() {
         byte[] source = new byte[]{0, 1, 2};
         byte[] data = MessageService.generateVideoRecordByData(source);
         assertNotNull(data);
     }
 
     @Test
-    public void generateImageRecordByData() {
+    void generateImageRecordByData() {
         byte[] source = new byte[]{0, 1, 2};
         byte[] data = MessageService.generateImageRecordByData(source);
         assertNotNull(data);
     }
 
     @Test
-    public void generateFileRecordByDate() {
+    void generateFileRecordByDate() {
         byte[] source = new byte[]{0, 1, 2};
         byte[] data = MessageService.generateFileRecordByDate(source);
         assertNotNull(data);
     }
 
     @Test
-    public void generateImageRecordByDescription() {
+    void generateImageRecordByDescription() {
         byte[] data = MessageService.generateImageRecordByDescription("https://abc.com", null, null, null);
         assertNotNull(data);
     }
 
     @Test
-    public void generateFileRecordByDescription() {
+    void generateFileRecordByDescription() {
         byte[] data = MessageService.generateFileRecordByDescription("https://abc.com", null, null);
         assertNotNull(data);
     }
