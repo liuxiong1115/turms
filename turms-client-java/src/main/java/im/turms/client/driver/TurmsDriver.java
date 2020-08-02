@@ -48,7 +48,11 @@ import java.util.logging.Logger;
 
 import static java.util.AbstractMap.SimpleEntry;
 
+/**
+ * @author James Chen
+ */
 public class TurmsDriver {
+
     private static final Logger LOGGER = Logger.getLogger(TurmsDriver.class.getName());
 
     private static final Integer HEARTBEAT_INTERVAL = 120 * 1000;
@@ -58,7 +62,7 @@ public class TurmsDriver {
     public static final String DEVICE_TYPE_FIELD = "dt";
     public static final String USER_ONLINE_STATUS_FIELD = "us";
     public static final String USER_LOCATION_FIELD = "loc";
-    private static final String LOCATION_SPLIT = ":";
+    private static final String LOCATION_DELIMITER = ":";
 
     private final Integer heartbeatInterval;
 
@@ -203,7 +207,7 @@ public class TurmsDriver {
                     .header(USER_ID_FIELD, String.valueOf(userId))
                     .header(PASSWORD_FIELD, password);
             if (userLocation != null) {
-                String location = String.format("%f%s%f", userLocation.getLongitude(), LOCATION_SPLIT, userLocation.getLatitude());
+                String location = String.format("%f%s%f", userLocation.getLongitude(), LOCATION_DELIMITER, userLocation.getLatitude());
                 requestBuilder.header(USER_LOCATION_FIELD, location);
             }
             if (userOnlineStatus != null) {
@@ -216,7 +220,7 @@ public class TurmsDriver {
                 @Override
                 public void onOpen(@org.jetbrains.annotations.NotNull WebSocket webSocket, @org.jetbrains.annotations.NotNull Response response) {
                     heartbeatFuture = heartbeatTimer.scheduleAtFixedRate(
-                            (() -> checkAndSendHeartbeatTask()),
+                            (TurmsDriver.this::checkAndSendHeartbeatTask),
                             heartbeatInterval,
                             heartbeatInterval,
                             TimeUnit.SECONDS);
@@ -360,7 +364,7 @@ public class TurmsDriver {
     private long generateRandomId() {
         long id;
         do {
-            id = (long) (Math.random() * 16384);
+            id = ThreadLocalRandom.current().nextLong(1, 16384);
         } while (requestMap.containsKey(id));
         return id;
     }
@@ -395,4 +399,5 @@ public class TurmsDriver {
             future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
         }
     }
+
 }

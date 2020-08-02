@@ -34,6 +34,9 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @author James Chen
+ */
 public class StorageService {
 
     private final TurmsClient turmsClient;
@@ -232,4 +235,5 @@ public class StorageService {
     private String getBucketName(ContentType contentType) {
         return contentType.name().toLowerCase().replace("_", "-");
     }
+
 }

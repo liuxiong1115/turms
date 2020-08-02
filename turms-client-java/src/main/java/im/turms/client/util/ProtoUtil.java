@@ -25,12 +25,16 @@ import im.turms.common.model.dto.request.group.enrollment.CheckGroupJoinQuestion
 import java.util.*;
 import java.util.logging.Level;
 
+/**
+ * @author James Chen
+ */
 public class ProtoUtil {
 
+    private static final String QUESTION_ID_AND_ANSWER_ENTRY_PROTO_PACKAGE_NAME = "im.turms.proto.CheckGroupJoinQuestionsAnswersRequest.QuestionIdAndAnswerEntry";
     private static final HashMap<String, com.google.protobuf.GeneratedMessageV3> RESOLVER_MAP;
 
     static {
-        RESOLVER_MAP = new HashMap<>();
+        RESOLVER_MAP = new HashMap<>(MapUtil.getCapability(4));
         RESOLVER_MAP.put("google.protobuf.StringValue.value", StringValue.getDefaultInstance());
         RESOLVER_MAP.put("google.protobuf.Int32Value.value", Int32Value.getDefaultInstance());
         RESOLVER_MAP.put("google.protobuf.Int64Value.value", Int64Value.getDefaultInstance());
@@ -61,8 +65,8 @@ public class ProtoUtil {
                             Descriptors.Descriptor messageType = fieldDescriptor.getMessageType();
                             List<Descriptors.FieldDescriptor> messageTypeFields = messageType.getFields();
                             boolean isMap = messageTypeFields.size() == 2
-                                    && messageTypeFields.get(0).getJsonName().equals("key")
-                                    && messageTypeFields.get(1).getJsonName().equals("value");
+                                    && "key".equals(messageTypeFields.get(0).getJsonName())
+                                    && "value".equals(messageTypeFields.get(1).getJsonName());
                             if (isMap) {
                                 builder = getCustomMapBuilder(builder, messageType, value);
                             } else if (messageTypeFields.size() == 1) {
@@ -93,7 +97,7 @@ public class ProtoUtil {
     }
 
     private static Message.Builder getCustomMapBuilder(Message.Builder builder, Descriptors.Descriptor messageType, Object value) {
-        if (messageType.getFullName().equals("im.turms.proto.CheckGroupJoinQuestionsAnswersRequest.QuestionIdAndAnswerEntry")) {
+        if (QUESTION_ID_AND_ANSWER_ENTRY_PROTO_PACKAGE_NAME.equals(messageType.getFullName())) {
             CheckGroupJoinQuestionsAnswersRequest.Builder requestBuilder = (CheckGroupJoinQuestionsAnswersRequest.Builder) builder;
             requestBuilder.putAllQuestionIdAndAnswer((Map<Long, String>) value);
             return requestBuilder;

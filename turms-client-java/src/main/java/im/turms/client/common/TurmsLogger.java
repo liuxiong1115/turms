@@ -19,6 +19,14 @@ package im.turms.client.common;
 
 import java.util.logging.Logger;
 
+/**
+ * @author James Chen
+ */
 public class TurmsLogger {
+
+    private TurmsLogger() {
+    }
+
     public static final Logger logger = Logger.getGlobal();
+
 }

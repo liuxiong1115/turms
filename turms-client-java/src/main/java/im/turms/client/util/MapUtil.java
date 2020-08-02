@@ -21,13 +21,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author James Chen
+ */
 public class MapUtil {
+
     private MapUtil() {
     }
 
-    public static Map<String, ?> of(Object... array) {
+    public static int getCapability(int expectedSize) {
+        return (int) ((float) expectedSize / 0.75F + 1.0F);
+    }
+
+    public static Map<String, Object> of(Object... array) {
         if (array != null && array.length % 2 == 0) {
-            HashMap<String, Object> map = new HashMap<>(array.length / 2);
+            HashMap<String, Object> map = new HashMap<>(getCapability(array.length / 2));
             for (int i = 0; i < array.length; i = i + 2) {
                 String key = (String) array[i];
                 Object value = array[i + 1];
@@ -39,4 +47,5 @@ public class MapUtil {
         }
         return Collections.emptyMap();
     }
+
 }

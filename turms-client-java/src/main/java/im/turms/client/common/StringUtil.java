@@ -17,6 +17,9 @@
 
 package im.turms.client.common;
 
+/**
+ * @author James Chen
+ */
 public class StringUtil {
     private StringUtil() {}
 

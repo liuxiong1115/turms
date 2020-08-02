@@ -17,6 +17,9 @@
 
 package im.turms.client;
 
+/**
+ * @author James Chen
+ */
 public class ClientOptions {
 
     private String turmsServerUrl;
@@ -30,7 +33,6 @@ public class ClientOptions {
 
     private ClientOptions() {
     }
-
 
     public String turmsServerUrl() {
         return turmsServerUrl;

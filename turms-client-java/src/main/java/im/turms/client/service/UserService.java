@@ -43,7 +43,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @author James Chen
+ */
 public class UserService {
+
     private final TurmsClient turmsClient;
     private Long userId;
     private String password;

@@ -22,7 +22,11 @@ import im.turms.common.model.bo.user.UserInfo;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
 import im.turms.common.model.dto.notification.TurmsNotification;
 
+/**
+ * @author James Chen
+ */
 public class UserInfoWithVersion {
+
     private UserInfo userInfo;
     private long lastUpdatedDate;
 
@@ -60,4 +64,5 @@ public class UserInfoWithVersion {
     public void setLastUpdatedDate(long lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
     }
+
 }

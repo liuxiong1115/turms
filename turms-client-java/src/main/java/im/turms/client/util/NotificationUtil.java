@@ -22,7 +22,11 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.common.Int64Values;
 import im.turms.common.model.dto.notification.TurmsNotification;
 
+/**
+ * @author James Chen
+ */
 public class NotificationUtil {
+
     private NotificationUtil() {
     }
 
@@ -34,4 +38,5 @@ public class NotificationUtil {
             throw TurmsBusinessException.get(TurmsStatusCode.MISSING_DATA);
         }
     }
+
 }

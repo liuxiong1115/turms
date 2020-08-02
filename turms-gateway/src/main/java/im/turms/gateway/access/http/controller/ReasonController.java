@@ -52,8 +52,8 @@ public class ReasonController {
             @RequestParam Long requestId) {
         return reasonCacheService.getLoginFailureReason(userId, deviceType, requestId)
                 .map(code -> {
-                    LoginFailureReasonDTO dto = new LoginFailureReasonDTO(code.getBusinessCode(), code.name(), code.getReason());
-                    return ResponseEntity.ok(dto);
+                    LoginFailureReasonDTO reason = new LoginFailureReasonDTO(code.getBusinessCode(), code.name(), code.getReason());
+                    return ResponseEntity.ok(reason);
                 })
                 .defaultIfEmpty(NOT_FOUND_RESPONSE);
     }
@@ -65,8 +65,8 @@ public class ReasonController {
             @RequestParam Integer sessionId) {
         return reasonCacheService.getDisconnectionReason(userId, deviceType, sessionId)
                 .map(closeStatus -> {
-                    SessionDisconnectionReasonDTO dto = new SessionDisconnectionReasonDTO(closeStatus.getCode(), closeStatus.name(), "");
-                    return ResponseEntity.ok(dto);
+                    SessionDisconnectionReasonDTO reason = new SessionDisconnectionReasonDTO(closeStatus.getCode(), closeStatus.name(), "");
+                    return ResponseEntity.ok(reason);
                 })
                 .defaultIfEmpty(NOT_FOUND_RESPONSE);
     }

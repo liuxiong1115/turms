@@ -22,7 +22,11 @@ import im.turms.common.model.dto.request.TurmsRequest;
 
 import java.util.function.Consumer;
 
+/**
+ * @author James Chen
+ */
 public class NotificationService {
+
     private Consumer<TurmsRequest> onNotification;
 
     public NotificationService(TurmsClient turmsClient) {
@@ -41,4 +45,5 @@ public class NotificationService {
     public void setOnNotification(Consumer<TurmsRequest> onNotification) {
         this.onNotification = onNotification;
     }
+
 }

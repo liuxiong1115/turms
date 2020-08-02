@@ -22,7 +22,11 @@ import im.turms.client.service.*;
 
 import javax.annotation.Nullable;
 
+/**
+ * @author James Chen
+ */
 public class TurmsClient {
+
     private final TurmsDriver driver;
     private final UserService userService;
     private final GroupService groupService;
@@ -90,4 +94,5 @@ public class TurmsClient {
     public NotificationService getNotificationService() {
         return notificationService;
     }
+
 }

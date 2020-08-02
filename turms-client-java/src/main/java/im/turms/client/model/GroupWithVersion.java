@@ -22,7 +22,11 @@ import im.turms.common.model.bo.group.Group;
 import im.turms.common.model.bo.group.GroupsWithVersion;
 import im.turms.common.model.dto.notification.TurmsNotification;
 
+/**
+ * @author James Chen
+ */
 public class GroupWithVersion {
+
     private Group group;
     private long lastUpdatedDate;
 
@@ -60,4 +64,5 @@ public class GroupWithVersion {
     public void setLastUpdatedDate(long lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
     }
+
 }

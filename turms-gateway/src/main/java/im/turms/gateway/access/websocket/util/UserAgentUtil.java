@@ -103,11 +103,11 @@ public class UserAgentUtil {
                             deviceType = DeviceType.DESKTOP;
                             break;
                         default:
-                            deviceType = DeviceType.OTHERS;
+                            deviceType = DeviceType.UNKNOWN;
                             break;
                     }
                 } else {
-                    deviceType = DeviceType.OTHERS;
+                    deviceType = DeviceType.UNKNOWN;
                 }
             } else {
                 String agentClass = deviceDetails.get(KEY_MAPPER.get(UserAgent.AGENT_CLASS));

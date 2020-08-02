@@ -19,7 +19,11 @@ package im.turms.client.model;
 
 import java.util.Set;
 
+/**
+ * @author James Chen
+ */
 public final class MessageAddition {
+
     private final boolean isMentioned;
     private final Set<Long> mentionedUserIds;
 
@@ -35,4 +39,5 @@ public final class MessageAddition {
     public Set<Long> getMentionedUserIds() {
         return mentionedUserIds;
     }
+
 }

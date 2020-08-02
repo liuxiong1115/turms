@@ -34,7 +34,7 @@ public class LoginFailureReasonKey {
 
     /**
      * Cache the request ID (as a token) to prevent other users
-     * from querying others' login failed reason
+     * from querying others' login failure reason
      */
     private final Long loginRequestId;
 }

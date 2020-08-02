@@ -35,6 +35,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
+
 /**
  * @author James Chen
  */
@@ -48,7 +50,6 @@ public class HandshakeRequestUtil {
     public static final String USER_LOCATION_FIELD = "loc";
     private static final String LOCATION_DELIMITER = ":";
     private static final int LOCATION_FIELDS_NUMBER = 2;
-    private static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
     private HandshakeRequestUtil() {
     }
@@ -126,13 +127,20 @@ public class HandshakeRequestUtil {
 
     public static String parseIp(ServerHttpRequest request) {
         String ip = request.getHeaders().getFirst(X_FORWARDED_FOR);
-        if (ip == null) {
-            InetSocketAddress address = request.getRemoteAddress();
-            if (address != null) {
-                ip = address.getHostString();
+        if (ip != null) {
+            int offset = ip.indexOf(",");
+            if (offset > 0) {
+                ip = ip.substring(0, offset);
+            }
+            if (InetAddresses.isInetAddress(ip)) {
+                return ip;
             }
         }
-        return ip != null && InetAddresses.isInetAddress(ip) ? ip : null;
+        InetSocketAddress address = request.getRemoteAddress();
+        if (address != null) {
+            ip = address.getHostString();
+        }
+        return ip;
     }
 
     // Base

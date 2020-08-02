@@ -44,9 +44,6 @@ import java.util.Set;
 @Log4j2
 public class ReasonCacheService {
 
-    /**
-     * We don't design a new object "LoginFailureReason" to avoid creating redundant object
-     */
     private final ReactiveValueOperations<LoginFailureReasonKey, TurmsStatusCode> loginFailureReasonCache;
     private final ReactiveValueOperations<SessionDisconnectionReasonKey, SessionCloseStatus> disconnectionReasonCache;
     private final Set<DeviceType> degradedDeviceTypes;

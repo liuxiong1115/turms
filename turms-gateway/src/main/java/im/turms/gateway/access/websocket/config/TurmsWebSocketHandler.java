@@ -36,7 +36,6 @@ import io.netty.buffer.EmptyByteBuf;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.CloseStatus;
@@ -54,7 +53,9 @@ import reactor.core.publisher.Mono;
 @Log4j2
 public class TurmsWebSocketHandler implements WebSocketHandler {
 
-    private static final EmptyByteBuf HEARTBEAT_BYTE_BUF = new EmptyByteBuf(UnpooledByteBufAllocator.DEFAULT);
+    private static final EmptyByteBuf EMPTY_BYTE_BUF = new EmptyByteBuf(UnpooledByteBufAllocator.DEFAULT);
+    private static final EmptyByteBuf HEARTBEAT_BYTE_BUF = EMPTY_BYTE_BUF;
+    private static final EmptyByteBuf PONG_BYTE_BUF = EMPTY_BYTE_BUF;
 
     private final Node node;
     private final WorkflowMediator workflowMediator;
@@ -122,7 +123,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                             }
                         case TEXT:
                         case PING:
-                            return Mono.just(webSocketSession.pongMessage(DataBufferFactory::allocateBuffer));
+                            return Mono.just(webSocketSession.pongMessage(factory -> ((NettyDataBufferFactory) factory).wrap(PONG_BYTE_BUF)));
                         case PONG:
                         default:
                             // ignore the message

@@ -46,9 +46,14 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author James Chen
+ */
 public class MessageService {
+
     /**
      * Format: "@{userId}"
+     * <p>
      * Example: "@{123}", "I need to talk with @{123} and @{321}"
      */
     private static final Function<im.turms.common.model.bo.message.Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<im.turms.common.model.bo.message.Message, Set<Long>>() {

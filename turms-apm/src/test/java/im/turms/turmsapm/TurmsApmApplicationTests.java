@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-package im.turms.gateway.plugin.extension;
+package im.turms.turmsapm;
 
-import im.turms.common.model.dto.notification.TurmsNotification;
-import im.turms.server.common.plugin.base.TurmsExtension;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.Set;
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class TurmsApmApplicationTests {
 
-/**
- * @author James Chen
- */
-public abstract class TurmsNotificationHandler extends TurmsExtension {
-
-    public abstract void handle(@NotNull TurmsNotification notification, @NotEmpty Set<Long> recipientIds, @NotNull Set<Long> offlineRecipientIds);
+    @Test
+    public void contextLoads() {
+    }
 
 }

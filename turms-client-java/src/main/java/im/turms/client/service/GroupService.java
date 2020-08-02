@@ -48,7 +48,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @author James Chen
+ */
 public class GroupService {
+
     private final TurmsClient turmsClient;
 
     public GroupService(TurmsClient turmsClient) {
@@ -468,4 +472,5 @@ public class GroupService {
                     return data.hasGroupMembersWithVersion() ? data.getGroupMembersWithVersion() : null;
                 });
     }
+
 }
