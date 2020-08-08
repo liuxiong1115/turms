@@ -146,7 +146,9 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
         workflowMediator.triggerGoOnlinePlugins(userSessionsManager, session).subscribe();
 
         // 5. Make sure the sessions information is cleared when the WebSocket session is closed
-        // FIXME: A known bug: https://github.com/reactor/reactor-netty/issues/1091
+        // Note that although the code seems redundant, it's really useful when the underlying frameworks have bugs.
+        // In that case, setLocalUserDeviceOffline may not be triggered in other places but only can be triggered here.
+        // FIXME: A known bug: https://github.com/reactor/reactor-netty/issues/1091#issuecomment-665334373
         webSocketSession.closeStatus()
                 .subscribe(closeStatus -> workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(SessionCloseStatus.DISCONNECTED_BY_ADMIN)).subscribe(),
                         throwable -> workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(SessionCloseStatus.SERVER_ERROR)).subscribe());

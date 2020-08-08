@@ -59,8 +59,9 @@ import java.util.Map;
 public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
 
     /**
-     * Use the "X-API" format as custom headers.
-     * Though the format is deprecated, we still think it's a good practice
+     * Use the "X-" prefix as the prefix of custom headers.
+     * Though the prefix is deprecated as mentioned in https://tools.ietf.org/html/rfc6648,
+     * we still think it's a good practice
      */
     private static final String RESPONSE_HEADER_NODE_IDENTITY = "X-API-Identity";
     private static final String RESPONSE_HEADER_TURMS_STATUS_CODE = "X-API-Code";
@@ -140,7 +141,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
                 : null;
         String ip = HandshakeRequestUtil.parseIp(request);
 
-        // 3. Try login
+        // 3. Try to login
         return workflowMediator.processLoginRequest(userId, password, loggingInDeviceType, userStatus, userLocation, ip, deviceDetails)
                 .flatMap(code -> code == TurmsStatusCode.OK
                         ? acceptUpgradeRequest(exchange, handler, userId, loggingInDeviceType)
