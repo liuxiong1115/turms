@@ -22,8 +22,8 @@ import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import im.turms.client.TurmsClient;
-import im.turms.client.common.Consumer4;
 import im.turms.client.common.StringUtil;
+import im.turms.client.model.SessionCloseInfo;
 import im.turms.client.util.ProtoUtil;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
@@ -78,8 +78,7 @@ public class TurmsDriver {
 
     private final List<Consumer<TurmsNotification>> onNotificationListeners = new LinkedList<>();
     private final ConcurrentLinkedQueue<CompletableFuture<Void>> heartbeatCallbacks = new ConcurrentLinkedQueue<>();
-    // TurmsCloseStatus, WebSocket status code, WebSocket reason, error
-    private Consumer4<SessionCloseStatus, Integer, String, Throwable> onClose;
+    private Consumer<SessionCloseInfo> onClose;
 
     private String websocketUrl = "ws://localhost:9510";
     private int connectionTimeout = 10;
@@ -105,7 +104,7 @@ public class TurmsDriver {
         return sessionId;
     }
 
-    public void setOnClose(Consumer4<SessionCloseStatus, Integer, String, Throwable> onClose) {
+    public void setOnClose(Consumer<SessionCloseInfo> onClose) {
         this.onClose = onClose;
     }
 
@@ -286,11 +285,11 @@ public class TurmsDriver {
                         } catch (Exception e) {
                             RuntimeException runtimeException = new RuntimeException("Failed to reconnect", e);
                             if (onClose != null) {
-                                onClose.accept(status, code, reason, runtimeException);
+                                onClose.accept(new SessionCloseInfo(status, code, reason, runtimeException));
                             }
                         }
                     } else if (onClose != null) {
-                        onClose.accept(status, code, reason, null);
+                        onClose.accept(new SessionCloseInfo(status, code, reason, null));
                     }
                 }
 
@@ -313,7 +312,7 @@ public class TurmsDriver {
                         }
                     }
                     if (onClose != null) {
-                        onClose.accept(null, null, null, throwable);
+                        onClose.accept(new SessionCloseInfo(null, null, null, throwable));
                     }
                     if (!isReconnecting) {
                         loginFuture.completeExceptionally(throwable);
