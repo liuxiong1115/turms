@@ -19,15 +19,15 @@ package im.turms.gateway.pojo.bo.login;
 
 import im.turms.common.constant.DeviceType;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * @author James Chen
  */
 @AllArgsConstructor
 @EqualsAndHashCode
-@Data
+@Getter
 public class LoginFailureReasonKey {
     private final Long userId;
     private final DeviceType deviceType;

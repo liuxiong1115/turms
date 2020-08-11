@@ -90,6 +90,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
             log.error("The user session for the device type {} of the user {} is null", deviceType.name(), userId);
             return disconnect(webSocketSession, userId, deviceType, CloseStatus.SERVER_ERROR);
         }
+        session.setWebSocketSession(webSocketSession);
 
         // 2. Set up the flux of responses (TurmsNotification) to users' requests
         Flux<WebSocketMessage> responseOutput = webSocketSession.receive()
