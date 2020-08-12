@@ -30,9 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.Set;
@@ -74,12 +76,15 @@ public class ReasonCacheService {
             String reason = String.format("The device type %s is forbidden to query the reason for login failure", deviceType.name());
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
         } else {
+            Assert.notNull(userId, "userId must not be null");
+            Assert.notNull(deviceType, "deviceType must not be null");
+            Assert.notNull(requestId, "requestId must not be null");
             LoginFailureReasonKey key = new LoginFailureReasonKey(userId, deviceType, requestId);
             return loginFailureReasonCache.get(key);
         }
     }
 
-    public boolean shouldCacheLoginFailureReason(Long userId, DeviceType deviceType, Long requestId) {
+    public boolean shouldCacheLoginFailureReason(@Nullable Long userId, @Nullable DeviceType deviceType, @Nullable Long requestId) {
         return enableQueryLoginFailureReason
                 && deviceType != null
                 && degradedDeviceTypes.contains(deviceType)
@@ -87,21 +92,33 @@ public class ReasonCacheService {
                 && requestId != null;
     }
 
-    public Mono<Boolean> cacheLoginFailureReason(Long userId, DeviceType deviceType, Long requestId, TurmsStatusCode status) {
+    public Mono<Boolean> cacheLoginFailureReason(
+            @NotNull Long userId,
+            @NotNull DeviceType deviceType,
+            @NotNull Long requestId,
+            @NotNull TurmsStatusCode status) {
+        Assert.notNull(userId, "userId must not be null");
+        Assert.notNull(deviceType, "deviceType must not be null");
+        Assert.notNull(requestId, "requestId must not be null");
+        Assert.notNull(status, "status must not be null");
         return loginFailureReasonCache.set(
                 new LoginFailureReasonKey(userId, deviceType, requestId),
                 status,
                 loginFailureReasonExpireAfter);
     }
 
-    public boolean shouldCacheDisconnectionReason(Long userId, DeviceType deviceType) {
+    public boolean shouldCacheDisconnectionReason(@Nullable Long userId, @Nullable DeviceType deviceType) {
         return enableQueryDisconnectionReason
                 && deviceType != null
                 && degradedDeviceTypes.contains(deviceType)
                 && userId != null;
     }
 
-    public Mono<Boolean> cacheDisconnectionReason(Long userId, DeviceType deviceType, int sessionId, CloseStatus closeStatus) {
+    public Mono<Boolean> cacheDisconnectionReason(@NotNull Long userId, @NotNull DeviceType deviceType, @NotNull Integer sessionId, @NotNull CloseStatus closeStatus) {
+        Assert.notNull(userId, "userId must not be null");
+        Assert.notNull(deviceType, "deviceType must not be null");
+        Assert.notNull(sessionId, "sessionId must not be null");
+        Assert.notNull(closeStatus, "closeStatus must not be null");
         SessionCloseStatus status = SessionCloseStatus.get(closeStatus.getCode());
         if (status != null) {
             return disconnectionReasonCache.set(
@@ -121,6 +138,9 @@ public class ReasonCacheService {
             String reason = "The device type " + deviceType + " is forbidden to query the reason for session disconnection";
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
         } else {
+            Assert.notNull(userId, "userId must not be null");
+            Assert.notNull(deviceType, "deviceType must not be null");
+            Assert.notNull(sessionId, "sessionId must not be null");
             SessionDisconnectionReasonKey key = new SessionDisconnectionReasonKey(userId, deviceType, sessionId);
             return disconnectionReasonCache.get(key);
         }
