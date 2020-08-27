@@ -36,7 +36,6 @@ import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.cluster.service.idgen.ServiceType;
 import im.turms.server.common.constraint.DeviceTypeConstraint;
 import im.turms.server.common.property.TurmsProperties;
-import im.turms.server.common.property.TurmsPropertiesManager;
 import im.turms.server.common.rpc.request.SetUserOfflineRequest;
 import im.turms.server.common.rpc.service.ISessionService;
 import im.turms.server.common.service.session.SessionLocationService;
@@ -66,7 +65,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionServiceTests implements ISessionService {
 
     private final Node node;
-    private final TurmsPropertiesManager turmsPropertiesManager;
     private final TurmsPluginManager turmsPluginManager;
     private final ReasonCacheService reasonCacheService;
     private final SessionLocationService sessionLocationService;
@@ -80,7 +78,6 @@ public class SessionServiceTests implements ISessionService {
 
     public SessionServiceTests(
             Node node,
-            TurmsPropertiesManager turmsPropertiesManager,
             TurmsPluginManager turmsPluginManager,
             UserLoginActionService userLoginActionService,
             SessionLocationService sessionLocationService,
@@ -88,7 +85,6 @@ public class SessionServiceTests implements ISessionService {
             UserStatusService userStatusService,
             UserSimultaneousLoginService userSimultaneousLoginService) {
         this.node = node;
-        this.turmsPropertiesManager = turmsPropertiesManager;
         this.userLoginActionService = userLoginActionService;
         this.sessionLocationService = sessionLocationService;
         this.turmsPluginManager = turmsPluginManager;
@@ -99,7 +95,7 @@ public class SessionServiceTests implements ISessionService {
         sessionsManagerByUserId = new ConcurrentHashMap<>(4096);
         pluginEnabled = turmsProperties.getPlugin().isEnabled();
         this.reasonCacheService = reasonCacheService;
-        heartbeatTimeout = node.getSharedProperties().getGateway().getSession().getHeartbeatTimeoutSeconds();
+        heartbeatTimeout = turmsProperties.getGateway().getSession().getHeartbeatTimeoutSeconds();
         heartbeatTimeoutDuration = Duration.ofSeconds(heartbeatTimeout);
     }
 
@@ -211,7 +207,7 @@ public class SessionServiceTests implements ISessionService {
 
     public Mono<Boolean> updateHeartbeatTimestamp(@NotNull Long userId, @NotNull UserSession session) {
         long lastHeartbeatTimestampMillis = session.getLastHeartbeatTimestampMillis();
-        int minimumUpdateHeartbeatIntervalSeconds = turmsPropertiesManager.getLocalProperties().getGateway().getSession().getMinimumUpdateHeartbeatIntervalSeconds();
+        int minimumUpdateHeartbeatIntervalSeconds = node.getSharedProperties().getGateway().getSession().getMinimumUpdateHeartbeatIntervalSeconds();
         boolean isAllowedToUpdate = (System.currentTimeMillis() - lastHeartbeatTimestampMillis) / 1000 > minimumUpdateHeartbeatIntervalSeconds;
         return isAllowedToUpdate
                 ? userStatusService.updateTtl(userId, heartbeatTimeoutDuration)
