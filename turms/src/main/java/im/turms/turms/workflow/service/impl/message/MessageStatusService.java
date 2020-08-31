@@ -185,7 +185,11 @@ public class MessageStatusService {
             query.addCriteria(Criteria.where(MessageStatus.Fields.READ_DATE).is(null));
             update = new Update().set(MessageStatus.Fields.READ_DATE, readDate);
         } else {
-            update = new Update().unset(MessageStatus.Fields.READ_DATE);
+            if (node.getSharedProperties().getService().getMessage().getReadReceipt().isAllowMarkingReadMessagesAsUnread()) {
+                update = new Update().unset(MessageStatus.Fields.READ_DATE);
+            } else {
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
+            }
         }
         return mongoTemplate.findAndModify(query, update, MessageStatus.class, MessageStatus.COLLECTION_NAME)
                 .defaultIfEmpty(EMPTY_MESSAGE_STATUS)
