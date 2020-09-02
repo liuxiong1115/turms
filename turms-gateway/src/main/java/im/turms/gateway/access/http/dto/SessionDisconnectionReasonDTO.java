@@ -18,7 +18,6 @@
 package im.turms.gateway.access.http.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 /**
