@@ -117,7 +117,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                         .map(notification ->
                                                 webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getByteBuffer(notification))))
                                         .doOnTerminate(() -> {
-                                            while (requestBuffer.refCnt() != 0) {
+                                            while (requestBuffer.refCnt() > 0) {
                                                 requestBuffer.release();
                                             }
                                         });
@@ -142,7 +142,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                 .map(byteBuf -> webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(byteBuf)))
                 .mergeWith(responseOutput);
 
-        // 4. Trivial things after session is established
+        // 4. Trivial things after the session is established
         workflowMediator.onSessionEstablished(userSessionsManager, deviceType);
         workflowMediator.triggerGoOnlinePlugins(userSessionsManager, session).subscribe();
 
