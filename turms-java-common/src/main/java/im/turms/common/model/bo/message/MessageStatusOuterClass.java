@@ -20,8 +20,6 @@
 
 package im.turms.common.model.bo.message;
 
-import im.turms.common.constant.MessageDeliveryStatusOuterClass;
-
 public final class MessageStatusOuterClass {
   private MessageStatusOuterClass() {}
   public static void registerAllExtensions(
@@ -65,7 +63,7 @@ public final class MessageStatusOuterClass {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.protobuf.WrappersProto.getDescriptor(),
-          MessageDeliveryStatusOuterClass.getDescriptor(),
+          im.turms.common.constant.MessageDeliveryStatusOuterClass.getDescriptor(),
         });
     internal_static_im_turms_proto_MessageStatus_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -74,7 +72,7 @@ public final class MessageStatusOuterClass {
         internal_static_im_turms_proto_MessageStatus_descriptor,
         new java.lang.String[] { "MessageId", "ToUserId", "DeliveryStatus", "ReceptionDate", "ReadDate", "RecallDate", });
     com.google.protobuf.WrappersProto.getDescriptor();
-    MessageDeliveryStatusOuterClass.getDescriptor();
+    im.turms.common.constant.MessageDeliveryStatusOuterClass.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -23,7 +23,7 @@ package im.turms.common.model.bo.signal;
 /**
  * Protobuf type {@code im.turms.proto.Acknowledge}
  */
-public  final class Acknowledge extends
+public final class Acknowledge extends
     com.google.protobuf.GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:im.turms.proto.Acknowledge)
     AcknowledgeOrBuilder {
@@ -104,15 +104,15 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_descriptor;
+    return im.turms.common.model.bo.signal.AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_fieldAccessorTable
+    return im.turms.common.model.bo.signal.AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            Acknowledge.class, Acknowledge.Builder.class);
+            im.turms.common.model.bo.signal.Acknowledge.class, im.turms.common.model.bo.signal.Acknowledge.Builder.class);
   }
 
   public static final int DELIVERY_DATE_FIELD_NUMBER = 1;
@@ -121,6 +121,7 @@ private static final long serialVersionUID = 0L;
    * <code>int64 delivery_date = 1;</code>
    * @return The deliveryDate.
    */
+  @java.lang.Override
   public long getDeliveryDate() {
     return deliveryDate_;
   }
@@ -131,6 +132,7 @@ private static final long serialVersionUID = 0L;
    * <code>.google.protobuf.Int64Value message_id = 2;</code>
    * @return Whether the messageId field is set.
    */
+  @java.lang.Override
   public boolean hasMessageId() {
     return messageId_ != null;
   }
@@ -138,12 +140,14 @@ private static final long serialVersionUID = 0L;
    * <code>.google.protobuf.Int64Value message_id = 2;</code>
    * @return The messageId.
    */
+  @java.lang.Override
   public com.google.protobuf.Int64Value getMessageId() {
     return messageId_ == null ? com.google.protobuf.Int64Value.getDefaultInstance() : messageId_;
   }
   /**
    * <code>.google.protobuf.Int64Value message_id = 2;</code>
    */
+  @java.lang.Override
   public com.google.protobuf.Int64ValueOrBuilder getMessageIdOrBuilder() {
     return getMessageId();
   }
@@ -195,10 +199,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof Acknowledge)) {
+    if (!(obj instanceof im.turms.common.model.bo.signal.Acknowledge)) {
       return super.equals(obj);
     }
-    Acknowledge other = (Acknowledge) obj;
+    im.turms.common.model.bo.signal.Acknowledge other = (im.turms.common.model.bo.signal.Acknowledge) obj;
 
     if (getDeliveryDate()
         != other.getDeliveryDate()) return false;
@@ -230,69 +234,69 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static Acknowledge parseFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static Acknowledge parseFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static Acknowledge parseFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static Acknowledge parseFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static Acknowledge parseFrom(byte[] data)
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static Acknowledge parseFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static Acknowledge parseFrom(java.io.InputStream input)
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static Acknowledge parseFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static Acknowledge parseDelimitedFrom(java.io.InputStream input)
+  public static im.turms.common.model.bo.signal.Acknowledge parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static Acknowledge parseDelimitedFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static Acknowledge parseFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static Acknowledge parseFrom(
+  public static im.turms.common.model.bo.signal.Acknowledge parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -305,7 +309,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(Acknowledge prototype) {
+  public static Builder newBuilder(im.turms.common.model.bo.signal.Acknowledge prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -326,18 +330,18 @@ private static final long serialVersionUID = 0L;
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:im.turms.proto.Acknowledge)
-          AcknowledgeOrBuilder {
+      im.turms.common.model.bo.signal.AcknowledgeOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_descriptor;
+      return im.turms.common.model.bo.signal.AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_fieldAccessorTable
+      return im.turms.common.model.bo.signal.AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              Acknowledge.class, Acknowledge.Builder.class);
+              im.turms.common.model.bo.signal.Acknowledge.class, im.turms.common.model.bo.signal.Acknowledge.Builder.class);
     }
 
     // Construct using im.turms.common.model.bo.signal.Acknowledge.newBuilder()
@@ -372,17 +376,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_descriptor;
+      return im.turms.common.model.bo.signal.AcknowledgeOuterClass.internal_static_im_turms_proto_Acknowledge_descriptor;
     }
 
     @java.lang.Override
-    public Acknowledge getDefaultInstanceForType() {
-      return Acknowledge.getDefaultInstance();
+    public im.turms.common.model.bo.signal.Acknowledge getDefaultInstanceForType() {
+      return im.turms.common.model.bo.signal.Acknowledge.getDefaultInstance();
     }
 
     @java.lang.Override
-    public Acknowledge build() {
-      Acknowledge result = buildPartial();
+    public im.turms.common.model.bo.signal.Acknowledge build() {
+      im.turms.common.model.bo.signal.Acknowledge result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -390,8 +394,8 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public Acknowledge buildPartial() {
-      Acknowledge result = new Acknowledge(this);
+    public im.turms.common.model.bo.signal.Acknowledge buildPartial() {
+      im.turms.common.model.bo.signal.Acknowledge result = new im.turms.common.model.bo.signal.Acknowledge(this);
       result.deliveryDate_ = deliveryDate_;
       if (messageIdBuilder_ == null) {
         result.messageId_ = messageId_;
@@ -436,16 +440,16 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof Acknowledge) {
-        return mergeFrom((Acknowledge)other);
+      if (other instanceof im.turms.common.model.bo.signal.Acknowledge) {
+        return mergeFrom((im.turms.common.model.bo.signal.Acknowledge)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(Acknowledge other) {
-      if (other == Acknowledge.getDefaultInstance()) return this;
+    public Builder mergeFrom(im.turms.common.model.bo.signal.Acknowledge other) {
+      if (other == im.turms.common.model.bo.signal.Acknowledge.getDefaultInstance()) return this;
       if (other.getDeliveryDate() != 0L) {
         setDeliveryDate(other.getDeliveryDate());
       }
@@ -467,11 +471,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Acknowledge parsedMessage = null;
+      im.turms.common.model.bo.signal.Acknowledge parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (Acknowledge) e.getUnfinishedMessage();
+        parsedMessage = (im.turms.common.model.bo.signal.Acknowledge) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -486,6 +490,7 @@ private static final long serialVersionUID = 0L;
      * <code>int64 delivery_date = 1;</code>
      * @return The deliveryDate.
      */
+    @java.lang.Override
     public long getDeliveryDate() {
       return deliveryDate_;
     }
@@ -646,12 +651,12 @@ private static final long serialVersionUID = 0L;
   }
 
   // @@protoc_insertion_point(class_scope:im.turms.proto.Acknowledge)
-  private static final Acknowledge DEFAULT_INSTANCE;
+  private static final im.turms.common.model.bo.signal.Acknowledge DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new Acknowledge();
+    DEFAULT_INSTANCE = new im.turms.common.model.bo.signal.Acknowledge();
   }
 
-  public static Acknowledge getDefaultInstance() {
+  public static im.turms.common.model.bo.signal.Acknowledge getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
@@ -676,7 +681,7 @@ private static final long serialVersionUID = 0L;
   }
 
   @java.lang.Override
-  public Acknowledge getDefaultInstanceForType() {
+  public im.turms.common.model.bo.signal.Acknowledge getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

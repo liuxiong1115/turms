@@ -23,7 +23,7 @@ package im.turms.common.model.dto.request.message;
 /**
  * Protobuf type {@code im.turms.proto.QueryPendingMessagesWithTotalRequest}
  */
-public  final class QueryPendingMessagesWithTotalRequest extends
+public final class QueryPendingMessagesWithTotalRequest extends
     com.google.protobuf.GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:im.turms.proto.QueryPendingMessagesWithTotalRequest)
     QueryPendingMessagesWithTotalRequestOrBuilder {
@@ -99,15 +99,15 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_descriptor;
+    return im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_fieldAccessorTable
+    return im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            QueryPendingMessagesWithTotalRequest.class, QueryPendingMessagesWithTotalRequest.Builder.class);
+            im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest.class, im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest.Builder.class);
   }
 
   public static final int SIZE_FIELD_NUMBER = 1;
@@ -116,6 +116,7 @@ private static final long serialVersionUID = 0L;
    * <code>.google.protobuf.Int32Value size = 1;</code>
    * @return Whether the size field is set.
    */
+  @java.lang.Override
   public boolean hasSize() {
     return size_ != null;
   }
@@ -123,12 +124,14 @@ private static final long serialVersionUID = 0L;
    * <code>.google.protobuf.Int32Value size = 1;</code>
    * @return The size.
    */
+  @java.lang.Override
   public com.google.protobuf.Int32Value getSize() {
     return size_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : size_;
   }
   /**
    * <code>.google.protobuf.Int32Value size = 1;</code>
    */
+  @java.lang.Override
   public com.google.protobuf.Int32ValueOrBuilder getSizeOrBuilder() {
     return getSize();
   }
@@ -173,10 +176,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof QueryPendingMessagesWithTotalRequest)) {
+    if (!(obj instanceof im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest)) {
       return super.equals(obj);
     }
-    QueryPendingMessagesWithTotalRequest other = (QueryPendingMessagesWithTotalRequest) obj;
+    im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest other = (im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest) obj;
 
     if (hasSize() != other.hasSize()) return false;
     if (hasSize()) {
@@ -203,69 +206,69 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static QueryPendingMessagesWithTotalRequest parseFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(byte[] data)
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(java.io.InputStream input)
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static QueryPendingMessagesWithTotalRequest parseDelimitedFrom(java.io.InputStream input)
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static QueryPendingMessagesWithTotalRequest parseDelimitedFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static QueryPendingMessagesWithTotalRequest parseFrom(
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -278,7 +281,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(QueryPendingMessagesWithTotalRequest prototype) {
+  public static Builder newBuilder(im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -299,18 +302,18 @@ private static final long serialVersionUID = 0L;
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:im.turms.proto.QueryPendingMessagesWithTotalRequest)
-          QueryPendingMessagesWithTotalRequestOrBuilder {
+      im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_descriptor;
+      return im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_fieldAccessorTable
+      return im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              QueryPendingMessagesWithTotalRequest.class, QueryPendingMessagesWithTotalRequest.Builder.class);
+              im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest.class, im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest.Builder.class);
     }
 
     // Construct using im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest.newBuilder()
@@ -343,17 +346,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_descriptor;
+      return im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequestOuterClass.internal_static_im_turms_proto_QueryPendingMessagesWithTotalRequest_descriptor;
     }
 
     @java.lang.Override
-    public QueryPendingMessagesWithTotalRequest getDefaultInstanceForType() {
-      return QueryPendingMessagesWithTotalRequest.getDefaultInstance();
+    public im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest getDefaultInstanceForType() {
+      return im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest.getDefaultInstance();
     }
 
     @java.lang.Override
-    public QueryPendingMessagesWithTotalRequest build() {
-      QueryPendingMessagesWithTotalRequest result = buildPartial();
+    public im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest build() {
+      im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -361,8 +364,8 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public QueryPendingMessagesWithTotalRequest buildPartial() {
-      QueryPendingMessagesWithTotalRequest result = new QueryPendingMessagesWithTotalRequest(this);
+    public im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest buildPartial() {
+      im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest result = new im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest(this);
       if (sizeBuilder_ == null) {
         result.size_ = size_;
       } else {
@@ -406,16 +409,16 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof QueryPendingMessagesWithTotalRequest) {
-        return mergeFrom((QueryPendingMessagesWithTotalRequest)other);
+      if (other instanceof im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest) {
+        return mergeFrom((im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(QueryPendingMessagesWithTotalRequest other) {
-      if (other == QueryPendingMessagesWithTotalRequest.getDefaultInstance()) return this;
+    public Builder mergeFrom(im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest other) {
+      if (other == im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest.getDefaultInstance()) return this;
       if (other.hasSize()) {
         mergeSize(other.getSize());
       }
@@ -434,11 +437,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      QueryPendingMessagesWithTotalRequest parsedMessage = null;
+      im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (QueryPendingMessagesWithTotalRequest) e.getUnfinishedMessage();
+        parsedMessage = (im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -583,12 +586,12 @@ private static final long serialVersionUID = 0L;
   }
 
   // @@protoc_insertion_point(class_scope:im.turms.proto.QueryPendingMessagesWithTotalRequest)
-  private static final QueryPendingMessagesWithTotalRequest DEFAULT_INSTANCE;
+  private static final im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new QueryPendingMessagesWithTotalRequest();
+    DEFAULT_INSTANCE = new im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest();
   }
 
-  public static QueryPendingMessagesWithTotalRequest getDefaultInstance() {
+  public static im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
@@ -613,7 +616,7 @@ private static final long serialVersionUID = 0L;
   }
 
   @java.lang.Override
-  public QueryPendingMessagesWithTotalRequest getDefaultInstanceForType() {
+  public im.turms.common.model.dto.request.message.QueryPendingMessagesWithTotalRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

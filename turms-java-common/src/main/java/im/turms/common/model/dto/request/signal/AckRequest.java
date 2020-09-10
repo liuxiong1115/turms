@@ -23,7 +23,7 @@ package im.turms.common.model.dto.request.signal;
 /**
  * Protobuf type {@code im.turms.proto.AckRequest}
  */
-public  final class AckRequest extends
+public final class AckRequest extends
     com.google.protobuf.GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:im.turms.proto.AckRequest)
     AckRequestOrBuilder {
@@ -112,15 +112,15 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_descriptor;
+    return im.turms.common.model.dto.request.signal.AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_fieldAccessorTable
+    return im.turms.common.model.dto.request.signal.AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            AckRequest.class, AckRequest.Builder.class);
+            im.turms.common.model.dto.request.signal.AckRequest.class, im.turms.common.model.dto.request.signal.AckRequest.Builder.class);
   }
 
   public static final int MESSAGES_IDS_FIELD_NUMBER = 1;
@@ -129,6 +129,7 @@ private static final long serialVersionUID = 0L;
    * <code>repeated int64 messages_ids = 1;</code>
    * @return A list containing the messagesIds.
    */
+  @java.lang.Override
   public java.util.List<java.lang.Long>
       getMessagesIdsList() {
     return messagesIds_;
@@ -205,10 +206,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof AckRequest)) {
+    if (!(obj instanceof im.turms.common.model.dto.request.signal.AckRequest)) {
       return super.equals(obj);
     }
-    AckRequest other = (AckRequest) obj;
+    im.turms.common.model.dto.request.signal.AckRequest other = (im.turms.common.model.dto.request.signal.AckRequest) obj;
 
     if (!getMessagesIdsList()
         .equals(other.getMessagesIdsList())) return false;
@@ -232,69 +233,69 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static AckRequest parseFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static AckRequest parseFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static AckRequest parseFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static AckRequest parseFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static AckRequest parseFrom(byte[] data)
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static AckRequest parseFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static AckRequest parseFrom(java.io.InputStream input)
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static AckRequest parseFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static AckRequest parseDelimitedFrom(java.io.InputStream input)
+  public static im.turms.common.model.dto.request.signal.AckRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static AckRequest parseDelimitedFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static AckRequest parseFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static AckRequest parseFrom(
+  public static im.turms.common.model.dto.request.signal.AckRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -307,7 +308,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(AckRequest prototype) {
+  public static Builder newBuilder(im.turms.common.model.dto.request.signal.AckRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -328,18 +329,18 @@ private static final long serialVersionUID = 0L;
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:im.turms.proto.AckRequest)
-          AckRequestOrBuilder {
+      im.turms.common.model.dto.request.signal.AckRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_descriptor;
+      return im.turms.common.model.dto.request.signal.AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_fieldAccessorTable
+      return im.turms.common.model.dto.request.signal.AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              AckRequest.class, AckRequest.Builder.class);
+              im.turms.common.model.dto.request.signal.AckRequest.class, im.turms.common.model.dto.request.signal.AckRequest.Builder.class);
     }
 
     // Construct using im.turms.common.model.dto.request.signal.AckRequest.newBuilder()
@@ -368,17 +369,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_descriptor;
+      return im.turms.common.model.dto.request.signal.AckRequestOuterClass.internal_static_im_turms_proto_AckRequest_descriptor;
     }
 
     @java.lang.Override
-    public AckRequest getDefaultInstanceForType() {
-      return AckRequest.getDefaultInstance();
+    public im.turms.common.model.dto.request.signal.AckRequest getDefaultInstanceForType() {
+      return im.turms.common.model.dto.request.signal.AckRequest.getDefaultInstance();
     }
 
     @java.lang.Override
-    public AckRequest build() {
-      AckRequest result = buildPartial();
+    public im.turms.common.model.dto.request.signal.AckRequest build() {
+      im.turms.common.model.dto.request.signal.AckRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -386,8 +387,8 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public AckRequest buildPartial() {
-      AckRequest result = new AckRequest(this);
+    public im.turms.common.model.dto.request.signal.AckRequest buildPartial() {
+      im.turms.common.model.dto.request.signal.AckRequest result = new im.turms.common.model.dto.request.signal.AckRequest(this);
       int from_bitField0_ = bitField0_;
       if (((bitField0_ & 0x00000001) != 0)) {
         messagesIds_.makeImmutable();
@@ -432,16 +433,16 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof AckRequest) {
-        return mergeFrom((AckRequest)other);
+      if (other instanceof im.turms.common.model.dto.request.signal.AckRequest) {
+        return mergeFrom((im.turms.common.model.dto.request.signal.AckRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(AckRequest other) {
-      if (other == AckRequest.getDefaultInstance()) return this;
+    public Builder mergeFrom(im.turms.common.model.dto.request.signal.AckRequest other) {
+      if (other == im.turms.common.model.dto.request.signal.AckRequest.getDefaultInstance()) return this;
       if (!other.messagesIds_.isEmpty()) {
         if (messagesIds_.isEmpty()) {
           messagesIds_ = other.messagesIds_;
@@ -467,11 +468,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      AckRequest parsedMessage = null;
+      im.turms.common.model.dto.request.signal.AckRequest parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (AckRequest) e.getUnfinishedMessage();
+        parsedMessage = (im.turms.common.model.dto.request.signal.AckRequest) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -577,12 +578,12 @@ private static final long serialVersionUID = 0L;
   }
 
   // @@protoc_insertion_point(class_scope:im.turms.proto.AckRequest)
-  private static final AckRequest DEFAULT_INSTANCE;
+  private static final im.turms.common.model.dto.request.signal.AckRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new AckRequest();
+    DEFAULT_INSTANCE = new im.turms.common.model.dto.request.signal.AckRequest();
   }
 
-  public static AckRequest getDefaultInstance() {
+  public static im.turms.common.model.dto.request.signal.AckRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
@@ -607,7 +608,7 @@ private static final long serialVersionUID = 0L;
   }
 
   @java.lang.Override
-  public AckRequest getDefaultInstanceForType() {
+  public im.turms.common.model.dto.request.signal.AckRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

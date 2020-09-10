@@ -20,8 +20,6 @@
 
 package im.turms.common.model.bo.message;
 
-import im.turms.common.constant.MessageDeliveryStatus;
-
 public interface MessageStatusOrBuilder extends
     // @@protoc_insertion_point(interface_extends:im.turms.proto.MessageStatus)
     com.google.protobuf.MessageOrBuilder {
@@ -65,7 +63,7 @@ public interface MessageStatusOrBuilder extends
    * <code>.im.turms.proto.MessageDeliveryStatus delivery_status = 3;</code>
    * @return The deliveryStatus.
    */
-  MessageDeliveryStatus getDeliveryStatus();
+  im.turms.common.constant.MessageDeliveryStatus getDeliveryStatus();
 
   /**
    * <code>.google.protobuf.Int64Value reception_date = 4;</code>
