@@ -19,16 +19,18 @@ package im.turms.client.util;
 
 
 import com.google.protobuf.*;
-import im.turms.client.common.TurmsLogger;
 import im.turms.common.model.dto.request.group.enrollment.CheckGroupJoinQuestionsAnswersRequest;
 
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author James Chen
  */
 public class ProtoUtil {
+
+    private static final Logger LOGGER = Logger.getLogger(ProtoUtil.class.getName());
 
     private static final String QUESTION_ID_AND_ANSWER_ENTRY_PROTO_PACKAGE_NAME = "im.turms.proto.CheckGroupJoinQuestionsAnswersRequest.QuestionIdAndAnswerEntry";
     private static final HashMap<String, com.google.protobuf.GeneratedMessageV3> RESOLVER_MAP;
@@ -58,7 +60,7 @@ public class ProtoUtil {
                     String key = entry.getKey();
                     Descriptors.FieldDescriptor fieldDescriptor = descriptor.findFieldByName(key);
                     if (fieldDescriptor == null) {
-                        TurmsLogger.logger.log(Level.WARNING, "", new NoSuchFieldException(key));
+                        LOGGER.log(Level.WARNING, "", new NoSuchFieldException(key));
                     } else {
                         Descriptors.FieldDescriptor.JavaType javaType = fieldDescriptor.getJavaType();
                         if (javaType == Descriptors.FieldDescriptor.JavaType.MESSAGE) {
@@ -77,11 +79,11 @@ public class ProtoUtil {
                                     Message subMessage = defaultMessage.toBuilder().setField(subfieldDescriptor, value).build();
                                     builder.setField(fieldDescriptor, subMessage);
                                 } else {
-                                    TurmsLogger.logger.log(Level.WARNING, "", new ClassNotFoundException(fullName));
+                                    LOGGER.log(Level.WARNING, "", new ClassNotFoundException(fullName));
                                 }
                             } else {
                                 String reason = String.format("The message %s can only have one field at most", key);
-                                TurmsLogger.logger.log(Level.WARNING, "", new IllegalArgumentException(reason));
+                                LOGGER.log(Level.WARNING, "", new IllegalArgumentException(reason));
                             }
                         } else {
                             if (value instanceof Set) {

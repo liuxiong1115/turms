@@ -105,6 +105,7 @@ export default class SessionService {
         for (const cb of this._onSessionClosedListeners) {
             cb(disconnectInfo);
         }
+        this._currentStatus = SessionStatus.CLOSED;
     }
 
     // Parsers

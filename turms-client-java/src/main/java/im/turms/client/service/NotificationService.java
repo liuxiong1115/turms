@@ -31,8 +31,7 @@ public class NotificationService {
 
     public NotificationService(TurmsClient turmsClient) {
         turmsClient.getDriver()
-                .getOnNotificationListeners()
-                .add(notification -> {
+                .addOnNotificationListener(notification -> {
                     if (onNotification != null && notification.hasRelayedRequest()) {
                         TurmsRequest request = notification.getRelayedRequest();
                         if (!request.hasCreateMessageRequest()) {

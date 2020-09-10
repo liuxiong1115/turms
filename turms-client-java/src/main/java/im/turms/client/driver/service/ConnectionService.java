@@ -45,6 +45,8 @@ import java.util.function.Consumer;
  */
 public class ConnectionService {
 
+    private static final String HEADER_REASON = "X-API-Reason";
+
     public static final String REQUEST_ID_FIELD = "rid";
     public static final String USER_ID_FIELD = "uid";
     public static final String PASSWORD_FIELD = "pwd";
@@ -290,7 +292,7 @@ public class ConnectionService {
         String redirectHost = null;
         if (isRedirectSignal) {
             if (response != null) {
-                redirectHost = response.header("X-API-Reason");
+                redirectHost = response.header(HEADER_REASON);
             }
             if (redirectHost == null && reason != null && !reason.isEmpty()) {
                 redirectHost = reason;

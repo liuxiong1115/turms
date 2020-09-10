@@ -19,6 +19,9 @@ package im.turms.client.driver;
 
 import okhttp3.WebSocket;
 
+/**
+ * @author James Chen
+ */
 public class StateStore {
 
     private WebSocket webSocket;

@@ -48,8 +48,8 @@ public class HeartbeatService {
         this.heartbeatInterval = heartbeatInterval != null ? heartbeatInterval : HEARTBEAT_INTERVAL;
     }
 
-    public void start() {
-        if (heartbeatFuture == null) {
+    public synchronized void start() {
+        if (heartbeatFuture == null || heartbeatFuture.isDone()) {
             heartbeatFuture = heartbeatTimer.scheduleAtFixedRate(
                     (this::checkAndSendHeartbeatTask),
                     heartbeatInterval.toMillis(),
@@ -58,8 +58,8 @@ public class HeartbeatService {
         }
     }
 
-    public void stop() {
-        if (heartbeatFuture != null && !heartbeatFuture.isCancelled() && !heartbeatFuture.isDone()) {
+    public synchronized void stop() {
+        if (heartbeatFuture != null) {
             heartbeatFuture.cancel(true);
         }
     }

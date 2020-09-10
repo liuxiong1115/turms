@@ -21,7 +21,9 @@ package im.turms.client.common;
  * @author James Chen
  */
 public class StringUtil {
-    private StringUtil() {}
+
+    private StringUtil() {
+    }
 
     public static String camelToSnakeCase(String camelcase) {
         StringBuilder builder = new StringBuilder();
@@ -35,4 +37,5 @@ public class StringUtil {
         }
         return builder.toString();
     }
+
 }

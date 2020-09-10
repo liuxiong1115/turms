@@ -73,7 +73,7 @@ public class SessionService {
         onSessionClosedListeners.add(listener);
     }
 
-    public void notifyOnSessionConnectedListeners() {
+    public synchronized void notifyOnSessionConnectedListeners() {
         if (currentStatus == SessionStatus.DISCONNECTED || currentStatus == SessionStatus.CLOSED) {
             for (Consumer<Void> listener : onSessionConnectedListeners) {
                 listener.accept(null);
@@ -82,7 +82,7 @@ public class SessionService {
         }
     }
 
-    public void notifyOnSessionDisconnectedListeners(SessionDisconnectInfo info) {
+    public synchronized void notifyOnSessionDisconnectedListeners(SessionDisconnectInfo info) {
         if (currentStatus == SessionStatus.CONNECTED) {
             for (Consumer<SessionDisconnectInfo> listener : onSessionDisconnectedListeners) {
                 listener.accept(info);
@@ -91,7 +91,7 @@ public class SessionService {
         }
     }
 
-    public void notifyOnSessionClosedListeners(SessionDisconnectInfo info) {
+    public synchronized void notifyOnSessionClosedListeners(SessionDisconnectInfo info) {
         switch (currentStatus) {
             case CONNECTED:
                 this.notifyOnSessionDisconnectedListeners(info);
@@ -107,6 +107,7 @@ public class SessionService {
         for (Consumer<SessionDisconnectInfo> listener : onSessionClosedListeners) {
             listener.accept(info);
         }
+        currentStatus = SessionStatus.CLOSED;
     }
 
 }

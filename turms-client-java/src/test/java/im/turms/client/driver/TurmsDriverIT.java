@@ -18,9 +18,9 @@
 package im.turms.client.driver;
 
 import im.turms.client.TurmsClient;
+import im.turms.client.model.UserLocation;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
-import im.turms.common.model.bo.user.UserLocation;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.user.QueryUserProfileRequest;
@@ -60,11 +60,7 @@ class TurmsDriverIT {
     @Test
     @Order(ORDER_HIGHEST_PRIORITY)
     void connect_shouldSucceed() throws ExecutionException, InterruptedException, TimeoutException {
-        UserLocation location = UserLocation
-                .newBuilder()
-                .setLongitude(1.0f)
-                .setLatitude(1.0f)
-                .build();
+        UserLocation location = new UserLocation(1.0f, 1.0f);
         CompletableFuture<Void> future = turmsDriver.connect(1, "123", DeviceType.ANDROID, UserStatus.BUSY, location);
         Void result = future.get(5, TimeUnit.SECONDS);
         assertNull(result);
