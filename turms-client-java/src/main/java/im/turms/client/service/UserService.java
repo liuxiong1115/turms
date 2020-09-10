@@ -19,6 +19,7 @@ package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
 import im.turms.client.model.UserInfoWithVersion;
+import im.turms.client.model.UserLocation;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
 import im.turms.client.util.SystemUtil;

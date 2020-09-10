@@ -21,6 +21,7 @@ import im.turms.client.driver.TurmsDriver;
 import im.turms.client.service.*;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 
 /**
  * @author James Chen
@@ -45,25 +46,25 @@ public class TurmsClient {
 
     public TurmsClient(
             @Nullable String turmsServerUrl,
-            @Nullable Integer connectionTimeout,
-            @Nullable Integer minRequestsInterval) {
-        this(turmsServerUrl, connectionTimeout, minRequestsInterval, null);
+            @Nullable Duration connectTimeout,
+            @Nullable Duration minRequestsInterval) {
+        this(turmsServerUrl, connectTimeout, minRequestsInterval, null);
     }
 
     public TurmsClient(ClientOptions options) {
-        this(options.turmsServerUrl(),
-                options.connectionTimeout(),
+        this(options.url(),
+                options.connectTimeout(),
                 options.minRequestsInterval(),
                 options.storageServerUrl());
     }
 
     // Base constructor
     public TurmsClient(
-            @Nullable String turmsServerUrl,
-            @Nullable Integer connectionTimeout,
-            @Nullable Integer minRequestsInterval,
+            @Nullable String url,
+            @Nullable Duration connectTimeout,
+            @Nullable Duration minRequestsInterval,
             @Nullable String storageServerUrl) {
-        driver = new TurmsDriver(this, turmsServerUrl, connectionTimeout, minRequestsInterval);
+        driver = new TurmsDriver(url, connectTimeout, minRequestsInterval);
         userService = new UserService(this);
         groupService = new GroupService(this);
         messageService = new MessageService(this);

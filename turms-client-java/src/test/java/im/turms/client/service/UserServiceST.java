@@ -50,7 +50,7 @@ class UserServiceST {
 
     @AfterAll
     static void tearDown() {
-        if (turmsClient.getDriver().connected()) {
+        if (turmsClient.getDriver().isConnected()) {
             turmsClient.getDriver().disconnect();
         }
     }

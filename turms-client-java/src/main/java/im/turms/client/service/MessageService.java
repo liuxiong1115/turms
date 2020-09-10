@@ -83,8 +83,7 @@ public class MessageService {
     public MessageService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;
         this.turmsClient.getDriver()
-                .getOnNotificationListeners()
-                .add(notification -> {
+                .addOnNotificationListener(notification -> {
                     if (onMessage != null && notification.hasRelayedRequest()) {
                         TurmsRequest relayedRequest = notification.getRelayedRequest();
                         if (relayedRequest.hasCreateMessageRequest()) {

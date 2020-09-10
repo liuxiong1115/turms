@@ -46,7 +46,7 @@ class TurmsDriverIT {
 
     @AfterAll
     static void tearDown() {
-        if (turmsDriver.connected()) {
+        if (turmsDriver.isConnected()) {
             turmsDriver.disconnect();
         }
     }

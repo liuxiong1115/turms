@@ -56,13 +56,13 @@ class MessageServiceST {
 
     @AfterAll
     static void tearDown() {
-        if (senderClient.getDriver().connected()) {
+        if (senderClient.getDriver().isConnected()) {
             senderClient.getDriver().disconnect();
         }
-        if (recipientClient.getDriver().connected()) {
+        if (recipientClient.getDriver().isConnected()) {
             recipientClient.getDriver().disconnect();
         }
-        if (groupMemberClient.getDriver().connected()) {
+        if (groupMemberClient.getDriver().isConnected()) {
             groupMemberClient.getDriver().disconnect();
         }
     }

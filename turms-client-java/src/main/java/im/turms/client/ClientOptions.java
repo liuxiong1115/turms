@@ -17,46 +17,45 @@
 
 package im.turms.client;
 
+import java.time.Duration;
+
 /**
  * @author James Chen
  */
 public class ClientOptions {
 
-    private String turmsServerUrl;
-    private Integer connectionTimeout;
-    private Integer minRequestsInterval;
+    private String url;
+    private Duration connectTimeout;
+    private Duration minRequestsInterval;
     private String storageServerUrl;
 
     public static ClientOptions build() {
         return new ClientOptions();
     }
 
-    private ClientOptions() {
+    public String url() {
+        return url;
     }
 
-    public String turmsServerUrl() {
-        return turmsServerUrl;
-    }
-
-    public ClientOptions turmsServerUrl(String turmsServerUrl) {
-        this.turmsServerUrl = turmsServerUrl;
+    public ClientOptions url(String url) {
+        this.url = url;
         return this;
     }
 
-    public Integer connectionTimeout() {
-        return connectionTimeout;
+    public Duration connectTimeout() {
+        return connectTimeout;
     }
 
-    public ClientOptions connectionTimeout(Integer connectionTimeout) {
-        this.connectionTimeout = connectionTimeout;
+    public ClientOptions connectTimeout(Duration connectTimeout) {
+        this.connectTimeout = connectTimeout;
         return this;
     }
 
-    public Integer minRequestsInterval() {
+    public Duration minRequestsInterval() {
         return minRequestsInterval;
     }
 
-    public ClientOptions minRequestsInterval(Integer minRequestsInterval) {
+    public ClientOptions minRequestsInterval(Duration minRequestsInterval) {
         this.minRequestsInterval = minRequestsInterval;
         return this;
     }

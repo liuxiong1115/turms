@@ -22,18 +22,35 @@ import im.turms.common.constant.statuscode.SessionCloseStatus;
 /**
  * @author James Chen
  */
-public class SessionCloseInfo {
+public class SessionDisconnectInfo {
 
+    private final boolean wasConnected;
+    private final boolean isClosedByClient;
     private final SessionCloseStatus closeStatus;
     private final Integer webSocketStatus;
     private final String webSocketReason;
     private final Throwable error;
 
-    public SessionCloseInfo(SessionCloseStatus closeStatus, Integer webSocketStatus, String webSocketReason, Throwable error) {
+    public SessionDisconnectInfo(boolean wasConnected,
+                                 boolean isClosedByClient,
+                                 SessionCloseStatus closeStatus,
+                                 Integer webSocketStatus,
+                                 String webSocketReason,
+                                 Throwable error) {
+        this.wasConnected = wasConnected;
+        this.isClosedByClient = isClosedByClient;
         this.closeStatus = closeStatus;
         this.webSocketStatus = webSocketStatus;
         this.webSocketReason = webSocketReason;
         this.error = error;
+    }
+
+    public boolean isWasConnected() {
+        return wasConnected;
+    }
+
+    public boolean isClosedByClient() {
+        return isClosedByClient;
     }
 
     public SessionCloseStatus getCloseStatus() {
