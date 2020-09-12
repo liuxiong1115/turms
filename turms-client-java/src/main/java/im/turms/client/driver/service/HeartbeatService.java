@@ -38,19 +38,19 @@ public class HeartbeatService {
     private final Duration minRequestsInterval;
 
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
-    private ScheduledFuture<?> heartbeatFuture;
+    private ScheduledFuture<?> heartbeatTimerFuture;
 
-    private final ConcurrentLinkedQueue<CompletableFuture<Void>> heartbeatCallbacks = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<CompletableFuture<Void>> heartbeatFutures = new ConcurrentLinkedQueue<>();
 
     public HeartbeatService(StateStore stateStore, Duration minRequestsInterval, Duration heartbeatInterval) {
         this.stateStore = stateStore;
-        this.minRequestsInterval = minRequestsInterval;
+        this.minRequestsInterval = minRequestsInterval != null ? minRequestsInterval : Duration.ZERO;
         this.heartbeatInterval = heartbeatInterval != null ? heartbeatInterval : HEARTBEAT_INTERVAL;
     }
 
     public synchronized void start() {
-        if (heartbeatFuture == null || heartbeatFuture.isDone()) {
-            heartbeatFuture = heartbeatTimer.scheduleAtFixedRate(
+        if (heartbeatTimerFuture == null || heartbeatTimerFuture.isDone()) {
+            heartbeatTimerFuture = heartbeatTimer.scheduleAtFixedRate(
                     (this::checkAndSendHeartbeatTask),
                     heartbeatInterval.toMillis(),
                     heartbeatInterval.toMillis(),
@@ -58,9 +58,9 @@ public class HeartbeatService {
         }
     }
 
-    public synchronized void stop() {
-        if (heartbeatFuture != null) {
-            heartbeatFuture.cancel(true);
+    public void stop() {
+        if (heartbeatTimerFuture != null) {
+            heartbeatTimerFuture.cancel(true);
         }
     }
 
@@ -69,7 +69,7 @@ public class HeartbeatService {
         if (stateStore.isConnected()) {
             boolean wasEnqueued = stateStore.getWebSocket().send(ByteString.EMPTY);
             if (wasEnqueued) {
-                heartbeatCallbacks.offer(future);
+                heartbeatFutures.offer(future);
             } else {
                 future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
             }
@@ -84,15 +84,25 @@ public class HeartbeatService {
         start();
     }
 
-    public void notifyHeartbeatCallbacks() {
-        while (!heartbeatCallbacks.isEmpty()) {
-            heartbeatCallbacks.poll().complete(null);
+    public void completeHeartbeatFutures() {
+        while (true) {
+            CompletableFuture<Void> future = heartbeatFutures.poll();
+            if (future != null) {
+                future.complete(null);
+            } else {
+                return;
+            }
         }
     }
 
-    public void rejectHeartbeatCallbacks(Throwable throwable) {
-        while (!heartbeatCallbacks.isEmpty()) {
-            heartbeatCallbacks.poll().completeExceptionally(throwable);
+    public void rejectHeartbeatFutures(Throwable throwable) {
+        while (true) {
+            CompletableFuture<Void> future = heartbeatFutures.poll();
+            if (future != null) {
+                future.completeExceptionally(throwable);
+            } else {
+                return;
+            }
         }
     }
 

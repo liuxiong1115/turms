@@ -58,7 +58,7 @@ public class MessageService {
         onNotificationListeners.add(listener);
     }
 
-    private void notifyOnNotificationListener(TurmsNotification notification) {
+    private void notifyOnNotificationListeners(TurmsNotification notification) {
         for (Consumer<TurmsNotification> listener : onNotificationListeners) {
             try {
                 listener.accept(notification);
@@ -78,12 +78,12 @@ public class MessageService {
             if (isFrequent) {
                 future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT));
             } else {
-                stateStore.setLastRequestDate(now.getTime());
                 long requestId = generateRandomId();
                 requestBuilder.setRequestId(Int64Value.newBuilder().setValue(requestId).build());
                 TurmsRequest request = requestBuilder.build();
                 ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
                 requestMap.put(requestId, new AbstractMap.SimpleEntry<>(request, future));
+                stateStore.setLastRequestDate(now.getTime());
                 boolean wasEnqueued = stateStore.getWebSocket().send(ByteString.of(data));
                 if (!wasEnqueued) {
                     future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
@@ -95,15 +95,7 @@ public class MessageService {
         return future;
     }
 
-    private long generateRandomId() {
-        long id;
-        do {
-            id = ThreadLocalRandom.current().nextLong(1, 16384);
-        } while (requestMap.containsKey(id));
-        return id;
-    }
-
-    public void triggerOnNotificationReceived(TurmsNotification notification) {
+    public void didReceiveNotification(TurmsNotification notification) {
         boolean isResponse = !notification.hasRelayedRequest() && notification.hasRequestId();
         if (isResponse) {
             long requestId = notification.getRequestId().getValue();
@@ -127,7 +119,15 @@ public class MessageService {
                 }
             }
         }
-        notifyOnNotificationListener(notification);
+        notifyOnNotificationListeners(notification);
+    }
+
+    private long generateRandomId() {
+        long id;
+        do {
+            id = ThreadLocalRandom.current().nextLong(1, 16384);
+        } while (requestMap.containsKey(id));
+        return id;
     }
 
 }

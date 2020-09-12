@@ -19,6 +19,8 @@ package im.turms.client.driver;
 
 import okhttp3.WebSocket;
 
+import java.util.Date;
+
 /**
  * @author James Chen
  */
@@ -29,7 +31,7 @@ public class StateStore {
     private Integer connectionRequestId;
     private String sessionId;
 
-    private long lastRequestDate;
+    private long lastRequestDate = new Date(0).getTime();
 
     public WebSocket getWebSocket() {
         return webSocket;

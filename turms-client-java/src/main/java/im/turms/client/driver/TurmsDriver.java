@@ -58,7 +58,7 @@ public class TurmsDriver {
     private Consumer<SessionDisconnectInfo> onSessionClosed;
 
     private String websocketUrl = "ws://localhost:9510";
-    private Duration connectionTimeout = Duration.ofSeconds(10);
+    private Duration connectTimeout = Duration.ofSeconds(10);
 
     private final StateStore stateStore;
 
@@ -68,13 +68,13 @@ public class TurmsDriver {
     private final SessionService sessionService;
 
     public TurmsDriver(@Nullable String websocketUrl,
-                       @Nullable Duration connectionTimeout,
+                       @Nullable Duration connectTimeout,
                        @Nullable Duration minRequestsInterval) {
         if (websocketUrl != null) {
             this.websocketUrl = websocketUrl;
         }
-        if (connectionTimeout != null) {
-            this.connectionTimeout = connectionTimeout;
+        if (connectTimeout != null) {
+            this.connectTimeout = connectTimeout;
         }
 
         stateStore = new StateStore();
@@ -152,12 +152,12 @@ public class TurmsDriver {
         heartbeatService.stop();
     }
 
-    public CompletableFuture<Void> sendHeartbeat() {
-        return heartbeatService.send();
+    public void resetHeartbeat() {
+        heartbeatService.reset();
     }
 
-    public void resetHeartBeatTimer() {
-        heartbeatService.reset();
+    public CompletableFuture<Void> sendHeartbeat() {
+        return heartbeatService.send();
     }
 
     // Connection Service
@@ -188,7 +188,7 @@ public class TurmsDriver {
             @Nullable UserStatus userOnlineStatus,
             @Nullable UserLocation userLocation) {
         return connectionService.connect(websocketUrl,
-                connectionTimeout,
+                connectTimeout,
                 userId,
                 password,
                 deviceType,
@@ -236,7 +236,7 @@ public class TurmsDriver {
 
     private void onConnectionDisconnected(SessionDisconnectInfo info) {
         heartbeatService.stop();
-        heartbeatService.rejectHeartbeatCallbacks(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
+        heartbeatService.rejectHeartbeatFutures(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
     }
 
     private void onConnectionClosed(SessionDisconnectInfo info) {
@@ -249,16 +249,16 @@ public class TurmsDriver {
             try {
                 notification = TurmsNotification.parseFrom(byteBuffer);
             } catch (InvalidProtocolBufferException e) {
-                LOGGER.log(Level.SEVERE, "", e);
+                LOGGER.log(Level.SEVERE, "Failed to parse TurmsNotification", e);
                 return;
             }
             boolean isSessionInfo = notification.hasData() && notification.getData().hasSession();
             if (isSessionInfo) {
                 sessionService.setSessionId(notification.getData().getSession().getSessionId());
             }
-            messageService.triggerOnNotificationReceived(notification);
+            messageService.didReceiveNotification(notification);
         } else {
-            heartbeatService.notifyHeartbeatCallbacks();
+            heartbeatService.completeHeartbeatFutures();
         }
     }
 

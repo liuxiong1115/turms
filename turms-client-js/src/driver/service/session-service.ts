@@ -113,7 +113,7 @@ export default class SessionService {
     private static _parseDisconnectInfo(event: CloseEvent, info?: SessionDisconnectInfo): SessionDisconnectInfo {
         const code = TurmsCloseStatus[event.code] ? event.code : null;
         return Object.assign({}, {
-            code,
+            closeStatus: code,
             webSocketStatusCode: event.code,
             webSocketReason: event.reason,
         }, info || {});

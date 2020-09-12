@@ -54,7 +54,7 @@ public class UserService {
     private String password;
     private UserLocation location;
     private UserStatus userOnlineStatus;
-    private DeviceType deviceType = SystemUtil.getDeviceType();
+    private DeviceType deviceType;
 
     public UserService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;
@@ -69,11 +69,12 @@ public class UserService {
         if (password == null) {
             return TurmsBusinessException.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "password must not be null");
         }
+        if (deviceType == null) {
+            deviceType = SystemUtil.getDeviceType();
+        }
         this.userId = userId;
         this.password = password;
-        if (deviceType != null) {
-            this.deviceType = deviceType;
-        }
+        this.deviceType = deviceType;
         this.userOnlineStatus = userOnlineStatus != null ? userOnlineStatus : UserStatus.AVAILABLE;
         this.location = location;
         return turmsClient.getDriver().connect(userId, password, deviceType, userOnlineStatus, location)

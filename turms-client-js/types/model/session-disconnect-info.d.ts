@@ -1,5 +1,5 @@
 export interface SessionDisconnectInfo {
-    code?: number;
+    closeStatus?: number;
     webSocketStatusCode?: number;
     webSocketReason?: string;
     error?: Error;

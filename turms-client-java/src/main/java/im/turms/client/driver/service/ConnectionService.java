@@ -59,7 +59,7 @@ public class ConnectionService {
     private final StateStore stateStore;
 
     private boolean isClosedByClient;
-    private final ConcurrentLinkedQueue<CompletableFuture<Void>> disconnectionCallbacks = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<CompletableFuture<Void>> disconnectFutures = new ConcurrentLinkedQueue<>();
     private ConnectOptions connectOptions;
 
     private final List<Consumer<Void>> onConnectedListeners = new LinkedList<>();
@@ -76,7 +76,7 @@ public class ConnectionService {
     private void resetStates() {
         this.stateStore.setConnectionRequestId(null);
         isClosedByClient = false;
-        triggerDisconnectCallbacks();
+        completeDisconnectFutures();
     }
 
     // Listeners
@@ -97,7 +97,7 @@ public class ConnectionService {
         onMessageListeners.add(listener);
     }
 
-    private void notifyOnConnectedListener() {
+    private void notifyOnConnectedListeners() {
         for (Consumer<Void> listener : onConnectedListeners) {
             listener.accept(null);
         }
@@ -109,21 +109,21 @@ public class ConnectionService {
         }
     }
 
-    private void notifyOnClosedListener(SessionDisconnectInfo info) {
+    private void notifyOnClosedListeners(SessionDisconnectInfo info) {
         for (Consumer<SessionDisconnectInfo> listener : onClosedListeners) {
             listener.accept(info);
         }
     }
 
-    private void notifyOnMessageListener(ByteBuffer message) {
+    private void notifyOnMessageListeners(ByteBuffer message) {
         for (Consumer<ByteBuffer> listener : onMessageListeners) {
             listener.accept(message);
         }
     }
 
-    private void triggerDisconnectCallbacks() {
-        while (!disconnectionCallbacks.isEmpty()) {
-            disconnectionCallbacks.poll().complete(null);
+    private void completeDisconnectFutures() {
+        while (!disconnectFutures.isEmpty()) {
+            disconnectFutures.poll().complete(null);
         }
     }
 
@@ -172,15 +172,15 @@ public class ConnectionService {
                     .header(REQUEST_ID_FIELD, String.valueOf(connectionRequestId))
                     .header(USER_ID_FIELD, String.valueOf(userId))
                     .header(PASSWORD_FIELD, password);
-            if (userLocation != null) {
-                String location = String.format("%f%s%f", userLocation.getLongitude(), LOCATION_DELIMITER, userLocation.getLatitude());
-                requestBuilder.header(USER_LOCATION_FIELD, location);
+            if (deviceType != null) {
+                requestBuilder.header(DEVICE_TYPE_FIELD, deviceType.name());
             }
             if (userOnlineStatus != null) {
                 requestBuilder.header(USER_ONLINE_STATUS_FIELD, userOnlineStatus.toString());
             }
-            if (deviceType != null) {
-                requestBuilder.header(DEVICE_TYPE_FIELD, deviceType.name());
+            if (userLocation != null) {
+                String location = String.format("%f%s%f", userLocation.getLongitude(), LOCATION_DELIMITER, userLocation.getLatitude());
+                requestBuilder.header(USER_LOCATION_FIELD, location);
             }
             WebSocket websocket = httpClient.newWebSocket(requestBuilder.build(), new WebSocketListener() {
                 @Override
@@ -191,7 +191,7 @@ public class ConnectionService {
 
                 @Override
                 public void onMessage(@org.jetbrains.annotations.NotNull WebSocket webSocket, @org.jetbrains.annotations.NotNull ByteString bytes) {
-                    notifyOnMessageListener(bytes.asByteBuffer());
+                    notifyOnMessageListeners(bytes.asByteBuffer());
                 }
 
                 @Override
@@ -263,7 +263,7 @@ public class ConnectionService {
             if (wasEnqueued) {
                 isClosedByClient = true;
                 stateStore.setConnected(false);
-                disconnectionCallbacks.offer(future);
+                disconnectFutures.offer(future);
             } else {
                 future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
             }
@@ -277,11 +277,11 @@ public class ConnectionService {
 
     private void onWebSocketOpen() {
         stateStore.setConnected(true);
-        notifyOnConnectedListener();
+        notifyOnConnectedListeners();
     }
 
     private CompletableFuture<Void> onWebSocketClose(int code, String reason, Response response, Throwable throwable) {
-        triggerDisconnectCallbacks();
+        completeDisconnectFutures();
         boolean wasConnected = stateStore.isConnected();
         boolean closedByClient = isClosedByClient;
         stateStore.setConnected(false);
@@ -299,15 +299,16 @@ public class ConnectionService {
             }
         }
 
-        notifyOnDisconnectedListeners(new SessionDisconnectInfo(wasConnected, closedByClient, status, code, reason, throwable));
+        SessionDisconnectInfo disconnectInfo = new SessionDisconnectInfo(wasConnected, closedByClient, status, code, reason, throwable);
+        notifyOnDisconnectedListeners(disconnectInfo);
         if (isRedirectSignal && redirectHost != null) {
             return reconnect(redirectHost)
                     .exceptionally(t -> {
-                        notifyOnClosedListener(new SessionDisconnectInfo(wasConnected, closedByClient, status, code, reason, throwable));
+                        notifyOnClosedListeners(disconnectInfo);
                         return null;
                     });
         } else {
-            notifyOnClosedListener(new SessionDisconnectInfo(wasConnected, closedByClient, status, code, reason, throwable));
+            notifyOnClosedListeners(disconnectInfo);
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(new RuntimeException());
             return future;
