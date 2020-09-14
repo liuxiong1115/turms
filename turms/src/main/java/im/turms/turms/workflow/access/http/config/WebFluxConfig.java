@@ -34,9 +34,9 @@ public class WebFluxConfig implements WebFluxConfigurer {
      */
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
+        // We don't allow developers to customize the cors config here
+        // because it's better to be done by firewall/ECS/EC2 and so on for better flexibility
         corsRegistry.addMapping("/**")
-                // Allow credentials because cookies are used to transfer
-                // clients' credentials at the handshake stage of WebSocket in the browser.
                 .allowCredentials(true)
                 .allowedOrigins("*")
                 .allowedMethods("*")
