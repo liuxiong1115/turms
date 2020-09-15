@@ -26,6 +26,7 @@ import im.turms.common.constant.UserStatus;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.util.RandomUtil;
 import okhttp3.*;
 import okio.ByteString;
 
@@ -37,7 +38,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 /**
@@ -166,7 +166,7 @@ public class ConnectionService {
                     httpClient = httpClient.newBuilder().connectTimeout(Duration.ZERO).build();
                 }
             }
-            long connectionRequestId = ThreadLocalRandom.current().nextLong();
+            long connectionRequestId = RandomUtil.nextPositiveLong();
             Request.Builder requestBuilder = new Request.Builder()
                     .url(wsUrl)
                     .header(REQUEST_ID_FIELD, String.valueOf(connectionRequestId))

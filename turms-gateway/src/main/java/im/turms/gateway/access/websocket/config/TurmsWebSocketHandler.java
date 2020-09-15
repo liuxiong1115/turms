@@ -107,7 +107,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                 return workflowMediator.processHeartbeatRequest(userId, deviceType)
                                         .thenReturn(webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(HEARTBEAT_BYTE_BUF)));
                             } else {
-//                                long traceId = ThreadLocalRandom.current().nextLong(); TODO: tracing
+//                                long traceId = RandomUtil.nextPositiveLong(); TODO: tracing
                                 long requestId = TurmsRequestUtil.parseRequestId(payload.asByteBuffer());
                                 ByteBuf requestBuffer = NettyDataBufferFactory.toByteBuf(payload);
                                 // FIXME: We use retain() as a workaround for now to fix the bug mentioned in https://github.com/turms-im/turms/issues/430
