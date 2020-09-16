@@ -169,9 +169,9 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         HttpHeaders headers = exchange.getResponse().getHeaders();
         String headerCodeValue = CODE_STRING_POOL.computeIfAbsent(statusCode, key -> Integer.toString(key.getBusinessCode()));
         headers.set(RESPONSE_HEADER_TURMS_STATUS_CODE, headerCodeValue);
-        ResponseStatusException error = new ResponseStatusException(HttpStatus.valueOf(statusCode.getHttpStatusCode()));
+        ResponseStatusException exception = new ResponseStatusException(HttpStatus.valueOf(statusCode.getHttpStatusCode()));
         return workflowMediator.rejectLoginRequest(statusCode, userId, loggingInDeviceType, requestId)
-                .then(Mono.error(error));
+                .then(Mono.error(exception));
     }
 
     private List<String> getNewIdentityList() {
