@@ -37,34 +37,69 @@ public class TurmsClient {
     private final NotificationService notificationService;
 
     public TurmsClient() {
-        this(null, null, null, null);
+        this(null, null, null, null, null, null);
     }
 
-    public TurmsClient(@Nullable String turmsServerUrl) {
-        this(turmsServerUrl, null, null, null);
+    public TurmsClient(@Nullable String url) {
+        this(url, null, null);
     }
 
     public TurmsClient(
-            @Nullable String turmsServerUrl,
+            @Nullable String url,
+            @Nullable Duration connectTimeout) {
+        this(url, connectTimeout, null);
+    }
+
+    public TurmsClient(
+            @Nullable String url,
             @Nullable Duration connectTimeout,
-            @Nullable Duration minRequestsInterval) {
-        this(turmsServerUrl, connectTimeout, minRequestsInterval, null);
+            @Nullable Duration requestTimeout) {
+        this(url, connectTimeout, requestTimeout, null);
+    }
+
+    public TurmsClient(
+            @Nullable String url,
+            @Nullable Duration connectTimeout,
+            @Nullable Duration requestTimeout,
+            @Nullable Duration minRequestInterval) {
+        this(url, connectTimeout, requestTimeout, minRequestInterval, null);
+    }
+
+    public TurmsClient(
+            @Nullable String url,
+            @Nullable Duration connectTimeout,
+            @Nullable Duration requestTimeout,
+            @Nullable Duration minRequestInterval,
+            @Nullable Duration heartbeatInterval) {
+        this(url, connectTimeout, requestTimeout, minRequestInterval, heartbeatInterval, null);
+    }
+
+    public TurmsClient(
+            @Nullable String url,
+            @Nullable String storageServerUrl) {
+        this(url, null, null, null, null, storageServerUrl);
     }
 
     public TurmsClient(ClientOptions options) {
         this(options.url(),
                 options.connectTimeout(),
-                options.minRequestsInterval(),
+                options.heartbeatInterval(),
+                options.minRequestInterval(),
+                options.heartbeatInterval(),
                 options.storageServerUrl());
     }
 
-    // Base constructor
+    /**
+     * Base constructor
+     */
     public TurmsClient(
             @Nullable String url,
             @Nullable Duration connectTimeout,
-            @Nullable Duration minRequestsInterval,
+            @Nullable Duration requestTimeout,
+            @Nullable Duration minRequestInterval,
+            @Nullable Duration heartbeatInterval,
             @Nullable String storageServerUrl) {
-        driver = new TurmsDriver(url, connectTimeout, minRequestsInterval);
+        driver = new TurmsDriver(url, connectTimeout, requestTimeout, minRequestInterval, heartbeatInterval);
         userService = new UserService(this);
         groupService = new GroupService(this);
         messageService = new MessageService(this);

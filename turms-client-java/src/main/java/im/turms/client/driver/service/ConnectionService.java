@@ -55,20 +55,28 @@ public class ConnectionService {
     public static final String USER_LOCATION_FIELD = "loc";
     private static final String LOCATION_DELIMITER = ":";
 
-    private OkHttpClient httpClient;
+    private static final String DEFAULT_WEBSOCKET_URL = "ws://localhost:9510";
+    private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
+
     private final StateStore stateStore;
+    private final String initialWsUrl;
+    private final Duration initialConnectTimeout;
+
+    private OkHttpClient httpClient;
+    private ConnectOptions connectOptions;
 
     private boolean isClosedByClient;
     private final ConcurrentLinkedQueue<CompletableFuture<Void>> disconnectFutures = new ConcurrentLinkedQueue<>();
-    private ConnectOptions connectOptions;
 
     private final List<Consumer<Void>> onConnectedListeners = new LinkedList<>();
     private final List<Consumer<SessionDisconnectInfo>> onDisconnectedListeners = new LinkedList<>();
     private final List<Consumer<SessionDisconnectInfo>> onClosedListeners = new LinkedList<>();
     private final List<Consumer<ByteBuffer>> onMessageListeners = new LinkedList<>();
 
-    public ConnectionService(StateStore stateStore) {
+    public ConnectionService(StateStore stateStore, @Nullable String wsUrl, @Nullable Duration connectTimeout) {
         this.stateStore = stateStore;
+        initialWsUrl = wsUrl != null ? wsUrl : DEFAULT_WEBSOCKET_URL;
+        initialConnectTimeout = connectTimeout != null ? connectTimeout : DEFAULT_CONNECT_TIMEOUT;
         httpClient = new OkHttpClient.Builder()
                 .build();
     }
@@ -130,30 +138,40 @@ public class ConnectionService {
     // Connection
 
     public CompletableFuture<Void> connect(
-            @NotNull String wsUrl,
+            @Nullable String wsUrl,
             @Nullable Duration connectTimeout,
             long userId,
             @NotNull String password,
             @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus,
             @Nullable UserLocation userLocation) {
+        wsUrl = wsUrl != null
+                ? wsUrl
+                : initialWsUrl;
+        connectTimeout = connectTimeout != null
+                ? connectTimeout
+                : initialConnectTimeout;
+        connectOptions = new ConnectOptions()
+                .wsUrl(wsUrl)
+                .connectTimeout(connectTimeout)
+                .userId(userId)
+                .password(password)
+                .deviceType(deviceType)
+                .userOnlineStatus(userOnlineStatus)
+                .location(userLocation);
+        return connect(connectOptions);
+    }
+
+    public CompletableFuture<Void> connect(ConnectOptions options) {
         CompletableFuture<Void> loginFuture = new CompletableFuture<>();
         if (stateStore.isConnected()) {
             loginFuture.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_ALREADY_ESTABLISHED));
             return loginFuture;
         } else {
             resetStates();
-            // FIXME
-            connectOptions = new ConnectOptions()
-                    .wsUrl(wsUrl)
-                    .connectTimeout(connectTimeout)
-                    .userId(userId)
-                    .password(password)
-                    .deviceType(deviceType)
-                    .userOnlineStatus(userOnlineStatus)
-                    .location(userLocation);
-            // TODO: redirect connect timeout
             boolean isConnectTimeoutChanged;
+            // TODO: redirect connect timeout
+            Duration connectTimeout = options.connectTimeout();
             if (connectTimeout != null) {
                 isConnectTimeoutChanged = connectTimeout.toMillis() != httpClient.connectTimeoutMillis();
             } else {
@@ -168,16 +186,17 @@ public class ConnectionService {
             }
             long connectionRequestId = RandomUtil.nextPositiveLong();
             Request.Builder requestBuilder = new Request.Builder()
-                    .url(wsUrl)
+                    .url(options.wsUrl())
                     .header(REQUEST_ID_FIELD, String.valueOf(connectionRequestId))
-                    .header(USER_ID_FIELD, String.valueOf(userId))
-                    .header(PASSWORD_FIELD, password);
-            if (deviceType != null) {
-                requestBuilder.header(DEVICE_TYPE_FIELD, deviceType.name());
+                    .header(USER_ID_FIELD, String.valueOf(options.userId()))
+                    .header(PASSWORD_FIELD, options.password());
+            if (options.deviceType() != null) {
+                requestBuilder.header(DEVICE_TYPE_FIELD, options.deviceType().name());
             }
-            if (userOnlineStatus != null) {
-                requestBuilder.header(USER_ONLINE_STATUS_FIELD, userOnlineStatus.toString());
+            if (options.userOnlineStatus() != null) {
+                requestBuilder.header(USER_ONLINE_STATUS_FIELD, options.userOnlineStatus().toString());
             }
+            UserLocation userLocation = options.location();
             if (userLocation != null) {
                 String location = String.format("%f%s%f", userLocation.getLongitude(), LOCATION_DELIMITER, userLocation.getLatitude());
                 requestBuilder.header(USER_LOCATION_FIELD, location);
@@ -228,17 +247,6 @@ public class ConnectionService {
             stateStore.setWebSocket(websocket);
         }
         return loginFuture;
-    }
-
-    // TODO
-    public CompletableFuture<Void> connect(ConnectOptions options) {
-        return connect(options.wsUrl(),
-                options.connectTimeout(),
-                options.userId(),
-                options.password(),
-                options.deviceType(),
-                options.userOnlineStatus(),
-                options.location());
     }
 
     public CompletableFuture<Void> reconnect() {

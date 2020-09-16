@@ -25,6 +25,7 @@ import im.turms.client.driver.service.ConnectionService;
 import im.turms.client.driver.service.HeartbeatService;
 import im.turms.client.driver.service.MessageService;
 import im.turms.client.driver.service.SessionService;
+import im.turms.client.model.ConnectOptions;
 import im.turms.client.model.SessionDisconnectInfo;
 import im.turms.client.model.SessionStatus;
 import im.turms.client.model.UserLocation;
@@ -57,9 +58,6 @@ public class TurmsDriver {
     private Consumer<SessionDisconnectInfo> onSessionDisconnected;
     private Consumer<SessionDisconnectInfo> onSessionClosed;
 
-    private String websocketUrl = "ws://localhost:9510";
-    private Duration connectTimeout = Duration.ofSeconds(10);
-
     private final StateStore stateStore;
 
     private final ConnectionService connectionService;
@@ -69,26 +67,21 @@ public class TurmsDriver {
 
     public TurmsDriver(@Nullable String websocketUrl,
                        @Nullable Duration connectTimeout,
-                       @Nullable Duration minRequestsInterval) {
-        if (websocketUrl != null) {
-            this.websocketUrl = websocketUrl;
-        }
-        if (connectTimeout != null) {
-            this.connectTimeout = connectTimeout;
-        }
-
+                       @Nullable Duration requestTimeout,
+                       @Nullable Duration minRequestInterval,
+                       @Nullable Duration heartbeatInterval) {
         stateStore = new StateStore();
 
-        connectionService = initConnectionService();
-        heartbeatService = new HeartbeatService(stateStore, minRequestsInterval, null);
-        messageService = new MessageService(stateStore, minRequestsInterval);
+        connectionService = initConnectionService(websocketUrl, connectTimeout);
+        heartbeatService = new HeartbeatService(stateStore, minRequestInterval, heartbeatInterval);
+        messageService = new MessageService(stateStore, requestTimeout, minRequestInterval);
         sessionService = initSessionService();
     }
 
     // Initializers
 
-    private ConnectionService initConnectionService() {
-        ConnectionService service = new ConnectionService(stateStore);
+    private ConnectionService initConnectionService(String websocketUrl, Duration connectTimeout) {
+        ConnectionService service = new ConnectionService(stateStore, websocketUrl, connectTimeout);
         service.addOnConnectedListener(unused -> onConnectionConnected());
         service.addOnDisconnectedListener(this::onConnectionDisconnected);
         service.addOnClosedListener(this::onConnectionClosed);
@@ -163,14 +156,14 @@ public class TurmsDriver {
     // Connection Service
 
     public CompletableFuture<Void> connect(long userId, @NotNull String password) {
-        return connect(userId, password, null, null, null);
+        return connect(null, userId, password, null, null, null);
     }
 
     public CompletableFuture<Void> connect(
             long userId,
             @NotNull String password,
             @Nullable DeviceType deviceType) {
-        return connect(userId, password, deviceType, null, null);
+        return connect(null, userId, password, deviceType, null, null);
     }
 
     public CompletableFuture<Void> connect(
@@ -178,7 +171,7 @@ public class TurmsDriver {
             @NotNull String password,
             @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus) {
-        return connect(userId, password, deviceType, userOnlineStatus, null);
+        return connect(null, userId, password, deviceType, userOnlineStatus, null);
     }
 
     public CompletableFuture<Void> connect(
@@ -186,14 +179,45 @@ public class TurmsDriver {
             @NotNull String password,
             @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus,
+            @Nullable UserLocation location) {
+        return connect(null, userId, password, deviceType, userOnlineStatus, location);
+    }
+
+    public CompletableFuture<Void> connect(
+            @Nullable Duration connectTimeout,
+            long userId,
+            @NotNull String password,
+            @Nullable DeviceType deviceType,
+            @Nullable UserStatus userOnlineStatus,
             @Nullable UserLocation userLocation) {
-        return connectionService.connect(websocketUrl,
+        return connect(null,
                 connectTimeout,
                 userId,
                 password,
                 deviceType,
                 userOnlineStatus,
                 userLocation);
+    }
+
+    public CompletableFuture<Void> connect(
+            @Nullable String wsUrl,
+            @Nullable Duration connectTimeout,
+            long userId,
+            @NotNull String password,
+            @Nullable DeviceType deviceType,
+            @Nullable UserStatus userOnlineStatus,
+            @Nullable UserLocation userLocation) {
+        return connectionService.connect(wsUrl,
+                connectTimeout,
+                userId,
+                password,
+                deviceType,
+                userOnlineStatus,
+                userLocation);
+    }
+
+    public CompletableFuture<Void> connect(ConnectOptions options) {
+        return connectionService.connect(options);
     }
 
     public CompletableFuture<Void> disconnect() {

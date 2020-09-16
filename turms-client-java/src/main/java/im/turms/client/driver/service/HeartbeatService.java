@@ -22,6 +22,8 @@ import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import okio.ByteString;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.concurrent.*;
 
@@ -30,22 +32,22 @@ import java.util.concurrent.*;
  */
 public class HeartbeatService {
 
-    private static final Duration HEARTBEAT_INTERVAL = Duration.ofSeconds(120);
+    private static final Duration DEFAULT_HEARTBEAT_INTERVAL = Duration.ofSeconds(120);
 
     private final StateStore stateStore;
 
     private final Duration heartbeatInterval;
-    private final Duration minRequestsInterval;
+    private final Duration minRequestInterval;
 
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> heartbeatTimerFuture;
 
     private final ConcurrentLinkedQueue<CompletableFuture<Void>> heartbeatFutures = new ConcurrentLinkedQueue<>();
 
-    public HeartbeatService(StateStore stateStore, Duration minRequestsInterval, Duration heartbeatInterval) {
+    public HeartbeatService(@NotNull StateStore stateStore, @Nullable Duration minRequestInterval, @Nullable Duration heartbeatInterval) {
         this.stateStore = stateStore;
-        this.minRequestsInterval = minRequestsInterval != null ? minRequestsInterval : Duration.ZERO;
-        this.heartbeatInterval = heartbeatInterval != null ? heartbeatInterval : HEARTBEAT_INTERVAL;
+        this.minRequestInterval = minRequestInterval != null ? minRequestInterval : Duration.ZERO;
+        this.heartbeatInterval = heartbeatInterval != null ? heartbeatInterval : DEFAULT_HEARTBEAT_INTERVAL;
     }
 
     public synchronized void start() {
@@ -108,7 +110,7 @@ public class HeartbeatService {
 
     private void checkAndSendHeartbeatTask() {
         long difference = System.currentTimeMillis() - stateStore.getLastRequestDate();
-        if (difference > minRequestsInterval.toMillis()) {
+        if (difference > minRequestInterval.toMillis()) {
             send();
         }
     }

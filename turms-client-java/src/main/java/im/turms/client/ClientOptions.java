@@ -26,7 +26,9 @@ public class ClientOptions {
 
     private String url;
     private Duration connectTimeout;
-    private Duration minRequestsInterval;
+    private Duration requestTimeout;
+    private Duration minRequestInterval;
+    private Duration heartbeatInterval;
     private String storageServerUrl;
 
     public static ClientOptions build() {
@@ -51,12 +53,30 @@ public class ClientOptions {
         return this;
     }
 
-    public Duration minRequestsInterval() {
-        return minRequestsInterval;
+    public Duration requestTimeout() {
+        return requestTimeout;
     }
 
-    public ClientOptions minRequestsInterval(Duration minRequestsInterval) {
-        this.minRequestsInterval = minRequestsInterval;
+    public ClientOptions requestTimeout(Duration requestTimeout) {
+        this.requestTimeout = requestTimeout;
+        return this;
+    }
+
+    public Duration minRequestInterval() {
+        return minRequestInterval;
+    }
+
+    public ClientOptions minRequestInterval(Duration minRequestInterval) {
+        this.minRequestInterval = minRequestInterval;
+        return this;
+    }
+
+    public Duration heartbeatInterval() {
+        return heartbeatInterval;
+    }
+
+    public ClientOptions heartbeatInterval(Duration heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
         return this;
     }
 
@@ -68,4 +88,5 @@ public class ClientOptions {
         this.storageServerUrl = storageServerUrl;
         return this;
     }
+
 }

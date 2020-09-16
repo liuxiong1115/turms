@@ -45,7 +45,7 @@ class UserServiceST {
 
     @BeforeAll
     static void setup() {
-        turmsClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
+        turmsClient = new TurmsClient(WS_URL, STORAGE_SERVER_URL);
     }
 
     @AfterAll

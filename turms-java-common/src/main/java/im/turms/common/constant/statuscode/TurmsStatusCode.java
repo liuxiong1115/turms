@@ -74,6 +74,7 @@ public enum TurmsStatusCode {
     CLIENT_SESSION_ALREADY_ESTABLISHED(6002, "The session has been established", 0),
     CLIENT_REQUESTS_TOO_FREQUENT(6003, "Client requests are too frequent", 0),
     MISSING_DATA(6004, "The data is missing", 0),
+    TIMEOUT(6005, "The request has timed out", 0),
     MESSAGE_IS_REJECTED(6050, "The message failed to be enqueued by the outgoing message buffer", 0);
 
     private final int businessCode;

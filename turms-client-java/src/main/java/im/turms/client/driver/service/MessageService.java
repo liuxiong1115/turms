@@ -19,17 +19,22 @@ package im.turms.client.driver.service;
 
 import com.google.protobuf.Int64Value;
 import im.turms.client.driver.StateStore;
+import im.turms.client.util.FutureUtil;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import okio.ByteString;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,16 +45,25 @@ import java.util.logging.Logger;
 public class MessageService {
 
     private static final Logger LOGGER = Logger.getLogger(MessageService.class.getName());
+    private static final String SCHEDULED_THREAD_NAME = "turms-request-timeout-watchdog";
+    private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = new ScheduledThreadPoolExecutor(1, runnable -> {
+        Thread t = new Thread(runnable);
+        t.setName(SCHEDULED_THREAD_NAME);
+        return t;
+    });
+    private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(30);
 
     private final StateStore stateStore;
 
-    private final Duration minRequestsInterval;
+    private final Duration requestTimeout;
+    private final Duration minRequestInterval;
     private final List<Consumer<TurmsNotification>> onNotificationListeners = new LinkedList<>();
-    private final HashMap<Long, AbstractMap.SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>>> requestMap = new HashMap<>(256);
+    private final Map<Long, RequestFuturePair> requestMap = new ConcurrentHashMap<>(256);
 
-    public MessageService(StateStore stateStore, Duration minRequestsInterval) {
+    public MessageService(@NotNull StateStore stateStore, @Nullable Duration requestTimeout, @Nullable Duration minRequestInterval) {
         this.stateStore = stateStore;
-        this.minRequestsInterval = minRequestsInterval;
+        this.requestTimeout = requestTimeout != null ? requestTimeout : DEFAULT_REQUEST_TIMEOUT;
+        this.minRequestInterval = minRequestInterval;
     }
 
     // Listeners
@@ -74,19 +88,31 @@ public class MessageService {
         CompletableFuture<TurmsNotification> future = new CompletableFuture<>();
         if (stateStore.isConnected()) {
             Date now = new Date();
-            boolean isFrequent = minRequestsInterval != null && now.getTime() - stateStore.getLastRequestDate() <= minRequestsInterval.toMillis();
+            boolean isFrequent = minRequestInterval != null && now.getTime() - stateStore.getLastRequestDate() <= minRequestInterval.toMillis();
             if (isFrequent) {
                 future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT));
             } else {
-                long requestId = generateRandomId();
-                requestBuilder.setRequestId(Int64Value.newBuilder().setValue(requestId).build());
-                TurmsRequest request = requestBuilder.build();
-                ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
-                requestMap.put(requestId, new AbstractMap.SimpleEntry<>(request, future));
-                stateStore.setLastRequestDate(now.getTime());
-                boolean wasEnqueued = stateStore.getWebSocket().send(ByteString.of(data));
-                if (!wasEnqueued) {
-                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
+                while (true) {
+                    long requestId = generateRandomId();
+                    TurmsRequest request = requestBuilder
+                            .setRequestId(Int64Value.newBuilder().setValue(requestId).build())
+                            .build();
+                    RequestFuturePair newRequest = new RequestFuturePair(request, future);
+                    RequestFuturePair currentRequest = requestMap.putIfAbsent(requestId, newRequest);
+                    boolean wasRequestAbsent = newRequest == currentRequest;
+                    if (wasRequestAbsent) {
+                        ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
+                        stateStore.setLastRequestDate(now.getTime());
+                        boolean wasEnqueued = stateStore.getWebSocket().send(ByteString.of(data));
+                        if (wasEnqueued) {
+                            if (!requestTimeout.isZero()) {
+                                return FutureUtil.timeout(future, requestTimeout, SCHEDULED_EXECUTOR_SERVICE, e -> requestMap.remove(requestId));
+                            }
+                        } else {
+                            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
+                        }
+                        return future;
+                    }
                 }
             }
         } else {
@@ -99,9 +125,9 @@ public class MessageService {
         boolean isResponse = !notification.hasRelayedRequest() && notification.hasRequestId();
         if (isResponse) {
             long requestId = notification.getRequestId().getValue();
-            AbstractMap.SimpleEntry<TurmsRequest, CompletableFuture<TurmsNotification>> pair = requestMap.remove(requestId);
+            RequestFuturePair pair = requestMap.remove(requestId);
             if (pair != null) {
-                CompletableFuture<TurmsNotification> future = pair.getValue();
+                CompletableFuture<TurmsNotification> future = pair.future;
                 if (notification.hasCode()) {
                     int code = notification.getCode().getValue();
                     if (TurmsStatusCode.isSuccessCode(code)) {
@@ -128,6 +154,16 @@ public class MessageService {
             id = ThreadLocalRandom.current().nextLong(1, 16384);
         } while (requestMap.containsKey(id));
         return id;
+    }
+
+    private static class RequestFuturePair {
+        TurmsRequest request;
+        CompletableFuture<TurmsNotification> future;
+
+        public RequestFuturePair(TurmsRequest request, CompletableFuture<TurmsNotification> future) {
+            this.request = request;
+            this.future = future;
+        }
     }
 
 }

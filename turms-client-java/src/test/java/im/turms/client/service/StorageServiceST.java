@@ -42,7 +42,7 @@ class StorageServiceST {
 
     @BeforeAll
     static void setup() throws ExecutionException, InterruptedException, TimeoutException, IOException {
-        turmsClient = new TurmsClient(WS_URL, null, null, STORAGE_SERVER_URL);
+        turmsClient = new TurmsClient(WS_URL, STORAGE_SERVER_URL);
         turmsClient.getUserService()
                 .login(USER_ID, "123")
                 .get(5, TimeUnit.SECONDS);
