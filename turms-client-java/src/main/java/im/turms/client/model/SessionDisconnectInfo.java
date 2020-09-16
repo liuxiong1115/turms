@@ -19,6 +19,8 @@ package im.turms.client.model;
 
 import im.turms.common.constant.statuscode.SessionCloseStatus;
 
+import java.util.Objects;
+
 /**
  * @author James Chen
  */
@@ -26,6 +28,7 @@ public class SessionDisconnectInfo {
 
     private final boolean wasConnected;
     private final boolean isClosedByClient;
+    private final boolean isReconnecting;
     private final SessionCloseStatus closeStatus;
     private final Integer webSocketStatus;
     private final String webSocketReason;
@@ -33,12 +36,14 @@ public class SessionDisconnectInfo {
 
     public SessionDisconnectInfo(boolean wasConnected,
                                  boolean isClosedByClient,
+                                 boolean isReconnecting,
                                  SessionCloseStatus closeStatus,
                                  Integer webSocketStatus,
                                  String webSocketReason,
                                  Throwable error) {
         this.wasConnected = wasConnected;
         this.isClosedByClient = isClosedByClient;
+        this.isReconnecting = isReconnecting;
         this.closeStatus = closeStatus;
         this.webSocketStatus = webSocketStatus;
         this.webSocketReason = webSocketReason;
@@ -51,6 +56,10 @@ public class SessionDisconnectInfo {
 
     public boolean isClosedByClient() {
         return isClosedByClient;
+    }
+
+    public boolean isReconnecting() {
+        return isReconnecting;
     }
 
     public SessionCloseStatus getCloseStatus() {
@@ -67,6 +76,29 @@ public class SessionDisconnectInfo {
 
     public Throwable getError() {
         return error;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SessionDisconnectInfo that = (SessionDisconnectInfo) o;
+        return wasConnected == that.wasConnected &&
+                isClosedByClient == that.isClosedByClient &&
+                isReconnecting == that.isReconnecting &&
+                closeStatus == that.closeStatus &&
+                Objects.equals(webSocketStatus, that.webSocketStatus) &&
+                Objects.equals(webSocketReason, that.webSocketReason) &&
+                Objects.equals(error, that.error);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(wasConnected, isClosedByClient, isReconnecting, closeStatus, webSocketStatus, webSocketReason, error);
     }
 
 }

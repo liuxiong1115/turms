@@ -80,7 +80,7 @@ export default class SessionService {
         }
     }
 
-    notifyOnSessionDisconnectedListeners(event: CloseEvent, info?: SessionDisconnectInfo): void {
+    notifyOnSessionDisconnectedListeners(event: CloseEvent, info: SessionDisconnectInfo): void {
         const disconnectInfo = SessionService._parseDisconnectInfo(event, info);
         if (this._currentStatus == SessionStatus.CONNECTED) {
             for (const cb of this._onSessionDisconnectedListeners) {
@@ -90,7 +90,7 @@ export default class SessionService {
         }
     }
 
-    notifyOnSessionClosedListeners(event: CloseEvent, info?: SessionDisconnectInfo): void {
+    notifyOnSessionClosedListeners(event: CloseEvent, info: SessionDisconnectInfo): void {
         switch (this._currentStatus) {
             case SessionStatus.CONNECTED:
                 this.notifyOnSessionDisconnectedListeners(event, info);
@@ -110,13 +110,14 @@ export default class SessionService {
 
     // Parsers
 
-    private static _parseDisconnectInfo(event: CloseEvent, info?: SessionDisconnectInfo): SessionDisconnectInfo {
+    private static _parseDisconnectInfo(event: CloseEvent, info: SessionDisconnectInfo): SessionDisconnectInfo {
         const code = TurmsCloseStatus[event.code] ? event.code : null;
-        return Object.assign({}, {
+        return {
+            ...info,
             closeStatus: code,
             webSocketStatusCode: event.code,
             webSocketReason: event.reason,
-        }, info || {});
+        };
     }
 
 }

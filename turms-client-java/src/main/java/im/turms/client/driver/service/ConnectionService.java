@@ -299,16 +299,19 @@ public class ConnectionService {
             }
         }
 
-        SessionDisconnectInfo disconnectInfo = new SessionDisconnectInfo(wasConnected, closedByClient, status, code, reason, throwable);
+        boolean shouldReconnect = isRedirectSignal && redirectHost != null;
+        SessionDisconnectInfo disconnectInfo = new SessionDisconnectInfo(wasConnected, closedByClient, shouldReconnect, status, code, reason, throwable);
         notifyOnDisconnectedListeners(disconnectInfo);
-        if (isRedirectSignal && redirectHost != null) {
+        if (shouldReconnect) {
             return reconnect(redirectHost)
                     .exceptionally(t -> {
-                        notifyOnClosedListeners(disconnectInfo);
+                        SessionDisconnectInfo closeInfo = new SessionDisconnectInfo(wasConnected, closedByClient, false, status, code, reason, throwable);
+                        notifyOnClosedListeners(closeInfo);
                         return null;
                     });
         } else {
-            notifyOnClosedListeners(disconnectInfo);
+            SessionDisconnectInfo closeInfo = new SessionDisconnectInfo(wasConnected, closedByClient, false, status, code, reason, throwable);
+            notifyOnClosedListeners(closeInfo);
             CompletableFuture<Void> future = new CompletableFuture<>();
             future.completeExceptionally(new RuntimeException());
             return future;
