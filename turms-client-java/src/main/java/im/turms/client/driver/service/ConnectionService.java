@@ -27,18 +27,18 @@ import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.RandomUtil;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Consumer;
 import okhttp3.*;
 import okio.ByteString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
-import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Consumer;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author James Chen
@@ -56,11 +56,11 @@ public class ConnectionService {
     private static final String LOCATION_DELIMITER = ":";
 
     private static final String DEFAULT_WEBSOCKET_URL = "ws://localhost:9510";
-    private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
+    private static final int DEFAULT_CONNECT_TIMEOUT = 30 * 1000;
 
     private final StateStore stateStore;
     private final String initialWsUrl;
-    private final Duration initialConnectTimeout;
+    private final Integer initialConnectTimeout;
 
     private OkHttpClient httpClient;
     private ConnectOptions connectOptions;
@@ -73,7 +73,7 @@ public class ConnectionService {
     private final List<Consumer<SessionDisconnectInfo>> onClosedListeners = new LinkedList<>();
     private final List<Consumer<ByteBuffer>> onMessageListeners = new LinkedList<>();
 
-    public ConnectionService(StateStore stateStore, @Nullable String wsUrl, @Nullable Duration connectTimeout) {
+    public ConnectionService(StateStore stateStore, @Nullable String wsUrl, @Nullable Integer connectTimeout) {
         this.stateStore = stateStore;
         initialWsUrl = wsUrl != null ? wsUrl : DEFAULT_WEBSOCKET_URL;
         initialConnectTimeout = connectTimeout != null ? connectTimeout : DEFAULT_CONNECT_TIMEOUT;
@@ -139,7 +139,7 @@ public class ConnectionService {
 
     public CompletableFuture<Void> connect(
             @Nullable String wsUrl,
-            @Nullable Duration connectTimeout,
+            @Nullable Integer connectTimeout,
             long userId,
             @NotNull String password,
             @Nullable DeviceType deviceType,
@@ -171,18 +171,17 @@ public class ConnectionService {
             resetStates();
             boolean isConnectTimeoutChanged;
             // TODO: redirect connect timeout
-            Duration connectTimeout = options.connectTimeout();
+            Integer connectTimeout = options.connectTimeout();
             if (connectTimeout != null) {
-                isConnectTimeoutChanged = connectTimeout.toMillis() != httpClient.connectTimeoutMillis();
+                isConnectTimeoutChanged = connectTimeout != httpClient.connectTimeoutMillis();
             } else {
                 isConnectTimeoutChanged = httpClient.connectTimeoutMillis() > 0;
             }
             if (isConnectTimeoutChanged) {
-                if (connectTimeout != null) {
-                    httpClient = httpClient.newBuilder().connectTimeout(connectTimeout).build();
-                } else {
-                    httpClient = httpClient.newBuilder().connectTimeout(Duration.ZERO).build();
-                }
+                int timeout = connectTimeout != null ? connectTimeout : 0;
+                httpClient = httpClient.newBuilder()
+                        .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                        .build();
             }
             long connectionRequestId = RandomUtil.nextPositiveLong();
             Request.Builder requestBuilder = new Request.Builder()

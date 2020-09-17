@@ -20,10 +20,10 @@ package im.turms.client.driver.service;
 import im.turms.client.driver.StateStore;
 import im.turms.client.model.SessionDisconnectInfo;
 import im.turms.client.model.SessionStatus;
+import java8.util.function.Consumer;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @author James Chen

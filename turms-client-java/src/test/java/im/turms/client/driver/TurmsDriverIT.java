@@ -24,9 +24,9 @@ import im.turms.common.constant.UserStatus;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.user.QueryUserProfileRequest;
+import java8.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.*;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;

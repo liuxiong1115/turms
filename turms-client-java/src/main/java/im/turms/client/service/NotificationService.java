@@ -19,8 +19,7 @@ package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
 import im.turms.common.model.dto.request.TurmsRequest;
-
-import java.util.function.Consumer;
+import java8.util.function.Consumer;
 
 /**
  * @author James Chen

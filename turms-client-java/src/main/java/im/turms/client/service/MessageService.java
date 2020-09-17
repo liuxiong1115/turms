@@ -22,9 +22,9 @@ import im.turms.client.TurmsClient;
 import im.turms.client.model.MessageAddition;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
+import im.turms.client.util.TurmsBusinessExceptionUtil;
 import im.turms.common.constant.MessageDeliveryStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.file.AudioFile;
 import im.turms.common.model.bo.file.File;
 import im.turms.common.model.bo.file.ImageFile;
@@ -36,13 +36,13 @@ import im.turms.common.model.bo.user.UserLocation;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.message.*;
 import im.turms.common.util.Validator;
+import java8.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java8.util.function.BiConsumer;
+import java8.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,7 +56,7 @@ public class MessageService {
      * <p>
      * Example: "@{123}", "I need to talk with @{123} and @{321}"
      */
-    private static final Function<im.turms.common.model.bo.message.Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<im.turms.common.model.bo.message.Message, Set<Long>>() {
+    private static final Function<Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<im.turms.common.model.bo.message.Message, Set<Long>>() {
         private final Pattern regex = Pattern.compile("@\\{(\\d+?)}");
 
         @Override
@@ -78,7 +78,7 @@ public class MessageService {
     private final TurmsClient turmsClient;
     private Function<im.turms.common.model.bo.message.Message, Set<Long>> mentionedUserIdsParser;
 
-    private BiConsumer<im.turms.common.model.bo.message.Message, MessageAddition> onMessage;
+    private BiConsumer<Message, MessageAddition> onMessage;
 
     public MessageService(TurmsClient turmsClient) {
         this.turmsClient = turmsClient;
@@ -108,7 +108,7 @@ public class MessageService {
             @Nullable byte[] records,
             @Nullable Integer burnAfter) {
         if (text == null && records == null) {
-            return TurmsBusinessException.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "text and records must not all be null");
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "text and records must not all be null");
         }
         if (deliveryDate == null) {
             deliveryDate = new Date();

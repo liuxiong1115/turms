@@ -24,18 +24,20 @@ import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Consumer;
 import okio.ByteString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
-import java.time.Duration;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
-import java.util.function.Consumer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,16 +53,16 @@ public class MessageService {
         t.setName(SCHEDULED_THREAD_NAME);
         return t;
     });
-    private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(30);
+    private static final int DEFAULT_REQUEST_TIMEOUT = 30 * 1000;
 
     private final StateStore stateStore;
 
-    private final Duration requestTimeout;
-    private final Duration minRequestInterval;
+    private final int requestTimeout;
+    private final Integer minRequestInterval;
     private final List<Consumer<TurmsNotification>> onNotificationListeners = new LinkedList<>();
-    private final Map<Long, RequestFuturePair> requestMap = new ConcurrentHashMap<>(256);
+    private final ConcurrentHashMap<Long, RequestFuturePair> requestMap = new ConcurrentHashMap<>(256);
 
-    public MessageService(@NotNull StateStore stateStore, @Nullable Duration requestTimeout, @Nullable Duration minRequestInterval) {
+    public MessageService(@NotNull StateStore stateStore, @Nullable Integer requestTimeout, @Nullable Integer minRequestInterval) {
         this.stateStore = stateStore;
         this.requestTimeout = requestTimeout != null ? requestTimeout : DEFAULT_REQUEST_TIMEOUT;
         this.minRequestInterval = minRequestInterval;
@@ -88,7 +90,7 @@ public class MessageService {
         CompletableFuture<TurmsNotification> future = new CompletableFuture<>();
         if (stateStore.isConnected()) {
             Date now = new Date();
-            boolean isFrequent = minRequestInterval != null && now.getTime() - stateStore.getLastRequestDate() <= minRequestInterval.toMillis();
+            boolean isFrequent = minRequestInterval != null && now.getTime() - stateStore.getLastRequestDate() <= minRequestInterval;
             if (isFrequent) {
                 future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT));
             } else {
@@ -105,7 +107,7 @@ public class MessageService {
                         stateStore.setLastRequestDate(now.getTime());
                         boolean wasEnqueued = stateStore.getWebSocket().send(ByteString.of(data));
                         if (wasEnqueued) {
-                            if (!requestTimeout.isZero()) {
+                            if (requestTimeout > 0) {
                                 return FutureUtil.timeout(future, requestTimeout, SCHEDULED_EXECUTOR_SERVICE, e -> requestMap.remove(requestId));
                             }
                         } else {

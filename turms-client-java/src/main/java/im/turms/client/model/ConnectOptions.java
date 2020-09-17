@@ -20,15 +20,13 @@ package im.turms.client.model;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 
-import java.time.Duration;
-
 /**
  * @author James Chen
  */
 public final class ConnectOptions {
 
     private String wsUrl;
-    private Duration connectTimeout;
+    private Integer connectTimeout;
 
     private Long userId;
     private String password;
@@ -40,7 +38,7 @@ public final class ConnectOptions {
         return wsUrl;
     }
 
-    public Duration connectTimeout() {
+    public Integer connectTimeout() {
         return connectTimeout;
     }
 
@@ -69,7 +67,7 @@ public final class ConnectOptions {
         return this;
     }
 
-    public ConnectOptions connectTimeout(Duration connectTimeout) {
+    public ConnectOptions connectTimeout(Integer connectTimeout) {
         this.connectTimeout = connectTimeout;
         return this;
     }

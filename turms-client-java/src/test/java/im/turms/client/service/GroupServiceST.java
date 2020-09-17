@@ -25,17 +25,13 @@ import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.group.*;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
+import java8.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.*;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 import static helper.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -212,9 +208,11 @@ class GroupServiceST {
     void queryJoinedGroupsInfos_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
         GroupsWithVersion groupWithVersion = turmsClient.getGroupService().queryJoinedGroupsInfos(null)
                 .get(5, TimeUnit.SECONDS);
-        Set<Long> groupIds = groupWithVersion.getGroupsList().stream()
-                .map(group -> group.getId().getValue())
-                .collect(Collectors.toSet());
+        List<Group> groups = groupWithVersion.getGroupsList();
+        Set<Long> groupIds = new HashSet<>(groups.size());
+        for (Group group : groups) {
+            groupIds.add(group.getId().getValue());
+        }
         assertTrue(groupIds.contains(groupId));
     }
 
@@ -269,7 +267,7 @@ class GroupServiceST {
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
     void queryGroupMembersByMembersIds_shouldEqualNewMemberId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupMembersWithVersion groupMembersWithVersion = turmsClient.getGroupService().queryGroupMembersByMembersIds(groupId, Arrays.asList(GROUP_MEMBER_ID), true)
+        GroupMembersWithVersion groupMembersWithVersion = turmsClient.getGroupService().queryGroupMembersByMembersIds(groupId, Collections.singletonList(GROUP_MEMBER_ID), true)
                 .get(5, TimeUnit.SECONDS);
         Assertions.assertEquals(GROUP_MEMBER_ID, groupMembersWithVersion.getGroupMembers(0).getUserId().getValue());
     }

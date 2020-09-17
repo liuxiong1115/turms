@@ -20,11 +20,11 @@ package im.turms.client.driver.service;
 import im.turms.client.driver.StateStore;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
+import java8.util.concurrent.CompletableFuture;
 import okio.ByteString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.time.Duration;
 import java.util.concurrent.*;
 
 /**
@@ -32,21 +32,21 @@ import java.util.concurrent.*;
  */
 public class HeartbeatService {
 
-    private static final Duration DEFAULT_HEARTBEAT_INTERVAL = Duration.ofSeconds(120);
+    private static final int DEFAULT_HEARTBEAT_INTERVAL = 120 * 1000;
 
     private final StateStore stateStore;
 
-    private final Duration heartbeatInterval;
-    private final Duration minRequestInterval;
+    private final int heartbeatInterval;
+    private final int minRequestInterval;
 
     private final ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> heartbeatTimerFuture;
 
     private final ConcurrentLinkedQueue<CompletableFuture<Void>> heartbeatFutures = new ConcurrentLinkedQueue<>();
 
-    public HeartbeatService(@NotNull StateStore stateStore, @Nullable Duration minRequestInterval, @Nullable Duration heartbeatInterval) {
+    public HeartbeatService(@NotNull StateStore stateStore, @Nullable Integer minRequestInterval, @Nullable Integer heartbeatInterval) {
         this.stateStore = stateStore;
-        this.minRequestInterval = minRequestInterval != null ? minRequestInterval : Duration.ZERO;
+        this.minRequestInterval = minRequestInterval != null ? minRequestInterval : 0;
         this.heartbeatInterval = heartbeatInterval != null ? heartbeatInterval : DEFAULT_HEARTBEAT_INTERVAL;
     }
 
@@ -54,9 +54,9 @@ public class HeartbeatService {
         if (heartbeatTimerFuture == null || heartbeatTimerFuture.isDone()) {
             heartbeatTimerFuture = heartbeatTimer.scheduleAtFixedRate(
                     (this::checkAndSendHeartbeatTask),
-                    heartbeatInterval.toMillis(),
-                    heartbeatInterval.toMillis(),
-                    TimeUnit.SECONDS);
+                    heartbeatInterval,
+                    heartbeatInterval,
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -110,7 +110,7 @@ public class HeartbeatService {
 
     private void checkAndSendHeartbeatTask() {
         long difference = System.currentTimeMillis() - stateStore.getLastRequestDate();
-        if (difference > minRequestInterval.toMillis()) {
+        if (difference > minRequestInterval) {
             send();
         }
     }

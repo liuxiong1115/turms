@@ -18,31 +18,27 @@
 package im.turms.client.util;
 
 import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
 import java8.util.concurrent.CompletableFuture;
-import java8.util.function.Consumer;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
+
+import static im.turms.common.exception.TurmsBusinessException.get;
 
 /**
  * @author James Chen
  */
-public class FutureUtil {
+public class TurmsBusinessExceptionUtil {
 
-    private FutureUtil() {
+    private TurmsBusinessExceptionUtil() {
     }
 
-    public static <V> CompletableFuture<V> timeout(CompletableFuture<V> future, int timeout, ScheduledExecutorService executorService, Consumer<Exception> onTimeout) {
-        executorService.schedule(() -> {
-            if (!future.isDone()) {
-                TurmsBusinessException exception = TurmsBusinessException.get(TurmsStatusCode.TIMEOUT);
-                future.completeExceptionally(exception);
-                if (future.isCompletedExceptionally()) {
-                    onTimeout.accept(exception);
-                }
-            }
-        }, timeout, TimeUnit.MILLISECONDS);
+    public static <T> CompletableFuture<T> getFuture(TurmsStatusCode statusCode) {
+        return getFuture(statusCode, null);
+    }
+
+    public static <T> CompletableFuture<T> getFuture(TurmsStatusCode statusCode, @Nullable String reason) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        future.completeExceptionally(get(statusCode, reason));
         return future;
     }
 

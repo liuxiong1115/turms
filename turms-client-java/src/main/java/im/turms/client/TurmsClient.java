@@ -21,7 +21,6 @@ import im.turms.client.driver.TurmsDriver;
 import im.turms.client.service.*;
 
 import javax.annotation.Nullable;
-import java.time.Duration;
 
 /**
  * @author James Chen
@@ -46,31 +45,31 @@ public class TurmsClient {
 
     public TurmsClient(
             @Nullable String url,
-            @Nullable Duration connectTimeout) {
+            @Nullable Integer connectTimeout) {
         this(url, connectTimeout, null);
     }
 
     public TurmsClient(
             @Nullable String url,
-            @Nullable Duration connectTimeout,
-            @Nullable Duration requestTimeout) {
+            @Nullable Integer connectTimeout,
+            @Nullable Integer requestTimeout) {
         this(url, connectTimeout, requestTimeout, null);
     }
 
     public TurmsClient(
             @Nullable String url,
-            @Nullable Duration connectTimeout,
-            @Nullable Duration requestTimeout,
-            @Nullable Duration minRequestInterval) {
+            @Nullable Integer connectTimeout,
+            @Nullable Integer requestTimeout,
+            @Nullable Integer minRequestInterval) {
         this(url, connectTimeout, requestTimeout, minRequestInterval, null);
     }
 
     public TurmsClient(
             @Nullable String url,
-            @Nullable Duration connectTimeout,
-            @Nullable Duration requestTimeout,
-            @Nullable Duration minRequestInterval,
-            @Nullable Duration heartbeatInterval) {
+            @Nullable Integer connectTimeout,
+            @Nullable Integer requestTimeout,
+            @Nullable Integer minRequestInterval,
+            @Nullable Integer heartbeatInterval) {
         this(url, connectTimeout, requestTimeout, minRequestInterval, heartbeatInterval, null);
     }
 
@@ -94,10 +93,10 @@ public class TurmsClient {
      */
     public TurmsClient(
             @Nullable String url,
-            @Nullable Duration connectTimeout,
-            @Nullable Duration requestTimeout,
-            @Nullable Duration minRequestInterval,
-            @Nullable Duration heartbeatInterval,
+            @Nullable Integer connectTimeout,
+            @Nullable Integer requestTimeout,
+            @Nullable Integer minRequestInterval,
+            @Nullable Integer heartbeatInterval,
             @Nullable String storageServerUrl) {
         driver = new TurmsDriver(url, connectTimeout, requestTimeout, minRequestInterval, heartbeatInterval);
         userService = new UserService(this);

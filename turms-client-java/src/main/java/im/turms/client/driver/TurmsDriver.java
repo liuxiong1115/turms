@@ -36,14 +36,13 @@ import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Consumer;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
-import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,10 +65,10 @@ public class TurmsDriver {
     private final SessionService sessionService;
 
     public TurmsDriver(@Nullable String websocketUrl,
-                       @Nullable Duration connectTimeout,
-                       @Nullable Duration requestTimeout,
-                       @Nullable Duration minRequestInterval,
-                       @Nullable Duration heartbeatInterval) {
+                       @Nullable Integer connectTimeout,
+                       @Nullable Integer requestTimeout,
+                       @Nullable Integer minRequestInterval,
+                       @Nullable Integer heartbeatInterval) {
         stateStore = new StateStore();
 
         connectionService = initConnectionService(websocketUrl, connectTimeout);
@@ -80,7 +79,7 @@ public class TurmsDriver {
 
     // Initializers
 
-    private ConnectionService initConnectionService(String websocketUrl, Duration connectTimeout) {
+    private ConnectionService initConnectionService(String websocketUrl, Integer connectTimeout) {
         ConnectionService service = new ConnectionService(stateStore, websocketUrl, connectTimeout);
         service.addOnConnectedListener(unused -> onConnectionConnected());
         service.addOnDisconnectedListener(this::onConnectionDisconnected);
@@ -184,7 +183,7 @@ public class TurmsDriver {
     }
 
     public CompletableFuture<Void> connect(
-            @Nullable Duration connectTimeout,
+            @Nullable Integer connectTimeout,
             long userId,
             @NotNull String password,
             @Nullable DeviceType deviceType,
@@ -201,7 +200,7 @@ public class TurmsDriver {
 
     public CompletableFuture<Void> connect(
             @Nullable String wsUrl,
-            @Nullable Duration connectTimeout,
+            @Nullable Integer connectTimeout,
             long userId,
             @NotNull String password,
             @Nullable DeviceType deviceType,

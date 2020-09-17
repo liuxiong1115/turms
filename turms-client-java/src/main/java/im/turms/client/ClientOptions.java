@@ -17,18 +17,16 @@
 
 package im.turms.client;
 
-import java.time.Duration;
-
 /**
  * @author James Chen
  */
 public class ClientOptions {
 
     private String url;
-    private Duration connectTimeout;
-    private Duration requestTimeout;
-    private Duration minRequestInterval;
-    private Duration heartbeatInterval;
+    private Integer connectTimeout;
+    private Integer requestTimeout;
+    private Integer minRequestInterval;
+    private Integer heartbeatInterval;
     private String storageServerUrl;
 
     public static ClientOptions build() {
@@ -44,38 +42,38 @@ public class ClientOptions {
         return this;
     }
 
-    public Duration connectTimeout() {
+    public Integer connectTimeout() {
         return connectTimeout;
     }
 
-    public ClientOptions connectTimeout(Duration connectTimeout) {
+    public ClientOptions connectTimeout(Integer connectTimeout) {
         this.connectTimeout = connectTimeout;
         return this;
     }
 
-    public Duration requestTimeout() {
+    public Integer requestTimeout() {
         return requestTimeout;
     }
 
-    public ClientOptions requestTimeout(Duration requestTimeout) {
+    public ClientOptions requestTimeout(Integer requestTimeout) {
         this.requestTimeout = requestTimeout;
         return this;
     }
 
-    public Duration minRequestInterval() {
+    public Integer minRequestInterval() {
         return minRequestInterval;
     }
 
-    public ClientOptions minRequestInterval(Duration minRequestInterval) {
+    public ClientOptions minRequestInterval(Integer minRequestInterval) {
         this.minRequestInterval = minRequestInterval;
         return this;
     }
 
-    public Duration heartbeatInterval() {
+    public Integer heartbeatInterval() {
         return heartbeatInterval;
     }
 
-    public ClientOptions heartbeatInterval(Duration heartbeatInterval) {
+    public ClientOptions heartbeatInterval(Integer heartbeatInterval) {
         this.heartbeatInterval = heartbeatInterval;
         return this;
     }
