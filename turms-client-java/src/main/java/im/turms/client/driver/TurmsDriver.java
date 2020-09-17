@@ -155,14 +155,14 @@ public class TurmsDriver {
     // Connection Service
 
     public CompletableFuture<Void> connect(long userId, @NotNull String password) {
-        return connect(null, userId, password, null, null, null);
+        return connect(userId, password, null, null, null);
     }
 
     public CompletableFuture<Void> connect(
             long userId,
             @NotNull String password,
             @Nullable DeviceType deviceType) {
-        return connect(null, userId, password, deviceType, null, null);
+        return connect(userId, password, deviceType, null, null);
     }
 
     public CompletableFuture<Void> connect(
@@ -170,7 +170,7 @@ public class TurmsDriver {
             @NotNull String password,
             @Nullable DeviceType deviceType,
             @Nullable UserStatus userOnlineStatus) {
-        return connect(null, userId, password, deviceType, userOnlineStatus, null);
+        return connect(userId, password, deviceType, userOnlineStatus, null);
     }
 
     public CompletableFuture<Void> connect(

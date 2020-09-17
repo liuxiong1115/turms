@@ -27,12 +27,12 @@ import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.storage.DeleteResourceRequest;
 import im.turms.common.model.dto.request.storage.QuerySignedGetUrlRequest;
 import im.turms.common.model.dto.request.storage.QuerySignedPutUrlRequest;
+import java8.util.concurrent.CompletableFuture;
 import okhttp3.*;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author James Chen

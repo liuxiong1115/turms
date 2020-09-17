@@ -73,7 +73,7 @@ public class ReasonCacheService {
         if (!enableQueryLoginFailureReason) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
         } else if (!degradedDeviceTypes.contains(deviceType)) {
-            String reason = String.format("The device type %s is forbidden to query the reason for login failure", deviceType.name());
+            String reason = "The device type " + deviceType.name() + " is forbidden to query the reason for login failure";
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
         } else {
             Assert.notNull(userId, "userId must not be null");
