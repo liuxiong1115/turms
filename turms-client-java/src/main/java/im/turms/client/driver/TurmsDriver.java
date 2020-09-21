@@ -43,6 +43,8 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +54,12 @@ import java.util.logging.Logger;
 public class TurmsDriver {
 
     private static final Logger LOGGER = Logger.getLogger(TurmsDriver.class.getName());
+    private static final String SCHEDULED_THREAD_NAME = "turms-scheduler";
+    public static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = new ScheduledThreadPoolExecutor(1, runnable -> {
+        Thread t = new Thread(runnable);
+        t.setName(SCHEDULED_THREAD_NAME);
+        return t;
+    });
 
     private Consumer<Void> onSessionConnected;
     private Consumer<SessionDisconnectInfo> onSessionDisconnected;

@@ -35,11 +35,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static im.turms.client.driver.TurmsDriver.SCHEDULED_EXECUTOR_SERVICE;
 
 /**
  * @author James Chen
@@ -47,12 +47,6 @@ import java.util.logging.Logger;
 public class MessageService {
 
     private static final Logger LOGGER = Logger.getLogger(MessageService.class.getName());
-    private static final String SCHEDULED_THREAD_NAME = "turms-request-timeout-watchdog";
-    private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = new ScheduledThreadPoolExecutor(1, runnable -> {
-        Thread t = new Thread(runnable);
-        t.setName(SCHEDULED_THREAD_NAME);
-        return t;
-    });
     private static final int DEFAULT_REQUEST_TIMEOUT = 30 * 1000;
 
     private final StateStore stateStore;
@@ -89,38 +83,42 @@ public class MessageService {
     public CompletableFuture<TurmsNotification> sendRequest(TurmsRequest.Builder requestBuilder) {
         CompletableFuture<TurmsNotification> future = new CompletableFuture<>();
         if (stateStore.isConnected()) {
-            Date now = new Date();
-            boolean isFrequent = minRequestInterval != null && now.getTime() - stateStore.getLastRequestDate() <= minRequestInterval;
-            if (isFrequent) {
-                future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT));
-            } else {
-                while (true) {
-                    long requestId = generateRandomId();
-                    TurmsRequest request = requestBuilder
-                            .setRequestId(Int64Value.newBuilder().setValue(requestId).build())
-                            .build();
-                    RequestFuturePair newRequest = new RequestFuturePair(request, future);
-                    RequestFuturePair currentRequest = requestMap.putIfAbsent(requestId, newRequest);
-                    boolean wasRequestAbsent = newRequest == currentRequest;
-                    if (wasRequestAbsent) {
-                        ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
-                        stateStore.setLastRequestDate(now.getTime());
-                        boolean wasEnqueued = stateStore.getWebSocket().send(ByteString.of(data));
-                        if (wasEnqueued) {
-                            if (requestTimeout > 0) {
-                                return FutureUtil.timeout(future, requestTimeout, SCHEDULED_EXECUTOR_SERVICE, e -> requestMap.remove(requestId));
-                            }
-                        } else {
-                            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
+            boolean isSignalRequest = requestBuilder.getKindCase() == TurmsRequest.KindCase.ACK_REQUEST;
+            if (!isSignalRequest) {
+                Date now = new Date();
+                boolean isFrequent = minRequestInterval != null && now.getTime() - stateStore.getLastRequestDate() <= minRequestInterval;
+                if (isFrequent) {
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT));
+                    return future;
+                } else {
+                    stateStore.setLastRequestDate(now.getTime());
+                }
+            }
+            while (true) {
+                long requestId = generateRandomId();
+                TurmsRequest request = requestBuilder
+                        .setRequestId(Int64Value.newBuilder().setValue(requestId).build())
+                        .build();
+                RequestFuturePair newRequest = new RequestFuturePair(request, future);
+                RequestFuturePair currentRequest = requestMap.putIfAbsent(requestId, newRequest);
+                boolean wasRequestAbsent = newRequest == currentRequest;
+                if (wasRequestAbsent) {
+                    ByteBuffer data = ByteBuffer.wrap(request.toByteArray());
+                    boolean wasEnqueued = stateStore.getWebSocket().send(ByteString.of(data));
+                    if (wasEnqueued) {
+                        if (requestTimeout > 0) {
+                            return FutureUtil.timeout(future, requestTimeout, SCHEDULED_EXECUTOR_SERVICE, e -> requestMap.remove(requestId));
                         }
-                        return future;
+                    } else {
+                        future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));
                     }
+                    return future;
                 }
             }
         } else {
             future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
+            return future;
         }
-        return future;
     }
 
     public void didReceiveNotification(TurmsNotification notification) {

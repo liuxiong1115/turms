@@ -25,6 +25,7 @@ import im.turms.gateway.access.websocket.dto.CloseStatusFactory;
 import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
 import im.turms.gateway.manager.UserSessionsManager;
 import im.turms.gateway.pojo.bo.session.UserSession;
+import im.turms.gateway.pojo.dto.SimpleTurmsRequest;
 import im.turms.gateway.service.impl.SessionService;
 import im.turms.gateway.service.mediator.WorkflowMediator;
 import im.turms.gateway.util.TurmsRequestUtil;
@@ -108,11 +109,15 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                         .thenReturn(webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(HEARTBEAT_BYTE_BUF)));
                             } else {
 //                                long traceId = RandomUtil.nextPositiveLong(); TODO: tracing
-                                long requestId = TurmsRequestUtil.parseRequestId(payload.asByteBuffer());
+                                SimpleTurmsRequest turmsRequest = TurmsRequestUtil.parseSimpleRequest(payload.asByteBuffer());
                                 ByteBuf requestBuffer = NettyDataBufferFactory.toByteBuf(payload);
                                 // FIXME: We use retain() as a workaround for now to fix the bug mentioned in https://github.com/turms-im/turms/issues/430
                                 requestBuffer.retain();
-                                ServiceRequest request = new ServiceRequest(userId, deviceType, requestId, requestBuffer);
+                                ServiceRequest request = new ServiceRequest(userId,
+                                        deviceType,
+                                        turmsRequest.getRequestId(),
+                                        turmsRequest.getType(),
+                                        requestBuffer);
                                 return workflowMediator.processServiceRequest(request)
                                         .map(notification ->
                                                 webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getByteBuffer(notification))))

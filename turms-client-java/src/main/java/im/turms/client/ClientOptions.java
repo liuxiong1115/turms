@@ -27,6 +27,7 @@ public class ClientOptions {
     private Integer requestTimeout;
     private Integer minRequestInterval;
     private Integer heartbeatInterval;
+    private Integer ackMessageInterval;
     private String storageServerUrl;
 
     public static ClientOptions build() {
@@ -84,6 +85,15 @@ public class ClientOptions {
 
     public ClientOptions storageServerUrl(String storageServerUrl) {
         this.storageServerUrl = storageServerUrl;
+        return this;
+    }
+
+    public Integer ackMessageInterval() {
+        return ackMessageInterval;
+    }
+
+    public ClientOptions ackMessageInterval(Integer ackMessageInterval) {
+        this.ackMessageInterval = ackMessageInterval;
         return this;
     }
 

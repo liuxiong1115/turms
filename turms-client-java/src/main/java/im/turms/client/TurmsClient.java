@@ -75,8 +75,18 @@ public class TurmsClient {
 
     public TurmsClient(
             @Nullable String url,
+            @Nullable Integer connectTimeout,
+            @Nullable Integer requestTimeout,
+            @Nullable Integer minRequestInterval,
+            @Nullable Integer heartbeatInterval,
+            @Nullable Integer ackMessageInterval) {
+        this(url, connectTimeout, requestTimeout, minRequestInterval, heartbeatInterval, ackMessageInterval, null);
+    }
+
+    public TurmsClient(
+            @Nullable String url,
             @Nullable String storageServerUrl) {
-        this(url, null, null, null, null, storageServerUrl);
+        this(url, null, null, null, null, null, storageServerUrl);
     }
 
     public TurmsClient(ClientOptions options) {
@@ -85,6 +95,7 @@ public class TurmsClient {
                 options.heartbeatInterval(),
                 options.minRequestInterval(),
                 options.heartbeatInterval(),
+                options.ackMessageInterval(),
                 options.storageServerUrl());
     }
 
@@ -97,11 +108,12 @@ public class TurmsClient {
             @Nullable Integer requestTimeout,
             @Nullable Integer minRequestInterval,
             @Nullable Integer heartbeatInterval,
+            @Nullable Integer ackMessageInterval,
             @Nullable String storageServerUrl) {
         driver = new TurmsDriver(url, connectTimeout, requestTimeout, minRequestInterval, heartbeatInterval);
         userService = new UserService(this);
         groupService = new GroupService(this);
-        messageService = new MessageService(this);
+        messageService = new MessageService(this, ackMessageInterval);
         notificationService = new NotificationService(this);
         storageService = new StorageService(this, storageServerUrl);
     }

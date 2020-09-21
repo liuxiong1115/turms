@@ -19,6 +19,7 @@ package im.turms.client.service;
 
 import com.google.protobuf.*;
 import im.turms.client.TurmsClient;
+import im.turms.client.driver.TurmsDriver;
 import im.turms.client.model.MessageAddition;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
@@ -35,14 +36,18 @@ import im.turms.common.model.bo.message.MessagesWithTotal;
 import im.turms.common.model.bo.user.UserLocation;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.message.*;
+import im.turms.common.model.dto.request.signal.AckRequest;
 import im.turms.common.util.Validator;
 import java8.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import java.util.*;
 import java8.util.function.BiConsumer;
 import java8.util.function.Function;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,11 +61,11 @@ public class MessageService {
      * <p>
      * Example: "@{123}", "I need to talk with @{123} and @{321}"
      */
-    private static final Function<Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<im.turms.common.model.bo.message.Message, Set<Long>>() {
+    private static final Function<Message, Set<Long>> DEFAULT_MENTIONED_USER_IDS_PARSER = new Function<Message, Set<Long>>() {
         private final Pattern regex = Pattern.compile("@\\{(\\d+?)}");
 
         @Override
-        public Set<Long> apply(im.turms.common.model.bo.message.Message message) {
+        public Set<Long> apply(Message message) {
             if (message != null && message.hasText()) {
                 String text = message.getText().getValue();
                 Matcher matcher = regex.matcher(text);
@@ -76,19 +81,42 @@ public class MessageService {
     };
 
     private final TurmsClient turmsClient;
-    private Function<im.turms.common.model.bo.message.Message, Set<Long>> mentionedUserIdsParser;
+    private final ConcurrentLinkedQueue<Long> unacknowledgedMessageIds;
+
+    private Function<Message, Set<Long>> mentionedUserIdsParser;
 
     private BiConsumer<Message, MessageAddition> onMessage;
 
-    public MessageService(TurmsClient turmsClient) {
+    /**
+     * @param ackMessageInterval null if don't want to acknowledge messages automatically;
+     *                           <=0 if want to acknowledge messages once received
+     *                           >0 if wan to acknowledge at specified interval
+     */
+    public MessageService(TurmsClient turmsClient, @Nullable Integer ackMessageInterval) {
         this.turmsClient = turmsClient;
+        if (ackMessageInterval != null && ackMessageInterval > 0) {
+            unacknowledgedMessageIds = new ConcurrentLinkedQueue<>();
+            startAckMessagesTimer(ackMessageInterval);
+        } else {
+            unacknowledgedMessageIds = null;
+        }
         this.turmsClient.getDriver()
                 .addOnNotificationListener(notification -> {
                     if (onMessage != null && notification.hasRelayedRequest()) {
                         TurmsRequest relayedRequest = notification.getRelayedRequest();
                         if (relayedRequest.hasCreateMessageRequest()) {
                             CreateMessageRequest createMessageRequest = relayedRequest.getCreateMessageRequest();
-                            im.turms.common.model.bo.message.Message message = createMessageRequest2Message(notification.getRequestId().getValue(), createMessageRequest);
+                            if (ackMessageInterval != null) {
+                                long messageId = createMessageRequest.getMessageId().getValue();
+                                if (ackMessageInterval > 0) {
+                                    unacknowledgedMessageIds.add(messageId);
+                                } else {
+                                    ackMessages(Collections.singletonList(messageId));
+                                }
+                            }
+
+                            long requesterId = notification.getRequesterId().getValue();
+                            Message message = createMessageRequest2Message(requesterId, createMessageRequest);
                             MessageAddition addition = parseMessageAddition(message);
                             onMessage.accept(message, addition);
                         }
@@ -96,7 +124,7 @@ public class MessageService {
                 });
     }
 
-    public void setOnMessage(BiConsumer<im.turms.common.model.bo.message.Message, MessageAddition> onMessage) {
+    public void setOnMessage(BiConsumer<Message, MessageAddition> onMessage) {
         this.onMessage = onMessage;
     }
 
@@ -122,6 +150,15 @@ public class MessageService {
                         "records", records,
                         "burn_after", burnAfter))
                 .thenApply(NotificationUtil::getFirstId);
+    }
+
+    public CompletableFuture<Void> ackMessages(@NotEmpty List<Long> messageIds) {
+        if (messageIds == null || messageIds.isEmpty()) {
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "messageIds must not be null or empty");
+        }
+        return turmsClient.getDriver()
+                .send(AckRequest.newBuilder(), MapUtil.of("messages_ids", messageIds))
+                .thenApply(notification -> null);
     }
 
     public CompletableFuture<Long> forwardMessage(
@@ -151,7 +188,7 @@ public class MessageService {
                 .thenApply(notification -> null);
     }
 
-    public CompletableFuture<List<im.turms.common.model.bo.message.Message>> queryMessages(
+    public CompletableFuture<List<Message>> queryMessages(
             @Nullable List<Long> ids,
             @Nullable Boolean areGroupMessages,
             @Nullable Boolean areSystemMessages,
@@ -239,7 +276,7 @@ public class MessageService {
         }
     }
 
-    public void enableMention(@NotNull Function<im.turms.common.model.bo.message.Message, Set<Long>> mentionedUserIdsParser) {
+    public void enableMention(@NotNull Function<Message, Set<Long>> mentionedUserIdsParser) {
         if (mentionedUserIdsParser == null) {
             throw new IllegalArgumentException("mentionedUserIdsParser must not be null");
         }
@@ -394,7 +431,27 @@ public class MessageService {
                 .toByteArray();
     }
 
-    private MessageAddition parseMessageAddition(im.turms.common.model.bo.message.Message message) {
+    private void startAckMessagesTimer(int ackMessageInterval) {
+        TurmsDriver.SCHEDULED_EXECUTOR_SERVICE.scheduleWithFixedDelay(() -> {
+            if (!unacknowledgedMessageIds.isEmpty()) {
+                List<Long> unacknowledgedMessageIdList = new LinkedList<>();
+                while (!unacknowledgedMessageIds.isEmpty()) {
+                    Long messageId = unacknowledgedMessageIds.poll();
+                    unacknowledgedMessageIdList.add(messageId);
+                }
+                if (!unacknowledgedMessageIdList.isEmpty()) {
+                    ackMessages(unacknowledgedMessageIdList)
+                            .whenComplete((unused, throwable) -> {
+                                if (throwable != null) {
+                                    unacknowledgedMessageIds.addAll(unacknowledgedMessageIdList);
+                                }
+                            });
+                }
+            }
+        }, ackMessageInterval, ackMessageInterval, TimeUnit.MILLISECONDS);
+    }
+
+    private MessageAddition parseMessageAddition(Message message) {
         Set<Long> mentionedUserIds;
         if (mentionedUserIdsParser != null) {
             mentionedUserIds = mentionedUserIdsParser.apply(message);
@@ -405,8 +462,8 @@ public class MessageService {
         return new MessageAddition(isMentioned, mentionedUserIds);
     }
 
-    private im.turms.common.model.bo.message.Message createMessageRequest2Message(long requesterId, CreateMessageRequest request) {
-        im.turms.common.model.bo.message.Message.Builder builder = Message.newBuilder();
+    private Message createMessageRequest2Message(long requesterId, CreateMessageRequest request) {
+        Message.Builder builder = Message.newBuilder();
         if (request.hasMessageId()) {
             builder.setId(request.getMessageId());
         }
