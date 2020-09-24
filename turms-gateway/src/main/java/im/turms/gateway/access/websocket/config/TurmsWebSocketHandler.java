@@ -78,22 +78,29 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
      */
     @Override
     public Mono<Void> handle(WebSocketSession webSocketSession) {
-        // 1. Prepare and validate data
+        // 1. Prepare data and validate data
         long userId = (long) webSocketSession.getAttributes().get(HandshakeRequestUtil.USER_ID_FIELD);
         DeviceType deviceType = (DeviceType) webSocketSession.getAttributes().get(HandshakeRequestUtil.DEVICE_TYPE_FIELD);
+
         UserSessionsManager userSessionsManager = sessionService.getUserSessionsManager(userId);
         if (userSessionsManager == null) {
             log.error("The user sessions manager for the user {} is null", userId);
-            return disconnect(webSocketSession, userId, deviceType, CloseStatus.SERVER_ERROR);
+            return workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(SessionCloseStatus.SERVER_ERROR)).then();
         }
         UserSession session = userSessionsManager.getSession(deviceType);
         if (session == null) {
             log.error("The user session for the device type {} of the user {} is null", deviceType.name(), userId);
-            return disconnect(webSocketSession, userId, deviceType, CloseStatus.SERVER_ERROR);
+            return workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(SessionCloseStatus.SERVER_ERROR)).then();
         }
         session.setWebSocketSession(webSocketSession);
 
-        // 2. Set up the flux of responses (TurmsNotification) to users' requests
+        // 2. Listen to the close event of the WebSocket session
+        // to make sure the session information is cleared if it is closed with the close status besides SWITCH
+        webSocketSession.closeStatus()
+                .subscribe(closeStatus -> trySetOfflineAfterSessionClosed(session, userId, deviceType, closeStatus).subscribe(),
+                        log::error);
+
+        // 3. Set up the flux of responses (TurmsNotification) to users' requests
         Flux<WebSocketMessage> responseOutput = webSocketSession.receive()
                 .flatMap(inboundMessage -> {
                     if (!node.isActive()) {
@@ -108,7 +115,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                 return workflowMediator.processHeartbeatRequest(userId, deviceType)
                                         .thenReturn(webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(HEARTBEAT_BYTE_BUF)));
                             } else {
-//                                long traceId = RandomUtil.nextPositiveLong(); TODO: tracing
+                                // long traceId = RandomUtil.nextPositiveLong(); TODO: tracing
                                 SimpleTurmsRequest turmsRequest = TurmsRequestUtil.parseSimpleRequest(payload.asByteBuffer());
                                 ByteBuf requestBuffer = NettyDataBufferFactory.toByteBuf(payload);
                                 // FIXME: We use retain() as a workaround for now to fix the bug mentioned in https://github.com/turms-im/turms/issues/430
@@ -135,15 +142,12 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                             // ignore the message
                             return Mono.empty();
                     }
-                })
-                // doOnError will be handled by webSocketMessageFlux
-                .doOnComplete(() -> workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(SessionCloseStatus.DISCONNECTED_BY_CLIENT)).subscribe());
+                });
 
-        // 3. Merge inbound/outbound messages
-        Flux<WebSocketMessage> webSocketMessageFlux = session.getNotificationSink()
+        // 4. Merge inbound/outbound messages
+        Flux<WebSocketMessage> outputFlux = session.getNotificationSink()
                 .asFlux()
                 // Note: doOnError will be handled after merged with responseOutput
-                .doOnComplete(() -> workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(SessionCloseStatus.DISCONNECTED_BY_ADMIN)).subscribe())
                 .map(byteBuf -> webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(byteBuf)))
                 .mergeWith(responseOutput)
                 .doOnError(throwable -> {
@@ -170,29 +174,24 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                         reason = throwable.toString();
                         log.error(throwable);
                     }
-                    workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(closeStatus, reason))
-                            .subscribe();
+                    webSocketSession.close(CloseStatusFactory.get(closeStatus, reason)).subscribe();
                 });
 
-        // 4. Trivial things after the session is established
+        // 5. Trivial things after the session is established
         workflowMediator.onSessionEstablished(userSessionsManager, deviceType);
         workflowMediator.triggerGoOnlinePlugins(userSessionsManager, session).subscribe();
 
-        // 5. Make sure the sessions information is cleared when the WebSocket session is closed
-        // Note that although the code seems redundant, it's really useful when the underlying frameworks have bugs.
-        // In that case, setLocalUserDeviceOffline may not be triggered in other places but only can be triggered here.
-        // FIXME: A known bug: https://github.com/reactor/reactor-netty/issues/1091#issuecomment-665334373
-        webSocketSession.closeStatus()
-                .subscribe(closeStatus -> workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(SessionCloseStatus.DISCONNECTED_BY_ADMIN)).subscribe(),
-                        throwable -> workflowMediator.setLocalUserDeviceOffline(userId, deviceType, CloseStatusFactory.get(SessionCloseStatus.SERVER_ERROR)).subscribe());
-
         // 6. Send responses and notifications
-        return webSocketSession.send(webSocketMessageFlux);
+        return webSocketSession.send(outputFlux);
     }
 
-    private Mono<Void> disconnect(WebSocketSession session, Long userId, DeviceType deviceType, CloseStatus closeStatus) {
-        return workflowMediator.setLocalUserDeviceOffline(userId, deviceType, closeStatus)
-                .then(session.close(closeStatus));
+    private Mono<Void> trySetOfflineAfterSessionClosed(UserSession session, Long userId, DeviceType deviceType, CloseStatus closeStatus) {
+        if (closeStatus.getCode() != SessionCloseStatus.SWITCH.getCode()) {
+            session.setWebSocketSession(null);
+            session.close(closeStatus);
+            return workflowMediator.setLocalUserDeviceOffline(userId, deviceType, closeStatus).then();
+        }
+        return Mono.empty();
     }
 
 }
