@@ -78,7 +78,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
      */
     @Override
     public Mono<Void> handle(WebSocketSession webSocketSession) {
-        // 1. Prepare data and validate data
+        // 1. Prepare and validate data
         long userId = (long) webSocketSession.getAttributes().get(HandshakeRequestUtil.USER_ID_FIELD);
         DeviceType deviceType = (DeviceType) webSocketSession.getAttributes().get(HandshakeRequestUtil.DEVICE_TYPE_FIELD);
 
