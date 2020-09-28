@@ -31,6 +31,8 @@ import im.turms.turms.util.MapUtil;
 import im.turms.turms.workflow.dao.builder.QueryBuilder;
 import im.turms.turms.workflow.dao.builder.UpdateBuilder;
 import im.turms.turms.workflow.dao.domain.MessageStatus;
+import im.turms.turms.workflow.service.impl.statistics.MetricsService;
+import io.micrometer.core.instrument.Counter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -49,6 +51,8 @@ import javax.validation.constraints.PastOrPresent;
 import java.util.Date;
 import java.util.Set;
 
+import static im.turms.turms.constant.MetricsConstant.ACKNOWLEDGED_MESSAGES_COUNTER_NAME;
+
 /**
  * @author James Chen
  */
@@ -59,12 +63,15 @@ public class MessageStatusService {
     private static final MessageStatus EMPTY_MESSAGE_STATUS = new MessageStatus(null, null, null, null, null, null, null, null);
     private final ReactiveMongoTemplate mongoTemplate;
     private final Node node;
+    private final Counter acknowledgedMessagesCounter;
 
     public MessageStatusService(
             @Qualifier("messageMongoTemplate") ReactiveMongoTemplate mongoTemplate,
-            Node node) {
+            Node node,
+            MetricsService metricsService) {
         this.mongoTemplate = mongoTemplate;
         this.node = node;
+        acknowledgedMessagesCounter = metricsService.getRegistry().counter(ACKNOWLEDGED_MESSAGES_COUNTER_NAME);
     }
 
     public Mono<Boolean> isMessageRead(@NotNull Long messageId, @NotNull Long recipientId) {
@@ -164,16 +171,29 @@ public class MessageStatusService {
         return updateMessageStatuses(messageId, recipientIds, recallDate, readDate, receptionDate, operations);
     }
 
-    public Mono<Boolean> authAndUpdateMessagesDeliveryStatus(
+    public Mono<Boolean> updateMessagesDeliveryStatus(
             @NotNull Long recipientId,
             @NotEmpty Set<Long> messagesIds,
-            @NotNull @MessageDeliveryStatusConstraint MessageDeliveryStatus deliveryStatus) {
+            @NotNull @MessageDeliveryStatusConstraint MessageDeliveryStatus deliveryStatus,
+            boolean updateReadDate) {
         Query query = new Query()
                 .addCriteria(Criteria.where(MessageStatus.Fields.ID_MESSAGE_ID).in(messagesIds))
                 .addCriteria(Criteria.where(MessageStatus.Fields.ID_RECIPIENT_ID).is(recipientId));
         Update update = new Update().set(MessageStatus.Fields.DELIVERY_STATUS, deliveryStatus);
+        if (updateReadDate) {
+            Date now = new Date();
+            update.set(MessageStatus.Fields.READ_DATE, now);
+        }
         return mongoTemplate.updateMulti(query, update, MessageStatus.class, MessageStatus.COLLECTION_NAME)
-                .map(UpdateResult::wasAcknowledged);
+                .map(updateResult -> {
+                    if (deliveryStatus == MessageDeliveryStatus.RECEIVED) {
+                        long modifiedCount = updateResult.getModifiedCount();
+                        if (modifiedCount > 0) {
+                            acknowledgedMessagesCounter.increment(modifiedCount);
+                        }
+                    }
+                    return updateResult.wasAcknowledged();
+                });
     }
 
     public Mono<Boolean> updateMessagesReadDate(
@@ -267,18 +287,6 @@ public class MessageStatusService {
                     .addCriteria(Criteria.where(MessageStatus.Fields.SENDER_ID).is(groupOrSenderId));
         }
         return mongoTemplate.count(query, MessageStatus.class, MessageStatus.COLLECTION_NAME);
-    }
-
-    public Mono<Boolean> acknowledge(@NotEmpty Set<Long> messagesIds) {
-        Query query = new Query().addCriteria(Criteria.where(DaoConstant.ID_FIELD_NAME).in(messagesIds));
-        Update update = new Update().set(MessageStatus.Fields.DELIVERY_STATUS, MessageDeliveryStatus.RECEIVED);
-        if (node.getSharedProperties().getService().getMessage()
-                .isUpdateReadDateWhenUserQueryingMessage()) {
-            Date now = new Date();
-            update.set(MessageStatus.Fields.READ_DATE, now);
-        }
-        return mongoTemplate.updateMulti(query, update, MessageStatus.class, MessageStatus.COLLECTION_NAME)
-                .map(UpdateResult::wasAcknowledged);
     }
 
 }

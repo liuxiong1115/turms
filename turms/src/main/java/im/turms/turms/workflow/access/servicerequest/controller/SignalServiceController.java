@@ -92,7 +92,7 @@ public class SignalServiceController {
 
     private Mono<RequestHandlerResult> authAndUpdateMessagesDeliveryStatus(Long userId, Set<Long> messageIds) {
         return messageStatusService
-                .authAndUpdateMessagesDeliveryStatus(userId, messageIds, MessageDeliveryStatus.RECEIVED)
+                .updateMessagesDeliveryStatus(userId, messageIds, MessageDeliveryStatus.RECEIVED, false)
                 .map(RequestHandlerResultFactory::okIfTrue);
     }
 
