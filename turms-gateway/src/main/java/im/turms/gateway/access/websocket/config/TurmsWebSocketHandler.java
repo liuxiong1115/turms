@@ -164,14 +164,16 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                 closeStatus = SessionCloseStatus.ILLEGAL_REQUEST;
                                 break;
                             default:
-                                closeStatus = SessionCloseStatus.SERVER_ERROR;
-                                reason = throwable.toString();
+                                closeStatus = code.isServerError()
+                                        ? SessionCloseStatus.SERVER_ERROR
+                                        : SessionCloseStatus.UNKNOWN_ERROR;
+                                reason = throwable.getMessage();
                                 log.error(throwable);
                                 break;
                         }
                     } else {
                         closeStatus = SessionCloseStatus.SERVER_ERROR;
-                        reason = throwable.toString();
+                        reason = throwable.getMessage();
                         log.error(throwable);
                     }
                     webSocketSession.close(CloseStatusFactory.get(closeStatus, reason)).subscribe();
