@@ -23,15 +23,16 @@ import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.server.common.cluster.node.Node;
+import im.turms.server.common.util.AssertUtil;
 import im.turms.turms.bo.DateRange;
-import im.turms.turms.constant.DaoConstant;
-import im.turms.turms.constraint.MessageDeliveryStatusConstraint;
-import im.turms.turms.constraint.MessageStatusKeyConstraint;
+import im.turms.turms.constraint.ValidMessageDeliveryStatus;
+import im.turms.turms.constraint.ValidMessageStatusKey;
 import im.turms.turms.util.MapUtil;
 import im.turms.turms.workflow.dao.builder.QueryBuilder;
 import im.turms.turms.workflow.dao.builder.UpdateBuilder;
 import im.turms.turms.workflow.dao.domain.MessageStatus;
 import im.turms.turms.workflow.service.impl.statistics.MetricsService;
+import im.turms.turms.workflow.service.util.DomainConstraintUtil;
 import io.micrometer.core.instrument.Counter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -40,7 +41,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -57,7 +57,6 @@ import static im.turms.turms.constant.MetricsConstant.ACKNOWLEDGED_MESSAGES_COUN
  * @author James Chen
  */
 @Service
-@Validated
 public class MessageStatusService {
 
     private static final MessageStatus EMPTY_MESSAGE_STATUS = new MessageStatus(null, null, null, null, null, null, null, null);
@@ -74,18 +73,18 @@ public class MessageStatusService {
         acknowledgedMessagesCounter = metricsService.getRegistry().counter(ACKNOWLEDGED_MESSAGES_COUNTER_NAME);
     }
 
-    public Mono<Boolean> isMessageRead(@NotNull Long messageId, @NotNull Long recipientId) {
-        MessageStatus.Key key = new MessageStatus.Key(messageId, recipientId);
-        Query query = new Query()
-                .addCriteria(Criteria.where(DaoConstant.ID_FIELD_NAME).is(key))
-                .addCriteria(Criteria.where(MessageStatus.Fields.READ_DATE).ne(null));
-        return mongoTemplate.exists(query, MessageStatus.class, MessageStatus.COLLECTION_NAME);
-    }
-
     public Flux<Long> queryMessagesIdsByDeliveryStatusesAndTargetIds(
-            @NotEmpty Set<MessageDeliveryStatus> deliveryStatuses,
+            @NotEmpty Set<@ValidMessageDeliveryStatus MessageDeliveryStatus> deliveryStatuses,
             @Nullable Boolean areGroupMessages,
             @Nullable Set<Long> targetIds) {
+        try {
+            AssertUtil.notEmpty(deliveryStatuses, "deliveryStatuses");
+            for (MessageDeliveryStatus status : deliveryStatuses) {
+                DomainConstraintUtil.validMessageDeliveryStatus(status);
+            }
+        } catch (TurmsBusinessException e) {
+            return Flux.error(e);
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(MessageStatus.Fields.DELIVERY_STATUS).in(deliveryStatuses));
         if (areGroupMessages != null) {
@@ -105,11 +104,22 @@ public class MessageStatusService {
     }
 
     public Mono<Boolean> updateMessageStatuses(
-            @NotEmpty Set<MessageStatus.@MessageStatusKeyConstraint Key> keys,
+            @NotEmpty Set<MessageStatus.@ValidMessageStatusKey Key> keys,
             @Nullable @PastOrPresent Date recallDate,
             @Nullable @PastOrPresent Date readDate,
             @Nullable @PastOrPresent Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
+        try {
+            AssertUtil.notEmpty(keys, "keys");
+            for (MessageStatus.Key key : keys) {
+                DomainConstraintUtil.validMessageStatusKey(key);
+            }
+            AssertUtil.pastOrPresent(recallDate, "recallDate");
+            AssertUtil.pastOrPresent(readDate, "readDate");
+            AssertUtil.pastOrPresent(receptionDate, "receptionDate");
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
         if (Validator.areAllNull(recallDate, readDate, receptionDate)) {
             return Mono.just(true);
         }
@@ -118,7 +128,7 @@ public class MessageStatusService {
         boolean isIllegalRead = readDate != null
                 && !node.getSharedProperties().getService().getMessage().getReadReceipt().isEnabled();
         if (isIllegalRecall || isIllegalRead) {
-            throw TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION);
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
         }
         return MapUtil.fluxMerge(multimap -> {
             for (MessageStatus.Key key : keys) {
@@ -140,6 +150,14 @@ public class MessageStatusService {
             @Nullable @PastOrPresent Date readDate,
             @Nullable @PastOrPresent Date receptionDate,
             @Nullable ReactiveMongoOperations operations) {
+        try {
+            AssertUtil.notNull(messageId, "messageId");
+            AssertUtil.pastOrPresent(recallDate, "recallDate");
+            AssertUtil.pastOrPresent(readDate, "readDate");
+            AssertUtil.pastOrPresent(receptionDate, "receptionDate");
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
         if (Validator.areAllNull(recallDate, readDate, receptionDate)) {
             return Mono.just(true);
         }
@@ -173,11 +191,19 @@ public class MessageStatusService {
 
     public Mono<Boolean> updateMessagesDeliveryStatus(
             @NotNull Long recipientId,
-            @NotEmpty Set<Long> messagesIds,
-            @NotNull @MessageDeliveryStatusConstraint MessageDeliveryStatus deliveryStatus,
+            @NotEmpty Set<Long> messageIds,
+            @NotNull @ValidMessageDeliveryStatus MessageDeliveryStatus deliveryStatus,
             boolean updateReadDate) {
+        try {
+            AssertUtil.notNull(recipientId, "recipientId");
+            AssertUtil.notEmpty(messageIds, "messageIds");
+            AssertUtil.notNull(deliveryStatus, "deliveryStatus");
+            DomainConstraintUtil.validMessageDeliveryStatus(deliveryStatus);
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
         Query query = new Query()
-                .addCriteria(Criteria.where(MessageStatus.Fields.ID_MESSAGE_ID).in(messagesIds))
+                .addCriteria(Criteria.where(MessageStatus.Fields.ID_MESSAGE_ID).in(messageIds))
                 .addCriteria(Criteria.where(MessageStatus.Fields.ID_RECIPIENT_ID).is(recipientId));
         Update update = new Update().set(MessageStatus.Fields.DELIVERY_STATUS, deliveryStatus);
         if (updateReadDate) {
@@ -199,6 +225,12 @@ public class MessageStatusService {
     public Mono<Boolean> updateMessagesReadDate(
             @NotNull Long messageId,
             @Nullable @PastOrPresent Date readDate) {
+        try {
+            AssertUtil.notNull(messageId, "messageId");
+            AssertUtil.pastOrPresent(readDate, "readDate");
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
         Query query = new Query().addCriteria(Criteria.where(MessageStatus.Fields.ID_MESSAGE_ID).is(messageId));
         Update update;
         if (readDate != null) {
@@ -217,6 +249,11 @@ public class MessageStatusService {
     }
 
     public Mono<MessageStatus> queryMessageStatus(@NotNull Long messageId) {
+        try {
+            AssertUtil.notNull(messageId, "messageId");
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
         Query query = new Query().addCriteria(Criteria.where(MessageStatus.Fields.ID_MESSAGE_ID).is(messageId));
         return mongoTemplate.findOne(query, MessageStatus.class, MessageStatus.COLLECTION_NAME);
     }
@@ -274,6 +311,13 @@ public class MessageStatusService {
             @Nullable Boolean areSystemMessages,
             @NotNull Long groupOrSenderId,
             @NotNull Long recipientId) {
+        try {
+            AssertUtil.notNull(areGroupMessages, "areGroupMessages");
+            AssertUtil.notNull(groupOrSenderId, "groupOrSenderId");
+            AssertUtil.notNull(recipientId, "recipientId");
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
         Query query = new Query()
                 .addCriteria(Criteria.where(MessageStatus.Fields.ID_RECIPIENT_ID).is(recipientId))
                 .addCriteria(Criteria.where(MessageStatus.Fields.DELIVERY_STATUS).is(MessageDeliveryStatus.READY));

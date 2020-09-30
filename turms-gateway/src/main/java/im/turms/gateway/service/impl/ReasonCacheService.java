@@ -25,12 +25,12 @@ import im.turms.gateway.pojo.bo.login.LoginFailureReasonKey;
 import im.turms.gateway.pojo.bo.session.SessionDisconnectionReasonKey;
 import im.turms.server.common.property.TurmsPropertiesManager;
 import im.turms.server.common.property.env.gateway.SessionProperties;
+import im.turms.server.common.util.AssertUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveValueOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Mono;
 
@@ -69,22 +69,30 @@ public class ReasonCacheService {
         disconnectionReasonExpireAfter = Duration.ofSeconds(sessionProperties.getDisconnectionReasonExpireAfter());
     }
 
-    public Mono<TurmsStatusCode> getLoginFailureReason(@NotNull Long userId, @NotNull DeviceType deviceType, @NotNull Long requestId) {
+    public Mono<TurmsStatusCode> getLoginFailureReason(@NotNull Long userId,
+                                                       @NotNull DeviceType deviceType,
+                                                       @NotNull Long requestId) {
         if (!enableQueryLoginFailureReason) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
         } else if (!degradedDeviceTypes.contains(deviceType)) {
             String reason = "The device type " + deviceType.name() + " is forbidden to query the reason for login failure";
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
         } else {
-            Assert.notNull(userId, "userId must not be null");
-            Assert.notNull(deviceType, "deviceType must not be null");
-            Assert.notNull(requestId, "requestId must not be null");
+            try {
+                AssertUtil.notNull(userId, "userId");
+                AssertUtil.notNull(deviceType, "deviceType");
+                AssertUtil.notNull(requestId, "requestId");
+            } catch (TurmsBusinessException e) {
+                return Mono.error(e);
+            }
             LoginFailureReasonKey key = new LoginFailureReasonKey(userId, deviceType, requestId);
             return loginFailureReasonCache.get(key);
         }
     }
 
-    public boolean shouldCacheLoginFailureReason(@Nullable Long userId, @Nullable DeviceType deviceType, @Nullable Long requestId) {
+    public boolean shouldCacheLoginFailureReason(@Nullable Long userId,
+                                                 @Nullable DeviceType deviceType,
+                                                 @Nullable Long requestId) {
         return enableQueryLoginFailureReason
                 && deviceType != null
                 && degradedDeviceTypes.contains(deviceType)
@@ -97,10 +105,14 @@ public class ReasonCacheService {
             @NotNull DeviceType deviceType,
             @NotNull Long requestId,
             @NotNull TurmsStatusCode status) {
-        Assert.notNull(userId, "userId must not be null");
-        Assert.notNull(deviceType, "deviceType must not be null");
-        Assert.notNull(requestId, "requestId must not be null");
-        Assert.notNull(status, "status must not be null");
+        try {
+            AssertUtil.notNull(userId, "userId");
+            AssertUtil.notNull(deviceType, "deviceType");
+            AssertUtil.notNull(requestId, "requestId");
+            AssertUtil.notNull(status, "status");
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
         return loginFailureReasonCache.set(
                 new LoginFailureReasonKey(userId, deviceType, requestId),
                 status,
@@ -114,11 +126,18 @@ public class ReasonCacheService {
                 && userId != null;
     }
 
-    public Mono<Boolean> cacheDisconnectionReason(@NotNull Long userId, @NotNull DeviceType deviceType, @NotNull Integer sessionId, @NotNull CloseStatus closeStatus) {
-        Assert.notNull(userId, "userId must not be null");
-        Assert.notNull(deviceType, "deviceType must not be null");
-        Assert.notNull(sessionId, "sessionId must not be null");
-        Assert.notNull(closeStatus, "closeStatus must not be null");
+    public Mono<Boolean> cacheDisconnectionReason(@NotNull Long userId,
+                                                  @NotNull DeviceType deviceType,
+                                                  @NotNull Integer sessionId,
+                                                  @NotNull CloseStatus closeStatus) {
+        try {
+            AssertUtil.notNull(userId, "userId");
+            AssertUtil.notNull(deviceType, "deviceType");
+            AssertUtil.notNull(sessionId, "sessionId");
+            AssertUtil.notNull(closeStatus, "closeStatus");
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
         SessionCloseStatus status = SessionCloseStatus.get(closeStatus.getCode());
         if (status != null) {
             return disconnectionReasonCache.set(
@@ -131,16 +150,22 @@ public class ReasonCacheService {
         }
     }
 
-    public Mono<SessionCloseStatus> getDisconnectionReason(@NotNull Long userId, @NotNull DeviceType deviceType, @NotNull Integer sessionId) {
+    public Mono<SessionCloseStatus> getDisconnectionReason(@NotNull Long userId,
+                                                           @NotNull DeviceType deviceType,
+                                                           @NotNull Integer sessionId) {
         if (!enableQueryDisconnectionReason) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
         } else if (!degradedDeviceTypes.contains(deviceType)) {
             String reason = "The device type " + deviceType + " is forbidden to query the reason for session disconnection";
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
         } else {
-            Assert.notNull(userId, "userId must not be null");
-            Assert.notNull(deviceType, "deviceType must not be null");
-            Assert.notNull(sessionId, "sessionId must not be null");
+            try {
+                AssertUtil.notNull(userId, "userId");
+                AssertUtil.notNull(deviceType, "deviceType");
+                AssertUtil.notNull(sessionId, "sessionId");
+            } catch (TurmsBusinessException e) {
+                return Mono.error(e);
+            }
             SessionDisconnectionReasonKey key = new SessionDisconnectionReasonKey(userId, deviceType, sessionId);
             return disconnectionReasonCache.get(key);
         }
