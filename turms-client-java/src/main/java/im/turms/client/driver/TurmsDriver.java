@@ -76,10 +76,11 @@ public class TurmsDriver {
                        @Nullable Integer connectTimeout,
                        @Nullable Integer requestTimeout,
                        @Nullable Integer minRequestInterval,
-                       @Nullable Integer heartbeatInterval) {
+                       @Nullable Integer heartbeatInterval,
+                       @Nullable Boolean storePassword) {
         stateStore = new StateStore();
 
-        connectionService = initConnectionService(websocketUrl, connectTimeout);
+        connectionService = initConnectionService(websocketUrl, connectTimeout, storePassword);
         heartbeatService = new HeartbeatService(stateStore, minRequestInterval, heartbeatInterval);
         messageService = new MessageService(stateStore, requestTimeout, minRequestInterval);
         sessionService = initSessionService();
@@ -87,8 +88,8 @@ public class TurmsDriver {
 
     // Initializers
 
-    private ConnectionService initConnectionService(String websocketUrl, Integer connectTimeout) {
-        ConnectionService service = new ConnectionService(stateStore, websocketUrl, connectTimeout);
+    private ConnectionService initConnectionService(String websocketUrl, Integer connectTimeout, Boolean storePassword) {
+        ConnectionService service = new ConnectionService(stateStore, websocketUrl, connectTimeout, storePassword);
         service.addOnConnectedListener(unused -> onConnectionConnected());
         service.addOnDisconnectedListener(this::onConnectionDisconnected);
         service.addOnClosedListener(this::onConnectionClosed);

@@ -29,6 +29,7 @@ public class ClientOptions {
     private Integer heartbeatInterval;
     private Integer ackMessageInterval;
     private String storageServerUrl;
+    private Boolean storePassword;
 
     public static ClientOptions build() {
         return new ClientOptions();
@@ -94,6 +95,15 @@ public class ClientOptions {
 
     public ClientOptions ackMessageInterval(Integer ackMessageInterval) {
         this.ackMessageInterval = ackMessageInterval;
+        return this;
+    }
+
+    public Boolean storePassword() {
+        return storePassword;
+    }
+
+    public ClientOptions storePassword(Boolean storePassword) {
+        this.storePassword = storePassword;
         return this;
     }
 

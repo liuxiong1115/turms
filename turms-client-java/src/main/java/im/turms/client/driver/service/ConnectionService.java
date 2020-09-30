@@ -61,6 +61,7 @@ public class ConnectionService {
     private final StateStore stateStore;
     private final String initialWsUrl;
     private final Integer initialConnectTimeout;
+    private final boolean storePassword;
 
     private OkHttpClient httpClient;
     private ConnectOptions connectOptions;
@@ -73,10 +74,11 @@ public class ConnectionService {
     private final List<Consumer<SessionDisconnectInfo>> onClosedListeners = new LinkedList<>();
     private final List<Consumer<ByteBuffer>> onMessageListeners = new LinkedList<>();
 
-    public ConnectionService(StateStore stateStore, @Nullable String wsUrl, @Nullable Integer connectTimeout) {
+    public ConnectionService(StateStore stateStore, @Nullable String wsUrl, @Nullable Integer connectTimeout, @Nullable Boolean storePassword) {
         this.stateStore = stateStore;
         initialWsUrl = wsUrl != null ? wsUrl : DEFAULT_WEBSOCKET_URL;
         initialConnectTimeout = connectTimeout != null ? connectTimeout : DEFAULT_CONNECT_TIMEOUT;
+        this.storePassword = storePassword == null || storePassword;
         httpClient = new OkHttpClient.Builder()
                 .build();
     }
@@ -199,6 +201,9 @@ public class ConnectionService {
             if (userLocation != null) {
                 String location = String.format("%f%s%f", userLocation.getLongitude(), LOCATION_DELIMITER, userLocation.getLatitude());
                 requestBuilder.header(USER_LOCATION_FIELD, location);
+            }
+            if (!storePassword) {
+                options.password(null);
             }
             WebSocket websocket = httpClient.newWebSocket(requestBuilder.build(), new WebSocketListener() {
                 @Override

@@ -24,6 +24,11 @@ import StateStore from "../state-store";
 import {im} from "../../model/proto-bundle";
 import DeviceType = im.turms.proto.DeviceType;
 
+/**
+ * Fallback for the session close status in browsers
+ * because the spec (https://html.spec.whatwg.org/multipage/web-sockets.html#feedback-from-the-protocol)
+ * has required user agents to only convey 1006 in any situation for security purposes.
+ */
 export default class ReasonService {
 
     private _stateStore: StateStore;
