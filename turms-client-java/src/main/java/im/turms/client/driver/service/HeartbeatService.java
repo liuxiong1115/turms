@@ -22,9 +22,9 @@ import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import java8.util.concurrent.CompletableFuture;
 import okio.ByteString;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.util.concurrent.*;
 
 /**

@@ -19,8 +19,7 @@ package im.turms.client;
 
 import im.turms.client.driver.TurmsDriver;
 import im.turms.client.service.*;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author James Chen

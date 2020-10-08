@@ -31,9 +31,9 @@ import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
 import okhttp3.*;
 import okio.ByteString;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;

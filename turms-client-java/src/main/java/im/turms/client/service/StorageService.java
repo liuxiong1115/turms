@@ -29,9 +29,9 @@ import im.turms.common.model.dto.request.storage.QuerySignedGetUrlRequest;
 import im.turms.common.model.dto.request.storage.QuerySignedPutUrlRequest;
 import java8.util.concurrent.CompletableFuture;
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 /**

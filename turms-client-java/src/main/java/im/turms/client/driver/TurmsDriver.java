@@ -38,9 +38,9 @@ import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;

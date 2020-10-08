@@ -27,9 +27,9 @@ import im.turms.common.model.dto.request.TurmsRequest;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
 import okio.ByteString;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.LinkedList;

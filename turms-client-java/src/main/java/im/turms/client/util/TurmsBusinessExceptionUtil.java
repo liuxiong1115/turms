@@ -19,8 +19,7 @@ package im.turms.client.util;
 
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import java8.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import static im.turms.common.exception.TurmsBusinessException.get;
 
