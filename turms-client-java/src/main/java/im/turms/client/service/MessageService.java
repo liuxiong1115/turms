@@ -45,6 +45,7 @@ import java8.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -133,7 +134,7 @@ public class MessageService {
             long targetId,
             @Nullable Date deliveryDate,
             @Nullable String text,
-            @Nullable byte[] records,
+            @Nullable List<ByteBuffer> records,
             @Nullable Integer burnAfter) {
         if (text == null && records == null) {
             return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "text and records must not all be null");
@@ -176,7 +177,7 @@ public class MessageService {
     public CompletableFuture<Void> updateSentMessage(
             long messageId,
             @Nullable String text,
-            @Nullable byte[] records) {
+            @Nullable ByteBuffer records) {
         if (Validator.areAllFalsy(text, records)) {
             return CompletableFuture.completedFuture(null);
         }
@@ -283,7 +284,7 @@ public class MessageService {
         this.mentionedUserIdsParser = mentionedUserIdsParser;
     }
 
-    public static byte[] generateLocationRecord(
+    public static ByteBuffer generateLocationRecord(
             float latitude,
             float longitude,
             @Nullable String locationName,
@@ -297,10 +298,10 @@ public class MessageService {
         if (address != null) {
             builder.setAddress(StringValue.newBuilder().setValue(address).build());
         }
-        return builder.build().toByteArray();
+        return builder.build().toByteString().asReadOnlyByteBuffer();
     }
 
-    public static byte[] generateAudioRecordByDescription(
+    public static ByteBuffer generateAudioRecordByDescription(
             @NotNull String url,
             @Nullable Integer duration,
             @Nullable String format,
@@ -319,10 +320,12 @@ public class MessageService {
         }
         return AudioFile.newBuilder()
                 .setDescription(builder)
-                .build().toByteArray();
+                .build()
+                .toByteString()
+                .asReadOnlyByteBuffer();
     }
 
-    public static byte[] generateAudioRecordByData(byte[] data) {
+    public static ByteBuffer generateAudioRecordByData(byte[] data) {
         Validator.throwIfAnyFalsy((Object) data);
         BytesValue bytesValue = BytesValue.newBuilder()
                 .setValue(ByteString.copyFrom(data))
@@ -330,10 +333,11 @@ public class MessageService {
         return AudioFile.newBuilder()
                 .setData(bytesValue)
                 .build()
-                .toByteArray();
+                .toByteString()
+                .asReadOnlyByteBuffer();
     }
 
-    public static byte[] generateVideoRecordByDescription(
+    public static ByteBuffer generateVideoRecordByDescription(
             @NotNull String url,
             @Nullable Integer duration,
             @Nullable String format,
@@ -353,10 +357,11 @@ public class MessageService {
         return VideoFile.newBuilder()
                 .setDescription(builder)
                 .build()
-                .toByteArray();
+                .toByteString()
+                .asReadOnlyByteBuffer();
     }
 
-    public static byte[] generateVideoRecordByData(byte[] data) {
+    public static ByteBuffer generateVideoRecordByData(byte[] data) {
         Validator.throwIfAnyFalsy((Object) data);
         BytesValue bytesValue = BytesValue.newBuilder()
                 .setValue(ByteString.copyFrom(data))
@@ -364,10 +369,11 @@ public class MessageService {
         return VideoFile.newBuilder()
                 .setData(bytesValue)
                 .build()
-                .toByteArray();
+                .toByteString()
+                .asReadOnlyByteBuffer();
     }
 
-    public static byte[] generateImageRecordByData(byte[] data) {
+    public static ByteBuffer generateImageRecordByData(byte[] data) {
         Validator.throwIfAnyFalsy((Object) data);
         BytesValue bytesValue = BytesValue.newBuilder()
                 .setValue(ByteString.copyFrom(data))
@@ -375,10 +381,11 @@ public class MessageService {
         return ImageFile.newBuilder()
                 .setData(bytesValue)
                 .build()
-                .toByteArray();
+                .toByteString()
+                .asReadOnlyByteBuffer();
     }
 
-    public static byte[] generateImageRecordByDescription(
+    public static ByteBuffer generateImageRecordByDescription(
             @NotNull String url,
             @Nullable Integer fileSize,
             @Nullable Integer imageSize,
@@ -398,10 +405,11 @@ public class MessageService {
         return ImageFile.newBuilder()
                 .setDescription(builder)
                 .build()
-                .toByteArray();
+                .toByteString()
+                .asReadOnlyByteBuffer();
     }
 
-    public static byte[] generateFileRecordByDate(byte[] data) {
+    public static ByteBuffer generateFileRecordByDate(byte[] data) {
         Validator.throwIfAnyFalsy((Object) data);
         BytesValue bytesValue = BytesValue.newBuilder()
                 .setValue(ByteString.copyFrom(data))
@@ -409,10 +417,11 @@ public class MessageService {
         return File.newBuilder()
                 .setData(bytesValue)
                 .build()
-                .toByteArray();
+                .toByteString()
+                .asReadOnlyByteBuffer();
     }
 
-    public static byte[] generateFileRecordByDescription(
+    public static ByteBuffer generateFileRecordByDescription(
             @NotNull String url,
             @Nullable String format,
             @Nullable Integer size) {
@@ -428,11 +437,12 @@ public class MessageService {
         return File.newBuilder()
                 .setDescription(builder)
                 .build()
-                .toByteArray();
+                .toByteString()
+                .asReadOnlyByteBuffer();
     }
 
     private void startAckMessagesTimer(int ackMessageInterval) {
-        TurmsDriver.SCHEDULED_EXECUTOR_SERVICE.scheduleWithFixedDelay(() -> {
+        TurmsDriver.scheduledService.scheduleWithFixedDelay(() -> {
             if (!unacknowledgedMessageIds.isEmpty()) {
                 List<Long> unacknowledgedMessageIdList = new LinkedList<>();
                 while (!unacknowledgedMessageIds.isEmpty()) {
@@ -484,4 +494,5 @@ public class MessageService {
         }
         return builder.build();
     }
+
 }

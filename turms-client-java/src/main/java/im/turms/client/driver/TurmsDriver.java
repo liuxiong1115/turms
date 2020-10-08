@@ -30,6 +30,7 @@ import im.turms.client.model.SessionDisconnectInfo;
 import im.turms.client.model.SessionStatus;
 import im.turms.client.model.UserLocation;
 import im.turms.client.util.ProtoUtil;
+import im.turms.client.util.TurmsBusinessExceptionUtil;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
@@ -55,7 +56,7 @@ public class TurmsDriver {
 
     private static final Logger LOGGER = Logger.getLogger(TurmsDriver.class.getName());
     private static final String SCHEDULED_THREAD_NAME = "turms-scheduler";
-    public static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = new ScheduledThreadPoolExecutor(1, runnable -> {
+    public static final ScheduledExecutorService scheduledService = new ScheduledThreadPoolExecutor(1, runnable -> {
         Thread t = new Thread(runnable);
         t.setName(SCHEDULED_THREAD_NAME);
         return t;
@@ -242,9 +243,11 @@ public class TurmsDriver {
         return messageService.sendRequest(requestBuilder);
     }
 
-    public CompletableFuture<TurmsNotification> send(Message.Builder builder, Map<String, ?> fields) {
-        if (fields != null) {
+    public CompletableFuture<TurmsNotification> send(Message.Builder builder, @Nullable Map<String, ?> fields) {
+        try {
             ProtoUtil.fillFields(builder, fields);
+        } catch (Exception e) {
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.FAILED, e);
         }
         Descriptors.Descriptor descriptor = builder.getDescriptorForType();
         String fieldName = StringUtil.camelToSnakeCase(descriptor.getName());

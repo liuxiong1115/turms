@@ -23,6 +23,7 @@ import im.turms.common.model.bo.message.MessageStatus;
 import im.turms.common.model.bo.message.MessagesWithTotal;
 import org.junit.jupiter.api.*;
 
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -184,59 +185,60 @@ class MessageServiceST {
 
     @Test
     void generateLocationRecord() {
-        byte[] data = MessageService.generateLocationRecord(1.0f, 1.0f, "name", "address");
+        ByteBuffer data = MessageService.generateLocationRecord(1.0f, 1.0f, "name", "address");
         assertNotNull(data);
     }
 
     @Test
     void generateAudioRecordByDescription() {
-        byte[] data = MessageService.generateAudioRecordByDescription("https://abc.com", null, null, null);
+        ByteBuffer data = MessageService.generateAudioRecordByDescription("https://abc.com", null, null, null);
         assertNotNull(data);
     }
 
     @Test
     void generateAudioRecordByData() {
         byte[] source = new byte[]{0, 1, 2};
-        byte[] data = MessageService.generateAudioRecordByData(source);
+        ByteBuffer data = MessageService.generateAudioRecordByData(source);
         assertNotNull(data);
     }
 
     @Test
     void generateVideoRecordByDescription() {
-        byte[] data = MessageService.generateVideoRecordByDescription("https://abc.com", null, null, null);
+        ByteBuffer data = MessageService.generateVideoRecordByDescription("https://abc.com", null, null, null);
         assertNotNull(data);
     }
 
     @Test
     void generateVideoRecordByData() {
         byte[] source = new byte[]{0, 1, 2};
-        byte[] data = MessageService.generateVideoRecordByData(source);
+        ByteBuffer data = MessageService.generateVideoRecordByData(source);
         assertNotNull(data);
     }
 
     @Test
     void generateImageRecordByData() {
         byte[] source = new byte[]{0, 1, 2};
-        byte[] data = MessageService.generateImageRecordByData(source);
+        ByteBuffer data = MessageService.generateImageRecordByData(source);
         assertNotNull(data);
     }
 
     @Test
     void generateFileRecordByDate() {
         byte[] source = new byte[]{0, 1, 2};
-        byte[] data = MessageService.generateFileRecordByDate(source);
+        ByteBuffer data = MessageService.generateFileRecordByDate(source);
         assertNotNull(data);
     }
 
     @Test
     void generateImageRecordByDescription() {
-        byte[] data = MessageService.generateImageRecordByDescription("https://abc.com", null, null, null);
+        ByteBuffer data = MessageService.generateImageRecordByDescription("https://abc.com", null, null, null);
         assertNotNull(data);
     }
 
     @Test
     void generateFileRecordByDescription() {
-        byte[] data = MessageService.generateFileRecordByDescription("https://abc.com", null, null);
+        ByteBuffer data = MessageService.generateFileRecordByDescription("https://abc.com", null, null);
         assertNotNull(data);
     }
+
 }

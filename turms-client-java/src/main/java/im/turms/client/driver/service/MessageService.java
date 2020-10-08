@@ -39,7 +39,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static im.turms.client.driver.TurmsDriver.SCHEDULED_EXECUTOR_SERVICE;
+import static im.turms.client.driver.TurmsDriver.scheduledService;
 
 /**
  * @author James Chen
@@ -107,7 +107,7 @@ public class MessageService {
                     boolean wasEnqueued = stateStore.getWebSocket().send(ByteString.of(data));
                     if (wasEnqueued) {
                         if (requestTimeout > 0) {
-                            return FutureUtil.timeout(future, requestTimeout, SCHEDULED_EXECUTOR_SERVICE, e -> requestMap.remove(requestId));
+                            return FutureUtil.timeout(future, requestTimeout, scheduledService, e -> requestMap.remove(requestId));
                         }
                     } else {
                         future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MESSAGE_IS_REJECTED));

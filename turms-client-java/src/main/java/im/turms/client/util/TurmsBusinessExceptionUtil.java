@@ -32,12 +32,20 @@ public class TurmsBusinessExceptionUtil {
     }
 
     public static <T> CompletableFuture<T> getFuture(TurmsStatusCode statusCode) {
-        return getFuture(statusCode, null);
+        CompletableFuture<T> future = new CompletableFuture<>();
+        future.completeExceptionally(get(statusCode));
+        return future;
     }
 
     public static <T> CompletableFuture<T> getFuture(TurmsStatusCode statusCode, @Nullable String reason) {
         CompletableFuture<T> future = new CompletableFuture<>();
         future.completeExceptionally(get(statusCode, reason));
+        return future;
+    }
+
+    public static <T> CompletableFuture<T> getFuture(TurmsStatusCode statusCode, @Nullable Throwable cause) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        future.completeExceptionally(get(statusCode, cause));
         return future;
     }
 
