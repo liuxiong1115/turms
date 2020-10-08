@@ -21,8 +21,6 @@ import im.turms.client.TurmsClient;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -36,8 +34,8 @@ class StorageServiceST {
     private static TurmsClient turmsClient;
     private static final long USER_ID = 1L;
     private static final long GROUP_ID = 1;
-    private static byte[] PROFILE_PICTURE;
-    private static byte[] ATTACHMENT;
+    private static final byte[] PROFILE_PICTURE = new byte[]{1, 2, 3, 4, 9, 8, 7, 6, 5};
+    private static final byte[] ATTACHMENT = PROFILE_PICTURE;
     private static long messageId;
 
     @BeforeAll
@@ -46,8 +44,6 @@ class StorageServiceST {
         turmsClient.getUserService()
                 .login(USER_ID, "123")
                 .get(5, TimeUnit.SECONDS);
-        PROFILE_PICTURE = Files.readAllBytes(Paths.get("src", "test", "resources", "profile.webp"));
-        ATTACHMENT = PROFILE_PICTURE;
     }
 
     @AfterAll
