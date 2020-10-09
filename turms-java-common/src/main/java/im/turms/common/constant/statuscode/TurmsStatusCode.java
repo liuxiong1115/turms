@@ -77,6 +77,8 @@ public enum TurmsStatusCode {
     TIMEOUT(6005, "The request has timed out", 0),
     MESSAGE_IS_REJECTED(6050, "The message failed to be enqueued by the outgoing message buffer", 0);
 
+    public static final int STATUS_CODE_LENGTH = 4;
+
     private final int businessCode;
     private final String reason;
     private final int httpCode;
