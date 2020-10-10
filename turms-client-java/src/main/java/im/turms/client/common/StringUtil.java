@@ -27,12 +27,16 @@ public class StringUtil {
 
     public static String camelToSnakeCase(String camelcase) {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < camelcase.length(); i++) {
+        int length = camelcase.length();
+        for (int i = 0; i < length; i++) {
             char c = camelcase.charAt(i);
             if (Character.isUpperCase(c)) {
-                builder.append(builder.length() != 0 ? '_' : "").append(Character.toLowerCase(c));
-            } else {
+                if (builder.length() != 0) {
+                    builder.append('_');
+                }
                 builder.append(Character.toLowerCase(c));
+            } else {
+                builder.append(c);
             }
         }
         return builder.toString();

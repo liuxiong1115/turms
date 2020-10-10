@@ -66,6 +66,11 @@ public class HeartbeatService {
         }
     }
 
+    public void reset() {
+        stop();
+        start();
+    }
+
     public CompletableFuture<Void> send() {
         CompletableFuture<Void> future = new CompletableFuture<>();
         if (stateStore.isConnected()) {
@@ -81,10 +86,6 @@ public class HeartbeatService {
         return future;
     }
 
-    public void reset() {
-        stop();
-        start();
-    }
 
     public void completeHeartbeatFutures() {
         while (true) {

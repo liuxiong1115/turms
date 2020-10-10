@@ -22,6 +22,8 @@ import im.turms.common.model.bo.group.Group;
 import im.turms.common.model.bo.group.GroupsWithVersion;
 import im.turms.common.model.dto.notification.TurmsNotification;
 
+import javax.annotation.Nullable;
+
 /**
  * @author James Chen
  */
@@ -30,7 +32,7 @@ public class GroupWithVersion {
     private Group group;
     private long lastUpdatedDate;
 
-    public static GroupWithVersion from(TurmsNotification notification) {
+    public static GroupWithVersion from(@Nullable TurmsNotification notification) {
         if (notification != null) {
             TurmsNotification.Data data = notification.getData();
             if (notification.hasData() && data.hasGroupsWithVersion()) {

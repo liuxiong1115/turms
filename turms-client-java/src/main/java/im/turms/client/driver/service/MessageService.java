@@ -25,6 +25,7 @@ import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.concurrent.ThreadLocalRandom;
 import java8.util.function.Consumer;
 import okio.ByteString;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
