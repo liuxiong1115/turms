@@ -242,18 +242,18 @@ class UserServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    void queryUsersInfosNearby_shouldReturnUsersInfos() throws ExecutionException, InterruptedException, TimeoutException {
-        List<UserInfo> result = turmsClient.getUserService().queryUsersInfosNearby(1f, 1f, null, null)
+    void queryUserInfosNearby_shouldReturnUsersInfos() throws ExecutionException, InterruptedException, TimeoutException {
+        List<UserInfo> result = turmsClient.getUserService().queryUserInfosNearby(1f, 1f, null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(result);
     }
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    void queryUsersOnlineStatusRequest_shouldUsersOnlineStatus() throws ExecutionException, InterruptedException, TimeoutException {
+    void queryUserOnlineStatusesRequest_shouldUsersOnlineStatus() throws ExecutionException, InterruptedException, TimeoutException {
         Set<Long> set = new HashSet<>();
         set.add(1L);
-        List<UserStatusDetail> result = turmsClient.getUserService().queryUsersOnlineStatusRequest(set)
+        List<UserStatusDetail> result = turmsClient.getUserService().queryUserOnlineStatusesRequest(set)
                 .get(5, TimeUnit.SECONDS);
         assertEquals(userStatus, result.get(0).getUserStatus());
     }
@@ -270,8 +270,8 @@ class UserServiceST {
 
     @Test
     @Order(ORDER_LOW_PRIORITY)
-    void queryRelatedUsersIds_shouldReturnRelatedUsersIds() throws ExecutionException, InterruptedException, TimeoutException {
-        Int64ValuesWithVersion result = turmsClient.getUserService().queryRelatedUsersIds(null, null, null)
+    void queryRelatedUserIds_shouldReturnRelatedUserIds() throws ExecutionException, InterruptedException, TimeoutException {
+        Int64ValuesWithVersion result = turmsClient.getUserService().queryRelatedUserIds(null, null, null)
                 .get(5, TimeUnit.SECONDS);
         assertNotNull(result);
     }

@@ -162,7 +162,7 @@ public class UserService {
             @Nullable Integer distance,
             @Nullable Integer maxNumber) {
         return turmsClient.getDriver()
-                .send(QueryUsersIdsNearbyRequest.newBuilder(), MapUtil.of(
+                .send(QueryUserIdsNearbyRequest.newBuilder(), MapUtil.of(
                         "latitude", latitude,
                         "longitude", longitude,
                         "distance", distance,
@@ -176,7 +176,7 @@ public class UserService {
             @Nullable Integer distance,
             @Nullable Integer maxNumber) {
         return turmsClient.getDriver()
-                .send(QueryUsersIdsNearbyRequest.newBuilder(), MapUtil.of(
+                .send(QueryUserIdsNearbyRequest.newBuilder(), MapUtil.of(
                         "latitude", latitude,
                         "longitude", longitude,
                         "distance", distance,
@@ -184,13 +184,13 @@ public class UserService {
                 .thenApply(notification -> notification.getData().getUserSessionIds().getUserSessionIdsList());
     }
 
-    public CompletableFuture<List<UserInfo>> queryUsersInfosNearby(
+    public CompletableFuture<List<UserInfo>> queryUserInfosNearby(
             float latitude,
             float longitude,
             @Nullable Integer distance,
             @Nullable Integer maxNumber) {
         return turmsClient.getDriver()
-                .send(QueryUsersInfosNearbyRequest.newBuilder(), MapUtil.of(
+                .send(QueryUserInfosNearbyRequest.newBuilder(), MapUtil.of(
                         "latitude", latitude,
                         "longitude", longitude,
                         "distance", distance,
@@ -198,27 +198,27 @@ public class UserService {
                 .thenApply(notification -> notification.getData().getUsersInfosWithVersion().getUserInfosList());
     }
 
-    public CompletableFuture<List<UserStatusDetail>> queryUsersOnlineStatusRequest(@NotEmpty Set<Long> usersIds) {
-        if (usersIds == null || usersIds.isEmpty()) {
-            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "usersIds must not be null or empty");
+    public CompletableFuture<List<UserStatusDetail>> queryUserOnlineStatusesRequest(@NotEmpty Set<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "userIds must not be null or empty");
         }
         return turmsClient.getDriver()
-                .send(QueryUsersOnlineStatusRequest.newBuilder(), MapUtil.of(
-                        "users_ids", usersIds))
+                .send(QueryUserOnlineStatusesRequest.newBuilder(), MapUtil.of(
+                        "user_ids", userIds))
                 .thenApply(notification -> notification.getData().getUsersOnlineStatuses().getUserStatusesList());
     }
 
     // Relationship
 
     public CompletableFuture<UserRelationshipsWithVersion> queryRelationships(
-            @Nullable Set<Long> relatedUsersIds,
+            @Nullable Set<Long> relatedUserIds,
             @Nullable Boolean isBlocked,
             @Nullable Integer groupIndex,
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
                 .send(QueryRelationshipsRequest.newBuilder(), MapUtil.of(
-                        "related_users_ids", relatedUsersIds,
-                        "is_blocked", isBlocked,
+                        "user_ids", relatedUserIds,
+                        "blocked", isBlocked,
                         "group_index", groupIndex,
                         "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> {
@@ -227,13 +227,13 @@ public class UserService {
                 });
     }
 
-    public CompletableFuture<Int64ValuesWithVersion> queryRelatedUsersIds(
+    public CompletableFuture<Int64ValuesWithVersion> queryRelatedUserIds(
             @Nullable Boolean isBlocked,
             @Nullable Integer groupIndex,
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
-                .send(QueryRelatedUsersIdsRequest.newBuilder(), MapUtil.of(
-                        "is_blocked", isBlocked,
+                .send(QueryRelatedUserIdsRequest.newBuilder(), MapUtil.of(
+                        "blocked", isBlocked,
                         "group_index", groupIndex,
                         "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> {
@@ -261,7 +261,7 @@ public class UserService {
         return turmsClient.getDriver()
                 .send(CreateRelationshipRequest.newBuilder(), MapUtil.of(
                         "user_id", userId,
-                        "is_blocked", isBlocked,
+                        "blocked", isBlocked,
                         "group_index", groupIndex))
                 .thenApply(notification -> null);
     }
@@ -284,7 +284,7 @@ public class UserService {
             @Nullable Integer targetGroupIndex) {
         return turmsClient.getDriver()
                 .send(DeleteRelationshipRequest.newBuilder(), MapUtil.of(
-                        "related_user_id", relatedUserId,
+                        "user_id", relatedUserId,
                         "group_index", deleteGroupIndex,
                         "target_group_index", targetGroupIndex))
                 .thenApply(notification -> null);
@@ -299,7 +299,7 @@ public class UserService {
         }
         return turmsClient.getDriver()
                 .send(UpdateRelationshipRequest.newBuilder(), MapUtil.of(
-                        "related_user_id", relatedUserId,
+                        "user_id", relatedUserId,
                         "blocked", isBlocked,
                         "new_group_index", groupIndex))
                 .thenApply(notification -> null);
@@ -392,7 +392,7 @@ public class UserService {
             int groupIndex) {
         return turmsClient.getDriver()
                 .send(UpdateRelationshipRequest.newBuilder(), MapUtil.of(
-                        "related_user_id", relatedUserId,
+                        "user_id", relatedUserId,
                         "new_group_index", groupIndex))
                 .thenApply(notification -> null);
     }

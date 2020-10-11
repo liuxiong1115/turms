@@ -197,16 +197,16 @@ class GroupServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    void queryJoinedGroupsIds_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
-        Int64ValuesWithVersion joinedGroupsIdsWithVersion = turmsClient.getGroupService().queryJoinedGroupsIds(null)
+    void queryJoinedGroupIds_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
+        Int64ValuesWithVersion joinedGroupIdsWithVersion = turmsClient.getGroupService().queryJoinedGroupIds(null)
                 .get(5, TimeUnit.SECONDS);
-        assertTrue(joinedGroupsIdsWithVersion.getValuesList().contains(groupId));
+        assertTrue(joinedGroupIdsWithVersion.getValuesList().contains(groupId));
     }
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    void queryJoinedGroupsInfos_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupsWithVersion groupWithVersion = turmsClient.getGroupService().queryJoinedGroupsInfos(null)
+    void queryJoinedGroupInfos_shouldEqualNewGroupId() throws ExecutionException, InterruptedException, TimeoutException {
+        GroupsWithVersion groupWithVersion = turmsClient.getGroupService().queryJoinedGroupInfos(null)
                 .get(5, TimeUnit.SECONDS);
         List<Group> groups = groupWithVersion.getGroupsList();
         Set<Long> groupIds = new HashSet<>(groups.size());
@@ -218,16 +218,16 @@ class GroupServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    void queryBlacklistedUsersIds_shouldEqualBlacklistedUserId() throws ExecutionException, InterruptedException, TimeoutException {
-        Int64ValuesWithVersion blacklistedUsersIdsWithVersion = turmsClient.getGroupService().queryBlacklistedUsersIds(groupId, null)
+    void queryBlacklistedUserIds_shouldEqualBlacklistedUserId() throws ExecutionException, InterruptedException, TimeoutException {
+        Int64ValuesWithVersion blacklistedUserIdsWithVersion = turmsClient.getGroupService().queryBlacklistedUserIds(groupId, null)
                 .get(5, TimeUnit.SECONDS);
-        assertEquals(GROUP_BLACKLISTED_USER_ID, blacklistedUsersIdsWithVersion.getValues(0));
+        assertEquals(GROUP_BLACKLISTED_USER_ID, blacklistedUserIdsWithVersion.getValues(0));
     }
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    void queryBlacklistedUsersInfos_shouldEqualBlacklistedUserId() throws ExecutionException, InterruptedException, TimeoutException {
-        UsersInfosWithVersion usersInfosWithVersion = turmsClient.getGroupService().queryBlacklistedUsersInfos(groupId, null)
+    void queryBlacklistedUserInfos_shouldEqualBlacklistedUserId() throws ExecutionException, InterruptedException, TimeoutException {
+        UsersInfosWithVersion usersInfosWithVersion = turmsClient.getGroupService().queryBlacklistedUserInfos(groupId, null)
                 .get(5, TimeUnit.SECONDS);
         Assertions.assertEquals(GROUP_BLACKLISTED_USER_ID, usersInfosWithVersion.getUserInfos(0).getId().getValue());
     }
@@ -266,8 +266,8 @@ class GroupServiceST {
 
     @Test
     @Order(ORDER_MIDDLE_PRIORITY)
-    void queryGroupMembersByMembersIds_shouldEqualNewMemberId() throws ExecutionException, InterruptedException, TimeoutException {
-        GroupMembersWithVersion groupMembersWithVersion = turmsClient.getGroupService().queryGroupMembersByMembersIds(groupId, Collections.singletonList(GROUP_MEMBER_ID), true)
+    void queryGroupMembersByMemberIds_shouldEqualNewMemberId() throws ExecutionException, InterruptedException, TimeoutException {
+        GroupMembersWithVersion groupMembersWithVersion = turmsClient.getGroupService().queryGroupMembersByMemberIds(groupId, Collections.singletonList(GROUP_MEMBER_ID), true)
                 .get(5, TimeUnit.SECONDS);
         Assertions.assertEquals(GROUP_MEMBER_ID, groupMembersWithVersion.getGroupMembers(0).getUserId().getValue());
     }
@@ -281,7 +281,7 @@ class GroupServiceST {
             GroupJoinQuestionsAnswerResult answerResult = turmsClient.getGroupService()
                     .answerGroupQuestions(map)
                     .get(5, TimeUnit.SECONDS);
-            boolean isCorrect = answerResult.getQuestionsIdsList().contains(groupJoinQuestionId);
+            boolean isCorrect = answerResult.getQuestionIdsList().contains(groupJoinQuestionId);
             assertTrue(isCorrect);
         } catch (ExecutionException e) {
             assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.ALREADY_GROUP_MEMBER));

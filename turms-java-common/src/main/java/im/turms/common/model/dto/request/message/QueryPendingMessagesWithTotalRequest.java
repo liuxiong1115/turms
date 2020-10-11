@@ -538,7 +538,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value size = 1;</code>
      */
     public com.google.protobuf.Int32Value.Builder getSizeBuilder() {
-      
+
       onChanged();
       return getSizeFieldBuilder().getBuilder();
     }
@@ -557,7 +557,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int32Value size = 1;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder> 
+        com.google.protobuf.Int32Value, com.google.protobuf.Int32Value.Builder, com.google.protobuf.Int32ValueOrBuilder>
         getSizeFieldBuilder() {
       if (sizeBuilder_ == null) {
         sizeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

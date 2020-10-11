@@ -62,11 +62,11 @@ public class SignalServiceController {
     public ClientRequestHandler handleAckRequest() {
         return clientRequest -> {
             AckRequest ackRequest = clientRequest.getTurmsRequest().getAckRequest();
-            List<Long> messagesIds = ackRequest.getMessagesIdsList();
-            if (messagesIds.isEmpty()) {
+            List<Long> messageIds = ackRequest.getMessageIdsList();
+            if (messageIds.isEmpty()) {
                 return Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The list of message ID must not be empty"));
             }
-            Set<Long> ids = new HashSet<>(messagesIds);
+            Set<Long> ids = new HashSet<>(messageIds);
             if (node.getSharedProperties().getService().getMessage().isDeletePrivateMessageAfterAcknowledged()) {
                 return messageService.filterPrivateMessages(ids)
                         .flatMap(privateMessageIds -> {

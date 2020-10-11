@@ -27,7 +27,7 @@ public interface MessageStatusesOrBuilder extends
   /**
    * <code>repeated .im.turms.proto.MessageStatus message_statuses = 1;</code>
    */
-  java.util.List<im.turms.common.model.bo.message.MessageStatus> 
+  java.util.List<im.turms.common.model.bo.message.MessageStatus>
       getMessageStatusesList();
   /**
    * <code>repeated .im.turms.proto.MessageStatus message_statuses = 1;</code>
@@ -40,7 +40,7 @@ public interface MessageStatusesOrBuilder extends
   /**
    * <code>repeated .im.turms.proto.MessageStatus message_statuses = 1;</code>
    */
-  java.util.List<? extends im.turms.common.model.bo.message.MessageStatusOrBuilder> 
+  java.util.List<? extends im.turms.common.model.bo.message.MessageStatusOrBuilder>
       getMessageStatusesOrBuilderList();
   /**
    * <code>repeated .im.turms.proto.MessageStatus message_statuses = 1;</code>

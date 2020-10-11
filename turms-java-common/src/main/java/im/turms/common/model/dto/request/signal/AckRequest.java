@@ -33,7 +33,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private AckRequest() {
-    messagesIds_ = emptyLongList();
+    messageIds_ = emptyLongList();
   }
 
   @java.lang.Override
@@ -69,21 +69,21 @@ private static final long serialVersionUID = 0L;
             break;
           case 8: {
             if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-              messagesIds_ = newLongList();
+              messageIds_ = newLongList();
               mutable_bitField0_ |= 0x00000001;
             }
-            messagesIds_.addLong(input.readInt64());
+            messageIds_.addLong(input.readInt64());
             break;
           }
           case 10: {
             int length = input.readRawVarint32();
             int limit = input.pushLimit(length);
             if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
-              messagesIds_ = newLongList();
+              messageIds_ = newLongList();
               mutable_bitField0_ |= 0x00000001;
             }
             while (input.getBytesUntilLimit() > 0) {
-              messagesIds_.addLong(input.readInt64());
+              messageIds_.addLong(input.readInt64());
             }
             input.popLimit(limit);
             break;
@@ -104,7 +104,7 @@ private static final long serialVersionUID = 0L;
           e).setUnfinishedMessage(this);
     } finally {
       if (((mutable_bitField0_ & 0x00000001) != 0)) {
-        messagesIds_.makeImmutable(); // C
+        messageIds_.makeImmutable(); // C
       }
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -123,33 +123,33 @@ private static final long serialVersionUID = 0L;
             im.turms.common.model.dto.request.signal.AckRequest.class, im.turms.common.model.dto.request.signal.AckRequest.Builder.class);
   }
 
-  public static final int MESSAGES_IDS_FIELD_NUMBER = 1;
-  private com.google.protobuf.Internal.LongList messagesIds_;
+  public static final int MESSAGE_IDS_FIELD_NUMBER = 1;
+  private com.google.protobuf.Internal.LongList messageIds_;
   /**
-   * <code>repeated int64 messages_ids = 1;</code>
-   * @return A list containing the messagesIds.
+   * <code>repeated int64 message_ids = 1;</code>
+   * @return A list containing the messageIds.
    */
   @java.lang.Override
   public java.util.List<java.lang.Long>
-      getMessagesIdsList() {
-    return messagesIds_;
+      getMessageIdsList() {
+    return messageIds_;
   }
   /**
-   * <code>repeated int64 messages_ids = 1;</code>
-   * @return The count of messagesIds.
+   * <code>repeated int64 message_ids = 1;</code>
+   * @return The count of messageIds.
    */
-  public int getMessagesIdsCount() {
-    return messagesIds_.size();
+  public int getMessageIdsCount() {
+    return messageIds_.size();
   }
   /**
-   * <code>repeated int64 messages_ids = 1;</code>
+   * <code>repeated int64 message_ids = 1;</code>
    * @param index The index of the element to return.
-   * @return The messagesIds at the given index.
+   * @return The messageIds at the given index.
    */
-  public long getMessagesIds(int index) {
-    return messagesIds_.getLong(index);
+  public long getMessageIds(int index) {
+    return messageIds_.getLong(index);
   }
-  private int messagesIdsMemoizedSerializedSize = -1;
+  private int messageIdsMemoizedSerializedSize = -1;
 
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
@@ -166,12 +166,12 @@ private static final long serialVersionUID = 0L;
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
     getSerializedSize();
-    if (getMessagesIdsList().size() > 0) {
+    if (getMessageIdsList().size() > 0) {
       output.writeUInt32NoTag(10);
-      output.writeUInt32NoTag(messagesIdsMemoizedSerializedSize);
+      output.writeUInt32NoTag(messageIdsMemoizedSerializedSize);
     }
-    for (int i = 0; i < messagesIds_.size(); i++) {
-      output.writeInt64NoTag(messagesIds_.getLong(i));
+    for (int i = 0; i < messageIds_.size(); i++) {
+      output.writeInt64NoTag(messageIds_.getLong(i));
     }
     unknownFields.writeTo(output);
   }
@@ -184,17 +184,17 @@ private static final long serialVersionUID = 0L;
     size = 0;
     {
       int dataSize = 0;
-      for (int i = 0; i < messagesIds_.size(); i++) {
+      for (int i = 0; i < messageIds_.size(); i++) {
         dataSize += com.google.protobuf.CodedOutputStream
-          .computeInt64SizeNoTag(messagesIds_.getLong(i));
+          .computeInt64SizeNoTag(messageIds_.getLong(i));
       }
       size += dataSize;
-      if (!getMessagesIdsList().isEmpty()) {
+      if (!getMessageIdsList().isEmpty()) {
         size += 1;
         size += com.google.protobuf.CodedOutputStream
             .computeInt32SizeNoTag(dataSize);
       }
-      messagesIdsMemoizedSerializedSize = dataSize;
+      messageIdsMemoizedSerializedSize = dataSize;
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -211,8 +211,8 @@ private static final long serialVersionUID = 0L;
     }
     im.turms.common.model.dto.request.signal.AckRequest other = (im.turms.common.model.dto.request.signal.AckRequest) obj;
 
-    if (!getMessagesIdsList()
-        .equals(other.getMessagesIdsList())) return false;
+    if (!getMessageIdsList()
+        .equals(other.getMessageIdsList())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -224,9 +224,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (getMessagesIdsCount() > 0) {
-      hash = (37 * hash) + MESSAGES_IDS_FIELD_NUMBER;
-      hash = (53 * hash) + getMessagesIdsList().hashCode();
+    if (getMessageIdsCount() > 0) {
+      hash = (37 * hash) + MESSAGE_IDS_FIELD_NUMBER;
+      hash = (53 * hash) + getMessageIdsList().hashCode();
     }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
@@ -361,7 +361,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      messagesIds_ = emptyLongList();
+      messageIds_ = emptyLongList();
       bitField0_ = (bitField0_ & ~0x00000001);
       return this;
     }
@@ -391,10 +391,10 @@ private static final long serialVersionUID = 0L;
       im.turms.common.model.dto.request.signal.AckRequest result = new im.turms.common.model.dto.request.signal.AckRequest(this);
       int from_bitField0_ = bitField0_;
       if (((bitField0_ & 0x00000001) != 0)) {
-        messagesIds_.makeImmutable();
+        messageIds_.makeImmutable();
         bitField0_ = (bitField0_ & ~0x00000001);
       }
-      result.messagesIds_ = messagesIds_;
+      result.messageIds_ = messageIds_;
       onBuilt();
       return result;
     }
@@ -443,13 +443,13 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(im.turms.common.model.dto.request.signal.AckRequest other) {
       if (other == im.turms.common.model.dto.request.signal.AckRequest.getDefaultInstance()) return this;
-      if (!other.messagesIds_.isEmpty()) {
-        if (messagesIds_.isEmpty()) {
-          messagesIds_ = other.messagesIds_;
+      if (!other.messageIds_.isEmpty()) {
+        if (messageIds_.isEmpty()) {
+          messageIds_ = other.messageIds_;
           bitField0_ = (bitField0_ & ~0x00000001);
         } else {
-          ensureMessagesIdsIsMutable();
-          messagesIds_.addAll(other.messagesIds_);
+          ensureMessageIdsIsMutable();
+          messageIds_.addAll(other.messageIds_);
         }
         onChanged();
       }
@@ -483,80 +483,80 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.google.protobuf.Internal.LongList messagesIds_ = emptyLongList();
-    private void ensureMessagesIdsIsMutable() {
+    private com.google.protobuf.Internal.LongList messageIds_ = emptyLongList();
+    private void ensureMessageIdsIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
-        messagesIds_ = mutableCopy(messagesIds_);
+        messageIds_ = mutableCopy(messageIds_);
         bitField0_ |= 0x00000001;
        }
     }
     /**
-     * <code>repeated int64 messages_ids = 1;</code>
-     * @return A list containing the messagesIds.
+     * <code>repeated int64 message_ids = 1;</code>
+     * @return A list containing the messageIds.
      */
     public java.util.List<java.lang.Long>
-        getMessagesIdsList() {
+        getMessageIdsList() {
       return ((bitField0_ & 0x00000001) != 0) ?
-               java.util.Collections.unmodifiableList(messagesIds_) : messagesIds_;
+               java.util.Collections.unmodifiableList(messageIds_) : messageIds_;
     }
     /**
-     * <code>repeated int64 messages_ids = 1;</code>
-     * @return The count of messagesIds.
+     * <code>repeated int64 message_ids = 1;</code>
+     * @return The count of messageIds.
      */
-    public int getMessagesIdsCount() {
-      return messagesIds_.size();
+    public int getMessageIdsCount() {
+      return messageIds_.size();
     }
     /**
-     * <code>repeated int64 messages_ids = 1;</code>
+     * <code>repeated int64 message_ids = 1;</code>
      * @param index The index of the element to return.
-     * @return The messagesIds at the given index.
+     * @return The messageIds at the given index.
      */
-    public long getMessagesIds(int index) {
-      return messagesIds_.getLong(index);
+    public long getMessageIds(int index) {
+      return messageIds_.getLong(index);
     }
     /**
-     * <code>repeated int64 messages_ids = 1;</code>
+     * <code>repeated int64 message_ids = 1;</code>
      * @param index The index to set the value at.
-     * @param value The messagesIds to set.
+     * @param value The messageIds to set.
      * @return This builder for chaining.
      */
-    public Builder setMessagesIds(
+    public Builder setMessageIds(
         int index, long value) {
-      ensureMessagesIdsIsMutable();
-      messagesIds_.setLong(index, value);
+      ensureMessageIdsIsMutable();
+      messageIds_.setLong(index, value);
       onChanged();
       return this;
     }
     /**
-     * <code>repeated int64 messages_ids = 1;</code>
-     * @param value The messagesIds to add.
+     * <code>repeated int64 message_ids = 1;</code>
+     * @param value The messageIds to add.
      * @return This builder for chaining.
      */
-    public Builder addMessagesIds(long value) {
-      ensureMessagesIdsIsMutable();
-      messagesIds_.addLong(value);
+    public Builder addMessageIds(long value) {
+      ensureMessageIdsIsMutable();
+      messageIds_.addLong(value);
       onChanged();
       return this;
     }
     /**
-     * <code>repeated int64 messages_ids = 1;</code>
-     * @param values The messagesIds to add.
+     * <code>repeated int64 message_ids = 1;</code>
+     * @param values The messageIds to add.
      * @return This builder for chaining.
      */
-    public Builder addAllMessagesIds(
+    public Builder addAllMessageIds(
         java.lang.Iterable<? extends java.lang.Long> values) {
-      ensureMessagesIdsIsMutable();
+      ensureMessageIdsIsMutable();
       com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, messagesIds_);
+          values, messageIds_);
       onChanged();
       return this;
     }
     /**
-     * <code>repeated int64 messages_ids = 1;</code>
+     * <code>repeated int64 message_ids = 1;</code>
      * @return This builder for chaining.
      */
-    public Builder clearMessagesIds() {
-      messagesIds_ = emptyLongList();
+    public Builder clearMessageIds() {
+      messageIds_ = emptyLongList();
       bitField0_ = (bitField0_ & ~0x00000001);
       onChanged();
       return this;

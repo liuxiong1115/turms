@@ -500,7 +500,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder setDeliveryDate(long value) {
-      
+
       deliveryDate_ = value;
       onChanged();
       return this;
@@ -510,7 +510,7 @@ private static final long serialVersionUID = 0L;
      * @return This builder for chaining.
      */
     public Builder clearDeliveryDate() {
-      
+
       deliveryDate_ = 0L;
       onChanged();
       return this;
@@ -603,7 +603,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value message_id = 2;</code>
      */
     public com.google.protobuf.Int64Value.Builder getMessageIdBuilder() {
-      
+
       onChanged();
       return getMessageIdFieldBuilder().getBuilder();
     }
@@ -622,7 +622,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Int64Value message_id = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder> 
+        com.google.protobuf.Int64Value, com.google.protobuf.Int64Value.Builder, com.google.protobuf.Int64ValueOrBuilder>
         getMessageIdFieldBuilder() {
       if (messageIdBuilder_ == null) {
         messageIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<

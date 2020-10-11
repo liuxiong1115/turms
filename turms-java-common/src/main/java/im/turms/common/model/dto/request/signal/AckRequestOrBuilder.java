@@ -25,19 +25,19 @@ public interface AckRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated int64 messages_ids = 1;</code>
-   * @return A list containing the messagesIds.
+   * <code>repeated int64 message_ids = 1;</code>
+   * @return A list containing the messageIds.
    */
-  java.util.List<java.lang.Long> getMessagesIdsList();
+  java.util.List<java.lang.Long> getMessageIdsList();
   /**
-   * <code>repeated int64 messages_ids = 1;</code>
-   * @return The count of messagesIds.
+   * <code>repeated int64 message_ids = 1;</code>
+   * @return The count of messageIds.
    */
-  int getMessagesIdsCount();
+  int getMessageIdsCount();
   /**
-   * <code>repeated int64 messages_ids = 1;</code>
+   * <code>repeated int64 message_ids = 1;</code>
    * @param index The index of the element to return.
-   * @return The messagesIds at the given index.
+   * @return The messageIds at the given index.
    */
-  long getMessagesIds(int index);
+  long getMessageIds(int index);
 }

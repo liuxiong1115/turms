@@ -124,7 +124,7 @@ private static final long serialVersionUID = 0L;
    * <code>repeated .im.turms.proto.MessageStatus message_statuses = 1;</code>
    */
   @java.lang.Override
-  public java.util.List<? extends im.turms.common.model.bo.message.MessageStatusOrBuilder> 
+  public java.util.List<? extends im.turms.common.model.bo.message.MessageStatusOrBuilder>
       getMessageStatusesOrBuilderList() {
     return messageStatuses_;
   }
@@ -455,7 +455,7 @@ private static final long serialVersionUID = 0L;
             messageStatusesBuilder_ = null;
             messageStatuses_ = other.messageStatuses_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            messageStatusesBuilder_ = 
+            messageStatusesBuilder_ =
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                  getMessageStatusesFieldBuilder() : null;
           } else {
@@ -688,7 +688,7 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.MessageStatus message_statuses = 1;</code>
      */
-    public java.util.List<? extends im.turms.common.model.bo.message.MessageStatusOrBuilder> 
+    public java.util.List<? extends im.turms.common.model.bo.message.MessageStatusOrBuilder>
          getMessageStatusesOrBuilderList() {
       if (messageStatusesBuilder_ != null) {
         return messageStatusesBuilder_.getMessageOrBuilderList();
@@ -714,12 +714,12 @@ private static final long serialVersionUID = 0L;
     /**
      * <code>repeated .im.turms.proto.MessageStatus message_statuses = 1;</code>
      */
-    public java.util.List<im.turms.common.model.bo.message.MessageStatus.Builder> 
+    public java.util.List<im.turms.common.model.bo.message.MessageStatus.Builder>
          getMessageStatusesBuilderList() {
       return getMessageStatusesFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        im.turms.common.model.bo.message.MessageStatus, im.turms.common.model.bo.message.MessageStatus.Builder, im.turms.common.model.bo.message.MessageStatusOrBuilder> 
+        im.turms.common.model.bo.message.MessageStatus, im.turms.common.model.bo.message.MessageStatus.Builder, im.turms.common.model.bo.message.MessageStatusOrBuilder>
         getMessageStatusesFieldBuilder() {
       if (messageStatusesBuilder_ == null) {
         messageStatusesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<

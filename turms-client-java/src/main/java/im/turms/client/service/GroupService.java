@@ -33,8 +33,8 @@ import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.group.*;
 import im.turms.common.model.dto.request.group.blacklist.CreateGroupBlacklistedUserRequest;
 import im.turms.common.model.dto.request.group.blacklist.DeleteGroupBlacklistedUserRequest;
-import im.turms.common.model.dto.request.group.blacklist.QueryGroupBlacklistedUsersIdsRequest;
-import im.turms.common.model.dto.request.group.blacklist.QueryGroupBlacklistedUsersInfosRequest;
+import im.turms.common.model.dto.request.group.blacklist.QueryGroupBlacklistedUserIdsRequest;
+import im.turms.common.model.dto.request.group.blacklist.QueryGroupBlacklistedUserInfosRequest;
 import im.turms.common.model.dto.request.group.enrollment.*;
 import im.turms.common.model.dto.request.group.member.CreateGroupMemberRequest;
 import im.turms.common.model.dto.request.group.member.DeleteGroupMemberRequest;
@@ -141,9 +141,9 @@ public class GroupService {
                 .thenApply(GroupWithVersion::from);
     }
 
-    public CompletableFuture<Int64ValuesWithVersion> queryJoinedGroupsIds(@Nullable Date lastUpdatedDate) {
+    public CompletableFuture<Int64ValuesWithVersion> queryJoinedGroupIds(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
-                .send(QueryJoinedGroupsIdsRequest.newBuilder(), MapUtil.of(
+                .send(QueryJoinedGroupIdsRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> {
                     TurmsNotification.Data data = notification.getData();
@@ -151,9 +151,9 @@ public class GroupService {
                 });
     }
 
-    public CompletableFuture<GroupsWithVersion> queryJoinedGroupsInfos(@Nullable Date lastUpdatedDate) {
+    public CompletableFuture<GroupsWithVersion> queryJoinedGroupInfos(@Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
-                .send(QueryJoinedGroupsInfosRequest.newBuilder(), MapUtil.of(
+                .send(QueryJoinedGroupInfosRequest.newBuilder(), MapUtil.of(
                         "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> {
                     TurmsNotification.Data data = notification.getData();
@@ -209,7 +209,7 @@ public class GroupService {
     public CompletableFuture<Void> blacklistUser(long groupId, long userId) {
         return turmsClient.getDriver()
                 .send(CreateGroupBlacklistedUserRequest.newBuilder(), MapUtil.of(
-                        "blacklisted_user_id", userId,
+                        "user_id", userId,
                         "group_id", groupId))
                 .thenApply(notification -> null);
     }
@@ -218,15 +218,15 @@ public class GroupService {
         return turmsClient.getDriver()
                 .send(DeleteGroupBlacklistedUserRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
-                        "unblacklisted_user_id", userId))
+                        "user_id", userId))
                 .thenApply(notification -> null);
     }
 
-    public CompletableFuture<Int64ValuesWithVersion> queryBlacklistedUsersIds(
+    public CompletableFuture<Int64ValuesWithVersion> queryBlacklistedUserIds(
             long groupId,
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
-                .send(QueryGroupBlacklistedUsersIdsRequest.newBuilder(), MapUtil.of(
+                .send(QueryGroupBlacklistedUserIdsRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> {
@@ -235,11 +235,11 @@ public class GroupService {
                 });
     }
 
-    public CompletableFuture<UsersInfosWithVersion> queryBlacklistedUsersInfos(
+    public CompletableFuture<UsersInfosWithVersion> queryBlacklistedUserInfos(
             long groupId,
             @Nullable Date lastUpdatedDate) {
         return turmsClient.getDriver()
-                .send(QueryGroupBlacklistedUsersInfosRequest.newBuilder(), MapUtil.of(
+                .send(QueryGroupBlacklistedUserInfosRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
                         "last_updated_date", lastUpdatedDate))
                 .thenApply(notification -> {
@@ -394,7 +394,7 @@ public class GroupService {
         return turmsClient.getDriver()
                 .send(DeleteGroupMemberRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
-                        "group_member_id", turmsClient.getUserService().getUserId(),
+                        "member_id", turmsClient.getUserService().getUserId(),
                         "successor_id", successorId,
                         "quit_after_transfer", quitAfterTransfer))
                 .thenApply(notification -> null);
@@ -404,7 +404,7 @@ public class GroupService {
         return turmsClient.getDriver()
                 .send(DeleteGroupMemberRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
-                        "group_member_id", memberId))
+                        "member_id", memberId))
                 .thenApply(notification -> null);
     }
 
@@ -456,17 +456,17 @@ public class GroupService {
                 });
     }
 
-    public CompletableFuture<GroupMembersWithVersion> queryGroupMembersByMembersIds(
+    public CompletableFuture<GroupMembersWithVersion> queryGroupMembersByMemberIds(
             long groupId,
-            @NotEmpty List<Long> membersIds,
+            @NotEmpty List<Long> memberIds,
             boolean withStatus) {
-        if (membersIds == null || membersIds.isEmpty()) {
-            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "membersIds must not be null or empty");
+        if (memberIds == null || memberIds.isEmpty()) {
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "memberIds must not be null or empty");
         }
         return turmsClient.getDriver()
                 .send(QueryGroupMembersRequest.newBuilder(), MapUtil.of(
                         "group_id", groupId,
-                        "group_members_ids", membersIds,
+                        "member_ids", memberIds,
                         "with_status", withStatus))
                 .thenApply(notification -> {
                     TurmsNotification.Data data = notification.getData();
