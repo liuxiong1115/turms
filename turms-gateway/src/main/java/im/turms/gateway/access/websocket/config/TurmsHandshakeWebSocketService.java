@@ -20,6 +20,7 @@ package im.turms.gateway.access.websocket.config;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.common.exception.TurmsBusinessException;
 import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
 import im.turms.gateway.service.mediator.WorkflowMediator;
 import im.turms.server.common.cluster.node.Node;
@@ -136,16 +137,15 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         }
         String password = HandshakeRequestUtil.parsePasswordFromHeadersOrCookies(request);
         UserStatus userStatus = HandshakeRequestUtil.parseUserStatusFromHeadersOrCookies(request);
-        Point userLocation = locationEnabled
+        Point position = locationEnabled
                 ? HandshakeRequestUtil.parseLocationFromHeadersOrCookies(request)
                 : null;
         String ip = HandshakeRequestUtil.parseIp(request);
 
         // 3. Try to login
-        return workflowMediator.processLoginRequest(userId, password, loggingInDeviceType, userStatus, userLocation, ip, deviceDetails)
-                .flatMap(code -> code == TurmsStatusCode.OK
-                        ? acceptUpgradeRequest(exchange, handler, userId, loggingInDeviceType)
-                        : rejectUpgradeRequest(exchange, code, requestId, userId, loggingInDeviceType));
+        return workflowMediator.processLoginRequest(userId, password, loggingInDeviceType, userStatus, position, ip, deviceDetails)
+                .then(acceptUpgradeRequest(exchange, handler, userId, loggingInDeviceType))
+                .onErrorResume(TurmsBusinessException.class, e -> rejectUpgradeRequest(exchange, e.getCode(), requestId, userId, loggingInDeviceType));
     }
 
     private Mono<Void> acceptUpgradeRequest(

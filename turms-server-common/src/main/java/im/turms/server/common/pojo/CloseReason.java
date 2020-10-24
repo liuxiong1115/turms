@@ -15,25 +15,20 @@
  * limitations under the License.
  */
 
-package im.turms.gateway.pojo.bo.session;
+package im.turms.server.common.pojo;
 
-import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.statuscode.SessionCloseStatus;
+import im.turms.common.constant.statuscode.TurmsStatusCode;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * @author James Chen
  */
 @AllArgsConstructor
-@EqualsAndHashCode
-@Data
-public class SessionDisconnectionReasonKey {
-
-    private final Long userId;
-
-    private final DeviceType deviceType;
-
-    private final Integer sessionId;
-
+@Getter
+public class CloseReason {
+    private final TurmsStatusCode code;
+    private final SessionCloseStatus closeStatus;
+    private final String reason;
 }

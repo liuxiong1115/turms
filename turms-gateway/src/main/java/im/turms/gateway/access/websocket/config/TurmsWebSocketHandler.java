@@ -31,6 +31,8 @@ import im.turms.gateway.service.mediator.WorkflowMediator;
 import im.turms.gateway.util.TurmsRequestUtil;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.dto.ServiceRequest;
+import im.turms.server.common.pojo.CloseReason;
+import im.turms.server.common.util.CloseReasonUtil;
 import im.turms.server.common.util.ProtoUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.EmptyByteBuf;
@@ -127,7 +129,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                         requestBuffer);
                                 return workflowMediator.processServiceRequest(request)
                                         .map(notification ->
-                                                webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getByteBuffer(notification))))
+                                                webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getDirectByteBuffer(notification))))
                                         .doOnTerminate(() -> {
                                             while (requestBuffer.refCnt() > 0) {
                                                 requestBuffer.release();
@@ -150,32 +152,14 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                 // Note: doOnError will be handled after merged with responseOutput
                 .map(byteBuf -> webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(byteBuf)))
                 .mergeWith(responseOutput)
+                // Note: don't recover even if it's just a client error
                 .doOnError(throwable -> {
-                    SessionCloseStatus closeStatus;
-                    String reason = null;
-                    if (throwable instanceof TurmsBusinessException) {
-                        TurmsBusinessException exception = (TurmsBusinessException) throwable;
-                        TurmsStatusCode code = exception.getCode();
-                        switch (code) {
-                            case UNAVAILABLE:
-                                closeStatus = SessionCloseStatus.SERVER_UNAVAILABLE;
-                                break;
-                            case ILLEGAL_ARGUMENTS:
-                                closeStatus = SessionCloseStatus.ILLEGAL_REQUEST;
-                                break;
-                            default:
-                                closeStatus = code.isServerError()
-                                        ? SessionCloseStatus.SERVER_ERROR
-                                        : SessionCloseStatus.UNKNOWN_ERROR;
-                                reason = throwable.getMessage();
-                                log.error(throwable);
-                                break;
-                        }
-                    } else {
-                        closeStatus = SessionCloseStatus.SERVER_ERROR;
-                        reason = throwable.getMessage();
-                        log.error(throwable);
+                    CloseReason closeReason = CloseReasonUtil.parse(throwable);
+                    SessionCloseStatus closeStatus = closeReason.getCloseStatus();
+                    if (closeStatus.isServerError()) {
+                        log.error("Failed to send outbound notification", throwable);
                     }
+                    String reason = closeReason.getReason();
                     webSocketSession.close(CloseStatusFactory.get(closeStatus, reason)).subscribe();
                 });
 
