@@ -20,7 +20,7 @@ package im.turms.client.driver;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import im.turms.client.common.StringUtil;
+import im.turms.client.util.StringUtil;
 import im.turms.client.driver.service.ConnectionService;
 import im.turms.client.driver.service.HeartbeatService;
 import im.turms.client.driver.service.MessageService;
