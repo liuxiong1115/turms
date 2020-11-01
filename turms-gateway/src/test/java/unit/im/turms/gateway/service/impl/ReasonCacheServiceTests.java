@@ -22,14 +22,15 @@ import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.gateway.service.impl.ReasonCacheService;
+import im.turms.server.common.dto.CloseReason;
 import im.turms.server.common.property.TurmsProperties;
 import im.turms.server.common.property.TurmsPropertiesManager;
 import im.turms.server.common.property.env.gateway.GatewayProperties;
 import im.turms.server.common.property.env.gateway.SessionProperties;
+import im.turms.server.common.util.ExceptionUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveValueOperations;
-import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -131,7 +132,7 @@ class ReasonCacheServiceTests {
         Mono<SessionCloseStatus> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> throwable instanceof TurmsBusinessException && ((TurmsBusinessException) throwable).getCode().equals(TurmsStatusCode.DISABLED_FUNCTION))
+                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.DISABLED_FUNCTION))
                 .verify();
     }
 
@@ -141,7 +142,7 @@ class ReasonCacheServiceTests {
         Mono<SessionCloseStatus> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> throwable instanceof TurmsBusinessException && ((TurmsBusinessException) throwable).getCode().equals(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE))
+                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.FORBIDDEN_DEVICE_TYPE))
                 .verify();
     }
 
@@ -183,8 +184,8 @@ class ReasonCacheServiceTests {
     @Test
     void cacheDisconnectionReason_shouldReturnTrue_forValidArgs() {
         ReasonCacheService reasonCacheService = newReasonCacheService(true, Set.of(DeviceType.ANDROID), true);
-        CloseStatus closeStatus = CloseStatus.create(SessionCloseStatus.DISCONNECTED_BY_ADMIN.getCode(), null);
-        Mono<Boolean> result = reasonCacheService.cacheDisconnectionReason(1L, DeviceType.ANDROID, 1, closeStatus);
+        CloseReason closeReason = CloseReason.get(SessionCloseStatus.DISCONNECTED_BY_ADMIN);
+        Mono<Boolean> result = reasonCacheService.cacheDisconnectionReason(1L, DeviceType.ANDROID, 1, closeReason);
 
         StepVerifier.create(result)
                 .expectNext(true)

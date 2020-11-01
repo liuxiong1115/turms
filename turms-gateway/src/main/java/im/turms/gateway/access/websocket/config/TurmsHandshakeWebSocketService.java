@@ -25,6 +25,7 @@ import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
 import im.turms.gateway.service.mediator.WorkflowMediator;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.property.TurmsPropertiesManager;
+import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Point;
 import org.springframework.http.HttpHeaders;
@@ -33,7 +34,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.socket.HandshakeInfo;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.server.support.HandshakeWebSocketService;
@@ -176,7 +176,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
 
     private List<String> getNewIdentityList() {
         String identity = turmsPropertiesManager.getLocalProperties().getGateway().getDiscovery().getIdentity();
-        return StringUtils.isEmpty(identity) ? null : List.of(identity);
+        return StringUtils.isBlank(identity) ? null : List.of(identity);
     }
 
     private HandshakeInfo createHandshakeInfo(ServerWebExchange exchange, Map<String, Object> attributes) {

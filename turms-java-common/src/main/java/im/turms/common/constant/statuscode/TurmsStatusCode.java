@@ -17,6 +17,9 @@
 
 package im.turms.common.constant.statuscode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The status code can be used for both WebSocket or HTTP
  *
@@ -78,6 +81,13 @@ public enum TurmsStatusCode {
     MESSAGE_IS_REJECTED(6050, "The message failed to be enqueued by the outgoing message buffer", 0);
 
     public static final int STATUS_CODE_LENGTH = 4;
+    private static final Map<Integer, TurmsStatusCode> codeMap = new HashMap<>((int) (TurmsStatusCode.values().length / 0.5));
+
+    static {
+        for (TurmsStatusCode value : TurmsStatusCode.values()) {
+            codeMap.put(value.businessCode, value);
+        }
+    }
 
     private final int businessCode;
     private final String reason;
@@ -87,6 +97,18 @@ public enum TurmsStatusCode {
         this.businessCode = businessCode;
         this.reason = reason;
         this.httpCode = httpCode;
+    }
+
+    public static TurmsStatusCode from(int businessCode) {
+        return codeMap.get(businessCode);
+    }
+
+    public static boolean isServerError(int businessCode) {
+        return 5000 <= businessCode && businessCode < 6000;
+    }
+
+    public static boolean isSuccessCode(int businessCode) {
+        return 2000 <= businessCode && businessCode < 3000;
     }
 
     public int getBusinessCode() {
@@ -101,25 +123,12 @@ public enum TurmsStatusCode {
         return httpCode;
     }
 
-    public static TurmsStatusCode from(int businessCode) {
-        for (TurmsStatusCode code : TurmsStatusCode.values()) {
-            if (code.getBusinessCode() == businessCode) {
-                return code;
-            }
-        }
-        return null;
-    }
-
     public boolean isSuccessCode() {
         return isSuccessCode(businessCode);
     }
 
     public boolean isServerError() {
-        return 5000 <= businessCode && businessCode < 6000;
-    }
-
-    public static boolean isSuccessCode(int code) {
-        return 2000 <= code && code < 3000;
+        return isServerError(businessCode);
     }
 
 }

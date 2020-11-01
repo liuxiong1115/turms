@@ -17,9 +17,9 @@
 
 package unit.im.turms.gateway.access.websocket;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.gateway.access.websocket.config.TurmsHandshakeWebSocketService;
 import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
+import im.turms.gateway.pojo.bo.session.UserSession;
 import im.turms.gateway.service.mediator.WorkflowMediator;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.property.TurmsProperties;
@@ -115,8 +115,9 @@ class TurmsHandshakeWebSocketServiceTests {
                 .thenReturn(properties);
 
         WorkflowMediator workflowMediator = mock(WorkflowMediator.class);
+        UserSession userSession = mock(UserSession.class);
         when(workflowMediator.processLoginRequest(any(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(Mono.just(TurmsStatusCode.OK));
+                .thenReturn(Mono.just(userSession));
         when(workflowMediator.rejectLoginRequest(any(), any(), any(), any()))
                 .thenReturn(Mono.just(true));
 

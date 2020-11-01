@@ -20,7 +20,7 @@ package im.turms.server.common.util;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
-import im.turms.server.common.pojo.CloseReason;
+import im.turms.server.common.dto.CloseReason;
 
 /**
  * @author James Chen
@@ -32,32 +32,40 @@ public class CloseReasonUtil {
 
     public static CloseReason parse(Throwable throwable) {
         TurmsStatusCode code;
-        SessionCloseStatus closeStatus;
-        String reason = null;
+        String reason;
         if (throwable instanceof TurmsBusinessException) {
             TurmsBusinessException exception = (TurmsBusinessException) throwable;
             code = exception.getCode();
-            switch (code) {
-                case UNAVAILABLE:
-                    closeStatus = SessionCloseStatus.SERVER_UNAVAILABLE;
-                    break;
-                case ILLEGAL_ARGUMENTS:
-                case FORBIDDEN_DEVICE_TYPE:
-                    closeStatus = SessionCloseStatus.ILLEGAL_REQUEST;
-                    break;
-                default:
-                    closeStatus = code.isServerError()
-                            ? SessionCloseStatus.SERVER_ERROR
-                            : SessionCloseStatus.UNKNOWN_ERROR;
-                    reason = exception.getReason();
-                    break;
-            }
+            reason = exception.getReason();
         } else {
             code = TurmsStatusCode.SERVER_INTERNAL_ERROR;
-            closeStatus = SessionCloseStatus.SERVER_ERROR;
             reason = throwable.getMessage();
         }
-        return new CloseReason(code, closeStatus, reason);
+        return CloseReason.get(code, reason);
+    }
+
+    public static SessionCloseStatus statusCodeToCloseStatus(TurmsStatusCode code) {
+        SessionCloseStatus closeStatus;
+        switch (code) {
+            case SESSION_SIMULTANEOUS_CONFLICTS_DECLINE:
+            case SESSION_SIMULTANEOUS_CONFLICTS_NOTIFY:
+            case SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE:
+                closeStatus = SessionCloseStatus.DISCONNECTED_BY_OTHER_DEVICE;
+                break;
+            case UNAVAILABLE:
+                closeStatus = SessionCloseStatus.SERVER_UNAVAILABLE;
+                break;
+            case ILLEGAL_ARGUMENTS:
+            case FORBIDDEN_DEVICE_TYPE:
+                closeStatus = SessionCloseStatus.ILLEGAL_REQUEST;
+                break;
+            default:
+                closeStatus = code.isServerError()
+                        ? SessionCloseStatus.SERVER_ERROR
+                        : SessionCloseStatus.UNKNOWN_ERROR;
+                break;
+        }
+        return closeStatus;
     }
 
 }

@@ -18,8 +18,6 @@
 package unit.im.turms.gateway.access.http.dto;
 
 import im.turms.common.constant.statuscode.SessionCloseStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.gateway.access.http.dto.LoginFailureReasonDTO;
 import im.turms.gateway.access.http.dto.SessionDisconnectionReasonDTO;
 import org.junit.jupiter.api.Test;
 

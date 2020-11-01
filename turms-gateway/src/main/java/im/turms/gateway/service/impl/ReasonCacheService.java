@@ -23,6 +23,7 @@ import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.gateway.pojo.bo.login.LoginFailureReasonKey;
 import im.turms.gateway.pojo.bo.session.SessionDisconnectionReasonKey;
+import im.turms.server.common.dto.CloseReason;
 import im.turms.server.common.property.TurmsPropertiesManager;
 import im.turms.server.common.property.env.gateway.SessionProperties;
 import im.turms.server.common.util.AssertUtil;
@@ -31,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveValueOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.socket.CloseStatus;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
@@ -129,23 +129,24 @@ public class ReasonCacheService {
     public Mono<Boolean> cacheDisconnectionReason(@NotNull Long userId,
                                                   @NotNull DeviceType deviceType,
                                                   @NotNull Integer sessionId,
-                                                  @NotNull CloseStatus closeStatus) {
+                                                  @NotNull CloseReason closeReason) {
         try {
             AssertUtil.notNull(userId, "userId");
             AssertUtil.notNull(deviceType, "deviceType");
             AssertUtil.notNull(sessionId, "sessionId");
-            AssertUtil.notNull(closeStatus, "closeStatus");
+            AssertUtil.notNull(closeReason, "closeReason");
+            AssertUtil.state(!closeReason.isTurmsStatusCode(), "Only WebSocket status codes are supported");
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        SessionCloseStatus status = SessionCloseStatus.get(closeStatus.getCode());
+        SessionCloseStatus status = SessionCloseStatus.get(closeReason.getCode());
         if (status != null) {
             return disconnectionReasonCache.set(
                     new SessionDisconnectionReasonKey(userId, deviceType, sessionId),
                     status,
                     disconnectionReasonExpireAfter);
         } else {
-            String reason = "Cannot find a mapping SessionCloseStatus for the close status " + closeStatus.getCode();
+            String reason = "Cannot find a mapping SessionCloseStatus for the close status " + closeReason.getCode();
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR, reason));
         }
     }
