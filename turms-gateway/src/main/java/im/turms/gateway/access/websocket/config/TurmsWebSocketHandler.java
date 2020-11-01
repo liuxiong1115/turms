@@ -94,7 +94,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
             log.error("The user session for the device type {} of the user {} is null", deviceType.name(), userId);
             return workflowMediator.setLocalUserDeviceOffline(userId, deviceType, SessionCloseStatus.SERVER_ERROR).then();
         }
-        session.setConnection(new WebSocketConnection(webSocketSession));
+        session.setConnection(new WebSocketConnection(webSocketSession, true));
 
         // 2. Listen to the close event of the WebSocket session
         // to make sure the session information is cleared if it is closed with the close status besides SWITCH
@@ -112,7 +112,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                         case BINARY:
                             DataBuffer payload = inboundMessage.getPayload();
                             if (payload.capacity() == 0) {
-                                // Send an binary message instead of a pong frame to make sure that turms-client-js can get the response
+                                // Send a binary message instead of a pong frame to make sure turms-client-js can get the response
                                 // or it will be intercepted by some browsers
                                 return workflowMediator.processHeartbeatRequest(userId, deviceType)
                                         .thenReturn(webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(HEARTBEAT_BYTE_BUF)));
