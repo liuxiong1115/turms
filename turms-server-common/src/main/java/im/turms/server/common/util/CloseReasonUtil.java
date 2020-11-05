@@ -17,14 +17,19 @@
 
 package im.turms.server.common.util;
 
+import com.google.protobuf.Int32Value;
+import com.google.protobuf.StringValue;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.server.common.dto.CloseReason;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author James Chen
  */
+@Log4j2
 public class CloseReasonUtil {
 
     private CloseReasonUtil() {
@@ -45,6 +50,9 @@ public class CloseReasonUtil {
     }
 
     public static SessionCloseStatus statusCodeToCloseStatus(TurmsStatusCode code) {
+        if (code.isServerError()) {
+            return SessionCloseStatus.SERVER_ERROR;
+        }
         SessionCloseStatus closeStatus;
         switch (code) {
             case SESSION_SIMULTANEOUS_CONFLICTS_DECLINE:
@@ -60,12 +68,34 @@ public class CloseReasonUtil {
                 closeStatus = SessionCloseStatus.ILLEGAL_REQUEST;
                 break;
             default:
-                closeStatus = code.isServerError()
-                        ? SessionCloseStatus.SERVER_ERROR
-                        : SessionCloseStatus.UNKNOWN_ERROR;
+                closeStatus = SessionCloseStatus.UNKNOWN_ERROR;
                 break;
         }
         return closeStatus;
+    }
+
+    public static TurmsNotification toNotification(CloseReason closeReason) {
+        TurmsStatusCode statusCode;
+        SessionCloseStatus closeStatus;
+        if (closeReason.isTurmsStatusCode()) {
+            statusCode = TurmsStatusCode.from(closeReason.getCode());
+            closeStatus = statusCodeToCloseStatus(statusCode);
+        } else {
+            closeStatus = SessionCloseStatus.get(closeReason.getCode());
+            if (closeStatus == null) {
+                log.warn("Failed to convert the code {} to the session close status", closeReason.getCode());
+                closeStatus = SessionCloseStatus.UNKNOWN_ERROR;
+            }
+        }
+        String reason = closeReason.getReason();
+        TurmsNotification.Builder builder = TurmsNotification
+                .newBuilder()
+                .setCloseStatus(Int32Value.newBuilder().setValue(closeStatus.getCode()).build())
+                .setCode(Int32Value.newBuilder().setValue(closeReason.getCode()).build());
+        if (reason != null) {
+            builder.setReason(StringValue.newBuilder().setValue(reason).build());
+        }
+        return builder.build();
     }
 
 }
