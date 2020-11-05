@@ -41,7 +41,7 @@ public enum TurmsStatusCode {
     EXPIRED_RESOURCE(4003, "The target resource has expired", 406),
     DUPLICATE_KEY(4004, "The record being added contains a duplicate key", 406),
     ILLEGAL_ARGUMENTS(4005, "Illegal arguments", 400),
-    ILLEGAL_DATE_FORMAT(4006, "Illegal date format", 400),
+    INVALID_DATA(4006, "Invalid data", 400),
     NOT_ACTIVE(4007, "Not active", 406),
     OWNED_RESOURCE_LIMIT_REACHED(4008, "The resource limit is reached", 406),
     REQUESTED_RECORDS_TOO_MANY(4009, "Too many records are requested", 406),
