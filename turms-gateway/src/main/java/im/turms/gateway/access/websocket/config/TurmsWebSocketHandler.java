@@ -147,8 +147,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                 });
 
         // 4. Merge inbound/outbound messages
-        Flux<WebSocketMessage> outputFlux = session.getNotificationSink()
-                .asFlux()
+        Flux<WebSocketMessage> outputFlux = session.getNotificationFlux()
                 // Note: doOnError will be handled after merged with responseOutput
                 .map(byteBuf -> webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(byteBuf)))
                 .mergeWith(responseOutput)

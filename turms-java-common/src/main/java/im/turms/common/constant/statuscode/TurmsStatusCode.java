@@ -81,11 +81,11 @@ public enum TurmsStatusCode {
     MESSAGE_IS_REJECTED(6050, "The message failed to be enqueued by the outgoing message buffer", 0);
 
     public static final int STATUS_CODE_LENGTH = 4;
-    private static final Map<Integer, TurmsStatusCode> codeMap = new HashMap<>((int) (TurmsStatusCode.values().length / 0.5));
+    private static final Map<Integer, TurmsStatusCode> CODE_POOL = new HashMap<>((int) (TurmsStatusCode.values().length / 0.5));
 
     static {
         for (TurmsStatusCode value : TurmsStatusCode.values()) {
-            codeMap.put(value.businessCode, value);
+            CODE_POOL.put(value.businessCode, value);
         }
     }
 
@@ -100,7 +100,7 @@ public enum TurmsStatusCode {
     }
 
     public static TurmsStatusCode from(int businessCode) {
-        return codeMap.get(businessCode);
+        return CODE_POOL.get(businessCode);
     }
 
     public static boolean isServerError(int businessCode) {
