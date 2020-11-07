@@ -32,7 +32,13 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class CloseReasonUtil {
 
+    private static boolean returnReasonForServerError;
+
     private CloseReasonUtil() {
+    }
+
+    public static void setReturnReasonForServerError(boolean returnReasonForServerError) {
+        CloseReasonUtil.returnReasonForServerError = returnReasonForServerError;
     }
 
     public static CloseReason parse(Throwable throwable) {
@@ -93,7 +99,13 @@ public class CloseReasonUtil {
                 .setCloseStatus(Int32Value.newBuilder().setValue(closeStatus.getCode()).build())
                 .setCode(Int32Value.newBuilder().setValue(closeReason.getCode()).build());
         if (reason != null) {
-            builder.setReason(StringValue.newBuilder().setValue(reason).build());
+            if (closeStatus.isServerError()) {
+                if (returnReasonForServerError) {
+                    builder.setReason(StringValue.newBuilder().setValue(reason).build());
+                }
+            } else {
+                builder.setReason(StringValue.newBuilder().setValue(reason).build());
+            }
         }
         return builder.build();
     }
