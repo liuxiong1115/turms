@@ -31,12 +31,14 @@ import DeviceType = im.turms.proto.DeviceType;
  */
 export default class ReasonService {
 
+    private static readonly DEFAULT_HTTP_URL = 'http://localhost:9510';
+
     private _stateStore: StateStore;
     private _url: string;
 
-    constructor(stateStore: StateStore, url: string) {
+    constructor(stateStore: StateStore, url?: string) {
         this._stateStore = stateStore;
-        this._url = url;
+        this._url = url || ReasonService.DEFAULT_HTTP_URL;
     }
 
     queryLoginFailureReason(): Promise<LoginFailureReason> {
