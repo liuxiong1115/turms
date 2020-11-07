@@ -40,7 +40,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
                 // Allow credentials because cookies are used to transfer
                 // clients' credentials at the handshake stage of WebSocket in the browser.
                 .allowCredentials(true)
-                .allowedOrigins("*")
+                .allowedOriginPatterns("*")
                 .allowedMethods("*")
                 .allowedHeaders("*");
     }

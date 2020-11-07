@@ -38,7 +38,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
         // because it's better to be done by firewall/ECS/EC2 and so on for better flexibility
         corsRegistry.addMapping("/**")
                 .allowCredentials(true)
-                .allowedOrigins("*")
+                .allowedOriginPatterns("*")
                 .allowedMethods("*")
                 .allowedHeaders("*");
     }
