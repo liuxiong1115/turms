@@ -59,22 +59,22 @@ export default class SessionService {
 
     // Listeners
 
-    addOnSessionConnectedListeners(listener: () => void): void {
+    addOnSessionConnectedListener(listener: () => void): void {
         this._onSessionConnectedListeners.push(listener);
     }
 
-    addOnSessionDisconnectedListeners(listener: (disconnectInfo: SessionDisconnectInfo) => void): void {
+    addOnSessionDisconnectedListener(listener: (disconnectInfo: SessionDisconnectInfo) => void): void {
         this._onSessionDisconnectedListeners.push(listener);
     }
 
-    addOnSessionClosedListeners(listener: (disconnectInfo: SessionDisconnectInfo) => void): void {
+    addOnSessionClosedListener(listener: (disconnectInfo: SessionDisconnectInfo) => void): void {
         this._onSessionClosedListeners.push(listener);
     }
 
     notifyOnSessionConnectedListeners(): void {
         if (this._currentStatus == SessionStatus.DISCONNECTED || this._currentStatus == SessionStatus.CLOSED) {
             for (const cb of this._onSessionConnectedListeners) {
-                cb();
+                cb.call(this);
             }
             this._currentStatus = SessionStatus.CONNECTED;
         }
@@ -84,7 +84,7 @@ export default class SessionService {
         const disconnectInfo = SessionService._parseDisconnectInfo(event, info);
         if (this._currentStatus == SessionStatus.CONNECTED) {
             for (const cb of this._onSessionDisconnectedListeners) {
-                cb(disconnectInfo);
+                cb.call(this, disconnectInfo);
             }
             this._currentStatus = SessionStatus.DISCONNECTED;
         }
@@ -103,7 +103,7 @@ export default class SessionService {
         }
         const disconnectInfo = SessionService._parseDisconnectInfo(event, info);
         for (const cb of this._onSessionClosedListeners) {
-            cb(disconnectInfo);
+            cb.call(this, disconnectInfo);
         }
         this._currentStatus = SessionStatus.CLOSED;
     }
