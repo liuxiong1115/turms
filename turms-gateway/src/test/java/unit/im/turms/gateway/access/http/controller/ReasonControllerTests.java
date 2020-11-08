@@ -79,15 +79,15 @@ class ReasonControllerTests {
         long userId = 1L;
         int sessionId = 2;
         DeviceType deviceType = DeviceType.DESKTOP;
-        SessionCloseStatus closeStatus = SessionCloseStatus.SERVER_ERROR;
+        int code = SessionCloseStatus.SERVER_ERROR.getCode();
         when(service.getDisconnectionReason(userId, deviceType, sessionId))
-                .thenReturn(Mono.just(closeStatus));
+                .thenReturn(Mono.just(code));
         ReasonController reasonController = new ReasonController(service);
         Mono<ResponseEntity<SessionDisconnectionReasonDTO>> result = reasonController.getSessionDisconnectionReason(userId, deviceType, sessionId);
 
         StepVerifier
                 .create(result)
-                .expectNextMatches(entity -> closeStatus.getCode() == entity.getBody().getCloseCode())
+                .expectNextMatches(entity -> code == entity.getBody().getCloseCode())
                 .verifyComplete();
     }
 

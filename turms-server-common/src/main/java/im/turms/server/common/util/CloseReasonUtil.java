@@ -24,6 +24,8 @@ import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.server.common.dto.CloseReason;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -32,13 +34,11 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class CloseReasonUtil {
 
+    @Getter
+    @Setter
     private static boolean returnReasonForServerError;
 
     private CloseReasonUtil() {
-    }
-
-    public static void setReturnReasonForServerError(boolean returnReasonForServerError) {
-        CloseReasonUtil.returnReasonForServerError = returnReasonForServerError;
     }
 
     public static CloseReason parse(Throwable throwable) {
