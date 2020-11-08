@@ -17,7 +17,6 @@
 
 package im.turms.gateway.redis;
 
-import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.gateway.pojo.bo.login.LoginFailureReasonKey;
 import im.turms.gateway.pojo.bo.session.SessionDisconnectionReasonKey;
@@ -36,7 +35,7 @@ public class RedisSerializationContextPool {
     }
 
     public static final RedisSerializationContext<LoginFailureReasonKey, TurmsStatusCode> LOGIN_FAILURE_REASON_SERIALIZATION_CONTEXT;
-    public static final RedisSerializationContext<SessionDisconnectionReasonKey, SessionCloseStatus> SESSION_DISCONNECTION_REASON_SERIALIZATION_CONTEXT;
+    public static final RedisSerializationContext<SessionDisconnectionReasonKey, Integer> SESSION_DISCONNECTION_REASON_SERIALIZATION_CONTEXT;
 
     static {
         LoginFailureReasonKeySerializer loginFailureReasonKeySerializer = new LoginFailureReasonKeySerializer();
@@ -52,7 +51,7 @@ public class RedisSerializationContextPool {
         SessionDisconnectionReasonKeySerializer sessionDisconnectionReasonKeySerializer = new SessionDisconnectionReasonKeySerializer();
         SessionDisconnectionReasonSerializer sessionDisconnectionReasonSerializer = new SessionDisconnectionReasonSerializer();
         SESSION_DISCONNECTION_REASON_SERIALIZATION_CONTEXT = RedisSerializationContext
-                .<SessionDisconnectionReasonKey, SessionCloseStatus>newSerializationContext()
+                .<SessionDisconnectionReasonKey, Integer>newSerializationContext()
                 .key(sessionDisconnectionReasonKeySerializer, sessionDisconnectionReasonKeySerializer)
                 .value(sessionDisconnectionReasonSerializer, sessionDisconnectionReasonSerializer)
                 .hashKey(sessionDisconnectionReasonKeySerializer, sessionDisconnectionReasonKeySerializer)

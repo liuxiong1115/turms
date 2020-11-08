@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 class ReasonCacheServiceTests {
 
     private final TurmsStatusCode loginFailureReason = TurmsStatusCode.SERVER_INTERNAL_ERROR;
-    private final SessionCloseStatus disconnectionReason = SessionCloseStatus.DISCONNECTED_BY_ADMIN;
+    private final int disconnectionReason = SessionCloseStatus.DISCONNECTED_BY_ADMIN.getCode();
 
     @Test
     void constructor_shouldReturn() {
@@ -129,7 +129,7 @@ class ReasonCacheServiceTests {
     @Test
     void getDisconnectionReason_shouldThrow_ifDisabled() {
         ReasonCacheService reasonCacheService = newReasonCacheService(false, null, true);
-        Mono<SessionCloseStatus> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
+        Mono<Integer> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.DISABLED_FUNCTION))
@@ -139,7 +139,7 @@ class ReasonCacheServiceTests {
     @Test
     void getDisconnectionReason_shouldThrow_forDegradedDeviceType() {
         ReasonCacheService reasonCacheService = newReasonCacheService(true, Collections.emptySet(), true);
-        Mono<SessionCloseStatus> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
+        Mono<Integer> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.FORBIDDEN_DEVICE_TYPE))
@@ -149,7 +149,7 @@ class ReasonCacheServiceTests {
     @Test
     void getDisconnectionReason_shouldComplete_ifReasonNotExists() {
         ReasonCacheService reasonCacheService = newReasonCacheService(true, Set.of(DeviceType.ANDROID), false);
-        Mono<SessionCloseStatus> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
+        Mono<Integer> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
                 .verifyComplete();
@@ -158,7 +158,7 @@ class ReasonCacheServiceTests {
     @Test
     void getDisconnectionReason_shouldReturnReason_ifReasonExists() {
         ReasonCacheService reasonCacheService = newReasonCacheService(true, Set.of(DeviceType.ANDROID), true);
-        Mono<SessionCloseStatus> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
+        Mono<Integer> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
                 .expectNext(disconnectionReason)

@@ -17,7 +17,6 @@
 
 package im.turms.gateway.redis.serializer;
 
-import im.turms.common.constant.statuscode.SessionCloseStatus;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.springframework.data.redis.serializer.RedisElementReader;
 import org.springframework.data.redis.serializer.RedisElementWriter;
@@ -27,18 +26,18 @@ import java.nio.ByteBuffer;
 /**
  * @author James Chen
  */
-public class SessionDisconnectionReasonSerializer implements RedisElementWriter<SessionCloseStatus>, RedisElementReader<SessionCloseStatus> {
+public class SessionDisconnectionReasonSerializer implements RedisElementWriter<Integer>, RedisElementReader<Integer> {
 
     @Override
-    public ByteBuffer write(SessionCloseStatus element) {
+    public ByteBuffer write(Integer element) {
         return PooledByteBufAllocator.DEFAULT.directBuffer(Short.BYTES)
-                .writeShort(element.getCode())
+                .writeShort(element)
                 .nioBuffer();
     }
 
     @Override
-    public SessionCloseStatus read(ByteBuffer buffer) {
-        return SessionCloseStatus.get(buffer.getShort());
+    public Integer read(ByteBuffer buffer) {
+        return (int) buffer.getShort();
     }
 
 }

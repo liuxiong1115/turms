@@ -18,7 +18,6 @@
 package im.turms.gateway.service.impl;
 
 import im.turms.common.constant.DeviceType;
-import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.gateway.pojo.bo.login.LoginFailureReasonKey;
@@ -47,7 +46,7 @@ import java.util.Set;
 public class ReasonCacheService {
 
     private final ReactiveValueOperations<LoginFailureReasonKey, TurmsStatusCode> loginFailureReasonCache;
-    private final ReactiveValueOperations<SessionDisconnectionReasonKey, SessionCloseStatus> disconnectionReasonCache;
+    private final ReactiveValueOperations<SessionDisconnectionReasonKey, Integer> disconnectionReasonCache;
     private final Set<DeviceType> degradedDeviceTypes;
     private final boolean enableQueryLoginFailureReason;
     private final boolean enableQueryDisconnectionReason;
@@ -57,7 +56,7 @@ public class ReasonCacheService {
     @Autowired
     public ReasonCacheService(
             ReactiveRedisTemplate<LoginFailureReasonKey, TurmsStatusCode> loginFailureRedisTemplate,
-            ReactiveRedisTemplate<SessionDisconnectionReasonKey, SessionCloseStatus> sessionDisconnectionRedisTemplate,
+            ReactiveRedisTemplate<SessionDisconnectionReasonKey, Integer> sessionDisconnectionRedisTemplate,
             TurmsPropertiesManager turmsPropertiesManager) {
         SessionProperties sessionProperties = turmsPropertiesManager.getLocalProperties().getGateway().getSession();
         loginFailureReasonCache = loginFailureRedisTemplate.opsForValue();
@@ -143,21 +142,15 @@ public class ReasonCacheService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        SessionCloseStatus status = SessionCloseStatus.get(closeReason.getCode());
-        if (status != null) {
-            return disconnectionReasonCache.set(
-                    new SessionDisconnectionReasonKey(userId, deviceType, sessionId),
-                    status,
-                    disconnectionReasonExpireAfter);
-        } else {
-            String reason = "Cannot find a mapping SessionCloseStatus for the close status " + closeReason.getCode();
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR, reason));
-        }
+        return disconnectionReasonCache.set(
+                new SessionDisconnectionReasonKey(userId, deviceType, sessionId),
+                closeReason.getCode(),
+                disconnectionReasonExpireAfter);
     }
 
-    public Mono<SessionCloseStatus> getDisconnectionReason(@NotNull Long userId,
-                                                           @NotNull DeviceType deviceType,
-                                                           @NotNull Integer sessionId) {
+    public Mono<Integer> getDisconnectionReason(@NotNull Long userId,
+                                                @NotNull DeviceType deviceType,
+                                                @NotNull Integer sessionId) {
         if (!enableQueryDisconnectionReason) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
         } else if (!degradedDeviceTypes.contains(deviceType)) {

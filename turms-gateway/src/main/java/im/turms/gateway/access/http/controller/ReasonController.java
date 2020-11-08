@@ -18,9 +18,11 @@
 package im.turms.gateway.access.http.controller;
 
 import im.turms.common.constant.DeviceType;
+import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.gateway.access.http.dto.LoginFailureReasonDTO;
 import im.turms.gateway.access.http.dto.SessionDisconnectionReasonDTO;
 import im.turms.gateway.service.impl.ReasonCacheService;
+import io.netty.handler.codec.http.websocketx.WebSocketCloseStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,9 +66,12 @@ public class ReasonController {
             @RequestParam DeviceType deviceType,
             @RequestParam Integer sessionId) {
         return reasonCacheService.getDisconnectionReason(userId, deviceType, sessionId)
-                .map(closeStatus -> {
-                    SessionDisconnectionReasonDTO reason = new SessionDisconnectionReasonDTO(closeStatus.getCode(), closeStatus.name(), "");
-                    return ResponseEntity.ok(reason);
+                .map(code -> {
+                    SessionCloseStatus closeStatus = SessionCloseStatus.get(code);
+                    String name = closeStatus == null
+                            ? WebSocketCloseStatus.valueOf(code).reasonText()
+                            : closeStatus.name();
+                    return ResponseEntity.ok(new SessionDisconnectionReasonDTO(code, name, ""));
                 })
                 .defaultIfEmpty(NOT_FOUND_RESPONSE);
     }
