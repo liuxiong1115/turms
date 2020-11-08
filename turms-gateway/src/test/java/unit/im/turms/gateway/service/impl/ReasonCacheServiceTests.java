@@ -169,16 +169,19 @@ class ReasonCacheServiceTests {
     void shouldCacheDisconnectionReason_shouldReturnTrue_ifAllArgsAreValid() {
         ReasonCacheService reasonCacheService = newReasonCacheService(true, Set.of(DeviceType.ANDROID), true);
 
-        assertTrue(reasonCacheService.shouldCacheDisconnectionReason(1L, DeviceType.ANDROID));
+        assertTrue(reasonCacheService.shouldCacheDisconnectionReason(1L, DeviceType.ANDROID, CloseReason.get(SessionCloseStatus.DISCONNECTED_BY_ADMIN)));
     }
 
     @Test
     void shouldCacheDisconnectionReason_shouldReturnFalse_forAnyInvalidArgs() {
         ReasonCacheService reasonCacheService = newReasonCacheService(true, Set.of(DeviceType.IOS), true);
+        CloseReason validReason = CloseReason.get(SessionCloseStatus.DISCONNECTED_BY_ADMIN);
+        CloseReason invalidReason = CloseReason.get(TurmsStatusCode.FAILED);
 
-        assertFalse(reasonCacheService.shouldCacheDisconnectionReason(null, DeviceType.IOS));
-        assertFalse(reasonCacheService.shouldCacheDisconnectionReason(1L, null));
-        assertFalse(reasonCacheService.shouldCacheDisconnectionReason(1L, DeviceType.ANDROID));
+        assertFalse(reasonCacheService.shouldCacheDisconnectionReason(null, DeviceType.IOS, validReason));
+        assertFalse(reasonCacheService.shouldCacheDisconnectionReason(1L, null, validReason));
+        assertFalse(reasonCacheService.shouldCacheDisconnectionReason(1L, DeviceType.ANDROID, validReason));
+        assertFalse(reasonCacheService.shouldCacheDisconnectionReason(1L, DeviceType.BROWSER, invalidReason));
     }
 
     @Test

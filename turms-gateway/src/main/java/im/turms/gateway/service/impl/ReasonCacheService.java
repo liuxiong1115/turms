@@ -119,11 +119,15 @@ public class ReasonCacheService {
                 loginFailureReasonExpireAfter);
     }
 
-    public boolean shouldCacheDisconnectionReason(@Nullable Long userId, @Nullable DeviceType deviceType) {
+    public boolean shouldCacheDisconnectionReason(@Nullable Long userId,
+                                                  @Nullable DeviceType deviceType,
+                                                  @Nullable CloseReason closeReason) {
         return enableQueryDisconnectionReason
                 && deviceType != null
                 && degradedDeviceTypes.contains(deviceType)
-                && userId != null;
+                && userId != null
+                && closeReason != null
+                && !closeReason.isTurmsStatusCode();
     }
 
     public Mono<Boolean> cacheDisconnectionReason(@NotNull Long userId,
