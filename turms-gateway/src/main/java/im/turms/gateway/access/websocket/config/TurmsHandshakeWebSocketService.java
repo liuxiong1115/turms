@@ -71,7 +71,6 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
     private final Node node;
     private final TurmsPropertiesManager turmsPropertiesManager;
     private final WorkflowMediator workflowMediator;
-    private final boolean useOperatingSystemClassAsDefaultDeviceType;
     private final boolean locationEnabled;
 
     private List<String> identityList;
@@ -84,7 +83,6 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         this.node = node;
         this.turmsPropertiesManager = turmsPropertiesManager;
         this.workflowMediator = workflowMediator;
-        useOperatingSystemClassAsDefaultDeviceType = turmsPropertiesManager.getLocalProperties().getGateway().getSession().isUseOperatingSystemClassAsDefaultDeviceType();
         locationEnabled = turmsPropertiesManager.getLocalProperties().getLocation().isEnabled();
         identityList = getNewIdentityList();
         turmsPropertiesManager.addListeners(turmsProperties -> identityList = getNewIdentityList());
@@ -121,11 +119,8 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         // 2. Prepare and validate business data
         Long requestId = HandshakeRequestUtil.parseRequestIdFromHeadersOrCookies(request);
         Long userId = HandshakeRequestUtil.parseUserIdFromHeadersOrCookies(request);
-        Map<String, String> deviceDetails = HandshakeRequestUtil.parseDeviceDetailsFromHeaders(request);
-        DeviceType loggingInDeviceType = HandshakeRequestUtil.parseDeviceTypeFromHeadersOrCookies(
-                request,
-                deviceDetails,
-                useOperatingSystemClassAsDefaultDeviceType);
+        String deviceDetails = HandshakeRequestUtil.parseDeviceDetailsFromHeaders(request);
+        DeviceType loggingInDeviceType = HandshakeRequestUtil.parseDeviceTypeFromHeadersOrCookies(request);
         if (userId == null) {
             return rejectUpgradeRequest(exchange, TurmsStatusCode.UNAUTHORIZED, requestId, userId, loggingInDeviceType);
         }

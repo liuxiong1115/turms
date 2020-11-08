@@ -28,12 +28,10 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
 
@@ -63,26 +61,8 @@ public class HandshakeRequestUtil {
                 : DeviceType.UNKNOWN;
     }
 
-    public static Map<String, String> parseDeviceDetailsFromHeaders(@NotNull ServerHttpRequest request) {
-        String agent = request.getHeaders().getFirst(HttpHeaders.USER_AGENT);
-        return UserAgentUtil.parse(agent);
-    }
-
-    /**
-     * @return User Agent -> Device Type
-     */
-    public static DeviceType parseDeviceTypeFromHeadersOrCookies(
-            @NotNull ServerHttpRequest request,
-            @Nullable Map<String, String> deviceDetails,
-            @NotNull Boolean isUseOperatingSystemClassAsDefaultDeviceType) {
-        DeviceType deviceType = parseDeviceTypeFromHeadersOrCookies(request);
-        if (deviceType == null || deviceType == DeviceType.UNKNOWN) {
-            deviceType = deviceDetails != null ? UserAgentUtil.detectDeviceTypeIfUnset(
-                    deviceType,
-                    deviceDetails,
-                    isUseOperatingSystemClassAsDefaultDeviceType) : DeviceType.UNKNOWN;
-        }
-        return deviceType;
+    public static String parseDeviceDetailsFromHeaders(@NotNull ServerHttpRequest request) {
+        return request.getHeaders().getFirst(HttpHeaders.USER_AGENT);
     }
 
     public static Long parseRequestIdFromHeadersOrCookies(ServerHttpRequest request) {
