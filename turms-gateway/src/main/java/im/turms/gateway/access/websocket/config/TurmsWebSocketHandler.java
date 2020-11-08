@@ -58,7 +58,8 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
 
     private static final EmptyByteBuf EMPTY_BYTE_BUF = new EmptyByteBuf(UnpooledByteBufAllocator.DEFAULT);
     private static final EmptyByteBuf HEARTBEAT_BYTE_BUF = EMPTY_BYTE_BUF;
-    private static final EmptyByteBuf PONG_BYTE_BUF = EMPTY_BYTE_BUF;
+    private static final NettyDataBufferFactory DATA_BUFFER_FACTORY = new NettyDataBufferFactory(UnpooledByteBufAllocator.DEFAULT);
+    private static final WebSocketMessage PONG_MESSAGE = new WebSocketMessage(WebSocketMessage.Type.PONG, DATA_BUFFER_FACTORY.wrap(EMPTY_BYTE_BUF));
 
     private final Node node;
     private final WorkflowMediator workflowMediator;
@@ -120,7 +121,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                 // long traceId = RandomUtil.nextPositiveLong(); TODO: tracing
                                 SimpleTurmsRequest turmsRequest = TurmsRequestUtil.parseSimpleRequest(payload.asByteBuffer());
                                 ByteBuf requestBuffer = NettyDataBufferFactory.toByteBuf(payload);
-                                // FIXME: We use retain() as a workaround for now to fix the bug mentioned in https://github.com/turms-im/turms/issues/430
+                                // Retain it so that it won't be released by FluxReceive.drainReceiver unexpectedly
                                 requestBuffer.retain();
                                 ServiceRequest request = new ServiceRequest(userId,
                                         deviceType,
@@ -131,14 +132,18 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                         .map(notification ->
                                                 webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getDirectByteBuffer(notification))))
                                         .doOnTerminate(() -> {
-                                            while (requestBuffer.refCnt() > 0) {
+                                            int refCnt = requestBuffer.refCnt();
+                                            if (refCnt > 0) {
+                                                // Release once exactly rather than releasing it to 0 so that
+                                                // FluxReceive.drainReceiver won't throw IllegalReferenceCountException (refCnt: 0, decrement: 1)
+                                                // if "ReferenceCountUtil.release(v)" in FluxReceive.drainReceiver runs after this code
                                                 requestBuffer.release();
                                             }
                                         });
                             }
                         case TEXT:
                         case PING:
-                            return Mono.just(webSocketSession.pongMessage(factory -> ((NettyDataBufferFactory) factory).wrap(PONG_BYTE_BUF)));
+                            return Mono.just(PONG_MESSAGE);
                         case PONG:
                         default:
                             // ignore the message
