@@ -46,10 +46,16 @@ import java.util.Set;
 public class ReasonCacheService {
 
     private final ReactiveValueOperations<LoginFailureReasonKey, TurmsStatusCode> loginFailureReasonCache;
+    /**
+     * The value should be either the close status code
+     * of WebSocket or the code of SessionCloseStatus
+     */
     private final ReactiveValueOperations<SessionDisconnectionReasonKey, Integer> disconnectionReasonCache;
-    private final Set<DeviceType> degradedDeviceTypes;
     private final boolean enableQueryLoginFailureReason;
     private final boolean enableQueryDisconnectionReason;
+    private final Set<Integer> closeStatusCodesToIgnore;
+    private final Set<DeviceType> degradedDeviceTypesForLoginFailureReason;
+    private final Set<DeviceType> degradedDeviceTypesForDisconnectionReason;
     private final Duration loginFailureReasonExpireAfter;
     private final Duration disconnectionReasonExpireAfter;
 
@@ -63,7 +69,9 @@ public class ReasonCacheService {
         disconnectionReasonCache = sessionDisconnectionRedisTemplate.opsForValue();
         enableQueryLoginFailureReason = sessionProperties.isEnableQueryLoginFailureReason();
         enableQueryDisconnectionReason = sessionProperties.isEnableQueryDisconnectionReason();
-        degradedDeviceTypes = sessionProperties.getDegradedDeviceTypesForLoginFailureReason();
+        closeStatusCodesToIgnore = sessionProperties.getCloseStatusCodesToIgnore();
+        degradedDeviceTypesForDisconnectionReason = sessionProperties.getDegradedDeviceTypesForDisconnectionReason();
+        degradedDeviceTypesForLoginFailureReason = sessionProperties.getDegradedDeviceTypesForLoginFailureReason();
         loginFailureReasonExpireAfter = Duration.ofSeconds(sessionProperties.getLoginFailureReasonExpireAfter());
         disconnectionReasonExpireAfter = Duration.ofSeconds(sessionProperties.getDisconnectionReasonExpireAfter());
     }
@@ -73,7 +81,7 @@ public class ReasonCacheService {
                                                        @NotNull Long requestId) {
         if (!enableQueryLoginFailureReason) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
-        } else if (!degradedDeviceTypes.contains(deviceType)) {
+        } else if (!degradedDeviceTypesForLoginFailureReason.contains(deviceType)) {
             String reason = "The device type " + deviceType.name() + " is forbidden to query the reason for login failure";
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
         } else {
@@ -94,7 +102,7 @@ public class ReasonCacheService {
                                                  @Nullable Long requestId) {
         return enableQueryLoginFailureReason
                 && deviceType != null
-                && degradedDeviceTypes.contains(deviceType)
+                && degradedDeviceTypesForLoginFailureReason.contains(deviceType)
                 && userId != null
                 && requestId != null;
     }
@@ -123,10 +131,11 @@ public class ReasonCacheService {
                                                   @Nullable CloseReason closeReason) {
         return enableQueryDisconnectionReason
                 && deviceType != null
-                && degradedDeviceTypes.contains(deviceType)
+                && degradedDeviceTypesForDisconnectionReason.contains(deviceType)
                 && userId != null
                 && closeReason != null
-                && !closeReason.isTurmsStatusCode();
+                && !closeReason.isTurmsStatusCode()
+                && !closeStatusCodesToIgnore.contains(closeReason.getCode());
     }
 
     public Mono<Boolean> cacheDisconnectionReason(@NotNull Long userId,
@@ -139,6 +148,7 @@ public class ReasonCacheService {
             AssertUtil.notNull(sessionId, "sessionId");
             AssertUtil.notNull(closeReason, "closeReason");
             AssertUtil.state(!closeReason.isTurmsStatusCode(), "Only WebSocket status codes are supported");
+            AssertUtil.state(!closeStatusCodesToIgnore.contains(closeReason.getCode()), "The code is ignored to cache");
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
@@ -153,7 +163,7 @@ public class ReasonCacheService {
                                                 @NotNull Integer sessionId) {
         if (!enableQueryDisconnectionReason) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
-        } else if (!degradedDeviceTypes.contains(deviceType)) {
+        } else if (!degradedDeviceTypesForDisconnectionReason.contains(deviceType)) {
             String reason = "The device type " + deviceType + " is forbidden to query the reason for session disconnection";
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
         } else {
