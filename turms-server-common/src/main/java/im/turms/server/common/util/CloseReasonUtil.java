@@ -21,9 +21,9 @@ import com.google.protobuf.Int32Value;
 import com.google.protobuf.StringValue;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.server.common.dto.CloseReason;
+import im.turms.server.common.pojo.ThrowableInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -42,17 +42,8 @@ public class CloseReasonUtil {
     }
 
     public static CloseReason parse(Throwable throwable) {
-        TurmsStatusCode code;
-        String reason;
-        if (throwable instanceof TurmsBusinessException) {
-            TurmsBusinessException exception = (TurmsBusinessException) throwable;
-            code = exception.getCode();
-            reason = exception.getReason();
-        } else {
-            code = TurmsStatusCode.SERVER_INTERNAL_ERROR;
-            reason = throwable.getMessage();
-        }
-        return CloseReason.get(code, reason);
+        ThrowableInfo info = ThrowableInfo.get(throwable);
+        return CloseReason.get(info.getCode(), info.getReason());
     }
 
     public static SessionCloseStatus statusCodeToCloseStatus(TurmsStatusCode code) {

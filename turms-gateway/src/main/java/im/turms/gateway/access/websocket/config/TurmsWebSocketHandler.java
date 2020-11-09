@@ -32,6 +32,7 @@ import im.turms.gateway.util.TurmsRequestUtil;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.dto.CloseReason;
 import im.turms.server.common.dto.ServiceRequest;
+import im.turms.server.common.pojo.ThrowableInfo;
 import im.turms.server.common.util.CloseReasonUtil;
 import im.turms.server.common.util.ProtoUtil;
 import io.netty.buffer.ByteBuf;
@@ -57,8 +58,8 @@ import reactor.core.publisher.Mono;
 public class TurmsWebSocketHandler implements WebSocketHandler {
 
     private static final EmptyByteBuf EMPTY_BYTE_BUF = new EmptyByteBuf(UnpooledByteBufAllocator.DEFAULT);
-    private static final EmptyByteBuf HEARTBEAT_BYTE_BUF = EMPTY_BYTE_BUF;
     private static final NettyDataBufferFactory DATA_BUFFER_FACTORY = new NettyDataBufferFactory(UnpooledByteBufAllocator.DEFAULT);
+    private static final WebSocketMessage HEARTBEAT_MESSAGE = new WebSocketMessage(WebSocketMessage.Type.BINARY, DATA_BUFFER_FACTORY.wrap(EMPTY_BYTE_BUF));
     private static final WebSocketMessage PONG_MESSAGE = new WebSocketMessage(WebSocketMessage.Type.PONG, DATA_BUFFER_FACTORY.wrap(EMPTY_BYTE_BUF));
 
     private final Node node;
@@ -77,6 +78,8 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
     /**
      * The user has been in "logged in" status when handle() is invoked
      *
+     * @implNote If a throwable instance is thrown for failing to handle the client request,
+     * the method should recover it to TurmsNotification.
      * @see ReactorNettyRequestUpgradeStrategy#upgrade(org.springframework.web.server.ServerWebExchange, org.springframework.web.reactive.socket.WebSocketHandler, java.lang.String, java.util.function.Supplier)
      */
     @Override
@@ -116,7 +119,8 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                 // Send a binary message instead of a pong frame to make sure turms-client-js can get the response
                                 // or it will be intercepted by some browsers
                                 return workflowMediator.processHeartbeatRequest(userId, deviceType)
-                                        .thenReturn(webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(HEARTBEAT_BYTE_BUF)));
+                                        .thenReturn(HEARTBEAT_MESSAGE)
+                                        .onErrorResume(throwable -> Mono.empty());
                             } else {
                                 // long traceId = RandomUtil.nextPositiveLong(); TODO: tracing
                                 SimpleTurmsRequest turmsRequest = TurmsRequestUtil.parseSimpleRequest(payload.asByteBuffer());
@@ -129,6 +133,13 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                                         turmsRequest.getType(),
                                         requestBuffer);
                                 return workflowMediator.processServiceRequest(request)
+                                        .onErrorResume(throwable -> {
+                                            ThrowableInfo info = ThrowableInfo.get(throwable);
+                                            if (info.getCode().isServerError()) {
+                                                log.error("Failed to handle the client request", throwable);
+                                            }
+                                            return Mono.just(info.toNotification(request.getRequestId()));
+                                        })
                                         .map(notification ->
                                                 webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getDirectByteBuffer(notification))))
                                         .doOnTerminate(() -> {
@@ -156,7 +167,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                 // Note: doOnError will be handled after merged with responseOutput
                 .map(byteBuf -> webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(byteBuf)))
                 .mergeWith(responseOutput)
-                // Note: don't try to recover even if it's just a client error
+                // This should never happen
                 .doOnError(throwable -> {
                     CloseReason closeReason = CloseReasonUtil.parse(throwable);
                     if (TurmsStatusCode.isServerError(closeReason.getCode())) {
