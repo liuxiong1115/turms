@@ -17,14 +17,12 @@
 
 package im.turms.gateway.access.http.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * @author James Chen
  */
-@AllArgsConstructor
-@Getter
+@Data
 public class LoginFailureReasonDTO {
     private final int statusCode;
     private final String codeName;

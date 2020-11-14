@@ -17,14 +17,12 @@
 
 package im.turms.gateway.access.http.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * @author James Chen
  */
-@AllArgsConstructor
-@Getter
+@Data
 public class SessionDisconnectionReasonDTO {
     private final int closeCode;
     private final String codeName;

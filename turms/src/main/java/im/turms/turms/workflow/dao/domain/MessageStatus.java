@@ -22,7 +22,6 @@ import im.turms.turms.workflow.dao.index.documentation.OptionalIndexedForCustomF
 import im.turms.turms.workflow.dao.index.documentation.OptionalIndexedForStatistics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
@@ -101,7 +100,6 @@ public final class MessageStatus {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor // Make sure spring can initiate the key and use setters
-    @EqualsAndHashCode
     public static final class Key {
 
         @Field(Fields.MESSAGE_ID)
