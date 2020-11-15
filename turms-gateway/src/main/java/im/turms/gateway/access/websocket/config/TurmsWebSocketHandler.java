@@ -21,6 +21,7 @@ import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
+import im.turms.common.util.RandomUtil;
 import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
 import im.turms.gateway.manager.UserSessionsManager;
 import im.turms.gateway.pojo.bo.session.UserSession;
@@ -32,11 +33,11 @@ import im.turms.gateway.util.TurmsRequestUtil;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.dto.CloseReason;
 import im.turms.server.common.dto.ServiceRequest;
-import im.turms.server.common.pojo.ThrowableInfo;
 import im.turms.server.common.util.CloseReasonUtil;
 import im.turms.server.common.util.ProtoUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.EmptyByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -58,7 +59,7 @@ import reactor.core.publisher.Mono;
 public class TurmsWebSocketHandler implements WebSocketHandler {
 
     private static final EmptyByteBuf EMPTY_BYTE_BUF = new EmptyByteBuf(UnpooledByteBufAllocator.DEFAULT);
-    private static final NettyDataBufferFactory DATA_BUFFER_FACTORY = new NettyDataBufferFactory(UnpooledByteBufAllocator.DEFAULT);
+    private static final NettyDataBufferFactory DATA_BUFFER_FACTORY = new NettyDataBufferFactory(PooledByteBufAllocator.DEFAULT);
     private static final WebSocketMessage HEARTBEAT_MESSAGE = new WebSocketMessage(WebSocketMessage.Type.BINARY, DATA_BUFFER_FACTORY.wrap(EMPTY_BYTE_BUF));
     private static final WebSocketMessage PONG_MESSAGE = new WebSocketMessage(WebSocketMessage.Type.PONG, DATA_BUFFER_FACTORY.wrap(EMPTY_BYTE_BUF));
 
@@ -108,59 +109,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
 
         // 3. Set up the flux of responses (TurmsNotification) to users' requests
         Flux<WebSocketMessage> responseOutput = webSocketSession.receive()
-                .flatMap(inboundMessage -> {
-                    if (!node.isActive()) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAVAILABLE));
-                    }
-                    switch (inboundMessage.getType()) {
-                        case BINARY:
-                            DataBuffer payload = inboundMessage.getPayload();
-                            if (payload.capacity() == 0) {
-                                // Send a binary message instead of a pong frame to make sure turms-client-js can get the response
-                                // or it will be intercepted by some browsers
-                                return workflowMediator.processHeartbeatRequest(userId, deviceType)
-                                        .thenReturn(HEARTBEAT_MESSAGE)
-                                        .onErrorResume(throwable -> Mono.empty());
-                            } else {
-                                // long traceId = RandomUtil.nextPositiveLong(); TODO: tracing
-                                SimpleTurmsRequest turmsRequest = TurmsRequestUtil.parseSimpleRequest(payload.asByteBuffer());
-                                ByteBuf requestBuffer = NettyDataBufferFactory.toByteBuf(payload);
-                                // Retain it so that it won't be released by FluxReceive.drainReceiver unexpectedly
-                                requestBuffer.retain();
-                                ServiceRequest request = new ServiceRequest(userId,
-                                        deviceType,
-                                        turmsRequest.getRequestId(),
-                                        turmsRequest.getType(),
-                                        requestBuffer);
-                                return workflowMediator.processServiceRequest(request)
-                                        .onErrorResume(throwable -> {
-                                            ThrowableInfo info = ThrowableInfo.get(throwable);
-                                            if (info.getCode().isServerError()) {
-                                                log.error("Failed to handle the client request", throwable);
-                                            }
-                                            return Mono.just(info.toNotification(request.getRequestId()));
-                                        })
-                                        .map(notification ->
-                                                webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getDirectByteBuffer(notification))))
-                                        .doOnTerminate(() -> {
-                                            int refCnt = requestBuffer.refCnt();
-                                            if (refCnt > 0) {
-                                                // Release once exactly rather than releasing it to 0 so that
-                                                // FluxReceive.drainReceiver won't throw IllegalReferenceCountException (refCnt: 0, decrement: 1)
-                                                // if "ReferenceCountUtil.release(v)" in FluxReceive.drainReceiver runs after this code
-                                                requestBuffer.release();
-                                            }
-                                        });
-                            }
-                        case TEXT:
-                        case PING:
-                            return Mono.just(PONG_MESSAGE);
-                        case PONG:
-                        default:
-                            // ignore the message
-                            return Mono.empty();
-                    }
-                });
+                .flatMap(webSocketMessage -> handleInboundMessage(webSocketSession, webSocketMessage, userId, deviceType));
 
         // 4. Merge inbound/outbound messages
         Flux<WebSocketMessage> outputFlux = session.getNotificationFlux()
@@ -187,6 +136,52 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
     private void trySetOfflineAfterSessionClosed(Long userId, DeviceType deviceType, CloseStatus closeStatus) {
         if (closeStatus.getCode() != SessionCloseStatus.SWITCH.getCode()) {
             workflowMediator.setLocalUserDeviceOffline(userId, deviceType, closeStatus).subscribe();
+        }
+    }
+
+    private Mono<WebSocketMessage> handleInboundMessage(WebSocketSession webSocketSession, WebSocketMessage inboundMessage, long userId, DeviceType deviceType) {
+        if (!node.isActive()) {
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAVAILABLE));
+        }
+        switch (inboundMessage.getType()) {
+            case BINARY:
+                DataBuffer payload = inboundMessage.getPayload();
+                if (payload.capacity() == 0) {
+                    // Send a binary message instead of a pong frame to make sure turms-client-js can get the response
+                    // or it will be intercepted by some browsers
+                    return workflowMediator.processHeartbeatRequest(userId, deviceType)
+                            .thenReturn(HEARTBEAT_MESSAGE);
+                } else {
+                    SimpleTurmsRequest turmsRequest = TurmsRequestUtil.parseSimpleRequest(payload.asByteBuffer());
+                    ByteBuf requestBuffer = NettyDataBufferFactory.toByteBuf(payload);
+                    // Retain it so that it won't be released by FluxReceive.drainReceiver unexpectedly
+                    requestBuffer.retain();
+                    ServiceRequest request = new ServiceRequest(RandomUtil.nextPositiveLong(),
+                            userId,
+                            deviceType,
+                            turmsRequest.getRequestId(),
+                            turmsRequest.getType(),
+                            requestBuffer);
+                    return workflowMediator.processServiceRequest(request)
+                            .map(notification ->
+                                    webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getDirectByteBuffer(notification))))
+                            .doOnTerminate(() -> {
+                                int refCnt = requestBuffer.refCnt();
+                                if (refCnt > 0) {
+                                    // Release once exactly rather than releasing it to 0 so that
+                                    // FluxReceive.drainReceiver won't throw IllegalReferenceCountException (refCnt: 0, decrement: 1)
+                                    // if "ReferenceCountUtil.release(v)" in FluxReceive.drainReceiver runs after this code
+                                    requestBuffer.release();
+                                }
+                            });
+                }
+            case TEXT:
+            case PING:
+                return Mono.just(PONG_MESSAGE);
+            case PONG:
+            default:
+                // ignore the message
+                return Mono.empty();
         }
     }
 
