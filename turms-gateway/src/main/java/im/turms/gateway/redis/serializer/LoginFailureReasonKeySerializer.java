@@ -20,7 +20,6 @@ package im.turms.gateway.redis.serializer;
 import im.turms.common.constant.DeviceType;
 import im.turms.gateway.pojo.bo.login.LoginFailureReasonKey;
 import im.turms.server.common.redis.RedisEntryId;
-import io.netty.buffer.PooledByteBufAllocator;
 import org.springframework.data.redis.serializer.RedisElementReader;
 import org.springframework.data.redis.serializer.RedisElementWriter;
 
@@ -33,12 +32,12 @@ public class LoginFailureReasonKeySerializer implements RedisElementWriter<Login
 
     @Override
     public ByteBuffer write(LoginFailureReasonKey element) {
-        return PooledByteBufAllocator.DEFAULT.directBuffer(Long.BYTES * 2 + Byte.BYTES * 2)
-                .writeByte(RedisEntryId.LOGIN_FAILURE_REASON_KEY)
-                .writeLong(element.getUserId())
-                .writeByte(element.getDeviceType().getNumber())
-                .writeLong(element.getLoginRequestId())
-                .nioBuffer();
+        return ByteBuffer.allocateDirect(Long.BYTES * 2 + Byte.BYTES * 2)
+                .put(RedisEntryId.LOGIN_FAILURE_REASON_KEY)
+                .putLong(element.getUserId())
+                .put((byte) element.getDeviceType().getNumber())
+                .putLong(element.getLoginRequestId())
+                .flip();
     }
 
     @Override

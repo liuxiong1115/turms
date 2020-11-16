@@ -20,7 +20,6 @@ package im.turms.gateway.redis.serializer;
 import im.turms.common.constant.DeviceType;
 import im.turms.gateway.pojo.bo.session.SessionDisconnectionReasonKey;
 import im.turms.server.common.redis.RedisEntryId;
-import io.netty.buffer.PooledByteBufAllocator;
 import org.springframework.data.redis.serializer.RedisElementReader;
 import org.springframework.data.redis.serializer.RedisElementWriter;
 
@@ -33,12 +32,12 @@ public class SessionDisconnectionReasonKeySerializer implements RedisElementWrit
 
     @Override
     public ByteBuffer write(SessionDisconnectionReasonKey element) {
-        return PooledByteBufAllocator.DEFAULT.directBuffer(Long.BYTES * 2 + Byte.BYTES * 2)
-                .writeByte(RedisEntryId.SESSION_DISCONNECTION_REASON)
-                .writeLong(element.getUserId())
-                .writeByte(element.getDeviceType().getNumber())
-                .writeInt(element.getSessionId())
-                .nioBuffer();
+        return ByteBuffer.allocateDirect(Long.BYTES * 2 + Byte.BYTES * 2)
+                .put(RedisEntryId.SESSION_DISCONNECTION_REASON)
+                .putLong(element.getUserId())
+                .put((byte) element.getDeviceType().getNumber())
+                .putInt(element.getSessionId())
+                .flip();
     }
 
     @Override

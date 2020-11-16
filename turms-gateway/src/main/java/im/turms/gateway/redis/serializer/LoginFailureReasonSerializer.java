@@ -18,7 +18,6 @@
 package im.turms.gateway.redis.serializer;
 
 import im.turms.common.constant.statuscode.TurmsStatusCode;
-import io.netty.buffer.PooledByteBufAllocator;
 import org.springframework.data.redis.serializer.RedisElementReader;
 import org.springframework.data.redis.serializer.RedisElementWriter;
 
@@ -31,9 +30,9 @@ public class LoginFailureReasonSerializer implements RedisElementWriter<TurmsSta
 
     @Override
     public ByteBuffer write(TurmsStatusCode element) {
-        return PooledByteBufAllocator.DEFAULT.directBuffer(Short.BYTES)
-                .writeShort(element.getBusinessCode())
-                .nioBuffer();
+        return ByteBuffer.allocateDirect(Short.BYTES)
+                .putShort((short) element.getBusinessCode())
+                .flip();
     }
 
     @Override

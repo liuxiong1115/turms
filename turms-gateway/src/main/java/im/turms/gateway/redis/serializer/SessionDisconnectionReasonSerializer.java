@@ -17,7 +17,6 @@
 
 package im.turms.gateway.redis.serializer;
 
-import io.netty.buffer.PooledByteBufAllocator;
 import org.springframework.data.redis.serializer.RedisElementReader;
 import org.springframework.data.redis.serializer.RedisElementWriter;
 
@@ -30,9 +29,9 @@ public class SessionDisconnectionReasonSerializer implements RedisElementWriter<
 
     @Override
     public ByteBuffer write(Integer element) {
-        return PooledByteBufAllocator.DEFAULT.directBuffer(Short.BYTES)
-                .writeShort(element)
-                .nioBuffer();
+        return ByteBuffer.allocateDirect(Short.BYTES)
+                .putShort(element.shortValue())
+                .flip();
     }
 
     @Override
