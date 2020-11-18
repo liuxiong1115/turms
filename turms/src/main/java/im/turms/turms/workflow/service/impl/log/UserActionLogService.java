@@ -20,12 +20,10 @@ package im.turms.turms.workflow.service.impl.log;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.server.common.cluster.node.Node;
-import im.turms.server.common.constant.LogContextConstant;
+import im.turms.server.common.log4j.UserActivityLogging;
 import im.turms.turms.bo.UserActionLog;
 import im.turms.turms.plugin.extension.handler.UserActionLogHandler;
 import im.turms.turms.plugin.manager.TurmsPluginManager;
-import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.ThreadContext;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -38,7 +36,6 @@ import java.util.List;
  * @author James Chen
  */
 @Service
-@Log4j2
 public class UserActionLogService {
 
     private final Node node;
@@ -63,9 +60,7 @@ public class UserActionLogService {
                     : null;
             userActionLog = new UserActionLog(userId, deviceType, new Date(), request.getKindCase().name(), actionDetails);
             if (logUserAction) {
-                ThreadContext.put(LogContextConstant.LOG_TYPE, LogContextConstant.Type.USER_ACTIVITY);
-                log.info(userActionLog);
-                ThreadContext.remove(LogContextConstant.LOG_TYPE);
+                UserActivityLogging.log(userActionLog);
             }
             if (triggerHandlers) {
                 List<Mono<Void>> monos = new ArrayList<>(handlerList.size());

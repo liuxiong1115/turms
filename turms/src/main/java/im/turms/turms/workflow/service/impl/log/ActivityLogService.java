@@ -22,10 +22,10 @@ import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.server.common.bo.property.ActivityLoggingCategory;
 import im.turms.server.common.bo.property.ActivityLoggingRequest;
 import im.turms.server.common.cluster.node.Node;
+import im.turms.server.common.log4j.UserActivityLogging;
 import im.turms.server.common.property.constant.ActivityLoggingCategoryName;
 import im.turms.server.common.property.env.service.business.activity.ActivityLoggingProperties;
 import im.turms.turms.workflow.access.servicerequest.dto.ClientRequest;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -38,7 +38,6 @@ import static im.turms.common.model.dto.request.TurmsRequest.KindCase.*;
  * @author James Chen
  */
 @Service
-@Log4j2
 public class ActivityLogService {
 
     private final Map<TurmsRequest.KindCase, ActivityLoggingRequest> includedRequests;
@@ -57,10 +56,10 @@ public class ActivityLogService {
                 if (sampleRate < 1.0f) {
                     boolean shouldLog = ThreadLocalRandom.current().nextFloat() < sampleRate;
                     if (shouldLog) {
-                        log.info(clientRequest);
+                        UserActivityLogging.log(clientRequest);
                     }
                 } else {
-                    log.info(clientRequest);
+                    UserActivityLogging.log(clientRequest);
                 }
             }
         }
