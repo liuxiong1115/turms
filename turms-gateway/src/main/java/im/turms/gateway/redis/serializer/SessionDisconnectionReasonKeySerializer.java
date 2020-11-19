@@ -42,7 +42,7 @@ public class SessionDisconnectionReasonKeySerializer implements RedisElementWrit
 
     @Override
     public SessionDisconnectionReasonKey read(ByteBuffer buffer) {
-        buffer.get();
+        buffer.position(buffer.position() + Byte.BYTES);
         return new SessionDisconnectionReasonKey(buffer.getLong(), DeviceType.forNumber(buffer.get()), buffer.getInt());
     }
 

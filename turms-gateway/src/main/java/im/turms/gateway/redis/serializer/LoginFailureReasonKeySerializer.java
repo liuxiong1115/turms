@@ -42,7 +42,7 @@ public class LoginFailureReasonKeySerializer implements RedisElementWriter<Login
 
     @Override
     public LoginFailureReasonKey read(ByteBuffer buffer) {
-        buffer.get();
+        buffer.position(buffer.position() + Byte.BYTES);
         return new LoginFailureReasonKey(buffer.getLong(), DeviceType.forNumber(buffer.get()), buffer.getLong());
     }
 
