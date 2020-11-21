@@ -17,19 +17,21 @@
 
 package im.turms.server.common.log4j;
 
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author James Chen
  */
-@Log4j2
 public class UserActivityLogging {
+
+    public static final Logger logger = LogManager.getLogger(UserActivityLogging.class);
 
     private UserActivityLogging() {
     }
 
     public static void log(Object info) {
-        log.info(info);
+        logger.info(info);
     }
 
 }

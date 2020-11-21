@@ -15,26 +15,26 @@
  * limitations under the License.
  */
 
-package im.turms.server.common.property.constant;
+package im.turms.server.common.property.env.service.env.clientapi.property;
+
+import im.turms.common.model.dto.request.TurmsRequest;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * @author James Chen
  */
-public enum ActivityLoggingCategoryName {
-    ALL,
-    NONE,
+@Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class LoggingRequestProperties {
 
-    CREATE,
-    DELETE,
-    UPDATE,
-    QUERY,
+    @EqualsAndHashCode.Include
+    private TurmsRequest.KindCase type;
 
-    STORAGE,
-    MESSAGE,
-    USER,
-    USER_RELATIONSHIP,
-    GROUP,
-    GROUP_BLACKLIST,
-    GROUP_ENROLLMENT,
-    GROUP_MEMBER
+    private float sampleRate = 1.0f;
+
 }
