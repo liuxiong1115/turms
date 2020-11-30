@@ -21,8 +21,8 @@ import com.google.protobuf.Int64Value;
 import im.turms.common.model.bo.group.Group;
 import im.turms.common.model.bo.group.GroupsWithVersion;
 import im.turms.common.model.dto.notification.TurmsNotification;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 
 /**
  * @author James Chen
