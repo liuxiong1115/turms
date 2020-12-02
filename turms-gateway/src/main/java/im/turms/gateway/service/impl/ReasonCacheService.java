@@ -25,6 +25,7 @@ import im.turms.gateway.pojo.bo.session.SessionDisconnectionReasonKey;
 import im.turms.server.common.dto.CloseReason;
 import im.turms.server.common.property.TurmsPropertiesManager;
 import im.turms.server.common.property.env.gateway.SessionProperties;
+import im.turms.server.common.redis.sharding.ShardingAlgorithm;
 import im.turms.server.common.util.AssertUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,9 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author James Chen
@@ -45,12 +48,14 @@ import java.util.Set;
 @Log4j2
 public class ReasonCacheService {
 
-    private final ReactiveValueOperations<LoginFailureReasonKey, TurmsStatusCode> loginFailureReasonCache;
+    private final ShardingAlgorithm shardingAlgorithmForLoginFailure;
+    private final ShardingAlgorithm shardingAlgorithmForSessionDisconnection;
+    private final List<ReactiveValueOperations<LoginFailureReasonKey, TurmsStatusCode>> loginFailureReasonCaches;
     /**
      * The value should be either the close status code
      * of WebSocket or the code of SessionCloseStatus
      */
-    private final ReactiveValueOperations<SessionDisconnectionReasonKey, Integer> disconnectionReasonCache;
+    private final List<ReactiveValueOperations<SessionDisconnectionReasonKey, Integer>> disconnectionReasonCaches;
     private final boolean enableQueryLoginFailureReason;
     private final boolean enableQueryDisconnectionReason;
     private final Set<Integer> closeStatusCodesToIgnore;
@@ -61,12 +66,20 @@ public class ReasonCacheService {
 
     @Autowired
     public ReasonCacheService(
-            ReactiveRedisTemplate<LoginFailureReasonKey, TurmsStatusCode> loginFailureRedisTemplate,
-            ReactiveRedisTemplate<SessionDisconnectionReasonKey, Integer> sessionDisconnectionRedisTemplate,
+            ShardingAlgorithm shardingAlgorithmForLoginFailure,
+            ShardingAlgorithm shardingAlgorithmForSessionDisconnection,
+            List<ReactiveRedisTemplate<LoginFailureReasonKey, TurmsStatusCode>> loginFailureRedisTemplates,
+            List<ReactiveRedisTemplate<SessionDisconnectionReasonKey, Integer>> sessionDisconnectionRedisTemplates,
             TurmsPropertiesManager turmsPropertiesManager) {
+        this.shardingAlgorithmForLoginFailure = shardingAlgorithmForLoginFailure;
+        this.shardingAlgorithmForSessionDisconnection = shardingAlgorithmForSessionDisconnection;
+        loginFailureReasonCaches = loginFailureRedisTemplates.stream()
+                .map(ReactiveRedisTemplate::opsForValue)
+                .collect(Collectors.toList());
+        disconnectionReasonCaches = sessionDisconnectionRedisTemplates.stream()
+                .map(ReactiveRedisTemplate::opsForValue)
+                .collect(Collectors.toList());
         SessionProperties sessionProperties = turmsPropertiesManager.getLocalProperties().getGateway().getSession();
-        loginFailureReasonCache = loginFailureRedisTemplate.opsForValue();
-        disconnectionReasonCache = sessionDisconnectionRedisTemplate.opsForValue();
         enableQueryLoginFailureReason = sessionProperties.isEnableQueryLoginFailureReason();
         enableQueryDisconnectionReason = sessionProperties.isEnableQueryDisconnectionReason();
         closeStatusCodesToIgnore = sessionProperties.getCloseStatusCodesToIgnore();
@@ -93,7 +106,7 @@ public class ReasonCacheService {
                 return Mono.error(e);
             }
             LoginFailureReasonKey key = new LoginFailureReasonKey(userId, deviceType, requestId);
-            return loginFailureReasonCache.get(key);
+            return getLoginFailureReasonCache(userId).get(key);
         }
     }
 
@@ -120,7 +133,7 @@ public class ReasonCacheService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        return loginFailureReasonCache.set(
+        return getLoginFailureReasonCache(userId).set(
                 new LoginFailureReasonKey(userId, deviceType, requestId),
                 status,
                 loginFailureReasonExpireAfter);
@@ -152,7 +165,7 @@ public class ReasonCacheService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        return disconnectionReasonCache.set(
+        return getSessionDisconnectionReasonCache(userId).set(
                 new SessionDisconnectionReasonKey(userId, deviceType, sessionId),
                 closeReason.getCode(),
                 disconnectionReasonExpireAfter);
@@ -175,8 +188,16 @@ public class ReasonCacheService {
                 return Mono.error(e);
             }
             SessionDisconnectionReasonKey key = new SessionDisconnectionReasonKey(userId, deviceType, sessionId);
-            return disconnectionReasonCache.get(key);
+            return getSessionDisconnectionReasonCache(userId).get(key);
         }
+    }
+
+    private ReactiveValueOperations<LoginFailureReasonKey, TurmsStatusCode> getLoginFailureReasonCache(long userId) {
+        return loginFailureReasonCaches.get(shardingAlgorithmForLoginFailure.doSharding(userId, loginFailureReasonCaches.size()));
+    }
+
+    private ReactiveValueOperations<SessionDisconnectionReasonKey, Integer> getSessionDisconnectionReasonCache(long userId) {
+        return disconnectionReasonCaches.get(shardingAlgorithmForSessionDisconnection.doSharding(userId, disconnectionReasonCaches.size()));
     }
 
 }

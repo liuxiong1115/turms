@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.server.common.property.env.service.env;
+package im.turms.server.common.property.env.service.env.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;

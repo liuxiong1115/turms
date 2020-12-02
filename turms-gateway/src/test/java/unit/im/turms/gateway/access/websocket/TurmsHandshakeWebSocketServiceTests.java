@@ -20,7 +20,7 @@ package unit.im.turms.gateway.access.websocket;
 import im.turms.gateway.access.websocket.config.TurmsHandshakeWebSocketService;
 import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
 import im.turms.gateway.pojo.bo.session.UserSession;
-import im.turms.gateway.service.mediator.WorkflowMediator;
+import im.turms.gateway.service.mediator.ServiceMediator;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.property.TurmsProperties;
 import im.turms.server.common.property.TurmsPropertiesManager;
@@ -114,18 +114,18 @@ class TurmsHandshakeWebSocketServiceTests {
         when(propertiesManager.getLocalProperties())
                 .thenReturn(properties);
 
-        WorkflowMediator workflowMediator = mock(WorkflowMediator.class);
+        ServiceMediator serviceMediator = mock(ServiceMediator.class);
         UserSession userSession = mock(UserSession.class);
-        when(workflowMediator.processLoginRequest(any(), any(), any(), any(), any(), any(), any()))
+        when(serviceMediator.processLoginRequest(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(Mono.just(userSession));
-        when(workflowMediator.rejectLoginRequest(any(), any(), any(), any()))
+        when(serviceMediator.rejectLoginRequest(any(), any(), any(), any()))
                 .thenReturn(Mono.just(true));
 
         RequestUpgradeStrategy upgradeStrategy = mock(RequestUpgradeStrategy.class);
         when(upgradeStrategy.upgrade(any(), any(), any(), any()))
                 .thenReturn(Mono.empty());
 
-        TurmsHandshakeWebSocketService webSocketService = spy(new TurmsHandshakeWebSocketService(node, propertiesManager, workflowMediator));
+        TurmsHandshakeWebSocketService webSocketService = spy(new TurmsHandshakeWebSocketService(node, propertiesManager, serviceMediator));
         when(webSocketService.getUpgradeStrategy()).thenReturn(upgradeStrategy);
         return webSocketService;
     }

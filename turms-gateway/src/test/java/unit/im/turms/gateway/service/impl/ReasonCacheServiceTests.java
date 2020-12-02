@@ -27,6 +27,8 @@ import im.turms.server.common.property.TurmsProperties;
 import im.turms.server.common.property.TurmsPropertiesManager;
 import im.turms.server.common.property.env.gateway.GatewayProperties;
 import im.turms.server.common.property.env.gateway.SessionProperties;
+import im.turms.server.common.redis.sharding.ConsistentHashingShardingAlgorithm;
+import im.turms.server.common.redis.sharding.ShardingAlgorithm;
 import im.turms.server.common.util.ExceptionUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -35,6 +37,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -196,6 +199,7 @@ class ReasonCacheServiceTests {
     }
 
     private ReasonCacheService newReasonCacheService(boolean enableCache, Set<DeviceType> degradedDeviceTypes, boolean reasonExists) {
+        ShardingAlgorithm shardingAlgorithm = new ConsistentHashingShardingAlgorithm();
         ReactiveValueOperations loginFailureOperations = mock(ReactiveValueOperations.class);
         ReactiveValueOperations disconnectionOperations = mock(ReactiveValueOperations.class);
         ReactiveRedisTemplate loginFailureRedisTemplate = mock(ReactiveRedisTemplate.class);
@@ -234,7 +238,7 @@ class ReasonCacheServiceTests {
         turmsProperties.setGateway(gateway);
         when(propertiesManager.getLocalProperties())
                 .thenReturn(turmsProperties);
-        return new ReasonCacheService(loginFailureRedisTemplate, disconnectionRedisTemplate, propertiesManager);
+        return new ReasonCacheService(shardingAlgorithm, shardingAlgorithm, List.of(loginFailureRedisTemplate), List.of(disconnectionRedisTemplate), propertiesManager);
     }
 
 }
