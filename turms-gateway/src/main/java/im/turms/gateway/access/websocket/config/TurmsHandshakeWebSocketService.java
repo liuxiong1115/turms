@@ -22,7 +22,7 @@ import im.turms.common.constant.UserStatus;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
-import im.turms.gateway.service.mediator.WorkflowMediator;
+import im.turms.gateway.service.mediator.ServiceMediator;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.property.TurmsPropertiesManager;
 import io.micrometer.core.instrument.util.StringUtils;
@@ -70,7 +70,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
 
     private final Node node;
     private final TurmsPropertiesManager turmsPropertiesManager;
-    private final WorkflowMediator workflowMediator;
+    private final ServiceMediator serviceMediator;
     private final boolean locationEnabled;
 
     private List<String> identityList;
@@ -79,10 +79,10 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
     public TurmsHandshakeWebSocketService(
             Node node,
             TurmsPropertiesManager turmsPropertiesManager,
-            WorkflowMediator workflowMediator) {
+            ServiceMediator serviceMediator) {
         this.node = node;
         this.turmsPropertiesManager = turmsPropertiesManager;
-        this.workflowMediator = workflowMediator;
+        this.serviceMediator = serviceMediator;
         locationEnabled = turmsPropertiesManager.getLocalProperties().getLocation().isEnabled();
         identityList = getNewIdentityList();
         turmsPropertiesManager.addListeners(turmsProperties -> identityList = getNewIdentityList());
@@ -138,7 +138,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         String ip = HandshakeRequestUtil.parseIp(request);
 
         // 3. Try to login
-        return workflowMediator.processLoginRequest(userId, password, loggingInDeviceType, userStatus, position, ip, deviceDetails)
+        return serviceMediator.processLoginRequest(userId, password, loggingInDeviceType, userStatus, position, ip, deviceDetails)
                 .then(acceptUpgradeRequest(exchange, handler, userId, loggingInDeviceType))
                 .onErrorResume(TurmsBusinessException.class, e -> rejectUpgradeRequest(exchange, e.getCode(), requestId, userId, loggingInDeviceType));
     }
@@ -165,7 +165,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         String headerCodeValue = CODE_STRING_POOL.computeIfAbsent(statusCode, key -> Integer.toString(key.getBusinessCode()));
         headers.set(RESPONSE_HEADER_TURMS_STATUS_CODE, headerCodeValue);
         ResponseStatusException exception = new ResponseStatusException(HttpStatus.valueOf(statusCode.getHttpStatusCode()));
-        return workflowMediator.rejectLoginRequest(statusCode, userId, loggingInDeviceType, requestId)
+        return serviceMediator.rejectLoginRequest(statusCode, userId, loggingInDeviceType, requestId)
                 .then(Mono.error(exception));
     }
 

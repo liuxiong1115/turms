@@ -28,7 +28,7 @@ import im.turms.gateway.pojo.bo.session.UserSession;
 import im.turms.gateway.pojo.bo.session.connection.WebSocketConnection;
 import im.turms.gateway.pojo.dto.SimpleTurmsRequest;
 import im.turms.gateway.service.impl.SessionService;
-import im.turms.gateway.service.mediator.WorkflowMediator;
+import im.turms.gateway.service.mediator.ServiceMediator;
 import im.turms.gateway.util.TurmsRequestUtil;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.dto.CloseReason;
@@ -64,15 +64,15 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
     private static final WebSocketMessage PONG_MESSAGE = new WebSocketMessage(WebSocketMessage.Type.PONG, DATA_BUFFER_FACTORY.wrap(EMPTY_BYTE_BUF));
 
     private final Node node;
-    private final WorkflowMediator workflowMediator;
+    private final ServiceMediator serviceMediator;
     private final SessionService sessionService;
 
     public TurmsWebSocketHandler(
             Node node,
-            WorkflowMediator workflowMediator,
+            ServiceMediator serviceMediator,
             SessionService sessionService) {
         this.node = node;
-        this.workflowMediator = workflowMediator;
+        this.serviceMediator = serviceMediator;
         this.sessionService = sessionService;
     }
 
@@ -92,12 +92,12 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
         UserSessionsManager userSessionsManager = sessionService.getUserSessionsManager(userId);
         if (userSessionsManager == null) {
             log.error("The user sessions manager for the user {} is null", userId);
-            return workflowMediator.setLocalUserDeviceOffline(userId, deviceType, SessionCloseStatus.SERVER_ERROR).then();
+            return serviceMediator.setLocalUserDeviceOffline(userId, deviceType, SessionCloseStatus.SERVER_ERROR).then();
         }
         UserSession session = userSessionsManager.getSession(deviceType);
         if (session == null) {
             log.error("The user session for the device type {} of the user {} is null", deviceType.name(), userId);
-            return workflowMediator.setLocalUserDeviceOffline(userId, deviceType, SessionCloseStatus.SERVER_ERROR).then();
+            return serviceMediator.setLocalUserDeviceOffline(userId, deviceType, SessionCloseStatus.SERVER_ERROR).then();
         }
         session.setConnection(new WebSocketConnection(webSocketSession, true));
 
@@ -122,12 +122,12 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                     if (TurmsStatusCode.isServerError(closeReason.getCode())) {
                         log.error("Failed to send outbound notification", throwable);
                     }
-                    workflowMediator.setLocalUserDeviceOffline(userId, deviceType, closeReason).subscribe();
+                    serviceMediator.setLocalUserDeviceOffline(userId, deviceType, closeReason).subscribe();
                 });
 
         // 5. Trivial things after the session is established
-        workflowMediator.onSessionEstablished(userSessionsManager, deviceType);
-        workflowMediator.triggerGoOnlinePlugins(userSessionsManager, session).subscribe();
+        serviceMediator.onSessionEstablished(userSessionsManager, deviceType);
+        serviceMediator.triggerGoOnlinePlugins(userSessionsManager, session).subscribe();
 
         // 6. Send responses and notifications
         return webSocketSession.send(outputFlux);
@@ -135,7 +135,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
 
     private void trySetOfflineAfterSessionClosed(Long userId, DeviceType deviceType, CloseStatus closeStatus) {
         if (closeStatus.getCode() != SessionCloseStatus.SWITCH.getCode()) {
-            workflowMediator.setLocalUserDeviceOffline(userId, deviceType, closeStatus).subscribe();
+            serviceMediator.setLocalUserDeviceOffline(userId, deviceType, closeStatus).subscribe();
         }
     }
 
@@ -149,7 +149,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                 if (payload.capacity() == 0) {
                     // Send a binary message instead of a pong frame to make sure turms-client-js can get the response
                     // or it will be intercepted by some browsers
-                    return workflowMediator.processHeartbeatRequest(userId, deviceType)
+                    return serviceMediator.processHeartbeatRequest(userId, deviceType)
                             .thenReturn(HEARTBEAT_MESSAGE);
                 } else {
                     SimpleTurmsRequest turmsRequest = TurmsRequestUtil.parseSimpleRequest(payload.asByteBuffer());
@@ -162,7 +162,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
                             turmsRequest.getRequestId(),
                             turmsRequest.getType(),
                             requestBuffer);
-                    return workflowMediator.processServiceRequest(request)
+                    return serviceMediator.processServiceRequest(request)
                             .map(notification ->
                                     webSocketSession.binaryMessage(factory -> ((NettyDataBufferFactory) factory).wrap(ProtoUtil.getDirectByteBuffer(notification))))
                             .doOnTerminate(() -> {
