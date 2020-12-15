@@ -44,7 +44,7 @@ public class TurmsMongoMappingContext extends MongoMappingContext {
      * Use volatile to implement a copy-on-write reference map
      */
     @SuppressWarnings("java:S3077")
-    private volatile Map<Class<?>, BasicMongoPersistentEntity<?>> entities = new IdentityHashMap<>();
+    private volatile Map<Class<?>, BasicMongoPersistentEntity<?>> entities = new IdentityHashMap<>(128);
 
     @Override
     public Collection<BasicMongoPersistentEntity<?>> getPersistentEntities() {
