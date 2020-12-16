@@ -23,6 +23,7 @@ import im.turms.turms.workflow.access.http.dto.request.group.AddGroupDTO;
 import im.turms.turms.workflow.access.http.dto.request.group.GroupStatisticsDTO;
 import im.turms.turms.workflow.access.http.dto.request.group.UpdateGroupDTO;
 import im.turms.turms.workflow.access.http.dto.response.AcknowledgedDTO;
+import im.turms.turms.workflow.access.http.dto.response.DeleteResultDTO;
 import im.turms.turms.workflow.access.http.dto.response.PaginationDTO;
 import im.turms.turms.workflow.access.http.dto.response.ResponseDTO;
 import im.turms.turms.workflow.access.http.dto.response.ResponseFactory;
@@ -215,6 +216,13 @@ public class GroupController {
     public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateGroups(
             @RequestParam Set<Long> ids,
             @RequestBody UpdateGroupDTO updateGroupDTO) {
+        Long successorId = updateGroupDTO.getSuccessorId();
+        if (successorId != null) {
+            groupService.checkAndTransferGroupOwnership(
+                    null,
+                    updateGroupDTO.get
+            )
+        }
         Mono<Boolean> updated = groupService.updateGroups(
                 ids,
                 updateGroupDTO.getTypeId(),
@@ -235,13 +243,14 @@ public class GroupController {
 
     @DeleteMapping
     @RequiredPermission(GROUP_DELETE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> deleteGroups(
+    public Mono<ResponseEntity<ResponseDTO<DeleteResultDTO>>> deleteGroups(
             @RequestParam(required = false) Set<Long> ids,
             @RequestParam(required = false) Boolean deleteLogically) {
-        Mono<Boolean> deleted = groupService.deleteGroupsAndGroupMembers(
+        Mono<DeleteResultDTO> deleted = groupService.deleteGroupsAndGroupMembers(
                 ids,
-                deleteLogically);
-        return ResponseFactory.acknowledged(deleted);
+                deleteLogically)
+                .map(DeleteResultDTO::get);
+        return ResponseFactory.okIfTruthy(deleted);
     }
 
 }

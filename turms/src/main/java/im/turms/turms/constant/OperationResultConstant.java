@@ -15,18 +15,21 @@
  * limitations under the License.
  */
 
-package im.turms.turms.workflow.dao.index.documentation;
+package im.turms.turms.constant;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 /**
- * Not indexed by default because the domain marked as OptionalIndexedForDifferentAmount
- * usually has only a few (or some) documents and has a low index selectivity.
- * <p>
- * No need to add an index unless your application really has a lot of records
- * and you are sure that it has a medium or high index selectivity.
+ * @author James Chen
  */
-@Retention(RetentionPolicy.SOURCE)
-public @interface OptionalIndexedForDifferentAmount {
+public class OperationResultConstant {
+
+    private OperationResultConstant() {
+    }
+
+    public static final UpdateResult ACKNOWLEDGED_UPDATE_RESULT = UpdateResult.acknowledged(0L, 0L, null);
+
+    public static final DeleteResult ACKNOWLEDGED_DELETE_RESULT = DeleteResult.acknowledged(0L);
+
 }

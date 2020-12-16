@@ -15,34 +15,31 @@
  * limitations under the License.
  */
 
-package im.turms.turms.workflow.access.http.dto.response;
-
+package im.turms.turms.bo;
 
 import im.turms.common.constant.statuscode.TurmsStatusCode;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldNameConstants;
-
-import javax.annotation.Nullable;
-import java.util.Date;
 
 /**
  * @author James Chen
  */
 @Data
-@FieldNameConstants
-public class ResponseDTO<T> {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class ServicePermission {
 
-    private final Integer code;
+    public static final ServicePermission OK = new ServicePermission(TurmsStatusCode.OK, null);
+
+    private final TurmsStatusCode code;
     private final String reason;
-    private final Date timestamp;
-    @Nullable
-    private final T data;
 
-    public ResponseDTO(TurmsStatusCode turmsStatusCode, @Nullable T data) {
-        this.code = turmsStatusCode.getBusinessCode();
-        this.reason = turmsStatusCode.getReason();
-        this.timestamp = new Date();
-        this.data = data;
+    public static ServicePermission get(TurmsStatusCode code) {
+        return new ServicePermission(code, null);
+    }
+
+    public static ServicePermission get(TurmsStatusCode code, String reason) {
+        return new ServicePermission(code, reason);
     }
 
 }

@@ -141,7 +141,7 @@ public class MessageService {
                         }
                     }
                 } else {
-                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.FAILED, "Invalid notification: the code is missing"));
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_DATA, "Invalid notification: the code is missing"));
                 }
             }
         }

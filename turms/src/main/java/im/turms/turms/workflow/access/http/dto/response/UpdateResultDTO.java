@@ -15,16 +15,23 @@
  * limitations under the License.
  */
 
-package im.turms.turms.bo;
+package im.turms.turms.workflow.access.http.dto.response;
 
-import im.turms.common.constant.GroupInvitationStrategy;
+import com.mongodb.client.result.UpdateResult;
 import lombok.Data;
 
 /**
+ * @implNote In most cases,
+ * it's meaningful to use UpdateResultDTO instead of TurmsStatusCode.OK for the result of update operations
+ * because a update operation is usually considered as successful even if the no documents changed (no documents matched)
  * @author James Chen
  */
 @Data
-public final class InvitableAndInvitationStrategy {
-    private final boolean invitable;
-    private final GroupInvitationStrategy groupInvitationStrategy;
+public class UpdateResultDTO {
+    private final Long matchedCount;
+    private final Long modifiedCount;
+
+    public static UpdateResultDTO get(UpdateResult result) {
+        return new UpdateResultDTO(result.getMatchedCount(), result.getModifiedCount());
+    }
 }

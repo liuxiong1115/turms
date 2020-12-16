@@ -20,7 +20,6 @@ package im.turms.turms.workflow.access.http.controller.message;
 import im.turms.common.constant.MessageDeliveryStatus;
 import im.turms.turms.bo.DateRange;
 import im.turms.turms.workflow.access.http.dto.request.message.UpdateMessageStatusDTO;
-import im.turms.turms.workflow.access.http.dto.response.AcknowledgedDTO;
 import im.turms.turms.workflow.access.http.dto.response.PaginationDTO;
 import im.turms.turms.workflow.access.http.dto.response.ResponseDTO;
 import im.turms.turms.workflow.access.http.dto.response.ResponseFactory;
@@ -40,6 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * TODO: remove
  * @author James Chen
  */
 @RestController
@@ -125,7 +125,7 @@ public class MessageStatusController {
 
     @PutMapping
     @RequiredPermission(AdminPermission.MESSAGE_STATUS_UPDATE)
-    public Mono<ResponseEntity<ResponseDTO<AcknowledgedDTO>>> updateMessageStatuses(
+    public Mono<ResponseEntity<ResponseDTO<Void>>> updateMessageStatuses(
             MessageStatus.KeyList keys,
             @RequestBody UpdateMessageStatusDTO updateMessageStatusDTO) {
         Mono<Boolean> updateMono = messageStatusService.updateMessageStatuses(
@@ -134,7 +134,7 @@ public class MessageStatusController {
                 updateMessageStatusDTO.getReadDate(),
                 updateMessageStatusDTO.getReceptionDate(),
                 null);
-        return ResponseFactory.acknowledged(updateMono);
+        return updateMono.then(ResponseFactory.ok());
     }
 
 }

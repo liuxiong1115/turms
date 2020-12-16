@@ -18,8 +18,8 @@
 package im.turms.turms.workflow.dao.domain;
 
 import im.turms.common.constant.MessageDeliveryStatus;
-import im.turms.turms.workflow.dao.index.documentation.OptionalIndexedForCustomFeature;
-import im.turms.turms.workflow.dao.index.documentation.OptionalIndexedForStatistics;
+import im.turms.turms.workflow.dao.index.OptionalIndexedForExtendedFeature;
+import im.turms.turms.workflow.dao.index.OptionalIndexedForStatistics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,13 +35,15 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * TODO: Remove
+ *
  * @author James Chen
  */
 @Data
 @AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
 @Document
 @CompoundIndex(
-        name = MessageStatus.Key.Fields.RECIPIENT_ID + "_" + MessageStatus.Key.Fields.MESSAGE_ID + "_idx",
+        name = MessageStatus.Key.Fields.RECIPIENT_ID + "_" + MessageStatus.Key.Fields.MESSAGE_ID,
         def = "{'" + MessageStatus.Fields.ID_RECIPIENT_ID + "': 1, '" + MessageStatus.Fields.ID_MESSAGE_ID + "': 1}")
 @Sharded(shardKey = {MessageStatus.Fields.ID_RECIPIENT_ID, MessageStatus.Fields.ID_MESSAGE_ID}, immutableKey = true)
 public final class MessageStatus {
@@ -106,7 +108,7 @@ public final class MessageStatus {
         private Long messageId;
 
         @Field(Fields.RECIPIENT_ID)
-        @OptionalIndexedForCustomFeature //?
+        @OptionalIndexedForExtendedFeature //?
         private Long recipientId;
 
         public static class Fields {

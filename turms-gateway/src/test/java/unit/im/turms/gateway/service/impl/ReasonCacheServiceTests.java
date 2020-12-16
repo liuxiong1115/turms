@@ -179,7 +179,7 @@ class ReasonCacheServiceTests {
     void shouldCacheDisconnectionReason_shouldReturnFalse_forAnyInvalidArgs() {
         ReasonCacheService reasonCacheService = newReasonCacheService(true, Set.of(DeviceType.IOS), true);
         CloseReason validReason = CloseReason.get(SessionCloseStatus.DISCONNECTED_BY_ADMIN);
-        CloseReason invalidReason = CloseReason.get(TurmsStatusCode.FAILED);
+        CloseReason invalidReason = CloseReason.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
 
         assertFalse(reasonCacheService.shouldCacheDisconnectionReason(null, DeviceType.IOS, validReason));
         assertFalse(reasonCacheService.shouldCacheDisconnectionReason(1L, null, validReason));

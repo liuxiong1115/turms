@@ -17,16 +17,17 @@
 
 package im.turms.turms.workflow.dao.domain;
 
-import im.turms.turms.workflow.dao.index.documentation.OptionalIndexedForCustomFeature;
+import im.turms.turms.workflow.dao.index.OptionalIndexedForExtendedFeature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.Sharded;
+import org.springframework.data.mongodb.core.mapping.ShardingStrategy;
 
 import java.util.Date;
 import java.util.List;
@@ -43,10 +44,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
 @Document
-@CompoundIndex(
-        name = UserRelationship.Key.Fields.OWNER_ID + "_" + UserRelationship.Key.Fields.RELATED_USER_ID + "_idx",
-        def = "{'" + UserRelationship.Fields.ID_OWNER_ID + "': 1, '" + UserRelationship.Fields.ID_RELATED_USER_ID + "': 1}")
-@Sharded(shardKey = {UserRelationship.Fields.ID_OWNER_ID, UserRelationship.Fields.ID_RELATED_USER_ID}, immutableKey = true)
+@Sharded(shardKey = UserRelationship.Fields.ID_OWNER_ID, shardingStrategy = ShardingStrategy.HASH, immutableKey = true)
 public final class UserRelationship {
 
     public static final String COLLECTION_NAME = "userRelationship";
@@ -58,7 +56,7 @@ public final class UserRelationship {
     private final Boolean isBlocked;
 
     @Field(Fields.ESTABLISHMENT_DATE)
-    @OptionalIndexedForCustomFeature
+    @OptionalIndexedForExtendedFeature
     private final Date establishmentDate;
 
     public UserRelationship(Long ownerId, Long relatedUserId, Boolean isBlocked, Date establishmentDate) {
@@ -73,6 +71,7 @@ public final class UserRelationship {
     public static final class Key {
 
         @Field(Fields.OWNER_ID)
+        @Indexed
         private Long ownerId;
 
         @Field(Fields.RELATED_USER_ID)

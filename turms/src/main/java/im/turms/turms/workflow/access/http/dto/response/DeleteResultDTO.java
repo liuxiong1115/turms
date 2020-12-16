@@ -15,11 +15,19 @@
  * limitations under the License.
  */
 
-package im.turms.turms.workflow.dao.index.documentation;
+package im.turms.turms.workflow.access.http.dto.response;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.mongodb.client.result.DeleteResult;
+import lombok.Data;
 
-@Retention(RetentionPolicy.RUNTIME)
-public @interface OptionalIndexedForStatistics {
+/**
+ * @author James Chen
+ */
+@Data
+public class DeleteResultDTO {
+    private final Long deletedCount;
+
+    public static DeleteResultDTO get(DeleteResult result) {
+        return new DeleteResultDTO(result.getDeletedCount());
+    }
 }

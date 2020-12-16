@@ -18,6 +18,8 @@
 package im.turms.turms.workflow.service.impl.group;
 
 import com.google.protobuf.Int64Value;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.GroupMemberRole;
 import im.turms.common.constant.GroupUpdateStrategy;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
@@ -29,6 +31,8 @@ import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.cluster.service.idgen.ServiceType;
 import im.turms.server.common.util.AssertUtil;
 import im.turms.turms.bo.DateRange;
+import im.turms.turms.bo.ServicePermission;
+import im.turms.turms.constant.OperationResultConstant;
 import im.turms.turms.util.ProtoUtil;
 import im.turms.turms.workflow.dao.builder.QueryBuilder;
 import im.turms.turms.workflow.dao.builder.UpdateBuilder;
@@ -36,10 +40,12 @@ import im.turms.turms.workflow.dao.domain.Group;
 import im.turms.turms.workflow.dao.domain.GroupMember;
 import im.turms.turms.workflow.dao.domain.GroupType;
 import im.turms.turms.workflow.dao.domain.UserPermissionGroup;
+import im.turms.server.common.dao.util.OperationResultUtil;
 import im.turms.turms.workflow.service.impl.statistics.MetricsService;
 import im.turms.turms.workflow.service.impl.user.UserPermissionGroupService;
 import im.turms.turms.workflow.service.impl.user.UserVersionService;
 import io.micrometer.core.instrument.Counter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -125,7 +131,9 @@ public class GroupService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        isActive = isActive != null ? isActive : node.getSharedProperties().getService().getGroup().isActivateGroupWhenCreated();
+        isActive = isActive != null
+                ? isActive
+                : node.getSharedProperties().getService().getGroup().isActivateGroupWhenCreated();
         Long groupId = node.nextId(ServiceType.GROUP);
         Group group = new Group(groupId, groupTypeId, creatorId, ownerId, groupName, intro,
                 announcement, minimumScore, creationDate, deletionDate, muteEndDate, isActive);
@@ -134,19 +142,20 @@ public class GroupService {
                 .execute(operations -> {
                     Date now = new Date();
                     return operations.insert(group, Group.COLLECTION_NAME)
-                            .zipWith(groupMemberService.addGroupMember(
+                            .flatMap(grp -> groupMemberService.addGroupMember(
                                     group.getId(),
                                     creatorId,
                                     GroupMemberRole.OWNER,
                                     null,
                                     now,
                                     null,
-                                    operations))
-                            .flatMap(results -> {
-                                createdGroupsCounter.increment();
-                                return groupVersionService.upsert(groupId, now)
-                                        .thenReturn(results.getT1());
-                            });
+                                    operations)
+                                    .then(Mono.defer(() -> {
+                                        createdGroupsCounter.increment();
+                                        return groupVersionService.upsert(groupId, now)
+                                                .onErrorResume(t -> Mono.empty())
+                                                .thenReturn(grp);
+                                    })));
                 })
                 .retryWhen(TRANSACTION_RETRY)
                 .singleOrEmpty();
@@ -178,22 +187,27 @@ public class GroupService {
         }
         Long finalGroupTypeId = groupTypeId;
         return isAllowedToCreateGroupAndHaveGroupType(creatorId, groupTypeId)
-                .flatMap(allowed -> allowed != null && allowed
-                        ? createGroup(creatorId,
-                        ownerId,
-                        groupName,
-                        intro,
-                        announcement,
-                        minimumScore,
-                        finalGroupTypeId,
-                        creationDate,
-                        deletionDate,
-                        muteEndDate,
-                        isActive)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED)));
+                .flatMap(result -> {
+                    TurmsStatusCode code = result.getCode();
+                    if (code == TurmsStatusCode.OK) {
+                        return createGroup(creatorId,
+                                ownerId,
+                                groupName,
+                                intro,
+                                announcement,
+                                minimumScore,
+                                finalGroupTypeId,
+                                creationDate,
+                                deletionDate,
+                                muteEndDate,
+                                isActive);
+                    } else {
+                        return Mono.error(TurmsBusinessException.get(code, result.getReason()));
+                    }
+                });
     }
 
-    public Mono<Boolean> deleteGroupsAndGroupMembers(
+    public Mono<DeleteResult> deleteGroupsAndGroupMembers(
             @Nullable Set<Long> groupIds,
             @Nullable Boolean deleteLogically) {
         if (deleteLogically == null) {
@@ -209,31 +223,23 @@ public class GroupService {
                             .newBuilder()
                             .addInIfNotNull(ID_FIELD_NAME, groupIds)
                             .buildQuery();
-                    Mono<Boolean> updateOrRemoveMono;
+                    Mono<DeleteResult> updateOrRemoveMono;
                     if (finalShouldDeleteLogically) {
                         Update update = new Update().set(Group.Fields.DELETION_DATE, new Date());
                         updateOrRemoveMono = operations.updateMulti(query, update, Group.class, Group.COLLECTION_NAME)
-                                .map(result -> {
-                                    long count = result.getModifiedCount();
-                                    if (count > 0) {
-                                        deletedGroupsCounter.increment(count);
-                                    }
-                                    return result.wasAcknowledged();
-                                });
+                                .map(OperationResultUtil::update2delete);
                     } else {
-                        updateOrRemoveMono = operations.remove(query, Group.class, Group.COLLECTION_NAME)
-                                .map(result -> {
-                                    long count = result.getDeletedCount();
-                                    if (count > 0) {
-                                        deletedGroupsCounter.increment(count);
-                                    }
-                                    return result.wasAcknowledged();
-                                });
+                        updateOrRemoveMono = operations.remove(query, Group.class, Group.COLLECTION_NAME);
                     }
-                    return updateOrRemoveMono.flatMap(acknowledged -> acknowledged != null && acknowledged
-                            ? groupMemberService.deleteAllGroupMembers(groupIds, operations, false)
-                            .then(groupVersionService.delete(groupIds, operations))
-                            : Mono.just(false));
+                    return updateOrRemoveMono.flatMap(result -> {
+                        long count = result.getDeletedCount();
+                        if (count > 0) {
+                            deletedGroupsCounter.increment(count);
+                        }
+                        return groupMemberService.deleteAllGroupMembers(groupIds, operations, false)
+                                .then(groupVersionService.delete(groupIds, operations))
+                                .thenReturn(result);
+                    });
                 })
                 .retryWhen(TRANSACTION_RETRY)
                 .singleOrEmpty();
@@ -276,6 +282,7 @@ public class GroupService {
             return Mono.error(e);
         }
         Query query = new Query().addCriteria(Criteria.where(ID_FIELD_NAME).is(groupId));
+        query.fields().include(Group.Fields.TYPE_ID);
         return mongoTemplate.findOne(query, Group.class, Group.COLLECTION_NAME)
                 .map(Group::getTypeId);
     }
@@ -287,11 +294,12 @@ public class GroupService {
             return Mono.error(e);
         }
         Query query = new Query().addCriteria(Criteria.where(ID_FIELD_NAME).is(groupId));
+        query.fields().include(Group.Fields.MINIMUM_SCORE);
         return mongoTemplate.findOne(query, Group.class, Group.COLLECTION_NAME)
                 .map(Group::getMinimumScore);
     }
 
-    public Mono<Boolean> authAndTransferGroupOwnership(
+    public Mono<Void> authAndTransferGroupOwnership(
             @NotNull Long requesterId,
             @NotNull Long groupId,
             @NotNull Long successorId,
@@ -304,9 +312,9 @@ public class GroupService {
         }
         return groupMemberService
                 .isOwner(requesterId, groupId)
-                .flatMap(isOwner -> isOwner != null && isOwner
+                .flatMap(isOwner -> isOwner
                         ? checkAndTransferGroupOwnership(requesterId, groupId, successorId, quitAfterTransfer, operations)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
+                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_TRANSFER_GROUP)));
     }
 
     public Mono<Long> queryGroupOwnerId(@NotNull Long groupId) {
@@ -321,8 +329,8 @@ public class GroupService {
                 .map(Group::getOwnerId);
     }
 
-    private Mono<Boolean> checkAndTransferGroupOwnership(
-            @Nullable Long helperCurrentOwnerId,
+    public Mono<Void> checkAndTransferGroupOwnership(
+            @Nullable Long auxiliaryCurrentOwnerId,
             @NotNull Long groupId,
             @NotNull Long successorId,
             boolean quitAfterTransfer,
@@ -333,24 +341,23 @@ public class GroupService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        Mono<Long> queryOwnerIdMono = helperCurrentOwnerId != null
-                ? Mono.just(helperCurrentOwnerId)
+        Mono<Long> queryOwnerIdMono = auxiliaryCurrentOwnerId != null
+                ? Mono.just(auxiliaryCurrentOwnerId)
                 : queryGroupOwnerId(groupId);
         return queryOwnerIdMono.flatMap(ownerId -> groupMemberService
                 .isGroupMember(groupId, successorId)
-                .flatMap(isGroupMember -> isGroupMember == null || !isGroupMember
+                .flatMap(isGroupMember -> !isGroupMember
                         ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.SUCCESSOR_NOT_GROUP_MEMBER))
                         : queryGroupTypeId(groupId))
                 .flatMap(groupTypeId ->
                         isAllowedToCreateGroupAndHaveGroupType(successorId, groupTypeId)
-                                .flatMap(allowed -> {
-                                    if (allowed == null || !allowed) {
-                                        return Mono.error(TurmsBusinessException
-                                                .get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED));
+                                .flatMap(result -> {
+                                    TurmsStatusCode code = result.getCode();
+                                    if (code != TurmsStatusCode.OK) {
+                                        return Mono.error(TurmsBusinessException.get(code, result.getReason()));
                                     }
                                     if (quitAfterTransfer) {
-                                        return groupMemberService.deleteGroupMembers(
-                                                groupId, Set.of(ownerId), operations, false);
+                                        return groupMemberService.deleteGroupMembers(groupId, ownerId, operations, false);
                                     } else {
                                         return groupMemberService.updateGroupMember(
                                                 groupId,
@@ -363,21 +370,16 @@ public class GroupService {
                                                 false);
                                     }
                                 })
-                                .flatMap(isDeletedOrUpdated -> {
-                                    if (isDeletedOrUpdated) {
-                                        return groupMemberService.updateGroupMember(
-                                                groupId,
-                                                successorId,
-                                                null,
-                                                GroupMemberRole.OWNER,
-                                                null,
-                                                null,
-                                                operations,
-                                                true);
-                                    } else {
-                                        return Mono.just(false);
-                                    }
-                                })));
+                                .then(groupMemberService.updateGroupMember(
+                                        groupId,
+                                        successorId,
+                                        null,
+                                        GroupMemberRole.OWNER,
+                                        null,
+                                        null,
+                                        operations,
+                                        true))
+                                .then()));
     }
 
     public Mono<GroupType> queryGroupType(@NotNull Long groupId) {
@@ -392,7 +394,7 @@ public class GroupService {
                 .flatMap(group -> groupTypeService.queryGroupType(group.getTypeId()));
     }
 
-    public Mono<Boolean> updateGroupsInformation(
+    public Mono<UpdateResult> updateGroupsInformation(
             @NotEmpty Set<Long> groupIds,
             @Nullable Long typeId,
             @Nullable Long creatorId,
@@ -417,7 +419,7 @@ public class GroupService {
         }
         if (Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
                 minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
-            return Mono.just(true);
+            return Mono.just(OperationResultConstant.ACKNOWLEDGED_UPDATE_RESULT);
         }
         Query query = new Query().addCriteria(Criteria.where(ID_FIELD_NAME).in(groupIds));
         Update update = UpdateBuilder.newBuilder()
@@ -436,19 +438,15 @@ public class GroupService {
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.updateMulti(query, update, Group.class, Group.COLLECTION_NAME)
                 .flatMap(result -> {
-                    if (result.wasAcknowledged()) {
-                        ArrayList<Mono<Boolean>> list = new ArrayList<>(groupIds.size());
-                        for (Long groupId : groupIds) {
-                            list.add(groupVersionService.updateInformation(groupId));
-                        }
-                        return Flux.merge(list).then(Mono.just(true));
-                    } else {
-                        return Mono.just(false);
+                    ArrayList<Mono<Boolean>> list = new ArrayList<>(groupIds.size());
+                    for (Long groupId : groupIds) {
+                        list.add(groupVersionService.updateInformation(groupId));
                     }
+                    return Flux.merge(list).then().thenReturn(result);
                 });
     }
 
-    public Mono<Boolean> authAndUpdateGroupInformation(
+    public Mono<UpdateResult> authAndUpdateGroupInformation(
             @Nullable Long requesterId,
             @NotNull Long groupId,
             @Nullable Long typeId,
@@ -473,7 +471,7 @@ public class GroupService {
         }
         if (Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
                 minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
-            return Mono.just(true);
+            return Mono.just(OperationResultConstant.ACKNOWLEDGED_UPDATE_RESULT);
         }
         return queryGroupType(groupId)
                 .flatMap(groupType -> {
@@ -491,10 +489,10 @@ public class GroupService {
                             return Mono.just(false);
                     }
                 })
-                .flatMap(authenticated -> authenticated != null && authenticated
+                .flatMap(authenticated -> authenticated
                         ? updateGroupsInformation(Set.of(groupId), typeId, creatorId, ownerId, name, intro,
                         announcement, minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
+                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_UPDATE_GROUP_INFO)));
     }
 
     public Mono<GroupsWithVersion> queryGroupWithVersion(
@@ -596,137 +594,7 @@ public class GroupService {
                 .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_UP_TO_DATE)));
     }
 
-    public Mono<Boolean> updateGroups(
-            @NotEmpty Set<Long> groupIds,
-            @Nullable Long typeId,
-            @Nullable Long creatorId,
-            @Nullable Long ownerId,
-            @Nullable String name,
-            @Nullable String intro,
-            @Nullable String announcement,
-            @Nullable @Min(0) Integer minimumScore,
-            @Nullable Boolean isActive,
-            @Nullable @PastOrPresent Date creationDate,
-            @Nullable @PastOrPresent Date deletionDate,
-            @Nullable Date muteEndDate,
-            @Nullable Long successorId,
-            @NotNull Boolean quitAfterTransfer) {
-        try {
-            AssertUtil.notEmpty(groupIds, "groupIds");
-            AssertUtil.min(minimumScore, "minimumScore", 0);
-            AssertUtil.pastOrPresent(creationDate, "creationDate");
-            AssertUtil.pastOrPresent(deletionDate, "deletionDate");
-            AssertUtil.before(creationDate, deletionDate, "creationDate", "deletionDate");
-        } catch (TurmsBusinessException e) {
-            return Mono.error(e);
-        }
-        if (Validator.areAllNull(
-                typeId,
-                creatorId,
-                ownerId,
-                name,
-                intro,
-                announcement,
-                minimumScore,
-                isActive,
-                creationDate,
-                deletionDate,
-                muteEndDate,
-                successorId)) {
-            return Mono.just(true);
-        }
-        return mongoTemplate
-                .inTransaction()
-                .execute(operations -> {
-                    List<Mono<Boolean>> monos = new LinkedList<>();
-                    if (successorId != null) {
-                        for (Long groupId : groupIds) {
-                            Mono<Boolean> transferMono = checkAndTransferGroupOwnership(
-                                    null, groupId, successorId, quitAfterTransfer, operations);
-                            monos.add(transferMono);
-                        }
-                    }
-                    if (!Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
-                            minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
-                        monos.add(updateGroupsInformation(
-                                groupIds, typeId, creatorId, ownerId, name, intro, announcement,
-                                minimumScore, isActive, creationDate, deletionDate, muteEndDate,
-                                operations));
-                    }
-                    return monos.isEmpty()
-                            ? Mono.just(true)
-                            : Mono.when(monos).thenReturn(true);
-                })
-                .retryWhen(TRANSACTION_RETRY)
-                .singleOrEmpty();
-    }
-
-    public Mono<Boolean> authAndUpdateGroup(
-            @NotNull Long requesterId,
-            @NotNull Long groupId,
-            @Nullable Long typeId,
-            @Nullable Long creatorId,
-            @Nullable Long ownerId,
-            @Nullable String name,
-            @Nullable String intro,
-            @Nullable String announcement,
-            @Nullable @Min(0) Integer minimumScore,
-            @Nullable Boolean isActive,
-            @Nullable @PastOrPresent Date creationDate,
-            @Nullable @PastOrPresent Date deletionDate,
-            @Nullable Date muteEndDate,
-            @Nullable Long successorId,
-            boolean quitAfterTransfer) {
-        try {
-            AssertUtil.notNull(requesterId, "requesterId");
-            AssertUtil.notNull(groupId, "groupId");
-            AssertUtil.min(minimumScore, "minimumScore", 0);
-            AssertUtil.pastOrPresent(creationDate, "creationDate");
-            AssertUtil.pastOrPresent(deletionDate, "deletionDate");
-            AssertUtil.before(creationDate, deletionDate, "creationDate", "deletionDate");
-        } catch (TurmsBusinessException e) {
-            return Mono.error(e);
-        }
-        Mono<Boolean> authorizeMono = Mono.just(true);
-        if (successorId != null || typeId != null) {
-            authorizeMono = groupMemberService.isOwner(requesterId, groupId);
-            if (typeId != null) {
-                authorizeMono = authorizeMono.flatMap(
-                        authorized -> authorized != null && authorized
-                                ? isAllowedToCreateGroupAndHaveGroupType(requesterId, typeId)
-                                : Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED)));
-            }
-        }
-        return authorizeMono.flatMap(authorized -> {
-            if (authorized != null && authorized) {
-                return mongoTemplate.inTransaction()
-                        .execute(operations -> {
-                            List<Mono<Boolean>> monos = new LinkedList<>();
-                            if (successorId != null) {
-                                Mono<Boolean> transferMono = authAndTransferGroupOwnership(
-                                        requesterId, groupId, successorId, quitAfterTransfer, operations);
-                                monos.add(transferMono);
-                            }
-                            if (!Validator.areAllNull(typeId, creatorId, ownerId, name, intro, announcement,
-                                    minimumScore, isActive, creationDate, deletionDate, muteEndDate)) {
-                                Mono<Boolean> updateMono = authAndUpdateGroupInformation(
-                                        requesterId, groupId, typeId, creatorId, ownerId, name, intro, announcement,
-                                        minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations);
-                                monos.add(updateMono);
-                            }
-                            return monos.isEmpty()
-                                    ? Mono.just(true)
-                                    : Mono.when(monos).thenReturn(true);
-                        })
-                        .retryWhen(TRANSACTION_RETRY)
-                        .singleOrEmpty();
-            } else {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-            }
-        });
-    }
-
-    public Mono<Boolean> isAllowedToCreateGroupAndHaveGroupType(
+    public Mono<ServicePermission> isAllowedToCreateGroupAndHaveGroupType(
             @NotNull Long requesterId,
             @NotNull Long groupTypeId) {
         try {
@@ -737,12 +605,16 @@ public class GroupService {
         Mono<UserPermissionGroup> userPermissionGroupMono = userPermissionGroupService.queryUserPermissionGroupByUserId(requesterId);
         return userPermissionGroupMono
                 .flatMap(userPermissionGroup -> isAllowedToCreateGroup(requesterId, userPermissionGroup)
-                        .flatMap(isAllowedToCreateGroup -> isAllowedToCreateGroup
+                        .flatMap(permission -> permission.getCode() == TurmsStatusCode.OK
                                 ? isAllowedHaveGroupType(requesterId, groupTypeId, userPermissionGroup)
-                                : Mono.just(false)));
+                                : Mono.just(ServicePermission.get(permission.getCode(), permission.getReason()))))
+                .defaultIfEmpty(ServicePermission.get(TurmsStatusCode.GROUP_TYPE_NOT_EXISTS));
     }
 
-    public Mono<Boolean> isAllowedToCreateGroup(
+    /**
+     * @return OK, USER_NOT_ACTIVE, OWNED_RESOURCE_LIMIT_REACHED
+     */
+    public Mono<ServicePermission> isAllowedToCreateGroup(
             @NotNull Long requesterId,
             @Nullable UserPermissionGroup auxiliaryUserPermissionGroup) {
         try {
@@ -755,23 +627,29 @@ public class GroupService {
                 : userPermissionGroupService.queryUserPermissionGroupByUserId(requesterId);
         return userPermissionGroupMono
                 .flatMap(userPermissionGroup -> {
-                    if (userPermissionGroup.getOwnedGroupLimit() == Integer.MAX_VALUE) {
-                        return Mono.just(true);
+                    Integer ownedGroupLimit = userPermissionGroup.getOwnedGroupLimit();
+                    if (ownedGroupLimit == Integer.MAX_VALUE) {
+                        String reason = String.format("The number of groups owned by the requester has reached the limit %d", ownedGroupLimit);
+                        return Mono.just(ServicePermission.get(TurmsStatusCode.OK, reason));
                     } else {
                         return countOwnedGroups(requesterId)
                                 .map(ownedGroupsNumber -> {
-                                    if (ownedGroupsNumber < userPermissionGroup.getOwnedGroupLimit()) {
-                                        return true;
+                                    TurmsStatusCode code;
+                                    String reason = null;
+                                    if (ownedGroupsNumber < ownedGroupLimit) {
+                                        code = TurmsStatusCode.OK;
                                     } else {
-                                        throw TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED);
+                                        code = TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED;
+                                        reason = String.format("The number of groups owned by the requester has reached the limit %d", ownedGroupLimit);
                                     }
+                                    return ServicePermission.get(code, reason);
                                 });
                     }
                 })
-                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED)));
+                .defaultIfEmpty(ServicePermission.get(TurmsStatusCode.USER_NOT_ACTIVE));
     }
 
-    public Mono<Boolean> isAllowedHaveGroupType(
+    public Mono<ServicePermission> isAllowedHaveGroupType(
             @NotNull Long requesterId,
             @NotNull Long groupTypeId,
             @Nullable UserPermissionGroup auxiliaryUserPermissionGroup) {
@@ -782,34 +660,33 @@ public class GroupService {
         }
         return groupTypeService.groupTypeExists(groupTypeId)
                 .flatMap(existed -> {
-                    if (existed != null && existed) {
-                        return auxiliaryUserPermissionGroup != null
-                                ? Mono.just(auxiliaryUserPermissionGroup)
-                                : userPermissionGroupService.queryUserPermissionGroupByUserId(requesterId);
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.TYPE_NOT_EXISTS));
+                    if (existed == null || !existed) {
+                        return Mono.just(ServicePermission.get(TurmsStatusCode.GROUP_TYPE_NOT_EXISTS));
                     }
-                })
-                .flatMap(userPermissionGroup -> {
-                    if (userPermissionGroup.getCreatableGroupTypeIds().contains(groupTypeId)) {
-                        if (userPermissionGroup.getOwnedGroupLimitForEachGroupType() == Integer.MAX_VALUE
-                                && (userPermissionGroup.getGroupTypeLimits() == null
-                                || userPermissionGroup.getGroupTypeLimits().getOrDefault(groupTypeId, Integer.MAX_VALUE) == Integer.MAX_VALUE)) {
-                            return Mono.just(true);
-                        } else {
-                            return countOwnedGroups(requesterId, groupTypeId)
-                                    .map(ownedGroupsNumber -> {
-                                        if (ownedGroupsNumber < userPermissionGroup.getOwnedGroupLimitForEachGroupType()
-                                                && userPermissionGroup.getGroupTypeLimits().getOrDefault(groupTypeId, Integer.MAX_VALUE) < Integer.MAX_VALUE) {
-                                            return true;
-                                        } else {
-                                            throw TurmsBusinessException.get(TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED);
-                                        }
-                                    });
+                    Mono<UserPermissionGroup> groupMono = auxiliaryUserPermissionGroup != null
+                            ? Mono.just(auxiliaryUserPermissionGroup)
+                            : userPermissionGroupService.queryUserPermissionGroupByUserId(requesterId);
+                    return groupMono.flatMap(userPermissionGroup -> {
+                        Set<Long> creatableGroupTypeIds = userPermissionGroup.getCreatableGroupTypeIds();
+                        if (!creatableGroupTypeIds.contains(groupTypeId)) {
+                            String ids = StringUtils.join(creatableGroupTypeIds, ", ");
+                            String reason = "The requester are only allowed to create groups with the types " + ids;
+                            return Mono.just(ServicePermission.get(TurmsStatusCode.NO_GROUP_TYPES_PERMISSION, reason));
                         }
-                    } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
-                    }
+                        boolean hasUnlimitedGroups = userPermissionGroup.getOwnedGroupLimitForEachGroupType() == Integer.MAX_VALUE
+                                && (userPermissionGroup.getGroupTypeLimits() == null
+                                || userPermissionGroup.getGroupTypeLimits().getOrDefault(groupTypeId, Integer.MAX_VALUE) == Integer.MAX_VALUE);
+                        if (hasUnlimitedGroups) {
+                            return Mono.just(ServicePermission.OK);
+                        }
+                        return countOwnedGroups(requesterId, groupTypeId)
+                                .map(ownedGroupsNumber -> {
+                                    boolean canCreate = ownedGroupsNumber < userPermissionGroup.getOwnedGroupLimitForEachGroupType()
+                                            && userPermissionGroup.getGroupTypeLimits().getOrDefault(groupTypeId, Integer.MAX_VALUE) < Integer.MAX_VALUE;
+                                    TurmsStatusCode code = canCreate ? TurmsStatusCode.OK : TurmsStatusCode.OWNED_RESOURCE_LIMIT_REACHED;
+                                    return ServicePermission.get(code);
+                                });
+                    });
                 });
     }
 
@@ -935,7 +812,7 @@ public class GroupService {
                     })
                     : joinedGroupIdsMono;
         } else {
-            return groupIds != null ? Mono.just(groupIds) : Mono.empty();
+            return groupIds != null ? Mono.just(groupIds) : Mono.just(Collections.emptySet());
         }
     }
 

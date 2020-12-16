@@ -85,7 +85,7 @@ class ServiceMediatorTests {
         Mono<UserSession> result = mediator.processLoginRequest(userId, null, deviceType, null, null, null, null);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.NOT_ACTIVE))
+                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.USER_NOT_ACTIVE))
                 .verify();
     }
 

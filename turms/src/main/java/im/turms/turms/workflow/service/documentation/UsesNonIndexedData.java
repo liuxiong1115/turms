@@ -15,23 +15,16 @@
  * limitations under the License.
  */
 
-package im.turms.turms.workflow.dao.index.documentation;
-
-import org.springframework.data.mongodb.core.index.Indexed;
+package im.turms.turms.workflow.service.documentation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Indexed by default because the index is used to support the widely used and advanced features of turms.
- * e.g.
- * 1. physically delete the data with a "deleted" flag,
- * <p>
- * 2. expiration date.
- * <p>
- * Remove the index if you don't need these features.
+ * If developers really need these features with efficient implementations,
+ * they should implement the features according to their requirements and the solutions mentioned
+ * in <a href="https://turms-im.github.io/docs/for-developers/schema.html">Schema Design</a>
  */
-@Indexed
-@Retention(RetentionPolicy.RUNTIME)
-public @interface OptionalIndexedForAdvancedFeature {
+@Retention(RetentionPolicy.SOURCE)
+public @interface UsesNonIndexedData {
 }

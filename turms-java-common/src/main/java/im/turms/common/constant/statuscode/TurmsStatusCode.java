@@ -72,15 +72,41 @@ public enum TurmsStatusCode {
     NOT_IMPLEMENTED(5002, "Not implemented", 501),
     UNAVAILABLE(5003, "The service is unavailable", 503),
 
+    USER_NOT_ACTIVE(5003, "The user is inactive or deleted", 503),
+    SESSION_NOT_EXISTS(5003, "The session doesn't exist", 503),
+
     CLIENT_USER_ID_AND_PASSWORD_MUST_NOT_NULL(6000, "The user ID and password must not be null", 0),
     CLIENT_SESSION_HAS_BEEN_CLOSED(6001, "The session has been closed", 0),
     CLIENT_SESSION_ALREADY_ESTABLISHED(6002, "The session has been established", 0),
     CLIENT_REQUESTS_TOO_FREQUENT(6003, "Client requests are too frequent", 0),
     MISSING_DATA(6004, "The data is missing", 0),
     TIMEOUT(6005, "The request has timed out", 0),
-    MESSAGE_IS_REJECTED(6050, "The message failed to be enqueued by the outgoing message buffer", 0);
+    MESSAGE_IS_REJECTED(6050, "The message failed to be enqueued by the outgoing message buffer", 0),
+    NO_PERMISSION_TO_BLACKLIST_USER(, , );
 
     public static final int STATUS_CODE_LENGTH = 4;
+    public static final int REQUEST_HAVE_BEEN_HANDLED = ;
+    public static final int NOT_JOIN_REQUEST_SENDER = ;
+    public static final int NO_PERMISSION_TO_ACCESS_GROUP_REQUEST = ;
+    public static final TurmsStatusCode GROUP_TYPE_NOT_EXISTS = ;
+    public static final TurmsStatusCode NO_GROUP_TYPES_PERMISSION = ;
+    public static final int NO_PERMISSION_TO_TRANSFER_GROUP = ;
+    public static final int NO_PERMISSION_TO_UPDATE_GROUP_INFO = ;
+    public static final int NO_PERMISSION_TO_REMOVE_GROUP_MEMBER_INFO = ;
+    public static final TurmsStatusCode NO_PERMISSION_TO_ACCESS_INVITATION = ;
+    public static final TurmsStatusCode INVITER_NOT_MEMBER = ;
+    public static final TurmsStatusCode GROUP_NOT_ACTIVE = ;
+    public static final int TARGET_USER_INACTIVE_OR_BLOCKED = ;
+    public static final int NO_PERMISSION_TO_UPDATE_GROUP_MEMBER_INFO = ;
+    public static final int NO_PERMISSION_TO_ACCESS_GROUP_QUESTION = ;
+    public static final TurmsStatusCode RECALL_TIMEOUT = ;
+    public static final TurmsStatusCode MESSAGE_NOT_EXISTS = ;
+    public static final int NOT_MESSAGE_SENDER = ;
+    public static final TurmsStatusCode TARGET_USERS_NOT_ACTIVE = ;
+    public static final TurmsStatusCode REQUESTER_NOT_IN_CONTACTS_OR_BLOCKED = ;
+    public static final int REQUESTER_NOT_IN_CONTACTS = ;
+    public static final int REQUESTER_NOT_REQUEST_RECIPIENT = ;
+    public static final int RELATIONSHIP_NOT_EXISTS = ;
     private static final Map<Integer, TurmsStatusCode> CODE_POOL = new HashMap<>((int) (TurmsStatusCode.values().length / 0.5));
 
     static {

@@ -15,14 +15,11 @@
  * limitations under the License.
  */
 
-package im.turms.turms.workflow.access.http.dto.response;
+package im.turms.turms.workflow.dao.index;
 
-import lombok.Data;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-/**
- * @author James Chen
- */
-@Data
-public final class AcknowledgedDTO {
-    private final boolean acknowledged;
+@Retention(RetentionPolicy.RUNTIME)
+public @interface OptionalIndexedForStatistics {
 }

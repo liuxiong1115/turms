@@ -308,18 +308,19 @@ public class UserStatusService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        String nodeId = node.getNodeId();
+        String nodeId = Node.getNodeId();
         // Do NOT use putAll() to put all values (the user status and the Node ID) in one command.
         // Because putAll() may overwrite the registered session info and make trouble
         // if a user with the same device type sends multiple login requests in a short time
         // (This can also happen in different servers).
         // So use putIfAbsent to make the code robust.
-        Mono<Boolean> updateMono = getSessionOperations(userId).putIfAbsent(userId, deviceType, nodeId);
+        ReactiveHashOperations<Long, Object, Object> operations = getSessionOperations(userId);
+        Mono<Boolean> updateMono = operations.putIfAbsent(userId, deviceType, nodeId);
         if (userStatus != null && userStatus != UserStatus.AVAILABLE) {
             updateMono = updateMono
                     .flatMap(wasSuccessful -> {
                         if (wasSuccessful) {
-                            return getSessionOperations(userId).put(userId, STATUS_KEY_STATUS, userStatus)
+                            return operations.put(userId, STATUS_KEY_STATUS, userStatus)
                                     .onErrorReturn(true)
                                     .thenReturn(true);
                         } else {

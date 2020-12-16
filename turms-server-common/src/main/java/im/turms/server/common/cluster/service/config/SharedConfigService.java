@@ -138,36 +138,25 @@ public class SharedConfigService implements ClusterService {
                         .switchIfEmpty((Mono) insertOrGet(record)));
     }
 
-    public Mono<Boolean> updateFirst(Query query, Update update, Class<?> entityClass) {
-        return mongoTemplate.updateFirst(query, update, entityClass)
-                .map(UpdateResult::wasAcknowledged);
+    public Mono<UpdateResult> updateFirst(Query query, Update update, Class<?> entityClass) {
+        return mongoTemplate.updateFirst(query, update, entityClass);
     }
 
-    public Mono<Boolean> updateMulti(Query query, Update update, Class<?> entityClass) {
-        return mongoTemplate.updateMulti(query, update, entityClass)
-                .map(UpdateResult::wasAcknowledged);
+    public Mono<UpdateResult> updateMulti(Query query, Update update, Class<?> entityClass) {
+        return mongoTemplate.updateMulti(query, update, entityClass);
     }
 
-    public Mono<Boolean> upsert(Query query, UpdateDefinition update, Object entity, Class<?> entityClass) {
+    public Mono<Void> upsert(Query query, UpdateDefinition update, Object entity, Class<?> entityClass) {
         return mongoTemplate.updateFirst(query, update, entityClass)
                 .flatMap(updateResult -> {
-                    if (updateResult.getModifiedCount() > 0) {
-                        return Mono.just(true);
-                    } else if (updateResult.getMatchedCount() > 0) {
-                        // e.g. "Invalid $addFields :: caused by :: an empty object is not a valid value."
-                        log.warn("The update definition for the class {} may be wrong: {}", entityClass, update);
-                        return Mono.just(false);
-                    } else {
-                        return mongoTemplate.insert(entity)
-                                .thenReturn(true)
-                                .onErrorResume(DuplicateKeyException.class, e -> this.upsert(query, update, entity, entityClass));
-                    }
+                    return mongoTemplate.insert(entity)
+                            .then()
+                            .onErrorResume(DuplicateKeyException.class, e -> this.upsert(query, update, entity, entityClass));
                 });
     }
 
-    public Mono<Boolean> remove(Query query, Class<?> clazz) {
-        return mongoTemplate.remove(query, clazz)
-                .map(DeleteResult::wasAcknowledged);
+    public Mono<DeleteResult> remove(Query query, Class<?> clazz) {
+        return mongoTemplate.remove(query, clazz);
     }
 
     /**

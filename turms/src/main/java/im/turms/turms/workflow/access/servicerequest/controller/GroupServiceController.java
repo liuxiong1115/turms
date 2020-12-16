@@ -119,15 +119,9 @@ public class GroupServiceController {
                             return groupService.queryGroupMemberIds(request.getGroupId())
                                     .collect(Collectors.toSet())
                                     .flatMap(memberIds -> groupService.deleteGroupsAndGroupMembers(Set.of(request.getGroupId()), null)
-                                            .map(deleted -> {
-                                                if (deleted != null && deleted) {
-                                                    return memberIds.isEmpty()
-                                                            ? RequestHandlerResultFactory.ok()
-                                                            : RequestHandlerResultFactory.get(memberIds, clientRequest.getTurmsRequest());
-                                                } else {
-                                                    return RequestHandlerResultFactory.fail();
-                                                }
-                                            }));
+                                            .map(deleted -> memberIds.isEmpty()
+                                                    ? RequestHandlerResultFactory.ok()
+                                                    : RequestHandlerResultFactory.get(memberIds, clientRequest.getTurmsRequest())));
                         } else {
                             return groupService.deleteGroupsAndGroupMembers(
                                     Set.of(request.getGroupId()),
@@ -188,15 +182,19 @@ public class GroupServiceController {
     public ClientRequestHandler handleUpdateGroupRequest() {
         return clientRequest -> {
             UpdateGroupRequest request = clientRequest.getTurmsRequest().getUpdateGroupRequest();
+            Long successorId = request.hasSuccessorId() ? request.getSuccessorId().getValue() : null;
+            if (successorId != null) {
+                boolean quitAfterTransfer = request.hasQuitAfterTransfer() && request.getQuitAfterTransfer().getValue();
+                // TODO
+                return groupService.authAndTransferGroupOwnership(clientRequest.getUserId(), request.getGroupId(), successorId, quitAfterTransfer, null);
+            }
             Integer minimumScore = request.hasMinimumScore() ? request.getMinimumScore().getValue() : null;
             Long groupTypeId = request.hasGroupTypeId() ? request.getGroupTypeId().getValue() : null;
-            Long successorId = request.hasSuccessorId() ? request.getSuccessorId().getValue() : null;
             String groupName = request.hasGroupName() ? request.getGroupName().getValue() : null;
             String intro = request.hasIntro() ? request.getIntro().getValue() : null;
             String announcement = request.hasAnnouncement() ? request.getAnnouncement().getValue() : null;
             Date muteEndDate = request.hasMuteEndDate() ? new Date(request.getMuteEndDate().getValue()) : null;
-            boolean quitAfterTransfer = request.hasQuitAfterTransfer() && request.getQuitAfterTransfer().getValue();
-            return groupService.authAndUpdateGroup(
+            return groupService.authAndUpdateGroupInformation(
                     clientRequest.getUserId(),
                     request.getGroupId(),
                     groupTypeId,
@@ -210,8 +208,7 @@ public class GroupServiceController {
                     null,
                     null,
                     muteEndDate,
-                    successorId,
-                    quitAfterTransfer)
+                    null)
                     .flatMap(updated -> {
                         if (updated == null || !updated) {
                             return Mono.just(RequestHandlerResultFactory.fail());

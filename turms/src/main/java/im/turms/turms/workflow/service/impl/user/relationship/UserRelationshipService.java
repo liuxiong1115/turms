@@ -19,16 +19,18 @@ package im.turms.turms.workflow.service.impl.user.relationship;
 
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.user.UserRelationshipsWithVersion;
 import im.turms.common.util.Validator;
 import im.turms.server.common.util.AssertUtil;
-import im.turms.server.common.util.ReactorUtil;
+import im.turms.server.common.util.MapUtil;
 import im.turms.turms.bo.DateRange;
+import im.turms.turms.constant.DaoConstant;
+import im.turms.turms.constant.OperationResultConstant;
 import im.turms.turms.constraint.ValidUserRelationshipKey;
-import im.turms.turms.util.MapUtil;
 import im.turms.turms.util.ProtoUtil;
 import im.turms.turms.workflow.dao.builder.QueryBuilder;
 import im.turms.turms.workflow.dao.builder.UpdateBuilder;
@@ -78,32 +80,7 @@ public class UserRelationshipService {
         this.userRelationshipGroupService = userRelationshipGroupService;
     }
 
-    public Mono<Boolean> deleteOneSidedRelationships(
-            @NotEmpty Set<Long> ownerIds,
-            @NotEmpty Set<Long> relatedUserIds) {
-        try {
-            AssertUtil.notEmpty(ownerIds, "ownerIds");
-            AssertUtil.notEmpty(relatedUserIds, "relatedUserIds");
-        } catch (TurmsBusinessException e) {
-            return Mono.error(e);
-        }
-        return mongoTemplate.inTransaction()
-                .execute(operations -> {
-                    Query query = new Query()
-                            .addCriteria(Criteria.where(UserRelationship.Fields.ID_OWNER_ID).in(ownerIds))
-                            .addCriteria(Criteria.where(UserRelationship.Fields.ID_RELATED_USER_ID).in(relatedUserIds));
-                    return operations.remove(query, UserRelationship.class, UserRelationship.COLLECTION_NAME)
-                            .flatMap(result -> result.wasAcknowledged()
-                                    ? userRelationshipGroupService.deleteRelatedUsersFromAllRelationshipGroups(ownerIds, relatedUserIds, operations, true)
-                                    .then(userVersionService.updateRelationshipsVersion(ownerIds, null))
-                                    .thenReturn(true)
-                                    : Mono.just(false));
-                })
-                .retryWhen(TRANSACTION_RETRY)
-                .singleOrEmpty();
-    }
-
-    public Mono<Boolean> deleteAllRelationships(
+    public Mono<DeleteResult> deleteAllRelationships(
             @NotEmpty Set<Long> userIds,
             @Nullable ReactiveMongoOperations operations,
             boolean updateRelationshipsVersion) {
@@ -119,26 +96,25 @@ public class UserRelationshipService {
         if (updateRelationshipsVersion) {
             if (operations != null) {
                 return operations.remove(query, UserRelationship.class, UserRelationship.COLLECTION_NAME)
-                        .flatMap(result -> result.wasAcknowledged()
-                                ? userVersionService.updateRelationshipsVersion(userIds, operations)
-                                : Mono.just(false));
+                        .flatMap(result -> userVersionService.updateRelationshipsVersion(userIds, operations)
+                                .onErrorResume(t -> Mono.empty())
+                                .thenReturn(result));
             } else {
                 return mongoTemplate.inTransaction()
                         .execute(newOperations -> newOperations.remove(query, UserRelationship.class, UserRelationship.COLLECTION_NAME)
-                                .flatMap(result -> result.wasAcknowledged()
-                                        ? userVersionService.updateRelationshipsVersion(userIds, newOperations)
-                                        : Mono.just(false)))
+                                .flatMap(result -> userVersionService.updateRelationshipsVersion(userIds, newOperations)
+                                        .onErrorResume(t -> Mono.empty())
+                                        .thenReturn(result)))
                         .retryWhen(TRANSACTION_RETRY)
                         .singleOrEmpty();
             }
         } else {
             ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
-            return mongoOperations.remove(query, UserRelationship.class, UserRelationship.COLLECTION_NAME)
-                    .map(DeleteResult::wasAcknowledged);
+            return mongoOperations.remove(query, UserRelationship.class, UserRelationship.COLLECTION_NAME);
         }
     }
 
-    public Mono<Boolean> deleteOneSidedRelationships(@NotEmpty Set<UserRelationship.@ValidUserRelationshipKey Key> keys) {
+    public Mono<DeleteResult> deleteOneSidedRelationships(@NotEmpty Set<UserRelationship.@ValidUserRelationshipKey Key> keys) {
         try {
             AssertUtil.notEmpty(keys, "keys");
             for (UserRelationship.Key key : keys) {
@@ -147,11 +123,21 @@ public class UserRelationshipService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        return MapUtil.fluxMerge(multimap -> {
-            for (UserRelationship.Key key : keys) {
-                multimap.put(key.getOwnerId(), key.getRelatedUserId());
-            }
-        }, (monos, key, values) -> monos.add(deleteOneSidedRelationships(Set.of(key), values)));
+        Set<Long> ownerIds = new HashSet<>(MapUtil.getCapability(keys.size()));
+        for (UserRelationship.Key key : keys) {
+            ownerIds.add(key.getOwnerId());
+        }
+        return mongoTemplate.inTransaction()
+                .execute(operations -> {
+                    Query query = new Query()
+                            .addCriteria(Criteria.where(DaoConstant.ID_FIELD_NAME).in(keys));
+                    return operations.remove(query, UserRelationship.class, UserRelationship.COLLECTION_NAME)
+                            .flatMap(result -> userRelationshipGroupService.deleteRelatedUsersFromAllRelationshipGroups(keys, operations, true)
+                                    .then(userVersionService.updateRelationshipsVersion(ownerIds, null).onErrorResume(t -> Mono.empty()))
+                                    .thenReturn(result));
+                })
+                .retryWhen(TRANSACTION_RETRY)
+                .singleOrEmpty();
     }
 
     public Mono<Boolean> deleteOneSidedRelationship(
@@ -460,7 +446,8 @@ public class UserRelationshipService {
         }
     }
 
-    public Mono<Boolean> upsertOneSidedRelationship(
+    // TODO: break down
+    public Mono<Void> upsertOneSidedRelationship(
             @NotNull Long ownerId,
             @NotNull Long relatedUserId,
             @Nullable Boolean isBlocked,
@@ -481,30 +468,30 @@ public class UserRelationshipService {
         isBlocked = isBlocked != null && isBlocked;
         establishmentDate = establishmentDate != null ? establishmentDate : new Date();
         UserRelationship userRelationship = new UserRelationship(ownerId, relatedUserId, isBlocked, establishmentDate);
-        List<Mono<Boolean>> monos = new LinkedList<>();
+        List<Mono<?>> monos = new ArrayList<>(3);
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         if (upsert) {
-            monos.add(mongoOperations.save(userRelationship, UserRelationship.COLLECTION_NAME).thenReturn(true));
+            monos.add(mongoOperations.save(userRelationship, UserRelationship.COLLECTION_NAME));
         } else {
-            monos.add(mongoOperations.insert(userRelationship, UserRelationship.COLLECTION_NAME).thenReturn(true));
+            monos.add(mongoOperations.insert(userRelationship, UserRelationship.COLLECTION_NAME)
+                    .onErrorMap(DuplicateKeyException.class, e -> TurmsBusinessException.get(TurmsStatusCode.RELATIONSHIP_HAS_ESTABLISHED)));
         }
         if (newGroupIndex != null && deleteGroupIndex != null && !newGroupIndex.equals(deleteGroupIndex)) {
-            monos.add(moveToNewGroup(ownerId, relatedUserId, deleteGroupIndex, newGroupIndex).thenReturn(true));
+            monos.add(moveToNewGroup(ownerId, relatedUserId, deleteGroupIndex, newGroupIndex));
         } else {
             if (newGroupIndex != null) {
-                Mono<Boolean> add = userRelationshipGroupService.addRelatedUserToRelationshipGroups(
-                        ownerId, Collections.singleton(newGroupIndex), relatedUserId, operations);
+                Mono<UserRelationshipGroupMember> add = userRelationshipGroupService.addRelatedUserToRelationshipGroups(
+                        ownerId, newGroupIndex, relatedUserId, operations);
                 monos.add(add);
             }
             if (deleteGroupIndex != null) {
-                Mono<Boolean> delete = userRelationshipGroupService.removeRelatedUserFromRelationshipGroup
-                        (ownerId, relatedUserId, deleteGroupIndex,
-                                newGroupIndex != null ? newGroupIndex : DEFAULT_RELATIONSHIP_GROUP_INDEX);
+                Integer targetGroupIndex = newGroupIndex != null ? newGroupIndex : DEFAULT_RELATIONSHIP_GROUP_INDEX;
+                Mono<UpdateResult> delete = userRelationshipGroupService.moveRelatedUserToNewGroup
+                        (ownerId, relatedUserId, deleteGroupIndex, targetGroupIndex);
                 monos.add(delete);
             }
         }
-        return ReactorUtil.areAllTrue(monos)
-                .onErrorMap(DuplicateKeyException.class, e -> TurmsBusinessException.get(TurmsStatusCode.RELATIONSHIP_HAS_ESTABLISHED));
+        return Flux.concat(monos).then();
     }
 
     public Mono<UserRelationshipGroupMember> moveToNewGroup(
@@ -570,51 +557,40 @@ public class UserRelationshipService {
         return mongoTemplate.exists(query, UserRelationship.class, UserRelationship.COLLECTION_NAME);
     }
 
-    public Mono<Boolean> updateUserOneSidedRelationships(
+    public Mono<UpdateResult> updateUserOneSidedRelationships(
             @NotEmpty Set<UserRelationship.@ValidUserRelationshipKey Key> keys,
             @Nullable Boolean isBlocked,
             @Nullable @PastOrPresent Date establishmentDate) {
+        Set<Long> ownerIds;
         try {
-            AssertUtil.notEmpty(keys, "ownerId");
+            AssertUtil.notEmpty(keys, "keys");
+            ownerIds = new HashSet<>(MapUtil.getCapability(keys.size()));
             for (UserRelationship.Key key : keys) {
                 DomainConstraintUtil.validRelationshipKey(key);
+                ownerIds.add(key.getOwnerId());
             }
-            AssertUtil.pastOrPresent(establishmentDate, "establishmentDate");
-        } catch (TurmsBusinessException e) {
-            return Mono.error(e);
-        }
-        return MapUtil.fluxMerge(map -> {
-            for (UserRelationship.Key key : keys) {
-                map.put(key.getOwnerId(), key.getRelatedUserId());
-            }
-        }, (monos, key, values) -> monos.add(updateUserOneSidedRelationships(key, values, isBlocked, establishmentDate)));
-    }
-
-    public Mono<Boolean> updateUserOneSidedRelationships(
-            @NotNull Long ownerId,
-            @NotEmpty Set<Long> relatedUserIds,
-            @Nullable Boolean isBlocked,
-            @Nullable @PastOrPresent Date establishmentDate) {
-        try {
-            AssertUtil.notNull(ownerId, "ownerId");
-            AssertUtil.notEmpty(relatedUserIds, "relatedUserIds");
             AssertUtil.pastOrPresent(establishmentDate, "establishmentDate");
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
         if (Validator.areAllNull(isBlocked, establishmentDate)) {
-            return Mono.just(true);
+            return Mono.just(OperationResultConstant.ACKNOWLEDGED_UPDATE_RESULT);
         }
         Query query = new Query()
-                .addCriteria(Criteria.where(UserRelationship.Fields.ID_OWNER_ID).is(ownerId))
-                .addCriteria(Criteria.where(UserRelationship.Fields.ID_RELATED_USER_ID).in(relatedUserIds));
+                .addCriteria(Criteria.where(DaoConstant.ID_FIELD_NAME).in(keys));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(UserRelationship.Fields.IS_BLOCKED, isBlocked)
                 .setIfNotNull(UserRelationship.Fields.ESTABLISHMENT_DATE, establishmentDate)
                 .build();
+        Set<Long> finalOwnerIds = ownerIds;
         return mongoTemplate.updateMulti(query, update, UserRelationship.class, UserRelationship.COLLECTION_NAME)
-                .zipWith(userVersionService.updateRelationshipsVersion(ownerId, null))
-                .map(result -> result.getT1().wasAcknowledged());
+                .flatMap(result -> {
+                    if (result.getModifiedCount() > 0) {
+                        return userVersionService.updateRelationshipsVersion(finalOwnerIds, null).onErrorResume(t -> Mono.empty())
+                                .thenReturn(result);
+                    }
+                    return Mono.just(result);
+                });
     }
 
     /**

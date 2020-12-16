@@ -40,7 +40,10 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/reasons")
 public class ReasonController {
 
-    private static final ResponseEntity NOT_FOUND_RESPONSE = ResponseEntity.notFound().build();
+    /**
+     * We don't use 404 because it's confusing and cannot be used to distinguish
+     */
+    private static final ResponseEntity NO_CONTENT_RESPONSE = ResponseEntity.noContent().build();
     private final ReasonCacheService reasonCacheService;
 
     public ReasonController(ReasonCacheService reasonCacheService) {
@@ -57,7 +60,7 @@ public class ReasonController {
                     LoginFailureReasonDTO reason = new LoginFailureReasonDTO(code.getBusinessCode(), code.name(), code.getReason());
                     return ResponseEntity.ok(reason);
                 })
-                .defaultIfEmpty(NOT_FOUND_RESPONSE);
+                .defaultIfEmpty(NO_CONTENT_RESPONSE);
     }
 
     @GetMapping("/disconnection")
@@ -73,7 +76,7 @@ public class ReasonController {
                             : closeStatus.name();
                     return ResponseEntity.ok(new SessionDisconnectionReasonDTO(code, name, ""));
                 })
-                .defaultIfEmpty(NOT_FOUND_RESPONSE);
+                .defaultIfEmpty(NO_CONTENT_RESPONSE);
     }
 
 }

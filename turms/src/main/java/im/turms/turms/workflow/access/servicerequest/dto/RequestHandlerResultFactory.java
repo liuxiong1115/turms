@@ -52,10 +52,6 @@ public class RequestHandlerResultFactory {
         return get(TurmsStatusCode.OK);
     }
 
-    public static RequestHandlerResult fail() {
-        return get(TurmsStatusCode.FAILED);
-    }
-
     public static RequestHandlerResult okIfTrue(@Nullable Boolean acknowledged) {
         return acknowledged != null && acknowledged ? ok() : fail();
     }

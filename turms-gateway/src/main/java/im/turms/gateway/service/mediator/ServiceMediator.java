@@ -230,7 +230,7 @@ public class ServiceMediator {
                 .flatMap(isActiveAndNotDeleted -> isActiveAndNotDeleted != null && isActiveAndNotDeleted
                         ? userService.authenticate(userId, password)
                         .map(authenticated -> authenticated ? TurmsStatusCode.OK : TurmsStatusCode.UNAUTHORIZED)
-                        : Mono.just(TurmsStatusCode.NOT_ACTIVE));
+                        : Mono.just(TurmsStatusCode.USER_NOT_ACTIVE));
     }
 
 }

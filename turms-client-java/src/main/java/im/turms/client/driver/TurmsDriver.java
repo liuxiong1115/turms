@@ -247,7 +247,7 @@ public class TurmsDriver {
         try {
             ProtoUtil.fillFields(builder, fields);
         } catch (Exception e) {
-            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.FAILED, e);
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.INVALID_DATA, e);
         }
         Descriptors.Descriptor descriptor = builder.getDescriptorForType();
         String fieldName = StringUtil.camelToSnakeCase(descriptor.getName());
