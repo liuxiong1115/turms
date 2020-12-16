@@ -82,10 +82,10 @@ public class ConfigController {
             @RequestBody(required = false) Map<String, Object> turmsProperties) throws IOException {
         if (updateGlobalProperties) {
             Mono<Void> updatePropertiesMono = turmsPropertiesManager.updateGlobalConfig(reset, turmsProperties);
-            return updatePropertiesMono.then(ResponseFactory.ok());
+            return updatePropertiesMono.thenReturn(ResponseFactory.OK);
         } else {
             turmsPropertiesManager.updateLocalConfig(reset, turmsProperties);
-            return ResponseFactory.ok();
+            return Mono.just(ResponseFactory.OK);
         }
     }
 

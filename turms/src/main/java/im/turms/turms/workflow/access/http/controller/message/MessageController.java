@@ -71,7 +71,7 @@ public class MessageController {
                 createMessageDTO.getTargetId(),
                 createMessageDTO.getBurnAfter(),
                 createMessageDTO.getReferenceId());
-        return sendMono.thenReturn(ResponseFactory.ok());
+        return sendMono.thenReturn(ResponseFactory.OK);
     }
 
     @GetMapping

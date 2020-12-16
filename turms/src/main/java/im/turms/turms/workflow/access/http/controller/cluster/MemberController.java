@@ -59,7 +59,7 @@ public class MemberController {
     @RequiredPermission(CLUSTER_MEMBERS_DELETE)
     public Mono<ResponseEntity<ResponseDTO<Void>>> removeMembers(@RequestParam List<String> ids) {
         Mono<Void> unregisterMembers = node.getDiscoveryService().unregisterMembers(new HashSet<>(ids));
-        return unregisterMembers.then(ResponseFactory.ok());
+        return unregisterMembers.thenReturn(ResponseFactory.OK);
     }
 
     @PostMapping
@@ -81,7 +81,7 @@ public class MemberController {
                 addMemberDTO.isActive());
         return node.getDiscoveryService()
                 .registerMember(member)
-                .then(ResponseFactory.ok());
+                .thenReturn(ResponseFactory.OK);
     }
 
     @PutMapping
@@ -93,7 +93,7 @@ public class MemberController {
                 id,
                 updateMemberDTO.getIsSeed(),
                 updateMemberDTO.getIsActive());
-        return addMemberMono.then(ResponseFactory.ok());
+        return addMemberMono.thenReturn(ResponseFactory.OK);
     }
 
     @GetMapping("/master")

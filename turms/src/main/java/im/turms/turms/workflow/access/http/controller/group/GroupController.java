@@ -22,7 +22,6 @@ import im.turms.turms.bo.DateRange;
 import im.turms.turms.workflow.access.http.dto.request.group.AddGroupDTO;
 import im.turms.turms.workflow.access.http.dto.request.group.GroupStatisticsDTO;
 import im.turms.turms.workflow.access.http.dto.request.group.UpdateGroupDTO;
-import im.turms.turms.workflow.access.http.dto.response.AcknowledgedDTO;
 import im.turms.turms.workflow.access.http.dto.response.DeleteResultDTO;
 import im.turms.turms.workflow.access.http.dto.response.PaginationDTO;
 import im.turms.turms.workflow.access.http.dto.response.ResponseDTO;

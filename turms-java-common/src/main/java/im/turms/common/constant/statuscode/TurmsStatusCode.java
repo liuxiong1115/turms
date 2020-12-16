@@ -31,7 +31,6 @@ public enum TurmsStatusCode {
     OK(2000, "ok", 200),
     FAILED(4000, "failed", 400),
     SERVER_INTERNAL_ERROR(5000, "Internal server error", 500),
-
     NO_CONTENT(2001, "No content", 204),
     ALREADY_UP_TO_DATE(2002, "Already up-to-date", 204),
     RECIPIENTS_OFFLINE(2003, "The recipients are offline", 200),
@@ -72,6 +71,7 @@ public enum TurmsStatusCode {
     NOT_IMPLEMENTED(5002, "Not implemented", 501),
     UNAVAILABLE(5003, "The service is unavailable", 503),
 
+    // For business
     USER_NOT_ACTIVE(5003, "The user is inactive or deleted", 503),
     SESSION_NOT_EXISTS(5003, "The session doesn't exist", 503),
 
