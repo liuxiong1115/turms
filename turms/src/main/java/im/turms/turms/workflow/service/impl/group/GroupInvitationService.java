@@ -22,8 +22,8 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.GroupInvitationStrategy;
 import im.turms.common.constant.RequestStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.group.GroupInvitationsWithVersion;
 import im.turms.common.util.Validator;
 import im.turms.server.common.cluster.node.Node;
@@ -161,7 +161,7 @@ public class GroupInvitationService {
                                     return createGroupInvitation(null, groupId, inviterId, inviteeId, finalContent,
                                             RequestStatus.PENDING, null, null, null);
                                 } else {
-                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REDUNDANT_REQUEST, "The invitation is redundant under the strategy " + strategy));
+                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REDUNDANT_GROUP_INVITATION, "The invitation is redundant under the strategy " + strategy));
                                 }
                             });
                 });
@@ -247,14 +247,14 @@ public class GroupInvitationService {
         }
         if (!node.getSharedProperties()
                 .getService().getGroup().isAllowRecallingPendingGroupInvitationByOwnerAndManager()) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION, "It's not allowed to recall pending invitations"));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RECALLING_GROUP_INVITATION_IS_DISABLED));
         }
         return queryGroupIdAndStatus(invitationId)
                 .flatMap(invitation -> {
                     RequestStatus requestStatus = invitation.getStatus();
                     if (requestStatus != RequestStatus.PENDING) {
                         String reason = "The invitation is under the status " + requestStatus;
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REQUEST_HAVE_BEEN_HANDLED, reason));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_INVITATION_NOT_PENDING, reason));
                     }
                     return groupMemberService.isOwnerOrManager(requesterId, invitation.getGroupId())
                             .flatMap(authenticated -> {

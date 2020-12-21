@@ -20,7 +20,7 @@ package im.turms.turms.workflow.access.servicerequest.dispatcher;
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import im.turms.common.constant.DeviceType;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.server.common.constant.TurmsStatusCode;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.server.common.cluster.node.Node;
@@ -157,13 +157,13 @@ public class ServiceRequestDispatcher implements IServiceRequestDispatcher {
             return Mono.just(new ServiceResponse(null, TurmsStatusCode.SERVER_INTERNAL_ERROR, message));
         }
         if (!node.isActive()) {
-            return Mono.just(ServiceResponseFactory.get(TurmsStatusCode.UNAVAILABLE));
+            return Mono.just(ServiceResponseFactory.get(TurmsStatusCode.SERVER_UNAVAILABLE));
         }
         TurmsRequest request;
         try {
             request = TurmsRequest.parseFrom(serviceRequest.getTurmsRequestBuffer().nioBuffer());
         } catch (InvalidProtocolBufferException e) {
-            return Mono.just(ServiceResponseFactory.get(TurmsStatusCode.INVALID_DATA));
+            return Mono.just(ServiceResponseFactory.get(TurmsStatusCode.INVALID_REQUEST));
         }
 
         TracingContext tracingContext = new TracingContext(traceId);

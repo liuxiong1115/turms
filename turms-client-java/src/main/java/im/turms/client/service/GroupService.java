@@ -18,14 +18,14 @@
 package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
+import im.turms.client.exception.TurmsBusinessException;
 import im.turms.client.model.GroupWithVersion;
+import im.turms.client.constant.TurmsStatusCode;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
 import im.turms.client.util.TurmsBusinessExceptionUtil;
-import im.turms.common.annotation.NotEmpty;
+import im.turms.client.annotation.NotEmpty;
 import im.turms.common.constant.GroupMemberRole;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.group.*;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
@@ -363,7 +363,7 @@ public class GroupService {
                     if (data.hasGroupJoinQuestionAnswerResult()) {
                         return data.getGroupJoinQuestionAnswerResult();
                     } else {
-                        throw TurmsBusinessException.get(TurmsStatusCode.MISSING_DATA);
+                        throw TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION);
                     }
                 });
     }

@@ -18,8 +18,8 @@
 package im.turms.plugin.impl;
 
 import im.turms.common.constant.ContentType;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.server.common.plugin.base.TurmsPlugin;
 import im.turms.server.common.property.TurmsProperties;
 import im.turms.server.common.property.env.service.business.StorageProperties;
@@ -415,7 +415,7 @@ public class TurmsMinioPlugin extends TurmsPlugin {
                     return Mono.just(true);
                 case ATTACHMENT:
                     if (keyNum != null) {
-                        return messageService.isMessageSentToUserOrByUser(keyNum, requesterId);
+                        return messageService.isMessageRecipientOrSender(keyNum, requesterId);
                     } else {
                         throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The message ID must not be null");
                     }
@@ -436,7 +436,7 @@ public class TurmsMinioPlugin extends TurmsPlugin {
                     }
                 case ATTACHMENT:
                     if (keyNum != null) {
-                        return messageService.isMessageSentToUserOrByUser(keyNum, requesterId);
+                        return messageService.isMessageRecipientOrSender(keyNum, requesterId);
                     } else {
                         throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The message ID must not be null");
                     }

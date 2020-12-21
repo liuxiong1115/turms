@@ -20,8 +20,8 @@ package im.turms.turms.workflow.service.impl.user.relationship;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.user.UserRelationshipGroupsWithVersion;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.cluster.service.idgen.ServiceType;
@@ -244,7 +244,7 @@ public class UserRelationshipGroupService {
         return userRelationshipService.hasOneSidedRelationship(ownerId, relatedUserId)
                 .flatMap(hasRelationship -> {
                     if (!hasRelationship) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RELATIONSHIP_NOT_EXISTS));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ADD_NOT_RELATED_USER_TO_GROUP));
                     }
                     ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
                     Date now = new Date();
@@ -376,7 +376,7 @@ public class UserRelationshipGroupService {
         if (currentGroupIndex.equals(targetGroupIndex)) {
             return Mono.just(OperationResultConstant.ACKNOWLEDGED_UPDATE_RESULT);
         } else {
-            Update update = new Update().set(UserRelationshipGroup.Fields.ID_GROUP_INDEX, targetGroupIndex);
+            Update update = new Update().set(UserRelationshipGroupMember.Fields.ID_GROUP_INDEX, targetGroupIndex);
             return mongoTemplate.updateFirst(query, update, UserRelationshipGroupMember.class, UserRelationshipGroupMember.COLLECTION_NAME);
         }
     }

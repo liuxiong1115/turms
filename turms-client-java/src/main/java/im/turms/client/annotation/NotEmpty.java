@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package im.turms.common.annotation;
+package im.turms.client.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

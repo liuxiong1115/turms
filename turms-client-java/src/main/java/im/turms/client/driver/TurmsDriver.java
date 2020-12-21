@@ -20,21 +20,19 @@ package im.turms.client.driver;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import im.turms.client.util.StringUtil;
+import im.turms.client.constant.SessionStatus;
+import im.turms.client.constant.TurmsStatusCode;
 import im.turms.client.driver.service.ConnectionService;
 import im.turms.client.driver.service.HeartbeatService;
 import im.turms.client.driver.service.MessageService;
 import im.turms.client.driver.service.SessionService;
-import im.turms.client.model.ConnectOptions;
-import im.turms.client.model.SessionDisconnectInfo;
-import im.turms.client.model.SessionStatus;
-import im.turms.client.model.UserLocation;
+import im.turms.client.exception.TurmsBusinessException;
+import im.turms.client.model.*;
 import im.turms.client.util.ProtoUtil;
+import im.turms.client.util.StringUtil;
 import im.turms.client.util.TurmsBusinessExceptionUtil;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import java8.util.concurrent.CompletableFuture;
@@ -247,7 +245,7 @@ public class TurmsDriver {
         try {
             ProtoUtil.fillFields(builder, fields);
         } catch (Exception e) {
-            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.INVALID_DATA, e);
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.INVALID_REQUEST, e);
         }
         Descriptors.Descriptor descriptor = builder.getDescriptorForType();
         String fieldName = StringUtil.camelToSnakeCase(descriptor.getName());

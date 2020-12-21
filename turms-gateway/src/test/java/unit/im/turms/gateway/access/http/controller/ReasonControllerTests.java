@@ -19,7 +19,7 @@ package unit.im.turms.gateway.access.http.controller;
 
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.server.common.constant.TurmsStatusCode;
 import im.turms.gateway.access.http.controller.ReasonController;
 import im.turms.gateway.access.http.dto.LoginFailureReasonDTO;
 import im.turms.gateway.access.http.dto.SessionDisconnectionReasonDTO;

@@ -18,7 +18,7 @@
 package im.turms.turms.workflow.access.servicerequest.controller;
 
 import im.turms.common.constant.MessageDeliveryStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.server.common.constant.TurmsStatusCode;
 import im.turms.common.model.dto.request.signal.AckRequest;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.turms.workflow.access.servicerequest.dispatcher.ClientRequestHandler;
@@ -37,6 +37,8 @@ import java.util.Set;
 import static im.turms.common.model.dto.request.TurmsRequest.KindCase.ACK_REQUEST;
 
 /**
+ * TODO: Remove
+ *
  * @author James Chen
  */
 @Controller
@@ -73,12 +75,12 @@ public class SignalServiceController {
                             if (!privateMessageIds.isEmpty()) {
                                 if (privateMessageIds.size() == ids.size()) {
                                     return messageService.deleteMessages(privateMessageIds, true, false)
-                                            .map(RequestHandlerResultFactory::okIfTrue);
+                                            .thenReturn(RequestHandlerResultFactory.OK);
                                 } else {
                                     ids.removeAll(privateMessageIds);
                                     return authAndUpdateMessagesDeliveryStatus(clientRequest.getUserId(), ids)
                                             .then(messageService.deleteMessages(privateMessageIds, true, false)
-                                                    .map(RequestHandlerResultFactory::okIfTrue));
+                                                    .thenReturn(RequestHandlerResultFactory.OK));
                                 }
                             } else {
                                 return authAndUpdateMessagesDeliveryStatus(clientRequest.getUserId(), ids);
@@ -93,7 +95,7 @@ public class SignalServiceController {
     private Mono<RequestHandlerResult> authAndUpdateMessagesDeliveryStatus(Long userId, Set<Long> messageIds) {
         return messageStatusService
                 .updateMessagesDeliveryStatus(userId, messageIds, MessageDeliveryStatus.RECEIVED, false)
-                .map(RequestHandlerResultFactory::okIfTrue);
+                .thenReturn(RequestHandlerResultFactory.OK);
     }
 
 }

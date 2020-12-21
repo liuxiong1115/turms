@@ -17,11 +17,10 @@
 
 package im.turms.client.util;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
 import java8.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.Nullable;
 
-import static im.turms.common.exception.TurmsBusinessException.get;
+import static im.turms.client.exception.TurmsBusinessException.get;
 
 /**
  * @author James Chen
@@ -31,19 +30,19 @@ public class TurmsBusinessExceptionUtil {
     private TurmsBusinessExceptionUtil() {
     }
 
-    public static <T> CompletableFuture<T> getFuture(TurmsStatusCode statusCode) {
+    public static <T> CompletableFuture<T> getFuture(int statusCode) {
         CompletableFuture<T> future = new CompletableFuture<>();
         future.completeExceptionally(get(statusCode));
         return future;
     }
 
-    public static <T> CompletableFuture<T> getFuture(TurmsStatusCode statusCode, @Nullable String reason) {
+    public static <T> CompletableFuture<T> getFuture(int statusCode, @Nullable String reason) {
         CompletableFuture<T> future = new CompletableFuture<>();
         future.completeExceptionally(get(statusCode, reason));
         return future;
     }
 
-    public static <T> CompletableFuture<T> getFuture(TurmsStatusCode statusCode, @Nullable Throwable cause) {
+    public static <T> CompletableFuture<T> getFuture(int statusCode, @Nullable Throwable cause) {
         CompletableFuture<T> future = new CompletableFuture<>();
         future.completeExceptionally(get(statusCode, cause));
         return future;

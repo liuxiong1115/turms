@@ -22,8 +22,8 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.RequestStatus;
 import im.turms.common.constant.ResponseAction;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.user.UserFriendRequestsWithVersion;
 import im.turms.common.util.Validator;
 import im.turms.server.common.cluster.node.Node;
@@ -239,11 +239,10 @@ public class UserFriendRequestService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        // if requester is stranger for recipient, requester isn't blocked and already a friend.
-        return userRelationshipService.isStranger(recipientId, requesterId)
-                .flatMap(isStranger -> {
-                    if (isStranger) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REQUESTER_NOT_IN_CONTACTS));
+        return userRelationshipService.hasNoRelationshipOrNotBlocked(recipientId, requesterId)
+                .flatMap(isNotBlocked -> {
+                    if (!isNotBlocked) {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FRIEND_REQUEST_SENDER_HAS_BEEN_BLOCKED));
                     }
                     // Allow to create a friend request even there is already an accepted request
                     // because the relationships can be deleted and rebuilt
@@ -260,7 +259,7 @@ public class UserFriendRequestService {
                     return requestExistsMono.flatMap(requestExists -> {
                         String finalContent = content != null ? content : "";
                         return requestExists
-                                ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.FRIEND_REQUEST_HAS_EXISTED))
+                                ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.CREATE_EXISTING_FRIEND_REQUEST))
                                 : createFriendRequest(null, requesterId, recipientId, finalContent, RequestStatus.PENDING, creationDate, null, null, null);
                     });
                 });
@@ -376,7 +375,7 @@ public class UserFriendRequestService {
         return queryRequesterAndRecipient(friendRequestId)
                 .flatMap(request -> {
                     if (!request.getRecipientId().equals(requesterId)) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REQUESTER_NOT_REQUEST_RECIPIENT));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REQUESTER_NOT_FRIEND_REQUEST_RECIPIENT));
                     }
                     switch (action) {
                         case ACCEPT:

@@ -17,7 +17,7 @@
 
 package unit.im.turms.gateway.access.http.dto;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.server.common.constant.TurmsStatusCode;
 import im.turms.gateway.access.http.dto.LoginFailureReasonDTO;
 import org.junit.jupiter.api.Test;
 

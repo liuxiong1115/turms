@@ -93,6 +93,13 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder addNeNullIfNotNull(@NotNull String key, @Nullable Object obj) {
+        if (obj != null) {
+            criteriaList.add(Criteria.where(key).ne(null));
+        }
+        return this;
+    }
+
     public QueryBuilder max(String field) {
         if (outputQuery == null) {
             buildQuery();

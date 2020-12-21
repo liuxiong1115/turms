@@ -19,14 +19,15 @@ package im.turms.client.service;
 
 import com.google.protobuf.*;
 import im.turms.client.TurmsClient;
+import im.turms.client.annotation.NotEmpty;
 import im.turms.client.driver.TurmsDriver;
 import im.turms.client.model.MessageAddition;
+import im.turms.client.constant.TurmsStatusCode;
+import im.turms.client.util.AssertUtil;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
 import im.turms.client.util.TurmsBusinessExceptionUtil;
-import im.turms.common.annotation.NotEmpty;
 import im.turms.common.constant.MessageDeliveryStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.model.bo.file.AudioFile;
 import im.turms.common.model.bo.file.File;
 import im.turms.common.model.bo.file.ImageFile;
@@ -306,7 +307,7 @@ public class MessageService {
             @Nullable Integer duration,
             @Nullable String format,
             @Nullable Integer size) {
-        Validator.throwIfAnyFalsy(url);
+        AssertUtil.throwIfAnyFalsy(url);
         AudioFile.Description.Builder builder = AudioFile.Description.newBuilder();
         builder.setUrl(url);
         if (duration != null) {
@@ -326,7 +327,7 @@ public class MessageService {
     }
 
     public static ByteBuffer generateAudioRecordByData(byte[] data) {
-        Validator.throwIfAnyFalsy((Object) data);
+        AssertUtil.throwIfAnyFalsy((Object) data);
         BytesValue bytesValue = BytesValue.newBuilder()
                 .setValue(ByteString.copyFrom(data))
                 .build();
@@ -342,7 +343,7 @@ public class MessageService {
             @Nullable Integer duration,
             @Nullable String format,
             @Nullable Integer size) {
-        Validator.throwIfAnyFalsy(url);
+        AssertUtil.throwIfAnyFalsy(url);
         VideoFile.Description.Builder builder = VideoFile.Description.newBuilder()
                 .setUrl(url);
         if (duration != null) {
@@ -362,7 +363,7 @@ public class MessageService {
     }
 
     public static ByteBuffer generateVideoRecordByData(byte[] data) {
-        Validator.throwIfAnyFalsy((Object) data);
+        AssertUtil.throwIfAnyFalsy((Object) data);
         BytesValue bytesValue = BytesValue.newBuilder()
                 .setValue(ByteString.copyFrom(data))
                 .build();
@@ -374,7 +375,7 @@ public class MessageService {
     }
 
     public static ByteBuffer generateImageRecordByData(byte[] data) {
-        Validator.throwIfAnyFalsy((Object) data);
+        AssertUtil.throwIfAnyFalsy((Object) data);
         BytesValue bytesValue = BytesValue.newBuilder()
                 .setValue(ByteString.copyFrom(data))
                 .build();
@@ -390,7 +391,7 @@ public class MessageService {
             @Nullable Integer fileSize,
             @Nullable Integer imageSize,
             @Nullable Boolean original) {
-        Validator.throwIfAnyFalsy(url);
+        AssertUtil.throwIfAnyFalsy(url);
         ImageFile.Description.Builder builder = ImageFile.Description.newBuilder()
                 .setUrl(url);
         if (fileSize != null) {
@@ -410,7 +411,7 @@ public class MessageService {
     }
 
     public static ByteBuffer generateFileRecordByDate(byte[] data) {
-        Validator.throwIfAnyFalsy((Object) data);
+        AssertUtil.throwIfAnyFalsy((Object) data);
         BytesValue bytesValue = BytesValue.newBuilder()
                 .setValue(ByteString.copyFrom(data))
                 .build();
@@ -425,7 +426,7 @@ public class MessageService {
             @NotNull String url,
             @Nullable String format,
             @Nullable Integer size) {
-        Validator.throwIfAnyFalsy(url);
+        AssertUtil.throwIfAnyFalsy(url);
         File.Description.Builder builder = File.Description.newBuilder()
                 .setUrl(url);
         if (format != null) {

@@ -19,10 +19,10 @@ package im.turms.client.service;
 
 import helper.ExceptionUtil;
 import im.turms.client.TurmsClient;
+import im.turms.client.constant.TurmsStatusCode;
 import im.turms.client.model.UserInfoWithVersion;
 import im.turms.common.constant.ResponseAction;
 import im.turms.common.constant.UserStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.user.*;
 import org.junit.jupiter.api.*;
@@ -103,7 +103,7 @@ class UserServiceST {
                     .get(5, TimeUnit.SECONDS);
             assertNull(result);
         } catch (ExecutionException e) {
-            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.RELATIONSHIP_HAS_ESTABLISHED));
+            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.CREATE_EXISTING_RELATIONSHIP));
         }
     }
 
@@ -115,7 +115,7 @@ class UserServiceST {
                     .get(5, TimeUnit.SECONDS);
             assertNull(result);
         } catch (ExecutionException e) {
-            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.RELATIONSHIP_HAS_ESTABLISHED));
+            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.CREATE_EXISTING_RELATIONSHIP));
         }
     }
 
@@ -127,7 +127,7 @@ class UserServiceST {
                     .get(5, TimeUnit.SECONDS);
             assertNull(result);
         } catch (ExecutionException e) {
-            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.RELATIONSHIP_HAS_ESTABLISHED));
+            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.CREATE_EXISTING_RELATIONSHIP));
         }
     }
 
@@ -139,7 +139,7 @@ class UserServiceST {
                     .get(5, TimeUnit.SECONDS);
             assertNotNull(friendRequestId);
         } catch (ExecutionException e) {
-            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.FRIEND_REQUEST_HAS_EXISTED));
+            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.CREATE_EXISTING_FRIEND_REQUEST));
         }
     }
 

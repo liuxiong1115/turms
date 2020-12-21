@@ -52,16 +52,16 @@ public final class UserRelationship {
     @Id
     private final Key key;
 
-    @Field(Fields.IS_BLOCKED)
-    private final Boolean isBlocked;
+    @Field(Fields.BLOCK_DATE)
+    private final Date blockDate;
 
     @Field(Fields.ESTABLISHMENT_DATE)
     @OptionalIndexedForExtendedFeature
     private final Date establishmentDate;
 
-    public UserRelationship(Long ownerId, Long relatedUserId, Boolean isBlocked, Date establishmentDate) {
+    public UserRelationship(Long ownerId, Long relatedUserId, Date blockDate, Date establishmentDate) {
         this.key = new Key(ownerId, relatedUserId);
-        this.isBlocked = isBlocked;
+        this.blockDate = blockDate;
         this.establishmentDate = establishmentDate;
     }
 
@@ -74,7 +74,9 @@ public final class UserRelationship {
         @Indexed
         private Long ownerId;
 
+        // The index is used by deleteAllRelationships
         @Field(Fields.RELATED_USER_ID)
+        @Indexed
         private Long relatedUserId;
 
         public static class Fields {
@@ -89,7 +91,7 @@ public final class UserRelationship {
     public static class Fields {
         public static final String ID_OWNER_ID = "_id." + Key.Fields.OWNER_ID;
         public static final String ID_RELATED_USER_ID = "_id." + Key.Fields.RELATED_USER_ID;
-        public static final String IS_BLOCKED = "bld";
+        public static final String BLOCK_DATE = "bd";
         public static final String ESTABLISHMENT_DATE = "ed";
 
         private Fields() {

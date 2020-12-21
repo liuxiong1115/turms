@@ -19,8 +19,8 @@ package im.turms.turms.workflow.service.impl.admin;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.server.common.cluster.service.config.ChangeStreamUtil;
 import im.turms.server.common.constraint.NoWhitespace;

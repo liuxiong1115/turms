@@ -19,8 +19,8 @@ package im.turms.gateway.access.websocket.config;
 
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.UserStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
 import im.turms.gateway.service.mediator.ServiceMediator;
 import im.turms.server.common.cluster.node.Node;
@@ -122,10 +122,10 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         String deviceDetails = HandshakeRequestUtil.parseDeviceDetailsFromHeaders(request);
         DeviceType loggingInDeviceType = HandshakeRequestUtil.parseDeviceTypeFromHeadersOrCookies(request);
         if (userId == null) {
-            return rejectUpgradeRequest(exchange, TurmsStatusCode.UNAUTHORIZED, requestId, userId, loggingInDeviceType);
+            return rejectUpgradeRequest(exchange, TurmsStatusCode.LOGIN_USER_ID_IS_NULL, requestId, userId, loggingInDeviceType);
         }
         if (!node.isActive()) {
-            return rejectUpgradeRequest(exchange, TurmsStatusCode.UNAVAILABLE, requestId, userId, loggingInDeviceType);
+            return rejectUpgradeRequest(exchange, TurmsStatusCode.SERVER_UNAVAILABLE, requestId, userId, loggingInDeviceType);
         }
         if (identityList != null) {
             exchange.getResponse().getHeaders().put(RESPONSE_HEADER_NODE_IDENTITY, identityList);

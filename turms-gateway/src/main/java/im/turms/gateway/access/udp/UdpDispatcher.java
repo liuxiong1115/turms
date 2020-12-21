@@ -19,8 +19,8 @@ package im.turms.gateway.access.udp;
 
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.udpsignal.UdpNotificationType;
 import im.turms.common.model.dto.udpsignal.UdpRequestType;
 import im.turms.common.model.dto.udpsignal.UdpSignalRequest;
@@ -135,7 +135,7 @@ public class UdpDispatcher {
                     throw new IllegalStateException("Unexpected value: " + signalRequest.getType());
             }
         } else {
-            return Mono.just(TurmsStatusCode.INVALID_DATA);
+            return Mono.just(TurmsStatusCode.INVALID_REQUEST);
         }
     }
 

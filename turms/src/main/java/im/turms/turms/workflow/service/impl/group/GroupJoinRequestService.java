@@ -21,8 +21,8 @@ import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.RequestStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.group.GroupJoinRequestsWithVersion;
 import im.turms.common.util.Validator;
 import im.turms.server.common.cluster.node.Node;
@@ -139,12 +139,12 @@ public class GroupJoinRequestService {
             return Mono.error(e);
         }
         return groupMemberService.isBlacklisted(groupId, requesterId)
-                .flatMap(isBlacklisted -> isBlacklisted != null && isBlacklisted
-                        ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED))
+                .flatMap(isBlacklisted -> isBlacklisted
+                        ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_JOIN_REQUEST_SENDER_HAS_BEEN_BLOCKED))
                         : groupService.isGroupActiveAndNotDeleted(groupId))
                 .flatMap(isActive -> {
-                    if (isActive == null || !isActive) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_NOT_ACTIVE));
+                    if (!isActive) {
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.SEND_JOIN_REQUEST_TO_INACTIVE_GROUP));
                     }
                     int hours = node.getSharedProperties().getService().getGroup()
                             .getGroupJoinRequestTimeToLiveHours();
@@ -202,17 +202,17 @@ public class GroupJoinRequestService {
             return Mono.error(e);
         }
         if (!node.getSharedProperties().getService().getGroup().isAllowRecallingJoinRequestSentByOneself()) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION, "It's not allow to recall the join request sent by oneself"));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RECALLING_GROUP_JOIN_REQUEST_IS_DISABLED));
         }
         return queryRequesterIdAndStatusAndGroupId(requestId)
                 .flatMap(request -> {
                     RequestStatus status = request.getStatus();
                     if (status != RequestStatus.PENDING) {
                         String reason = "The request is under the status " + status;
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REQUEST_HAVE_BEEN_HANDLED, reason));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_JOIN_REQUEST_NOT_PENDING, reason));
                     }
                     if (!request.getRequesterId().equals(requesterId)) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_JOIN_REQUEST_SENDER));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REQUESTER_NOT_JOIN_REQUEST_SENDER));
                     }
                     Query query = new Query().addCriteria(where(DaoConstant.ID_FIELD_NAME).is(requestId));
                     Update update = new Update()

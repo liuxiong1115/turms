@@ -17,8 +17,8 @@
 
 package im.turms.turms.bo;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import lombok.Data;
 
 import java.util.Date;

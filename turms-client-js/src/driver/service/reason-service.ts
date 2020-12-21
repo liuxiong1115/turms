@@ -19,7 +19,7 @@ import {LoginFailureReason} from "../../model/login-failure-reason";
 import {SessionDisconnectionReason} from "../../model/session-disconnection-reason";
 
 // @ts-ignore
-import fetch from "unfetch/dist/unfetch.es";
+import unfetch from "unfetch/dist/unfetch";
 import StateStore from "../state-store";
 import {im} from "../../model/proto-bundle";
 import DeviceType = im.turms.proto.DeviceType;
@@ -41,7 +41,7 @@ export default class ReasonService {
         this._url = url || ReasonService.DEFAULT_HTTP_URL;
     }
 
-    queryLoginFailureReason(): Promise<LoginFailureReason> {
+    queryLoginFailureReason(): Promise<LoginFailureReason | null> {
         const userId = this._stateStore.userInfo.userId;
         const deviceType = DeviceType[this._stateStore.userInfo.deviceType] || '';
         const requestId = this._stateStore.connectionRequestId;
@@ -49,20 +49,21 @@ export default class ReasonService {
             return Promise.reject(new Error('userId and requestId must not be null'));
         }
         const params = `userId=${userId}&deviceType=${deviceType}&requestId=${requestId}`;
-        return fetch(`${this._url}/reasons/login-failure?${params}`)
+        return unfetch(`${this._url}/reasons/login-failure?${params}`)
             .catch((_: ProgressEvent) => {
                 throw new Error(`Failed to fetch the reason for login failure`);
             })
             .then(response => {
                 if (response.status === 200) {
-                    return response.json();
+                    return response.text()
+                        .then(text => text ? JSON.parse(text) : null);
                 } else {
                     throw new Error(`Failed to fetch the reason for login failure: ${response.status}`);
                 }
             });
     }
 
-    queryDisconnectionReason(): Promise<SessionDisconnectionReason> {
+    queryDisconnectionReason(): Promise<SessionDisconnectionReason | null> {
         const userId = this._stateStore.userInfo.userId;
         const deviceType = DeviceType[this._stateStore.userInfo.deviceType] || '';
         const sessionId = this._stateStore.sessionId;
@@ -70,13 +71,14 @@ export default class ReasonService {
             return Promise.reject(new Error('userId and sessionId must not be null'));
         }
         const params = `userId=${userId}&deviceType=${deviceType}&sessionId=${sessionId}`;
-        return fetch(`${this._url}/reasons/disconnection?${params}`)
+        return unfetch(`${this._url}/reasons/disconnection?${params}`)
             .catch((_: ProgressEvent) => {
                 throw new Error(`Failed to fetch the reason for session disconnection`);
             })
             .then(response => {
                 if (response.status === 200) {
-                    return response.json();
+                    return response.text()
+                        .then(text => text ? JSON.parse(text) : null);
                 } else {
                     throw new Error(`Failed to fetch the reason for session disconnection: ${response.status}`);
                 }

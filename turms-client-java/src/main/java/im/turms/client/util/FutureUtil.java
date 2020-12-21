@@ -17,8 +17,8 @@
 
 package im.turms.client.util;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.client.exception.TurmsBusinessException;
+import im.turms.client.constant.TurmsStatusCode;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
 
@@ -36,7 +36,7 @@ public class FutureUtil {
     public static <V> CompletableFuture<V> timeout(CompletableFuture<V> future, int timeout, ScheduledExecutorService executorService, Consumer<Exception> onTimeout) {
         executorService.schedule(() -> {
             if (!future.isDone()) {
-                TurmsBusinessException exception = TurmsBusinessException.get(TurmsStatusCode.TIMEOUT);
+                TurmsBusinessException exception = TurmsBusinessException.get(TurmsStatusCode.REQUEST_TIMEOUT);
                 future.completeExceptionally(exception);
                 if (future.isCompletedExceptionally()) {
                     onTimeout.accept(exception);

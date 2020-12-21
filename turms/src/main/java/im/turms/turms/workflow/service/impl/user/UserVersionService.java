@@ -19,7 +19,7 @@ package im.turms.turms.workflow.service.impl.user;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.server.common.util.AssertUtil;
 import im.turms.turms.workflow.dao.domain.UserVersion;
 import org.springframework.beans.factory.annotation.Qualifier;

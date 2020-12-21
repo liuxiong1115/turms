@@ -18,18 +18,18 @@
 package im.turms.client.service;
 
 import im.turms.client.TurmsClient;
+import im.turms.client.constant.TurmsStatusCode;
 import im.turms.client.model.UserInfoWithVersion;
 import im.turms.client.model.UserLocation;
 import im.turms.client.util.MapUtil;
 import im.turms.client.util.NotificationUtil;
 import im.turms.client.util.SystemUtil;
 import im.turms.client.util.TurmsBusinessExceptionUtil;
-import im.turms.common.annotation.NotEmpty;
+import im.turms.client.annotation.NotEmpty;
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.ProfileAccessStrategy;
 import im.turms.common.constant.ResponseAction;
 import im.turms.common.constant.UserStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.user.*;
 import im.turms.common.model.dto.notification.TurmsNotification;
@@ -89,7 +89,7 @@ public class UserService {
         if (userId != null && password != null) {
             return this.login(userId, password, deviceType, userOnlineStatus, location);
         } else {
-            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.CLIENT_USER_ID_AND_PASSWORD_MUST_NOT_NULL);
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The userId and password must not be null");
         }
     }
 

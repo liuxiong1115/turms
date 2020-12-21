@@ -19,9 +19,9 @@ package im.turms.client.driver.service;
 
 import com.google.protobuf.Int64Value;
 import im.turms.client.driver.StateStore;
+import im.turms.client.exception.TurmsBusinessException;
+import im.turms.client.constant.TurmsStatusCode;
 import im.turms.client.util.FutureUtil;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import java8.util.concurrent.CompletableFuture;
@@ -141,7 +141,7 @@ public class MessageService {
                         }
                     }
                 } else {
-                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_DATA, "Invalid notification: the code is missing"));
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION, "The code is missing"));
                 }
             }
         }

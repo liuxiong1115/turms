@@ -17,12 +17,15 @@
 
 package im.turms.server.common.util;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.Date;
+
+import static im.turms.common.util.Validator.areAllFalsy;
 
 /**
  * @author James Chen
@@ -47,6 +50,12 @@ public class AssertUtil {
     public static void notEmpty(Object[] array, String name) {
         if (array == null || array.length == 0) {
             throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, name + " must not be null or empty");
+        }
+    }
+
+    public static void throwIfAllFalsy(String message, @NotEmpty Object... array) {
+        if (areAllFalsy(array)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, message);
         }
     }
 

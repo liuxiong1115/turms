@@ -18,7 +18,7 @@
 package unit.im.turms.gateway.service.mediator;
 
 import im.turms.common.constant.DeviceType;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.server.common.constant.TurmsStatusCode;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.gateway.manager.UserSessionsManager;
 import im.turms.gateway.plugin.manager.TurmsPluginManager;
@@ -65,7 +65,7 @@ class ServiceMediatorTests {
         Mono<UserSession> result = mediator.processLoginRequest(userId, null, deviceType, null, null, null, null);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.FORBIDDEN_DEVICE_TYPE))
+                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.LOGIN_FROM_FORBIDDEN_DEVICE_TYPE))
                 .verify();
     }
 
@@ -85,7 +85,7 @@ class ServiceMediatorTests {
         Mono<UserSession> result = mediator.processLoginRequest(userId, null, deviceType, null, null, null, null);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.USER_NOT_ACTIVE))
+                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.LOGGING_IN_USER_NOT_ACTIVE))
                 .verify();
     }
 

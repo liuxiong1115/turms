@@ -19,9 +19,9 @@ package im.turms.client.service;
 
 import helper.ExceptionUtil;
 import im.turms.client.TurmsClient;
+import im.turms.client.constant.TurmsStatusCode;
 import im.turms.client.model.GroupWithVersion;
 import im.turms.common.constant.GroupMemberRole;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.group.*;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
@@ -284,7 +284,7 @@ class GroupServiceST {
             boolean isCorrect = answerResult.getQuestionIdsList().contains(groupJoinQuestionId);
             assertTrue(isCorrect);
         } catch (ExecutionException e) {
-            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.ALREADY_GROUP_MEMBER));
+            assertTrue(ExceptionUtil.isTurmsStatusCode(e, TurmsStatusCode.MEMBER_CANNOT_ANSWER_GROUP_QUESTION));
         }
     }
 

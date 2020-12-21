@@ -20,7 +20,7 @@ package im.turms.server.common.util;
 import com.google.protobuf.Int32Value;
 import com.google.protobuf.StringValue;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.server.common.constant.TurmsStatusCode;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.server.common.dto.CloseReason;
 import im.turms.server.common.pojo.ThrowableInfo;
@@ -57,11 +57,11 @@ public class CloseReasonUtil {
             case SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE:
                 closeStatus = SessionCloseStatus.DISCONNECTED_BY_OTHER_DEVICE;
                 break;
-            case UNAVAILABLE:
+            case SERVER_UNAVAILABLE:
                 closeStatus = SessionCloseStatus.SERVER_UNAVAILABLE;
                 break;
             case ILLEGAL_ARGUMENTS:
-            case FORBIDDEN_DEVICE_TYPE:
+            case LOGIN_FROM_FORBIDDEN_DEVICE_TYPE:
                 closeStatus = SessionCloseStatus.ILLEGAL_REQUEST;
                 break;
             default:

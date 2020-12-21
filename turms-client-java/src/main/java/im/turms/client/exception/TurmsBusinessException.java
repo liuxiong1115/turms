@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-package im.turms.common.exception;
+package im.turms.client.exception;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.common.exception.NoStackTraceException;
 import im.turms.common.model.dto.notification.TurmsNotification;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -31,53 +28,26 @@ import java.util.Objects;
  */
 public class TurmsBusinessException extends NoStackTraceException {
 
-    private static final Map<TurmsStatusCode, TurmsBusinessException> exceptionPool = new EnumMap<>(TurmsStatusCode.class);
-
-    static {
-        for (TurmsStatusCode code : TurmsStatusCode.values()) {
-            TurmsBusinessException exception = new TurmsBusinessException(code, code.getReason());
-            exceptionPool.put(code, exception);
-        }
-    }
-
-    private final TurmsStatusCode code;
+    private final int code;
     private final String reason;
 
-    private TurmsBusinessException(@NotNull TurmsStatusCode code, @Nullable String reason) {
+    private TurmsBusinessException(int code, @Nullable String reason) {
         super(formatMessage(code, reason));
         this.code = code;
         this.reason = reason;
     }
 
-    private TurmsBusinessException(@NotNull TurmsStatusCode code, @Nullable Throwable cause) {
+    private TurmsBusinessException(int code, @Nullable Throwable cause) {
         super(formatMessage(code, null), cause);
         this.code = code;
         this.reason = null;
     }
 
-    public static TurmsBusinessException get(@NotNull TurmsStatusCode code) {
-        return exceptionPool.get(code);
+    public static TurmsBusinessException get(int code) {
+        return new TurmsBusinessException(code, (String) null);
     }
 
-    public static TurmsBusinessException get(int statusCode) {
-        for (TurmsStatusCode value : TurmsStatusCode.values()) {
-            if (value.getBusinessCode() == statusCode) {
-                return get(value);
-            }
-        }
-        return null;
-    }
-
-    public static TurmsBusinessException get(int statusCode, @Nullable String reason) {
-        for (TurmsStatusCode value : TurmsStatusCode.values()) {
-            if (value.getBusinessCode() == statusCode) {
-                return get(value, reason);
-            }
-        }
-        return null;
-    }
-
-    public static TurmsBusinessException get(@NotNull TurmsStatusCode code, @Nullable String reason) {
+    public static TurmsBusinessException get(int code, @Nullable String reason) {
         if (reason != null && !reason.isEmpty()) {
             return new TurmsBusinessException(code, reason);
         } else {
@@ -85,7 +55,7 @@ public class TurmsBusinessException extends NoStackTraceException {
         }
     }
 
-    public static TurmsBusinessException get(@NotNull TurmsStatusCode code, @Nullable Throwable cause) {
+    public static TurmsBusinessException get(int code, @Nullable Throwable cause) {
         return new TurmsBusinessException(code, cause);
     }
 
@@ -96,19 +66,24 @@ public class TurmsBusinessException extends NoStackTraceException {
                 : TurmsBusinessException.get(code);
     }
 
-    private static String formatMessage(@NotNull TurmsStatusCode code, @Nullable String reason) {
+    private static String formatMessage(int code, @Nullable String reason) {
         if (reason != null) {
-            return "code: " + code.getBusinessCode() + ", reason: " + reason;
+            return "code: " + code + ", reason: " + reason;
         } else {
-            return "code: " + code.getBusinessCode();
+            return "code: " + code;
         }
     }
 
-    public TurmsStatusCode getCode() {
+    public int getCode() {
         return code;
     }
 
     public String getReason() {
+        return reason;
+    }
+
+    @Override
+    public String getMessage() {
         return reason;
     }
 
@@ -121,13 +96,11 @@ public class TurmsBusinessException extends NoStackTraceException {
             return false;
         }
         TurmsBusinessException that = (TurmsBusinessException) o;
-        return code == that.code
-                && Objects.equals(reason, that.reason);
+        return code == that.code && Objects.equals(reason, that.reason);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(code, reason);
     }
-
 }

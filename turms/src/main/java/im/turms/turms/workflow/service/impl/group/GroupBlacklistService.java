@@ -20,8 +20,8 @@ package im.turms.turms.workflow.service.impl.group;
 import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.common.Int64ValuesWithVersion;
 import im.turms.common.model.bo.user.UserInfo;
 import im.turms.common.model.bo.user.UsersInfosWithVersion;
@@ -97,7 +97,7 @@ public class GroupBlacklistService {
         return groupMemberService.isOwnerOrManager(requesterId, groupId)
                 .flatMap(authenticated -> authenticated
                         ? groupMemberService.isGroupMember(groupId, blacklistedUserId)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_BLACKLIST_USER)))
+                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_BLOCK_GROUP_USER)))
                 .flatMap(isGroupMember -> {
                     GroupBlacklistedUser blacklistedUser = new GroupBlacklistedUser(
                             groupId, blacklistedUserId, new Date(), requesterId);
@@ -147,7 +147,7 @@ public class GroupBlacklistService {
         return groupMemberService
                 .isOwnerOrManager(requesterId, groupId)
                 .flatMap(authenticated -> {
-                    if (authenticated != null && authenticated) {
+                    if (authenticated) {
                         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
                         Query query = new Query()
                                 .addCriteria(Criteria.where(DaoConstant.ID_FIELD_NAME).is(new GroupBlacklistedUser.Key(groupId, unblacklistedUserId)));
@@ -159,7 +159,7 @@ public class GroupBlacklistService {
                         }
                         return removeMono.then();
                     } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_BLACKLIST_USER));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_BLOCK_GROUP_USER));
                     }
                 });
     }

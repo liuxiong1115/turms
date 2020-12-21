@@ -19,8 +19,8 @@ package im.turms.turms.workflow.service.impl.message;
 
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.MessageDeliveryStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.util.AssertUtil;

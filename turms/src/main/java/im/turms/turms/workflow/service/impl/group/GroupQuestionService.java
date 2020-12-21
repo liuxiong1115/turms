@@ -21,8 +21,8 @@ import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.GroupMemberRole;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.group.GroupJoinQuestionsAnswerResult;
 import im.turms.common.model.bo.group.GroupJoinQuestionsWithVersion;
 import im.turms.common.util.Validator;
@@ -152,14 +152,14 @@ public class GroupQuestionService {
         return queryGroupId(firstQuestionId)
                 .flatMap(groupId -> groupMemberService.isBlacklisted(groupId, requesterId)
                         .flatMap(isBlacklisted -> isBlacklisted
-                                ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED))
-                                : groupMemberService.exists(groupId, requesterId))
+                                ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_QUESTION_ANSWERER_HAS_BEEN_BLOCKED))
+                                : groupMemberService.isGroupMember(groupId, requesterId))
                         .flatMap(isGroupMember -> isGroupMember
-                                ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.ALREADY_GROUP_MEMBER))
+                                ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.MEMBER_CANNOT_ANSWER_GROUP_QUESTION))
                                 : groupService.isGroupActiveAndNotDeleted(groupId))
                         .flatMap(isActive -> isActive
                                 ? checkGroupQuestionAnswersAndCountScore(questionIdAndAnswers, groupId)
-                                : Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_NOT_ACTIVE)))
+                                : Mono.error(TurmsBusinessException.get(TurmsStatusCode.ANSWER_QUESTION_OF_INACTIVE_GROUP)))
                         .flatMap(idsAndScore -> groupService.queryGroupMinimumScore(groupId)
                                 .flatMap(minimumScore -> idsAndScore.getRight() >= minimumScore
                                         ? groupMemberService.addGroupMember(
@@ -238,7 +238,7 @@ public class GroupQuestionService {
                 .map(GroupJoinQuestion::getGroupId);
     }
 
-    public Mono<DeleteResult> authAndDeleteGroupJoinQuestion(
+    public Mono<Void> authAndDeleteGroupJoinQuestion(
             @NotNull Long requesterId,
             @NotNull Long questionId) {
         try {
@@ -254,7 +254,7 @@ public class GroupQuestionService {
                                 return mongoTemplate.remove(query, GroupJoinQuestion.class, GroupJoinQuestion.COLLECTION_NAME)
                                         .flatMap(result -> groupVersionService.updateJoinQuestionsVersion(groupId)
                                                 .onErrorResume(t -> Mono.empty())
-                                                .thenReturn(result));
+                                                .then());
                             } else {
                                 return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_GROUP_QUESTION));
                             }

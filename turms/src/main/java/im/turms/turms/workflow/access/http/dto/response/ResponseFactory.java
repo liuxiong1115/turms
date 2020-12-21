@@ -19,8 +19,8 @@ package im.turms.turms.workflow.access.http.dto.response;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;

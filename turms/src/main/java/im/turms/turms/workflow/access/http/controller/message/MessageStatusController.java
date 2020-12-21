@@ -134,7 +134,7 @@ public class MessageStatusController {
                 updateMessageStatusDTO.getReadDate(),
                 updateMessageStatusDTO.getReceptionDate(),
                 null);
-        return updateMono.then(ResponseFactory.ok());
+        return updateMono.thenReturn(ResponseFactory.OK);
     }
 
 }

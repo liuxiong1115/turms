@@ -17,8 +17,7 @@
 
 package helper;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.client.exception.TurmsBusinessException;
 
 import java.util.concurrent.ExecutionException;
 
@@ -26,12 +25,12 @@ public class ExceptionUtil {
     private ExceptionUtil() {
     }
 
-    public static boolean isTurmsStatusCode(ExecutionException throwable, TurmsStatusCode code) {
+    public static boolean isTurmsStatusCode(ExecutionException throwable, int code) {
         Throwable cause = throwable.getCause();
-        return isTurmsStatusCode(cause, code);
+        return isBusinessError(cause, code);
     }
 
-    public static boolean isTurmsStatusCode(Throwable throwable, TurmsStatusCode code) {
+    public static boolean isBusinessError(Throwable throwable, int code) {
         if (throwable instanceof TurmsBusinessException) {
             return ((TurmsBusinessException) throwable).getCode() == code;
         }

@@ -23,8 +23,8 @@ import com.google.protobuf.Int64Value;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.MessageDeliveryStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.util.Validator;
@@ -78,7 +78,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static im.turms.common.constant.statuscode.TurmsStatusCode.*;
+import static im.turms.server.common.constant.TurmsStatusCode.*;
 import static im.turms.turms.constant.MetricsConstant.SENT_MESSAGES_COUNTER_NAME;
 
 /**
@@ -169,7 +169,7 @@ public class MessageService {
         return mongoTemplate.exists(query, Message.class, Message.COLLECTION_NAME);
     }
 
-    public Mono<Boolean> isMessageSentToUser(@NotNull Long messageId, @NotNull Long recipientId) {
+    public Mono<Boolean> isMessageRecipient(@NotNull Long messageId, @NotNull Long recipientId) {
         try {
             AssertUtil.notNull(messageId, "messageId");
             AssertUtil.notNull(recipientId, "recipientId");
@@ -187,8 +187,8 @@ public class MessageService {
         return mongoTemplate.exists(query, MessageStatus.class, MessageStatus.COLLECTION_NAME);
     }
 
-    public Mono<Boolean> isMessageSentToUserOrByUser(@NotNull Long messageId, @NotNull Long userId) {
-        return isMessageSentToUser(messageId, userId)
+    public Mono<Boolean> isMessageRecipientOrSender(@NotNull Long messageId, @NotNull Long userId) {
+        return isMessageRecipient(messageId, userId)
                 .flatMap(isSentToUser -> isSentToUser
                         ? Mono.just(true)
                         : isMessageSentByUser(messageId, userId));
@@ -222,9 +222,9 @@ public class MessageService {
                             .getAvailableRecallDurationSeconds();
                     return isRecallable
                             ? ServicePermission.OK
-                            : ServicePermission.get(RECALL_TIMEOUT);
+                            : ServicePermission.get(MESSAGE_RECALL_TIMEOUT);
                 })
-                .defaultIfEmpty(ServicePermission.get(MESSAGE_NOT_EXISTS));
+                .defaultIfEmpty(ServicePermission.get(RECALL_NON_EXISTING_MESSAGE));
     }
 
     public Flux<Message> authAndQueryCompleteMessages(
@@ -809,17 +809,17 @@ public class MessageService {
                 .getService()
                 .getMessage()
                 .isAllowRecallingMessage()) {
-            return Mono.error(TurmsBusinessException.get(DISABLED_FUNCTION, "It's not allowed to recall message"));
+            return Mono.error(TurmsBusinessException.get(RECALLING_MESSAGE_IS_DISABLED));
         }
         if (updateMessageContent && !node.getSharedProperties()
                 .getService()
                 .getMessage().isAllowEditingMessageBySender()) {
-            return Mono.error(TurmsBusinessException.get(DISABLED_FUNCTION));
+            return Mono.error(TurmsBusinessException.get(UPDATING_MESSAGE_BY_SENDER_IS_DISABLED));
         }
         return isMessageSentByUser(messageId, requesterId)
                 .flatMap(isSentByUser -> {
                     if (!isSentByUser) {
-                        return Mono.error(TurmsBusinessException.get(NOT_MESSAGE_SENDER));
+                        return Mono.error(TurmsBusinessException.get(UPDATE_MESSAGE_REQUESTER_NOT_SENDER));
                     }
                     if (recallDate != null) {
                         return isMessageRecallable(messageId)
@@ -1009,7 +1009,7 @@ public class MessageService {
             AssertUtil.notNull(isSystemMessage, "isSystemMessage");
             AssertUtil.notNull(targetId, "targetId");
             AssertUtil.min(burnAfter, "burnAfter", 0);
-            Validator.throwIfAllFalsy("text and records cannot be both null", text, records);
+            AssertUtil.throwIfAllFalsy("text and records cannot be both null", text, records);
             AssertUtil.maxLength(text, "text", node.getSharedProperties().getService().getMessage().getMaxTextLimit());
             validRecordsLength(records);
         } catch (TurmsBusinessException e) {

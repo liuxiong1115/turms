@@ -20,8 +20,8 @@ package im.turms.turms.workflow.service.impl.user;
 import com.mongodb.client.model.changestream.OperationType;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.util.Validator;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.cluster.service.config.ChangeStreamUtil;
@@ -217,27 +217,8 @@ public class UserPermissionGroupService {
     public Mono<UserPermissionGroup> queryUserPermissionGroupByUserId(@NotNull Long userId) {
         return userService.queryUserPermissionGroupId(userId)
                 .flatMap(groupId -> queryUserPermissionGroup(groupId)
-                        .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR, "The user is in a nonexistent group " + groupId))));
-    }
-
-    public Mono<Boolean> userPermissionGroupExists(@NotNull Long groupId) {
-        try {
-            AssertUtil.notNull(groupId, "groupId");
-        } catch (TurmsBusinessException e) {
-            return Mono.error(e);
-        }
-        UserPermissionGroup userPermissionGroup = userPermissionGroupMap.get(groupId);
-        if (userPermissionGroup != null) {
-            return Mono.just(true);
-        } else {
-            Query query = new Query().addCriteria(Criteria.where(DaoConstant.ID_FIELD_NAME).is(groupId));
-            return mongoTemplate.findOne(query, UserPermissionGroup.class, UserPermissionGroup.COLLECTION_NAME)
-                    .map(type -> {
-                        userPermissionGroupMap.put(groupId, type);
-                        return true;
-                    })
-                    .defaultIfEmpty(false);
-        }
+                        .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.SERVER_INTERNAL_ERROR, "The user is in a nonexistent permission group " + groupId))))
+                .switchIfEmpty(Mono.error(TurmsBusinessException.get(TurmsStatusCode.QUERY_PERMISSION_OF_NON_EXISTING_USER)));
     }
 
     public Mono<Long> countUserPermissionGroups() {

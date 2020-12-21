@@ -18,8 +18,8 @@
 package im.turms.turms.workflow.service.util;
 
 import im.turms.common.constant.*;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.turms.bo.GroupQuestionIdAndAnswer;
 import im.turms.turms.workflow.dao.domain.*;
 

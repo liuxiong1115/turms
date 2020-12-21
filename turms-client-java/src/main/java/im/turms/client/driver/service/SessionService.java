@@ -19,7 +19,7 @@ package im.turms.client.driver.service;
 
 import im.turms.client.driver.StateStore;
 import im.turms.client.model.SessionDisconnectInfo;
-import im.turms.client.model.SessionStatus;
+import im.turms.client.constant.SessionStatus;
 import java8.util.function.Consumer;
 
 import java.util.LinkedList;

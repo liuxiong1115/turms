@@ -15,16 +15,41 @@
  * limitations under the License.
  */
 
-package im.turms.common.util;
+package im.turms.client.util;
+
+import im.turms.client.annotation.NotEmpty;
+import im.turms.client.exception.TurmsBusinessException;
+import im.turms.client.constant.TurmsStatusCode;
 
 import java.util.Collection;
 
 /**
  * @author James Chen
  */
-public class Validator {
+public class AssertUtil {
+    private AssertUtil() {
+    }
 
-    private Validator() {
+    public static void throwIfAnyFalsy(@NotEmpty Object... array) {
+        for (Object o : array) {
+            if (o == null) {
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The required values must not be null");
+            } else {
+                if (o instanceof String) {
+                    if (((String) o).isEmpty()) {
+                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The string value must not be blank");
+                    }
+                } else if (o instanceof Collection && ((Collection<?>) o).isEmpty()) {
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The collection value must not be empty");
+                }
+            }
+        }
+    }
+
+    public static void throwIfAllFalsy(String message, @NotEmpty Object... array) {
+        if (areAllFalsy(array)) {
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, message);
+        }
     }
 
     public static boolean areAllFalsy(Object... array) {

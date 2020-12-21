@@ -19,10 +19,10 @@ package unit.im.turms.gateway.service.impl;
 
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.gateway.service.impl.ReasonCacheService;
+import im.turms.server.common.constant.TurmsStatusCode;
 import im.turms.server.common.dto.CloseReason;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.server.common.property.TurmsProperties;
 import im.turms.server.common.property.TurmsPropertiesManager;
 import im.turms.server.common.property.env.gateway.GatewayProperties;
@@ -77,7 +77,7 @@ class ReasonCacheServiceTests {
         Mono<TurmsStatusCode> result = reasonCacheService.getLoginFailureReason(1L, DeviceType.ANDROID, 1L);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> throwable instanceof TurmsBusinessException && ((TurmsBusinessException) throwable).getCode().equals(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE))
+                .expectErrorMatches(throwable -> throwable instanceof TurmsBusinessException && ((TurmsBusinessException) throwable).getCode().equals(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE_FOR_LOGIN_FAILURE_REASON))
                 .verify();
     }
 
@@ -145,7 +145,7 @@ class ReasonCacheServiceTests {
         Mono<Integer> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.FORBIDDEN_DEVICE_TYPE))
+                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.FORBIDDEN_DEVICE_TYPE_FOR_SESSION_DISCONNECTION_REASON))
                 .verify();
     }
 

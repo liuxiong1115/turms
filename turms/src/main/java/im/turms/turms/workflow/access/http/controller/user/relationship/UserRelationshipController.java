@@ -17,7 +17,6 @@
 
 package im.turms.turms.workflow.access.http.controller.user.relationship;
 
-import com.mongodb.client.result.DeleteResult;
 import im.turms.turms.bo.DateRange;
 import im.turms.turms.constant.DaoConstant;
 import im.turms.turms.workflow.access.http.dto.request.user.AddRelationshipDTO;
@@ -65,7 +64,7 @@ public class UserRelationshipController {
         Mono<Void> upsertMono = userRelationshipService.upsertOneSidedRelationship(
                 addRelationshipDTO.getOwnerId(),
                 addRelationshipDTO.getRelatedUserId(),
-                addRelationshipDTO.getIsBlocked(),
+                addRelationshipDTO.getBlockDate(),
                 DaoConstant.DEFAULT_RELATIONSHIP_GROUP_INDEX,
                 null,
                 addRelationshipDTO.getEstablishmentDate(),
@@ -120,7 +119,7 @@ public class UserRelationshipController {
             @RequestBody UpdateRelationshipDTO updateRelationshipDTO) {
         Mono<UpdateResultDTO> updateMono = userRelationshipService.updateUserOneSidedRelationships(
                 new HashSet<>(keys.getKeys()),
-                updateRelationshipDTO.getIsBlocked(),
+                updateRelationshipDTO.getBlockDate(),
                 updateRelationshipDTO.getEstablishmentDate())
                 .map(UpdateResultDTO::get);
         return ResponseFactory.okIfTruthy(updateMono);

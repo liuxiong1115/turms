@@ -18,8 +18,8 @@
 package im.turms.client.driver.service;
 
 import im.turms.client.driver.StateStore;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.client.exception.TurmsBusinessException;
+import im.turms.client.constant.TurmsStatusCode;
 import java8.util.concurrent.CompletableFuture;
 import okio.ByteString;
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +85,6 @@ public class HeartbeatService {
         }
         return future;
     }
-
 
     public void completeHeartbeatFutures() {
         while (true) {

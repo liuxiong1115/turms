@@ -19,8 +19,8 @@ package im.turms.gateway.access.websocket.config;
 
 import im.turms.common.constant.DeviceType;
 import im.turms.common.constant.statuscode.SessionCloseStatus;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.util.RandomUtil;
 import im.turms.gateway.access.websocket.util.HandshakeRequestUtil;
 import im.turms.gateway.manager.UserSessionsManager;
@@ -141,7 +141,7 @@ public class TurmsWebSocketHandler implements WebSocketHandler {
 
     private Mono<WebSocketMessage> handleInboundMessage(WebSocketSession webSocketSession, WebSocketMessage inboundMessage, long userId, DeviceType deviceType) {
         if (!node.isActive()) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UNAVAILABLE));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.SERVER_UNAVAILABLE));
         }
         switch (inboundMessage.getType()) {
             case BINARY:

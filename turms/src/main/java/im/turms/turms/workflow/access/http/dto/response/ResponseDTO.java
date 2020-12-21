@@ -18,7 +18,7 @@
 package im.turms.turms.workflow.access.http.dto.response;
 
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.server.common.constant.TurmsStatusCode;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 

@@ -22,14 +22,15 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import im.turms.common.constant.GroupInvitationStrategy;
 import im.turms.common.constant.GroupMemberRole;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.common.model.bo.group.GroupMembersWithVersion;
 import im.turms.common.util.Validator;
 import im.turms.server.common.bo.session.UserSessionsStatus;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.service.session.UserStatusService;
 import im.turms.server.common.util.AssertUtil;
+import im.turms.server.common.util.MapUtil;
 import im.turms.turms.bo.DateRange;
 import im.turms.turms.bo.ServicePermission;
 import im.turms.turms.constant.DaoConstant;
@@ -145,7 +146,7 @@ public class GroupMemberService {
                     return Mono.zip(isBlacklistedMono, isActiveMono)
                             .flatMap(results -> !results.getT1() && results.getT2()
                                     ? addGroupMember(groupId, userId, groupMemberRole, name, new Date(), muteEndDate, operations)
-                                    : Mono.error(TurmsBusinessException.get(TurmsStatusCode.TARGET_USER_INACTIVE_OR_BLOCKED)));
+                                    : Mono.error(TurmsBusinessException.get(TurmsStatusCode.ADD_INACTIVE_BLOCKED_USER_TO_GROUP)));
                 });
     }
 
@@ -231,8 +232,7 @@ public class GroupMemberService {
     }
 
     public Mono<UpdateResult> updateGroupMembers(
-            @NotNull Long groupId,
-            @NotEmpty Set<Long> memberIds,
+            @NotEmpty Set<GroupMember.Key> keys,
             @Nullable String name,
             @Nullable @ValidGroupMemberRole GroupMemberRole role,
             @Nullable @PastOrPresent Date joinDate,
@@ -240,8 +240,7 @@ public class GroupMemberService {
             @Nullable ReactiveMongoOperations operations,
             boolean updateGroupMembersVersion) {
         try {
-            AssertUtil.notNull(groupId, "groupId");
-            AssertUtil.notEmpty(memberIds, "memberIds");
+            AssertUtil.notEmpty(keys, "keys");
             DomainConstraintUtil.validGroupMemberRole(role);
             AssertUtil.pastOrPresent(joinDate, "joinDate");
         } catch (TurmsBusinessException e) {
@@ -251,8 +250,7 @@ public class GroupMemberService {
             return Mono.just(OperationResultConstant.ACKNOWLEDGED_UPDATE_RESULT);
         }
         Query query = new Query()
-                .addCriteria(Criteria.where(GroupMember.Fields.ID_GROUP_ID).is(groupId))
-                .addCriteria(Criteria.where(GroupMember.Fields.ID_USER_ID).in(memberIds));
+                .addCriteria(Criteria.where(DaoConstant.ID_FIELD_NAME).in(keys));
         Update update = UpdateBuilder.newBuilder()
                 .setIfNotNull(GroupMember.Fields.NAME, name)
                 .setIfNotNull(GroupMember.Fields.ROLE, role)
@@ -267,9 +265,44 @@ public class GroupMemberService {
         }
         ReactiveMongoOperations mongoOperations = operations != null ? operations : mongoTemplate;
         return mongoOperations.updateMulti(query, update, GroupMember.class, GroupMember.COLLECTION_NAME)
-                .flatMap(result -> updateGroupMembersVersion && result.getModifiedCount() > 0
-                        ? groupVersionService.updateMembersVersion(groupId).onErrorResume(t -> Mono.empty()).thenReturn(result)
-                        : Mono.just(result));
+                .flatMap(result -> {
+                    if (updateGroupMembersVersion && result.getModifiedCount() > 0) {
+                        int size = keys.size();
+                        Mono<?> updateMono;
+                        if (size == 1) {
+                            Long groupId = keys.iterator().next().getGroupId();
+                            updateMono = groupVersionService.updateMembersVersion(groupId);
+                        } else {
+                            Set<Long> groupIds = new HashSet<>(MapUtil.getCapability(size));
+                            updateMono = groupVersionService.updateMembersVersion(groupIds);
+                        }
+                        return updateMono.onErrorResume(t -> Mono.empty()).thenReturn(result);
+                    } else {
+                        return Mono.just(result);
+                    }
+                });
+    }
+
+    public Mono<UpdateResult> updateGroupMembers(
+            @NotNull Long groupId,
+            @NotEmpty Set<Long> memberIds,
+            @Nullable String name,
+            @Nullable @ValidGroupMemberRole GroupMemberRole role,
+            @Nullable @PastOrPresent Date joinDate,
+            @Nullable Date muteEndDate,
+            @Nullable ReactiveMongoOperations operations,
+            boolean updateGroupMembersVersion) {
+        try {
+            AssertUtil.notNull(groupId, "groupId");
+            AssertUtil.notEmpty(memberIds, "memberIds");
+        } catch (TurmsBusinessException e) {
+            return Mono.error(e);
+        }
+        Set<GroupMember.Key> keys = new HashSet<>(MapUtil.getCapability(memberIds.size()));
+        for (Long memberId : memberIds) {
+            keys.add(new GroupMember.Key(groupId, memberId));
+        }
+        return updateGroupMembers(keys, name, role, joinDate, muteEndDate, operations, updateGroupMembersVersion);
     }
 
     public Flux<Long> getMemberIdsByGroupId(@NotNull Long groupId) {
@@ -330,23 +363,24 @@ public class GroupMemberService {
                                 String reason = String.format("The inviter with the role %s isn't allowed to send an invitation under the strategy %s", inviterRole, strategy);
                                 return Mono.just(Pair.of(ServicePermission.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_INVITATION, reason), strategy));
                             }
-                        }))
-                .defaultIfEmpty(Pair.of(ServicePermission.get(TurmsStatusCode.INVITER_NOT_MEMBER), null));
+                        })
+                        .defaultIfEmpty(Pair.of(ServicePermission.get(TurmsStatusCode.ADD_USER_TO_INACTIVE_GROUP), null)))
+                .defaultIfEmpty(Pair.of(ServicePermission.get(TurmsStatusCode.GROUP_INVITER_NOT_MEMBER), null));
     }
 
     /**
-     * @return Possible codes: OK, USER_HAS_BEEN_BLACKLISTED, USER_NOT_GROUP_MEMBER
+     * @return Possible codes: OK, INVITEE_ALREADY_GROUP_MEMBER, INVITEE_HAS_BEEN_BLACKLISTED
      */
     public Mono<TurmsStatusCode> isAllowedToBeInvited(@NotNull Long groupId, @NotNull Long inviteeId) {
         return isGroupMember(groupId, inviteeId)
                 .flatMap(isGroupMember -> {
-                    if (isGroupMember != null && isGroupMember) {
+                    if (isGroupMember) {
+                        return Mono.just(TurmsStatusCode.GROUP_INVITEE_ALREADY_GROUP_MEMBER);
+                    } else {
                         return isBlacklisted(groupId, inviteeId)
                                 .map(isBlacklisted -> isBlacklisted
-                                        ? TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED
+                                        ? TurmsStatusCode.INVITEE_HAS_BEEN_BLOCKED
                                         : TurmsStatusCode.OK);
-                    } else {
-                        return Mono.just(TurmsStatusCode.USER_NOT_GROUP_MEMBER);
                     }
                 });
     }
@@ -378,7 +412,7 @@ public class GroupMemberService {
                         return groupService.isGroupActiveAndNotDeleted(groupId)
                                 .flatMap(isActive -> isActive
                                         ? isMemberMuted(groupId, senderId).map(muted -> muted ? TurmsStatusCode.MEMBER_HAS_BEEN_MUTED : TurmsStatusCode.OK)
-                                        : Mono.just(TurmsStatusCode.GROUP_NOT_ACTIVE));
+                                        : Mono.just(TurmsStatusCode.SEND_MESSAGE_TO_INACTIVE_GROUP));
                     }
                 });
     }
@@ -400,15 +434,15 @@ public class GroupMemberService {
                                             if (isGroupActiveAndNotDeleted) {
                                                 return isBlacklisted(groupId, senderId)
                                                         .map(isBlacklisted -> isBlacklisted
-                                                                ? TurmsStatusCode.USER_HAS_BEEN_BLACKLISTED
+                                                                ? TurmsStatusCode.GROUP_MESSAGE_SENDER_HAS_BEEN_BLOCKED
                                                                 : TurmsStatusCode.OK);
                                             } else {
-                                                return Mono.just(TurmsStatusCode.GROUP_NOT_ACTIVE);
+                                                return Mono.just(TurmsStatusCode.SEND_MESSAGE_TO_INACTIVE_GROUP);
                                             }
                                         });
                             });
                 })
-                .defaultIfEmpty(TurmsStatusCode.GROUP_TYPE_NOT_EXISTS);
+                .defaultIfEmpty(TurmsStatusCode.SEND_MESSAGE_TO_INACTIVE_GROUP);
     }
 
     public Mono<Boolean> isMemberMuted(@NotNull Long groupId, @NotNull Long userId) {
@@ -747,19 +781,6 @@ public class GroupMemberService {
                     }
                     return builder.build();
                 });
-    }
-
-    public Mono<Boolean> exists(@NotNull Long groupId, @NotNull Long userId) {
-        try {
-            AssertUtil.notNull(groupId, "groupId");
-            AssertUtil.notNull(userId, "userId");
-        } catch (TurmsBusinessException e) {
-            return Mono.error(e);
-        }
-        Query query = new Query()
-                .addCriteria(Criteria.where(GroupMember.Fields.ID_GROUP_ID).is(groupId))
-                .addCriteria(Criteria.where(GroupMember.Fields.ID_USER_ID).is(userId));
-        return mongoTemplate.exists(query, GroupMember.class, GroupMember.COLLECTION_NAME);
     }
 
     private boolean isRoleAuthorizedToAddNewRole(@NotNull GroupMemberRole requesterRole,

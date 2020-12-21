@@ -18,8 +18,8 @@
 package im.turms.gateway.service.impl;
 
 import im.turms.common.constant.DeviceType;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import im.turms.gateway.pojo.bo.login.LoginFailureReasonKey;
 import im.turms.gateway.pojo.bo.session.SessionDisconnectionReasonKey;
 import im.turms.server.common.dto.CloseReason;
@@ -93,10 +93,9 @@ public class ReasonCacheService {
                                                        @NotNull DeviceType deviceType,
                                                        @NotNull Long requestId) {
         if (!enableQueryLoginFailureReason) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.CACHING_FOR_LOGIN_FAILURE_REASON_IS_DISABLED));
         } else if (!degradedDeviceTypesForLoginFailureReason.contains(deviceType)) {
-            String reason = "The device type " + deviceType.name() + " is forbidden to query the reason for login failure";
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE_FOR_LOGIN_FAILURE_REASON));
         } else {
             try {
                 AssertUtil.notNull(userId, "userId");
@@ -175,10 +174,9 @@ public class ReasonCacheService {
                                                 @NotNull DeviceType deviceType,
                                                 @NotNull Integer sessionId) {
         if (!enableQueryDisconnectionReason) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.DISABLED_FUNCTION));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.CACHING_FOR_SESSION_DISCONNECTION_REASON_IS_DISABLED));
         } else if (!degradedDeviceTypesForDisconnectionReason.contains(deviceType)) {
-            String reason = "The device type " + deviceType + " is forbidden to query the reason for session disconnection";
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE, reason));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE_FOR_SESSION_DISCONNECTION_REASON));
         } else {
             try {
                 AssertUtil.notNull(userId, "userId");

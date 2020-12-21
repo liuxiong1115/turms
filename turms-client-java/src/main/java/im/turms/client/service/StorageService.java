@@ -20,9 +20,9 @@ package im.turms.client.service;
 import com.google.protobuf.Int64Value;
 import com.google.protobuf.StringValue;
 import im.turms.client.TurmsClient;
+import im.turms.client.exception.TurmsBusinessException;
+import im.turms.client.constant.TurmsStatusCode;
 import im.turms.common.constant.ContentType;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
 import im.turms.common.model.dto.request.TurmsRequest;
 import im.turms.common.model.dto.request.storage.DeleteResourceRequest;
 import im.turms.common.model.dto.request.storage.QuerySignedGetUrlRequest;
@@ -72,7 +72,7 @@ public class StorageService {
             return getSignedPutUrl(ContentType.PROFILE, pictureSize, null, userId);
         } else {
             CompletableFuture<String> future = new CompletableFuture<>();
-            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.UNAUTHORIZED));
+            future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.QUERY_PROFILE_URL_TO_UPDATE_BEFORE_LOGIN));
             return future;
         }
     }
@@ -200,7 +200,7 @@ public class StorageService {
                 if (body != null) {
                     future.complete(body.bytes());
                 } else {
-                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MISSING_DATA));
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION));
                 }
             }
         });
@@ -225,7 +225,7 @@ public class StorageService {
                 if (body != null) {
                     future.complete(body.string());
                 } else {
-                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.MISSING_DATA));
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION));
                 }
             }
         });

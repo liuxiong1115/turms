@@ -17,8 +17,8 @@
 
 package im.turms.server.common.access.http.config;
 
-import im.turms.common.constant.statuscode.TurmsStatusCode;
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.constant.TurmsStatusCode;
+import im.turms.server.common.exception.TurmsBusinessException;
 import lombok.Data;
 import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.dao.DuplicateKeyException;
@@ -98,7 +98,7 @@ public class ErrorAttributes {
             if (throwable instanceof ConstraintViolationException) {
                 statusCode = TurmsStatusCode.ILLEGAL_ARGUMENTS;
             } else if (throwable instanceof DuplicateKeyException) {
-                statusCode = TurmsStatusCode.DUPLICATE_KEY;
+                statusCode = TurmsStatusCode.RECORD_CONTAINS_DUPLICATE_KEY;
             } else if (throwable instanceof DataBufferLimitException) {
                 statusCode = TurmsStatusCode.FILE_TOO_LARGE;
             } else {

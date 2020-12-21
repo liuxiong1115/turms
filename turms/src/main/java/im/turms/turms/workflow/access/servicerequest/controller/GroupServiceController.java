@@ -18,7 +18,7 @@
 package im.turms.turms.workflow.access.servicerequest.controller;
 
 import im.turms.common.constant.GroupMemberRole;
-import im.turms.common.constant.statuscode.TurmsStatusCode;
+import im.turms.server.common.constant.TurmsStatusCode;
 import im.turms.common.model.dto.notification.TurmsNotification;
 import im.turms.common.model.dto.request.group.*;
 import im.turms.common.model.dto.request.group.blacklist.CreateGroupBlacklistedUserRequest;
@@ -109,26 +109,18 @@ public class GroupServiceController {
     public ClientRequestHandler handleDeleteGroupRequest() {
         return clientRequest -> {
             DeleteGroupRequest request = clientRequest.getTurmsRequest().getDeleteGroupRequest();
-            return groupMemberService
-                    .isOwner(clientRequest.getUserId(), request.getGroupId())
-                    .flatMap(authenticated -> {
-                        if (!authenticated) {
-                            return Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.UNAUTHORIZED));
-                        }
+            return groupService.authAndDeleteGroup(clientRequest.getUserId(), request.getGroupId())
+                    .then(Mono.defer(() -> {
                         if (node.getSharedProperties().getService().getNotification().isNotifyMembersAfterGroupDeleted()) {
                             return groupService.queryGroupMemberIds(request.getGroupId())
                                     .collect(Collectors.toSet())
-                                    .flatMap(memberIds -> groupService.deleteGroupsAndGroupMembers(Set.of(request.getGroupId()), null)
-                                            .map(deleted -> memberIds.isEmpty()
-                                                    ? RequestHandlerResultFactory.ok()
-                                                    : RequestHandlerResultFactory.get(memberIds, clientRequest.getTurmsRequest())));
+                                    .map(memberIds -> memberIds.isEmpty()
+                                            ? RequestHandlerResultFactory.OK
+                                            : RequestHandlerResultFactory.get(memberIds, clientRequest.getTurmsRequest()));
                         } else {
-                            return groupService.deleteGroupsAndGroupMembers(
-                                    Set.of(request.getGroupId()),
-                                    null)
-                                    .map(RequestHandlerResultFactory::okIfTrue);
+                            return Mono.just(RequestHandlerResultFactory.OK);
                         }
-                    });
+                    }));
         };
     }
 
@@ -183,46 +175,44 @@ public class GroupServiceController {
         return clientRequest -> {
             UpdateGroupRequest request = clientRequest.getTurmsRequest().getUpdateGroupRequest();
             Long successorId = request.hasSuccessorId() ? request.getSuccessorId().getValue() : null;
+            Mono<Void> updateMono;
             if (successorId != null) {
                 boolean quitAfterTransfer = request.hasQuitAfterTransfer() && request.getQuitAfterTransfer().getValue();
-                // TODO
-                return groupService.authAndTransferGroupOwnership(clientRequest.getUserId(), request.getGroupId(), successorId, quitAfterTransfer, null);
+                updateMono = groupService.authAndTransferGroupOwnership(clientRequest.getUserId(), request.getGroupId(), successorId, quitAfterTransfer, null);
+            } else {
+                Integer minimumScore = request.hasMinimumScore() ? request.getMinimumScore().getValue() : null;
+                Long groupTypeId = request.hasGroupTypeId() ? request.getGroupTypeId().getValue() : null;
+                String groupName = request.hasGroupName() ? request.getGroupName().getValue() : null;
+                String intro = request.hasIntro() ? request.getIntro().getValue() : null;
+                String announcement = request.hasAnnouncement() ? request.getAnnouncement().getValue() : null;
+                Date muteEndDate = request.hasMuteEndDate() ? new Date(request.getMuteEndDate().getValue()) : null;
+                updateMono = groupService.authAndUpdateGroupInformation(
+                        clientRequest.getUserId(),
+                        request.getGroupId(),
+                        groupTypeId,
+                        null,
+                        null,
+                        groupName,
+                        intro,
+                        announcement,
+                        minimumScore,
+                        null,
+                        null,
+                        null,
+                        muteEndDate,
+                        null);
             }
-            Integer minimumScore = request.hasMinimumScore() ? request.getMinimumScore().getValue() : null;
-            Long groupTypeId = request.hasGroupTypeId() ? request.getGroupTypeId().getValue() : null;
-            String groupName = request.hasGroupName() ? request.getGroupName().getValue() : null;
-            String intro = request.hasIntro() ? request.getIntro().getValue() : null;
-            String announcement = request.hasAnnouncement() ? request.getAnnouncement().getValue() : null;
-            Date muteEndDate = request.hasMuteEndDate() ? new Date(request.getMuteEndDate().getValue()) : null;
-            return groupService.authAndUpdateGroupInformation(
-                    clientRequest.getUserId(),
-                    request.getGroupId(),
-                    groupTypeId,
-                    null,
-                    null,
-                    groupName,
-                    intro,
-                    announcement,
-                    minimumScore,
-                    null,
-                    null,
-                    null,
-                    muteEndDate,
-                    null)
-                    .flatMap(updated -> {
-                        if (updated == null || !updated) {
-                            return Mono.just(RequestHandlerResultFactory.fail());
-                        }
-                        if (node.getSharedProperties().getService().getNotification().isNotifyMembersAfterGroupUpdated()) {
-                            return groupMemberService.queryGroupMemberIds(request.getGroupId())
-                                    .collect(Collectors.toSet())
-                                    .map(memberIds -> memberIds.isEmpty()
-                                            ? RequestHandlerResultFactory.ok()
-                                            : RequestHandlerResultFactory.get(memberIds, clientRequest.getTurmsRequest()));
-                        } else {
-                            return Mono.just(RequestHandlerResultFactory.ok());
-                        }
-                    });
+            return updateMono.then(Mono.defer(() -> {
+                if (node.getSharedProperties().getService().getNotification().isNotifyMembersAfterGroupUpdated()) {
+                    return groupMemberService.queryGroupMemberIds(request.getGroupId())
+                            .collect(Collectors.toSet())
+                            .map(memberIds -> memberIds.isEmpty()
+                                    ? RequestHandlerResultFactory.OK
+                                    : RequestHandlerResultFactory.get(memberIds, clientRequest.getTurmsRequest()));
+                } else {
+                    return Mono.just(RequestHandlerResultFactory.OK);
+                }
+            }));
         };
     }
 
@@ -236,10 +226,9 @@ public class GroupServiceController {
                     request.getGroupId(),
                     request.getUserId(),
                     null)
-                    .map(success -> success != null && success
-                            && node.getSharedProperties().getService().getNotification().isNotifyUserAfterBlacklistedByGroup()
+                    .then(Mono.fromCallable(() -> node.getSharedProperties().getService().getNotification().isNotifyUserAfterBlacklistedByGroup()
                             ? RequestHandlerResultFactory.get(request.getUserId(), clientRequest.getTurmsRequest())
-                            : RequestHandlerResultFactory.okIfTrue(success));
+                            : RequestHandlerResultFactory.OK));
         };
     }
 
@@ -254,10 +243,9 @@ public class GroupServiceController {
                     request.getUserId(),
                     null,
                     true)
-                    .map(success -> success != null && success
-                            && node.getSharedProperties().getService().getNotification().isNotifyUserAfterUnblacklistedByGroup()
+                    .then(Mono.fromCallable(() -> node.getSharedProperties().getService().getNotification().isNotifyUserAfterUnblacklistedByGroup()
                             ? RequestHandlerResultFactory.get(request.getUserId(), clientRequest.getTurmsRequest())
-                            : RequestHandlerResultFactory.okIfTrue(success));
+                            : RequestHandlerResultFactory.OK));
         };
     }
 
@@ -321,7 +309,7 @@ public class GroupServiceController {
                     request.getContent())
                     .map(invitation -> node.getSharedProperties().getService().getNotification().isNotifyUserAfterInvitedByGroup()
                             ? RequestHandlerResultFactory.get(invitation.getId(), request.getInviteeId(), clientRequest.getTurmsRequest())
-                            : RequestHandlerResultFactory.ok());
+                            : RequestHandlerResultFactory.OK);
         };
     }
 
@@ -339,10 +327,10 @@ public class GroupServiceController {
                             return groupMemberService.queryGroupManagersAndOwnerId(request.getGroupId())
                                     .collect(Collectors.toSet())
                                     .map(recipientsIds -> recipientsIds.isEmpty()
-                                            ? RequestHandlerResultFactory.ok()
+                                            ? RequestHandlerResultFactory.OK
                                             : RequestHandlerResultFactory.get(joinRequest.getId(), recipientsIds, false, clientRequest.getTurmsRequest()));
                         } else {
-                            return Mono.just(RequestHandlerResultFactory.ok());
+                            return Mono.just(RequestHandlerResultFactory.OK);
                         }
                     });
         };
@@ -374,14 +362,12 @@ public class GroupServiceController {
                     .flatMap(inviteeId -> groupInvitationService.recallPendingGroupInvitation(
                             clientRequest.getUserId(),
                             request.getInvitationId())
-                            .map(recalled -> recalled != null && recalled
-                                    && node.getSharedProperties().getService().getNotification().isNotifyInviteeAfterGroupInvitationRecalled()
+                            .then(Mono.fromCallable(() -> node.getSharedProperties().getService().getNotification().isNotifyInviteeAfterGroupInvitationRecalled()
                                     ? RequestHandlerResultFactory.get(inviteeId, clientRequest.getTurmsRequest())
-                                    : RequestHandlerResultFactory.okIfTrue(recalled)));
+                                    : RequestHandlerResultFactory.OK)));
         };
     }
 
-    //TODO
     @ServiceRequestMapping(DELETE_GROUP_JOIN_REQUEST_REQUEST)
     public ClientRequestHandler handleDeleteGroupJoinRequestRequest() {
         return clientRequest -> {
@@ -390,19 +376,18 @@ public class GroupServiceController {
             return groupJoinRequestService.recallPendingGroupJoinRequest(
                     clientRequest.getUserId(),
                     request.getRequestId())
-                    .flatMap(recalled -> {
-                        if (recalled != null && recalled
-                                && node.getSharedProperties().getService().getNotification().isNotifyOwnerAndManagersAfterGroupJoinRequestRecalled()) {
+                    .then(Mono.defer(() -> {
+                        if (node.getSharedProperties().getService().getNotification().isNotifyOwnerAndManagersAfterGroupJoinRequestRecalled()) {
                             return groupJoinRequestService.queryGroupId(request.getRequestId())
                                     .flatMap(groupId -> groupMemberService.queryGroupManagersAndOwnerId(groupId)
                                             .collect(Collectors.toSet())
                                             .map(ids -> ids.isEmpty()
-                                                    ? RequestHandlerResultFactory.ok()
+                                                    ? RequestHandlerResultFactory.OK
                                                     : RequestHandlerResultFactory.get(ids, clientRequest.getTurmsRequest())));
                         } else {
-                            return Mono.just(RequestHandlerResultFactory.okIfTrue(recalled));
+                            return Mono.just(RequestHandlerResultFactory.OK);
                         }
-                    });
+                    }));
         };
     }
 
@@ -414,7 +399,7 @@ public class GroupServiceController {
             return groupQuestionService.authAndDeleteGroupJoinQuestion(
                     clientRequest.getUserId(),
                     request.getQuestionId())
-                    .map(RequestHandlerResultFactory::okIfTrue);
+                    .thenReturn(RequestHandlerResultFactory.OK);
         };
     }
 
@@ -496,7 +481,7 @@ public class GroupServiceController {
                     question,
                     answers,
                     score)
-                    .map(RequestHandlerResultFactory::okIfTrue);
+                    .thenReturn(RequestHandlerResultFactory.OK);
         };
     }
 
@@ -522,7 +507,7 @@ public class GroupServiceController {
                     null)
                     .map(member -> member != null && node.getSharedProperties().getService().getNotification().isNotifyUserAfterAddedToGroupByOthers()
                             ? RequestHandlerResultFactory.get(request.getUserId(), clientRequest.getTurmsRequest())
-                            : RequestHandlerResultFactory.okIfTrue(true));
+                            : RequestHandlerResultFactory.OK);
         };
     }
 
@@ -538,11 +523,10 @@ public class GroupServiceController {
                     request.getMemberId(),
                     successorId,
                     quitAfterTransfer)
-                    .map(deleted -> deleted != null && deleted
-                            && node.getSharedProperties().getService().getNotification().isNotifyUserAfterRemovedFromGroupByOthers()
+                    .then(Mono.fromCallable(() -> node.getSharedProperties().getService().getNotification().isNotifyUserAfterRemovedFromGroupByOthers()
                             && !clientRequest.getUserId().equals(request.getMemberId())
                             ? RequestHandlerResultFactory.get(request.getMemberId(), clientRequest.getTurmsRequest())
-                            : RequestHandlerResultFactory.okIfTrue(deleted));
+                            : RequestHandlerResultFactory.OK));
         };
     }
 
@@ -592,24 +576,22 @@ public class GroupServiceController {
                     name,
                     role,
                     muteEndDate)
-                    .flatMap(updated -> {
-                        if (updated != null && updated) {
-                            if (node.getSharedProperties().getService().getNotification()
-                                    .isNotifyMembersAfterOtherMemberInfoUpdated()) {
-                                return groupMemberService.queryGroupMemberIds(request.getGroupId())
-                                        .collect(Collectors.toSet())
-                                        .map(groupMemberIds -> groupMemberIds.isEmpty()
-                                                ? RequestHandlerResultFactory.ok()
-                                                : RequestHandlerResultFactory.get(groupMemberIds, clientRequest.getTurmsRequest()));
-                            } else if (!clientRequest.getUserId().equals(request.getMemberId())
-                                    && node.getSharedProperties().getService().getNotification().isNotifyMemberAfterInfoUpdatedByOthers()) {
-                                return Mono.just(RequestHandlerResultFactory.get(
-                                        clientRequest.getUserId(),
-                                        clientRequest.getTurmsRequest()));
-                            }
+                    .then(Mono.defer(() -> {
+                        if (node.getSharedProperties().getService().getNotification()
+                                .isNotifyMembersAfterOtherMemberInfoUpdated()) {
+                            return groupMemberService.queryGroupMemberIds(request.getGroupId())
+                                    .collect(Collectors.toSet())
+                                    .map(groupMemberIds -> groupMemberIds.isEmpty()
+                                            ? RequestHandlerResultFactory.OK
+                                            : RequestHandlerResultFactory.get(groupMemberIds, clientRequest.getTurmsRequest()));
+                        } else if (!clientRequest.getUserId().equals(request.getMemberId())
+                                && node.getSharedProperties().getService().getNotification().isNotifyMemberAfterInfoUpdatedByOthers()) {
+                            return Mono.just(RequestHandlerResultFactory.get(
+                                    clientRequest.getUserId(),
+                                    clientRequest.getTurmsRequest()));
                         }
-                        return Mono.just(RequestHandlerResultFactory.okIfTrue(updated));
-                    });
+                        return Mono.just(RequestHandlerResultFactory.OK);
+                    }));
         };
     }
 

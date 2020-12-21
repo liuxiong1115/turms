@@ -17,7 +17,7 @@
 
 package im.turms.turms.constant;
 
-import im.turms.common.exception.TurmsBusinessException;
+import im.turms.server.common.exception.TurmsBusinessException;
 import org.springframework.dao.DuplicateKeyException;
 import reactor.util.retry.Retry;
 
