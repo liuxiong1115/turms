@@ -45,7 +45,7 @@ public enum TurmsStatusCode {
     SERVER_INTERNAL_ERROR(1200, "Internal server error", 500),
     SERVER_UNAVAILABLE(1201, "The server is unavailable", 503),
     // TODO: Remove after MessageStatusService is removed
-    DISABLED_FUNCTION(1202, "The function has been disabled in servers", 405),
+    DISABLED_FUNCTION(1202, "The function has been disabled on the server side", 405),
 
     //**********************************************************
     //* For error about administrator actions
@@ -178,7 +178,10 @@ public enum TurmsStatusCode {
 
     // Storage
     STORAGE_NOT_IMPLEMENTED(6000, "The function is enabled but not implemented yet", 501),
-    FILE_TOO_LARGE(6001, "The file is too large to upload", 413);
+    FILE_TOO_LARGE(6001, "The file is too large to upload", 413),
+
+    // Storage - Extension
+    REDUNDANT_REQUEST_FOR_PRESIGNED_PROFILE_URL(6500, "The file is too large to upload", 413);
 
     public static final int STATUS_CODE_LENGTH = 4;
     private static final Map<Integer, TurmsStatusCode> CODE_POOL = new HashMap<>((int) (TurmsStatusCode.values().length / 0.5));

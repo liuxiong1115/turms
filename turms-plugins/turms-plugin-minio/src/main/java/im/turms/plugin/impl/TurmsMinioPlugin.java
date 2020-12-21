@@ -122,7 +122,7 @@ public class TurmsMinioPlugin extends TurmsPlugin {
                             switch (contentType) {
                                 case PROFILE:
                                 case GROUP_PROFILE:
-                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REDUNDANT_REQUEST));
+                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REDUNDANT_REQUEST_FOR_PRESIGNED_PROFILE_URL));
                                 case ATTACHMENT:
                                     if (keyNum != null) {
                                         String key;
