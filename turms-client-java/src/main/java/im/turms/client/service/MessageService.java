@@ -138,7 +138,7 @@ public class MessageService {
             @Nullable List<ByteBuffer> records,
             @Nullable Integer burnAfter) {
         if (text == null && records == null) {
-            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "text and records must not all be null");
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENT, "text and records must not all be null");
         }
         if (deliveryDate == null) {
             deliveryDate = new Date();
@@ -156,7 +156,7 @@ public class MessageService {
 
     public CompletableFuture<Void> ackMessages(@NotEmpty List<Long> messageIds) {
         if (messageIds == null || messageIds.isEmpty()) {
-            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENTS, "messageIds must not be null or empty");
+            return TurmsBusinessExceptionUtil.getFuture(TurmsStatusCode.ILLEGAL_ARGUMENT, "messageIds must not be null or empty");
         }
         return turmsClient.getDriver()
                 .send(AckRequest.newBuilder(), MapUtil.of("messages_ids", messageIds))

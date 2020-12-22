@@ -74,7 +74,7 @@ export default class HeartbeatService {
                     reject
                 });
             } else {
-                reject(TurmsBusinessError.fromCode(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
+                reject(TurmsBusinessError.fromCode(TurmsStatusCode.SESSION_HAS_BEEN_CLOSED));
             }
         });
     }

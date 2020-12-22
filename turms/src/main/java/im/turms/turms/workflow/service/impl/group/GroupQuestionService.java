@@ -171,7 +171,7 @@ public class GroupQuestionService {
                                         null,
                                         null)
                                         .thenReturn(true)
-                                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.GUESTS_HAVE_BEEN_MUTED)))
+                                        : Mono.just(false))
                                 .map(joined -> GroupJoinQuestionsAnswerResult
                                         .newBuilder()
                                         .setJoined(joined)
@@ -197,7 +197,7 @@ public class GroupQuestionService {
         return groupMemberService.isOwnerOrManager(requesterId, groupId)
                 .flatMap(authenticated -> authenticated
                         ? createGroupJoinQuestion(groupId, question, answers, score)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_GROUP_QUESTION)));
+                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_CREATE_GROUP_QUESTION)));
     }
 
     public Mono<GroupJoinQuestion> createGroupJoinQuestion(
@@ -256,7 +256,7 @@ public class GroupQuestionService {
                                                 .onErrorResume(t -> Mono.empty())
                                                 .then());
                             } else {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_GROUP_QUESTION));
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_DELETE_GROUP_QUESTION));
                             }
                         }));
     }
@@ -311,7 +311,7 @@ public class GroupQuestionService {
         return authenticated
                 .flatMap(isAuthenticated -> isAuthenticated != null && isAuthenticated
                         ? groupVersionService.queryGroupJoinQuestionsVersion(groupId)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_GROUP_QUESTION)))
+                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_ACCESS_GROUP_QUESTION_ANSWER)))
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                         return queryGroupJoinQuestions(null, Set.of(groupId), null, null, false)
@@ -366,7 +366,7 @@ public class GroupQuestionService {
                                                 .onErrorResume(t -> Mono.empty())
                                                 .thenReturn(result));
                             } else {
-                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_GROUP_QUESTION));
+                                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_QUESTION));
                             }
                         }));
     }

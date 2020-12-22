@@ -136,7 +136,7 @@ export default class ConnectionService {
     connect(options: ConnectOptions): Promise<void> {
         return new Promise((resolve, reject) => {
             if (this._stateStore.isConnected) {
-                return TurmsBusinessError.fromCode(TurmsStatusCode.CLIENT_SESSION_ALREADY_ESTABLISHED);
+                return TurmsBusinessError.fromCode(TurmsStatusCode.SESSION_ALREADY_ESTABLISHED);
             } else {
                 this._resetStates();
                 this._stateStore.connectionRequestId = Math.floor(Math.random() * 16383) + 1;

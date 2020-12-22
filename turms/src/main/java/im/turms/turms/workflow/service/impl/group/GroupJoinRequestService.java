@@ -209,10 +209,10 @@ public class GroupJoinRequestService {
                     RequestStatus status = request.getStatus();
                     if (status != RequestStatus.PENDING) {
                         String reason = "The request is under the status " + status;
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_JOIN_REQUEST_NOT_PENDING, reason));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RECALL_NOT_PENDING_GROUP_JOIN_REQUEST, reason));
                     }
                     if (!request.getRequesterId().equals(requesterId)) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.REQUESTER_NOT_JOIN_REQUEST_SENDER));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_JOIN_REQUEST_SENDER_TO_RECALL_REQUEST));
                     }
                     Query query = new Query().addCriteria(where(DaoConstant.ID_FIELD_NAME).is(requestId));
                     Update update = new Update()
@@ -242,7 +242,7 @@ public class GroupJoinRequestService {
                             if (authenticated != null && authenticated) {
                                 return groupVersionService.queryGroupJoinRequestsVersion(groupId);
                             }
-                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_GROUP_REQUEST));
+                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_ACCESS_GROUP_REQUEST));
                         })
                 : userVersionService.queryGroupJoinRequestsVersion(requesterId);
         return versionMono

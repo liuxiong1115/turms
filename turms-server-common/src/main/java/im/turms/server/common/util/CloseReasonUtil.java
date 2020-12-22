@@ -60,7 +60,7 @@ public class CloseReasonUtil {
             case SERVER_UNAVAILABLE:
                 closeStatus = SessionCloseStatus.SERVER_UNAVAILABLE;
                 break;
-            case ILLEGAL_ARGUMENTS:
+            case ILLEGAL_ARGUMENT:
             case LOGIN_FROM_FORBIDDEN_DEVICE_TYPE:
                 closeStatus = SessionCloseStatus.ILLEGAL_REQUEST;
                 break;

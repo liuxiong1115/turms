@@ -93,7 +93,7 @@ public class ReasonCacheService {
                                                        @NotNull DeviceType deviceType,
                                                        @NotNull Long requestId) {
         if (!enableQueryLoginFailureReason) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.CACHING_FOR_LOGIN_FAILURE_REASON_IS_DISABLED));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.LOGIN_FAILURE_REASON_CACHE_IS_DISABLED));
         } else if (!degradedDeviceTypesForLoginFailureReason.contains(deviceType)) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE_FOR_LOGIN_FAILURE_REASON));
         } else {

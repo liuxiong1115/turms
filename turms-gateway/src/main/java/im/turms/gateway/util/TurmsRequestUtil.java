@@ -65,14 +65,14 @@ public class TurmsRequestUtil {
                     if (value != null && !value.equals(value.getDefaultInstanceForType())) {
                         requestId = value.getValue();
                     } else {
-                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The requestId of TurmsRequest is null");
+                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The requestId of TurmsRequest is null");
                     }
                 } else {
                     // key = (field_number << 3) | wire_type
                     int kindFieldNumber = tag >>> 3;
                     type = TurmsRequest.KindCase.forNumber(kindFieldNumber);
                     if (type == null || type == KIND_NOT_SET) {
-                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Not a valid TurmsRequest");
+                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "Not a valid TurmsRequest");
                     }
                     break;
                 }
@@ -84,10 +84,10 @@ public class TurmsRequestUtil {
                 }
                 return new SimpleTurmsRequest(requestId, type, createSessionRequest);
             } else {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Not a valid TurmsRequest");
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "Not a valid TurmsRequest");
             }
         } catch (IOException e) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Not a valid TurmsRequest");
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "Not a valid TurmsRequest");
         }
     }
 

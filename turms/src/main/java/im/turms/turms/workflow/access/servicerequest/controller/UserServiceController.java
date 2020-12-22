@@ -251,7 +251,7 @@ public class UserServiceController {
             UpdateUserOnlineStatusRequest request = clientRequest.getTurmsRequest().getUpdateUserOnlineStatusRequest();
             UserStatus userStatus = request.getUserStatus();
             if (userStatus == UserStatus.UNRECOGNIZED) {
-                return Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The user status must not be UNRECOGNIZED"));
+                return Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The user status must not be UNRECOGNIZED"));
             }
             Set<DeviceType> deviceTypes = request.getDeviceTypesCount() > 0 ? Sets.newHashSet(request.getDeviceTypesList()) : null;
             Mono<Boolean> updateMono;

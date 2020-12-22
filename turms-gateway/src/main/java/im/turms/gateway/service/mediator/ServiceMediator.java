@@ -147,7 +147,7 @@ public class ServiceMediator {
         return inboundRequestService.processServiceRequest(serviceRequest);
     }
 
-    public Mono<Boolean> processHeartbeatRequest(long userId, DeviceType deviceType) {
+    public Mono<Boolean> processHeartbeatRequest(Long userId, DeviceType deviceType) {
         return inboundRequestService.processHeartbeatRequest(userId, deviceType);
     }
 

@@ -43,7 +43,7 @@ public class ReasonController {
     /**
      * We don't use 404 because it's confusing and cannot be used to distinguish
      */
-    private static final ResponseEntity NO_CONTENT_RESPONSE = ResponseEntity.noContent().build();
+    private static final ResponseEntity EMPTY_RESPONSE = ResponseEntity.ok().build();
     private final ReasonCacheService reasonCacheService;
 
     public ReasonController(ReasonCacheService reasonCacheService) {
@@ -60,7 +60,7 @@ public class ReasonController {
                     LoginFailureReasonDTO reason = new LoginFailureReasonDTO(code.getBusinessCode(), code.name(), code.getReason());
                     return ResponseEntity.ok(reason);
                 })
-                .defaultIfEmpty(NO_CONTENT_RESPONSE);
+                .defaultIfEmpty(EMPTY_RESPONSE);
     }
 
     @GetMapping("/disconnection")
@@ -76,7 +76,7 @@ public class ReasonController {
                             : closeStatus.name();
                     return ResponseEntity.ok(new SessionDisconnectionReasonDTO(code, name, ""));
                 })
-                .defaultIfEmpty(NO_CONTENT_RESPONSE);
+                .defaultIfEmpty(EMPTY_RESPONSE);
     }
 
 }

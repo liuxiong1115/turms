@@ -180,7 +180,7 @@ public class UserPermissionGroupService {
 
     public Mono<DeleteResult> deleteUserPermissionGroups(@Nullable Set<Long> groupIds) {
         if (groupIds != null && groupIds.contains(DaoConstant.DEFAULT_USER_PERMISSION_GROUP_ID)) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The default user permission group cannot be deleted"));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The default user permission group cannot be deleted"));
         }
         Query query = QueryBuilder
                 .newBuilder()

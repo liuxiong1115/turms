@@ -71,12 +71,12 @@ class TurmsHandshakeWebSocketServiceTests {
     void handleRequest_shouldReject_ifRequestHeaderUserIdNotExists() {
         MockServerHttpRequest.BaseBuilder<?> requestWithoutUserId = getQualifiedUpgradeRequest();
         ServerWebExchange exchange = MockServerWebExchange.from(requestWithoutUserId);
-        Mono<Void> result = newMockWebSocketService(false).handleRequest(exchange, session -> null);
+        Mono<Void> result = newMockWebSocketService(false).handleRequest(exchange, session -> Mono.empty());
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
                         throwable instanceof ResponseStatusException
-                                && ((ResponseStatusException) throwable).getStatus().equals(HttpStatus.UNAUTHORIZED))
+                                && ((ResponseStatusException) throwable).getStatus().equals(HttpStatus.BAD_REQUEST))
                 .verify();
     }
 

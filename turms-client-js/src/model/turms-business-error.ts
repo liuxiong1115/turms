@@ -32,20 +32,12 @@ export default class TurmsBusinessError extends Error {
         }
     }
 
-    static fromMessage(message?: string): TurmsBusinessError {
-        if (message) {
-            return new TurmsBusinessError(TurmsStatusCode.FAILED, message);
-        } else {
-            return TurmsBusinessError.fromCode(TurmsStatusCode.FAILED);
-        }
-    }
-
     static fromCode(code: number): TurmsBusinessError {
         return new TurmsBusinessError(code, TurmsStatusCode.getReason(code));
     }
 
     static illegalParam<T = never>(reason: string): Promise<T> {
-        const exception = new TurmsBusinessError(TurmsStatusCode.ILLEGAL_ARGUMENTS, reason);
+        const exception = new TurmsBusinessError(TurmsStatusCode.ILLEGAL_ARGUMENT, reason);
         return Promise.reject(exception);
     }
 

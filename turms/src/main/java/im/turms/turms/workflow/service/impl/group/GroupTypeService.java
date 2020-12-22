@@ -228,7 +228,7 @@ public class GroupTypeService {
 
     public Mono<DeleteResult> deleteGroupTypes(@Nullable Set<Long> groupTypeIds) {
         if (groupTypeIds != null && groupTypeIds.contains(DaoConstant.DEFAULT_GROUP_TYPE_ID)) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The default group type cannot be deleted"));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The default group type cannot be deleted"));
         }
         Query query = QueryBuilder
                 .newBuilder()

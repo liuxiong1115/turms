@@ -142,11 +142,21 @@ public class GroupMemberService {
                         return Mono.error(TurmsBusinessException.get(code, permission.getReason()));
                     }
                     Mono<Boolean> isBlacklistedMono = isBlacklisted(groupId, userId);
-                    Mono<Boolean> isActiveMono = groupService.isGroupActiveAndNotDeleted(groupId);
-                    return Mono.zip(isBlacklistedMono, isActiveMono)
-                            .flatMap(results -> !results.getT1() && results.getT2()
-                                    ? addGroupMember(groupId, userId, groupMemberRole, name, new Date(), muteEndDate, operations)
-                                    : Mono.error(TurmsBusinessException.get(TurmsStatusCode.ADD_INACTIVE_BLOCKED_USER_TO_GROUP)));
+                    Mono<Boolean> isGroupActiveMono = groupService.isGroupActiveAndNotDeleted(groupId);
+                    return Mono.zip(isBlacklistedMono, isGroupActiveMono)
+                            .flatMap(results -> {
+                                boolean isUserBlocked = results.getT1();
+                                boolean isGroupActive = results.getT2();
+                                if (isUserBlocked) {
+                                    return isGroupActive
+                                            ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.ADD_BLOCKED_USER_TO_GROUP))
+                                            : Mono.error(TurmsBusinessException.get(TurmsStatusCode.ADD_BLOCKED_USER_TO_INACTIVE_GROUP));
+                                } else if (isGroupActive) {
+                                    return addGroupMember(groupId, userId, groupMemberRole, name, new Date(), muteEndDate, operations);
+                                } else {
+                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ADD_USER_TO_INACTIVE_GROUP));
+                                }
+                            });
                 });
     }
 
@@ -172,13 +182,13 @@ public class GroupMemberService {
         if (quitGroup) {
             return isOwner(deleteMemberId, groupId)
                     .flatMap(isOwner -> isOwner
-                            ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The successor ID must not be null if you are quiting the group"))
+                            ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.OWNER_QUITS_WITHOUT_SPECIFYING_SUCCESSOR))
                             : deleteGroupMembers(groupId, deleteMemberId, null, true).then());
         } else {
             return isOwnerOrManager(requesterId, groupId)
                     .flatMap(isOwnerOrManager -> isOwnerOrManager
                             ? deleteGroupMembers(Set.of(new GroupMember.Key(groupId, deleteMemberId)), null, true).then()
-                            : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_REMOVE_GROUP_MEMBER_INFO)));
+                            : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_REMOVE_GROUP_MEMBER)));
         }
     }
 
@@ -361,7 +371,7 @@ public class GroupMemberService {
                                 return Mono.just(Pair.of(ServicePermission.OK, strategy));
                             } else {
                                 String reason = String.format("The inviter with the role %s isn't allowed to send an invitation under the strategy %s", inviterRole, strategy);
-                                return Mono.just(Pair.of(ServicePermission.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_INVITATION, reason), strategy));
+                                return Mono.just(Pair.of(ServicePermission.get(TurmsStatusCode.NO_PERMISSION_TO_SEND_INVITATION, reason), strategy));
                             }
                         })
                         .defaultIfEmpty(Pair.of(ServicePermission.get(TurmsStatusCode.ADD_USER_TO_INACTIVE_GROUP), null)))
@@ -404,14 +414,14 @@ public class GroupMemberService {
         return groupService.isGroupMuted(groupId)
                 .flatMap(isGroupMuted -> {
                     if (isGroupMuted) {
-                        return Mono.just(TurmsStatusCode.GROUP_HAS_BEEN_MUTED);
+                        return Mono.just(TurmsStatusCode.SEND_MESSAGE_TO_MUTED_GROUP);
                     } else {
                         if (!node.getSharedProperties().getService().getMessage().isCheckIfTargetActiveAndNotDeleted()) {
                             return Mono.just(TurmsStatusCode.OK);
                         }
                         return groupService.isGroupActiveAndNotDeleted(groupId)
                                 .flatMap(isActive -> isActive
-                                        ? isMemberMuted(groupId, senderId).map(muted -> muted ? TurmsStatusCode.MEMBER_HAS_BEEN_MUTED : TurmsStatusCode.OK)
+                                        ? isMemberMuted(groupId, senderId).map(muted -> muted ? TurmsStatusCode.MUTED_MEMBER_SEND_MESSAGE : TurmsStatusCode.OK)
                                         : Mono.just(TurmsStatusCode.SEND_MESSAGE_TO_INACTIVE_GROUP));
                     }
                 });
@@ -427,7 +437,7 @@ public class GroupMemberService {
                     return groupService.isGroupMuted(groupId)
                             .flatMap(isGroupMuted -> {
                                 if (isGroupMuted) {
-                                    return Mono.just(TurmsStatusCode.GROUP_HAS_BEEN_MUTED);
+                                    return Mono.just(TurmsStatusCode.SEND_MESSAGE_TO_MUTED_GROUP);
                                 }
                                 return groupService.isGroupActiveAndNotDeleted(groupId)
                                         .flatMap(isGroupActiveAndNotDeleted -> {
@@ -637,7 +647,7 @@ public class GroupMemberService {
         }
         return isGroupMember(groupId, requesterId)
                 .flatMap(isGroupMember -> isGroupMember == null || !isGroupMember
-                        ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_NOT_GROUP_MEMBER))
+                        ? Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_MEMBER_TO_QUERY_MEMBER_INFO))
                         : queryGroupMembers(groupId, memberIds).collectList())
                 .flatMap(members -> {
                     if (members.isEmpty()) {
@@ -665,7 +675,7 @@ public class GroupMemberService {
         return isGroupMember(groupId, requesterId)
                 .flatMap(isGroupMember -> isGroupMember != null && isGroupMember
                         ? groupVersionService.queryMembersVersion(groupId)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.USER_NOT_GROUP_MEMBER)))
+                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_MEMBER_TO_QUERY_MEMBER_INFO)))
                 .flatMap(version -> {
                     if (lastUpdatedDate == null || lastUpdatedDate.before(version)) {
                         return queryGroupsMembers(Set.of(groupId), null, null, null, null, null, null)

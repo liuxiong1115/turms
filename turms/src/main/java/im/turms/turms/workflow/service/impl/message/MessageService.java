@@ -240,7 +240,7 @@ public class MessageService {
             @Nullable Integer page,
             @Nullable Integer size) {
         if (deliveryStatus != MessageDeliveryStatus.READY && deliveryStatus != MessageDeliveryStatus.RECEIVED) {
-            return Flux.error(TurmsBusinessException.get(ILLEGAL_ARGUMENTS, "deliveryStatus must be READY or RECEIVED"));
+            return Flux.error(TurmsBusinessException.get(ILLEGAL_ARGUMENT, "deliveryStatus must be READY or RECEIVED"));
         }
         return queryMessages(
                 closeToDate,
@@ -819,7 +819,7 @@ public class MessageService {
         return isMessageSentByUser(messageId, requesterId)
                 .flatMap(isSentByUser -> {
                     if (!isSentByUser) {
-                        return Mono.error(TurmsBusinessException.get(UPDATE_MESSAGE_REQUESTER_NOT_SENDER));
+                        return Mono.error(TurmsBusinessException.get(NOT_SENDER_TO_UPDATE_MESSAGE));
                     }
                     if (recallDate != null) {
                         return isMessageRecallable(messageId)
@@ -1019,7 +1019,7 @@ public class MessageService {
             if (isSystemMessage) {
                 senderId = DaoConstant.ADMIN_REQUESTER_ID;
             } else {
-                return Mono.error(TurmsBusinessException.get(ILLEGAL_ARGUMENTS, "senderId must not be null for user messages"));
+                return Mono.error(TurmsBusinessException.get(ILLEGAL_ARGUMENT, "senderId must not be null for user messages"));
             }
         }
         Date deliveryDate = new Date();
@@ -1157,7 +1157,7 @@ public class MessageService {
                     count += record.length;
                 }
                 if (count > maxRecordsSize) {
-                    throw TurmsBusinessException.get(ILLEGAL_ARGUMENTS, "The total size of records must be less than or equal to " + maxRecordsSize);
+                    throw TurmsBusinessException.get(ILLEGAL_ARGUMENT, "The total size of records must be less than or equal to " + maxRecordsSize);
                 }
             }
         }

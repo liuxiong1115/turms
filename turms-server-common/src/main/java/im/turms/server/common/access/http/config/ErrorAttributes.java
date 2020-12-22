@@ -96,7 +96,7 @@ public class ErrorAttributes {
         private static SimpleErrorAttributes fromTrivialException(Throwable throwable) {
             TurmsStatusCode statusCode;
             if (throwable instanceof ConstraintViolationException) {
-                statusCode = TurmsStatusCode.ILLEGAL_ARGUMENTS;
+                statusCode = TurmsStatusCode.ILLEGAL_ARGUMENT;
             } else if (throwable instanceof DuplicateKeyException) {
                 statusCode = TurmsStatusCode.RECORD_CONTAINS_DUPLICATE_KEY;
             } else if (throwable instanceof DataBufferLimitException) {

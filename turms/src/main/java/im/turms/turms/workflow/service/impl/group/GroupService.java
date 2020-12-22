@@ -168,7 +168,7 @@ public class GroupService {
                 .isOwner(requesterId, groupId)
                 .flatMap(authenticated -> {
                     if (!authenticated) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_DELETE_GROUP));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_TO_DELETE_GROUP));
                     }
                     if (node.getSharedProperties().getService().getNotification().isNotifyMembersAfterGroupDeleted()) {
                         return queryGroupMemberIds(groupId)
@@ -337,7 +337,7 @@ public class GroupService {
                 .isOwner(requesterId, groupId)
                 .flatMap(isOwner -> isOwner
                         ? checkAndTransferGroupOwnership(requesterId, groupId, successorId, quitAfterTransfer, operations)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_TRANSFER_GROUP)));
+                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_TO_TRANSFER_GROUP)));
     }
 
     public Mono<Long> queryGroupOwnerId(@NotNull Long groupId) {
@@ -753,7 +753,7 @@ public class GroupService {
                                 });
                     }
                 })
-                .defaultIfEmpty(ServicePermission.get(TurmsStatusCode.CREATE_GROUP_REQUESTER_NOT_ACTIVE));
+                .defaultIfEmpty(ServicePermission.get(TurmsStatusCode.NOT_ACTIVE_USER_TO_CREATE_GROUP));
     }
 
     public Mono<ServicePermission> isAllowedHaveGroupType(
@@ -767,7 +767,7 @@ public class GroupService {
         }
         return groupTypeService.groupTypeExists(groupTypeId)
                 .flatMap(existed -> {
-                    if (existed == null || !existed) {
+                    if (!existed) {
                         return Mono.just(ServicePermission.get(TurmsStatusCode.CREATE_GROUP_WITH_NON_EXISTING_GROUP_TYPE));
                     }
                     Mono<UserPermissionGroup> groupMono = auxiliaryUserPermissionGroup != null

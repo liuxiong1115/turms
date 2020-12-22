@@ -82,7 +82,7 @@ public class InboundRequestService {
     /**
      * If the method returns MonoError, the session should be closed by downstream.
      */
-    public Mono<Boolean> processHeartbeatRequest(long userId, DeviceType deviceType) {
+    public Mono<Boolean> processHeartbeatRequest(Long userId, DeviceType deviceType) {
         if (!node.isActive()) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.SERVER_UNAVAILABLE));
         }
@@ -108,7 +108,7 @@ public class InboundRequestService {
         DeviceType deviceType = serviceRequest.getDeviceType();
         UserSession session = sessionService.getLocalUserSession(userId, deviceType);
         if (session == null) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.SESSION_NOT_EXISTS));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.SEND_REQUEST_FROM_NON_EXISTING_SESSION));
         }
 
         // Flow control

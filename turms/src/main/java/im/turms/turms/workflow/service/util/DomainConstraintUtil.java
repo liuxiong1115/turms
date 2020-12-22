@@ -33,7 +33,7 @@ public class DomainConstraintUtil {
 
     public static void validRequestStatus(RequestStatus status) {
         if (status == RequestStatus.UNRECOGNIZED) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The request status must not be UNRECOGNIZED");
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The request status must not be UNRECOGNIZED");
         }
     }
 

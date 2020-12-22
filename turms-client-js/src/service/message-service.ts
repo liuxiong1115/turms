@@ -11,6 +11,7 @@ import VideoFile = im.turms.proto.VideoFile;
 import ImageFile = im.turms.proto.ImageFile;
 import Location = im.turms.proto.UserLocation;
 import MessageDeliveryStatus = im.turms.proto.MessageDeliveryStatus;
+import TurmsStatusCode from "../model/turms-status-code";
 
 export default class MessageService {
     /**
@@ -74,7 +75,7 @@ export default class MessageService {
             return TurmsBusinessError.notFalsy('targetId');
         }
         if (RequestUtil.isFalsy(text) && RequestUtil.isFalsy(records)) {
-            return TurmsBusinessError.illegalParam('text and records must not all be null');
+            return Promise.reject(TurmsBusinessError.fromCode(TurmsStatusCode.ILLEGAL_TEXT_AND_RECORDS));
         }
         if (!deliveryDate) {
             deliveryDate = new Date();

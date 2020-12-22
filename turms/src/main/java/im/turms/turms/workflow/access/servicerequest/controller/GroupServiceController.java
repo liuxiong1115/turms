@@ -342,14 +342,14 @@ public class GroupServiceController {
             CreateGroupJoinQuestionRequest request = clientRequest.getTurmsRequest()
                     .getCreateGroupJoinQuestionRequest();
             if (request.getAnswersCount() == 0) {
-                return Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The answers must not be empty"));
+                return Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The answers must not be empty"));
             } else {
                 Set<String> answers = new HashSet<>(request.getAnswersList());
                 int score = request.getScore();
                 return score >= 0
                         ? groupQuestionService.authAndCreateGroupJoinQuestion(clientRequest.getUserId(), request.getGroupId(), request.getQuestion(), answers, score)
                         .map(question -> RequestHandlerResultFactory.get(question.getId()))
-                        : Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The score must be greater than or equal to 0"));
+                        : Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The score must be greater than or equal to 0"));
             }
         };
     }
@@ -495,7 +495,7 @@ public class GroupServiceController {
             if (role == null || role == GroupMemberRole.UNRECOGNIZED) {
                 role = GroupMemberRole.MEMBER;
             } else if (role == GroupMemberRole.OWNER) {
-                return Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The role of the new member must not be OWNER"));
+                return Mono.just(RequestHandlerResultFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The role of the new member must not be OWNER"));
             }
             return groupMemberService.authAndAddGroupMember(
                     clientRequest.getUserId(),

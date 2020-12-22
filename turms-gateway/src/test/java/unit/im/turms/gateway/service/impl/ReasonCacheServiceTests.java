@@ -67,7 +67,7 @@ class ReasonCacheServiceTests {
         Mono<TurmsStatusCode> result = reasonCacheService.getLoginFailureReason(1L, DeviceType.ANDROID, 1L);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> throwable instanceof TurmsBusinessException && ((TurmsBusinessException) throwable).getCode().equals(TurmsStatusCode.DISABLED_FUNCTION))
+                .expectErrorMatches(throwable -> throwable instanceof TurmsBusinessException && ((TurmsBusinessException) throwable).getCode().equals(TurmsStatusCode.LOGIN_FAILURE_REASON_CACHE_IS_DISABLED))
                 .verify();
     }
 
@@ -135,7 +135,7 @@ class ReasonCacheServiceTests {
         Mono<Integer> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.DISABLED_FUNCTION))
+                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.CACHING_FOR_SESSION_DISCONNECTION_REASON_IS_DISABLED))
                 .verify();
     }
 
@@ -179,7 +179,7 @@ class ReasonCacheServiceTests {
     void shouldCacheDisconnectionReason_shouldReturnFalse_forAnyInvalidArgs() {
         ReasonCacheService reasonCacheService = newReasonCacheService(true, Set.of(DeviceType.IOS), true);
         CloseReason validReason = CloseReason.get(SessionCloseStatus.DISCONNECTED_BY_ADMIN);
-        CloseReason invalidReason = CloseReason.get(TurmsStatusCode.ILLEGAL_ARGUMENTS);
+        CloseReason invalidReason = CloseReason.get(TurmsStatusCode.ILLEGAL_ARGUMENT);
 
         assertFalse(reasonCacheService.shouldCacheDisconnectionReason(null, DeviceType.IOS, validReason));
         assertFalse(reasonCacheService.shouldCacheDisconnectionReason(1L, null, validReason));

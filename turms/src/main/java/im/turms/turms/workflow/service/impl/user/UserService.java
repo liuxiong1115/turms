@@ -152,7 +152,7 @@ public class UserService {
                                     : ServicePermission.get(TurmsStatusCode.PRIVATE_MESSAGE_SENDER_HAS_BEEN_BLOCKED));
                 } else {
                     return userRelationshipService.hasRelationshipAndNotBlocked(targetId, requesterId)
-                            .map(isRelatedAndAllowed -> isRelatedAndAllowed
+                            .map(isRelatedAndNotBlocked -> isRelatedAndNotBlocked
                                     ? ServicePermission.OK
                                     : ServicePermission.get(TurmsStatusCode.MESSAGE_SENDER_NOT_IN_CONTACTS_OR_BLOCKED));
                 }

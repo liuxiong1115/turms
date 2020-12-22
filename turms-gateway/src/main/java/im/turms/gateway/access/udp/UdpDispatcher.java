@@ -125,8 +125,8 @@ public class UdpDispatcher {
                                 session.getConnection().setAddress(senderAddress);
                                 return TurmsStatusCode.OK;
                             })
-                            .onErrorReturn(TurmsStatusCode.ILLEGAL_ARGUMENTS)
-                            .defaultIfEmpty(TurmsStatusCode.SESSION_NOT_EXISTS);
+                            .onErrorReturn(TurmsStatusCode.ILLEGAL_ARGUMENT)
+                            .defaultIfEmpty(TurmsStatusCode.SEND_REQUEST_FROM_NON_EXISTING_SESSION);
                 case GO_OFFLINE:
                     CloseStatus status = CloseStatusFactory.get(SessionCloseStatus.DISCONNECTED_BY_CLIENT);
                     return serviceMediator.authAndSetLocalUserDeviceOffline(userId, deviceType, status, sessionId)

@@ -24,7 +24,7 @@ import lombok.Data;
  */
 @Data
 public class LoginFailureReasonDTO {
-    private final int statusCode;
+    private final Integer statusCode;
     private final String codeName;
     private final String reason;
 }

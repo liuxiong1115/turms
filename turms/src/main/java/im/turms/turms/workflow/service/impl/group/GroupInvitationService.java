@@ -254,12 +254,12 @@ public class GroupInvitationService {
                     RequestStatus requestStatus = invitation.getStatus();
                     if (requestStatus != RequestStatus.PENDING) {
                         String reason = "The invitation is under the status " + requestStatus;
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.GROUP_INVITATION_NOT_PENDING, reason));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.RECALL_NOT_PENDING_GROUP_INVITATION, reason));
                     }
                     return groupMemberService.isOwnerOrManager(requesterId, invitation.getGroupId())
                             .flatMap(authenticated -> {
-                                if (authenticated == null || !authenticated) {
-                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_INVITATION));
+                                if (!authenticated) {
+                                    return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_RECALL_INVITATION));
                                 }
                                 Query query = new Query().addCriteria(where(ID_FIELD_NAME).is(invitationId));
                                 Update update = new Update()
@@ -364,7 +364,7 @@ public class GroupInvitationService {
         return groupMemberService.isOwnerOrManager(userId, groupId)
                 .flatMap(authenticated -> {
                     if (!authenticated) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_ACCESS_INVITATION));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_ACCESS_INVITATION));
                     }
                     return groupVersionService.queryGroupInvitationsVersion(groupId)
                             .flatMap(version -> {

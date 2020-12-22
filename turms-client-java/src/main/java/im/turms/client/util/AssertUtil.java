@@ -33,14 +33,14 @@ public class AssertUtil {
     public static void throwIfAnyFalsy(@NotEmpty Object... array) {
         for (Object o : array) {
             if (o == null) {
-                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The required values must not be null");
+                throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The required values must not be null");
             } else {
                 if (o instanceof String) {
                     if (((String) o).isEmpty()) {
-                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The string value must not be blank");
+                        throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The string value must not be blank");
                     }
                 } else if (o instanceof Collection && ((Collection<?>) o).isEmpty()) {
-                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The collection value must not be empty");
+                    throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The collection value must not be empty");
                 }
             }
         }
@@ -48,7 +48,7 @@ public class AssertUtil {
 
     public static void throwIfAllFalsy(String message, @NotEmpty Object... array) {
         if (areAllFalsy(array)) {
-            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, message);
+            throw TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, message);
         }
     }
 

@@ -193,11 +193,11 @@ public class ServiceRequestDispatcher implements IServiceRequestDispatcher {
             }
             TurmsRequest.KindCase requestType = lastRequest.getKindCase();
             if (requestType == KIND_NOT_SET) {
-                return Mono.just(ServiceResponseFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The request type cannot be KIND_NOT_SET"));
+                return Mono.just(ServiceResponseFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The request type cannot be KIND_NOT_SET"));
             }
             ClientRequestHandler handler = router.get(requestType);
             if (handler == null) {
-                return Mono.just(ServiceResponseFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The request type is unsupported"));
+                return Mono.just(ServiceResponseFactory.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The request type is unsupported"));
             }
             // 4. Log
             if (LoggingRequestUtil.shouldLog(requestType, supportedLoggingRequestProperties)) {

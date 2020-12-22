@@ -180,7 +180,7 @@ export default class TurmsDriver {
                 return Promise.reject(e);
             }
         } else {
-            return Promise.reject(TurmsBusinessError.fromCode(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED));
+            return Promise.reject(TurmsBusinessError.fromCode(TurmsStatusCode.SESSION_HAS_BEEN_CLOSED));
         }
     }
 
@@ -197,7 +197,7 @@ export default class TurmsDriver {
 
     private _onConnectionDisconnected(info): Promise<void> {
         this._heartbeatService.stop();
-        const error = TurmsBusinessError.fromCode(TurmsStatusCode.CLIENT_SESSION_HAS_BEEN_CLOSED);
+        const error = TurmsBusinessError.fromCode(TurmsStatusCode.SESSION_HAS_BEEN_CLOSED);
         this._heartbeatService.rejectHeartbeatPromises(error);
         const isDisconnectOnLogin = !info.wasConnected;
         if (isDisconnectOnLogin) {

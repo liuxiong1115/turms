@@ -22,6 +22,7 @@ import im.turms.gateway.manager.UserSessionsManager;
 import im.turms.gateway.plugin.extension.NotificationHandler;
 import im.turms.gateway.plugin.manager.TurmsPluginManager;
 import im.turms.gateway.pojo.bo.session.UserSession;
+import im.turms.gateway.pojo.bo.session.connection.NetConnection;
 import im.turms.server.common.cluster.node.Node;
 import im.turms.server.common.rpc.service.IOutboundMessageService;
 import im.turms.server.common.util.AssertUtil;
@@ -91,7 +92,11 @@ public class OutboundMessageService implements IOutboundMessageService {
                     userSession.tryEmitNextNotification(wrappedNotificationData);
                     // Keep the logic easy and we don't care about whether the notification is really flushed
                     hasForwardedMessageToOneRecipient = true;
-                    userSession.getConnection().tryNotifyClientToRecover();
+                    NetConnection connection = userSession.getConnection();
+                    if (connection == null) {
+                        throw new IllegalStateException("The user session " + userSession.getUserId() + " hasn't a connection");
+                    }
+                    connection.tryNotifyClientToRecover();
                 }
             } else {
                 if (triggerHandlers) {

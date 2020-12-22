@@ -48,7 +48,7 @@ class WebFluxConfigTests {
         Map.Entry<String, CorsConfiguration> entry = configurations.entrySet().iterator().next();
         Assertions.assertEquals("/**", entry.getKey());
         Assertions.assertEquals(true, entry.getValue().getAllowCredentials());
-        Assertions.assertTrue(entry.getValue().getAllowedOrigins().contains("*"));
+        Assertions.assertTrue(entry.getValue().getAllowedOriginPatterns().contains("*"));
         Assertions.assertTrue(entry.getValue().getAllowedMethods().contains("*"));
         Assertions.assertTrue(entry.getValue().getAllowedHeaders().contains("*"));
     }

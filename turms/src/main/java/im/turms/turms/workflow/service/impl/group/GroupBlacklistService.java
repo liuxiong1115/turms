@@ -97,7 +97,7 @@ public class GroupBlacklistService {
         return groupMemberService.isOwnerOrManager(requesterId, groupId)
                 .flatMap(authenticated -> authenticated
                         ? groupMemberService.isGroupMember(groupId, blacklistedUserId)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_BLOCK_GROUP_USER)))
+                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_ADD_BLOCKED_USER)))
                 .flatMap(isGroupMember -> {
                     GroupBlacklistedUser blacklistedUser = new GroupBlacklistedUser(
                             groupId, blacklistedUserId, new Date(), requesterId);
@@ -159,7 +159,7 @@ public class GroupBlacklistService {
                         }
                         return removeMono.then();
                     } else {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_BLOCK_GROUP_USER));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_REMOVE_BLOCKED_USER));
                     }
                 });
     }

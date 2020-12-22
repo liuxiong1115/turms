@@ -67,7 +67,7 @@ class InboundRequestServiceTests {
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
-                        throwable instanceof TurmsBusinessException && ((TurmsBusinessException) throwable).getCode().equals(TurmsStatusCode.SESSION_NOT_EXISTS))
+                        throwable instanceof TurmsBusinessException && ((TurmsBusinessException) throwable).getCode().equals(TurmsStatusCode.SEND_REQUEST_FROM_NON_EXISTING_SESSION))
                 .verify();
     }
 

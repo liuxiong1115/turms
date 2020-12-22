@@ -122,7 +122,7 @@ public class TurmsHandshakeWebSocketService extends HandshakeWebSocketService {
         String deviceDetails = HandshakeRequestUtil.parseDeviceDetailsFromHeaders(request);
         DeviceType loggingInDeviceType = HandshakeRequestUtil.parseDeviceTypeFromHeadersOrCookies(request);
         if (userId == null) {
-            return rejectUpgradeRequest(exchange, TurmsStatusCode.LOGIN_USER_ID_IS_NULL, requestId, userId, loggingInDeviceType);
+            return rejectUpgradeRequest(exchange, TurmsStatusCode.LOGIN_USER_ID_NOT_NUMBER, requestId, userId, loggingInDeviceType);
         }
         if (!node.isActive()) {
             return rejectUpgradeRequest(exchange, TurmsStatusCode.SERVER_UNAVAILABLE, requestId, userId, loggingInDeviceType);

@@ -82,12 +82,12 @@ public class MessageServiceController {
         return clientRequest -> {
             CreateMessageRequest request = clientRequest.getTurmsRequest().getCreateMessageRequest();
             if (request.hasIsSystemMessage() && request.getIsSystemMessage().getValue()) {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Users cannot send the system message"));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "Users cannot send the system message"));
             }
             Mono<Pair<Message, Set<Long>>> messageAndRelatedUserIdsMono;
             boolean isGroupMessage = request.hasGroupId();
             if (!isGroupMessage && !request.hasRecipientId()) {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The recipientId must not be null for private messages"));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The recipientId must not be null for private messages"));
             }
             long targetId = isGroupMessage ? request.getGroupId().getValue() : request.getRecipientId().getValue();
             if (request.hasMessageId()) {
@@ -306,7 +306,7 @@ public class MessageServiceController {
         return clientRequest -> {
             UpdateMessageRequest request = clientRequest.getTurmsRequest().getUpdateMessageRequest();
             if (request.hasIsSystemMessage() && request.getIsSystemMessage().getValue()) {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "Users cannot create system messages"));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "Users cannot create system messages"));
             }
             long messageId = request.getMessageId();
             if (request.hasReadDate()) {
@@ -383,7 +383,7 @@ public class MessageServiceController {
         return messageService.isMessageRecipient(messageId, userId)
                 .flatMap(isMessageRecipient -> {
                     if (!isMessageRecipient) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.UPDATE_MESSAGE_REQUESTER_NOT_MESSAGE_RECIPIENT));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_MESSAGE_RECIPIENT_TO_UPDATE_MESSAGE_REQUESTER));
                     }
                     Date date = null;
                     if (readDate != null) {

@@ -17,6 +17,7 @@
 
 package im.turms.client.util;
 
+import im.turms.client.exception.TurmsBusinessException;
 import java8.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +39,7 @@ public class TurmsBusinessExceptionUtil {
 
     public static <T> CompletableFuture<T> getFuture(int statusCode, @Nullable String reason) {
         CompletableFuture<T> future = new CompletableFuture<>();
-        future.completeExceptionally(get(statusCode, reason));
+        future.completeExceptionally(TurmsBusinessException.get(statusCode, reason));
         return future;
     }
 

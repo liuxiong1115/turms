@@ -31,32 +31,27 @@ public class TurmsBusinessException extends NoStackTraceException {
     private final int code;
     private final String reason;
 
-    private TurmsBusinessException(int code, @Nullable String reason) {
-        super(formatMessage(code, reason));
+    private TurmsBusinessException(int code, @Nullable String reason, @Nullable Throwable cause) {
+        super(formatMessage(code, reason), cause);
         this.code = code;
         this.reason = reason;
     }
 
-    private TurmsBusinessException(int code, @Nullable Throwable cause) {
-        super(formatMessage(code, null), cause);
-        this.code = code;
-        this.reason = null;
-    }
-
     public static TurmsBusinessException get(int code) {
-        return new TurmsBusinessException(code, (String) null);
+        return new TurmsBusinessException(code, null, null);
     }
 
     public static TurmsBusinessException get(int code, @Nullable String reason) {
-        if (reason != null && !reason.isEmpty()) {
-            return new TurmsBusinessException(code, reason);
+        boolean reasonExists = reason != null && !reason.isEmpty();
+        if (reasonExists) {
+            return new TurmsBusinessException(code, reason, null);
         } else {
-            return get(code);
+            return new TurmsBusinessException(code, null, null);
         }
     }
 
     public static TurmsBusinessException get(int code, @Nullable Throwable cause) {
-        return new TurmsBusinessException(code, cause);
+        return new TurmsBusinessException(code, null, cause);
     }
 
     public static TurmsBusinessException get(TurmsNotification notification) {
@@ -103,4 +98,5 @@ public class TurmsBusinessException extends NoStackTraceException {
     public int hashCode() {
         return Objects.hash(code, reason);
     }
+
 }

@@ -32,6 +32,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 import reactor.util.concurrent.Queues;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -47,6 +48,7 @@ public final class UserSession {
     private final Long userId;
     private final DeviceType deviceType;
     private final Date loginDate;
+    @Nullable
     private Point loginLocation;
     /**
      * 1. Use Sinks.Many<ByteBuf> instead of Sinks.Many<TurmsNotification>
@@ -73,6 +75,7 @@ public final class UserSession {
      * @implNote For better performance, it's acceptable for our scenarios to not update isSessionOpen atomically.
      */
     private volatile boolean isSessionOpen = true;
+    @Nullable
     private NetConnection connection;
 
     public UserSession(Long userId,

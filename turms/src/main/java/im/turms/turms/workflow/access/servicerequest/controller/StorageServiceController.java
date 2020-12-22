@@ -59,7 +59,7 @@ public class StorageServiceController {
                                 .setUrl(StringValue.newBuilder().setValue(url).build())
                                 .build()));
             } else {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The content type must not be UNRECOGNIZED"));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The content type must not be UNRECOGNIZED"));
             }
         };
     }
@@ -78,7 +78,7 @@ public class StorageServiceController {
                                 .setUrl(StringValue.newBuilder().setValue(url).build())
                                 .build()));
             } else {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The content type must not be UNRECOGNIZED"));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The content type must not be UNRECOGNIZED"));
             }
         };
     }
@@ -94,7 +94,7 @@ public class StorageServiceController {
                 return storageService.deleteResource(clientRequest.getUserId(), contentType, keyStr, keyNum)
                         .thenReturn(RequestHandlerResultFactory.OK);
             } else {
-                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The content type must not be UNRECOGNIZED"));
+                return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The content type must not be UNRECOGNIZED"));
             }
         };
     }

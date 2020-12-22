@@ -57,7 +57,7 @@ class ReasonControllerTests {
     }
 
     @Test
-    void getLoginFailureReason_shouldReturn404_ifReasonNotExists() {
+    void getLoginFailureReason_shouldReturn200WithEmptyBody_ifReasonNotExists() {
         ReasonCacheService service = mock(ReasonCacheService.class);
         long userId = 1L;
         long requestId = 2L;
@@ -69,7 +69,7 @@ class ReasonControllerTests {
 
         StepVerifier
                 .create(result)
-                .expectNextMatches(entity -> entity.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                .expectNextMatches(entity -> entity.getStatusCode().equals(HttpStatus.OK) && entity.getBody() == null)
                 .verifyComplete();
     }
 
@@ -92,7 +92,7 @@ class ReasonControllerTests {
     }
 
     @Test
-    void getSessionDisconnectionReason_shouldReturn404_ifReasonNotExists() {
+    void getSessionDisconnectionReason_shouldReturn200withEmptyBody_ifReasonNotExists() {
         ReasonCacheService service = mock(ReasonCacheService.class);
         long userId = 1L;
         int sessionId = 2;
@@ -104,7 +104,7 @@ class ReasonControllerTests {
 
         StepVerifier
                 .create(result)
-                .expectNextMatches(entity -> entity.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                .expectNextMatches(entity -> entity.getStatusCode().equals(HttpStatus.OK) && entity.getBody() == null)
                 .verifyComplete();
     }
 

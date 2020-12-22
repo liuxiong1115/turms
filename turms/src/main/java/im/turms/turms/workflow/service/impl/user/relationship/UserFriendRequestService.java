@@ -392,7 +392,7 @@ public class UserFriendRequestService {
                             return updatePendingFriendRequestStatus(friendRequestId, RequestStatus.DECLINED, reason, null)
                                     .then();
                         default:
-                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENTS, "The response action must not be UNRECOGNIZED"));
+                            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.ILLEGAL_ARGUMENT, "The response action must not be UNRECOGNIZED"));
                     }
                 });
     }
