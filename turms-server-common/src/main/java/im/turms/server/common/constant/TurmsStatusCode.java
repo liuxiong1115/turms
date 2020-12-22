@@ -106,7 +106,9 @@ public enum TurmsStatusCode {
 
     // Group - Info
     UPDATE_INFO_OF_NON_EXISTING_GROUP(3000, "Cannot update the information of a non-existing group", 403),
-    NO_PERMISSION_TO_UPDATE_GROUP_INFO(3001, "No permission to update the group information", 401),
+    NOT_OWNER_TO_UPDATE_GROUP_INFO(3001, "Only the owner of the group can update the group information", 401),
+    NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_INFO(3002, "Only the owner and managers of the group can update the group information", 401),
+    NOT_MEMBER_TO_UPDATE_GROUP_INFO(3003, "Only the members of the group can update the group information", 401),
 
     // Group - Type
     NO_PERMISSION_TO_CREATE_GROUP_WITH_GROUP_TYPE(3100, "No permission to create a group with the group type", 401),
@@ -122,21 +124,22 @@ public enum TurmsStatusCode {
     TRANSFER_NON_EXISTING_GROUP(3206, "Cannot transfer a non-existing group", 403),
 
     // Group - Question
-    NOT_OWNER_OR_MANAGER_TO_CREATE_GROUP_QUESTION(3300, "Only the owner and managers can create group questions", 401),
-    NOT_OWNER_OR_MANAGER_TO_DELETE_GROUP_QUESTION(3301, "Only the owner and managers can delete group questions", 401),
-    NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_QUESTION(3302, "Only the owner and managers can update group questions", 401),
-    NOT_OWNER_OR_MANAGER_TO_ACCESS_GROUP_QUESTION_ANSWER(3303, "Only the owner and managers can access group question answers", 401),
+    NOT_OWNER_OR_MANAGER_TO_CREATE_GROUP_QUESTION(3300, "Only the owner and managers of the group can create group questions", 401),
+    NOT_OWNER_OR_MANAGER_TO_DELETE_GROUP_QUESTION(3301, "Only the owner and managers of the group can delete group questions", 401),
+    NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_QUESTION(3302, "Only the owner and managers of the group can update group questions", 401),
+    NOT_OWNER_OR_MANAGER_TO_ACCESS_GROUP_QUESTION_ANSWER(3303, "Only the owner and managers of the group can access group question answers", 401),
     GROUP_QUESTION_ANSWERER_HAS_BEEN_BLOCKED(3304, "The group question answerer has been blocked", 403),
-    MEMBER_CANNOT_ANSWER_GROUP_QUESTION(3305, "The user is already a member of the group", 409),
+    MEMBER_CANNOT_ANSWER_GROUP_QUESTION(3305, "A group member cannot answer group questions", 409),
     ANSWER_QUESTION_OF_INACTIVE_GROUP(3306, "Cannot answer the questions of an inactive group", 403),
 
     // Group - Member
-    NO_PERMISSION_TO_REMOVE_GROUP_MEMBER(3400, "No permission to remove the group member", 401),
+    NOT_OWNER_OR_MANAGER_TO_REMOVE_GROUP_MEMBER(3400, "Only the owner and managers of the group can remove the group member", 401),
     NO_PERMISSION_TO_UPDATE_GROUP_MEMBER_INFO(3401, "No permission to update the group member's information", 401),
     NOT_MEMBER_TO_QUERY_MEMBER_INFO(3402, "Only the member of the group can query its group members' information", 401),
     ADD_BLOCKED_USER_TO_GROUP(3403, "Cannot add a blocked user to the group", 403),
     ADD_BLOCKED_USER_TO_INACTIVE_GROUP(3404, "Cannot add a blocked user to the inactive group", 403),
     ADD_USER_TO_INACTIVE_GROUP(3405, "Cannot add a user to the inactive group", 403),
+    ADD_NEW_MEMBER_WITH_ROLE_HIGHER_THAN_REQUESTER(3406, "Cannot add a user with the role higher than the requester's", 403),
 
     // Group - Blocklist
     NOT_OWNER_OR_MANAGER_TO_ADD_BLOCKED_USER(3500, "Only the owner and managers of the group can add blocked users", 401),
@@ -155,11 +158,13 @@ public enum TurmsStatusCode {
     GROUP_INVITEE_ALREADY_GROUP_MEMBER(3702, "The invitee is already a member of the group", 409),
     NOT_OWNER_OR_MANAGER_TO_RECALL_INVITATION(3703, "Only the owner and managers of the group can recall invitations", 401),
     NOT_OWNER_OR_MANAGER_TO_ACCESS_INVITATION(3704, "Only the owner and managers of the group can access invitations", 401),
-    NO_PERMISSION_TO_SEND_INVITATION(3705, "No permission to send invitation", 401),
-    INVITEE_HAS_BEEN_BLOCKED(3706, "The invitee has been blocked by the group", 403),
-    RECALLING_GROUP_INVITATION_IS_DISABLED(3707, "The feature to recall group invitations is disabled", 510),
-    REDUNDANT_GROUP_INVITATION(3708, "The group invitation is redundant", 406),
-    RECALL_NOT_PENDING_GROUP_INVITATION(3709, "Cannot recall not pending group invitations", 403),
+    NOT_OWNER_TO_SEND_INVITATION(3705, "Only the owner of the group can send invitation", 401),
+    NOT_OWNER_OR_MANAGER_TO_SEND_INVITATION(3706, "Only the owner and managers of the group can send invitation", 401),
+    NOT_MEMBER_TO_SEND_INVITATION(3707, "Only the members of the group can send invitation", 401),
+    INVITEE_HAS_BEEN_BLOCKED(3708, "The invitee has been blocked by the group", 403),
+    RECALLING_GROUP_INVITATION_IS_DISABLED(3709, "The feature to recall group invitations is disabled", 510),
+    REDUNDANT_GROUP_INVITATION(3710, "The group invitation is redundant", 406),
+    RECALL_NOT_PENDING_GROUP_INVITATION(3711, "Cannot recall not pending group invitations", 403),
 
     // Conversation
     UPDATING_TYPING_STATUS_IS_DISABLED(4000, "The feature to update typing status is disabled", 510),

@@ -586,21 +586,24 @@ public class GroupService {
                     GroupUpdateStrategy groupUpdateStrategy = groupType.getGroupInfoUpdateStrategy();
                     switch (groupUpdateStrategy) {
                         case OWNER:
-                            return groupMemberService.isOwner(requesterId, groupId);
+                            return groupMemberService.isOwner(requesterId, groupId)
+                                    .map(isOwner -> isOwner ? TurmsStatusCode.OK : TurmsStatusCode.NOT_OWNER_TO_UPDATE_GROUP_INFO);
                         case OWNER_MANAGER:
-                            return groupMemberService.isOwnerOrManager(requesterId, groupId);
+                            return groupMemberService.isOwnerOrManager(requesterId, groupId)
+                                    .map(isOwnerOrManager -> isOwnerOrManager ? TurmsStatusCode.OK : TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_INFO);
                         case OWNER_MANAGER_MEMBER:
-                            return groupMemberService.isOwnerOrManagerOrMember(requesterId, groupId);
+                            return groupMemberService.isOwnerOrManagerOrMember(requesterId, groupId)
+                                    .map(isMember -> isMember ? TurmsStatusCode.OK : TurmsStatusCode.NOT_MEMBER_TO_UPDATE_GROUP_INFO);
                         case ALL:
-                            return Mono.just(true);
+                            return Mono.just(TurmsStatusCode.OK);
                         default:
                             return Mono.error(new IllegalStateException("Unexpected value: " + groupUpdateStrategy));
                     }
                 })
-                .flatMap(authenticated -> authenticated
+                .flatMap(code -> code == TurmsStatusCode.OK
                         ? updateGroupInformation(groupId, typeId, creatorId, ownerId, name, intro,
                         announcement, minimumScore, isActive, creationDate, deletionDate, muteEndDate, operations)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_UPDATE_GROUP_INFO)));
+                        : Mono.error(TurmsBusinessException.get(code)));
     }
 
     public Mono<GroupsWithVersion> queryGroupWithVersion(

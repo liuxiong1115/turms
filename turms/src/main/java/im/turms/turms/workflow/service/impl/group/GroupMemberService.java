@@ -188,7 +188,7 @@ public class GroupMemberService {
             return isOwnerOrManager(requesterId, groupId)
                     .flatMap(isOwnerOrManager -> isOwnerOrManager
                             ? deleteGroupMembers(Set.of(new GroupMember.Key(groupId, deleteMemberId)), null, true).then()
-                            : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_REMOVE_GROUP_MEMBER)));
+                            : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_REMOVE_GROUP_MEMBER)));
         }
     }
 
@@ -366,12 +366,12 @@ public class GroupMemberService {
                 .flatMap(inviterRole -> groupService.queryGroupType(groupId)
                         .flatMap(groupType -> {
                             GroupInvitationStrategy strategy = groupType.getInvitationStrategy();
-                            boolean isAuthorized = isRoleAuthorizedToAddNewRole(inviterRole, newMemberRole, strategy);
-                            if (isAuthorized) {
+                            TurmsStatusCode code = isRoleAuthorizedToAddNewRole(inviterRole, newMemberRole, strategy);
+                            if (code == TurmsStatusCode.OK) {
                                 return Mono.just(Pair.of(ServicePermission.OK, strategy));
                             } else {
                                 String reason = String.format("The inviter with the role %s isn't allowed to send an invitation under the strategy %s", inviterRole, strategy);
-                                return Mono.just(Pair.of(ServicePermission.get(TurmsStatusCode.NO_PERMISSION_TO_SEND_INVITATION, reason), strategy));
+                                return Mono.just(Pair.of(ServicePermission.get(code, reason), strategy));
                             }
                         })
                         .defaultIfEmpty(Pair.of(ServicePermission.get(TurmsStatusCode.ADD_USER_TO_INACTIVE_GROUP), null)))
@@ -793,30 +793,46 @@ public class GroupMemberService {
                 });
     }
 
-    private boolean isRoleAuthorizedToAddNewRole(@NotNull GroupMemberRole requesterRole,
+    private TurmsStatusCode isRoleAuthorizedToAddNewRole(@NotNull GroupMemberRole requesterRole,
                                                  @Nullable GroupMemberRole newMemberRole,
                                                  @NotNull GroupInvitationStrategy groupInvitationStrategy) {
-        boolean isAllowToAddRole;
+        TurmsStatusCode isAllowToAddRole;
         switch (groupInvitationStrategy) {
             case OWNER:
             case OWNER_REQUIRING_ACCEPTANCE:
-                isAllowToAddRole = requesterRole == GroupMemberRole.OWNER;
+                isAllowToAddRole = requesterRole == GroupMemberRole.OWNER
+                        ? TurmsStatusCode.OK
+                        : TurmsStatusCode.NOT_OWNER_TO_SEND_INVITATION;
                 break;
             case OWNER_MANAGER:
             case OWNER_MANAGER_REQUIRING_ACCEPTANCE:
                 isAllowToAddRole = requesterRole == GroupMemberRole.OWNER
-                        || requesterRole == GroupMemberRole.MANAGER;
+                        || requesterRole == GroupMemberRole.MANAGER
+                        ? TurmsStatusCode.OK
+                        : TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_SEND_INVITATION;
                 break;
             case OWNER_MANAGER_MEMBER:
             case OWNER_MANAGER_MEMBER_REQUIRING_ACCEPTANCE:
                 isAllowToAddRole = requesterRole == GroupMemberRole.OWNER
                         || requesterRole == GroupMemberRole.MANAGER
-                        || requesterRole == GroupMemberRole.MEMBER;
+                        || requesterRole == GroupMemberRole.MEMBER
+                        ? TurmsStatusCode.OK
+                        : TurmsStatusCode.NOT_MEMBER_TO_SEND_INVITATION;
                 break;
             default:
-                isAllowToAddRole = true;
+                isAllowToAddRole = TurmsStatusCode.OK;
         }
-        return isAllowToAddRole && (newMemberRole == null || requesterRole.getNumber() < newMemberRole.getNumber());
+        if (isAllowToAddRole == TurmsStatusCode.OK) {
+            boolean isRequesterRoleHigherThanNewMemberRole = newMemberRole == null
+                    || requesterRole.getNumber() < newMemberRole.getNumber();
+            if (isRequesterRoleHigherThanNewMemberRole) {
+                return TurmsStatusCode.OK;
+            } else {
+                return TurmsStatusCode.ADD_NEW_MEMBER_WITH_ROLE_HIGHER_THAN_REQUESTER;
+            }
+        } else {
+            return isAllowToAddRole;
+        }
     }
 
 }
