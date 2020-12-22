@@ -135,7 +135,7 @@ class ReasonCacheServiceTests {
         Mono<Integer> result = reasonCacheService.getDisconnectionReason(1L, DeviceType.ANDROID, 1);
 
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.CACHING_FOR_SESSION_DISCONNECTION_REASON_IS_DISABLED))
+                .expectErrorMatches(throwable -> ExceptionUtil.isStatusCode(throwable, TurmsStatusCode.SESSION_DISCONNECTION_REASON_CACHE_IS_DISABLED))
                 .verify();
     }
 

@@ -89,12 +89,12 @@ public class TurmsStatusCode {
     // User
 
     // User - Login
-    public static final int LOGIN_USER_ID_IS_NULL = 2000;
+    public static final int LOGIN_USER_ID_NOT_NUMBER = 2000;
     public static final int LOGIN_AUTHENTICATION_FAILED = 2001;
     public static final int LOGGING_IN_USER_NOT_ACTIVE = 2002;
     public static final int LOGIN_FROM_FORBIDDEN_DEVICE_TYPE = 2003;
     public static final int FORBIDDEN_DEVICE_TYPE_FOR_LOGIN_FAILURE_REASON = 2004;
-    public static final int CACHING_FOR_LOGIN_FAILURE_REASON_IS_DISABLED = 2005;
+    public static final int LOGIN_FAILURE_REASON_CACHE_IS_DISABLED = 2005;
 
     // User - Session
     public static final int SESSION_SIMULTANEOUS_CONFLICTS_DECLINE = 2100;
@@ -102,7 +102,7 @@ public class TurmsStatusCode {
     public static final int SESSION_SIMULTANEOUS_CONFLICTS_OFFLINE = 2102;
     public static final int CREATE_EXISTING_SESSION = 2103;
     public static final int FORBIDDEN_DEVICE_TYPE_FOR_SESSION_DISCONNECTION_REASON = 2104;
-    public static final int CACHING_FOR_SESSION_DISCONNECTION_REASON_IS_DISABLED = 2105;
+    public static final int SESSION_DISCONNECTION_REASON_CACHE_IS_DISABLED = 2105;
 
     // User - Location
     public static final int USER_LOCATION_RELATED_FEATURES_ARE_DISABLED = 2200;
@@ -130,7 +130,9 @@ public class TurmsStatusCode {
 
     // Group - Info
     public static final int UPDATE_INFO_OF_NON_EXISTING_GROUP = 3000;
-    public static final int NO_PERMISSION_TO_UPDATE_GROUP_INFO = 3001;
+    public static final int NOT_OWNER_TO_UPDATE_GROUP_INFO = 3001;
+    public static final int NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_INFO = 3002;
+    public static final int NOT_MEMBER_TO_UPDATE_GROUP_INFO = 3003;
 
     // Group - Type
     public static final int NO_PERMISSION_TO_CREATE_GROUP_WITH_GROUP_TYPE = 3100;
@@ -138,72 +140,82 @@ public class TurmsStatusCode {
 
     // Group - Ownership
     public static final int NOT_ACTIVE_USER_TO_CREATE_GROUP = 3200;
-    public static final int NO_PERMISSION_TO_TRANSFER_GROUP = 3201;
-    public static final int NO_PERMISSION_TO_DELETE_GROUP = 3202;
+    public static final int NOT_OWNER_TO_TRANSFER_GROUP = 3201;
+    public static final int NOT_OWNER_TO_DELETE_GROUP = 3202;
     public static final int SUCCESSOR_NOT_GROUP_MEMBER = 3203;
-    public static final int MAX_OWNED_GROUPS_REACHED = 3204;
+    public static final int OWNER_QUITS_WITHOUT_SPECIFYING_SUCCESSOR = 3204;
+    public static final int MAX_OWNED_GROUPS_REACHED = 3205;
+    public static final int TRANSFER_NON_EXISTING_GROUP = 3206;
 
     // Group - Question
-    public static final int NO_PERMISSION_TO_CREATE_GROUP_QUESTION = 3300;
-    public static final int NO_PERMISSION_TO_DELETE_GROUP_QUESTION = 3301;
-    public static final int NO_PERMISSION_TO_UPDATE_GROUP_QUESTION = 3302;
-    public static final int NO_PERMISSION_TO_ACCESS_GROUP_QUESTION_ANSWER = 3303;
+    public static final int NOT_OWNER_OR_MANAGER_TO_CREATE_GROUP_QUESTION = 3300;
+    public static final int NOT_OWNER_OR_MANAGER_TO_DELETE_GROUP_QUESTION = 3301;
+    public static final int NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_QUESTION = 3302;
+    public static final int NOT_OWNER_OR_MANAGER_TO_ACCESS_GROUP_QUESTION_ANSWER = 3303;
     public static final int GROUP_QUESTION_ANSWERER_HAS_BEEN_BLOCKED = 3304;
     public static final int MEMBER_CANNOT_ANSWER_GROUP_QUESTION = 3305;
     public static final int ANSWER_QUESTION_OF_INACTIVE_GROUP = 3306;
 
     // Group - Member
-    public static final int NO_PERMISSION_TO_REMOVE_GROUP_MEMBER_INFO = 3400;
-    public static final int NO_PERMISSION_TO_UPDATE_GROUP_MEMBER_INFO = 3401;
-    public static final int USER_NOT_GROUP_MEMBER = 3402;
-    public static final int MEMBER_HAS_BEEN_MUTED = 3403;
-    public static final int GUESTS_HAVE_BEEN_MUTED = 3404;
-    public static final int ADD_INACTIVE_BLOCKED_USER_TO_GROUP = 3405;
+    public static final int NOT_OWNER_OR_MANAGER_TO_REMOVE_GROUP_MEMBER = 3400;
+    public static final int NOT_OWNER_TO_UPDATE_GROUP_MEMBER_INFO = 3401;
+    public static final int NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_MEMBER_INFO = 3402;
+    public static final int NOT_MEMBER_TO_QUERY_MEMBER_INFO = 3403;
+    public static final int ADD_BLOCKED_USER_TO_GROUP = 3404;
+    public static final int ADD_BLOCKED_USER_TO_INACTIVE_GROUP = 3405;
     public static final int ADD_USER_TO_INACTIVE_GROUP = 3406;
+    public static final int ADD_NEW_MEMBER_WITH_ROLE_HIGHER_THAN_REQUESTER = 3407;
 
     // Group - Blocklist
-    public static final int NOT_OWNER_OR_MANAGER_TO_BLOCK_GROUP_USER = 3500;
+    public static final int NOT_OWNER_OR_MANAGER_TO_ADD_BLOCKED_USER = 3500;
+    public static final int NOT_OWNER_OR_MANAGER_TO_REMOVE_BLOCKED_USER = 3501;
 
     // Group - Join Request
     public static final int GROUP_JOIN_REQUEST_SENDER_HAS_BEEN_BLOCKED = 3600;
-    public static final int REQUESTER_NOT_JOIN_REQUEST_SENDER = 3601;
-    public static final int NO_PERMISSION_TO_ACCESS_GROUP_REQUEST = 3602;
-    public static final int GROUP_JOIN_REQUEST_NOT_PENDING = 3603;
+    public static final int NOT_JOIN_REQUEST_SENDER_TO_RECALL_REQUEST = 3601;
+    public static final int NOT_OWNER_OR_MANAGER_TO_ACCESS_GROUP_REQUEST = 3602;
+    public static final int RECALL_NOT_PENDING_GROUP_JOIN_REQUEST = 3603;
     public static final int SEND_JOIN_REQUEST_TO_INACTIVE_GROUP = 3604;
     public static final int RECALLING_GROUP_JOIN_REQUEST_IS_DISABLED = 3605;
 
     // Group - Invitation
-    public static final int GROUP_INVITER_NOT_MEMBER = 3701;
-    public static final int GROUP_INVITEE_ALREADY_GROUP_MEMBER = 3702;
-    public static final int NO_PERMISSION_TO_ACCESS_INVITATION = 3703;
-    public static final int INVITEE_HAS_BEEN_BLOCKED = 3704;
-    public static final int RECALLING_GROUP_INVITATION_IS_DISABLED = 3705;
-    public static final int REDUNDANT_GROUP_INVITATION = 3706;
-    public static final int GROUP_INVITATION_NOT_PENDING = 3707;
+    public static final int GROUP_INVITER_NOT_MEMBER = 3700;
+    public static final int GROUP_INVITEE_ALREADY_GROUP_MEMBER = 3701;
+    public static final int NOT_OWNER_OR_MANAGER_TO_RECALL_INVITATION = 3702;
+    public static final int NOT_OWNER_OR_MANAGER_TO_ACCESS_INVITATION = 3703;
+    public static final int NOT_OWNER_TO_SEND_INVITATION = 3704;
+    public static final int NOT_OWNER_OR_MANAGER_TO_SEND_INVITATION = 3705;
+    public static final int NOT_MEMBER_TO_SEND_INVITATION = 3706;
+    public static final int INVITEE_HAS_BEEN_BLOCKED = 3707;
+    public static final int RECALLING_GROUP_INVITATION_IS_DISABLED = 3708;
+    public static final int REDUNDANT_GROUP_INVITATION = 3709;
+    public static final int RECALL_NOT_PENDING_GROUP_INVITATION = 3710;
 
     // Conversation
     public static final int UPDATING_TYPING_STATUS_IS_DISABLED = 4000;
 
     // Message
-    public static final int MESSAGE_RECALL_TIMEOUT = 5000;
 
     // Message - Send
-    public static final int MESSAGE_RECIPIENT_NOT_ACTIVE = 5100;
-    public static final int MESSAGE_SENDER_NOT_IN_CONTACTS_OR_BLOCKED = 5101;
-    public static final int PRIVATE_MESSAGE_SENDER_HAS_BEEN_BLOCKED = 5102;
-    public static final int GROUP_MESSAGE_SENDER_HAS_BEEN_BLOCKED = 5103;
-    public static final int SEND_MESSAGE_TO_INACTIVE_GROUP = 5104;
-    public static final int SEND_MESSAGE_TO_MUTED_GROUP = 5105;
-    public static final int SENDING_MESSAGES_TO_ONESELF_IS_DISABLED = 5106;
+    public static final int MESSAGE_RECIPIENT_NOT_ACTIVE = 5000;
+    public static final int MESSAGE_SENDER_NOT_IN_CONTACTS_OR_BLOCKED = 5001;
+    public static final int PRIVATE_MESSAGE_SENDER_HAS_BEEN_BLOCKED = 5002;
+    public static final int GROUP_MESSAGE_SENDER_HAS_BEEN_BLOCKED = 5003;
+    public static final int SEND_MESSAGE_TO_INACTIVE_GROUP = 5004;
+    public static final int SEND_MESSAGE_TO_MUTED_GROUP = 5005;
+    public static final int SENDING_MESSAGES_TO_ONESELF_IS_DISABLED = 5006;
+    public static final int MUTED_MEMBER_SEND_MESSAGE = 5007;
+    public static final int GUESTS_HAVE_BEEN_MUTED = 5008;
 
     // Message - Update
-    public static final int UPDATING_MESSAGE_BY_SENDER_IS_DISABLED = 5200;
-    public static final int NOT_SENDER_TO_UPDATE_MESSAGE = 5201;
-    public static final int UPDATE_MESSAGE_REQUESTER_NOT_MESSAGE_RECIPIENT = 5202;
+    public static final int UPDATING_MESSAGE_BY_SENDER_IS_DISABLED = 5100;
+    public static final int NOT_SENDER_TO_UPDATE_MESSAGE = 5101;
+    public static final int NOT_MESSAGE_RECIPIENT_TO_UPDATE_MESSAGE_READ_DATE = 5102;
 
     // Message - Recall
-    public static final int RECALL_NON_EXISTING_MESSAGE = 5300;
-    public static final int RECALLING_MESSAGE_IS_DISABLED = 5301;
+    public static final int RECALL_NON_EXISTING_MESSAGE = 5200;
+    public static final int RECALLING_MESSAGE_IS_DISABLED = 5201;
+    public static final int MESSAGE_RECALL_TIMEOUT = 5202;
 
     // Storage
     public static final int STORAGE_NOT_IMPLEMENTED = 6000;
@@ -213,11 +225,11 @@ public class TurmsStatusCode {
     public static final int REDUNDANT_REQUEST_FOR_PRESIGNED_PROFILE_URL = 6900;
 
     public static boolean isSuccessCode(int businessCode) {
-        return 1000 <= businessCode && businessCode < 2000;
+        return 1000 <= businessCode && businessCode < 1100;
     }
 
     public static boolean isServerError(int businessCode) {
-        return 5000 <= businessCode && businessCode < 6000;
+        return (1200 <= businessCode && businessCode < 1300) || (200 <= businessCode && businessCode < 300);
     }
 
 }

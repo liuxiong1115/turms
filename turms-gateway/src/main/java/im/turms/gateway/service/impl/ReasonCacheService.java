@@ -174,7 +174,7 @@ public class ReasonCacheService {
                                                 @NotNull DeviceType deviceType,
                                                 @NotNull Integer sessionId) {
         if (!enableQueryDisconnectionReason) {
-            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.CACHING_FOR_SESSION_DISCONNECTION_REASON_IS_DISABLED));
+            return Mono.error(TurmsBusinessException.get(TurmsStatusCode.SESSION_DISCONNECTION_REASON_CACHE_IS_DISABLED));
         } else if (!degradedDeviceTypesForDisconnectionReason.contains(deviceType)) {
             return Mono.error(TurmsBusinessException.get(TurmsStatusCode.FORBIDDEN_DEVICE_TYPE_FOR_SESSION_DISCONNECTION_REASON));
         } else {

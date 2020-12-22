@@ -383,7 +383,7 @@ public class MessageServiceController {
         return messageService.isMessageRecipient(messageId, userId)
                 .flatMap(isMessageRecipient -> {
                     if (!isMessageRecipient) {
-                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_MESSAGE_RECIPIENT_TO_UPDATE_MESSAGE_REQUESTER));
+                        return Mono.error(TurmsBusinessException.get(TurmsStatusCode.NOT_MESSAGE_RECIPIENT_TO_UPDATE_MESSAGE_READ_DATE));
                     }
                     Date date = null;
                     if (readDate != null) {

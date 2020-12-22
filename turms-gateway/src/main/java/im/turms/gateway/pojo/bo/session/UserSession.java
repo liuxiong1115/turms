@@ -64,6 +64,7 @@ public final class UserSession {
     private final Sinks.Many<ByteBuf> notificationSink = Sinks.many().unicast()
             .onBackpressureBuffer(Queues.<ByteBuf>unbounded(64).get());
     private Timeout heartbeatTimeout;
+    @Nullable
     private Long logId;
     private volatile long lastHeartbeatTimestampMillis;
     private volatile long lastRequestTimestampMillis;
@@ -80,8 +81,8 @@ public final class UserSession {
 
     public UserSession(Long userId,
                        DeviceType loggingInDeviceType,
-                       Point loginLocation,
-                       Long logId) {
+                       @Nullable Point loginLocation,
+                       @Nullable Long logId) {
         Date now = new Date();
         this.userId = userId;
         this.deviceType = loggingInDeviceType;

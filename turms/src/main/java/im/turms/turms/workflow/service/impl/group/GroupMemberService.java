@@ -366,7 +366,7 @@ public class GroupMemberService {
                 .flatMap(inviterRole -> groupService.queryGroupType(groupId)
                         .flatMap(groupType -> {
                             GroupInvitationStrategy strategy = groupType.getInvitationStrategy();
-                            TurmsStatusCode code = isRoleAuthorizedToAddNewRole(inviterRole, newMemberRole, strategy);
+                            TurmsStatusCode code = isAllowedToInviteUserWithSpecifiedRole(inviterRole, newMemberRole, strategy);
                             if (code == TurmsStatusCode.OK) {
                                 return Mono.just(Pair.of(ServicePermission.OK, strategy));
                             } else {
@@ -718,18 +718,20 @@ public class GroupMemberService {
         } catch (TurmsBusinessException e) {
             return Mono.error(e);
         }
-        Mono<Boolean> isAuthorizedMono;
+        Mono<TurmsStatusCode> isAuthorizedMono;
         if (role != null) {
-            isAuthorizedMono = isOwner(requesterId, groupId);
+            isAuthorizedMono = isOwner(requesterId, groupId)
+                    .map(isOwner -> isOwner ? TurmsStatusCode.OK : TurmsStatusCode.NOT_OWNER_TO_UPDATE_GROUP_MEMBER_INFO);
         } else if (muteEndDate != null || (name != null && !requesterId.equals(memberId))) {
-            isAuthorizedMono = isOwnerOrManager(requesterId, groupId);
+            isAuthorizedMono = isOwnerOrManager(requesterId, groupId)
+                    .map(isOwnerOrManager -> isOwnerOrManager ? TurmsStatusCode.OK : TurmsStatusCode.NOT_OWNER_OR_MANAGER_TO_UPDATE_GROUP_MEMBER_INFO);
         } else {
             return Mono.just(OperationResultConstant.ACKNOWLEDGED_UPDATE_RESULT);
         }
         return isAuthorizedMono
-                .flatMap(isAuthorized -> isAuthorized != null && isAuthorized
+                .flatMap(code -> code == TurmsStatusCode.OK
                         ? updateGroupMember(groupId, memberId, name, role, new Date(), muteEndDate, null, false)
-                        : Mono.error(TurmsBusinessException.get(TurmsStatusCode.NO_PERMISSION_TO_UPDATE_GROUP_MEMBER_INFO)));
+                        : Mono.error(TurmsBusinessException.get(code)));
     }
 
     public Mono<DeleteResult> deleteAllGroupMembers(
@@ -793,9 +795,9 @@ public class GroupMemberService {
                 });
     }
 
-    private TurmsStatusCode isRoleAuthorizedToAddNewRole(@NotNull GroupMemberRole requesterRole,
-                                                 @Nullable GroupMemberRole newMemberRole,
-                                                 @NotNull GroupInvitationStrategy groupInvitationStrategy) {
+    private TurmsStatusCode isAllowedToInviteUserWithSpecifiedRole(@NotNull GroupMemberRole requesterRole,
+                                                                   @Nullable GroupMemberRole newMemberRole,
+                                                                   @NotNull GroupInvitationStrategy groupInvitationStrategy) {
         TurmsStatusCode isAllowToAddRole;
         switch (groupInvitationStrategy) {
             case OWNER:
