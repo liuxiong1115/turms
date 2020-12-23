@@ -363,7 +363,7 @@ public class GroupService {
                     if (data.hasGroupJoinQuestionAnswerResult()) {
                         return data.getGroupJoinQuestionAnswerResult();
                     } else {
-                        throw TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION);
+                        throw TurmsBusinessException.get(TurmsStatusCode.INVALID_RESPONSE);
                     }
                 });
     }

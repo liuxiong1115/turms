@@ -134,11 +134,7 @@ public class MessageService {
                         future.complete(notification);
                     } else {
                         TurmsBusinessException exception = TurmsBusinessException.get(notification);
-                        if (exception != null) {
-                            future.completeExceptionally(exception);
-                        } else {
-                            LOGGER.log(Level.WARNING, "Unknown status code");
-                        }
+                        future.completeExceptionally(exception);
                     }
                 } else {
                     future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION, "The code is missing"));

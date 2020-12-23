@@ -200,7 +200,7 @@ public class StorageService {
                 if (body != null) {
                     future.complete(body.bytes());
                 } else {
-                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION));
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_RESPONSE));
                 }
             }
         });
@@ -225,7 +225,7 @@ public class StorageService {
                 if (body != null) {
                     future.complete(body.string());
                 } else {
-                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION));
+                    future.completeExceptionally(TurmsBusinessException.get(TurmsStatusCode.INVALID_RESPONSE));
                 }
             }
         });

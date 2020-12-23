@@ -35,7 +35,7 @@ public class NotificationUtil {
         if (ids.getValuesCount() > 0) {
             return ids.getValues(0);
         } else {
-            throw TurmsBusinessException.get(TurmsStatusCode.INVALID_NOTIFICATION);
+            throw TurmsBusinessException.get(TurmsStatusCode.INVALID_RESPONSE);
         }
     }
 

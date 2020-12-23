@@ -41,6 +41,7 @@ public class TurmsStatusCode {
 
     // Server - Notification
     public static final int INVALID_NOTIFICATION = 200;
+    public static final int INVALID_RESPONSE = 201;
 
     //**********************************************************
     //* For business error
@@ -48,7 +49,7 @@ public class TurmsStatusCode {
 
     // User - Session
     public static final int CLIENT_SESSION_ALREADY_ESTABLISHED = 300;
-    public static final int CLIENT_SESSION_HAS_BEEN_CLOSED = 300;
+    public static final int CLIENT_SESSION_HAS_BEEN_CLOSED = 301;
 
     // Message
     public static final int MESSAGE_IS_REJECTED = 400;

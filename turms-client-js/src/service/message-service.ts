@@ -75,7 +75,7 @@ export default class MessageService {
             return TurmsBusinessError.notFalsy('targetId');
         }
         if (RequestUtil.isFalsy(text) && RequestUtil.isFalsy(records)) {
-            return Promise.reject(TurmsBusinessError.fromCode(TurmsStatusCode.ILLEGAL_TEXT_AND_RECORDS));
+            return Promise.reject(TurmsBusinessError.from(TurmsStatusCode.ILLEGAL_ARGUMENT, "text and records must not all be null"));
         }
         if (!deliveryDate) {
             deliveryDate = new Date();

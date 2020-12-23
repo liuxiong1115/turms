@@ -78,7 +78,7 @@ export default class MessageService {
             const now = new Date();
             const isFrequent = this._minRequestInterval > 0 && now.getTime() - this._stateStore.lastRequestDate.getTime() <= this._minRequestInterval;
             if (isFrequent) {
-                reject(TurmsBusinessError.fromCode(TurmsStatusCode.REQUESTS_TOO_FREQUENT));
+                reject(TurmsBusinessError.fromCode(TurmsStatusCode.CLIENT_REQUESTS_TOO_FREQUENT));
             } else {
                 const requestId = RequestUtil.generateRandomId(this._requestMap);
                 message.requestId = {
@@ -123,7 +123,7 @@ export default class MessageService {
                             cb.reject(TurmsBusinessError.fromNotification(notification));
                         }
                     } else {
-                        cb.reject(TurmsBusinessError.fromCode('Invalid notification: the code is missing'))
+                        cb.reject(TurmsBusinessError.from(TurmsStatusCode.INVALID_NOTIFICATION, "The code is missing"))
                     }
                 }
             }
